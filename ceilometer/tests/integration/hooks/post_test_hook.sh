@@ -52,6 +52,20 @@ set +e
 
 sudo -E -H -u ${STACK_USER:-${USER}} tox -eintegration
 EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ] ; then
+    heat stack-show integration_test
+    ceilometer alarm-list
+    openstack server list
+
+    # TODO(sileht): replace by gnocchiclient when available
+    curl -s -X GET -H 'Content-Type: application/json' -H "X-Auth-Token: $ADMIN_TOKEN" $GNOCCHI_SERVICE_URL/v1/resource/instance | python -m "json.tool"
+    for instance_id in $(openstack server list -f value -c ID); do
+        output=$(curl -s -X GET -H 'Content-Type: application/json' -H "X-Auth-Token: $ADMIN_TOKEN" $GNOCCHI_SERVICE_URL/v1/resource/instance/$instance_id)
+        echo $output | python -m "json.tool" || echo -e "\n$output"
+    done
+fi
+
 set -e
 
 # Collect and parse result
