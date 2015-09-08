@@ -48,7 +48,7 @@ class ComplexQuery(base.Base):
     "The filter expression encoded in json."
 
     orderby = wtypes.text
-    "List of single-element dicts for specifing the ordering of the results."
+    "List of single-element dicts for specifying the ordering of the results."
 
     limit = int
     "The maximum number of results to be returned."
