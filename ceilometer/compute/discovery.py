@@ -37,8 +37,15 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
-        instances = self.nova_cli.instance_get_all_by_host(
-            cfg.CONF.host, self.last_run)
+        try:
+            instances = self.nova_cli.instance_get_all_by_host(
+                cfg.CONF.host, self.last_run)
+        except Exception:
+            # NOTE(zqfan): instance_get_all_by_host is wrapped and will log
+            # exception when there is any error. It is no need to raise it
+            # again and print one more time.
+            return []
+
         for instance in instances:
             if getattr(instance, 'OS-EXT-STS:vm_state', None) in ['deleted',
                                                                   'error']:

@@ -55,8 +55,14 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
         instance_get_all will return all instances if last_run is None,
         and will return only the instances changed since the last_run time.
         """
+        try:
+            instances = self.nova_cli.instance_get_all(self.last_run)
+        except Exception:
+            # NOTE(zqfan): instance_get_all is wrapped and will log exception
+            # when there is any error. It is no need to raise it again and
+            # print one more time.
+            return []
 
-        instances = self.nova_cli.instance_get_all(self.last_run)
         for instance in instances:
             if getattr(instance, 'OS-EXT-STS:vm_state', None) in ['deleted',
                                                                   'error']:
