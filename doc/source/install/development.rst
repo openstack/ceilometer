@@ -44,14 +44,6 @@ Configuring devstack
 
 2. Create a ``local.conf`` file as input to devstack.
 
-   .. note::
-
-      ``local.conf`` replaces the former configuration file called ``localrc``.
-      If you used localrc before, remove it to switch to using the new file.
-      For further information see the `localrc description page
-      <http://devstack.org/localrc.html>`_ or `devstack configuration
-      <http://devstack.org/configuration.html>`_.
-
 3. Ceilometer makes extensive use of the messaging bus, but has not
    yet been tested with ZeroMQ. We recommend using Rabbit for
    now. By default, RabbitMQ will be used by devstack.
@@ -63,18 +55,13 @@ Configuring devstack
    ceilometer::
 
       [[local|localrc]]
-
+      # Enable the Ceilometer devstack plugin
+      enable_plugin ceilometer https://git.openstack.org/openstack/ceilometer.git
       # Enable the ceilometer metering services
-      enable_service ceilometer-acompute ceilometer-acentral ceilometer-anotification ceilometer-collector
+      enable_service ceilometer-acompute ceilometer-acentral ceilometer-anotification ceilometer-collector ceilometer-api
 
-      # Enable the ceilometer alarming services
-      enable_service ceilometer-alarm-evaluator,ceilometer-alarm-notifier
-
-      # Enable the ceilometer api services
-      enable_service ceilometer-api
-
-   The first group of daemons are necessary for core ceilometer functionality:
-   polling, event listening, and data collection.
+   Enabling the above services is necessary for core Ceilometer
+   functionalities: polling, event listening, and data collection.
 
 5. Nova does not generate the periodic notifications for all known
    instances by default. To enable these auditing events, set
