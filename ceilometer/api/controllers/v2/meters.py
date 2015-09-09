@@ -454,7 +454,7 @@ class Meter(base.Base):
         meter_id = '%s+%s' % (kwargs['resource_id'], kwargs['name'])
         # meter_id is of type Unicode but base64.encodestring() only accepts
         # strings. See bug #1333177
-        meter_id = base64.encodestring(meter_id.encode('utf-8'))
+        meter_id = base64.b64encode(meter_id.encode('utf-8'))
         kwargs['meter_id'] = meter_id
         super(Meter, self).__init__(**kwargs)
 
