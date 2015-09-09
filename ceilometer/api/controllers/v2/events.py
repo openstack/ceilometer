@@ -157,16 +157,19 @@ class Event(base.Base):
         )
 
 
-def _add_user_proj_filter():
-    traits_filter = []
+def _build_rbac_query_filters():
+    filters = {'t_filter': [], 'admin_proj': None}
     # Returns user_id, proj_id for non-admins
     user_id, proj_id = rbac.get_limited_to(pecan.request.headers)
     # If non-admin, filter events by user and project
-    if (user_id and proj_id):
-        traits_filter.append({"key": "project_id", "string": proj_id,
-                              "op": "eq"})
-        traits_filter.append({"key": "user_id", "string": user_id, "op": "eq"})
-    return traits_filter
+    if user_id and proj_id:
+        filters['t_filter'].append({"key": "project_id", "string": proj_id,
+                                    "op": "eq"})
+        filters['t_filter'].append({"key": "user_id", "string": user_id,
+                                    "op": "eq"})
+    elif not user_id and not proj_id:
+        filters['admin_proj'] = pecan.request.headers.get('X-Project-Id')
+    return filters
 
 
 def _event_query_to_event_filter(q):
@@ -176,7 +179,9 @@ def _event_query_to_event_filter(q):
         'start_timestamp': None,
         'end_timestamp': None
     }
-    traits_filter = _add_user_proj_filter()
+    filters = _build_rbac_query_filters()
+    traits_filter = filters['t_filter']
+    admin_proj = filters['admin_proj']
 
     for i in q:
         if not i.op:
@@ -193,7 +198,8 @@ def _event_query_to_event_filter(q):
             traits_filter.append({"key": i.field,
                                   trait_type: i._get_value_as_type(),
                                   "op": i.op})
-    return storage.EventFilter(traits_filter=traits_filter, **evt_model_filter)
+    return storage.EventFilter(traits_filter=traits_filter,
+                               admin_proj=admin_proj, **evt_model_filter)
 
 
 class TraitsController(rest.RestController):
@@ -279,8 +285,11 @@ class EventsController(rest.RestController):
         :param message_id: Message ID of the Event to be returned
         """
         rbac.enforce("events:show", pecan.request)
-        t_filter = _add_user_proj_filter()
+        filters = _build_rbac_query_filters()
+        t_filter = filters['t_filter']
+        admin_proj = filters['admin_proj']
         event_filter = storage.EventFilter(traits_filter=t_filter,
+                                           admin_proj=admin_proj,
                                            message_id=message_id)
         events = [event for event
                   in pecan.request.event_storage_conn.get_events(event_filter)]

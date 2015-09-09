@@ -141,9 +141,10 @@ class Connection(base.Connection):
             q_args['doc_type'] = ev_filter.event_type
         if ev_filter.message_id:
             filters.append({'term': {'_id': ev_filter.message_id}})
-        if ev_filter.traits_filter:
+        if ev_filter.traits_filter or ev_filter.admin_proj:
             trait_filters = []
-            for t_filter in ev_filter.traits_filter:
+            or_cond = []
+            for t_filter in ev_filter.traits_filter or []:
                 value = None
                 for val_type in ['integer', 'string', 'float', 'datetime']:
                     if t_filter.get(val_type):
@@ -164,9 +165,13 @@ class Connection(base.Connection):
                     if t_filter.get('op') == 'ne':
                         tf = {"not": tf}
                     trait_filters.append(tf)
+            if ev_filter.admin_proj:
+                or_cond = [{'missing': {'field': 'project_id'}},
+                           {'term': {'project_id': ev_filter.admin_proj}}]
             filters.append(
                 {'nested': {'path': 'traits', 'query': {'filtered': {
-                    'filter': {'bool': {'must': trait_filters}}}}}})
+                    'filter': {'bool': {'must': trait_filters,
+                                        'should': or_cond}}}}}})
 
         q_args['body'] = {'query': {'filtered':
                                     {'filter': {'bool': {'must': filters}}}}}

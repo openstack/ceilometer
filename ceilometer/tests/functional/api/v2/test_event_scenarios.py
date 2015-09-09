@@ -540,6 +540,51 @@ class AclRestrictedEventTestBase(v2.FunctionalTest,
                              expect_errors=True)
         self.assertEqual(404, data.status_int)
 
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'es', 'db2')
+    def test_admin_access(self):
+        a_headers = {"X-Roles": "admin",
+                     "X-User-Id": self.admin_user_id,
+                     "X-Project-Id": self.admin_proj_id}
+        data = self.get_json('/events', headers=a_headers)
+        self.assertEqual(2, len(data))
+        self.assertEqual(set(['empty_ev', 'admin_ev']),
+                         set(ev['event_type'] for ev in data))
+
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'es', 'db2')
+    def test_admin_access_trait_filter(self):
+        a_headers = {"X-Roles": "admin",
+                     "X-User-Id": self.admin_user_id,
+                     "X-Project-Id": self.admin_proj_id}
+        data = self.get_json('/events', headers=a_headers,
+                             q=[{'field': 'random',
+                                 'value': 'blah',
+                                 'type': 'string',
+                                 'op': 'eq'}])
+        self.assertEqual(1, len(data))
+        self.assertEqual('empty_ev', data[0]['event_type'])
+
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'es', 'db2')
+    def test_admin_access_single(self):
+        a_headers = {"X-Roles": "admin",
+                     "X-User-Id": self.admin_user_id,
+                     "X-Project-Id": self.admin_proj_id}
+        data = self.get_json('/events/1', headers=a_headers)
+        self.assertEqual('empty_ev', data['event_type'])
+        data = self.get_json('/events/2', headers=a_headers)
+        self.assertEqual('admin_ev', data['event_type'])
+
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'es', 'db2')
+    def test_admin_access_trait_filter_no_access(self):
+        a_headers = {"X-Roles": "admin",
+                     "X-User-Id": self.admin_user_id,
+                     "X-Project-Id": self.admin_proj_id}
+        data = self.get_json('/events', headers=a_headers,
+                             q=[{'field': 'user_id',
+                                 'value': self.user_id,
+                                 'type': 'string',
+                                 'op': 'eq'}])
+        self.assertEqual(0, len(data))
+
 
 class EventRestrictionTestBase(v2.FunctionalTest,
                                tests_db.MixinTestsWithBackendScenarios):
