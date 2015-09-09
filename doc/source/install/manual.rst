@@ -117,7 +117,7 @@ Installing the notification agent
 
 1. If you want to be able to retrieve image samples, you need to instruct
    Glance to send notifications to the bus by changing ``notifier_strategy``
-   to ``rabbit`` or ``qpid`` in ``glance-api.conf`` and restarting the
+   to ``rabbit`` in ``glance-api.conf`` and restarting the
    service.
 
 2. If you want to be able to retrieve volume samples, you need to instruct
@@ -211,8 +211,8 @@ Installing the notification agent
       .. note::
 
          Ceilometer makes extensive use of the messaging bus, but has
-         not yet been tested with ZeroMQ. We recommend using Rabbit or
-         qpid for now.
+         not yet been tested with ZeroMQ. We recommend using Rabbit
+         for now.
 
    2. Set the ``telemetry_secret`` value.
 
@@ -283,8 +283,8 @@ Installing the collector
       .. note::
 
          Ceilometer makes extensive use of the messaging bus, but has
-         not yet been tested with ZeroMQ. We recommend using Rabbit or
-         qpid for now.
+         not yet been tested with ZeroMQ. We recommend using Rabbit
+         for now.
 
    2. Set the ``telemetry_secret`` value.
 
@@ -355,8 +355,8 @@ Installing the Polling Agent
    .. note::
 
       Ceilometer makes extensive use of the messaging bus, but has
-      not yet been tested with ZeroMQ. We recommend using Rabbit or
-      qpid for now.
+      not yet been tested with ZeroMQ. We recommend using Rabbit
+      for now.
 
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
@@ -422,8 +422,8 @@ Installing the API Server
       .. note::
 
          Ceilometer makes extensive use of the messaging bus, but has
-         not yet been tested with ZeroMQ. We recommend using Rabbit or
-         qpid for now.
+         not yet been tested with ZeroMQ. We recommend using Rabbit
+         for now.
 
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.

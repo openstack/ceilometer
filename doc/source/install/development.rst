@@ -53,7 +53,7 @@ Configuring devstack
       <http://devstack.org/configuration.html>`_.
 
 3. Ceilometer makes extensive use of the messaging bus, but has not
-   yet been tested with ZeroMQ. We recommend using Rabbit or qpid for
+   yet been tested with ZeroMQ. We recommend using Rabbit for
    now. By default, RabbitMQ will be used by devstack.
 
 4. The ceilometer services are not enabled by default, so they must be
