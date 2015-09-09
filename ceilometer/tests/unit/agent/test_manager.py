@@ -19,11 +19,13 @@ import shutil
 
 import eventlet
 import mock
+from novaclient import client as novaclient
 from oslo_service import service as os_service
 from oslo_utils import fileutils
 from oslo_utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
+import requests
 import six
 from stevedore import extension
 import yaml
@@ -31,6 +33,7 @@ import yaml
 from ceilometer.agent import base as agent_base
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
+from ceilometer.hardware import discovery
 from ceilometer import pipeline
 from ceilometer.tests.unit.agent import agentbase
 
@@ -299,6 +302,54 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
+
+    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.nova_client.LOG')
+    def test_hardware_discover_fail_minimize_logs(self, novalog, baselog):
+        self.useFixture(mockpatch.PatchObject(
+            novaclient.HTTPClient,
+            'authenticate',
+            side_effect=requests.ConnectionError))
+
+        class PollsterHardware(agentbase.TestPollster):
+            discovery = 'tripleo_overcloud_nodes'
+
+        class PollsterHardwareAnother(agentbase.TestPollster):
+            discovery = 'tripleo_overcloud_nodes'
+
+        self.mgr.extensions.extend([
+            extension.Extension('testhardware',
+                                None,
+                                None,
+                                PollsterHardware(), ),
+            extension.Extension('testhardware2',
+                                None,
+                                None,
+                                PollsterHardwareAnother(), )
+        ])
+        ext = extension.Extension('tripleo_overcloud_nodes',
+                                  None,
+                                  None,
+                                  discovery.NodesDiscoveryTripleO())
+        self.mgr.discovery_manager = (extension.ExtensionManager
+                                      .make_test_instance([ext]))
+
+        self.pipeline_cfg = {
+            'sources': [{
+                'name': "test_hardware",
+                'interval': 10,
+                'meters': ['testhardware', 'testhardware2'],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ["test"]}]
+        }
+        self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(list(polling_tasks.values())[0])
+        self.assertEqual(1, novalog.exception.call_count)
+        self.assertFalse(baselog.exception.called)
 
     @mock.patch('ceilometer.agent.base.LOG')
     def test_polling_exception(self, LOG):
