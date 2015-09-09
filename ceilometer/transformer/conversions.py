@@ -20,15 +20,15 @@ from oslo_log import log
 from oslo_utils import timeutils
 import six
 
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LW
 from ceilometer import sample
 from ceilometer import transformer
 
 LOG = log.getLogger(__name__)
 
 
-class ScalingTransformer(transformer.TransformerBase):
-    """Transformer to apply a scaling conversion."""
+class BaseConversionTransformer(transformer.TransformerBase):
+    """Transformer to derive conversion."""
 
     grouping_keys = ['resource_id']
 
@@ -44,22 +44,7 @@ class ScalingTransformer(transformer.TransformerBase):
         target = target or {}
         self.source = source
         self.target = target
-        self.scale = target.get('scale')
-        LOG.debug('scaling conversion transformer with source:'
-                  ' %(source)s target: %(target)s:', {'source': source,
-                                                      'target': target})
-        super(ScalingTransformer, self).__init__(**kwargs)
-
-    def _scale(self, s):
-        """Apply the scaling factor.
-
-        Either a straight multiplicative factor or else a string to be eval'd.
-        """
-        ns = transformer.Namespace(s.as_dict())
-
-        scale = self.scale
-        return ((eval(scale, {}, ns) if isinstance(scale, six.string_types)
-                 else s.volume * scale) if scale else s.volume)
+        super(BaseConversionTransformer, self).__init__(**kwargs)
 
     def _map(self, s, attr):
         """Apply the name or unit mapping if configured."""
@@ -73,6 +58,93 @@ class ScalingTransformer(transformer.TransformerBase):
                 except Exception:
                     pass
         return mapped or self.target.get(attr, getattr(s, attr))
+
+
+class DeltaTransformer(BaseConversionTransformer):
+    """Transformer based on the delta of a sample volume."""
+
+    def __init__(self, target=None, growth_only=False, **kwargs):
+        """Initialize transformer with configured parameters.
+
+        :param growth_only: capture only positive deltas
+        """
+        super(DeltaTransformer, self).__init__(target=target, **kwargs)
+        self.growth_only = growth_only
+        self.cache = {}
+
+    def handle_sample(self, context, s):
+        """Handle a sample, converting if necessary."""
+        key = s.name + s.resource_id
+        prev = self.cache.get(key)
+        timestamp = timeutils.parse_isotime(s.timestamp)
+        self.cache[key] = (s.volume, timestamp)
+
+        if prev:
+            prev_volume = prev[0]
+            prev_timestamp = prev[1]
+            time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
+            # disallow violations of the arrow of time
+            if time_delta < 0:
+                LOG.warn(_LW('Dropping out of time order sample: %s'), (s,))
+                # Reset the cache to the newer sample.
+                self.cache[key] = prev
+                return None
+            volume_delta = s.volume - prev_volume
+            if self.growth_only and volume_delta < 0:
+                LOG.warn(_LW('Negative delta detected, dropping value'))
+                s = None
+            else:
+                s = self._convert(s, volume_delta)
+                LOG.debug('Converted to: %s', s)
+        else:
+            LOG.warn(_LW('Dropping sample with no predecessor: %s'),
+                     (s,))
+            s = None
+        return s
+
+    def _convert(self, s, delta):
+        """Transform the appropriate sample fields."""
+        return sample.Sample(
+            name=self._map(s, 'name'),
+            unit=s.unit,
+            type=sample.TYPE_DELTA,
+            volume=delta,
+            user_id=s.user_id,
+            project_id=s.project_id,
+            resource_id=s.resource_id,
+            timestamp=s.timestamp,
+            resource_metadata=s.resource_metadata
+        )
+
+
+class ScalingTransformer(BaseConversionTransformer):
+    """Transformer to apply a scaling conversion."""
+
+    def __init__(self, source=None, target=None, **kwargs):
+        """Initialize transformer with configured parameters.
+
+        :param source: dict containing source sample unit
+        :param target: dict containing target sample name, type,
+                       unit and scaling factor (a missing value
+                       connotes no change)
+        """
+        super(ScalingTransformer, self).__init__(source=source, target=target,
+                                                 **kwargs)
+        self.scale = self.target.get('scale')
+        LOG.debug('scaling conversion transformer with source:'
+                  ' %(source)s target: %(target)s:', {'source': self.source,
+                                                      'target': self.target})
+
+    def _scale(self, s):
+        """Apply the scaling factor.
+
+        Either a straight multiplicative factor or else a string to be eval'd.
+        """
+        ns = transformer.Namespace(s.as_dict())
+
+        scale = self.scale
+        return ((eval(scale, {}, ns) if isinstance(scale, six.string_types)
+                 else s.volume * scale) if scale else s.volume)
 
     def _convert(self, s, growth=1):
         """Transform the appropriate sample fields."""
