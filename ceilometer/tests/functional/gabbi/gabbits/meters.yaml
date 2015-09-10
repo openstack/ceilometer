@@ -352,3 +352,32 @@ tests:
       url: /v2/meters/apples/statistics?aggregate.func=max
       response_json_paths:
           $[0].aggregate.max: 3.0
+
+# limit meters results
+
+    - name: get meters ulimited
+      url: /v2/meters
+      response_json_paths:
+          $.`len`: 2
+
+    - name: get meters limited
+      url: /v2/meters?limit=1
+      response_json_paths:
+          $.`len`: 1
+
+    - name: get meters double limit
+      url: /v2/meters?limit=1&limit=1
+      status: 400
+
+    - name: get meters filter limit
+      desc: expressing limit this way is now disallowed
+      url: /v2/meters?q.field=limit&q.op=eq&q.type=&q.value=1
+      status: 400
+      response_strings:
+          - Limit is not a valid field for queries,
+
+    - name: get meters filter limit and limit
+      url: /v2/meters?q.field=limit&q.op=eq&q.type=&q.value=1&limit=1
+      status: 400
+      response_strings:
+          - Limit is not a valid field for queries,

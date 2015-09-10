@@ -55,3 +55,32 @@ tests:
       response_json_paths:
           $[0].links[0].rel: self
           $[0].links[-1].rel: self
+
+# limit resource results
+
+    - name: get resources ulimited
+      url: /v2/resources
+      response_json_paths:
+          $.`len`: 1
+
+    - name: get resources limited
+      url: /v2/resources?limit=1
+      response_json_paths:
+          $.`len`: 1
+
+    - name: get resources double limit
+      url: /v2/resources?limit=1&limit=1
+      status: 400
+
+    - name: get resources filter limit
+      desc: expressing limit this way is now disallowed
+      url: /v2/resources?q.field=limit&q.op=eq&q.type=&q.value=1
+      status: 400
+      response_strings:
+          - Limit is not a valid field for queries,
+
+    - name: get resources filter limit and limit
+      url: /v2/resources?q.field=limit&q.op=eq&q.type=&q.value=1&limit=1
+      status: 400
+      response_strings:
+          - Limit is not a valid field for queries,

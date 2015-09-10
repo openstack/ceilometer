@@ -143,6 +143,10 @@ class ResourcesController(rest.RestController):
         limit = utils.enforce_limit(limit)
         kwargs = utils.query_to_kwargs(
             q, pecan.request.storage_conn.get_resources)
+        if 'limit' in kwargs:
+            raise base.ClientSideError(_(
+                "Limit is not a valid field for queries, "
+                "use 'limit' parameter."))
         resources = [
             Resource.from_db_and_links(r,
                                        self._resource_links(r.resource_id,
