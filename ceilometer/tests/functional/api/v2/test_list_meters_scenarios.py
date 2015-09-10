@@ -791,5 +791,5 @@ class TestListMeters(v2.FunctionalTest,
             self.assertEqual(expected, i['meter_id'])
             self.assertFalse(i['meter_id'].endswith('\n'))
             self.assertEqual(
-                [i['resource_id'].encode('utf-8'), i['name'].encode('utf-8')],
-                base64.b64decode(i['meter_id']).split('+'))
+                [i['resource_id'], i['name']],
+                base64.b64decode(i['meter_id']).decode('utf-8').split('+'))
