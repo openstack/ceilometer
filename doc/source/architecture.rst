@@ -31,12 +31,27 @@ collection and alarming, but also designed to work together as a
 complete solution:
 
 1. polling agent - daemon designed to poll OpenStack services and build Meters.
-2. notification agent - daemon designed to listen to notifications on message queue
-   and convert them to Events and Samples.
+2. notification agent - daemon designed to listen to notifications on message queue,
+   convert them to Events and Samples, and apply pipeline actions.
 3. collector - daemon designed to gather and record event and metering data
    created by notification and polling agents.
 4. api - service to query and view data recorded by collector service.
 5. alarming - daemons to evaluate and notify based on defined alarming rules.
+
+As Ceilometer has grown to capture more data, it became apparent that data
+storage would need to be optimised. To address this, Gnocchi_ (resource metering
+as a service) was developed to capture the data in a time series database to
+optimise storage and querying. Gnocchi is intended to replace the existing
+metering database interface.
+
+.. _Gnocchi: https://wiki.openstack.org/wiki/Gnocchi
+
+.. figure:: ./ceilo-gnocchi-arch.png
+   :width: 100%
+   :align: center
+   :alt: Ceilometer+Gnocchi Architecture summary
+
+   An overall summary of Ceilometer+Gnocchi's logical architecture.
 
 
 Gathering the data
@@ -82,10 +97,17 @@ Notification Agents: Listening for data
 .. index::
       double: notifications; architecture
 
+.. figure:: ./2-1-collection-notification.png
+   :width: 100%
+   :align: center
+   :alt: Notification agents
+
+   Notification agents consuming messages from services.
+
 The heart of the system is the notification daemon (agent-notification)
 which monitors the message bus for data being provided by other
 OpenStack components such as Nova, Glance, Cinder, Neutron, Swift, Keystone,
-and Heat.
+and Heat, as well as Ceilometer internal communication.
 
 The notification daemon loads one or more *listener* plugins, using the
 namespace ``ceilometer.notification``. Each plugin can listen to any topics,
@@ -115,6 +137,13 @@ Polling Agents: Asking for data
 .. index::
       double: polling; architecture
 
+.. figure:: ./2-2-collection-poll.png
+   :width: 100%
+   :align: center
+   :alt: Polling agents
+
+   Polling agents querying services for data.
+
 Polling for compute resources is handled by a polling agent running
 on the compute node (where communication with the hypervisor is more
 efficient), often referred to as the compute-agent. Polling via
@@ -137,6 +166,8 @@ Please notice that there's an optional config called
 setting an integer greater than zero to shuffle agents to start polling task,
 so as to add some random jitter to the time of sending requests to nova
 or other components to avoid large number of requests in short time.
+Additionally, there is an option to stream samples to minimise latency (at the
+expense of load) by setting ``batch_polled_samples`` to ``False`` in ceilometer.conf.
 
 
 Processing the data
@@ -155,7 +186,8 @@ Pipeline Manager
    The assembly of components making the Ceilometer pipeline.
 
 Ceilometer offers the ability to take data gathered by the agents, manipulate
-it, and publish it in various combinations via multiple pipelines.
+it, and publish it in various combinations via multiple pipelines. This
+functionality is handled by the notification agents.
 
 Transforming the data
 ---------------------
@@ -185,10 +217,9 @@ Publishing the data
 
 Currently, processed data can be published using 4 different transports:
 notifier, a notification based publisher which pushes samples to a message
-queue which can be consumed by the collector or an external system; rpc, a
-relatively secure, synchronous RPC based publisher; udp, which publishes
-samples using UDP packets; and kafka, which publishes data to a Kafka message
-queue to be consumed by any system that supports Kafka.
+queue which can be consumed by the collector or an external system; udp, which
+publishes samples using UDP packets; and kafka, which publishes data to a Kafka
+message queue to be consumed by any system that supports Kafka.
 
 
 Storing the data
@@ -282,6 +313,11 @@ Evaluating the data
 Alarming Service
 ----------------
 
+.. note::
+
+   This functionality has been moved to Aodh_ project. Existing functionality
+   is deprecated and will be removed post-Liberty.
+
 The alarming component of Ceilometer, first delivered in the Havana
 version, allows you to set alarms based on threshold evaluation for a
 collection of samples. An alarm can be set on a single meter, or on a
@@ -309,4 +345,5 @@ should be given to the section "Some notes about deploying alarming" as the
 database setup (using a separate database from the one used for metering)
 will be critical in all cases of production deployment.
 
+.. _Aodh: https://github.com/openstack/Aodh
 .. _Autoscaling with Heat and Ceilometer: http://techs.enovance.com/5991/autoscaling-with-heat-and-ceilometer
