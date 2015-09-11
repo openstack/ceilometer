@@ -75,3 +75,12 @@ class TestInstancePollster(base.TestPollsterBase):
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertNotIn('user_metadata', samples[0].resource_metadata)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_flavor_name_as_metadata_instance_type(self):
+        mgr = manager.AgentManager()
+        pollster = pollsters_instance.InstancePollster()
+        samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+        self.assertEqual(1, len(samples))
+        self.assertEqual('m1.small',
+                         samples[0].resource_metadata['instance_type'])
