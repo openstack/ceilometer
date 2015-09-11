@@ -37,6 +37,7 @@
 #   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'es')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENTS:             Set to True to enable event collection
+#   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
 
 # Save trace setting
 XTRACE=$(set +o | grep xtrace)
@@ -258,6 +259,11 @@ function configure_ceilometer {
 
     if [ "$CEILOMETER_PIPELINE_INTERVAL" ]; then
         sed -i "s/interval:.*/interval: ${CEILOMETER_PIPELINE_INTERVAL}/" $CEILOMETER_CONF_DIR/pipeline.yaml
+    fi
+    if [ "$CEILOMETER_EVENT_ALARM" == "True" ]; then
+        if ! grep -q '^ *- notifier://?topic=alarm.all$' $CEILOMETER_CONF_DIR/event_pipeline.yaml; then
+            sed -i '/^ *publishers:$/,+1s|^\( *\)-.*$|\1- notifier://?topic=alarm.all\n&|' $CEILOMETER_CONF_DIR/event_pipeline.yaml
+        fi
     fi
 
     # The compute and central agents need these credentials in order to
