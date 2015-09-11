@@ -30,7 +30,6 @@ import six
 from stevedore import extension
 import yaml
 
-from ceilometer.agent import base as agent_base
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
 from ceilometer.hardware import discovery
@@ -88,7 +87,7 @@ class TestManager(base.BaseTestCase):
                 mock.Mock(side_effect=plugin_base.ExtensionLoadError))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
-    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.agent.manager.LOG')
     def test_load_failed_plugins(self, LOG):
         # Here we additionally check that namespaces will be converted to the
         # list if param was not set as a list.
@@ -130,7 +129,7 @@ class TestManager(base.BaseTestCase):
     def test_load_plugins_pollster_list_forbidden(self):
         manager.cfg.CONF.set_override('backend_url', 'http://',
                                       group='coordination')
-        self.assertRaises(agent_base.PollsterListForbidden,
+        self.assertRaises(manager.PollsterListForbidden,
                           manager.AgentManager,
                           pollster_list=['disk.*'])
         manager.cfg.CONF.reset()
@@ -303,7 +302,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
 
-    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.agent.manager.LOG')
     @mock.patch('ceilometer.nova_client.LOG')
     def test_hardware_discover_fail_minimize_logs(self, novalog, baselog):
         self.useFixture(mockpatch.PatchObject(
@@ -351,7 +350,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertEqual(1, novalog.exception.call_count)
         self.assertFalse(baselog.exception.called)
 
-    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.agent.manager.LOG')
     def test_polling_exception(self, LOG):
         source_name = 'test_pollingexception'
         self.pipeline_cfg = {
