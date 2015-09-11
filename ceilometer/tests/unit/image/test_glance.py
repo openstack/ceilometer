@@ -117,8 +117,8 @@ class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
-        self.keystone = mock.Mock()
-        self.keystone.service_catalog.get_endpoints = mock.Mock(
+        self._keystone = mock.Mock()
+        self._keystone.service_catalog.get_endpoints = mock.Mock(
             return_value={'image': mock.ANY})
 
 

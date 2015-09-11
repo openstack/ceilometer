@@ -18,6 +18,7 @@
 import shutil
 
 import eventlet
+from keystoneclient import exceptions as ks_exceptions
 import mock
 from novaclient import client as novaclient
 from oslo_service import service as os_service
@@ -166,12 +167,9 @@ class TestManager(base.BaseTestCase):
 
 
 class TestPollsterKeystone(agentbase.TestPollster):
-    @plugin_base.check_keystone
     def get_samples(self, manager, cache, resources):
-        func = super(TestPollsterKeystone, self).get_samples
-        return func(manager=manager,
-                    cache=cache,
-                    resources=resources)
+        # Just try to use keystone, that will raise an exception
+        manager.keystone.tenants.list()
 
 
 class TestPollsterPollingException(agentbase.TestPollster):
@@ -283,7 +281,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         """Test for bug 1316532."""
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
-            side_effect=Exception))
+            side_effect=ks_exceptions.ClientException))
         self.pipeline_cfg = {
             'sources': [{
                 'name': "test_keystone",

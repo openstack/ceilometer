@@ -50,10 +50,9 @@ ENDPOINT = 'end://point'
 
 class TestManager(manager.AgentManager):
 
-    @mock.patch('keystoneclient.v2_0.client', mock.MagicMock())
     def __init__(self):
         super(TestManager, self).__init__()
-        self.keystone = mock.Mock()
+        self._keystone = mock.Mock()
 
 
 class _BaseTestCase(base.BaseTestCase):
@@ -131,7 +130,7 @@ class TestEnergyPollsterCache(_BaseTestCase):
         cache = {
             '%s-%s' % (ENDPOINT, self.pollster_cls.CACHE_KEY_PROBE): [probe],
         }
-        self.manager.keystone = mock.Mock()
+        self.manager._keystone = mock.Mock()
         pollster = self.pollster_cls()
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')

@@ -50,8 +50,8 @@ class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
-        self.keystone = mock.MagicMock()
-        self.keystone.service_catalog.url_for.return_value = '/endpoint'
+        self._keystone = mock.MagicMock()
+        self._keystone.service_catalog.url_for.return_value = '/endpoint'
 
 
 class TestRgwPollster(testscenarios.testcase.WithScenarios,
