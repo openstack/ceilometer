@@ -210,7 +210,7 @@ class PollingTask(object):
                         exc_info=True)
 
     def _send_notification(self, samples):
-        self.manager.notifier.info(
+        self.manager.notifier.sample(
             self.manager.context.to_dict(),
             'telemetry.polling',
             {'samples': samples}

@@ -60,10 +60,10 @@ NOTIFICATION = {
 }
 
 
-class TelemetryApiPostTestCase(base.BaseTestCase):
+class TelemetryIpcTestCase(base.BaseTestCase):
 
     def test_process_notification(self):
-        sample_creation = notifications.TelemetryApiPost(None)
+        sample_creation = notifications.TelemetryIpc(None)
         samples = list(sample_creation.process_notification(NOTIFICATION))
         self.assertEqual(2, len(samples))
         payload = NOTIFICATION["payload"]['samples']

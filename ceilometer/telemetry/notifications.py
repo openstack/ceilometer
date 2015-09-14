@@ -42,8 +42,11 @@ class TelemetryBase(plugin_base.NotificationBase):
                 for topic in conf.notification_topics]
 
 
-class TelemetryApiPost(TelemetryBase):
-    """Handle sample from notification bus, which is posted via API."""
+class TelemetryIpc(TelemetryBase):
+    """Handle sample from notification bus
+
+     Telemetry samples can be posted via API or polled by Polling agent.
+     """
 
     event_types = ['telemetry.api', 'telemetry.polling']
 
