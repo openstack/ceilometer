@@ -41,6 +41,7 @@ def _get_metadata_from_object(instance):
         'host': instance.hostId,
         'flavor': instance.flavor,
         'status': instance.status.lower(),
+        'state': getattr(instance, 'OS-EXT-STS:vm_state', u''),
     }
 
     # Image properties
