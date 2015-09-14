@@ -85,6 +85,10 @@ available in the backend.
 Alarms
 ======
 
+The Alarms API is deprecated in favor of the new
+`Telemetry Alarming service API <http://docs.openstack.org/developer/aodh/webapi/v2.html#alarms>`_.
+This API endpoint will be removed post-Liberty.
+
 .. rest-controller:: ceilometer.api.controllers.v2.alarms:AlarmsController
    :webprefix: /v2/alarms
 
