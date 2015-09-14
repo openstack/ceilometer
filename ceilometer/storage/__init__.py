@@ -57,10 +57,12 @@ OPTS = [
     cfg.StrOpt('alarm_connection',
                secret=True,
                default=None,
+               deprecated_for_removal=True,
                help='The connection string used to connect to the alarm '
                'database. (if unset, connection is used)'),
     cfg.IntOpt('alarm_history_time_to_live',
                default=-1,
+               deprecated_for_removal=True,
                help=("Number of seconds that alarm histories are kept "
                      "in the database for (<= 0 means forever).")),
     cfg.StrOpt('event_connection',

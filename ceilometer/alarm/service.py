@@ -37,6 +37,7 @@ from ceilometer import messaging
 OPTS = [
     cfg.IntOpt('evaluation_interval',
                default=60,
+               deprecated_for_removal=True,
                help='Period of evaluation cycle, should'
                     ' be >= than configured pipeline interval for'
                     ' collection of underlying meters.',

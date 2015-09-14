@@ -26,6 +26,7 @@ from ceilometer import messaging
 OPTS = [
     cfg.StrOpt('notifier_rpc_topic',
                default='alarm_notifier',
+               deprecated_for_removal=True,
                help='The topic that ceilometer uses for alarm notifier '
                     'messages.'),
 ]
