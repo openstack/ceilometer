@@ -30,6 +30,8 @@ class TestPollsterBase(base.BaseTestCase):
         self.instance.name = 'instance-00000001'
         setattr(self.instance, 'OS-EXT-SRV-ATTR:instance_name',
                 self.instance.name)
+        setattr(self.instance, 'OS-EXT-STS:vm_state',
+                'active')
         self.instance.id = 1
         self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
                                 'ram': 512, 'disk': 20, 'ephemeral': 0}
