@@ -41,6 +41,7 @@ COMPARATORS = {
 OPTS = [
     cfg.StrOpt('gnocchi_url',
                default="http://localhost:8041",
+               deprecated_for_removal=True,
                help='URL to Gnocchi.'),
 ]
 

@@ -30,19 +30,23 @@ LOG = log.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('rest_notifier_certificate_file',
                default='',
+               deprecated_for_removal=True,
                help='SSL Client certificate for REST notifier.'
                ),
     cfg.StrOpt('rest_notifier_certificate_key',
                default='',
+               deprecated_for_removal=True,
                help='SSL Client private key for REST notifier.'
                ),
     cfg.BoolOpt('rest_notifier_ssl_verify',
                 default=True,
+                deprecated_for_removal=True,
                 help='Whether to verify the SSL Server certificate when '
                 'calling alarm action.'
                 ),
     cfg.IntOpt('rest_notifier_max_retries',
                default=0,
+               deprecated_for_removal=True,
                help='Number of retries for REST notifier',
                ),
 
