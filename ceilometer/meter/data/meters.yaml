@@ -261,7 +261,34 @@ metric:
   - name: "image"
     event_type:
       - "image.upload"
+      - "image.update"
       - "image.delete"
+    type: "gauge"
+    unit: 'image'
+    volume: 1
+    resource_id: $.payload.id
+    project_id: $.payload.owner
+
+  - name: "image.upload"
+    event_type:
+      - "image.upload"
+    type: "gauge"
+    unit: 'image'
+    volume: 1
+    resource_id: $.payload.id
+    project_id: $.payload.owner
+
+  - name: "image.delete"
+    event_type:
+      - "image.delete"
+    type: "gauge"
+    unit: 'image'
+    volume: 1
+    resource_id: $.payload.id
+    project_id: $.payload.owner
+
+  - name: "image.update"
+    event_type:
       - "image.update"
     type: "gauge"
     unit: 'image'
