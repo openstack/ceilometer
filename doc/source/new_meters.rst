@@ -89,6 +89,18 @@ If you plan on adding meters, please follow the convention below:
 
 3. If you have any hesitation, come and ask in #openstack-ceilometer
 
+Meter definitions
+-----------------
+Meters definitions by default, are stored in separate configuration
+file, called :file:`ceilometer/meter/data/meter.yaml`. This is essentially
+a replacement for prior approach of writing notification handlers to consume
+specific topics.
+
+A detailed description of how to use meter definition is illustrated in
+the `admin_guide`_.
+
+.. _admin_guide: http://docs.openstack.org/admin-guide-cloud/telemetry-data-collection.html#meter-definitions
+
 Non-metric meters and events
 ----------------------------
 

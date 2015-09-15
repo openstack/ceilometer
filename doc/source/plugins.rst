@@ -59,8 +59,11 @@ on where is polling agent running.  This will load, among others, the
 the folder ``ceilometer/compute/pollsters``.
 
 Notifications mechanism uses plugins as well, for instance
-:class:`ceilometer.compute.notifications.instance.InstanceNotifications` plugin
-which is defined in the ``ceilometer/compute/notifications`` folder.
+:class:`ceilometer.telemetry.notifications.TelemetryApiPost` plugin
+which is defined in the ``ceilometer/telemetry/notifications`` folder, Though
+in most cases, this is not needed. A meter definition can be directly added
+to :file:`ceilometer/meter/data/meter.yaml` to match the event type. For
+more information, see the :ref:`add_new_meters` page.
 
 We are using these two existing plugins as examples as the first one provides
 an example of how to interact when you need to retrieve information from an
@@ -112,6 +115,12 @@ namespaces.
 
 Notifications
 -------------
+
+.. note::
+   This should only be needed for cases where a complex arithmetic or
+   non-primitive data types are used. In most cases, adding a meter
+   definition to the :file:`ceilometer/meter/data/meter.yaml` should
+   suffice.
 
 Notifications are defined as subclass of the
 :class:`ceilometer.agent.plugin_base.NotificationBase` meta class.
