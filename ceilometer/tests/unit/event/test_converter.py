@@ -20,6 +20,7 @@ import mock
 from oslo_config import fixture as fixture_config
 import six
 
+from ceilometer import declarative
 from ceilometer.event import converter
 from ceilometer.event.storage import models
 from ceilometer.tests import base
@@ -112,13 +113,13 @@ class TestTraitDefinition(ConverterBase):
         self.ext1 = mock.MagicMock(name='mock_test_plugin')
         self.test_plugin_class = self.ext1.plugin
         self.test_plugin = self.test_plugin_class()
-        self.test_plugin.trait_value.return_value = 'foobar'
+        self.test_plugin.trait_values.return_value = ['foobar']
         self.ext1.reset_mock()
 
         self.ext2 = mock.MagicMock(name='mock_nothing_plugin')
         self.nothing_plugin_class = self.ext2.plugin
         self.nothing_plugin = self.nothing_plugin_class()
-        self.nothing_plugin.trait_value.return_value = None
+        self.nothing_plugin.trait_values.return_value = [None]
         self.ext2.reset_mock()
 
         self.fake_plugin_mgr = dict(test=self.ext1, nothing=self.ext2)
@@ -136,7 +137,7 @@ class TestTraitDefinition(ConverterBase):
         self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
         self.assertEqual('foobar', t.value)
         self.test_plugin_class.assert_called_once_with()
-        self.test_plugin.trait_value.assert_called_once_with([
+        self.test_plugin.trait_values.assert_called_once_with([
             ('payload.instance_id', 'id-for-instance-0001'),
             ('payload.instance_uuid', 'uuid-for-instance-0001')])
 
@@ -153,7 +154,7 @@ class TestTraitDefinition(ConverterBase):
         self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
         self.assertEqual('foobar', t.value)
         self.test_plugin_class.assert_called_once_with()
-        self.test_plugin.trait_value.assert_called_once_with([])
+        self.test_plugin.trait_values.assert_called_once_with([])
 
     def test_to_trait_with_plugin_null(self):
         cfg = dict(type='text',
@@ -165,7 +166,7 @@ class TestTraitDefinition(ConverterBase):
         t = tdef.to_trait(self.n1)
         self.assertIs(None, t)
         self.nothing_plugin_class.assert_called_once_with()
-        self.nothing_plugin.trait_value.assert_called_once_with([
+        self.nothing_plugin.trait_values.assert_called_once_with([
             ('payload.instance_id', 'id-for-instance-0001'),
             ('payload.instance_uuid', 'uuid-for-instance-0001')])
 
@@ -182,7 +183,7 @@ class TestTraitDefinition(ConverterBase):
         self.assertEqual(models.Trait.TEXT_TYPE, t.dtype)
         self.assertEqual('foobar', t.value)
         self.test_plugin_class.assert_called_once_with(a=1, b='foo')
-        self.test_plugin.trait_value.assert_called_once_with([
+        self.test_plugin.trait_values.assert_called_once_with([
             ('payload.instance_id', 'id-for-instance-0001'),
             ('payload.instance_uuid', 'uuid-for-instance-0001')])
 
@@ -287,7 +288,7 @@ class TestTraitDefinition(ConverterBase):
         self.assertIs(None, t)
 
     def test_missing_fields_config(self):
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.TraitDefinition,
                           'bogus_trait',
                           dict(),
@@ -296,19 +297,20 @@ class TestTraitDefinition(ConverterBase):
     def test_string_fields_config(self):
         cfg = dict(fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertPathsEqual(t.fields, jsonpath_rw_ext.parse('payload.test'))
+        self.assertPathsEqual(t.getter.__self__,
+                              jsonpath_rw_ext.parse('payload.test'))
 
     def test_list_fields_config(self):
         cfg = dict(fields=['payload.test', 'payload.other'])
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
         self.assertPathsEqual(
-            t.fields,
+            t.getter.__self__,
             jsonpath_rw_ext.parse('(payload.test)|(payload.other)'))
 
     def test_invalid_path_config(self):
         # test invalid jsonpath...
         cfg = dict(fields='payload.bogus(')
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.TraitDefinition,
                           'bogus_trait',
                           cfg,
@@ -317,7 +319,7 @@ class TestTraitDefinition(ConverterBase):
     def test_invalid_plugin_config(self):
         # test invalid jsonpath...
         cfg = dict(fields='payload.test', plugin=dict(bogus="true"))
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.TraitDefinition,
                           'test_trait',
                           cfg,
@@ -326,7 +328,7 @@ class TestTraitDefinition(ConverterBase):
     def test_unknown_plugin(self):
         # test invalid jsonpath...
         cfg = dict(fields='payload.test', plugin=dict(name='bogus'))
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.TraitDefinition,
                           'test_trait',
                           cfg,
@@ -352,7 +354,7 @@ class TestTraitDefinition(ConverterBase):
     def test_invalid_type_config(self):
         # test invalid jsonpath...
         cfg = dict(type='bogus', fields='payload.test')
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.TraitDefinition,
                           'bogus_trait',
                           cfg,
@@ -438,14 +440,14 @@ class TestEventDefinition(ConverterBase):
 
     def test_bogus_cfg_no_traits(self):
         bogus = dict(event_type='test.foo')
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.EventDefinition,
                           bogus,
                           self.fake_plugin_mgr)
 
     def test_bogus_cfg_no_type(self):
         bogus = dict(traits=self.traits_cfg)
-        self.assertRaises(converter.EventDefinitionException,
+        self.assertRaises(declarative.DefinitionException,
                           converter.EventDefinition,
                           bogus,
                           self.fake_plugin_mgr)
