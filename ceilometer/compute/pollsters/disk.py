@@ -174,6 +174,7 @@ class PerDeviceReadRequestsPollster(_Base):
                 unit='request',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -207,6 +208,7 @@ class PerDeviceReadBytesPollster(_Base):
                 unit='B',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -240,6 +242,7 @@ class PerDeviceWriteRequestsPollster(_Base):
                 unit='request',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -273,6 +276,7 @@ class PerDeviceWriteBytesPollster(_Base):
                 unit='B',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -379,6 +383,7 @@ class PerDeviceReadBytesRatePollster(_DiskRatesPollsterBase):
                 unit='B/s',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -411,6 +416,7 @@ class PerDeviceReadRequestsRatePollster(_DiskRatesPollsterBase):
                 unit='requests/s',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -443,6 +449,7 @@ class PerDeviceWriteBytesRatePollster(_DiskRatesPollsterBase):
                 unit='B/s',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -475,6 +482,7 @@ class PerDeviceWriteRequestsRatePollster(_DiskRatesPollsterBase):
                 unit='requests/s',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -557,7 +565,8 @@ class PerDeviceDiskLatencyPollster(_DiskLatencyPollsterBase):
                 type=sample.TYPE_GAUGE,
                 unit='ms',
                 volume=value / 1000,
-                resource_id="%s-%s" % (instance.id, disk)
+                resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -638,7 +647,8 @@ class PerDeviceDiskIOPSPollster(_DiskIOPSPollsterBase):
                 type=sample.TYPE_GAUGE,
                 unit='count/s',
                 volume=value,
-                resource_id="%s-%s" % (instance.id, disk)
+                resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -745,6 +755,7 @@ class PerDeviceCapacityPollster(_DiskInfoPollsterBase):
                 unit='B',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -777,6 +788,7 @@ class PerDeviceAllocationPollster(_DiskInfoPollsterBase):
                 unit='B',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples
 
@@ -809,5 +821,6 @@ class PerDevicePhysicalPollster(_DiskInfoPollsterBase):
                 unit='B',
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
             ))
         return samples

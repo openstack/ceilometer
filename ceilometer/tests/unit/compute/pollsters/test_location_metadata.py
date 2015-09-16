@@ -49,6 +49,8 @@ class TestLocationMetadata(base.BaseTestCase):
 
         # Mimics an instance returned from nova api call
         self.INSTANCE_PROPERTIES = {'name': 'display name',
+                                    'id': ('234cbe81-4e09-4f64-9b2a-'
+                                           '714f6b9046e3'),
                                     'OS-EXT-SRV-ATTR:instance_name':
                                     'instance-000001',
                                     'OS-EXT-AZ:availability_zone':
@@ -89,6 +91,8 @@ class TestLocationMetadata(base.BaseTestCase):
                     prop = "host"
                 elif prop == 'OS-EXT-SRV-ATTR:instance_name':
                     prop = 'name'
+                elif prop == "id":
+                    prop = "instance_id"
                 self.assertEqual(value, md[prop])
         user_metadata = md['user_metadata']
         expected = self.INSTANCE_PROPERTIES[

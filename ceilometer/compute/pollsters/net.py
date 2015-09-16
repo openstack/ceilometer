@@ -48,9 +48,11 @@ class _Base(pollsters.BaseComputePollster):
 
         if vnic_data.fref is not None:
             rid = vnic_data.fref
+            resource_metadata['vnic_name'] = vnic_data.fref
         else:
             instance_name = util.instance_name(instance)
             rid = "%s-%s-%s" % (instance_name, instance.id, vnic_data.name)
+            resource_metadata['vnic_name'] = vnic_data.name
 
         return sample.Sample(
             name=name,
