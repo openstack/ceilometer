@@ -36,8 +36,11 @@ http_dispatcher_opts = [
                     'to same as Sample target.'),
     cfg.BoolOpt('cadf_only',
                 default=False,
+                deprecated_for_removal=True,
                 help='The flag that indicates if only cadf message should '
-                     'be posted. If false, all meters will be posted.'),
+                     'be posted. If false, all meters will be posted. This is '
+                     'deprecated in favor of keystonemiddleware\'s audit '
+                     'middleware functionality'),
     cfg.IntOpt('timeout',
                default=5,
                help='The max time in seconds to wait for a request to '
