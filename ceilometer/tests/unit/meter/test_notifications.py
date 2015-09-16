@@ -231,16 +231,19 @@ class TestMeterDefinition(test.BaseTestCase):
         self.assertEqual("30be1fc9a03c4e94ab05c403a8a377f2",
                          handler.parse_fields("project_id", NOTIFICATION))
 
-    def test_config_missing_fields(self):
-        cfg = dict(name="test", type="delta")
+    def test_config_required_missing_fields(self):
+        cfg = dict()
         try:
             notifications.MeterDefinition(cfg)
         except notifications.MeterDefinitionException as e:
-            self.assertEqual("Required field event_type not specified",
-                             e.message)
+            self.assertEqual("Required fields ['name', 'type', 'event_type',"
+                             " 'unit', 'volume', 'resource_id']"
+                             " not specified", e.message)
 
     def test_bad_type_cfg_definition(self):
-        cfg = dict(name="test", type="foo", event_type="bar.create")
+        cfg = dict(name="test", type="foo", event_type="bar.create",
+                   unit="foo", volume="bar",
+                   resource_id="bea70e51c7340cb9d555b15cbfcaec23")
         try:
             notifications.MeterDefinition(cfg)
         except notifications.MeterDefinitionException as e:

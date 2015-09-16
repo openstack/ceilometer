@@ -57,13 +57,17 @@ class MeterDefinition(object):
 
     JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
 
+    REQUIRED_FIELDS = ['name', 'type', 'event_type', 'unit', 'volume',
+                       'resource_id']
+
     def __init__(self, definition_cfg):
         self.cfg = definition_cfg
-
-        self._event_type = self.cfg.get('event_type')
-        if not self._event_type:
+        missing = [field for field in self.REQUIRED_FIELDS
+                   if not self.cfg.get(field)]
+        if missing:
             raise MeterDefinitionException(
-                _LE("Required field event_type not specified"), self.cfg)
+                _LE("Required fields %s not specified") % missing, self.cfg)
+        self._event_type = self.cfg.get('event_type')
         if isinstance(self._event_type, six.string_types):
             self._event_type = [self._event_type]
 
