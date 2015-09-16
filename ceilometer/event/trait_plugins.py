@@ -15,7 +15,12 @@
 
 import abc
 
+from oslo_log import log
 import six
+
+from ceilometer.i18n import _LW
+
+LOG = log.getLogger(__name__)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -102,6 +107,14 @@ class SplitterTraitPlugin(TraitPluginBase):
         :param  segment:    Which segment to return. (int) default 0
         :param  max_split: Limit number of splits. Default: None (no limit)
         """
+        LOG.warning(_LW('split plugin is deprecated, '
+                        'add ".`split(%(sep)s, %(segment)d, '
+                        '%(max_split)d)`" to your jsonpath instead') %
+                    dict(sep=separator,
+                         segment=segment,
+                         max_split=(-1 if max_split is None
+                                    else max_split)))
+
         self.separator = separator
         self.segment = segment
         self.max_split = max_split
