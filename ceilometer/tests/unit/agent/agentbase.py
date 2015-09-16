@@ -679,7 +679,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         for c in expected:
             self.assertIn(c, p_coord.extract_my_subset.call_args_list)
 
-    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.agent.manager.LOG')
     def test_polling_and_notify_with_resources(self, LOG):
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
@@ -688,7 +688,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'Polling pollster %(poll)s in the context of %(src)s',
             {'poll': 'test', 'src': 'test_pipeline'})
 
-    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.agent.manager.LOG')
     def test_skip_polling_and_notify_with_no_resources(self, LOG):
         self.pipeline_cfg['sources'][0]['resources'] = []
         self.setup_polling()
@@ -699,7 +699,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'Skip pollster %(name)s, no %(p_context)sresources found this '
             'cycle', {'name': pollster.name, 'p_context': ''})
 
-    @mock.patch('ceilometer.agent.base.LOG')
+    @mock.patch('ceilometer.agent.manager.LOG')
     def test_skip_polling_polled_resources(self, LOG):
         self.pipeline_cfg['sources'].append({
             'name': 'test_pipeline_1',
