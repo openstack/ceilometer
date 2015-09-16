@@ -374,10 +374,10 @@ tests:
       url: /v2/meters?q.field=limit&q.op=eq&q.type=&q.value=1
       status: 400
       response_strings:
-          - Limit is not a valid field for queries,
+          - 'Unknown argument: \"limit\": unrecognized field in query'
 
     - name: get meters filter limit and limit
       url: /v2/meters?q.field=limit&q.op=eq&q.type=&q.value=1&limit=1
       status: 400
       response_strings:
-          - Limit is not a valid field for queries,
+          - 'Unknown argument: \"limit\": unrecognized field in query'

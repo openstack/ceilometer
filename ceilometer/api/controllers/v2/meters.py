@@ -491,11 +491,8 @@ class MetersController(rest.RestController):
         # Timestamp field is not supported for Meter queries
         limit = v2_utils.enforce_limit(limit)
         kwargs = v2_utils.query_to_kwargs(
-            q, pecan.request.storage_conn.get_meters, allow_timestamps=False)
-        if 'limit' in kwargs:
-            raise base.ClientSideError(_(
-                "Limit is not a valid field for queries, "
-                "use 'limit' parameter."))
+            q, pecan.request.storage_conn.get_meters,
+            ['limit'], allow_timestamps=False)
         return [Meter.from_db_model(m)
                 for m in pecan.request.storage_conn.get_meters(limit=limit,
                                                                **kwargs)]

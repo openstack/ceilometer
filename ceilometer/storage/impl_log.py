@@ -55,7 +55,7 @@ class Connection(base.Connection):
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None):
+                      metaquery=None, resource=None, limit=None):
         """Return an iterable of dictionaries containing resource information.
 
         { 'resource_id': UUID of the resource,
@@ -75,6 +75,7 @@ class Connection(base.Connection):
         :param end_timestamp_op: Optional end time operator, like lt, le.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Maximum number of results to return.
         """
         return []
 
@@ -98,7 +99,7 @@ class Connection(base.Connection):
         """
         return []
 
-    def get_samples(self, sample_filter):
+    def get_samples(self, sample_filter, limit=None):
         """Return an iterable of samples.
 
         Items are created by
