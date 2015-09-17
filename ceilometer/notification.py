@@ -231,7 +231,7 @@ class NotificationService(service_base.BaseService):
             self.listeners.append(listener)
 
     def _refresh_agent(self, event):
-        self.reload_pipeline()
+        self._refresh_listeners()
 
     def _refresh_listeners(self):
         utils.kill_listeners(self.pipeline_listeners)
