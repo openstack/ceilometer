@@ -98,14 +98,14 @@ class TestNetPollster(base.TestPollsterBase):
                                               'links': [{"rel": "bookmark",
                                                          'href': 2}]},
                                     'hostId': '1234-5678',
-                                    'flavor': {'id': 1,
-                                               'disk': 20,
+                                    'flavor': {'disk': 20,
                                                'ram': 512,
+                                               'name': 'tiny',
                                                'vcpus': 2,
                                                'ephemeral': 0},
                                     'metadata': {'metering.autoscale.group':
                                                  'X' * 512,
-                                                 'metering.ephemeral_gb': 42}}
+                                                 'metering.foobar': 42}}
 
         self.faux_instance = FauxInstance(**self.INSTANCE_PROPERTIES)
 

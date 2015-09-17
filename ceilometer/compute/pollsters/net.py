@@ -17,12 +17,10 @@
 import copy
 
 from oslo_log import log
-from oslo_utils import timeutils
 
 import ceilometer
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
-from ceilometer.compute import util as compute_util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.i18n import _, _LW
 from ceilometer import sample
@@ -38,32 +36,23 @@ class _Base(pollsters.BaseComputePollster):
     @staticmethod
     def make_vnic_sample(instance, name, type, unit, volume, vnic_data):
         metadata = copy.copy(vnic_data)
-        resource_metadata = dict(zip(metadata._fields, metadata))
-        resource_metadata['instance_id'] = instance.id
-        resource_metadata['instance_type'] = (instance.flavor['id'] if
-                                              instance.flavor else None)
-
-        compute_util.add_reserved_user_metadata(instance.metadata,
-                                                resource_metadata)
-
+        additional_metadata = dict(zip(metadata._fields, metadata))
         if vnic_data.fref is not None:
             rid = vnic_data.fref
-            resource_metadata['vnic_name'] = vnic_data.fref
+            additional_metadata['vnic_name'] = vnic_data.fref
         else:
             instance_name = util.instance_name(instance)
             rid = "%s-%s-%s" % (instance_name, instance.id, vnic_data.name)
-            resource_metadata['vnic_name'] = vnic_data.name
+            additional_metadata['vnic_name'] = vnic_data.name
 
-        return sample.Sample(
+        return util.make_sample_from_instance(
+            instance=instance,
             name=name,
             type=type,
             unit=unit,
             volume=volume,
-            user_id=instance.user_id,
-            project_id=instance.tenant_id,
             resource_id=rid,
-            timestamp=timeutils.utcnow().isoformat(),
-            resource_metadata=resource_metadata
+            additional_metadata=additional_metadata
         )
 
     CACHE_KEY_VNIC = 'vnics'
