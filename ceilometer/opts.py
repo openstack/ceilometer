@@ -58,7 +58,7 @@ import ceilometer.utils
 def list_opts():
     return [
         ('DEFAULT',
-         itertools.chain(ceilometer.agent.base.OPTS,
+         itertools.chain(ceilometer.agent.manager.OPTS,
                          ceilometer.api.app.OPTS,
                          ceilometer.cmd.eventlet.polling.CLI_OPTS,
                          ceilometer.compute.notifications.OPTS,
