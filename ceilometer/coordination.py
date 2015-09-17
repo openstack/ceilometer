@@ -133,6 +133,9 @@ class PartitionCoordinator(object):
                     create_grp_req.get()
                 except tooz.coordination.GroupAlreadyExist:
                     pass
+            except tooz.coordination.ToozError:
+                LOG.exception(_LE('Error joining partitioning group %s,'
+                                  ' re-trying'), group_id)
         self._groups.add(group_id)
 
     def leave_group(self, group_id):

@@ -82,6 +82,21 @@ class MockToozCoordExceptionRaiser(MockToozCoordinator):
         raise tooz.coordination.ToozError('error')
 
 
+class MockToozCoordExceptionOnJoinRaiser(MockToozCoordinator):
+    def __init__(self, member_id, shared_storage, retry_count=None):
+        super(MockToozCoordExceptionOnJoinRaiser,
+              self).__init__(member_id, shared_storage)
+        self.tooz_error_count = retry_count
+        self.count = 0
+
+    def join_group(self, group_id, capabilities=b''):
+        if self.count == self.tooz_error_count:
+            return MockAsyncResult(None)
+        else:
+            self.count += 1
+            raise tooz.coordination.ToozError('error')
+
+
 class MockAsyncResult(tooz.coordination.CoordAsyncResult):
     def __init__(self, result):
         self.result = result
@@ -134,12 +149,14 @@ class TestPartitioning(base.BaseTestCase):
         self.shared_storage = {}
 
     def _get_new_started_coordinator(self, shared_storage, agent_id=None,
-                                     coordinator_cls=None):
+                                     coordinator_cls=None, retry_count=None):
         coordinator_cls = coordinator_cls or MockToozCoordinator
         self.CONF.set_override('backend_url', 'xxx://yyy',
                                group='coordination')
         with mock.patch('tooz.coordination.get_coordinator',
                         lambda _, member_id:
+                        coordinator_cls(member_id, shared_storage,
+                                        retry_count) if retry_count else
                         coordinator_cls(member_id, shared_storage)):
             pc = coordination.PartitionCoordinator(agent_id)
             pc.start()
@@ -208,6 +225,20 @@ class TestPartitioning(base.BaseTestCase):
                            'Error connecting to coordination backend.']
         for e in expected_errors:
             self.assertIn(e, self.str_handler.messages['error'])
+
+    def test_coordination_backend_connection_fail_on_join(self):
+        coord = self._get_new_started_coordinator(
+            {'group'}, 'agent1', MockToozCoordExceptionOnJoinRaiser,
+            retry_count=2)
+        with mock.patch('tooz.coordination.get_coordinator',
+                        return_value=MockToozCoordExceptionOnJoinRaiser):
+            coord.join_group(group_id='group')
+
+        expected_errors = ['Error joining partitioning group group,'
+                           ' re-trying',
+                           'Error joining partitioning group group,'
+                           ' re-trying']
+        self.assertEqual(expected_errors, self.str_handler.messages['error'])
 
     def test_reconnect(self):
         coord = self._get_new_started_coordinator({}, 'a',
