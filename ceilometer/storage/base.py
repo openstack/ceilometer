@@ -176,7 +176,7 @@ class Connection(object):
     def get_resources(user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
                       end_timestamp=None, end_timestamp_op=None,
-                      metaquery=None, resource=None):
+                      metaquery=None, resource=None, limit=None):
         """Return an iterable of models.Resource instances.
 
         Iterable items containing resource information.
@@ -189,12 +189,13 @@ class Connection(object):
         :param end_timestamp_op: Optional timestamp end range operation.
         :param metaquery: Optional dict with metadata to match on.
         :param resource: Optional resource filter.
+        :param limit: Maximum number of results to return.
         """
         raise ceilometer.NotImplementedError('Resources not implemented')
 
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
-                   metaquery=None):
+                   metaquery=None, limit=None):
         """Return an iterable of model.Meter instances.
 
         Iterable items containing meter information.
@@ -203,6 +204,7 @@ class Connection(object):
         :param resource: Optional resource filter.
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
+        :param limit: Maximum number of results to return.
         """
         raise ceilometer.NotImplementedError('Meters not implemented')
 
