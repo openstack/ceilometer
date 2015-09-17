@@ -5,21 +5,23 @@
 # Translators:
 # aji.zqfan <aji.zqfan@gmail.com>, 2015
 # Shuwen SUN <chris-void@outlook.com>, 2014
+# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: Ceilometer\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev77\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-04 06:16+0000\n"
-"PO-Revision-Date: 2015-09-03 19:17+0000\n"
+"POT-Creation-Date: 2015-09-17 06:13+0000\n"
+"PO-Revision-Date: 2015-09-03 07:17+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/openstack/"
 "ceilometer/language/zh_CN/)\n"
-"Language: zh_CN\n"
+"Language: zh-CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Zanata 3.7.1\n"
 
 #, python-format
 msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"

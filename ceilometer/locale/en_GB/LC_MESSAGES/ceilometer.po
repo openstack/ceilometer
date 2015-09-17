@@ -4,12 +4,13 @@
 #
 # Translators:
 # Andi Chandler <andi@gowling.com>, 2013-2014
+# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version:  Ceilometer\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev77\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-04 06:16+0000\n"
-"PO-Revision-Date: 2015-09-02 18:21+0000\n"
+"POT-Creation-Date: 2015-09-17 06:13+0000\n"
+"PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/openstack/"
 "ceilometer/language/en_GB/)\n"
@@ -81,10 +82,6 @@ msgstr "Alarms %(alarm_ids)s are in unknown state"
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "Arithmetic transformer must use at least one meter in expression '%s'"
-
-#, python-format
-msgid "Can NOT load inspector %(name)s: %(err)s"
-msgstr "Can NOT load inspector %(name)s: %(err)s"
 
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
@@ -476,10 +473,6 @@ msgstr "dropping sample with no predecessor: %s"
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr "initiating evaluation cycle on %d alarms"
-
-#, python-format
-msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
-msgstr "inspector call failed for %(ident)s host %(host)s: %(err)s"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes and backup_count should be numbers."

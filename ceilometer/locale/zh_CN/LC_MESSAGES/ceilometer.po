@@ -8,12 +8,13 @@
 # Tom Fifield <tom@openstack.org>, 2013
 # 颜海峰 <yanheven@gmail.com>, 2014
 # Yu Zhang, 2013
+# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version:  Ceilometer\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev77\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-04 06:16+0000\n"
-"PO-Revision-Date: 2015-09-02 18:21+0000\n"
+"POT-Creation-Date: 2015-09-17 06:13+0000\n"
+"PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/openstack/"
 "ceilometer/language/zh_CN/)\n"
@@ -84,10 +85,6 @@ msgstr "告警%(alarm_ids)s处于未知的状态"
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
-
-#, python-format
-msgid "Can NOT load inspector %(name)s: %(err)s"
-msgstr "无法加载探测器%(name)s: %(err)s"
 
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
@@ -304,9 +301,6 @@ msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
 #, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "orderby表达式不合法：%s"
-
-msgid "Passed resource dict must contain keys resource_id and resource_url."
-msgstr "传入的资源字典必须包含键resource_id和resource_url"
 
 msgid "Period must be positive."
 msgstr "period 参数必须是正数"
