@@ -23,6 +23,7 @@ import six
 from ceilometer import declarative
 from ceilometer.event import converter
 from ceilometer.event.storage import models
+from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
 
 
@@ -597,6 +598,7 @@ class TestNotificationConverter(ConverterBase):
     def setUp(self):
         super(TestNotificationConverter, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        ceilometer_service.prepare_service(argv=[], config_files=[])
         self.valid_event_def1 = [{
             'event_type': 'compute.instance.create.*',
             'traits': {
@@ -760,9 +762,9 @@ class TestNotificationConverter(ConverterBase):
         self.assertTrue(self._convert_message(c, 'info').raw)
         self.assertFalse(self._convert_message(c, 'error').raw)
 
-    @mock.patch('ceilometer.event.converter.get_config_file',
-                mock.Mock(return_value=None))
     def test_setup_events_default_config(self):
+        self.CONF.set_override('definitions_cfg_file',
+                               '/not/existing/file', group='event')
         self.CONF.set_override('drop_unmatched_notifications',
                                False, group='event')
 
