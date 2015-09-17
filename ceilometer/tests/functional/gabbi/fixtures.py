@@ -22,6 +22,7 @@ from unittest import case
 import uuid
 
 from gabbi import fixture
+from oslo_config import cfg
 from oslo_config import fixture as fixture_config
 from oslo_policy import opts
 from six.moves.urllib import parse as urlparse
@@ -64,6 +65,11 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('policy_file',
                           os.path.abspath('etc/ceilometer/policy.json'),
                           group='oslo_policy')
+        conf.set_override(
+            'api_paste_config',
+            os.path.abspath(
+                'ceilometer/tests/functional/gabbi/gabbi_paste.ini')
+        )
 
         # A special pipeline is required to use the direct publisher.
         conf.set_override('pipeline_cfg_file',
@@ -148,3 +154,24 @@ class EventDataFixture(fixture.GabbiFixture):
     def stop_fixture(self):
         """Destroy the events."""
         self.conn.db.event.remove({'event_type': '/^cookies_/'})
+
+
+class CORSConfigFixture(fixture.GabbiFixture):
+    """Inject mock configuration for the CORS middleware."""
+
+    def start_fixture(self):
+        # Here we monkeypatch GroupAttr.__getattr__, necessary because the
+        # paste.ini method of initializing this middleware creates its own
+        # ConfigOpts instance, bypassing the regular config fixture.
+
+        def _mock_getattr(instance, key):
+            if key != 'allowed_origin':
+                return self._original_call_method(instance, key)
+            return "http://valid.example.com"
+
+        self._original_call_method = cfg.ConfigOpts.GroupAttr.__getattr__
+        cfg.ConfigOpts.GroupAttr.__getattr__ = _mock_getattr
+
+    def stop_fixture(self):
+        """Remove the monkeypatch."""
+        cfg.ConfigOpts.GroupAttr.__getattr__ = self._original_call_method

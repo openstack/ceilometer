@@ -1,0 +1,44 @@
+#
+# Test the middlewares. Just CORS for now.
+#
+
+fixtures:
+    - ConfigFixture
+    - CORSConfigFixture
+
+tests:
+
+    - name: valid cors options
+      OPTIONS: /
+      status: 200
+      request_headers:
+          origin: http://valid.example.com
+          access-control-request-method: GET
+      response_headers:
+          access-control-allow-origin: http://valid.example.com
+
+    - name: invalid cors options
+      OPTIONS: /
+      status: 200
+      request_headers:
+          origin: http://invalid.example.com
+          access-control-request-method: GET
+      response_forbidden_headers:
+          - access-control-allow-origin
+
+    - name: valid cors get
+      GET: /
+      status: 200
+      request_headers:
+          origin: http://valid.example.com
+          access-control-request-method: GET
+      response_headers:
+          access-control-allow-origin: http://valid.example.com
+
+    - name: invalid cors get
+      GET: /
+      status: 200
+      request_headers:
+          origin: http://invalid.example.com
+      response_forbidden_headers:
+          - access-control-allow-origin
