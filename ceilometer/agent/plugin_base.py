@@ -123,7 +123,7 @@ class NotificationBase(PluginBase):
         """
 
     def info(self, ctxt, publisher_id, event_type, payload, metadata):
-        """RPC endpoint for notification messages
+        """RPC endpoint for notification messages at info level
 
         When another service sends a notification over the message
         bus, this method receives it.
@@ -137,6 +137,23 @@ class NotificationBase(PluginBase):
         """
         notification = messaging.convert_to_old_notification_format(
             'info', ctxt, publisher_id, event_type, payload, metadata)
+        self.to_samples_and_publish(context.get_admin_context(), notification)
+
+    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+        """RPC endpoint for notification messages at sample level
+
+        When another service sends a notification over the message
+        bus at sample priority, this method receives it.
+
+        :param ctxt: oslo.messaging context
+        :param publisher_id: publisher of the notification
+        :param event_type: type of notification
+        :param payload: notification payload
+        :param metadata: metadata about the notification
+
+        """
+        notification = messaging.convert_to_old_notification_format(
+            'sample', ctxt, publisher_id, event_type, payload, metadata)
         self.to_samples_and_publish(context.get_admin_context(), notification)
 
     def to_samples_and_publish(self, context, notification):

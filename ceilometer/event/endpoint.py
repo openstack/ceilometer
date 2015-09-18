@@ -36,7 +36,7 @@ class EventsNotificationEndpoint(object):
         self.manager = manager
 
     def info(self, ctxt, publisher_id, event_type, payload, metadata):
-        """Convert message to Ceilometer Event.
+        """Convert message at info level to Ceilometer Event.
 
         :param ctxt: oslo_messaging context
         :param publisher_id: publisher of the notification

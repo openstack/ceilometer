@@ -246,7 +246,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def setUp(self):
         self.notified_samples = []
         self.notifier = mock.Mock()
-        self.notifier.info.side_effect = self.fake_notifier_sample
+        self.notifier.sample.side_effect = self.fake_notifier_sample
         self.useFixture(mockpatch.Patch('oslo_messaging.Notifier',
                                         return_value=self.notifier))
         self.source_resources = True
@@ -418,7 +418,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
         samples = self.notified_samples
         self.assertEqual(expected_samples, len(samples))
-        self.assertEqual(call_count, self.notifier.info.call_count)
+        self.assertEqual(call_count, self.notifier.sample.call_count)
 
     def test_start_with_reloadable_pipeline(self):
 
