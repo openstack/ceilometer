@@ -29,6 +29,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.CONF.set_override('gnocchi_is_enabled', None, group='api')
         self.CONF.set_override('aodh_is_enabled', None, group='api')
         self.CONF.set_override('aodh_url', None, group='api')
+        self.CONF.set_override('dispatcher', ['database'])
         self.ks = mock.Mock()
         self.ks.service_catalog.url_for.side_effect = self._url_for
         self.useFixture(mockpatch.Patch(
