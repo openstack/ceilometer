@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev16\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev77\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"POT-Creation-Date: 2015-09-17 06:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -74,47 +74,47 @@ msgstr ""
 msgid "Pipeline config: %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:158
+#: ceilometer/agent/manager.py:171
 #, python-format
 msgid "Skip pollster %(name)s, no %(p_context)sresources found this cycle"
 msgstr ""
 
-#: ceilometer/agent/base.py:163
+#: ceilometer/agent/manager.py:176
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:188
+#: ceilometer/agent/manager.py:201
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
 
-#: ceilometer/agent/base.py:194
+#: ceilometer/agent/manager.py:207
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:263
+#: ceilometer/agent/manager.py:280
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:266
+#: ceilometer/agent/manager.py:283
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/base.py:404
+#: ceilometer/agent/manager.py:424
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:406
+#: ceilometer/agent/manager.py:426
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr ""
 
-#: ceilometer/agent/base.py:415
+#: ceilometer/agent/manager.py:435
 msgid "Error stopping pollster."
 msgstr ""
 
@@ -128,36 +128,36 @@ msgstr ""
 msgid "Skipping because %s service is not registered in keystone"
 msgstr ""
 
-#: ceilometer/alarm/service.py:93
+#: ceilometer/alarm/service.py:94
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr ""
 
-#: ceilometer/alarm/service.py:98
+#: ceilometer/alarm/service.py:99
 msgid "alarm evaluation cycle failed"
 msgstr ""
 
-#: ceilometer/alarm/service.py:110
+#: ceilometer/alarm/service.py:111
 #, python-format
 msgid "Failed to evaluate alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:178
+#: ceilometer/alarm/service.py:179
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:187
+#: ceilometer/alarm/service.py:188
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
 msgstr ""
 
-#: ceilometer/alarm/service.py:198
+#: ceilometer/alarm/service.py:199
 #, python-format
 msgid "Unable to notify alarm %s"
 msgstr ""
 
-#: ceilometer/alarm/service.py:219
+#: ceilometer/alarm/service.py:220
 msgid "Unable to notify for an alarm with no action"
 msgstr ""
 
@@ -189,23 +189,23 @@ msgstr ""
 msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/gnocchi.py:110
+#: ceilometer/alarm/evaluator/gnocchi.py:111
 #: ceilometer/alarm/evaluator/threshold.py:95
 msgid "alarm stats retrieval failed"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/gnocchi.py:113
+#: ceilometer/alarm/evaluator/gnocchi.py:114
 #, python-format
 msgid "alarm stats retrieval failed: %s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/gnocchi.py:140
+#: ceilometer/alarm/evaluator/gnocchi.py:141
 #: ceilometer/alarm/evaluator/threshold.py:112
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/gnocchi.py:163
+#: ceilometer/alarm/evaluator/gnocchi.py:164
 #: ceilometer/alarm/evaluator/threshold.py:137
 #, python-format
 msgid ""
@@ -213,7 +213,7 @@ msgid ""
 "threshold, most recent: %(most_recent)s"
 msgstr ""
 
-#: ceilometer/alarm/evaluator/gnocchi.py:167
+#: ceilometer/alarm/evaluator/gnocchi.py:168
 #: ceilometer/alarm/evaluator/threshold.py:141
 #, python-format
 msgid ""
@@ -228,7 +228,7 @@ msgid ""
 " %(previous)s to %(current)s with action %(action)s because %(reason)s."
 msgstr ""
 
-#: ceilometer/alarm/notifier/rest.py:64
+#: ceilometer/alarm/notifier/rest.py:68
 #, python-format
 msgid ""
 "Notifying alarm %(alarm_name)s %(alarm_id)s with severity %(severity)s "
@@ -268,80 +268,80 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:91
+#: ceilometer/api/controllers/v2/alarms.py:95
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:173
+#: ceilometer/api/controllers/v2/alarms.py:177
 #, python-format
 msgid "Timezone %s is not valid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:288
+#: ceilometer/api/controllers/v2/alarms.py:292
 msgid "Time constraint names must be unique for a given alarm."
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:298
+#: ceilometer/api/controllers/v2/alarms.py:302
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:309
+#: ceilometer/api/controllers/v2/alarms.py:313
 #, python-format
 msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:325
+#: ceilometer/api/controllers/v2/alarms.py:329
 #, python-format
 msgid "duplicate actions are found: %s, remove duplicate ones"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:331
+#: ceilometer/api/controllers/v2/alarms.py:335
 #, python-format
 msgid "%(name)s count exceeds maximum value %(maximum)d"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:342
+#: ceilometer/api/controllers/v2/alarms.py:346
 #, python-format
 msgid "Unable to parse action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:345
+#: ceilometer/api/controllers/v2/alarms.py:349
 #, python-format
 msgid "Unsupported action %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:348
+#: ceilometer/api/controllers/v2/alarms.py:352
 #, python-format
 msgid "You are not authorized to create action: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:590
+#: ceilometer/api/controllers/v2/alarms.py:594
 #, python-format
 msgid "Alarm with name=%s exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:602
+#: ceilometer/api/controllers/v2/alarms.py:606
 #, python-format
 msgid "Error while putting alarm: %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:603
-#: ceilometer/api/controllers/v2/alarms.py:772
+#: ceilometer/api/controllers/v2/alarms.py:607
+#: ceilometer/api/controllers/v2/alarms.py:776
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:663
+#: ceilometer/api/controllers/v2/alarms.py:667
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:765
+#: ceilometer/api/controllers/v2/alarms.py:769
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:771
+#: ceilometer/api/controllers/v2/alarms.py:775
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr ""
@@ -385,18 +385,18 @@ msgstr ""
 msgid "Alarm %(alarm_id)s not found in project %(project)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/events.py:185
+#: ceilometer/api/controllers/v2/events.py:190
 #, python-format
 msgid ""
 "operator %(operator)s is not supported. the supported operators are: "
 "%(supported)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/events.py:288
+#: ceilometer/api/controllers/v2/events.py:297
 msgid "Event"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/events.py:291
+#: ceilometer/api/controllers/v2/events.py:300
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
 msgstr ""
@@ -412,6 +412,11 @@ msgstr ""
 #: ceilometer/api/controllers/v2/meters.py:423
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
+msgstr ""
+
+#: ceilometer/api/controllers/v2/meters.py:496
+#: ceilometer/api/controllers/v2/resources.py:147
+msgid "Limit is not a valid field for queries, use 'limit' parameter."
 msgstr ""
 
 #: ceilometer/api/controllers/v2/query.py:205
@@ -622,18 +627,18 @@ msgid ""
 "status: %(status_code)d: %(msg)s"
 msgstr ""
 
-#: ceilometer/dispatcher/http.py:79
+#: ceilometer/dispatcher/http.py:82
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in"
 " the ceilometer.conf file"
 msgstr ""
 
-#: ceilometer/dispatcher/http.py:117
+#: ceilometer/dispatcher/http.py:120
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/http.py:120
+#: ceilometer/dispatcher/http.py:123
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr ""
@@ -692,23 +697,9 @@ msgstr ""
 msgid "Event Definitions: %s"
 msgstr ""
 
-#: ceilometer/hardware/discovery.py:89
+#: ceilometer/hardware/discovery.py:95
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
-msgstr ""
-
-#: ceilometer/hardware/plugin.py:67
-msgid "Passed resource dict must contain keys resource_id and resource_url."
-msgstr ""
-
-#: ceilometer/hardware/plugin.py:109
-#, python-format
-msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
-msgstr ""
-
-#: ceilometer/hardware/plugin.py:140
-#, python-format
-msgid "Can NOT load inspector %(name)s: %(err)s"
 msgstr ""
 
 #: ceilometer/ipmi/platform/intel_node_manager.py:300
@@ -871,31 +862,31 @@ msgstr ""
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:261
+#: ceilometer/storage/mongo/utils.py:264
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:276
+#: ceilometer/storage/mongo/utils.py:279
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:415
+#: ceilometer/storage/mongo/utils.py:418
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. "
 "Giving up."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:419
+#: ceilometer/storage/mongo/utils.py:422
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:466
+#: ceilometer/storage/mongo/utils.py:469
 #, python-format
 msgid "Index %s will be recreate."
 msgstr ""
