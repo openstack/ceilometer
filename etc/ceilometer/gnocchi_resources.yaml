@@ -64,10 +64,7 @@ resources:
       flavor_id: resource_metadata.(instance_flavor_id|(flavor.id))
       server_group: resource_metadata.user_metadata.server_group
 
-# NOTE(sileht): We are not able the create this resource yet
-# The resource id looks like: instance-00000001-1880d27c-678f-45bf-98ce-12e21e52a1c7-tap5f58854d-9d
-  - resource_type: instance-network
-    ignore: true
+  - resource_type: instance_network_interface
     metrics:
       - 'network.outgoing.packets.rate'
       - 'network.incoming.packets.rate'
@@ -77,12 +74,11 @@ resources:
       - 'network.incoming.bytes.rate'
       - 'network.outgoing.bytes'
       - 'network.incoming.bytes'
+    attributes:
+      name: resource_metadata.vnic_name
+      instance_id: resource_metadata.instance_id
 
-
-# NOTE(sileht): We are not able the create this resource yet
-# The resource id looks like: 1880d27c-678f-45bf-98ce-12e21e52a1c7-hdd
-  - resource_type: instance-disk
-    ignore: true
+  - resource_type: instance_disk
     metrics:
       - 'disk.device.read.requests'
       - 'disk.device.read.requests.rate'
@@ -97,6 +93,9 @@ resources:
       - 'disk.device.capacity'
       - 'disk.device.allocation'
       - 'disk.device.usage'
+    attributes:
+      name: resource_metadata.disk_name
+      instance_id: resource_metadata.instance_id
 
   - resource_type: image
     metrics:
