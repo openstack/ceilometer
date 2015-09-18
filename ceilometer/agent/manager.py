@@ -23,6 +23,7 @@ import fnmatch
 import itertools
 import random
 
+from keystoneclient import exceptions as ks_exceptions
 from oslo_config import cfg
 from oslo_context import context
 from oslo_log import log
@@ -33,7 +34,7 @@ from stevedore import extension
 
 from ceilometer.agent import plugin_base
 from ceilometer import coordination
-from ceilometer.i18n import _, _LI
+from ceilometer.i18n import _, _LI, _LE, _LW
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
@@ -71,6 +72,12 @@ cfg.CONF.register_opts(OPTS)
 cfg.CONF.register_opts(POLLING_OPTS, group='polling')
 cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')
+cfg.CONF.import_group('service_types', 'ceilometer.energy.kwapi')
+cfg.CONF.import_group('service_types', 'ceilometer.image.glance')
+cfg.CONF.import_group('service_types', 'ceilometer.neutron_client')
+cfg.CONF.import_group('service_types', 'ceilometer.nova_client')
+cfg.CONF.import_group('service_types', 'ceilometer.objectstore.rgw')
+cfg.CONF.import_group('service_types', 'ceilometer.objectstore.swift')
 
 
 class PollsterListForbidden(Exception):
@@ -271,6 +278,9 @@ class AgentManager(service_base.BaseService):
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id="ceilometer.api")
 
+        self._keystone = None
+        self._keystone_last_exception = None
+
     @staticmethod
     def _get_ext_mgr(namespace):
         def _catch_extension_load_error(mgr, ep, exc):
@@ -385,11 +395,30 @@ class AgentManager(service_base.BaseService):
         super(AgentManager, self).stop()
 
     def interval_task(self, task):
-        try:
-            self.keystone = keystone_client.get_client()
-        except Exception as e:
-            self.keystone = e
+        # NOTE(sileht): remove the previous keystone client
+        # and exception to get a new one in this polling cycle.
+        self._keystone = None
+        self._keystone_last_exception = None
+
         task.poll_and_notify()
+
+    @property
+    def keystone(self):
+        # NOTE(sileht): we do lazy loading of the keystone client
+        # for multiple reasons:
+        # * don't use it if no plugin need it
+        # * use only one client for all plugins per polling cycle
+        if self._keystone is None and self._keystone_last_exception is None:
+            try:
+                self._keystone = keystone_client.get_client()
+                self._keystone_last_exception = None
+            except ks_exceptions.ClientException as e:
+                self._keystone = None
+                self._keystone_last_exception = e
+        if self._keystone is not None:
+            return self._keystone
+        else:
+            raise self._keystone_last_exception
 
     @staticmethod
     def _parse_discoverer(url):
@@ -413,6 +442,18 @@ class AgentManager(service_base.BaseService):
             discoverer = self._discoverer(name)
             if discoverer:
                 try:
+                    if discoverer.KEYSTONE_REQUIRED_FOR_SERVICE:
+                        service_type = getattr(
+                            cfg.CONF.service_types,
+                            discoverer.KEYSTONE_REQUIRED_FOR_SERVICE)
+                        if not self.keystone.service_catalog.get_endpoints(
+                                service_type=service_type):
+                            LOG.warning(_LW(
+                                'Skipping %(name)s, %(service_type)s service '
+                                'is not registered in keystone'),
+                                {'name': name, 'service_type': service_type})
+                            continue
+
                     discovered = discoverer.discover(self, param)
                     partitioned = self.partition_coordinator.extract_my_subset(
                         self.construct_group_id(discoverer.group_id),
@@ -420,6 +461,9 @@ class AgentManager(service_base.BaseService):
                     resources.extend(partitioned)
                     if discovery_cache is not None:
                         discovery_cache[url] = partitioned
+                except ks_exceptions.ClientException as e:
+                    LOG.error(_LE('Skipping %(name)s, keystone issue: '
+                                  '%(exc)s'), {'name': name, 'exc': e})
                 except Exception as err:
                     LOG.exception(_('Unable to discover resources: %s') % err)
             else:

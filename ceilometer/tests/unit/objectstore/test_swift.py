@@ -67,7 +67,8 @@ class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
-        self.keystone = mock.MagicMock()
+        self._keystone = mock.MagicMock()
+        self._keystone_last_exception = None
 
 
 class TestSwiftPollster(testscenarios.testcase.WithScenarios,
