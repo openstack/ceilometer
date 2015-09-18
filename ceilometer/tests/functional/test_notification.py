@@ -455,9 +455,29 @@ class TestRealNotificationHA(BaseRealNotification):
 
     def test_reset_listeners_on_refresh(self):
         self.srv.start()
+        listeners = self.srv.pipeline_listeners
+        self.assertEqual(20, len(listeners))
+        self.srv._configure_pipeline_listeners()
         self.assertEqual(20, len(self.srv.pipeline_listeners))
-        self.srv._refresh_listeners()
-        self.assertEqual(20, len(self.srv.pipeline_listeners))
+        for listener in listeners:
+            self.assertNotIn(listeners, set(self.srv.pipeline_listeners))
+        self.srv.stop()
+
+    def test_retain_common_listeners_on_refresh(self):
+        with mock.patch('ceilometer.coordination.PartitionCoordinator'
+                        '.extract_my_subset', return_value=[1, 2]):
+            self.srv.start()
+        self.assertEqual(4, len(self.srv.pipeline_listeners))
+        listeners = [listener for listener in self.srv.pipeline_listeners]
+        with mock.patch('ceilometer.coordination.PartitionCoordinator'
+                        '.extract_my_subset', return_value=[1, 3]):
+            self.srv._refresh_agent(None)
+        self.assertEqual(4, len(self.srv.pipeline_listeners))
+        for listener in listeners:
+            if listener.dispatcher.targets[0].topic.endswith('1'):
+                self.assertIn(listener, set(self.srv.pipeline_listeners))
+            else:
+                self.assertNotIn(listener, set(self.srv.pipeline_listeners))
         self.srv.stop()
 
     @mock.patch('oslo_messaging.Notifier.sample')
