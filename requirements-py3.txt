@@ -24,7 +24,7 @@ oslo.messaging<1.9.0,>=1.8.0 # Apache-2.0
 oslo.middleware<1.1.0,>=1.0.0 # Apache-2.0
 oslo.utils!=1.4.1,<1.5.0,>=1.4.0 # Apache-2.0
 pysnmp<5.0.0,>=4.2.1
-python-ceilometerclient<1.1.0,>=1.0.13
+python-ceilometerclient<1.2,>=1.1.1
 python-glanceclient<0.18.0,>=0.15.0
 python-keystoneclient<1.4.0,>=1.2.0
 python-neutronclient<2.5.0,>=2.4.0
