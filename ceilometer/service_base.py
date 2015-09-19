@@ -29,30 +29,76 @@ LOG = log.getLogger(__name__)
 @six.add_metaclass(abc.ABCMeta)
 class BaseService(os_service.Service):
 
+    def clear_pipeline_validation_status(self):
+        """Clears pipeline validation status flags."""
+        self.pipeline_validated = False
+        self.event_pipeline_validated = False
+
     def init_pipeline_refresh(self):
+        """Initializes pipeline refresh state."""
+
+        self.clear_pipeline_validation_status()
         if cfg.CONF.refresh_pipeline_cfg:
+            self.set_pipeline_mtime(pipeline.get_pipeline_mtime())
+            self.set_pipeline_hash(pipeline.get_pipeline_hash())
 
-            self.pipeline_mtime = pipeline.get_pipeline_mtime()
-            self.pipeline_hash = pipeline.get_pipeline_hash()
+        if cfg.CONF.refresh_event_pipeline_cfg:
+            self.set_pipeline_mtime(pipeline.get_pipeline_mtime(
+                pipeline.EVENT_TYPE), pipeline.EVENT_TYPE)
+            self.set_pipeline_hash(pipeline.get_pipeline_hash(
+                pipeline.EVENT_TYPE), pipeline.EVENT_TYPE)
 
+        if (cfg.CONF.refresh_pipeline_cfg or
+                cfg.CONF.refresh_event_pipeline_cfg):
             self.tg.add_timer(cfg.CONF.pipeline_polling_interval,
                               self.refresh_pipeline)
+
+    def get_pipeline_mtime(self, p_type=pipeline.SAMPLE_TYPE):
+        return (self.event_pipeline_mtime if p_type == pipeline.EVENT_TYPE else
+                self.pipeline_mtime)
+
+    def set_pipeline_mtime(self, mtime, p_type=pipeline.SAMPLE_TYPE):
+        if p_type == pipeline.EVENT_TYPE:
+            self.event_pipeline_mtime = mtime
+        else:
+            self.pipeline_mtime = mtime
+
+    def get_pipeline_hash(self, p_type=pipeline.SAMPLE_TYPE):
+        return (self.event_pipeline_hash if p_type == pipeline.EVENT_TYPE else
+                self.pipeline_hash)
+
+    def set_pipeline_hash(self, _hash, p_type=pipeline.SAMPLE_TYPE):
+        if p_type == pipeline.EVENT_TYPE:
+            self.event_pipeline_hash = _hash
+        else:
+            self.pipeline_hash = _hash
 
     @abc.abstractmethod
     def reload_pipeline(self):
         """Reload pipeline in the agents."""
 
-    def refresh_pipeline(self):
-        mtime = pipeline.get_pipeline_mtime()
-        if mtime > self.pipeline_mtime:
+    def pipeline_changed(self, p_type=pipeline.SAMPLE_TYPE):
+        """Returns hash of changed pipeline else False."""
+
+        pipeline_mtime = self.get_pipeline_mtime(p_type)
+        mtime = pipeline.get_pipeline_mtime(p_type)
+        if mtime > pipeline_mtime:
             LOG.info(_LI('Pipeline configuration file has been updated.'))
 
-            self.pipeline_mtime = mtime
-            _hash = pipeline.get_pipeline_hash()
-
-            if _hash != self.pipeline_hash:
+            self.set_pipeline_mtime(mtime, p_type)
+            _hash = pipeline.get_pipeline_hash(p_type)
+            pipeline_hash = self.get_pipeline_hash(p_type)
+            if _hash != pipeline_hash:
                 LOG.info(_LI("Detected change in pipeline configuration."))
+                return _hash
+        return False
 
+    def refresh_pipeline(self):
+        """Refreshes appropriate pipeline, then delegates to agent."""
+
+        if cfg.CONF.refresh_pipeline_cfg:
+            pipeline_hash = self.pipeline_changed()
+            if pipeline_hash:
                 try:
                     # Pipeline in the notification agent.
                     if hasattr(self, 'pipeline_manager'):
@@ -63,13 +109,37 @@ class BaseService(os_service.Service):
                     LOG.debug("Pipeline has been refreshed. "
                               "old hash: %(old)s, new hash: %(new)s",
                               {'old': self.pipeline_hash,
-                               'new': _hash})
+                               'new': pipeline_hash})
+                    self.set_pipeline_hash(pipeline_hash)
+                    self.pipeline_validated = True
                 except Exception as err:
                     LOG.debug("Active pipeline config's hash is %s",
                               self.pipeline_hash)
                     LOG.exception(_LE('Unable to load changed pipeline: %s')
                                   % err)
-                    return
 
-                self.pipeline_hash = _hash
-                self.reload_pipeline()
+        if cfg.CONF.refresh_event_pipeline_cfg:
+            ev_pipeline_hash = self.pipeline_changed(pipeline.EVENT_TYPE)
+            if ev_pipeline_hash:
+                try:
+                    # Pipeline in the notification agent.
+                    if hasattr(self, 'event_pipeline_manager'):
+                        self.event_pipeline_manager = (pipeline.
+                                                       setup_event_pipeline())
+
+                    LOG.debug("Event Pipeline has been refreshed. "
+                              "old hash: %(old)s, new hash: %(new)s",
+                              {'old': self.event_pipeline_hash,
+                               'new': ev_pipeline_hash})
+                    self.set_pipeline_hash(ev_pipeline_hash,
+                                           pipeline.EVENT_TYPE)
+                    self.event_pipeline_validated = True
+                except Exception as err:
+                    LOG.debug("Active event pipeline config's hash is %s",
+                              self.event_pipeline_hash)
+                    LOG.exception(_LE('Unable to load changed event pipeline:'
+                                      ' %s') % err)
+
+        if self.pipeline_validated or self.event_pipeline_validated:
+            self.reload_pipeline()
+            self.clear_pipeline_validation_status()
