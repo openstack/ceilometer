@@ -18,7 +18,7 @@ from ceilometer import neutron_client
 
 
 class _BaseServicesDiscovery(plugin_base.DiscoveryBase):
-    REQUIRED_KEYSTONE_FOR_SERVICE = 'neutron'
+    KEYSTONE_REQUIRED_FOR_SERVICE = 'neutron'
 
     def __init__(self):
         super(_BaseServicesDiscovery, self).__init__()
