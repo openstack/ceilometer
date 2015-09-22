@@ -1742,12 +1742,11 @@ class BasePipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
-
-        pipe.publish_data(None, counters)
+        for s in counters:
+            pipe.publish_data(None, s)
+            pipe.flush(None)
         publisher = pipeline_manager.pipelines[0].publishers[0]
         expected_len = len(test_resources) * len(expected)
-        self.assertEqual(0, len(publisher.samples))
-        pipe.flush(None)
         self.assertEqual(expected_len, len(publisher.samples))
 
         # bucket samples by resource first
@@ -1817,7 +1816,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             dict(name='memory.usage', volume=512.0),
             dict(name='memory', volume=1024.0),
         ]
-        expected = [50.0]
+        expected = [25.0]
         self._do_test_arithmetic(expression, scenario, expected)
 
     def test_arithmetic_transformer_missing(self):

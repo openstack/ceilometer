@@ -101,15 +101,14 @@ class ArithmeticTransformer(transformer.TransformerBase):
 
     def flush(self, context):
         new_samples = []
+        cache_clean_list = []
         if not self.misconfigured:
             for resource_id in self.cache:
                 if self._check_requirements(resource_id):
                     new_samples.append(self._calculate(resource_id))
-                else:
-                    LOG.warn(_('Unable to perform calculation, not all of '
-                               '{%s} are present'),
-                             ', '.join(self.required_meters))
-            self.cache.clear()
+                    cache_clean_list.append(resource_id)
+            for res_id in cache_clean_list:
+                self.cache.pop(res_id)
         return new_samples
 
     @classmethod
