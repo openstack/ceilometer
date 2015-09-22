@@ -61,6 +61,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             'unit_conversion': conversions.ScalingTransformer,
             'rate_of_change': conversions.RateOfChangeTransformer,
             'arithmetic': arithmetic.ArithmeticTransformer,
+            'delta': conversions.DeltaTransformer,
         }
 
         if name in class_name_ext:
@@ -1896,6 +1897,164 @@ class BasePipelineTestCase(base.BaseTestCase):
         pipe.flush(None)
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(0, len(publisher.samples))
+
+    def _do_test_delta(self, data, expected, growth_only=False):
+        transformer_cfg = [
+            {
+                'name': 'delta',
+                'parameters': {
+                    'target': {'name': 'new_meter'},
+                    'growth_only': growth_only,
+                }
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('counters', ['cpu'])
+
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        pipe.publish_data(None, data)
+        pipe.flush(None)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+        self.assertEqual(expected, len(publisher.samples))
+        return publisher.samples
+
+    def test_delta_transformer(self):
+        samples = [
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=26,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=16,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=53,
+                unit='ns',
+                user_id='test_user_bis',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+        ]
+        deltas = self._do_test_delta(samples, 2)
+        self.assertEqual('new_meter', deltas[0].name)
+        self.assertEqual('delta', deltas[0].type)
+        self.assertEqual('ns', deltas[0].unit)
+        self.assertEqual({'version': '2.0'}, deltas[0].resource_metadata)
+        self.assertEqual(-10, deltas[0].volume)
+        self.assertEqual('new_meter', deltas[1].name)
+        self.assertEqual('delta', deltas[1].type)
+        self.assertEqual('ns', deltas[1].unit)
+        self.assertEqual({'version': '1.0'}, deltas[1].resource_metadata)
+        self.assertEqual(37, deltas[1].volume)
+
+    def test_delta_transformer_out_of_order(self):
+        samples = [
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=26,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=16,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=((timeutils.utcnow() - datetime.timedelta(minutes=5))
+                           .isoformat()),
+                resource_metadata={'version': '2.0'}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=53,
+                unit='ns',
+                user_id='test_user_bis',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+        ]
+        deltas = self._do_test_delta(samples, 1)
+        self.assertEqual('new_meter', deltas[0].name)
+        self.assertEqual('delta', deltas[0].type)
+        self.assertEqual('ns', deltas[0].unit)
+        self.assertEqual({'version': '1.0'}, deltas[0].resource_metadata)
+        self.assertEqual(27, deltas[0].volume)
+
+    def test_delta_transformer_growth_only(self):
+        samples = [
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=26,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=16,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '2.0'}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=53,
+                unit='ns',
+                user_id='test_user_bis',
+                project_id='test_proj_bis',
+                resource_id='test_resource',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={'version': '1.0'}
+            ),
+        ]
+        deltas = self._do_test_delta(samples, 1, True)
+        self.assertEqual('new_meter', deltas[0].name)
+        self.assertEqual('delta', deltas[0].type)
+        self.assertEqual('ns', deltas[0].unit)
+        self.assertEqual({'version': '1.0'}, deltas[0].resource_metadata)
+        self.assertEqual(37, deltas[0].volume)
 
     def test_unique_pipeline_names(self):
         self._dup_pipeline_name_cfg()
