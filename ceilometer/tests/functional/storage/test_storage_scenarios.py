@@ -2932,6 +2932,17 @@ class AlarmHistoryTest(AlarmTestBase,
         utcnow = datetime.datetime(2014, 4, 7, 7, 45)
         self._clear_alarm_history(utcnow, 3 * 60, 0)
 
+    def test_delete_history_when_delete_alarm(self):
+        alarms = list(self.alarm_conn.get_alarms())
+        self.assertEqual(3, len(alarms))
+        history = list(self.alarm_conn.query_alarm_history())
+        self.assertEqual(3, len(history))
+        for alarm in alarms:
+            self.alarm_conn.delete_alarm(alarm.alarm_id)
+        self.assertEqual(3, len(alarms))
+        history = list(self.alarm_conn.query_alarm_history())
+        self.assertEqual(0, len(history))
+
 
 class ComplexAlarmQueryTest(AlarmTestBase,
                             tests_db.MixinTestsWithBackendScenarios):
@@ -3060,24 +3071,9 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
 
             self.alarm_conn.record_alarm_change(alarm_change=alarm_change3)
 
-            if alarm.name in ["red-alert", "yellow-alert"]:
-                alarm_change4 = dict(event_id=(
-                                     "16fd2706-8baf-433b-82eb-8c7fada847f%s"
-                                     % i),
-                                     alarm_id=alarm.alarm_id,
-                                     type=alarm_models.AlarmChange.DELETION,
-                                     detail="detail %s" % (i + 2),
-                                     user_id=alarm.user_id,
-                                     project_id=alarm.project_id,
-                                     on_behalf_of=alarm.project_id,
-                                     timestamp=datetime.datetime(2012, 9, 27,
-                                                                 10 + i,
-                                                                 30 + i))
-                self.alarm_conn.record_alarm_change(alarm_change=alarm_change4)
-
     def test_alarm_history_with_no_filter(self):
         history = list(self.alarm_conn.query_alarm_history())
-        self.assertEqual(11, len(history))
+        self.assertEqual(9, len(history))
 
     def test_alarm_history_with_no_filter_and_limit(self):
         history = list(self.alarm_conn.query_alarm_history(limit=3))
@@ -3125,11 +3121,10 @@ class ComplexAlarmHistoryQueryTest(AlarmTestBase,
         filter_expr = {"=": {"alarm_id": "r3d"}}
         history = list(self.alarm_conn.query_alarm_history(
             filter_expr=filter_expr, orderby=[{"timestamp": "asc"}]))
-        self.assertEqual(4, len(history))
+        self.assertEqual(3, len(history))
         self.assertEqual([alarm_models.AlarmChange.CREATION,
                           alarm_models.AlarmChange.RULE_CHANGE,
-                          alarm_models.AlarmChange.STATE_TRANSITION,
-                          alarm_models.AlarmChange.DELETION],
+                          alarm_models.AlarmChange.STATE_TRANSITION],
                          [h.type for h in history])
 
 

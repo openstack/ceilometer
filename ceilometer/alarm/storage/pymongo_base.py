@@ -77,8 +77,9 @@ class Connection(base.Connection):
     create_alarm = update_alarm
 
     def delete_alarm(self, alarm_id):
-        """Delete an alarm."""
+        """Delete an alarm and its history data."""
         self.db.alarm.remove({'alarm_id': alarm_id})
+        self.db.alarm_history.remove({'alarm_id': alarm_id})
 
     def record_alarm_change(self, alarm_change):
         """Record alarm change event."""

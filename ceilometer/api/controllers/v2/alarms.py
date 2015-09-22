@@ -625,10 +625,6 @@ class AlarmController(rest.RestController):
         self.conn.delete_alarm(alarm.alarm_id)
         alarm_object = Alarm.from_db_model(alarm)
         alarm_object.delete_actions()
-        change = alarm_object.as_dict(alarm_models.Alarm)
-        self._record_change(change,
-                            timeutils.utcnow(),
-                            type=alarm_models.AlarmChange.DELETION)
 
     @wsme_pecan.wsexpose([AlarmChange], [base.Query])
     def history(self, q=None):

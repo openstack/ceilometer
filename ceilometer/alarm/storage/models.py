@@ -109,7 +109,6 @@ class AlarmChange(base.Model):
     CREATION = 'creation'
     RULE_CHANGE = 'rule change'
     STATE_TRANSITION = 'state transition'
-    DELETION = 'deletion'
 
     def __init__(self,
                  event_id,
