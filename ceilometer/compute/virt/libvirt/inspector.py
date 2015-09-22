@@ -48,7 +48,8 @@ def retry_on_disconnect(function):
         try:
             return function(self, *args, **kwargs)
         except libvirt.libvirtError as e:
-            if (e.get_error_code() == libvirt.VIR_ERR_SYSTEM_ERROR and
+            if (e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
+                                       libvirt.VIR_ERR_INTERNAL_ERROR) and
                 e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
                                          libvirt.VIR_FROM_RPC)):
                 LOG.debug('Connection to libvirt broken')
@@ -94,7 +95,8 @@ class LibvirtInspector(virt_inspector.Inspector):
             if not libvirt or not isinstance(ex, libvirt.libvirtError):
                 raise virt_inspector.InspectorException(six.text_type(ex))
             error_code = ex.get_error_code()
-            if (error_code == libvirt.VIR_ERR_SYSTEM_ERROR and
+            if (error_code in (libvirt.VIR_ERR_SYSTEM_ERROR,
+                               libvirt.VIR_ERR_INTERNAL_ERROR) and
                 ex.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
                                           libvirt.VIR_FROM_RPC)):
                 raise
