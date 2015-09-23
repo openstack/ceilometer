@@ -39,6 +39,7 @@ import ceilometer.image.glance
 import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
+import ceilometer.meter.notifications
 import ceilometer.middleware
 import ceilometer.network.notifications
 import ceilometer.neutron_client
@@ -97,10 +98,12 @@ def list_opts():
         ('database', ceilometer.storage.OPTS),
         ('dispatcher_file', ceilometer.dispatcher.file.OPTS),
         ('event', ceilometer.event.converter.OPTS),
+        ('exchange_control', ceilometer.exchange_control.EXCHANGE_OPTS),
         ('hardware', ceilometer.hardware.discovery.OPTS),
         ('ipmi',
          itertools.chain(ceilometer.ipmi.platform.intel_node_manager.OPTS,
                          ceilometer.ipmi.pollsters.OPTS)),
+        ('meter', ceilometer.meter.notifications.OPTS),
         ('notification',
          itertools.chain(ceilometer.notification.OPTS,
                          [ceilometer.service.NOTI_OPT])),
