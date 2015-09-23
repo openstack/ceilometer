@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev16\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev128\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-04 06:16+0000\n"
+"POT-Creation-Date: 2015-09-23 14:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,25 +17,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: ceilometer/notification.py:184
+#: ceilometer/notification.py:187
 msgid ""
 "Non-metric meters may be collected. It is highly advisable to disable "
 "these meters using ceilometer.conf or the pipeline.yaml"
 msgstr ""
 
-#: ceilometer/pipeline.py:584
+#: ceilometer/pipeline.py:588
 #, python-format
 msgid ""
 "metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s has no"
 " volume (volume: None), the sample will be dropped"
 msgstr ""
 
-#: ceilometer/pipeline.py:597
+#: ceilometer/pipeline.py:601
 #, python-format
 msgid ""
 "metering data %(counter_name)s for %(resource_id)s @ %(timestamp)s has "
 "volume which is not a number (volume: %(counter_volume)s), the sample "
 "will be dropped"
+msgstr ""
+
+#: ceilometer/agent/manager.py:451
+#, python-format
+msgid "Skipping %(name)s, %(service_type)s service is not registered in keystone"
 msgstr ""
 
 #: ceilometer/agent/discovery/endpoint.py:42
@@ -80,10 +85,10 @@ msgid "Duplicated values: %s found in CLI options, auto de-duplidated"
 msgstr ""
 
 #: ceilometer/compute/pollsters/disk.py:133
-#: ceilometer/compute/pollsters/disk.py:701
+#: ceilometer/compute/pollsters/disk.py:711
 #: ceilometer/compute/pollsters/memory.py:51
 #: ceilometer/compute/pollsters/memory.py:94
-#: ceilometer/compute/pollsters/net.py:108
+#: ceilometer/compute/pollsters/net.py:99
 #, python-format
 msgid ""
 "Instance %(instance_id)s was shut off while getting samples of "
@@ -106,5 +111,19 @@ msgstr ""
 #: ceilometer/hardware/pollsters/generic.py:66
 #, python-format
 msgid "Ignore unrecognized field %s"
+msgstr ""
+
+#: ceilometer/transformer/conversions.py:88
+#, python-format
+msgid "Dropping out of time order sample: %s"
+msgstr ""
+
+#: ceilometer/transformer/conversions.py:94
+msgid "Negative delta detected, dropping value"
+msgstr ""
+
+#: ceilometer/transformer/conversions.py:100
+#, python-format
+msgid "Dropping sample with no predecessor: %s"
 msgstr ""
 

@@ -1,13 +1,9 @@
-# Chinese (Simplified, China) translations for ceilometer.
+# Chinese (Traditional, Taiwan) translations for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
-# aji.zqfan <aji.zqfan@gmail.com>, 2015
-# yelu <yelu@unitedstack.com>, 2013
-# Tom Fifield <tom@openstack.org>, 2013
-# 颜海峰 <yanheven@gmail.com>, 2014
-# Yu Zhang, 2013
+# Stefano Maffulli <smaffulli@gmail.com>, 2013
 # Lucas Palm <lapalm@us.ibm.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
@@ -17,8 +13,8 @@ msgstr ""
 "POT-Creation-Date: 2015-09-23 14:39+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/openstack/"
-"ceilometer/language/zh_CN/)\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/openstack/"
+"ceilometer/language/zh_TW/)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -27,645 +23,631 @@ msgstr ""
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
-msgstr "无法找到%(entity)s %(id)s "
-
-#, python-format
-msgid "%(name)s count exceeds maximum value %(maximum)d"
-msgstr "%(name)s数量超过最大值%(maximum)d"
+msgstr "找不到 %(entity)s %(id)s"
 
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "类型为%(type)s的告警必须设置%(rule)s"
+msgstr "必須為 %(type)s 類型警示設定 %(rule)s"
 
 #, python-format
 msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
-msgstr "%(rule1)s和%(rule2)s无法同时被设置"
+msgstr "無法同時設定 %(rule1)s 和 %(rule2)s"
 
 #, python-format
 msgid "%d datapoints are unknown"
-msgstr "%d 数据点为未知"
+msgstr "%d 個資料點不明"
 
 #, python-format
 msgid "%d samples removed from database"
-msgstr "从数据库中移除%d个监控数据。"
+msgstr "已從資料庫移除了 %d 個範例"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
-msgstr "警报 %(alarm_id)s 的动作 %(scheme)s 未知，无法通知"
+msgstr "警示 %(alarm_id)s 的動作 %(scheme)s 不明，無法通知"
 
 #, python-format
 msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "告警%(alarm_id)s在项目%(project)s中未找到"
+msgstr "在專案 %(project)s 中找不到警示 %(alarm_id)s"
 
 #, python-format
 msgid "Alarm %s not found"
-msgstr "告警%s没有找到"
+msgstr "找不到警示 %s"
 
 msgid "Alarm combination rule should contain at least two different alarm ids."
-msgstr "告警组合规则必须包含至少两个不同的告警id"
+msgstr "警示組合規則應該至少包含兩個不同的警示 ID。"
 
 msgid "Alarm incorrect"
-msgstr "警报不正确"
+msgstr "警示不正確"
 
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr "用户%(u)s在项目%(p)s中的告警配额已溢出"
+msgstr "在專案 %(p)s 上，針對使用者 %(u)s 已超出的警示配額"
 
 #, python-format
 msgid ""
 "Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
 "%(threshold)s over %(period)s seconds"
 msgstr ""
-"请在 %(meter_name)s 是 %(comparison_operator)s（%(threshold)s 的 "
-"%(statistic)s）的时间超过 %(period)s 秒时发出警报"
+"如果 %(meter_name)s 在 %(period)s 秒內 %(comparison_operator)s %(threshold)s "
+"的%(statistic)s，則會出現警示"
 
 #, python-format
 msgid "Alarm with name=%s exists"
-msgstr "名称为%s的告警已存在"
+msgstr "名稱為 %s 的警示已存在"
 
 #, python-format
 msgid "Alarm with name='%s' exists"
-msgstr "名称为'%s'的告警已经存在"
+msgstr "名稱為 '%s' 的警示已存在"
 
 #, python-format
 msgid "Alarms %(alarm_ids)s are in unknown state"
-msgstr "告警%(alarm_ids)s处于未知的状态"
+msgstr "警示 %(alarm_ids)s 處於不明狀態"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
-msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
+msgstr "在表示式 '%s' 中，算術轉換器必須至少使用一種計量"
 
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
-msgstr "表%(table_name)s已经存在，无法创建。忽略此错误继续执行。"
+msgstr "無法建立表格 %(table_name)s，該表格已經存在。將忽略錯誤"
 
 #, python-format
 msgid "Cannot specify alarm %s itself in combination rule"
-msgstr "无法在组合规则中指定告警%s自身"
+msgstr "無法在組合規則中指定警示 %s 本身"
 
 #, python-format
 msgid "Combined state of alarms %s"
-msgstr "将告警%s的状态进行组合"
+msgstr "警示 %s 的合併狀態"
 
 msgid "Configuration:"
-msgstr "配置"
+msgstr "配置："
 
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "连接到%(nodelist)s节点的数据库%(db)s。"
+msgstr "正在連接至 %(nodelist)s 上的 %(db)s"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
-msgstr "遇到错误%(name)s：%(error)s，继续执行"
+msgstr "在 %(name)s 傳回錯誤 %(error)s 後繼續"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
-msgstr "无法连接到XenAPI：%s"
+msgstr "無法連接 XenAPI：%s"
 
 #, python-format
 msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr "无法为虚拟机%(id)s获取CPU使用率：%(e)s"
+msgstr "無法取得 %(id)s 的 CPU 使用率：%(e)s"
 
 #, python-format
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr "无法为%(id)s获取内存使用信息：%(e)s"
+msgstr "無法取得 %(id)s 的記憶體用量：%(e)s"
 
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
-msgstr "无法获取虚拟机%s的CPU使用率"
+msgstr "無法取得 VM %s CPU 使用率"
 
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
-msgstr "无法为实例%s获取IP地址"
+msgstr "無法取得實例 %s 的 IP 位址"
 
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in "
 "the ceilometer.conf file"
-msgstr "分发器目标未设置，没有指标将被发送。在ceilometer.conf文件中设置目标。"
+msgstr "未設定分派器目標，將不公佈任何計量。請在ceilometer.conf 檔中設定目標。"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "正在丢弃通知%(type)s (uuid:%(msgid)s)"
+msgstr "正在捨棄通知 %(type)s（UUID：%(msgid)s）"
 
 #, python-format
 msgid "Dropping metering data with TTL %d"
-msgstr "正在根据TTL %d丢弃监控数据"
+msgstr "正在捨棄 TTL 為 %d 的計量資料"
 
 #, python-format
 msgid "Duplicate VM name found: %s"
-msgstr "找到重复 VM 名称：%s"
+msgstr "發現重複的 VM 名稱：%s"
 
 #, python-format
 msgid ""
 "Error from libvirt while looking up instance <name=%(name)s, id=%(id)s>: "
 "[Error Code %(error_code)s] %(ex)s"
 msgstr ""
-"查找实例 <名称为 %(name)s，标识为 %(id)s> 时，libvirt 中出错：[错误代码 "
+"查閱實例 <名稱=%(name)s，ID=%(id)s> 時，libvirt 中發生錯誤：[錯誤碼 "
 "%(error_code)s] %(ex)s"
 
 #, python-format
 msgid "Error parsing HTTP response: %s"
-msgstr "解析HTTP响应失败: %s"
+msgstr "剖析 HTTP 回應時發生錯誤：%s"
 
 #, python-format
 msgid "Error while posting alarm: %s"
-msgstr "创建告警%s时遇到错误"
+msgstr "公佈警示時發生錯誤：%s"
 
 #, python-format
 msgid "Error while putting alarm: %s"
-msgstr "修改告警%s时遇到错误"
+msgstr "放置警示時發生錯誤：%s"
 
 msgid "Event"
 msgstr "事件"
 
 #, python-format
 msgid "Event Definitions: %s"
-msgstr "事件定义：%s"
+msgstr "事件定義：%s"
 
 msgid "Expired residual resource and meter definition data"
-msgstr "剩余资源和计量表定义数据已到期"
+msgstr "過期的殘留資源和計量定義資料"
 
 msgid "Expression evaluated to a NaN value!"
-msgstr "表达式计算结果为NaN！"
+msgstr "表示式已求值為非數字值！"
 
 #, python-format
 msgid "FLOATING IP USAGE: %s"
-msgstr "浮动IP使用情况：%s"
+msgstr "浮動 IP 使用情形：%s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
-msgstr "评估告警%s时失败了"
+msgstr "無法評估警示 %s"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr "无法为%(name)s引入扩展：%(error)s"
+msgstr "無法匯入 %(name)s 的延伸：%(error)s"
 
 #, python-format
 msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
-msgstr ""
-"为虚拟机<name=%(name)s, id=%(id)s>获取监控数据失败了，虚拟机状态为SHUTOFF"
+msgstr "無法檢查實例 <名稱=%(name)s，ID=%(id)s> 的資料，網域狀態為 SHUTOFF。"
 
 #, python-format
 msgid ""
 "Failed to inspect memory usage of %(instance_uuid)s, can not get info from "
 "libvirt: %(error)s"
 msgstr ""
-"为虚拟机%(instance_uuid)s采集内存使用指标失败了，无法从libvirt获取信息："
-"%(error)s"
+"無法檢查 %(instance_uuid)s 的記憶體用量，無法從 libVirt 取得資訊：%(error)s"
 
 #, python-format
 msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
 "not get info from libvirt."
 msgstr ""
-"为虚拟机<name=%(name)s, id=%(id)s>采集内存使用指标失败了，无法从libvirt获取信"
-"息。"
+"無法檢查實例 <名稱=%(name)s，ID=%(id)s> 的記憶體用量，無法從 libVirt 取得資"
+"訊。"
 
 #, python-format
 msgid "Failed to load any dispatchers for %s"
-msgstr "无法为%s加载任何分发器"
+msgstr "無法載入 %s 的任何分派器"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
-msgstr "无法为%s加载任何通知处理器"
+msgstr "無法載入 %s 的任何通知處理程式"
 
 #, python-format
 msgid "Failed to parse the timestamp value %s"
-msgstr "解析时间戳%s失败"
+msgstr "無法剖析時間戳記值 %s"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
-msgstr "发布%d个数据点时失败，正在将其丢弃"
+msgstr "無法發佈 %d 個資料點，正在捨棄它們"
 
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
-msgstr "发布%d个数据点时失败，将其入队"
+msgstr "無法發佈 %d 個資料點，正在將它們排入佇列"
 
 #, python-format
 msgid "Failed to record metering data: %s"
-msgstr "无法保存监控数据：%s"
+msgstr "無法記錄計量資料：%s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
-msgstr "过滤表达式不合法：%s"
+msgstr "過濾表示式無效：%s"
 
 #, python-format
 msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
-msgstr "忽略虚拟机%(name)s (%(instance_id)s) : %(error)s"
+msgstr "正在忽略實例 %(name)s (%(instance_id)s)：%(error)s"
 
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "忽略虚拟机%(name)s：%(error)s"
+msgstr "正在忽略實例 %(name)s：%(error)s"
 
 #, python-format
 msgid "Ignoring pool %(pool_id)s: %(error)s"
-msgstr "忽略pool %(pool_id)s：%(error)s"
+msgstr "正在忽略儲存區 %(pool_id)s：%(error)s"
 
 #, python-format
 msgid ""
 "Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
 "column: %(column)s."
-msgstr "事件定义文件%(file)s中有非法YAML语法，行：%(line)s，列%(column)s。"
+msgstr "事件定義檔 %(file)s 第 %(line)s 行第 %(column)s 欄的 YAML 語法無效。"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
-msgstr "非法的间隔%(period)s: %(err)s"
+msgstr "期間 %(period)s 無效：%(err)s"
 
 #, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
-msgstr "特征%(trait)s包含了不合法的特征类型'%(type)s' "
+msgstr "特徵 %(trait)s 的特徵類型 '%(type)s' 無效"
 
 msgid "Limit must be positive"
-msgstr "limit必须是正数"
+msgstr "限制值必須是正數"
 
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
-msgstr "从数据库返回了多个id为%s的事件"
+msgstr "從儲存體驅動程式傳回了多個 ID 為 %s 的事件"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
-msgstr "多个虚拟机%s在XenServer中被找到"
+msgstr "在 XenServer 中找到多個 VM %s"
 
 msgid "Must specify connection_url, and connection_password to use"
-msgstr "使用时必须指定connection_url和connection_password"
+msgstr "必須指定 connection_url 和 connection_password，才能使用"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for trait %(trait)s"
-msgstr "特征%(trait)s缺少可用的名为%(plugin)s的插件"
+msgstr "特徵 %(trait)s 無法使用任何名稱為 %(plugin)s 的外掛程式 "
 
 msgid "Node Manager init failed"
-msgstr "节点管理器初始化失败"
+msgstr "節點管理程式起始設定失敗"
 
 #, python-format
 msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "权限不足以访问%(aspect)s %(id)s"
+msgstr "未獲授權來存取 %(aspect)s %(id)s"
 
 #, python-format
 msgid ""
 "Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
 "%(previous)s to %(current)s with action %(action)s because %(reason)s."
 msgstr ""
-"正在通知警报%(alarm_name)s %(alarm_id)s，警报级别%(severity)s，状态"
-"从%(previous)s变为%(current)s，动作为%(action)s，原因是%(reason)s。"
+"正在以動作 %(action)s 通知優先順序為 %(severity)s 的警示 %(alarm_name)s "
+"%(alarm_id)s（從 %(previous)s 至 %(current)s），因為 %(reason)s。"
 
 #, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
-msgstr "OpenDaylight接口返回状态%(status)s，原因%(reason)s"
+msgstr "OpenDaylight API 傳回了 %(status)s %(reason)s"
 
 #, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
-msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
+msgstr "Opencontrail API 傳回了 %(status)s %(reason)s"
 
 #, python-format
 msgid "Order-by expression not valid: %s"
-msgstr "orderby表达式不合法：%s"
+msgstr "排序方式表示式無效：%s"
 
 #, python-format
 msgid ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: %(err)s"
-msgstr "%(trait)s 的 JSONPath 规范“%(jsonpath)s”中存在解析错误：%(err)s"
+msgstr "%(trait)s 的 JSONPath 規格 '%(jsonpath)s' 發生剖析錯誤：%(err)s"
 
 msgid "Period must be positive."
-msgstr "period 参数必须是正数"
+msgstr "期間必須是正數。"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "流水线%(pipeline)s：发布器%(pub)s报错，继续执行"
+msgstr "管線 %(pipeline)s：在發佈者 %(pub)s 傳回錯誤後繼續"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr "流水线%(pipeline)s：变形器%(trans)s清空数据时出错"
+msgstr "管線 %(pipeline)s：清除轉換器 %(trans)s 時發生錯誤"
 
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
-msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
+msgstr "管線 %(pipeline)s：%(smp)s 的轉換器 %(trans)s傳回錯誤後結束"
 
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
 "%(param)s"
-msgstr "流水线%(pipeline)s：使用参数%(param)s初始化变形器实例%(name)s"
+msgstr "管線 %(pipeline)s：使用參數 %(param)s 來設定轉換器實例 %(name)s"
 
 #, python-format
 msgid "Pipeline config: %s"
-msgstr "流水线配置：%s"
+msgstr "管線配置：%s"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
-msgstr "特征%s指定了插件但是没有提供插件的名称"
+msgstr "指定了外掛程式，但沒有提供任何外掛程式名稱給特徵 %s"
 
 #, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
+msgstr "輪詢 %(mtr)s 感應器已失敗 %(cnt)s 次！"
 
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr "拉取%(name)s失败了%(cnt)s次！"
+msgstr "輪詢 %(name)s 已失敗 %(cnt)s 次！"
 
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "在上下文环境%(src)s执行采集器%(poll)s"
+msgstr "正在 %(src)s 的環境定義中輪詢 pollster %(poll)s"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
-msgstr "%s的采集器被禁用"
+msgstr "已停用 %s 的 Pollster！"
 
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
-msgstr "请阻止轮询程序 %(name)s 再轮询源 %(source)s！"
+msgstr "阻止 pollster %(name)s 再次輪詢資源 %(source)s！"
 
 #, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr "发布的数据量超过本地队列最大长度，正在丢弃最老的%d个数据"
+msgstr "已超出發佈者 local_queue 長度上限，正在捨棄 %d 個最舊的樣本"
 
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
-msgstr "未知的发布策略(%s)，强制使用默认策略"
+msgstr "發佈原則不明 (%s)，強制設為預設值"
 
 #, python-format
 msgid "Publishing policy set to %s"
-msgstr "设置发布策略为%s"
+msgstr "正在將原則集發佈到 %s"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
-msgstr "RGW AdminOps接口返回%(status)s %(reason)s"
+msgstr "RGW AdminOps API 傳回了 %(status)s %(reason)s"
 
 #, python-format
 msgid ""
 "Remaining as %(state)s due to %(count)d samples %(disposition)s threshold, "
 "most recent: %(most_recent)s"
 msgstr ""
-"有%(count)d个数据满足%(disposition)s阈值，因而状态保持为%(state)s，最近的一次"
-"数据：%(most_recent)s"
+"保持 %(state)s，因為有 %(count)d 個樣本 %(disposition)s 臨界值，最新："
+"%(most_recent)s"
 
 #, python-format
 msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr "停留在状态%(state)s因为告警%(alarm_ids)s处于状态%(state)s"
+msgstr "保持 %(state)s，因為警示 %(alarm_ids)s 處於狀態 %(state)s"
 
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
-msgstr "请求无法连接到OpenDaylight的北向REST接口"
+msgstr "要求無法使用 NorthBound REST API 來連接至 OpenDaylight"
 
 #, python-format
 msgid "Required field %s not specified"
-msgstr "必填项%s没有填写"
+msgstr "未指定必要欄位 %s"
 
 #, python-format
 msgid "Required field in trait definition not specified: '%s'"
-msgstr "在特征定义中的必填项没有填写：'%s'"
+msgstr "未指定特徵定義中的必要欄位：'%s'"
 
 msgid "Resource"
-msgstr "资源"
+msgstr "資源"
 
 msgid "Sample"
-msgstr "数据"
+msgstr "樣本"
 
 #, python-format
 msgid "Skip loading extension for %s"
-msgstr "跳过为%s加载扩展"
+msgstr "跳過載入 %s 的延伸"
 
 #, python-format
 msgid "Starting server in PID %s"
-msgstr "正在启动服务进程PID %s"
+msgstr "正在以 PID %s 啟動伺服器"
 
 #, python-format
 msgid "String %s is not a valid isotime"
-msgstr "字符串%s不是个合法的标准时间格式"
+msgstr "字串 %s 不是有效的 ISO 時間"
 
 #, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
-msgstr "数据类型%(type)s不被支持。支持的数据类型列表：%(supported)s"
+msgstr "不支援資料類型 %(type)s。支援的資料類型清單為：%(supported)s"
 
 msgid "The path for the file publisher is required"
-msgstr "文件发布器必须设置文件路径"
+msgstr "需要檔案發佈者的路徑"
 
 msgid "Time constraint names must be unique for a given alarm."
-msgstr "一个指定的告警的时间约束名称必须唯一"
+msgstr "針對給定的警示，時間限制名稱必須是唯一的。"
 
 #, python-format
 msgid "Timezone %s is not valid"
-msgstr "时区%s不合法"
+msgstr "時區 %s 無效"
 
 #, python-format
 msgid ""
 "Transition to %(state)s due to %(count)d samples %(disposition)s threshold, "
 "most recent: %(most_recent)s"
 msgstr ""
-"有%(count)d个数据满足%(disposition)s阈值，因而状态迁移到%(state)s，最近的一次"
-"数据：%(most_recent)s"
+"轉移到 %(state)s，由於 %(count)d 個樣本 %(disposition)s 臨界值，最新："
+"%(most_recent)s"
 
 #, python-format
 msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr "迁移到状态%(state)s，因为告警%(alarm_ids)s处于状态%(state)s"
+msgstr "轉移至 %(state)s，因為警示 %(alarm_ids)s 處於狀態 %(state)s"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
-msgstr "UDP: 无法解码由 %s 发送的数据"
+msgstr "UDP：無法解碼由 %s 傳送的資料"
 
 msgid "UDP: Unable to store meter"
-msgstr "UDP: 无法存储计量器"
+msgstr "UDP：無法儲存計量"
 
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
-msgstr "无法连接到数据库服务器：%(errmsg)s。"
+msgstr "無法連接至資料庫伺服器：%(errmsg)s。"
 
 #, python-format
 msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr "无法转换%(value)s到预期的数据类型%(type)s。"
+msgstr "無法將值 %(value)s 轉換成預期的資料類型 %(type)s。"
 
 #, python-format
 msgid "Unable to discover resources: %s"
-msgstr "无法发现资源：%s"
+msgstr "無法探索資源：%s"
 
 #, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
-msgstr "无法计算表达式%(expr)s：%(exc)s"
+msgstr "無法對表示式 %(expr)s 進行求值：%(exc)s"
 
 #, python-format
 msgid "Unable to load publisher %s"
-msgstr "无法加载发布器%s"
+msgstr "無法載入發佈者 %s"
 
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
-msgstr "无法加载管理程序的探测器：%s"
+msgstr "無法載入 Hypervisor 檢查程式：%s"
 
 msgid "Unable to log in to XenAPI (is the Dom0 disk full?)"
-msgstr "无法登录到XenAPI(Dom0磁盘是空么？)"
+msgstr "無法登入 XenAPI（Dom0 磁碟已滿？）"
 
 #, python-format
 msgid "Unable to notify alarm %s"
-msgstr "无法通知警报 %s"
+msgstr "無法通知警示 %s"
 
 msgid "Unable to notify for an alarm with no action"
-msgstr "无法为一个没有动作的警报进行通知"
+msgstr "在不使用任何動作的情況下，無法通知警示"
 
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
-msgstr "无法为警报 %(alarm_id)s 解析动作 %(action)s "
+msgstr "無法剖析警示 %(alarm_id)s 的動作 %(action)s"
 
 #, python-format
 msgid "Unable to parse action %s"
-msgstr "无法解析动作%s"
+msgstr "無法剖析動作 %s"
 
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
 "up."
-msgstr "在%(retries)d次尝试后仍无法重连到MongoDB主节点。放弃重连。"
+msgstr "在 %(retries)d 次重試之後仍無法重新連接至主要 MongoDB。正在放棄。"
 
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
 msgstr ""
-"无法重连到MongoDB主节点：%(errmsg)s。在%(retry_interval)d秒后进行重试。"
+"無法重新連接至主要 MongoDB：%(errmsg)s。請在%(retry_interval)d 秒之後再次嘗"
+"試。"
 
 msgid "Unable to send sample over UDP"
-msgstr "无法通过UDP发送采样"
+msgstr "無法透過 UDP 來傳送樣本"
 
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type %(type)s."
-msgstr "在转换%(value)s到预期的数据类型%(type)s时发生了未预料的异常。"
+msgstr "將 %(value)s 轉換為預期的資料類型%(type)s 時發生非預期的異常狀況。"
 
 #, python-format
 msgid "Unknown discovery extension: %s"
-msgstr "未知的发现器插件：%s"
+msgstr "不明的探索延伸：%s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr "未知的元数据类型。键(%s)将无法进行查询。"
+msgstr "不明的 meta 資料類型。索引鍵 (%s) 將不可查詢。"
 
 #, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "从fw %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在防火牆 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
 msgid "Unknown status %(stat)s received on member %(id)s,skipping sample"
-msgstr "从member %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在成員 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
-msgstr "从pool %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在儲存區 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
-msgstr "从vip %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在 VIP %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
-msgstr "从VPN%(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在 VPN %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
 msgid "Unsupported action %s"
-msgstr "动作%s不支持"
+msgstr "不受支援的動作 %s"
 
 #, python-format
 msgid "VM %s not found in XenServer"
-msgstr "无法在XenServer中找到虚拟机%s"
+msgstr "在 XenServer 中找不到 VM %s"
 
 #, python-format
 msgid "VM %s not found on Hyper-V"
-msgstr "在Hyper-V上找不到 VM %s"
+msgstr "在 Hyper-V 上找不到 VM %s"
 
 msgid "Wrong sensor type"
-msgstr "错误的传感器类型"
+msgstr "感應器類型錯誤"
 
 msgid "XenAPI not installed"
-msgstr "XenAPI没有安装"
+msgstr "未安裝 XenAPI"
 
 #, python-format
 msgid "YAML error reading Event Definitions file %(file)s"
-msgstr "读取事件定义文件%(file)s时遇到YAML错误"
-
-#, python-format
-msgid "You are not authorized to create action: %s"
-msgstr "你没有权限创建动作：%s"
+msgstr "讀取事件定義檔 %(file)s 時發生 YAML 錯誤"
 
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "因为 %(reason)s, 警报 %(id)s 转换至 %(state)s "
+msgstr "警示 %(id)s 正在轉移到 %(state)s，原因：%(reason)s"
 
 msgid "alarm evaluation cycle failed"
-msgstr "警报周期评估失败"
+msgstr "警示評估週期失敗"
 
 msgid "alarm retrieval failed"
-msgstr "获取警报失败"
+msgstr "警示擷取失敗"
 
 msgid "alarm state update failed"
-msgstr "警报状态更新失败"
+msgstr "警示狀態更新失敗"
 
 msgid "alarm stats retrieval failed"
-msgstr "警报统计信息获取失败"
+msgstr "警示統計資料擷取失敗"
 
 #, python-format
 msgid "alarm stats retrieval failed: %s"
-msgstr "告警状态检索失败：%s"
+msgstr "警示統計資料擷取失敗：%s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
+msgstr "無法取得 %(id)s 的 CPU 時間：%(e)s"
 
 msgid "detected decoupled pipeline config format"
-msgstr "检测到分离的流水线配置格式"
+msgstr "偵測到已解除聯結的管線配置格式"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"
-msgstr "因为之前没有数据（用来计算差值）因而丢弃数据：%s"
-
-#, python-format
-msgid "duplicate actions are found: %s, remove duplicate ones"
-msgstr "检测到重复的动作：%s，已去除重复的内容"
+msgstr "正在捨棄不含前一版本的樣本：%s"
 
 #, python-format
 msgid "initiating evaluation cycle on %d alarms"
-msgstr "在 %d 个警报上初始化评估周期"
+msgstr "正在 %d 個警示上起始評估週期"
 
 msgid "ipmitool output length mismatch"
-msgstr "ipmi输出长度不匹配"
+msgstr "ipmitool 輸出長度不符"
 
 msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes和backup_count必须是整数。"
+msgstr "max_bytes 及 backup_count 應該是數字。"
 
 #, python-format
 msgid "message signature invalid, discarding message: %r"
-msgstr "消息签名不合法，丢弃消息：%r"
+msgstr "訊息簽章無效，正在捨棄訊息：%r"
 
 #, python-format
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr ""
-"为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(counter_volume)s"
+msgstr "%(resource_id)s 的計量資料 %(counter_name)s：%(counter_volume)s"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
-msgstr "解析IPMI传感器数据失败，从给定的输入中无法检索到数据"
+msgstr "剖析 IPMI 感應器資料失敗，未從給定的輸入擷取任何資料"
 
 msgid "parse IPMI sensor data failed,unknown sensor type"
-msgstr "解析IPMI传感器数据失败，未知的传感器类型"
+msgstr "剖析 IPMI 感應器資料失敗，感應器類型不明"
 
 msgid "running ipmitool failure"
-msgstr "运行ipmitool时失败了"
+msgstr "執行 ipmitool 失敗"
 
 #, python-format
 msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
 msgstr ""
-"服务在0.0.0.0:%(sport)s上运行，可以通过http://127.0.0.1:%(vport)s来查看"
+"正在於 0.0.0.0:%(sport)s 提供服務，可在 http://127.0.0.1:%(vport)s 檢視"
 
 #, python-format
 msgid "serving on http://%(host)s:%(port)s"
-msgstr "在 http://%(host)s:%(port)s上服务"
+msgstr "正在於 http://%(host)s:%(port)s 提供服務"
 
 msgid "state invalid"
-msgstr "状态无效"
+msgstr "狀態無效"
 
 msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp必须是datetime对象"
+msgstr "state_timestamp 應該為日期時間物件"
 
 msgid "timestamp should be datetime object"
-msgstr "timestamp必须是datatime对象"
+msgstr "時間戳記應該為日期時間物件"

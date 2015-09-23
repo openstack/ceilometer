@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev77\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev128\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-17 06:13+0000\n"
+"POT-Creation-Date: 2015-09-23 14:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,106 +26,96 @@ msgstr ""
 msgid "UDP: Unable to store meter"
 msgstr ""
 
-#: ceilometer/notification.py:196
+#: ceilometer/notification.py:199
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:392
+#: ceilometer/pipeline.py:396
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:411
+#: ceilometer/pipeline.py:415
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:430
+#: ceilometer/pipeline.py:434
 #, python-format
 msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:460
+#: ceilometer/pipeline.py:464
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:497
+#: ceilometer/pipeline.py:501
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:513
+#: ceilometer/pipeline.py:517
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:708 ceilometer/pipeline.py:770
+#: ceilometer/pipeline.py:712 ceilometer/pipeline.py:774
 msgid "detected decoupled pipeline config format"
 msgstr ""
 
-#: ceilometer/pipeline.py:794 ceilometer/pipeline.py:813
+#: ceilometer/pipeline.py:798 ceilometer/pipeline.py:817
 #, python-format
 msgid "Pipeline config: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:171
+#: ceilometer/agent/manager.py:178
 #, python-format
 msgid "Skip pollster %(name)s, no %(p_context)sresources found this cycle"
 msgstr ""
 
-#: ceilometer/agent/manager.py:176
+#: ceilometer/agent/manager.py:183
 #, python-format
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:201
+#: ceilometer/agent/manager.py:208
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
 
-#: ceilometer/agent/manager.py:207
+#: ceilometer/agent/manager.py:214
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:280
+#: ceilometer/agent/manager.py:290
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:283
+#: ceilometer/agent/manager.py:293
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:424
+#: ceilometer/agent/manager.py:468
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:426
+#: ceilometer/agent/manager.py:470
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:435
+#: ceilometer/agent/manager.py:479
 msgid "Error stopping pollster."
-msgstr ""
-
-#: ceilometer/agent/plugin_base.py:71
-#, python-format
-msgid "Skip due to keystone error %s"
-msgstr ""
-
-#: ceilometer/agent/plugin_base.py:78
-#, python-format
-msgid "Skipping because %s service is not registered in keystone"
 msgstr ""
 
 #: ceilometer/alarm/service.py:94
@@ -328,20 +318,20 @@ msgid "Error while putting alarm: %s"
 msgstr ""
 
 #: ceilometer/api/controllers/v2/alarms.py:607
-#: ceilometer/api/controllers/v2/alarms.py:776
+#: ceilometer/api/controllers/v2/alarms.py:772
 msgid "Alarm incorrect"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:667
+#: ceilometer/api/controllers/v2/alarms.py:663
 msgid "state invalid"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:769
+#: ceilometer/api/controllers/v2/alarms.py:765
 #, python-format
 msgid "Alarm with name='%s' exists"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/alarms.py:775
+#: ceilometer/api/controllers/v2/alarms.py:771
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr ""
@@ -414,11 +404,6 @@ msgstr ""
 msgid "Invalid period %(period)s: %(err)s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/meters.py:496
-#: ceilometer/api/controllers/v2/resources.py:147
-msgid "Limit is not a valid field for queries, use 'limit' parameter."
-msgstr ""
-
 #: ceilometer/api/controllers/v2/query.py:205
 #, python-format
 msgid "Filter expression not valid: %s"
@@ -483,15 +468,15 @@ msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr ""
 
 #: ceilometer/compute/pollsters/disk.py:144
-#: ceilometer/compute/pollsters/disk.py:350
-#: ceilometer/compute/pollsters/disk.py:532
-#: ceilometer/compute/pollsters/disk.py:613
-#: ceilometer/compute/pollsters/net.py:119
+#: ceilometer/compute/pollsters/disk.py:354
+#: ceilometer/compute/pollsters/disk.py:540
+#: ceilometer/compute/pollsters/disk.py:622
+#: ceilometer/compute/pollsters/net.py:110
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/disk.py:713
+#: ceilometer/compute/pollsters/disk.py:723
 #, python-format
 msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr ""
@@ -516,28 +501,28 @@ msgstr ""
 msgid "Duplicate VM name found: %s"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:101
+#: ceilometer/compute/virt/libvirt/inspector.py:103
 #, python-format
 msgid ""
 "Error from libvirt while looking up instance <name=%(name)s, id=%(id)s>: "
 "[Error Code %(error_code)s] %(ex)s"
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:121
+#: ceilometer/compute/virt/libvirt/inspector.py:123
 #, python-format
 msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain "
 "state is SHUTOFF."
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:191
+#: ceilometer/compute/virt/libvirt/inspector.py:193
 #, python-format
 msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, "
 "can not get info from libvirt."
 msgstr ""
 
-#: ceilometer/compute/virt/libvirt/inspector.py:199
+#: ceilometer/compute/virt/libvirt/inspector.py:201
 #, python-format
 msgid ""
 "Failed to inspect memory usage of %(instance_uuid)s, can not get info "
@@ -843,17 +828,17 @@ msgstr ""
 msgid "Dropping metering data with TTL %d"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:306
+#: ceilometer/storage/impl_sqlalchemy.py:307
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:362
+#: ceilometer/storage/impl_sqlalchemy.py:364
 #, python-format
 msgid "%d samples removed from database"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:381
+#: ceilometer/storage/impl_sqlalchemy.py:400
 msgid "Expired residual resource and meter definition data"
 msgstr ""
 
@@ -905,17 +890,12 @@ msgstr ""
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr ""
 
-#: ceilometer/transformer/arithmetic.py:109
-#, python-format
-msgid "Unable to perform calculation, not all of {%s} are present"
-msgstr ""
-
-#: ceilometer/transformer/conversions.py:127
+#: ceilometer/transformer/conversions.py:199
 #, python-format
 msgid "dropping out of time order sample: %s"
 msgstr ""
 
-#: ceilometer/transformer/conversions.py:145
+#: ceilometer/transformer/conversions.py:217
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr ""

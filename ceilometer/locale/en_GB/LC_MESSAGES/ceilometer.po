@@ -7,9 +7,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev77\n"
+"Project-Id-Version: ceilometer 5.0.0.0b4.dev127\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-17 06:13+0000\n"
+"POT-Creation-Date: 2015-09-23 14:39+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language-Team: English (United Kingdom) (http://www.transifex.com/openstack/"
@@ -303,10 +303,6 @@ msgid "Sample"
 msgstr "Sample"
 
 #, python-format
-msgid "Skip due to keystone error %s"
-msgstr "Skip due to keystone error %s"
-
-#, python-format
 msgid "Starting server in PID %s"
 msgstr "Starting server in PID %s"
 
@@ -386,10 +382,6 @@ msgstr "Unable to notify for an alarm with no action"
 #, python-format
 msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
 msgstr "Unable to parse action %(action)s for alarm %(alarm_id)s"
-
-#, python-format
-msgid "Unable to perform calculation, not all of {%s} are present"
-msgstr "Unable to perform calculation, not all of {%s} are present"
 
 msgid "Unable to send sample over UDP"
 msgstr "Unable to send sample over UDP"
