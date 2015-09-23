@@ -18,8 +18,10 @@ import json
 
 from oslo_log import log
 import requests
+from requests import adapters
 import retrying
 from six.moves.urllib import parse as urlparse
+import socket
 
 from ceilometer.i18n import _
 from ceilometer import keystone_client
@@ -61,13 +63,137 @@ def maybe_retry_if_authentication_error():
                           stop_max_delay=60000)
 
 
+class CustomHTTPAdapter(adapters.HTTPAdapter):
+    """CustomHTTPAdapter
+
+    This HTTPAdapter doesn't trigger some urllib3 issues.
+    urllib3 doesn't put back connection to the pool when
+    some errors occurs like a simple ECONNREFUSED.
+
+    This HTTPAdapter workaround this by enforcing preloading
+    of the response. When enabled, urllib3 releases the connection
+    to the pool immediately after its usage, and doesn't trigger the
+    issue.
+
+    By enforcing preloading, this break some requests
+    features (like stream) that we didn't use into our GnocchiClient
+
+    * https://github.com/shazow/urllib3/issues/659
+    * https://github.com/shazow/urllib3/issues/651
+    * https://github.com/shazow/urllib3/issues/644
+    * https://github.com/kennethreitz/requests/issues/2687
+
+    We could remove this when requests 2.8.0 will be released
+    """
+    def send(self, request, stream=False, timeout=None, verify=True, cert=None,
+             proxies=None):
+        conn = self.get_connection(request.url, proxies)
+        self.cert_verify(conn, request.url, verify, cert)
+        url = self.request_url(request, proxies)
+        self.add_headers(request)
+
+        chunked = not (request.body is None or
+                       'Content-Length' in request.headers)
+
+        if isinstance(timeout, tuple):
+            try:
+                connect, read = timeout
+                timeout = adapters.TimeoutSauce(connect=connect, read=read)
+            except ValueError as e:
+                # this may raise a string formatting error.
+                err = ("Invalid timeout {0}. Pass a (connect, read) "
+                       "timeout tuple, or a single float to set "
+                       "both timeouts to the same value".format(timeout))
+                raise ValueError(err)
+        else:
+            timeout = adapters.TimeoutSauce(connect=timeout, read=timeout)
+
+        try:
+            if not chunked:
+                resp = conn.urlopen(
+                    method=request.method,
+                    url=url,
+                    body=request.body,
+                    headers=request.headers,
+                    redirect=False,
+                    assert_same_host=False,
+                    preload_content=True,  # NOTE(sileht): workaround
+                    decode_content=False,
+                    retries=self.max_retries,
+                    timeout=timeout
+                )
+
+            # Send the request.
+            else:
+                if hasattr(conn, 'proxy_pool'):
+                    conn = conn.proxy_pool
+
+                low_conn = conn._get_conn(
+                    timeout=adapters.DEFAULT_POOL_TIMEOUT)
+
+                try:
+                    low_conn.putrequest(request.method,
+                                        url,
+                                        skip_accept_encoding=True)
+
+                    for header, value in request.headers.items():
+                        low_conn.putheader(header, value)
+
+                    low_conn.endheaders()
+
+                    for i in request.body:
+                        low_conn.send(hex(len(i))[2:].encode('utf-8'))
+                        low_conn.send(b'\r\n')
+                        low_conn.send(i)
+                        low_conn.send(b'\r\n')
+                    low_conn.send(b'0\r\n\r\n')
+
+                    r = low_conn.getresponse()
+                    resp = adapters.HTTPResponse.from_httplib(
+                        r,
+                        pool=conn,
+                        connection=low_conn,
+                        preload_content=True,  # NOTE(sileht): workaround
+                        decode_content=False
+                    )
+                except Exception:
+                    # If we hit any problems here, clean up the connection.
+                    # Then, reraise so that we can handle the actual exception.
+                    low_conn.close()
+                    raise
+
+        except (adapters.ProtocolError, socket.error) as err:
+            raise adapters.ConnectionError(err, request=request)
+
+        except adapters.MaxRetryError as e:
+            if isinstance(e.reason, adapters.ConnectTimeoutError):
+                raise adapters.ConnectTimeout(e, request=request)
+
+            if isinstance(e.reason, adapters.ResponseError):
+                raise adapters.RetryError(e, request=request)
+
+            raise adapters.ConnectionError(e, request=request)
+
+        except adapters._ProxyError as e:
+            raise adapters.ProxyError(e)
+
+        except (adapters._SSLError, adapters._HTTPError) as e:
+            if isinstance(e, adapters._SSLError):
+                raise adapters.SSLError(e, request=request)
+            elif isinstance(e, adapters.ReadTimeoutError):
+                raise adapters.ReadTimeout(e, request=request)
+            else:
+                raise
+
+        return self.build_response(request, resp)
+
+
 class GnocchiSession(object):
     def __init__(self):
         self._session = requests.session()
         # NOTE(sileht): wait when the pool is empty
         # instead of raising errors.
-        adapter = requests.adapters.HTTPAdapter(
-            pool_block=True)
+        adapter = CustomHTTPAdapter(pool_block=True)
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
 
