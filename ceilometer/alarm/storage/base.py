@@ -72,7 +72,7 @@ class Connection(object):
 
     @staticmethod
     def delete_alarm(alarm_id):
-        """Delete an alarm."""
+        """Delete an alarm and its history data."""
         raise ceilometer.NotImplementedError('Alarms not implemented')
 
     @staticmethod

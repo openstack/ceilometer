@@ -114,9 +114,14 @@ class Connection(hbase_base.Connection, base.Connection):
     create_alarm = update_alarm
 
     def delete_alarm(self, alarm_id):
+        """Delete an alarm and its history data."""
         with self.conn_pool.connection() as conn:
             alarm_table = conn.table(self.ALARM_TABLE)
             alarm_table.delete(alarm_id)
+            q = hbase_utils.make_query(alarm_id=alarm_id)
+            alarm_history_table = conn.table(self.ALARM_HISTORY_TABLE)
+            for alarm_id, ignored in alarm_history_table.scan(filter=q):
+                alarm_history_table.delete(alarm_id)
 
     def get_alarms(self, name=None, user=None, state=None, meter=None,
                    project=None, enabled=None, alarm_id=None,

@@ -216,7 +216,7 @@ class Connection(base.Connection):
         return self._row_to_alarm_model(alarm_row)
 
     def delete_alarm(self, alarm_id):
-        """Delete an alarm
+        """Delete an alarm and its history data.
 
         :param alarm_id: ID of the alarm to delete
         """
@@ -224,6 +224,9 @@ class Connection(base.Connection):
         with session.begin():
             session.query(models.Alarm).filter(
                 models.Alarm.alarm_id == alarm_id).delete()
+            # FIXME(liusheng): we should use delete cascade
+            session.query(models.AlarmChange).filter(
+                models.AlarmChange.alarm_id == alarm_id).delete()
 
     @staticmethod
     def _row_to_alarm_change_model(row):
