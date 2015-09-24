@@ -22,6 +22,7 @@ import six
 
 from ceilometer.i18n import _
 from ceilometer.network.services import base
+from ceilometer import neutron_client
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -204,11 +205,9 @@ class _LBStatsPollster(base.BaseServicesPollster):
      and bandwidth.
     """
 
-    def _get_lb_pools(self):
-        return self.nc.pool_get_all()
-
-    def _get_pool_stats(self, pool_id):
-        return self.nc.pool_stats(pool_id)
+    def __init__(self):
+        super(_LBStatsPollster, self).__init__()
+        self.client = neutron_client.Client()
 
     @staticmethod
     def make_sample_from_pool(pool, name, type, unit, volume,
@@ -230,7 +229,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
     def _populate_stats_cache(self, pool_id, cache):
         i_cache = cache.setdefault("lbstats", {})
         if pool_id not in i_cache:
-            stats = self._get_pool_stats(pool_id)['stats']
+            stats = self.client.pool_stats(pool_id)['stats']
             i_cache[pool_id] = LBStatsData(
                 active_connections=stats['active_connections'],
                 total_connections=stats['total_connections'],

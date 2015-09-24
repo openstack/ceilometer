@@ -16,7 +16,6 @@
 from oslo_log import log
 
 from ceilometer.agent import plugin_base
-from ceilometer import neutron_client
 
 LOG = log.getLogger(__name__)
 
@@ -32,7 +31,6 @@ STATUS = {
 class BaseServicesPollster(plugin_base.PollsterBase):
 
     FIELDS = []
-    nc = neutron_client.Client()
 
     @staticmethod
     def _iter_cache(cache, meter_name, method):
