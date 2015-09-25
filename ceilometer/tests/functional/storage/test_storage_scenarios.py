@@ -3589,12 +3589,8 @@ class MongoAutoReconnectTest(DBTestBase,
         self.CONF.set_override('retry_interval', 0, group='database')
 
     def test_mongo_client(self):
-        if cfg.CONF.database.mongodb_replica_set:
-            self.assertIsInstance(self.conn.conn.conn,
-                                  pymongo.MongoReplicaSetClient)
-        else:
-            self.assertIsInstance(self.conn.conn.conn,
-                                  pymongo.MongoClient)
+        self.assertIsInstance(self.conn.conn.conn,
+                              pymongo.MongoClient)
 
     def test_mongo_cursor_next(self):
         expected_first_sample_timestamp = datetime.datetime(2012, 7, 2, 10, 39)

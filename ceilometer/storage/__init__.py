@@ -75,14 +75,6 @@ OPTS = [
                help="The max length of resources id in DB2 nosql, "
                     "the value should be larger than len(hostname) * 2 "
                     "as compute node's resource id is <hostname>_<nodename>."),
-
-    # Deprecated in liberty
-    cfg.StrOpt('mongodb_replica_set',
-               deprecated_for_removal=True,
-               default='',
-               help=('The name of the replica set which is used to connect to '
-                     'MongoDB database. Add "?replicaSet=myreplicatset" in '
-                     'your connection URI instead.')),
 ]
 
 cfg.CONF.register_opts(OPTS, group='database')

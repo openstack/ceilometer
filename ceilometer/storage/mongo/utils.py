@@ -269,12 +269,7 @@ class ConnectionPool(object):
     @staticmethod
     def _mongo_connect(url):
         try:
-            client = MongoProxy(
-                pymongo.MongoClient(
-                    url, replicaSet=cfg.CONF.database.mongodb_replica_set
-                )
-            )
-            return client
+            return MongoProxy(pymongo.MongoClient(url))
         except pymongo.errors.ConnectionFailure as e:
             LOG.warn(_('Unable to connect to the database server: '
                        '%(errmsg)s.') % {'errmsg': e})
