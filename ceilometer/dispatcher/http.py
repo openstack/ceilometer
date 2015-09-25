@@ -34,13 +34,6 @@ http_dispatcher_opts = [
                help='The target for event data where the http request '
                     'will be sent to. If this is not set, it will default '
                     'to same as Sample target.'),
-    cfg.BoolOpt('cadf_only',
-                default=False,
-                deprecated_for_removal=True,
-                help='The flag that indicates if only cadf message should '
-                     'be posted. If false, all meters will be posted. This is '
-                     'deprecated in favor of keystonemiddleware\'s audit '
-                     'middleware functionality'),
     cfg.IntOpt('timeout',
                default=5,
                help='The max time in seconds to wait for a request to '
@@ -64,7 +57,6 @@ class HttpDispatcher(dispatcher.Base):
         [dispatcher_http]
         target = www.example.com
         event_target = www.example.com
-        cadf_only = true
         timeout = 2
     """
     def __init__(self, conf):
@@ -74,7 +66,6 @@ class HttpDispatcher(dispatcher.Base):
         self.target = self.conf.dispatcher_http.target
         self.event_target = (self.conf.dispatcher_http.event_target or
                              self.target)
-        self.cadf_only = self.conf.dispatcher_http.cadf_only
 
     def record_metering_data(self, data):
         if self.target == '':
@@ -99,19 +90,9 @@ class HttpDispatcher(dispatcher.Base):
             if publisher_utils.verify_signature(
                     meter, self.conf.publisher.telemetry_secret):
                 try:
-                    if self.cadf_only:
-                        # Only cadf messages are being wanted.
-                        req_data = meter.get('resource_metadata',
-                                             {}).get('request')
-                        if req_data and 'CADF_EVENT' in req_data:
-                            data = req_data['CADF_EVENT']
-                        else:
-                            continue
-                    else:
-                        # Every meter should be posted to the target
-                        data = meter
+                    # Every meter should be posted to the target
                     res = requests.post(self.target,
-                                        data=json.dumps(data),
+                                        data=json.dumps(meter),
                                         headers=self.headers,
                                         timeout=self.timeout)
                     LOG.debug('Message posting finished with status code '
