@@ -26,9 +26,11 @@ import random
 import uuid
 
 import make_test_data
+from oslo_config import cfg
 from oslo_context import context
 
 from ceilometer import messaging
+from ceilometer.publisher import utils
 from ceilometer import service
 
 
@@ -62,6 +64,10 @@ def generate_data(rpc_client, make_data_args, samples_count,
         resource = resources_list[random.randint(0, len(resources_list) - 1)]
         resource_samples[resource] += 1
         sample['resource_id'] = resource
+        # need to recalculate signature because of the resource_id change
+        sig = utils.compute_signature(sample,
+                                      cfg.CONF.publisher.telemetry_secret)
+        sample['message_signature'] = sig
         batch.append(sample)
         if len(batch) == batch_size:
             send_batch(rpc_client, topic, batch)

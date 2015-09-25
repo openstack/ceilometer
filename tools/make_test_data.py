@@ -76,7 +76,7 @@ def make_test_data(name, meter_type, unit, volume, random_min,
                           user_id=user_id,
                           project_id=project_id,
                           resource_id=resource_id,
-                          timestamp=timestamp,
+                          timestamp=timestamp.isoformat(),
                           resource_metadata=resource_metadata,
                           source=source,
                           )
