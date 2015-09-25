@@ -30,18 +30,12 @@ import uuid
 
 import make_test_data
 from oslo_config import cfg
-from oslo_context import context
 import oslo_messaging
 from six import moves
 
 from ceilometer import messaging
 from ceilometer.publisher import utils
 from ceilometer import service
-
-
-def send_batch_rpc(rpc_client, topic, batch):
-    rpc_client.prepare(topic=topic).cast(context.RequestContext(),
-                                         'record_metering_data', data=batch)
 
 
 def send_batch_notifier(notifier, topic, batch):
@@ -56,13 +50,6 @@ def get_notifier(config_file):
         publisher_id='telemetry.publisher.test',
         topic='metering',
     )
-
-
-def get_rpc_client(config_file):
-    service.prepare_service(argv=['/', '--config-file', config_file])
-    transport = messaging.get_transport()
-    rpc_client = messaging.get_rpc_client(transport, version='1.0')
-    return rpc_client
 
 
 def generate_data(send_batch, make_data_args, samples_count,
@@ -104,12 +91,6 @@ def generate_data(send_batch, make_data_args, samples_count,
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '--notify',
-        dest='notify',
-        type=bool,
-        default=True
-    )
 
     parser.add_argument(
         '--batch-size',
@@ -148,12 +129,8 @@ def get_parser():
 def main():
     args = get_parser().parse_known_args()[0]
     make_data_args = make_test_data.get_parser().parse_known_args()[0]
-    if args.notify:
-        notifier = get_notifier(args.config_file)
-        send_batch = functools.partial(send_batch_notifier, notifier)
-    else:
-        rpc_client = get_rpc_client(args.config_file)
-        send_batch = functools.partial(send_batch_rpc, rpc_client)
+    notifier = get_notifier(args.config_file)
+    send_batch = functools.partial(send_batch_notifier, notifier)
     result_dir = args.result_dir
     del args.notify
     del args.config_file

@@ -17,7 +17,6 @@ import socket
 import mock
 import msgpack
 from oslo_config import fixture as fixture_config
-from oslo_context import context
 import oslo_messaging
 from oslo_utils import timeutils
 from oslotest import mockpatch
@@ -25,7 +24,6 @@ from stevedore import extension
 
 from ceilometer import collector
 from ceilometer import dispatcher
-from ceilometer import messaging
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
@@ -208,18 +206,6 @@ class TestCollector(tests_base.BaseTestCase):
             self.assertEqual(0, rpc_start.call_count)
             self.assertEqual(1, udp_start.call_count)
 
-    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')
-    @mock.patch.object(collector.CollectorService, 'start_udp')
-    def test_only_rpc(self, udp_start, rpc_start):
-        """Check that only RPC is started if udp_address is empty."""
-        self.CONF.set_override('enable_rpc', True, group='collector')
-        self.CONF.set_override('udp_address', '', group='collector')
-        self._setup_fake_dispatcher()
-        self.srv.start()
-        # two calls because two servers (notification and rpc)
-        self.assertEqual(2, rpc_start.call_count)
-        self.assertEqual(0, udp_start.call_count)
-
     def test_udp_receive_valid_encoding(self):
         self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
@@ -230,21 +216,6 @@ class TestCollector(tests_base.BaseTestCase):
             self.assertTrue(utils.verify_signature(
                 mock_dispatcher.method_calls[0][1][0],
                 "not-so-secret"))
-
-    @mock.patch('ceilometer.storage.impl_log.LOG')
-    def test_collector_no_mock(self, mylog):
-        self.CONF.set_override('enable_rpc', True, group='collector')
-        self.CONF.set_override('udp_address', '', group='collector')
-        mylog.info.side_effect = lambda *args: self.srv.stop()
-        self.srv.start()
-
-        client = messaging.get_rpc_client(self.transport, version='1.0')
-        cclient = client.prepare(topic='metering')
-        cclient.cast(context.RequestContext(),
-                     'record_metering_data', data=[self.utf8_msg])
-        self.srv.rpc_server.wait()
-        mylog.info.assert_called_once_with(
-            'metering data test for test_run_tasks: 1')
 
     def _test_collector_requeue(self, listener):
 

@@ -35,15 +35,6 @@ from ceilometer.publisher import utils
 
 LOG = log.getLogger(__name__)
 
-RPC_OPTS = [
-    cfg.StrOpt('metering_topic',
-               default='metering',
-               deprecated_for_removal=True,
-               help='The topic that ceilometer uses for metering messages.',
-               deprecated_group="DEFAULT",
-               ),
-]
-
 NOTIFIER_OPTS = [
     cfg.StrOpt('metering_topic',
                default='metering',
@@ -63,8 +54,6 @@ NOTIFIER_OPTS = [
                )
 ]
 
-cfg.CONF.register_opts(RPC_OPTS,
-                       group="publisher_rpc")
 cfg.CONF.register_opts(NOTIFIER_OPTS,
                        group="publisher_notifier")
 cfg.CONF.import_opt('host', 'ceilometer.service')
@@ -122,7 +111,7 @@ class MessagingPublisher(publisher.PublisherBase):
                 sample, cfg.CONF.publisher.telemetry_secret)
             for sample in samples
         ]
-        topic = cfg.CONF.publisher_rpc.metering_topic
+        topic = cfg.CONF.publisher_notifier.metering_topic
         self.local_queue.append((context, topic, meters))
 
         if self.per_meter_topic:
@@ -199,26 +188,6 @@ class MessagingPublisher(publisher.PublisherBase):
     @abc.abstractmethod
     def _send(self, context, topic, meters):
         """Send the meters to the messaging topic."""
-
-
-class RPCPublisher(MessagingPublisher):
-    def __init__(self, parsed_url):
-        super(RPCPublisher, self).__init__(parsed_url)
-
-        options = urlparse.parse_qs(parsed_url.query)
-        self.target = options.get('target', ['record_metering_data'])[0]
-
-        self.rpc_client = messaging.get_rpc_client(
-            messaging.get_transport(),
-            retry=self.retry, version='1.0'
-        )
-
-    def _send(self, context, topic, meters):
-        try:
-            self.rpc_client.prepare(topic=topic).cast(context, self.target,
-                                                      data=meters)
-        except oslo_messaging.MessageDeliveryFailure as e:
-            raise_delivery_failure(e)
 
 
 class NotifierPublisher(MessagingPublisher):
