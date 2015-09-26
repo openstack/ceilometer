@@ -353,7 +353,7 @@ class Connection(base.Connection):
         Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
         """
-        # Prevent database deadlocks from occuring by
+        # Prevent database deadlocks from occurring by
         # using separate transaction for each delete
         session = self._engine_facade.get_session()
         with session.begin():
