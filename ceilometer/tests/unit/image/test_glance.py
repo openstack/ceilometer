@@ -118,7 +118,8 @@ class TestManager(manager.AgentManager):
     def __init__(self):
         super(TestManager, self).__init__()
         self._keystone = mock.Mock()
-        self._keystone.service_catalog.get_endpoints = mock.Mock(
+        access = self._keystone.session.auth.get_access.return_value
+        access.service_catalog.get_endpoints = mock.Mock(
             return_value={'image': mock.ANY})
 
 

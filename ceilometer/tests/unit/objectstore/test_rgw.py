@@ -50,8 +50,10 @@ class TestManager(manager.AgentManager):
 
     def __init__(self):
         super(TestManager, self).__init__()
-        self._keystone = mock.MagicMock()
-        self._keystone.service_catalog.url_for.return_value = '/endpoint'
+        self._keystone = mock.Mock()
+        self._catalog = (self._keystone.session.auth.get_access.
+                         return_value.service_catalog)
+        self._catalog.url_for.return_value = 'http://foobar/endpoint'
 
 
 class TestRgwPollster(testscenarios.testcase.WithScenarios,
@@ -148,7 +150,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         api_method = 'get_%s' % self.pollster.METHOD
         with mockpatch.PatchObject(rgw_client, api_method, new=mock_method):
             with mockpatch.PatchObject(
-                    self.manager.keystone.service_catalog, 'url_for',
+                    self.manager._catalog, 'url_for',
                     return_value=endpoint):
                 list(self.pollster.get_samples(self.manager, {},
                                                ASSIGNED_TENANTS))
@@ -163,7 +165,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         with mockpatch.PatchObject(rgw_client, api_method,
                                    new=mock.MagicMock()):
             with mockpatch.PatchObject(
-                    self.manager.keystone.service_catalog, 'url_for',
+                    self.manager._catalog, 'url_for',
                     new=mock_url_for):
                 list(self.pollster.get_samples(self.manager, {},
                                                ASSIGNED_TENANTS))
@@ -173,7 +175,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
 
     def test_endpoint_notfound(self):
         with mockpatch.PatchObject(
-                self.manager.keystone.service_catalog, 'url_for',
+                self.manager._catalog, 'url_for',
                 side_effect=self.fake_ks_service_catalog_url_for):
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))

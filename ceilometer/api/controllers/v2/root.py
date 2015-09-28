@@ -18,7 +18,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient import exceptions
+from keystoneauth1 import exceptions
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import strutils
@@ -114,8 +114,9 @@ class V2Controller(object):
                 self._gnocchi_is_enabled = False
             else:
                 try:
-                    ks = keystone_client.get_client()
-                    ks.service_catalog.url_for(service_type='metric')
+                    catalog = keystone_client.get_service_catalog(
+                        keystone_client.get_client())
+                    catalog.url_for(service_type='metric')
                 except exceptions.EndpointNotFound:
                     self._gnocchi_is_enabled = False
                 except exceptions.ClientException:
@@ -138,9 +139,10 @@ class V2Controller(object):
                     cfg.CONF.api.aodh_url)
             else:
                 try:
-                    ks = keystone_client.get_client()
+                    catalog = keystone_client.get_service_catalog(
+                        keystone_client.get_client())
                     self._aodh_url = self._normalize_aodh_url(
-                        ks.service_catalog.url_for(service_type='alarming'))
+                        catalog.url_for(service_type='alarming'))
                 except exceptions.EndpointNotFound:
                     self._aodh_url = ""
                 except exceptions.ClientException:

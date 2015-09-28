@@ -25,6 +25,7 @@ import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 
 from ceilometer.agent import plugin_base
+from ceilometer import keystone_client
 from ceilometer import sample
 
 
@@ -45,7 +46,7 @@ SERVICE_OPTS = [
 
 cfg.CONF.register_opts(OPTS)
 cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
 
 
 class _Base(plugin_base.PollsterBase):
@@ -68,9 +69,10 @@ class _Base(plugin_base.PollsterBase):
         if _Base._ENDPOINT is None:
             try:
                 conf = cfg.CONF.service_credentials
-                _Base._ENDPOINT = ksclient.service_catalog.url_for(
-                    service_type=cfg.CONF.service_types.swift,
-                    endpoint_type=conf.os_endpoint_type)
+                _Base._ENDPOINT = keystone_client.get_service_catalog(
+                    ksclient).url_for(
+                        service_type=cfg.CONF.service_types.swift,
+                        interface=conf.interface)
             except exceptions.EndpointNotFound:
                 LOG.debug("Swift endpoint not found")
         return _Base._ENDPOINT
@@ -90,7 +92,7 @@ class _Base(plugin_base.PollsterBase):
             api_method = '%s_account' % self.METHOD
             yield (t.id, getattr(swift, api_method)
                                 (self._neaten_url(endpoint, t.id),
-                                 ksclient.auth_token))
+                                 keystone_client.get_auth_token(ksclient)))
 
     @staticmethod
     def _neaten_url(endpoint, tenant_id):

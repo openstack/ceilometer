@@ -97,7 +97,7 @@ class Client(object):
     def _get_headers(self, content_type="application/json"):
         return {
             'Content-Type': content_type,
-            'X-Auth-Token': self._ks_client.auth_token,
+            'X-Auth-Token': keystone_client.get_auth_token(self._ks_client),
         }
 
     @maybe_retry_if_authentication_error()

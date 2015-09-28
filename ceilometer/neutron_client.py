@@ -19,6 +19,7 @@ from neutronclient.v2_0 import client as clientv20
 from oslo_config import cfg
 from oslo_log import log
 
+from ceilometer import keystone_client
 
 SERVICE_OPTS = [
     cfg.StrOpt('neutron',
@@ -27,8 +28,7 @@ SERVICE_OPTS = [
 ]
 
 cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
-cfg.CONF.import_group('service_credentials', 'ceilometer.service')
+cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
 
 LOG = log.getLogger(__name__)
 
@@ -58,22 +58,11 @@ class Client(object):
     def __init__(self):
         conf = cfg.CONF.service_credentials
         params = {
-            'insecure': conf.insecure,
-            'ca_cert': conf.os_cacert,
-            'username': conf.os_username,
-            'password': conf.os_password,
-            'auth_url': conf.os_auth_url,
-            'region_name': conf.os_region_name,
-            'endpoint_type': conf.os_endpoint_type,
-            'timeout': cfg.CONF.http_timeout,
+            'session': keystone_client.get_session(),
+            'endpoint_type': conf.interface,
+            'region_name': conf.region_name,
             'service_type': cfg.CONF.service_types.neutron,
         }
-
-        if conf.os_tenant_id:
-            params['tenant_id'] = conf.os_tenant_id
-        else:
-            params['tenant_name'] = conf.os_tenant_name
-
         self.client = clientv20.Client(**params)
 
     @logged

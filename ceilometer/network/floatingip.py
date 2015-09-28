@@ -34,7 +34,8 @@ class FloatingIPPollster(plugin_base.PollsterBase):
     @staticmethod
     def _get_floating_ips(ksclient, endpoint):
         nv = nova_client.Client(
-            auth_token=ksclient.auth_token, bypass_url=endpoint)
+            auth=ksclient.session.auth,
+            endpoint_override=endpoint)
         return nv.floating_ip_get_all()
 
     def _iter_floating_ips(self, ksclient, cache, endpoint):

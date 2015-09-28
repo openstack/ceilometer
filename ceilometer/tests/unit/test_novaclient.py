@@ -247,4 +247,4 @@ class TestNovaClient(base.BaseTestCase):
     def test_with_nova_http_log_debug(self):
         self.CONF.set_override("nova_http_log_debug", True)
         self.nv = nova_client.Client()
-        self.assertTrue(self.nv.nova_client.client.http_log_debug)
+        self.assertIsNotNone(self.nv.nova_client.client.logger)

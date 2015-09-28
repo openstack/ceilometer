@@ -13,6 +13,8 @@
 # under the License.
 import itertools
 
+from keystoneauth1 import loading
+
 import ceilometer.agent.manager
 import ceilometer.api
 import ceilometer.api.app
@@ -35,6 +37,7 @@ import ceilometer.image.glance
 import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
+import ceilometer.keystone_client
 import ceilometer.meter.notifications
 import ceilometer.middleware
 import ceilometer.network.notifications
@@ -103,7 +106,15 @@ def list_opts():
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('publisher_rpc', ceilometer.publisher.messaging.RPC_OPTS),
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
-        ('service_credentials', ceilometer.service.CLI_OPTS),
+        # NOTE(sileht): the configuration file contains only the options
+        # for the password plugin that handles keystone v2 and v3 API
+        # with discovery. But other options are possible.
+        # Also, the default loaded plugin is password-ceilometer-legacy for
+        # backward compatibily
+        ('service_credentials', (
+            ceilometer.keystone_client.CLI_OPTS +
+            loading.get_auth_common_conf_options() +
+            loading.get_auth_plugin_conf_options('password'))),
         ('service_types',
          itertools.chain(ceilometer.energy.kwapi.SERVICE_OPTS,
                          ceilometer.image.glance.SERVICE_OPTS,

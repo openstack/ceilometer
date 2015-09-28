@@ -69,6 +69,10 @@ class TestManager(manager.AgentManager):
         super(TestManager, self).__init__()
         self._keystone = mock.MagicMock()
         self._keystone_last_exception = None
+        self._service_catalog = (self._keystone.session.auth.
+                                 get_access.return_value.service_catalog)
+        self._auth_token = (self._keystone.session.auth.
+                            get_access.return_value.auth_token)
 
 
 class TestSwiftPollster(testscenarios.testcase.WithScenarios,
@@ -180,12 +184,12 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         api_method = '%s_account' % self.pollster.METHOD
         with mockpatch.PatchObject(swift_client, api_method, new=mock_method):
             with mockpatch.PatchObject(
-                    self.manager.keystone.service_catalog, 'url_for',
+                    self.manager._service_catalog, 'url_for',
                     return_value=endpoint):
                 list(self.pollster.get_samples(self.manager, {},
                                                ASSIGNED_TENANTS))
         expected = [mock.call(self.pollster._neaten_url(endpoint, t.id),
-                              self.manager.keystone.auth_token)
+                              self.manager._auth_token)
                     for t in ASSIGNED_TENANTS]
         self.assertEqual(expected, mock_method.call_args_list)
 
@@ -196,7 +200,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         with mockpatch.PatchObject(swift_client, api_method,
                                    new=mock.MagicMock()):
             with mockpatch.PatchObject(
-                    self.manager.keystone.service_catalog, 'url_for',
+                    self.manager._service_catalog, 'url_for',
                     new=mock_url_for):
                 list(self.pollster.get_samples(self.manager, {},
                                                ASSIGNED_TENANTS))
@@ -206,7 +210,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
 
     def test_endpoint_notfound(self):
         with mockpatch.PatchObject(
-                self.manager.keystone.service_catalog, 'url_for',
+                self.manager._service_catalog, 'url_for',
                 side_effect=self.fake_ks_service_catalog_url_for):
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))

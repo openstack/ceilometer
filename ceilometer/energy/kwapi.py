@@ -21,6 +21,7 @@ import requests
 import six
 
 from ceilometer.agent import plugin_base
+from ceilometer import keystone_client
 from ceilometer import sample
 
 
@@ -69,7 +70,7 @@ class _Base(plugin_base.PollsterBase):
     @staticmethod
     def get_kwapi_client(ksclient, endpoint):
         """Returns a KwapiClient configured with the proper url and token."""
-        return KwapiClient(endpoint, ksclient.auth_token)
+        return KwapiClient(endpoint, keystone_client.get_auth_token(ksclient))
 
     CACHE_KEY_PROBE = 'kwapi.probes'
 
