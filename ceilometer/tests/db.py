@@ -161,9 +161,10 @@ class HBaseManager(fixtures.Fixture):
 
     @property
     def url(self):
-        return '%s?table_prefix=%s' % (
+        return '%s?table_prefix=%s&table_prefix_separator=%s' % (
             self._url,
-            os.getenv("CEILOMETER_TEST_HBASE_TABLE_PREFIX", "test")
+            os.getenv("CEILOMETER_TEST_HBASE_TABLE_PREFIX", "test"),
+            os.getenv("CEILOMETER_TEST_HBASE_TABLE_PREFIX_SEPARATOR", "_")
         )
 
 

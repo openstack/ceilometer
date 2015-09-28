@@ -25,8 +25,10 @@ class MockHBaseTable(happybase.Table):
         # We create happybase Table with prefix from
         # CEILOMETER_TEST_HBASE_TABLE_PREFIX
         prefix = os.getenv("CEILOMETER_TEST_HBASE_TABLE_PREFIX", 'test')
+        separator = os.getenv(
+            "CEILOMETER_TEST_HBASE_TABLE_PREFIX_SEPARATOR", '_')
         super(MockHBaseTable, self).__init__(
-            "%s_%s" % (prefix, name),
+            "%s%s%s" % (prefix, separator, name),
             connection)
 
     def put(self, row, *args, **kwargs):
