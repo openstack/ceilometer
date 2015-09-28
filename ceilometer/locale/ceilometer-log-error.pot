@@ -6,16 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev128\n"
+"Project-Id-Version: ceilometer 6.0.0.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-23 14:39+0000\n"
+"POT-Creation-Date: 2015-09-28 06:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.1.1\n"
 
 #: ceilometer/collector.py:178
 #, python-format
@@ -30,7 +30,12 @@ msgstr ""
 msgid "Error sending a heartbeat to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:174
+#: ceilometer/coordination.py:134
+#, python-format
+msgid "Error joining partitioning group %s, re-trying"
+msgstr ""
+
+#: ceilometer/coordination.py:177
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
