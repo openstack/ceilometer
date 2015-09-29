@@ -255,7 +255,8 @@ metric:
 
 
 # NOTE: non-metric meters are generally events/existence meters
-# These are expected to be DEPRECATED in future releases
+# These are DEPRECATED in current release and expected to be
+# REMOVED in the next upcoming release.
 #
   # Image
   - name: "image"
