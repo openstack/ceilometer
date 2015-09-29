@@ -70,7 +70,7 @@ def _build_trait_query(session, trait_type, key, value, op='eq'):
                'ne': (trait_model.value != value)}
     conditions = [trait_model.key == key, op_dict[op]]
     return (session.query(trait_model.event_id.label('ev_id'))
-            .filter(*conditions), trait_model)
+            .filter(*conditions))
 
 
 class Connection(base.Connection):
@@ -258,17 +258,17 @@ class Connection(base.Connection):
                 trait_filter = filters.pop()
                 key = trait_filter.pop('key')
                 op = trait_filter.pop('op', 'eq')
-                trait_subq, t_model = _build_trait_query(
-                    session, trait_filter.keys()[0], key,
-                    trait_filter.values()[0], op)
+                trait_type, value = list(trait_filter.items())[0]
+                trait_subq = _build_trait_query(session, trait_type,
+                                                key, value, op)
                 for trait_filter in filters:
                     key = trait_filter.pop('key')
                     op = trait_filter.pop('op', 'eq')
-                    q, model = _build_trait_query(
-                        session, trait_filter.keys()[0], key,
-                        trait_filter.values()[0], op)
+                    trait_type, value = list(trait_filter.items())[0]
+                    q = _build_trait_query(session, trait_type,
+                                           key, value, op)
                     trait_subq = trait_subq.filter(
-                        q.filter(model.event_id == t_model.event_id).exists())
+                        trait_subq.subquery().c.ev_id == q.subquery().c.ev_id)
                 trait_subq = trait_subq.subquery()
 
             query = (session.query(models.Event.id)
