@@ -79,7 +79,10 @@ HBase
 
     import happybase
 
-    conn = happybase.Connection(host=$hbase-thrift-server, port=9090, table_prefix=None)
+    conn = happybase.Connection(host=$hbase-thrift-server,
+                                port=9090,
+                                table_prefix=None,
+                                table_prefix_separator='_')
     print conn.tables() # this returns a list of HBase tables in your HBase server
 
    .. note::
@@ -97,6 +100,16 @@ HBase
     [database]
     connection = hbase://hbase-thrift-host:9090
 
+   It is possible to customize happybase's `table_prefix` and `table_prefix_separator`
+   via query string. By default `table_prefix` is not set and `table_prefix_separator`
+   is '_'. When `table_prefix` is not specified `table_prefix_separator` is not taken
+   into account. E.g. the resource table in the default case will be 'resource' while
+   with `table_prefix` set to 'ceilo' and `table_prefix_separator` to '.' the resulting
+   table will be 'ceilo.resource'. For this second case this is the database connection
+   configuration::
+
+    [database]
+    connection = hbase://hbase-thrift-host:9090?table_prefix=ceilo&table_prefix_separator=.
 
 .. _HappyBase: http://happybase.readthedocs.org/en/latest/index.html#
 .. _MongoDB: http://www.mongodb.org/

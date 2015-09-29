@@ -60,9 +60,10 @@ class Connection(object):
         """
         LOG.debug('connecting to HBase on %(host)s:%(port)s',
                   {'host': conf['host'], 'port': conf['port']})
-        return happybase.ConnectionPool(size=100, host=conf['host'],
-                                        port=conf['port'],
-                                        table_prefix=conf['table_prefix'])
+        return happybase.ConnectionPool(
+            size=100, host=conf['host'], port=conf['port'],
+            table_prefix=conf['table_prefix'],
+            table_prefix_separator=conf['table_prefix_separator'])
 
     @staticmethod
     def _parse_connection_url(url):
@@ -77,6 +78,8 @@ class Connection(object):
         result = netutils.urlsplit(url)
         opts['table_prefix'] = urlparse.parse_qs(
             result.query).get('table_prefix', [None])[0]
+        opts['table_prefix_separator'] = urlparse.parse_qs(
+            result.query).get('table_prefix_separator', ['_'])[0]
         opts['dbtype'] = result.scheme
         if ':' in result.netloc:
             opts['host'], port = result.netloc.split(':')
