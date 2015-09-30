@@ -6,14 +6,13 @@
 # Tomoyuki KATO <tomo@dream.daynight.jp>, 2013
 # Akihiro Motoki <amotoki@gmail.com>, 2015. #zanata
 # Mie Yamamoto <myamamot@redhat.com>, 2015. #zanata
-# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev19\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
-"PO-Revision-Date: 2015-09-28 05:14+0000\n"
+"POT-Creation-Date: 2015-09-30 06:17+0000\n"
+"PO-Revision-Date: 2015-09-29 06:28+0000\n"
 "Last-Translator: Akihiro Motoki <amotoki@gmail.com>\n"
 "Language: ja\n"
 "Language-Team: Japanese (http://www.transifex.com/openstack/ceilometer/"
@@ -51,7 +50,7 @@ msgstr ""
 
 #, python-format
 msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "アラーム %(alarm_id)s はプロジェクト %(project)s に見つかりません"
+msgstr "アラーム %(alarm_id)s がプロジェクト %(project)s には見つかりません"
 
 #, python-format
 msgid "Alarm %s not found"
@@ -67,7 +66,7 @@ msgstr "アラームが正しくありません"
 
 #, python-format
 msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr "プロジェクト %(p)s でユーザー %(u)s のアラーム割り当て量を超過しました"
+msgstr "プロジェクト %(p)s のユーザー %(u)s のアラームクォータを超過しました"
 
 #, python-format
 msgid ""
@@ -134,7 +133,7 @@ msgstr "%(id)s のメモリー使用量を取得できませんでした: %(e)s"
 
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
-msgstr "VM %s CPU 使用率を取得できませんでした"
+msgstr "VM %s のCPU 使用率を取得できませんでした"
 
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
@@ -164,12 +163,12 @@ msgid ""
 "Error from libvirt while looking up instance <name=%(name)s, id=%(id)s>: "
 "[Error Code %(error_code)s] %(ex)s"
 msgstr ""
-"インスタンス <name=%(name)s、id=%(id)s> の検索中に libvirt でエラーが発生しま"
+"インスタンス <name=%(name)s, id=%(id)s> の検索中に libvirt でエラーが発生しま"
 "した: [エラーコード %(error_code)s] %(ex)s"
 
 #, python-format
 msgid "Error parsing HTTP response: %s"
-msgstr "HTTP 応答を解析しているときにエラーが発生しました: %s"
+msgstr "HTTP 応答を解析している際にエラーが発生しました: %s"
 
 #, python-format
 msgid "Error while posting alarm: %s"
@@ -285,7 +284,7 @@ msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "特性 %(trait)s の特性タイプ '%(type)s' が無効です"
 
 msgid "Limit must be positive"
-msgstr "「制限」は正の値でなければなりません"
+msgstr "上限は正の値でなければなりません"
 
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
@@ -308,7 +307,7 @@ msgstr "ノードマネージャーの初期化に失敗しました"
 
 #, python-format
 msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "%(aspect)s %(id)s にアクセスする許可がありません"
+msgstr "%(aspect)s %(id)s にアクセスする権限がありません"
 
 #, python-format
 msgid ""
@@ -338,7 +337,7 @@ msgstr ""
 "%(trait)s の JSONPath 指定 '%(jsonpath)s' で解析エラーが発生しました: %(err)s"
 
 msgid "Period must be positive."
-msgstr "期間は正数でなければなりません。"
+msgstr "期間は正の数でなければなりません。"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
@@ -456,11 +455,11 @@ msgstr "%s の拡張機能のロードをスキップします"
 
 #, python-format
 msgid "Starting server in PID %s"
-msgstr "PID %s でサーバーを始動しています"
+msgstr "PID %s でサーバーを開始しています"
 
 #, python-format
 msgid "String %s is not a valid isotime"
-msgstr "ストリング %s は無効な isotime です"
+msgstr "文字列 %s は無効な isotime です"
 
 #, python-format
 msgid ""
@@ -474,11 +473,11 @@ msgid "The path for the file publisher is required"
 msgstr "ファイルパブリッシャーのパスが必要です"
 
 msgid "Time constraint names must be unique for a given alarm."
-msgstr "時間制約名は、指定のアラームで固有でなければなりません。"
+msgstr "時間制約の名前は、指定されたアラームで一意でなければなりません。"
 
 #, python-format
 msgid "Timezone %s is not valid"
-msgstr "時間帯 %s は無効です"
+msgstr "タイムゾーン %s が無効です"
 
 #, python-format
 msgid ""
@@ -509,7 +508,7 @@ msgstr "データベースサーバーに接続できません: %(errmsg)s。"
 #, python-format
 msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr "値 %(value)s を、予期されたデータ型 %(type)s に変換できません。"
+msgstr "値 %(value)s を、想定されるデータ型 %(type)s に変換できません。"
 
 #, fuzzy, python-format
 msgid "Unable to discover resources: %s"
@@ -567,8 +566,8 @@ msgstr "UDP 経由でサンプルを送信できません"
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type %(type)s."
 msgstr ""
-"予期されない例外が発生したため、%(value)s が、予期されるデータ型 %(type)s に"
-"変換されています。"
+"%(value)s を想定されるデータ型 %(type)s に変換する際に、想定しない例外が発生"
+"しました。"
 
 #, python-format
 msgid "Unknown discovery extension: %s"
@@ -632,6 +631,7 @@ msgstr ""
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr "アラーム %(id)s は %(state)s に遷移します。理由: %(reason)s"
 
+#, fuzzy
 msgid "alarm evaluation cycle failed"
 msgstr "アラーム評価サイクルで障害が発生しました"
 
@@ -642,7 +642,7 @@ msgid "alarm state update failed"
 msgstr "アラームの状態を更新できませんでした"
 
 msgid "alarm stats retrieval failed"
-msgstr "アラーム統計を取得できませんでした"
+msgstr "アラーム統計の取得に失敗しました"
 
 #, python-format
 msgid "alarm stats retrieval failed: %s"
@@ -659,7 +659,7 @@ msgstr "分離されたパイプライン設定フォーマットが検出され
 msgid "dropping sample with no predecessor: %s"
 msgstr "サンプル (先行なし) を廃棄しています: %s"
 
-#, python-format
+#, fuzzy, python-format
 msgid "initiating evaluation cycle on %d alarms"
 msgstr "%d アラームで評価サイクルを開始しています"
 
@@ -702,7 +702,7 @@ msgid "state invalid"
 msgstr "状態が無効です"
 
 msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp は日時オブジェクトでなければなりません"
+msgstr "state_timestamp は datetime オブジェクトでなければなりません"
 
 msgid "timestamp should be datetime object"
-msgstr "タイムスタンプは日時オブジェクトでなければなりません"
+msgstr "タイムスタンプは datetime オブジェクトでなければなりません"
