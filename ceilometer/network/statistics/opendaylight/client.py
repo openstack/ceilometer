@@ -120,7 +120,7 @@ class SwitchManagerAPIClient(_Base):
     base_url = '/switchmanager/%(container_name)s'
 
     def get_nodes(self, container_name):
-        """Get node informations
+        """Get node information
 
         URL:
             {Base URL}/nodes
@@ -146,7 +146,7 @@ class HostTrackerAPIClient(_Base):
         return self.request('/hosts/active', container_name)
 
     def get_inactive_hosts(self, container_name):
-        """Get inactive hosts informations
+        """Get inactive hosts information
 
         URL:
             {Base URL}/hosts/inactive

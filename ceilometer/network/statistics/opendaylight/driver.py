@@ -121,7 +121,7 @@ class OpenDayLightDriver(driver.Driver):
                 container_data['topology'] = cs.topology.get_topology(
                     container_name)
 
-                # get switch informations
+                # get switch information
                 container_data['switch'] = cs.switch_manager.get_nodes(
                     container_name)
 
