@@ -73,18 +73,18 @@ def make_events_query_from_filter(event_filter):
 
     :param event_filter: storage.EventFilter object.
     """
-    q = {}
+    query = {}
+    q_list = []
     ts_range = make_timestamp_range(event_filter.start_timestamp,
                                     event_filter.end_timestamp)
     if ts_range:
-        q['timestamp'] = ts_range
+        q_list.append({'timestamp': ts_range})
     if event_filter.event_type:
-        q['event_type'] = event_filter.event_type
+        q_list.append({'event_type': event_filter.event_type})
     if event_filter.message_id:
-        q['_id'] = event_filter.message_id
+        q_list.append({'_id': event_filter.message_id})
 
     if event_filter.traits_filter:
-        q.setdefault('traits')
         for trait_filter in event_filter.traits_filter:
             op = trait_filter.pop('op', 'eq')
             dict_query = {}
@@ -101,14 +101,10 @@ def make_events_query_from_filter(event_filter):
                                               v if op == 'eq'
                                               else {OP_SIGN[op]: v})
             dict_query = {'$elemMatch': dict_query}
-            if q['traits'] is None:
-                q['traits'] = dict_query
-            elif q.get('$and') is None:
-                q.setdefault('$and', [{'traits': q.pop('traits')},
-                                      {'traits': dict_query}])
-            else:
-                q['$and'].append({'traits': dict_query})
-    return q
+            q_list.append({'traits': dict_query})
+    if q_list:
+        query = {'$and': q_list}
+    return query
 
 
 def make_query_from_filter(sample_filter, require_meter=True):
