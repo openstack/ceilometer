@@ -12,7 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Test listing raw events.
+"""Test listing raw samples.
 """
 
 import datetime
@@ -27,11 +27,11 @@ from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2
 
 
-class TestListEvents(v2.FunctionalTest,
-                     tests_db.MixinTestsWithBackendScenarios):
+class TestListSamples(v2.FunctionalTest,
+                      tests_db.MixinTestsWithBackendScenarios):
 
     def setUp(self):
-        super(TestListEvents, self).setUp()
+        super(TestListSamples, self).setUp()
         patcher = mock.patch.object(timeutils, 'utcnow')
         self.addCleanup(patcher.stop)
         self.mock_utcnow = patcher.start()
