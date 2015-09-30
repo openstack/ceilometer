@@ -368,8 +368,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             attributes = self.postable_attributes.copy()
             attributes.update(self.patchable_attributes)
             attributes['id'] = self.sample['resource_id']
-            attributes['metrics'] = dict((metric_name,
-                                          {'archive_policy_name': 'low'})
+            attributes['metrics'] = dict((metric_name, {})
                                          for metric_name in self.metric_names)
             expected_calls.append(mock.call.session().post(
                 "%(url)s/%(resource_type)s" % url_params,
@@ -383,8 +382,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 "%(url)s/%(resource_type)s/%(resource_id)s/metric"
                 % url_params,
                 headers=headers,
-                data=json_matcher({self.sample['counter_name']:
-                                   {'archive_policy_name': 'low'}})
+                data=json_matcher({self.sample['counter_name']: {}})
             ))
             post_responses.append(MockResponse(self.metric))
 
