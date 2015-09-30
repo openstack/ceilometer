@@ -192,7 +192,6 @@ class TestEventAPI(EventTestBase):
         self.assertEqual('Foo', data[0]['event_type'])
 
     def test_get_events_filter_trait_empty_type(self):
-        return
         data = self.get_json(self.PATH, headers=HEADERS,
                              q=[{'field': 'trait_A',
                                  'value': 'my_Foo_text',
