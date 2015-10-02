@@ -26,9 +26,7 @@ from oslotest import mockpatch
 import requests
 import six
 import six.moves.urllib.parse as urlparse
-import tempfile
 import testscenarios
-import yaml
 
 from ceilometer.dispatcher import gnocchi
 from ceilometer import service as ceilometer_service
@@ -156,21 +154,6 @@ class DispatcherTest(base.BaseTestCase):
 
         fake_process_resource.assert_called_with(self.resource_id,
                                                  mock.ANY)
-
-    def test_archive_policy_map_config(self):
-        archive_policy_map = yaml.dump({
-            'foo.*': 'low'
-        })
-        archive_policy_cfg_file = tempfile.NamedTemporaryFile(
-            mode='w+b', prefix="foo", suffix=".yaml")
-        archive_policy_cfg_file.write(archive_policy_map.encode())
-        archive_policy_cfg_file.seek(0)
-        self.conf.conf.dispatcher_gnocchi.archive_policy_file = (
-            archive_policy_cfg_file.name)
-        d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        legacy = d._load_archive_policy(self.conf.conf)
-        self.assertEqual(legacy.get('foo.disk.rate'), "low")
-        archive_policy_cfg_file.close()
 
     def test_activity_filter_match_project_id(self):
         self.samples[0]['project_id'] = (

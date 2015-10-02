@@ -1,8 +1,5 @@
 #
-# Copyright 2014 eNovance
-#
-# Authors: Julien Danjou <julien@danjou.info>
-#          Mehdi Abaakouk <mehdi.abaakouk@enovance.com>
+# Copyright 2014-2015 eNovance
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -51,11 +48,6 @@ dispatcher_opts = [
                default="low",
                help='The archive policy to use when the dispatcher '
                'create a new metric.'),
-    cfg.StrOpt('archive_policy_file',
-               default='gnocchi_archive_policy_map.yaml',
-               deprecated_for_removal=True,
-               help=_('The Yaml file that defines per metric archive '
-                      'policies.')),
     cfg.StrOpt('resources_definition_file',
                default='gnocchi_resources.yaml',
                help=_('The Yaml file that defines mapping between samples '
@@ -72,20 +64,6 @@ def log_and_ignore_unexpected_workflow_error(func):
         except gnocchi_client.UnexpectedError as e:
             LOG.error(six.text_type(e))
     return log_and_ignore
-
-
-class LegacyArchivePolicyDefinition(object):
-    def __init__(self, definition_cfg):
-        self.cfg = definition_cfg
-        if self.cfg is None:
-            LOG.debug("No archive policy file found! Using default config.")
-
-    def get(self, metric_name):
-        if self.cfg is not None:
-            for metric, policy in self.cfg.items():
-                # Support wild cards such as disk.*
-                if fnmatch.fnmatch(metric_name, metric):
-                    return policy
 
 
 class ResourcesDefinitionException(Exception):
@@ -105,11 +83,8 @@ class ResourcesDefinition(object):
 
     JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
 
-    def __init__(self, definition_cfg, default_archive_policy,
-                 legacy_archive_policy_definition):
+    def __init__(self, definition_cfg, default_archive_policy):
         self._default_archive_policy = default_archive_policy
-        self._legacy_archive_policy_definition =\
-            legacy_archive_policy_definition
         self.cfg = definition_cfg
 
         for field, field_type in self.MANDATORY_FIELDS.items():
@@ -163,9 +138,7 @@ class ResourcesDefinition(object):
     def metrics(self):
         metrics = {}
         for t in self.cfg['metrics']:
-            archive_policy = self.cfg.get(
-                'archive_policy',
-                self._legacy_archive_policy_definition.get(t))
+            archive_policy = self.cfg.get('archive_policy')
             metrics[t] = dict(archive_policy_name=archive_policy or
                               self._default_archive_policy)
         return metrics
@@ -178,7 +151,6 @@ class GnocchiDispatcher(dispatcher.Base):
         self.filter_service_activity = (
             conf.dispatcher_gnocchi.filter_service_activity)
         self._ks_client = keystone_client.get_client()
-        self.gnocchi_archive_policy_data = self._load_archive_policy(conf)
         self.resources_definition = self._load_resources_definitions(conf)
 
         self._gnocchi_project_id = None
@@ -207,23 +179,8 @@ class GnocchiDispatcher(dispatcher.Base):
                 except ValueError:
                     data = {}
 
-        legacy_archive_policies = cls._load_archive_policy(conf)
-        return [ResourcesDefinition(r, conf.dispatcher_gnocchi.archive_policy,
-                                    legacy_archive_policies)
+        return [ResourcesDefinition(r, conf.dispatcher_gnocchi.archive_policy)
                 for r in data.get('resources', [])]
-
-    @classmethod
-    def _load_archive_policy(cls, conf):
-        policy_config_file = cls._get_config_file(
-            conf, conf.dispatcher_gnocchi.archive_policy_file)
-        data = {}
-        if policy_config_file is not None:
-            with open(policy_config_file) as data_file:
-                try:
-                    data = yaml.safe_load(data_file)
-                except ValueError:
-                    data = {}
-        return LegacyArchivePolicyDefinition(data)
 
     @property
     def gnocchi_project_id(self):
