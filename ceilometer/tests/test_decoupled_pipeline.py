@@ -277,3 +277,35 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
                           pipeline.PipelineManager,
                           self.pipeline_cfg,
                           self.transformer_manager)
+
+    def test_specific_instance_type_meter(self):
+        self.pipeline_cfg = [{
+            'name': "test_pipeline",
+            'interval': 5,
+            'meters': ['instance:m1.tiny'],
+            'transformers': [],
+            'publishers': ["test://"],
+        }, ]
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+
+        self.test_counter = sample.Sample(
+            name='instance:m1.tiny',
+            type=self.test_counter.type,
+            volume=self.test_counter.volume,
+            unit=self.test_counter.unit,
+            user_id=self.test_counter.user_id,
+            project_id=self.test_counter.project_id,
+            resource_id=self.test_counter.resource_id,
+            timestamp=self.test_counter.timestamp,
+            resource_metadata=self.test_counter.resource_metadata,
+        )
+
+        with pipeline_manager.publisher(None) as p:
+            p([self.test_counter])
+
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+
+        self.assertEqual(1, len(publisher.samples))
+        self.assertEqual('instance:m1.tiny',
+                         getattr(publisher.samples[0], "name"))

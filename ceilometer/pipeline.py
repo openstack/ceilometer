@@ -255,19 +255,7 @@ class SampleSource(Source):
             raise PipelineException("Discovery should be a list", cfg)
         self.check_source_filtering(self.meters, 'meters')
 
-    # (yjiang5) To support meters like instance:m1.tiny,
-    # which include variable part at the end starting with ':'.
-    # Hope we will not add such meters in future.
-    @staticmethod
-    def _variable_meter_name(name):
-        m = name.partition(':')
-        if m[1] == ':':
-            return m[1].join((m[0], '*'))
-        else:
-            return name
-
     def support_meter(self, meter_name):
-        meter_name = self._variable_meter_name(meter_name)
         return self.is_supported(self.meters, meter_name)
 
 
