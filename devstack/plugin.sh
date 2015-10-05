@@ -381,9 +381,12 @@ function stop_ceilometer {
     if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
         disable_apache_site ceilometer
         restart_apache_server
+    else
+        stop_process ceilometer-api
     fi
+
     # Kill the ceilometer screen windows
-    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-api ceilometer-alarm-notifier ceilometer-alarm-evaluator; do
+    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector ceilometer-alarm-notifier ceilometer-alarm-evaluator; do
         stop_process $serv
     done
 }
