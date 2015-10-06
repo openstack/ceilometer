@@ -40,6 +40,8 @@ CEILOMETER_EVENT_ALARM=${CEILOMETER_EVENT_ALARM:-False}
 TEMPEST_SERVICES+=,ceilometer
 
 # Set up default directories for client and middleware
+GITREPO["python-ceilometerclient"]=${CEILOMETERCLIENT_REPO:-${GIT_BASE}/openstack/python-ceilometerclient.git}
+GITBRANCH["python-ceilometerclient"]=${CEILOMETERCLIENT_BRANCH:-master}
 GITDIR["python-ceilometerclient"]=$DEST/python-ceilometerclient
 GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
 
