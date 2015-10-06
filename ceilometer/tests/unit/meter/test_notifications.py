@@ -276,6 +276,34 @@ class TestMeterProcessing(test.BaseTestCase):
         cfg = notifications.setup_meters_config()
         return cfg
 
+    @mock.patch('ceilometer.meter.notifications.LOG')
+    def test_bad_meter_definition_skip(self, LOG):
+        cfg = yaml.dump(
+            {'metric': [dict(name="good_test_1",
+                             event_type="test.create",
+                             type="delta",
+                             unit="B",
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id"),
+                        dict(name="bad_test_2", type="bad_type",
+                             event_type="bar.create",
+                             unit="foo", volume="bar",
+                             resource_id="bea70e51c7340cb9d555b15cbfcaec23"),
+                        dict(name="good_test_3",
+                             event_type="test.create",
+                             type="delta",
+                             unit="B",
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id")]})
+        data = self.__setup_meter_def_file(cfg)
+        meter_loaded = notifications.load_definitions(data)
+        self.assertEqual(2, len(meter_loaded))
+        LOG.error.assert_called_with(
+            "Error loading meter definition : "
+            "Invalid type bad_type specified")
+
     def test_jsonpath_values_parsed(self):
         cfg = yaml.dump(
             {'metric': [dict(name="test1",
