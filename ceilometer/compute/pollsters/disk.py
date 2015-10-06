@@ -130,10 +130,10 @@ class _Base(pollsters.BaseComputePollster):
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
-                LOG.warn(_LW('Instance %(instance_id)s was shut off while '
-                             'getting samples of %(pollster)s: %(exc)s'),
-                         {'instance_id': instance.id,
-                          'pollster': self.__class__.__name__, 'exc': e})
+                LOG.warning(_LW('Instance %(instance_id)s was shut off while '
+                                'getting samples of %(pollster)s: %(exc)s'),
+                            {'instance_id': instance.id,
+                             'pollster': self.__class__.__name__, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug('%(inspector)s does not provide data for '
@@ -708,10 +708,10 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
-                LOG.warn(_LW('Instance %(instance_id)s was shut off while '
-                             'getting samples of %(pollster)s: %(exc)s'),
-                         {'instance_id': instance.id,
-                          'pollster': self.__class__.__name__, 'exc': e})
+                LOG.warning(_LW('Instance %(instance_id)s was shut off while '
+                                'getting samples of %(pollster)s: %(exc)s'),
+                            {'instance_id': instance.id,
+                             'pollster': self.__class__.__name__, 'exc': e})
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug('%(inspector)s does not provide data for '

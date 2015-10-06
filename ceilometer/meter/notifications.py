@@ -25,7 +25,7 @@ from oslo_log import log
 import oslo_messaging
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _LE
+from ceilometer.i18n import _LE, _LI
 from ceilometer import sample
 
 OPTS = [
@@ -174,7 +174,7 @@ def setup_meters_config():
                   " Using default config."))
         meters_config = {}
 
-    LOG.info(_LE("Meter Definitions: %s"), meters_config)
+    LOG.info(_LI("Meter Definitions: %s"), meters_config)
 
     return meters_config
 

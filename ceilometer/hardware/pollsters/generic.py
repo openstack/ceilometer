@@ -63,7 +63,7 @@ class MeterDefinition(object):
                  fname.endswith('_inspector'))):
                 setattr(self, fname, fval)
             else:
-                LOG.warn(_LW("Ignore unrecognized field %s"), fname)
+                LOG.warning(_LW("Ignore unrecognized field %s"), fname)
         for fname in self.required_fields:
             if not getattr(self, fname, None):
                 raise MeterDefinitionException(
