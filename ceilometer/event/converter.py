@@ -24,7 +24,7 @@ import six
 import yaml
 
 from ceilometer.event.storage import models
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 
 OPTS = [
     cfg.StrOpt('definitions_cfg_file',
@@ -404,7 +404,7 @@ def setup_events(trait_plugin_mgr):
                   " Using default config.")
         events_config = []
 
-    LOG.info(_("Event Definitions: %s"), events_config)
+    LOG.info(_LI("Event Definitions: %s"), events_config)
 
     allow_drop = cfg.CONF.event.drop_unmatched_notifications
     return NotificationEventsConverter(events_config,

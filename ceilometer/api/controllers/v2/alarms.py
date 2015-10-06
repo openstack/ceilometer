@@ -46,7 +46,7 @@ from ceilometer.api.controllers.v2.alarm_rules import combination
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import utils
@@ -326,8 +326,8 @@ class Alarm(base.Base):
 
             action_set = set(actions)
             if len(actions) != len(action_set):
-                LOG.info(_('duplicate actions are found: %s, '
-                           'remove duplicate ones') % actions)
+                LOG.info(_LI('duplicate actions are found: %s, '
+                             'remove duplicate ones') % actions)
                 actions = list(action_set)
                 setattr(alarm, actions_name, actions)
 

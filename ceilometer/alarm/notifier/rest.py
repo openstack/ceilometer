@@ -23,7 +23,7 @@ import requests
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.alarm import notifier
-from ceilometer.i18n import _
+from ceilometer.i18n import _LI
 
 LOG = log.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class RestAlarmNotifier(notifier.AlarmNotifier):
         if not headers.get('x-openstack-request-id'):
             headers['x-openstack-request-id'] = context.generate_request_id()
 
-        LOG.info(_(
+        LOG.info(_LI(
             "Notifying alarm %(alarm_name)s %(alarm_id)s with severity"
             " %(severity)s from %(previous)s to %(current)s with action "
             "%(action)s because %(reason)s. request-id: %(request_id)s ") %

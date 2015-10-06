@@ -21,7 +21,7 @@ from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _
+from ceilometer.i18n import _LI
 from ceilometer import nova_client
 from ceilometer import sample
 
@@ -51,7 +51,7 @@ class FloatingIPPollster(plugin_base.PollsterBase):
         for endpoint in resources:
             for ip in self._iter_floating_ips(manager.keystone, cache,
                                               endpoint):
-                LOG.info(_("FLOATING IP USAGE: %s") % ip.ip)
+                LOG.info(_LI("FLOATING IP USAGE: %s") % ip.ip)
                 # FIXME (flwang) Now Nova API /os-floating-ips can't provide
                 # those attributes were used by Ceilometer, such as project
                 # id, host. In this fix, those attributes usage will be
