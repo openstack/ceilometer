@@ -39,8 +39,11 @@ def logged(func):
     def with_logging(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except exceptions.NeutronClientException as e:
+        except exceptions.NotFound:
             # handles 404's when services are disabled in neutron
+            LOG.warn("The resource could not be found.")
+            return []
+        except exceptions.NeutronClientException as e:
             LOG.warn(e)
             return []
         except Exception as e:
