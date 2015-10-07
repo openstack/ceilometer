@@ -64,15 +64,6 @@ class TestNeutronClient(base.BaseTestCase):
                   'tenant_id': '62d6f08bbd3a44f6ad6f00ca15cce4e5'},
                  ]}
 
-    def test_network_get_all(self):
-        with mock.patch.object(self.nc.client, 'list_networks',
-                               side_effect=self.fake_networks_list):
-            networks = self.nc.network_get_all()
-
-        self.assertEqual(1, len(networks))
-        self.assertEqual('298a3088-a446-4d5a-bad8-f92ecacd786b',
-                         networks[0]['id'])
-
     @staticmethod
     def fake_pool_list():
         return {'pools': [{'status': 'ACTIVE',
