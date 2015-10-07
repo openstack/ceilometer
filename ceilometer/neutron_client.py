@@ -78,12 +78,6 @@ class Client(object):
         self.client = clientv20.Client(**params)
 
     @logged
-    def network_get_all(self):
-        """Returns all networks."""
-        resp = self.client.list_networks()
-        return resp.get('networks')
-
-    @logged
     def port_get_all(self):
         resp = self.client.list_ports()
         return resp.get('ports')
