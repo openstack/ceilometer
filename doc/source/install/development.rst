@@ -57,11 +57,6 @@ Configuring devstack
       [[local|localrc]]
       # Enable the Ceilometer devstack plugin
       enable_plugin ceilometer https://git.openstack.org/openstack/ceilometer.git
-      # Enable the ceilometer metering services
-      enable_service ceilometer-acompute ceilometer-acentral ceilometer-anotification ceilometer-collector ceilometer-api
-
-   Enabling the above services is necessary for core Ceilometer
-   functionalities: polling, event listening, and data collection.
 
 5. Nova does not generate the periodic notifications for all known
    instances by default. To enable these auditing events, set
