@@ -32,7 +32,7 @@ import yaml
 
 
 from ceilometer.event.storage import models
-from ceilometer.i18n import _, _LW
+from ceilometer.i18n import _, _LI, _LW
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
@@ -412,7 +412,7 @@ class Sink(object):
                     "No transformer named %s loaded" % transformer['name'],
                     cfg)
             transformers.append(ext.plugin(**parameter))
-            LOG.info(_(
+            LOG.info(_LI(
                 "Pipeline %(pipeline)s: Setup transformer instance %(name)s "
                 "with parameter %(param)s") % ({'pipeline': self,
                                                 'name': transformer['name'],
@@ -709,7 +709,7 @@ class PipelineManager(object):
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
                                     cfg)
-        LOG.info(_('detected decoupled pipeline config format'))
+        LOG.info(_LI('detected decoupled pipeline config format'))
 
         unique_names = set()
         sources = []
@@ -771,7 +771,7 @@ class PollingManager(object):
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
                                     cfg)
-        LOG.info(_('detected decoupled pipeline config format'))
+        LOG.info(_LI('detected decoupled pipeline config format'))
 
         unique_names = set()
         for s in cfg.get('sources', []):
@@ -795,7 +795,7 @@ def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
         data = fap.read()
 
     pipeline_cfg = yaml.safe_load(data)
-    LOG.info(_("Pipeline config: %s"), pipeline_cfg)
+    LOG.info(_LI("Pipeline config: %s"), pipeline_cfg)
 
     return PipelineManager(pipeline_cfg,
                            transformer_manager or
@@ -814,7 +814,7 @@ def _setup_polling_manager(cfg_file):
         data = fap.read()
 
     pipeline_cfg = yaml.safe_load(data)
-    LOG.info(_("Pipeline config: %s"), pipeline_cfg)
+    LOG.info(_LI("Pipeline config: %s"), pipeline_cfg)
 
     return PollingManager(pipeline_cfg)
 

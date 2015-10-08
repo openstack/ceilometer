@@ -25,8 +25,7 @@ from werkzeug import serving
 from ceilometer.api import config as api_config
 from ceilometer.api import hooks
 from ceilometer.api import middleware
-from ceilometer.i18n import _
-from ceilometer.i18n import _LW
+from ceilometer.i18n import _LI, _LW
 
 LOG = log.getLogger(__name__)
 
@@ -130,16 +129,16 @@ def build_server():
     # Create the WSGI server and start it
     host, port = cfg.CONF.api.host, cfg.CONF.api.port
 
-    LOG.info(_('Starting server in PID %s') % os.getpid())
-    LOG.info(_("Configuration:"))
+    LOG.info(_LI('Starting server in PID %s') % os.getpid())
+    LOG.info(_LI("Configuration:"))
     cfg.CONF.log_opt_values(LOG, logging.INFO)
 
     if host == '0.0.0.0':
-        LOG.info(_(
+        LOG.info(_LI(
             'serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s')
             % ({'sport': port, 'vport': port}))
     else:
-        LOG.info(_("serving on http://%(host)s:%(port)s") % (
+        LOG.info(_LI("serving on http://%(host)s:%(port)s") % (
                  {'host': host, 'port': port}))
 
     serving.run_simple(cfg.CONF.api.host, cfg.CONF.api.port,

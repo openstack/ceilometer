@@ -30,7 +30,7 @@ from stevedore import extension
 from ceilometer import alarm as ceilometer_alarm
 from ceilometer.alarm import rpc as rpc_alarm
 from ceilometer import coordination as coordination
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 from ceilometer import messaging
 
 
@@ -91,7 +91,7 @@ class AlarmService(object):
     def _evaluate_assigned_alarms(self):
         try:
             alarms = self._assigned_alarms()
-            LOG.info(_('initiating evaluation cycle on %d alarms') %
+            LOG.info(_LI('initiating evaluation cycle on %d alarms') %
                      len(alarms))
             for alarm in alarms:
                 self._evaluate_alarm(alarm)

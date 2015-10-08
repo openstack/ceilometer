@@ -17,7 +17,7 @@
 
 from oslo_log import log
 
-from ceilometer.i18n import _
+from ceilometer.i18n import _LI
 from ceilometer.storage import base
 
 LOG = log.getLogger(__name__)
@@ -38,8 +38,8 @@ class Connection(base.Connection):
         :param data: a dictionary such as returned by
                      ceilometer.meter.meter_message_from_counter.
         """
-        LOG.info(_('metering data %(counter_name)s for %(resource_id)s: '
-                   '%(counter_volume)s')
+        LOG.info(_LI('metering data %(counter_name)s for %(resource_id)s: '
+                     '%(counter_volume)s')
                  % ({'counter_name': data['counter_name'],
                      'resource_id': data['resource_id'],
                      'counter_volume': data['counter_volume']}))
@@ -50,7 +50,7 @@ class Connection(base.Connection):
         Clearing occurs according to the time-to-live.
         :param ttl: Number of seconds to keep records for.
         """
-        LOG.info(_("Dropping metering data with TTL %d"), ttl)
+        LOG.info(_LI("Dropping metering data with TTL %d"), ttl)
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,

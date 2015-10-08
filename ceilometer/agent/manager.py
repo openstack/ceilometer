@@ -175,13 +175,13 @@ class PollingTask(object):
                 # If no resources, skip for this pollster
                 if not polling_resources:
                     p_context = 'new ' if history else ''
-                    LOG.info(_("Skip pollster %(name)s, no %(p_context)s"
-                               "resources found this cycle"),
+                    LOG.info(_LI("Skip pollster %(name)s, no %(p_context)s"
+                                 "resources found this cycle"),
                              {'name': pollster.name, 'p_context': p_context})
                     continue
 
-                LOG.info(_("Polling pollster %(poll)s in the context of "
-                           "%(src)s"),
+                LOG.info(_LI("Polling pollster %(poll)s in the context of "
+                             "%(src)s"),
                          dict(poll=pollster.name, src=source_name))
                 try:
                     samples = pollster.obj.get_samples(

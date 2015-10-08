@@ -30,7 +30,7 @@ import pymongo.errors
 import six
 from six.moves.urllib import parse
 
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 
 ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS = 86
 
@@ -261,7 +261,7 @@ class ConnectionPool(object):
         splitted_url = netutils.urlsplit(url)
         log_data = {'db': splitted_url.scheme,
                     'nodelist': connection_options['nodelist']}
-        LOG.info(_('Connecting to %(db)s on %(nodelist)s') % log_data)
+        LOG.info(_LI('Connecting to %(db)s on %(nodelist)s') % log_data)
         client = self._mongo_connect(url)
         self._pool[pool_key] = weakref.ref(client)
         return client
@@ -461,7 +461,7 @@ class MongoProxy(object):
             self.conn.create_index(keys, name=name, *args, **kwargs)
         except pymongo.errors.OperationFailure as e:
             if e.code is ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS:
-                LOG.info(_("Index %s will be recreate.") % name)
+                LOG.info(_LI("Index %s will be recreate.") % name)
                 self._recreate_index(keys, name, *args, **kwargs)
 
     @safe_mongo_call

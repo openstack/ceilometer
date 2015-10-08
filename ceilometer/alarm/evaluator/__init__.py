@@ -27,7 +27,7 @@ from oslo_utils import timeutils
 import pytz
 import six
 
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 
 
 LOG = log.getLogger(__name__)
@@ -72,10 +72,10 @@ class Evaluator(object):
         try:
             previous = alarm.state
             if previous != state:
-                LOG.info(_('alarm %(id)s transitioning to %(state)s because '
-                           '%(reason)s') % {'id': alarm.alarm_id,
-                                            'state': state,
-                                            'reason': reason})
+                LOG.info(_LI('alarm %(id)s transitioning to %(state)s because '
+                             '%(reason)s') % {'id': alarm.alarm_id,
+                                              'state': state,
+                                              'reason': reason})
 
                 self._client.alarms.set_state(alarm.alarm_id, state=state)
             alarm.state = state

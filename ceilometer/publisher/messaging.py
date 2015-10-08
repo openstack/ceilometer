@@ -27,7 +27,7 @@ from oslo_utils import excutils
 import six
 import six.moves.urllib.parse as urlparse
 
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _, _LI, _LE
 from ceilometer import messaging
 from ceilometer import publisher
 from ceilometer.publisher import utils
@@ -101,7 +101,7 @@ class MessagingPublisher(publisher.PublisherBase):
         self.local_queue = []
 
         if self.policy in ['default', 'queue', 'drop']:
-            LOG.info(_('Publishing policy set to %s') % self.policy)
+            LOG.info(_LI('Publishing policy set to %s') % self.policy)
         else:
             LOG.warn(_('Publishing policy is unknown (%s) force to default')
                      % self.policy)

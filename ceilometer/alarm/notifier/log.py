@@ -17,7 +17,7 @@
 from oslo_log import log
 
 from ceilometer.alarm import notifier
-from ceilometer.i18n import _
+from ceilometer.i18n import _LI
 
 LOG = log.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class LogAlarmNotifier(notifier.AlarmNotifier):
     @staticmethod
     def notify(action, alarm_id, alarm_name, severity, previous, current,
                reason, reason_data):
-        LOG.info(_(
+        LOG.info(_LI(
             "Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s "
             "priority from %(previous)s to %(current)s with action %(action)s"
             " because %(reason)s.") % ({'alarm_name': alarm_name,

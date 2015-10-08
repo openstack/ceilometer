@@ -34,7 +34,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import cast
 
 import ceilometer
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models as api_models
@@ -361,7 +361,7 @@ class Connection(base.Connection):
             sample_q = (session.query(models.Sample)
                         .filter(models.Sample.timestamp < end))
             rows = sample_q.delete()
-            LOG.info(_("%d samples removed from database"), rows)
+            LOG.info(_LI("%d samples removed from database"), rows)
 
         if not cfg.CONF.sql_expire_samples_only:
             with session.begin():
@@ -397,8 +397,8 @@ class Connection(base.Connection):
                               .filter(models.Resource.metadata_hash
                                       .like('delete_%')))
                 resource_q.delete(synchronize_session=False)
-            LOG.info(_("Expired residual resource and"
-                       " meter definition data"))
+            LOG.info(_LI("Expired residual resource and"
+                         " meter definition data"))
 
     def get_resources(self, user=None, project=None, source=None,
                       start_timestamp=None, start_timestamp_op=None,
