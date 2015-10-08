@@ -103,6 +103,10 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         del self.pipeline_cfg['sinks']
         self._exception_create_pipelinemanager()
 
+    def test_source_no_meters_or_counters(self):
+        del self.pipeline_cfg['sources'][0]['counters']
+        self._exception_create_pipelinemanager()
+
     def test_source_dangling_sink(self):
         self.pipeline_cfg['sources'].append({
             'name': 'second_source',
