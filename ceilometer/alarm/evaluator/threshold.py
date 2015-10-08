@@ -103,8 +103,8 @@ class ThresholdEvaluator(evaluator.Evaluator):
         """
         sufficient = len(statistics) >= alarm.rule['evaluation_periods']
         if not sufficient and alarm.state != evaluator.UNKNOWN:
-            LOG.warn(_LW('Expecting %(expected)d datapoints but only get '
-                         '%(actual)d') % {
+            LOG.warning(_LW('Expecting %(expected)d datapoints but only get '
+                            '%(actual)d') % {
                 'expected': alarm.rule['evaluation_periods'],
                 'actual': len(statistics)})
             # Reason is not same as log message because we want to keep

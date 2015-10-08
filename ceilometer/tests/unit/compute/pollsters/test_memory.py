@@ -57,7 +57,7 @@ class TestMemoryPollster(base.TestPollsterBase):
                                  set([s.name for s in samples]))
                 self.assertEqual(expected_memory_mb, samples[0].volume)
             else:
-                self.assertEqual(1, mylog.warn.call_count)
+                self.assertEqual(1, mylog.warning.call_count)
             self.assertEqual(0, mylog.exception.call_count)
 
         _verify_memory_metering(1, 1.0)
@@ -105,7 +105,7 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
                 self.assertEqual(expected_resident_memory_mb,
                                  samples[0].volume)
             else:
-                self.assertEqual(1, mylog.warn.call_count)
+                self.assertEqual(1, mylog.warning.call_count)
             self.assertEqual(0, mylog.exception.call_count)
 
         _verify_resident_memory_metering(1, 1.0)

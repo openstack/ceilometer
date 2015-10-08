@@ -85,20 +85,19 @@ class DeltaTransformer(BaseConversionTransformer):
             time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
             # disallow violations of the arrow of time
             if time_delta < 0:
-                LOG.warn(_LW('Dropping out of time order sample: %s'), (s,))
+                LOG.warning(_LW('Dropping out of time order sample: %s'), (s,))
                 # Reset the cache to the newer sample.
                 self.cache[key] = prev
                 return None
             volume_delta = s.volume - prev_volume
             if self.growth_only and volume_delta < 0:
-                LOG.warn(_LW('Negative delta detected, dropping value'))
+                LOG.warning(_LW('Negative delta detected, dropping value'))
                 s = None
             else:
                 s = self._convert(s, volume_delta)
                 LOG.debug('Converted to: %s', s)
         else:
-            LOG.warn(_LW('Dropping sample with no predecessor: %s'),
-                     (s,))
+            LOG.warning(_LW('Dropping sample with no predecessor: %s'), (s,))
             s = None
         return s
 
