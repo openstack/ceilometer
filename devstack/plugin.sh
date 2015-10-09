@@ -235,6 +235,8 @@ function _ceilometer_configure_storage_backend {
 # Configure Ceilometer
 function configure_ceilometer {
 
+    local conffile
+
     iniset_rpc_backend ceilometer $CEILOMETER_CONF
 
     iniset $CEILOMETER_CONF DEFAULT notification_topics "$CEILOMETER_NOTIFICATION_TOPICS"
@@ -246,8 +248,17 @@ function configure_ceilometer {
         iniset $CEILOMETER_CONF compute workload_partitioning True
     fi
 
-    # Install the policy file for the API server
-    cp -a $CEILOMETER_DIR/etc/ceilometer/* $CEILOMETER_CONF_DIR
+    # Install the policy file and declarative configuration files to
+    # the conf dir.
+    # NOTE(cdent): Do not make this a glob as it will conflict
+    # with rootwrap installation done elsewhere and also clobber
+    # ceilometer.conf settings that have already been made.
+    # Anyway, explicit is better than implicit.
+    for conffile in policy.json api_paste.ini pipeline.yaml \
+                    event_definitions.yaml event_pipeline.yaml \
+                    gnocchi_resources.yaml; do
+        cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
+    done
     iniset $CEILOMETER_CONF oslo_policy policy_file $CEILOMETER_CONF_DIR/policy.json
 
     if [ "$CEILOMETER_PIPELINE_INTERVAL" ]; then
