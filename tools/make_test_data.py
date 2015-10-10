@@ -84,7 +84,9 @@ def make_test_data(name, meter_type, unit, volume, random_min,
                           )
         data = utils.meter_message_from_counter(
             c, cfg.CONF.publisher.telemetry_secret)
-
+        # timestamp should be string when calculating signature, but should be
+        # datetime object when calling record_metering_data.
+        data['timestamp'] = timestamp
         yield data
         n += 1
         timestamp = timestamp + increment
