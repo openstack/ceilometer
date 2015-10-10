@@ -49,7 +49,7 @@ late2="2012-08-31T20:00:00"
 mkdata() {
   ${bindir}/make_test_data.py --project "$project" \
     --user "$user" --start "$2" --end "$3" \
-    "$1" instance:m1.tiny 1
+    --resource "$1" --counter instance:m1.tiny --volume 1
 }
 
 dates=(early1 early2 start middle1 middle2 middle3 middle4 end late1 late2)
