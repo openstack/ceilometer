@@ -5,13 +5,12 @@
 # Translators:
 # Tomoyuki KATO <tomo@dream.daynight.jp>, 2013
 # Akihiro Motoki <amotoki@gmail.com>, 2015. #zanata
-# Mie Yamamoto <myamamot@redhat.com>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev19\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-30 06:17+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-29 06:28+0000\n"
 "Last-Translator: Akihiro Motoki <amotoki@gmail.com>\n"
 "Language: ja\n"
@@ -38,10 +37,6 @@ msgstr "%(rule1)s と %(rule2)s を同時に設定することはできません
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d データポイントが不明です"
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "%d 個のサンプルがデータベースから削除されました"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -108,13 +103,6 @@ msgstr "アラーム %s 自体を組み合わせルールに指定すること�
 msgid "Combined state of alarms %s"
 msgstr "アラーム %s の結合状態"
 
-msgid "Configuration:"
-msgstr "設定:"
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "%(nodelist)s 上の %(db)s に接続しています"
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "%(name)s からのエラーの後で続行します: %(error)s"
@@ -146,13 +134,9 @@ msgstr ""
 "ディスパッチャーターゲットが設定されておらず、メーターは通知されません。"
 "ceilometer.conf ファイルでターゲットを設定してください。"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "通知 %(type)s を除去しています (uuid:%(msgid)s)"
-
-#, python-format
-msgid "Dropping metering data with TTL %d"
-msgstr "TTL %d の計測データを除去中"
 
 #, python-format
 msgid "Duplicate VM name found: %s"
@@ -181,19 +165,8 @@ msgstr "アラームを配置するときにエラーが発生しました: %s"
 msgid "Event"
 msgstr "イベント"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "イベント定義: %s"
-
-msgid "Expired residual resource and meter definition data"
-msgstr "残余リソースおよびメーター定義データの有効期限が切れました"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "式が NaN 値に評価されました。"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "Floating IP 使用: %s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
@@ -310,15 +283,6 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "%(aspect)s %(id)s にアクセスする権限がありません"
 
 #, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
-"%(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-"優先順位 %(severity)s のアラーム %(alarm_name)s %(alarm_id)s をアクション "
-"%(action)s によって %(previous)s から %(current)s へ通知中。理由: "
-"%(reason)s。"
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylitght API から %(status)s %(reason)s が返されました"
 
@@ -359,18 +323,6 @@ msgstr ""
 "パイプライン %(pipeline)s: %(smp)s について変換プログラム %(trans)s からエ"
 "ラーが発生した後に終了します"
 
-#, fuzzy, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr ""
-"パイプライン %(pipeline)s: パラメーター %(param)s を使用して変換プログラムイ"
-"ンスタンス %(name)s をセットアップします"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "パイプライン設定: %s"
-
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr ""
@@ -384,10 +336,6 @@ msgstr "センサー %(mtr)s のポーリングが %(cnt)s 回失敗しました
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
 msgstr "%(name)s のポーリングが %(cnt)s 回失敗しましたstar"
-
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "%(src)s のコンテキスト内で pollster %(poll)s をポーリング中"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -409,10 +357,6 @@ msgstr ""
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "パブリッシュポリシーが不明です (%s)。強制的にデフォルトに設定されます"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "パブリッシュポリシーが %s に設定されました"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -454,10 +398,6 @@ msgid "Skip loading extension for %s"
 msgstr "%s の拡張機能のロードをスキップします"
 
 #, python-format
-msgid "Starting server in PID %s"
-msgstr "PID %s でサーバーを開始しています"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "文字列 %s は無効な isotime です"
 
@@ -487,17 +427,16 @@ msgstr ""
 "%(count)d 個のサンプルの %(disposition)s しきい値が原因で%(state)s に遷移しま"
 "す。最新: %(most_recent)s"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
 msgstr ""
-"%(state)s に移行します。アラーム %(alarm_ids)s の状態が %(state)s であるため"
-"です"
+"%(state)s に移行します。これは、アラーム %(alarm_ids)s の状態が %(state)s で"
+"あるためです"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: %s から送信されたデータをデコードできません"
 
-#, fuzzy
 msgid "UDP: Unable to store meter"
 msgstr "UDP: 計測値を保管できません"
 
@@ -510,7 +449,7 @@ msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr "値 %(value)s を、想定されるデータ型 %(type)s に変換できません。"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to discover resources: %s"
 msgstr "リソースをディスカバーできません: %s"
 
@@ -627,11 +566,6 @@ msgid "YAML error reading Event Definitions file %(file)s"
 msgstr ""
 "イベント定義ファイル %(file)s を読み取るときに YAML エラーが発生しました"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "アラーム %(id)s は %(state)s に遷移します。理由: %(reason)s"
-
-#, fuzzy
 msgid "alarm evaluation cycle failed"
 msgstr "アラーム評価サイクルで障害が発生しました"
 
@@ -652,16 +586,9 @@ msgstr "アラーム統計の取得に失敗しました: %s"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "%(id)s の CPU 時間を取得できませんでした: %(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "分離されたパイプライン設定フォーマットが検出されました"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "サンプル (先行なし) を廃棄しています: %s"
-
-#, fuzzy, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "%d アラームで評価サイクルを開始しています"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 出力の長さが一致しません"
@@ -673,10 +600,6 @@ msgstr "max_bytes と backup_count は数値でなければなりません。"
 msgid "message signature invalid, discarding message: %r"
 msgstr "メッセージシグニチャーが無効です。メッセージを破棄します: %r"
 
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr "%(resource_id)s の計測データ %(counter_name)s: %(counter_volume)s"
-
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
 "IPMI センサーデータの解析に失敗しました。指定された入力からデータが取得されま"
@@ -687,16 +610,6 @@ msgstr "IPMI センサーデータの解析に失敗しました。不明なセ�
 
 msgid "running ipmitool failure"
 msgstr "ipmitool の実行に失敗しました"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr ""
-"0.0.0.0:%(sport)s でサービスを提供しています。http://127.0.0.1:%(vport)s で確"
-"認してください"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "http://%(host)s:%(port)s でサービスを提供しています"
 
 msgid "state invalid"
 msgstr "状態が無効です"
