@@ -10,9 +10,9 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: de\n"
@@ -39,10 +39,6 @@ msgstr "%(rule1)s und %(rule2)s können nicht gleichzeitig festgelegt werden"
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d Datenpunkte sind unbekannt"
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "%d Beispiele aus Datenbank entfernt"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -111,13 +107,6 @@ msgstr ""
 msgid "Combined state of alarms %s"
 msgstr "Kombinierter Alarmstatus %s"
 
-msgid "Configuration:"
-msgstr "Konfiguration:"
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "Verbindung mit %(db)s auf %(nodelist)s wird hergestellt"
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Fortfahren nach Fehler von %(name)s: %(error)s"
@@ -154,10 +143,6 @@ msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "Löschen von Benachrichtigung %(type)s (UUID:%(msgid)s)"
 
 #, python-format
-msgid "Dropping metering data with TTL %d"
-msgstr "Löschen von Messdaten mit TTL %d"
-
-#, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "Doppelter VM Name gefunden: %s"
 
@@ -184,19 +169,8 @@ msgstr "Fehler beim Verwenden von Alarm: %s"
 msgid "Event"
 msgstr "Ereignis"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "Ereignisdefinitionen: %s"
-
-msgid "Expired residual resource and meter definition data"
-msgstr "Abgelaufene Daten für residente Ressource und für Messdefinition"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "Ausdruck ergab einen NaN-Wert!"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "NUTZUNG DER DYNAMISCHEN IP: %s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
@@ -316,15 +290,6 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "Nicht berechtigt für den Zugriff auf %(aspect)s %(id)s"
 
 #, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
-"%(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-"Benachrichtigung von Alarm %(alarm_name)s %(alarm_id)s mit Priorität "
-"%(severity)s von %(previous)s in %(current)s mit Aktion %(action)s wegen "
-"%(reason)s."
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylight-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
 
@@ -363,18 +328,6 @@ msgstr ""
 "%(smp)s"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr ""
-"Pipeline %(pipeline)s: Konfiguration von Transformerinstanz %(name)s mit "
-"Parameter %(param)s"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "Pipelinekonfiguration: %s"
-
-#, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr "Plug-in angegeben, aber kein Plug-in-Name für Trait %s angegeben"
 
@@ -385,10 +338,6 @@ msgstr "Polling von %(mtr)s-Sensor %(cnt)s Mal fehlgeschlagen!"
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
 msgstr "Polling von %(name)s %(cnt)s Mal fehlgeschlagen!"
-
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "Abfrage von Pollster %(poll)s im Kontext von %(src)s"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -411,10 +360,6 @@ msgid "Publishing policy is unknown (%s) force to default"
 msgstr ""
 "Veröffentlichungsrichtlinie ist unbekannt (%s); auf Standardeinstellung "
 "setzen"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "Veröffentlichungsrichtlinie auf %s gesetzt"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -456,10 +401,6 @@ msgstr "Beispiel"
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "Laden der Ausnahme für %s überspringen"
-
-#, python-format
-msgid "Starting server in PID %s"
-msgstr "Starten von Server in PID %s"
 
 #, python-format
 msgid "String %s is not a valid isotime"
@@ -635,10 +576,6 @@ msgstr "XenAPI nicht installiert"
 msgid "YAML error reading Event Definitions file %(file)s"
 msgstr "YAML-Fehler beim Lesen von Ereignisdefinitionsdatei %(file)s"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "Alarm %(id)s wird geändert in %(state)s aufgrund von %(reason)s"
-
 msgid "alarm evaluation cycle failed"
 msgstr "Der Zyklus für die Alarmauswertung ist fehlgeschlagen"
 
@@ -659,16 +596,9 @@ msgstr "Abrufen der Alarmstatistiken ist fehlgeschlagen: %s"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "Abruf von CPU-Zeit nicht möglich für %(id)s: %(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "entkoppeltes Pipeline-Konfigurationsformat erkannt"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "Beispiel ohne Vorgänger wird gelöscht: %s"
-
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "Auswertungszyklus für %d Alarme wird eingeleitet"
 
 msgid "ipmitool output length mismatch"
 msgstr "Abweichung bei ipmitool-Ausgabelänge"
@@ -680,11 +610,6 @@ msgstr "max_bytes und backup_count sollten Zahlen sein."
 msgid "message signature invalid, discarding message: %r"
 msgstr "Nachrichtensignatur ungültig, Nachricht wird verworfen: %r"
 
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr ""
-"Messung von Daten %(counter_name)s für %(resource_id)s: %(counter_volume)s"
-
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
 "Analyse von IPMI-Sensordaten fehlgeschlagen, keine Daten von angegebener "
@@ -695,16 +620,6 @@ msgstr "Analyse von IPMI-Sensordaten fehlgeschlagen, unbekannter Sensortyp"
 
 msgid "running ipmitool failure"
 msgstr "Fehler beim Ausführen von ipmitool"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr ""
-"Bereitstellung auf 0.0.0.0:%(sport)s, Ansicht unter http://127.0.0.1:"
-"%(vport)s"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "Bereitstellung auf http://%(host)s:%(port)s"
 
 msgid "state invalid"
 msgstr "Zustand ungültig"

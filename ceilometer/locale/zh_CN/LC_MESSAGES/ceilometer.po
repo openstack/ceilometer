@@ -12,9 +12,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: zh_Hans_CN\n"
@@ -45,10 +45,6 @@ msgstr "%(rule1)s和%(rule2)s无法同时被设置"
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d 数据点为未知"
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "从数据库中移除%d个监控数据。"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -108,13 +104,6 @@ msgstr "无法在组合规则中指定告警%s自身"
 msgid "Combined state of alarms %s"
 msgstr "将告警%s的状态进行组合"
 
-msgid "Configuration:"
-msgstr "配置"
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "连接到%(nodelist)s节点的数据库%(db)s。"
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "遇到错误%(name)s：%(error)s，继续执行"
@@ -149,10 +138,6 @@ msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "正在丢弃通知%(type)s (uuid:%(msgid)s)"
 
 #, python-format
-msgid "Dropping metering data with TTL %d"
-msgstr "正在根据TTL %d丢弃监控数据"
-
-#, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "找到重复 VM 名称：%s"
 
@@ -179,19 +164,8 @@ msgstr "修改告警%s时遇到错误"
 msgid "Event"
 msgstr "事件"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "事件定义：%s"
-
-msgid "Expired residual resource and meter definition data"
-msgstr "剩余资源和计量表定义数据已到期"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "表达式计算结果为NaN！"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "浮动IP使用情况：%s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
@@ -304,14 +278,6 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "权限不足以访问%(aspect)s %(id)s"
 
 #, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
-"%(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-"正在通知警报%(alarm_name)s %(alarm_id)s，警报级别%(severity)s，状态"
-"从%(previous)s变为%(current)s，动作为%(action)s，原因是%(reason)s。"
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylight接口返回状态%(status)s，原因%(reason)s"
 
@@ -346,16 +312,6 @@ msgid ""
 msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr "流水线%(pipeline)s：使用参数%(param)s初始化变形器实例%(name)s"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "流水线配置：%s"
-
-#, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr "特征%s指定了插件但是没有提供插件的名称"
 
@@ -366,10 +322,6 @@ msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
 msgstr "拉取%(name)s失败了%(cnt)s次！"
-
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "在上下文环境%(src)s执行采集器%(poll)s"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -387,10 +339,6 @@ msgstr "发布的数据量超过本地队列最大长度，正在丢弃最老的
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "未知的发布策略(%s)，强制使用默认策略"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "设置发布策略为%s"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -428,10 +376,6 @@ msgstr "数据"
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "跳过为%s加载扩展"
-
-#, python-format
-msgid "Starting server in PID %s"
-msgstr "正在启动服务进程PID %s"
 
 #, python-format
 msgid "String %s is not a valid isotime"
@@ -590,10 +534,6 @@ msgstr "读取事件定义文件%(file)s时遇到YAML错误"
 msgid "You are not authorized to create action: %s"
 msgstr "你没有权限创建动作：%s"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "因为 %(reason)s, 警报 %(id)s 转换至 %(state)s "
-
 msgid "alarm evaluation cycle failed"
 msgstr "警报周期评估失败"
 
@@ -614,20 +554,9 @@ msgstr "告警状态检索失败：%s"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "检测到分离的流水线配置格式"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "因为之前没有数据（用来计算差值）因而丢弃数据：%s"
-
-#, python-format
-msgid "duplicate actions are found: %s, remove duplicate ones"
-msgstr "检测到重复的动作：%s，已去除重复的内容"
-
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "在 %d 个警报上初始化评估周期"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmi输出长度不匹配"
@@ -639,11 +568,6 @@ msgstr "max_bytes和backup_count必须是整数。"
 msgid "message signature invalid, discarding message: %r"
 msgstr "消息签名不合法，丢弃消息：%r"
 
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr ""
-"为资源%(resource_id)s获得指标%(counter_name)s的监控数据：%(counter_volume)s"
-
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr "解析IPMI传感器数据失败，从给定的输入中无法检索到数据"
 
@@ -652,15 +576,6 @@ msgstr "解析IPMI传感器数据失败，未知的传感器类型"
 
 msgid "running ipmitool failure"
 msgstr "运行ipmitool时失败了"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr ""
-"服务在0.0.0.0:%(sport)s上运行，可以通过http://127.0.0.1:%(vport)s来查看"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "在 http://%(host)s:%(port)s上服务"
 
 msgid "state invalid"
 msgstr "状态无效"

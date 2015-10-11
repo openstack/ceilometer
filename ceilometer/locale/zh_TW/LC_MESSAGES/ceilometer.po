@@ -8,9 +8,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: zh_Hant_TW\n"
@@ -37,10 +37,6 @@ msgstr "無法同時設定 %(rule1)s 和 %(rule2)s"
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d 個資料點不明"
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "已從資料庫移除了 %d 個範例"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -100,13 +96,6 @@ msgstr "無法在組合規則中指定警示 %s 本身"
 msgid "Combined state of alarms %s"
 msgstr "警示 %s 的合併狀態"
 
-msgid "Configuration:"
-msgstr "配置："
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "正在連接至 %(nodelist)s 上的 %(db)s"
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "在 %(name)s 傳回錯誤 %(error)s 後繼續"
@@ -141,10 +130,6 @@ msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "正在捨棄通知 %(type)s（UUID：%(msgid)s）"
 
 #, python-format
-msgid "Dropping metering data with TTL %d"
-msgstr "正在捨棄 TTL 為 %d 的計量資料"
-
-#, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "發現重複的 VM 名稱：%s"
 
@@ -171,19 +156,8 @@ msgstr "放置警示時發生錯誤：%s"
 msgid "Event"
 msgstr "事件"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "事件定義：%s"
-
-msgid "Expired residual resource and meter definition data"
-msgstr "過期的殘留資源和計量定義資料"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "表示式已求值為非數字值！"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "浮動 IP 使用情形：%s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
@@ -294,14 +268,6 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "未獲授權來存取 %(aspect)s %(id)s"
 
 #, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
-"%(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-"正在以動作 %(action)s 通知優先順序為 %(severity)s 的警示 %(alarm_name)s "
-"%(alarm_id)s（從 %(previous)s 至 %(current)s），因為 %(reason)s。"
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylight API 傳回了 %(status)s %(reason)s"
 
@@ -336,16 +302,6 @@ msgid ""
 msgstr "管線 %(pipeline)s：%(smp)s 的轉換器 %(trans)s傳回錯誤後結束"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr "管線 %(pipeline)s：使用參數 %(param)s 來設定轉換器實例 %(name)s"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "管線配置：%s"
-
-#, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr "指定了外掛程式，但沒有提供任何外掛程式名稱給特徵 %s"
 
@@ -356,10 +312,6 @@ msgstr "輪詢 %(mtr)s 感應器已失敗 %(cnt)s 次！"
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
 msgstr "輪詢 %(name)s 已失敗 %(cnt)s 次！"
-
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "正在 %(src)s 的環境定義中輪詢 pollster %(poll)s"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -377,10 +329,6 @@ msgstr "已超出發佈者 local_queue 長度上限，正在捨棄 %d 個最舊�
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "發佈原則不明 (%s)，強制設為預設值"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "正在將原則集發佈到 %s"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -418,10 +366,6 @@ msgstr "樣本"
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "跳過載入 %s 的延伸"
-
-#, python-format
-msgid "Starting server in PID %s"
-msgstr "正在以 PID %s 啟動伺服器"
 
 #, python-format
 msgid "String %s is not a valid isotime"
@@ -577,10 +521,6 @@ msgstr "未安裝 XenAPI"
 msgid "YAML error reading Event Definitions file %(file)s"
 msgstr "讀取事件定義檔 %(file)s 時發生 YAML 錯誤"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "警示 %(id)s 正在轉移到 %(state)s，原因：%(reason)s"
-
 msgid "alarm evaluation cycle failed"
 msgstr "警示評估週期失敗"
 
@@ -601,16 +541,9 @@ msgstr "警示統計資料擷取失敗：%s"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "無法取得 %(id)s 的 CPU 時間：%(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "偵測到已解除聯結的管線配置格式"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "正在捨棄不含前一版本的樣本：%s"
-
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "正在 %d 個警示上起始評估週期"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 輸出長度不符"
@@ -622,10 +555,6 @@ msgstr "max_bytes 及 backup_count 應該是數字。"
 msgid "message signature invalid, discarding message: %r"
 msgstr "訊息簽章無效，正在捨棄訊息：%r"
 
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr "%(resource_id)s 的計量資料 %(counter_name)s：%(counter_volume)s"
-
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr "剖析 IPMI 感應器資料失敗，未從給定的輸入擷取任何資料"
 
@@ -634,15 +563,6 @@ msgstr "剖析 IPMI 感應器資料失敗，感應器類型不明"
 
 msgid "running ipmitool failure"
 msgstr "執行 ipmitool 失敗"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr ""
-"正在於 0.0.0.0:%(sport)s 提供服務，可在 http://127.0.0.1:%(vport)s 檢視"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "正在於 http://%(host)s:%(port)s 提供服務"
 
 msgid "state invalid"
 msgstr "狀態無效"

@@ -7,9 +7,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: en_GB\n"
@@ -32,10 +32,6 @@ msgstr "%(rule)s must be set for %(type)s type alarm"
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d datapoints are unknown"
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "%d samples removed from database"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -92,13 +88,6 @@ msgstr "Cannot specify alarm %s itself in combination rule"
 msgid "Combined state of alarms %s"
 msgstr "Combined state of alarms %s"
 
-msgid "Configuration:"
-msgstr "Configuration:"
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "Connecting to %(db)s on %(nodelist)s"
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continue after error from %(name)s: %(error)s"
@@ -142,16 +131,8 @@ msgstr "Error while putting alarm: %s"
 msgid "Event"
 msgstr "Event"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "Event Definitions: %s"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "Expression evaluated to a NaN value!"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "FLOATING IP USAGE: %s"
 
 #, python-format
 msgid "Failed to load any dispatchers for %s"
@@ -245,18 +226,6 @@ msgstr ""
 "%(smp)s"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "Pipeline config: %s"
-
-#, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr "Plugin specified, but no plugin name supplied for trait %s"
 
@@ -269,10 +238,6 @@ msgstr ""
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "Publishing policy is unknown (%s) force to default"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "Publishing policy set to %s"
 
 #, python-format
 msgid ""
@@ -302,10 +267,6 @@ msgstr "Resource"
 
 msgid "Sample"
 msgstr "Sample"
-
-#, python-format
-msgid "Starting server in PID %s"
-msgstr "Starting server in PID %s"
 
 #, python-format
 msgid "String %s is not a valid isotime"
@@ -436,10 +397,6 @@ msgstr "XenAPI not installed"
 msgid "YAML error reading Event Definitions file %(file)s"
 msgstr "YAML error reading Event Definitions file %(file)s"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "alarm %(id)s transitioning to %(state)s because %(reason)s"
-
 msgid "alarm evaluation cycle failed"
 msgstr "alarm evaluation cycle failed"
 
@@ -456,16 +413,9 @@ msgstr "alarm stats retrieval failed"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "could not get CPU time for %(id)s: %(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "detected decoupled pipeline config format"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "dropping sample with no predecessor: %s"
-
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "initiating evaluation cycle on %d alarms"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes and backup_count should be numbers."
@@ -473,18 +423,6 @@ msgstr "max_bytes and backup_count should be numbers."
 #, python-format
 msgid "message signature invalid, discarding message: %r"
 msgstr "message signature invalid, discarding message: %r"
-
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "serving on http://%(host)s:%(port)s"
 
 msgid "state invalid"
 msgstr "state invalid"

@@ -9,9 +9,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-22 11:03+0000\n"
 "Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
 "Language: pt_BR\n"
@@ -38,10 +38,6 @@ msgstr "%(rule1)s e %(rule2)s não podem ser configurados ao mesmo tempo"
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d datapoints são desconhecidos"
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "%d amostras removidas do banco de dados"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -107,13 +103,6 @@ msgstr "Não é possível especificar o próprio alarme %s na regra de combinaç
 msgid "Combined state of alarms %s"
 msgstr "Estado combinado de alarmes %s"
 
-msgid "Configuration:"
-msgstr "Configuração:"
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "Conectando ao %(db)s em %(nodelist)s"
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continuar após erro de %(name)s: %(error)s"
@@ -150,10 +139,6 @@ msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "Descartando Notificação %(type)s (uuid:%(msgid)s)"
 
 #, python-format
-msgid "Dropping metering data with TTL %d"
-msgstr "Descartando dados de medição com TTL %d"
-
-#, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "Nome de VM duplicado localizado: %s"
 
@@ -180,19 +165,8 @@ msgstr "Erro ao colocar o alarme: %s"
 msgid "Event"
 msgstr "Evento"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "Definições de Evento: %s"
-
-msgid "Expired residual resource and meter definition data"
-msgstr "Dados de recurso residual e definição de medidor expirados"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "Expressão avaliada para um valor NaN!"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "USO DE IP FLUTUANTE: %s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
@@ -309,14 +283,6 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "Não Autorizado a acessar %(aspect)s %(id)s"
 
 #, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
-"%(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-"Notificando alarme %(alarm_name)s %(alarm_id)s da prioridade %(severity)s do "
-"%(previous)s para %(current)s com ação %(action)s porque %(reason)s."
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "API OpenDaylitght retornou %(status)s %(reason)s"
 
@@ -354,18 +320,6 @@ msgstr ""
 "Pipeline %(pipeline)s: Saia após erro do transformador %(trans)s para %(smp)s"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr ""
-"Pipeline %(pipeline)s: %(name)s de instância do transformador de "
-"configuração com parâmetro %(param)s"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "Configuração de Pipeline: %s"
-
-#, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr ""
 "Plug-in especificado, mas nenhum nome de plug-in fornecido para traço %s"
@@ -377,10 +331,6 @@ msgstr "O sensor de pesquisa %(mtr)s falhou para %(cnt)s vezes!"
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
 msgstr "A pesquisa %(name)s falhou para %(cnt)s vezes!"
-
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "Pesquisador %(poll)s no contexto de %(src)s"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -401,10 +351,6 @@ msgstr ""
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "Publicando política desconhecida (%s) força para o padrão"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "Publicando conjunto de políticas para %s"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -444,10 +390,6 @@ msgstr "Amostra"
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "Ignorar a extensão de carregamento para %s"
-
-#, python-format
-msgid "Starting server in PID %s"
-msgstr "Iniciando o servidor em PID %s"
 
 #, python-format
 msgid "String %s is not a valid isotime"
@@ -620,10 +562,6 @@ msgstr "XenAPI não instalado"
 msgid "YAML error reading Event Definitions file %(file)s"
 msgstr "Erro YAML ao ler o arquivo de definições de evento %(file)s"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "alarme %(id)s transicionando para %(state)s por causa %(reason)s"
-
 msgid "alarm evaluation cycle failed"
 msgstr "ciclo de avaliação de alarme falhou"
 
@@ -644,16 +582,9 @@ msgstr "a recuperação de estatísticas de alarme falhou: %s"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "não pôde obter o tempo de CPU para %(id)s: %(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "formato de configuração do pipeline desacoplado detectado"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "descartando amostra sem predecessor: %s"
-
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "iniciando ciclo de avaliação em %d alarmes"
 
 msgid "ipmitool output length mismatch"
 msgstr "incompatibilidade no comprimento da saída de ipmitool"
@@ -665,11 +596,6 @@ msgstr "max_bytes e backup_count devem ser números."
 msgid "message signature invalid, discarding message: %r"
 msgstr "assinatura de mensagem inválida, descartando mensagem: %r"
 
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr ""
-"medindo dados %(counter_name)s para %(resource_id)s: %(counter_volume)s"
-
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
 "análise dos dados do sensor IPMI com falha, nenhum dado recuperado da "
@@ -680,15 +606,6 @@ msgstr "análise dos dados do sensor IPMI com falha,tipo de sensor desconhecido"
 
 msgid "running ipmitool failure"
 msgstr "executando falha de ipmitool"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr ""
-"atendendo em 0.0.0.0:%(sport)s, visualizar em http://127.0.0.1:%(vport)s"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "atendendo em http://%(host)s:%(port)s"
 
 msgid "state invalid"
 msgstr "estado inválido"

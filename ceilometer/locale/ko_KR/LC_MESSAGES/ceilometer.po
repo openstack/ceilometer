@@ -10,9 +10,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.dev48\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-28 06:16+0000\n"
+"POT-Creation-Date: 2015-10-10 06:16+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: ko_KR\n"
@@ -39,10 +39,6 @@ msgstr "%(rule1)s 및 %(rule2)s을(를) 동시에 설정할 수 없음"
 #, python-format
 msgid "%d datapoints are unknown"
 msgstr "%d 데이터포인트를 알 수 없습니다. "
-
-#, python-format
-msgid "%d samples removed from database"
-msgstr "데이터베이스에서 %d 샘플이 제거됨"
 
 #, python-format
 msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
@@ -104,13 +100,6 @@ msgstr "조합 규칙에 %s 알람 자체를 지정할 수 없음"
 msgid "Combined state of alarms %s"
 msgstr "알람 %s의 결합된 상태"
 
-msgid "Configuration:"
-msgstr "구성:"
-
-#, python-format
-msgid "Connecting to %(db)s on %(nodelist)s"
-msgstr "%(nodelist)s에서 %(db)s에 연결 중 "
-
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "%(name)s에서 오류 후 계속: %(error)s"
@@ -147,10 +136,6 @@ msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "알림 %(type)s 삭제 중(uuid:%(msgid)s)"
 
 #, python-format
-msgid "Dropping metering data with TTL %d"
-msgstr "TTL %d(으)로 측정 데이터 삭제 중"
-
-#, python-format
 msgid "Duplicate VM name found: %s"
 msgstr "중복 VM 이름 발견: %s"
 
@@ -177,19 +162,8 @@ msgstr "알람 설정 중 오류 발생: %s"
 msgid "Event"
 msgstr "이벤트"
 
-#, python-format
-msgid "Event Definitions: %s"
-msgstr "이벤트 정의: %s"
-
-msgid "Expired residual resource and meter definition data"
-msgstr "잔여 자원 및 측정 정의 데이터 만료됨"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "표현식이 NaN 값으로 평가되었습니다!"
-
-#, python-format
-msgid "FLOATING IP USAGE: %s"
-msgstr "부동 IP 사용: %s"
 
 #, python-format
 msgid "Failed to evaluate alarm %s"
@@ -305,14 +279,6 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "%(aspect)s %(id)s에 대한 액세스 권한이 부여되지 않음"
 
 #, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from "
-"%(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-"%(severity)s 우선순위에 대한 알람 %(alarm_name)s %(alarm_id)s 알림, "
-"%(previous)s부터 %(current)s까지, 조치 %(action)s 사용. 이유: %(reason)s."
-
-#, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
 msgstr "OpenDaylitght API가 %(status)s 리턴: %(reason)s"
 
@@ -348,18 +314,6 @@ msgid ""
 msgstr "파이프라인 %(pipeline)s: %(smp)s의 변환기 %(trans)s에서 오류 후 종료"
 
 #, python-format
-msgid ""
-"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
-"%(param)s"
-msgstr ""
-"파이프라인 %(pipeline)s: 매개변수 %(param)s이(가) 있는 변환기 인스턴스 "
-"%(name)s 설정"
-
-#, python-format
-msgid "Pipeline config: %s"
-msgstr "파이프라인 구성: %s"
-
-#, python-format
 msgid "Plugin specified, but no plugin name supplied for trait %s"
 msgstr "플러그인이 지정되었으나 특성 %s에 대해 플러그인 이름이 제공되지 않음"
 
@@ -370,10 +324,6 @@ msgstr "폴링 %(mtr)s 센서가 %(cnt)s번 실패했습니다!"
 #, python-format
 msgid "Polling %(name)s faild for %(cnt)s times!"
 msgstr "폴링 %(name)s이(가) %(cnt)s번 실패했습니다!"
-
-#, python-format
-msgid "Polling pollster %(poll)s in the context of %(src)s"
-msgstr "%(src)s 컨텍스트의 의견조사자 %(poll)s 폴링"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -392,10 +342,6 @@ msgstr "공개자 최대 local_queue 길이가 초과됨. %d 가장 오래된 �
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr "공개 정책을 알 수 없음(%s). 기본값으로 강제 설정함"
-
-#, python-format
-msgid "Publishing policy set to %s"
-msgstr "공개 정책이 %s(으)로 설정됨"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -434,10 +380,6 @@ msgstr "샘플"
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "%s 확장자 로드 건너뛰기"
-
-#, python-format
-msgid "Starting server in PID %s"
-msgstr "PID %s에서 서버 시작 중"
 
 #, python-format
 msgid "String %s is not a valid isotime"
@@ -605,10 +547,6 @@ msgstr "XenAPI가 설치되지 않음"
 msgid "YAML error reading Event Definitions file %(file)s"
 msgstr "이벤트 정의 파일 %(file)s을(를) 읽는 중에 YAML 오류 발생"
 
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr "%(reason)s 때문에 %(id)s 알람이 %(state)s(으)로 전환되었습니다. "
-
 msgid "alarm evaluation cycle failed"
 msgstr "알람 평가 주기 실패"
 
@@ -629,16 +567,9 @@ msgstr "알람 상태 검색 실패: %s"
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "%(id)s의 CPU 시간을 가져올 수 없음: %(e)s"
 
-msgid "detected decoupled pipeline config format"
-msgstr "비결합 파이프라인 구성 형식 발견"
-
 #, python-format
 msgid "dropping sample with no predecessor: %s"
 msgstr "선행 작업이 없는 샘플 삭제: %s"
-
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr "%d 알람에서 평가 주기 시작"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 출력 길이 불일치"
@@ -650,10 +581,6 @@ msgstr "max_bytes 및 backup_count는 숫자여야 합니다."
 msgid "message signature invalid, discarding message: %r"
 msgstr "올바르지 않은 메시지 서명. 메시지 버리는 중: %r"
 
-#, python-format
-msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
-msgstr "%(resource_id)s의 측정 데이터 %(counter_name)s: %(counter_volume)s"
-
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
 "IPMI 센서 데이터 구문 분석에 실패했음, 제공된 입력에서 검색된 데이터가 없음"
@@ -663,14 +590,6 @@ msgstr "IPMI 센서 데이터 구문 분석에 실패했음, 알 수 없는 센�
 
 msgid "running ipmitool failure"
 msgstr "ipmitool 실행 실패"
-
-#, python-format
-msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
-msgstr "0.0.0.0:%(sport)s에서 전달 중, http://127.0.0.1:%(vport)s에서 보기"
-
-#, python-format
-msgid "serving on http://%(host)s:%(port)s"
-msgstr "http://%(host)s:%(port)s에서 전달 중"
 
 msgid "state invalid"
 msgstr "상태가 잘못되었습니다"
