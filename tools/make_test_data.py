@@ -58,8 +58,8 @@ def make_test_data(name, meter_type, unit, volume, random_min,
 
     increment = datetime.timedelta(minutes=interval)
 
-    print('Adding new events for meter %s.' % (name))
-    # Generate events
+    print('Adding new samples for meter %s.' % (name))
+    # Generate samples
     n = 0
     total_volume = volume
     while timestamp <= end:
@@ -95,7 +95,7 @@ def make_test_data(name, meter_type, unit, volume, random_min,
             # volume.
             total_volume = volume
 
-    print('Added %d new events for meter %s.' % (n, name))
+    print('Added %d new samples for meter %s.' % (n, name))
 
 
 def record_test_data(conn, *args, **kwargs):
@@ -111,7 +111,7 @@ def get_parser():
         '--interval',
         default=10,
         type=int,
-        help='The period between events, in minutes.',
+        help='The period between samples, in minutes.',
     )
     parser.add_argument(
         '--start',
@@ -121,7 +121,6 @@ def get_parser():
     )
     parser.add_argument(
         '--end',
-        type=int,
         default=2,
         help='Number of days to be stepped forward from now or date in the '
              'future ("YYYY-MM-DDTHH:MM:SS" format) to define timestamps end '
