@@ -8,10 +8,10 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev48\n"
+"Project-Id-Version: ceilometer 6.0.0.dev53\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-10 06:16+0000\n"
-"PO-Revision-Date: 2015-09-29 06:28+0000\n"
+"POT-Creation-Date: 2015-10-12 06:17+0000\n"
+"PO-Revision-Date: 2015-10-10 06:26+0000\n"
 "Last-Translator: Akihiro Motoki <amotoki@gmail.com>\n"
 "Language: ja\n"
 "Language-Team: Japanese (http://www.transifex.com/openstack/ceilometer/"
@@ -134,7 +134,7 @@ msgstr ""
 "ディスパッチャーターゲットが設定されておらず、メーターは通知されません。"
 "ceilometer.conf ファイルでターゲットを設定してください。"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "通知 %(type)s を除去しています (uuid:%(msgid)s)"
 
@@ -427,16 +427,17 @@ msgstr ""
 "%(count)d 個のサンプルの %(disposition)s しきい値が原因で%(state)s に遷移しま"
 "す。最新: %(most_recent)s"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
 msgstr ""
-"%(state)s に移行します。これは、アラーム %(alarm_ids)s の状態が %(state)s で"
-"あるためです"
+"%(state)s に移行します。アラーム %(alarm_ids)s の状態が %(state)s であるため"
+"です"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: %s から送信されたデータをデコードできません"
 
+#, fuzzy
 msgid "UDP: Unable to store meter"
 msgstr "UDP: 計測値を保管できません"
 
@@ -449,7 +450,7 @@ msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr "値 %(value)s を、想定されるデータ型 %(type)s に変換できません。"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Unable to discover resources: %s"
 msgstr "リソースをディスカバーできません: %s"
 
@@ -490,7 +491,7 @@ msgid ""
 msgstr ""
 "%(retries)d 回の再試行後、1 次 mongodb に再接続できません。中止します。"
 
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
@@ -566,6 +567,7 @@ msgid "YAML error reading Event Definitions file %(file)s"
 msgstr ""
 "イベント定義ファイル %(file)s を読み取るときに YAML エラーが発生しました"
 
+#, fuzzy
 msgid "alarm evaluation cycle failed"
 msgstr "アラーム評価サイクルで障害が発生しました"
 
