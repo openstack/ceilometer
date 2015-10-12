@@ -74,6 +74,8 @@ if [ $EXIT_CODE -ne 0 ] ; then
         echo $output | python -m "json.tool" || echo -e "\n$output"
     done
 
+    # Be sure to source Gnocchi settings before
+    source $BASE/new/gnocchi/devstack/settings
     echo "* Unprocessed measures:"
     find $GNOCCHI_DATA_DIR/measures
     set -x
