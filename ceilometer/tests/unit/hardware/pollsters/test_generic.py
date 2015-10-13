@@ -65,6 +65,26 @@ class TestMeterDefinition(test_base.BaseTestCase):
         except generic.MeterDefinitionException as e:
             self.assertEqual("Unrecognized type value invalid", e.message)
 
+    @mock.patch('ceilometer.hardware.pollsters.generic.LOG')
+    def test_bad_metric_skip(self, LOG):
+        cfg = {'metric': [dict(name='test1',
+                               type='gauge',
+                               unit='B',
+                               snmp_inspector={}),
+                          dict(name='test_bad',
+                               type='invalid',
+                               unit='B',
+                               snmp_inspector={}),
+                          dict(name='test2',
+                               type='gauge',
+                               unit='B',
+                               snmp_inspector={})]}
+        data = generic.load_definition(cfg)
+        self.assertEqual(2, len(data))
+        LOG.error.assert_called_with(
+            "Error loading meter definition : "
+            "Unrecognized type value invalid")
+
 
 class FakeInspector(inspector_base.Inspector):
     net_metadata = dict(name='test.teest',
