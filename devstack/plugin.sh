@@ -213,13 +213,13 @@ function _ceilometer_configure_storage_backend {
         iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-        iniset $CEILOMETER_CONF DEFAULT collector_workers $API_WORKERS
+        iniset $CEILOMETER_CONF collector workers $API_WORKERS
     elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
         # es is only supported for events. we will use sql for alarming/metering.
         iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database event_connection es://localhost:9200
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-        iniset $CEILOMETER_CONF DEFAULT collector_workers $API_WORKERS
+        iniset $CEILOMETER_CONF collector workers $API_WORKERS
         ${TOP_DIR}/pkg/elasticsearch.sh start
         cleanup_ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
