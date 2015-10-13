@@ -689,8 +689,7 @@ class PipelineManager(object):
         "meter_name" will be excluded; 'meter_name' means 'meter_name'
         will be included.
 
-        The 'meter_name" is Sample name field. For meter names with
-        variable like "instance:m1.tiny", it's "instance:*".
+        The 'meter_name" is Sample name field.
 
         Valid meters definition is all "included meter names", all
         "excluded meter names", wildcard and "excluded meter names", or

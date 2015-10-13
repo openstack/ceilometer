@@ -163,7 +163,7 @@ with which a source should operate:
   * To define the list of included meters, use the 'meter_name' syntax
   * To define the list of excluded meters, use the '!meter_name' syntax
   * For meters, which identify a complex Sample field, use the wildcard
-    symbol to select all, e.g. for "instance:m1.tiny", use "instance:\*"
+    symbol to select all, e.g. for "disk.read.bytes", use "disk.\*"
 
 The above definition methods can be used in the following combinations:
 
