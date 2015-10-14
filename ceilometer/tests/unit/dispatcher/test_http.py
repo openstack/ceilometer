@@ -136,7 +136,9 @@ class TestEventDispatcherHttp(base.BaseTestCase):
 
         event = event_models.Event(uuid.uuid4(), 'test',
                                    datetime.datetime(2012, 7, 2, 13, 53, 40),
-                                   [], {}).serialize()
+                                   [], {})
+        event = utils.message_from_event(event,
+                                         self.CONF.publisher.telemetry_secret)
 
         with mock.patch.object(requests, 'post') as post:
             dispatcher.record_events(event)
@@ -149,8 +151,9 @@ class TestEventDispatcherHttp(base.BaseTestCase):
 
         event = event_models.Event(uuid.uuid4(), 'test',
                                    datetime.datetime(2012, 7, 2, 13, 53, 40),
-                                   [], {}).serialize()
-
+                                   [], {})
+        event = utils.message_from_event(event,
+                                         self.CONF.publisher.telemetry_secret)
         with mock.patch('ceilometer.dispatcher.http.LOG',
                         mock.MagicMock()) as LOG:
             dispatcher.record_events(event)
@@ -162,8 +165,9 @@ class TestEventDispatcherHttp(base.BaseTestCase):
 
         event = event_models.Event(uuid.uuid4(), 'test',
                                    datetime.datetime(2012, 7, 2, 13, 53, 40),
-                                   [], {}).serialize()
-
+                                   [], {})
+        event = utils.message_from_event(event,
+                                         self.CONF.publisher.telemetry_secret)
         with mock.patch.object(requests, 'post') as post:
             dispatcher.record_events(event)
 

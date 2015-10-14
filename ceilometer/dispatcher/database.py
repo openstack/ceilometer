@@ -106,20 +106,25 @@ class DatabaseDispatcher(dispatcher.Base):
 
         event_list = []
         for ev in events:
-            try:
-                event_list.append(
-                    models.Event(
-                        message_id=ev['message_id'],
-                        event_type=ev['event_type'],
-                        generated=timeutils.normalize_time(
-                            timeutils.parse_isotime(ev['generated'])),
-                        traits=[models.Trait(
-                                name, dtype,
-                                models.Trait.convert_value(dtype, value))
-                                for name, dtype, value in ev['traits']],
-                        raw=ev.get('raw', {}))
-                )
-            except Exception:
-                LOG.exception(_LE("Error processing event and it will be "
-                                  "dropped: %s"), ev)
+            if publisher_utils.verify_signature(
+                    ev, self.conf.publisher.telemetry_secret):
+                try:
+                    event_list.append(
+                        models.Event(
+                            message_id=ev['message_id'],
+                            event_type=ev['event_type'],
+                            generated=timeutils.normalize_time(
+                                timeutils.parse_isotime(ev['generated'])),
+                            traits=[models.Trait(
+                                    name, dtype,
+                                    models.Trait.convert_value(dtype, value))
+                                    for name, dtype, value in ev['traits']],
+                            raw=ev.get('raw', {}))
+                    )
+                except Exception:
+                    LOG.exception(_LE("Error processing event and it will be "
+                                      "dropped: %s"), ev)
+            else:
+                LOG.warning(_LW(
+                    'event signature invalid, discarding event: %s'), ev)
         self.event_conn.record_events(event_list)

@@ -19,7 +19,7 @@ from oslo_log import log
 import requests
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _, _LE, _LW
 from ceilometer.publisher import utils as publisher_utils
 
 LOG = log.getLogger(__name__)
@@ -129,13 +129,19 @@ class HttpDispatcher(dispatcher.Base):
             events = [events]
 
         for event in events:
-            res = None
-            try:
-                res = requests.post(self.event_target, data=event,
-                                    headers=self.headers, timeout=self.timeout)
-                res.raise_for_status()
-            except Exception:
-                error_code = res.status_code if res else 'unknown'
-                LOG.exception(_LE('Status Code: %{code}s. Failed to dispatch '
-                                  'event: %{event}s'),
-                              {'code': error_code, 'event': event})
+            if publisher_utils.verify_signature(
+                    event, self.conf.publisher.telemetry_secret):
+                res = None
+                try:
+                    res = requests.post(self.event_target, data=event,
+                                        headers=self.headers,
+                                        timeout=self.timeout)
+                    res.raise_for_status()
+                except Exception:
+                    error_code = res.status_code if res else 'unknown'
+                    LOG.exception(_LE('Status Code: %{code}s. Failed to'
+                                      'dispatch event: %{event}s'),
+                                  {'code': error_code, 'event': event})
+            else:
+                LOG.warning(_LW(
+                    'event signature invalid, discarding event: %s'), event)
