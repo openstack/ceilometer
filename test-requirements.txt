@@ -22,7 +22,6 @@ pylint>=1.3.0 # GNU GPL v2
 pymongo<3.0,>=2.6.3
 python-subunit>=0.0.18
 sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2
-sphinxcontrib-docbookrestapi
 sphinxcontrib-httpdomain
 sphinxcontrib-pecanwsme>=0.8
 testrepository>=0.0.18
