@@ -216,7 +216,7 @@ class GnocchiSession(object):
 
 class Client(object):
     def __init__(self, url):
-        self._gnocchi_url = url
+        self._gnocchi_url = url.rstrip("/")
         self._ks_client = keystone_client.get_client()
         self._session = GnocchiSession()
 
