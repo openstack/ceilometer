@@ -24,6 +24,8 @@ import uuid
 from gabbi import fixture
 from oslo_config import fixture as fixture_config
 from oslo_policy import opts
+from oslo_utils import fileutils
+import six
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.event.storage import models
@@ -61,8 +63,15 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.import_group('api', 'ceilometer.api.controllers.v2.root')
         conf.import_opt('store_events', 'ceilometer.notification',
                         group='notification')
-        conf.set_override('policy_file',
-                          os.path.abspath('etc/ceilometer/policy.json'),
+
+        content = ('{"default": ""}')
+        if six.PY3:
+            content = content.encode('utf-8')
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='policy',
+                                                    suffix='.json')
+
+        conf.set_override("policy_file", self.tempfile,
                           group='oslo_policy')
 
         # A special pipeline is required to use the direct publisher.

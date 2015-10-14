@@ -1,7 +1,18 @@
 {
     "context_is_admin": "role:admin",
-    "context_is_project": "project_id:%(target.project_id)s",
-    "context_is_owner": "user_id:%(target.user_id)s",
     "segregation": "rule:context_is_admin",
-    "default": ""
+
+    "telemetry:get_samples": "",
+    "telemetry:get_sample": "",
+    "telemetry:query_sample": "",
+    "telemetry:create_samples": "rule:context_is_admin",
+
+    "telemetry:compute_statistics": "",
+    "telemetry:get_meters": "",
+
+    "telemetry:get_resource": "",
+    "telemetry:get_resources": "",
+
+    "telemetry:events:index": "",
+    "telemetry:events:show": ""
 }
