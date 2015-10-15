@@ -156,6 +156,8 @@ class V2Controller(object):
     def _lookup(self, kind, *remainder):
         if (kind in ['meters', 'resources', 'samples']
                 and self.gnocchi_is_enabled):
+            if kind == 'meters' and pecan.request.method == 'POST':
+                return meters.MetersController(), remainder
             gnocchi_abort()
         elif kind == 'meters':
             return meters.MetersController(), remainder
