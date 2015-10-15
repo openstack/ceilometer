@@ -69,7 +69,7 @@ class DispatcherTest(base.BaseTestCase):
             'resource_id': self.resource_id,
             'resource_metadata': {
                 'host': 'foo',
-                'image_ref_url': 'imageref!',
+                'image_ref': 'imageref!',
                 'instance_flavor_id': 1234,
                 'display_name': 'myinstance',
             }},
@@ -84,7 +84,7 @@ class DispatcherTest(base.BaseTestCase):
                 'resource_id': self.resource_id,
                 'resource_metadata': {
                     'host': 'foo',
-                    'image_ref_url': 'imageref!',
+                    'image_ref': 'imageref!',
                     'instance_flavor_id': 1234,
                     'display_name': 'myinstance',
                 }
@@ -196,7 +196,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 'timestamp': '2012-05-08 20:23:48.028195',
                 'resource_metadata': {
                     'host': 'foo',
-                    'image_ref_url': 'imageref!',
+                    'image_ref': 'imageref!',
                     'instance_flavor_id': 1234,
                     'display_name': 'myinstance',
                 }
