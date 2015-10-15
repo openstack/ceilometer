@@ -116,7 +116,8 @@ def prepare_service(argv=None, config_files=None):
     oslo_i18n.enable_lazy()
     log.register_options(cfg.CONF)
     log_levels = (cfg.CONF.default_log_levels +
-                  ['stevedore=INFO', 'keystoneclient=INFO'])
+                  ['stevedore=INFO', 'keystoneclient=INFO',
+                   'neutronclient=INFO'])
     log.set_defaults(default_log_levels=log_levels)
     if argv is None:
         argv = sys.argv
