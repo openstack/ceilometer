@@ -187,6 +187,7 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     DRIVER_MANAGERS = {
         'mongodb': MongoDbManager,
         'mysql': MySQLManager,
+        'mysql+pymysql': MySQLManager,
         'postgresql': PgSQLManager,
         'db2': MongoDbManager,
         'sqlite': SQLiteManager,
