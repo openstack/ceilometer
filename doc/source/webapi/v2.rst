@@ -346,20 +346,6 @@ project::
          "op": "eq",
          "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
 
-Get the list of samples about instances with *m1.tiny* flavor running for June
-2013 for a particular project::
-
-    GET /v2/meters/instance:m1.tiny
-    q: [{"field": "timestamp",
-         "op": "ge",
-         "value": "2013-06-01T00:00:00"},
-        {"field": "timestamp",
-         "op": "lt",
-         "value": "2013-07-01T00:00:00"},
-        {"field": "project_id",
-         "op": "eq",
-         "value": "8d6057bc-5b90-4296-afe0-84acaa2ef909"}]
-
 Now you may want to have statistics on the meters you are targeting.
 Consider the following example where you are getting the list of samples
 about CPU utilization of a given instance (identified by its *resource_id*)

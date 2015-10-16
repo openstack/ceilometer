@@ -77,7 +77,7 @@ class TestComputeDurationByResource(v2.FunctionalTest,
                                  side_effect=get_interval)
 
     def _invoke_api(self):
-        return self.get_json('/meters/instance:m1.tiny/statistics',
+        return self.get_json('/meters/instance/statistics',
                              q=[{'field': 'timestamp',
                                  'op': 'ge',
                                  'value': self.start.isoformat()},
@@ -151,7 +151,7 @@ class TestComputeDurationByResource(v2.FunctionalTest,
         ]
         with mock.patch.object(type(self.conn), 'get_meter_statistics',
                                return_value=statistics):
-            data = self.get_json('/meters/instance:m1.tiny/statistics',
+            data = self.get_json('/meters/instance/statistics',
                                  q=[{'field': 'timestamp',
                                      'op': 'ge',
                                      'value': self.late1.isoformat()},
@@ -183,7 +183,7 @@ class TestComputeDurationByResource(v2.FunctionalTest,
 
         with mock.patch.object(type(self.conn), 'get_meter_statistics',
                                return_value=statistics):
-            data = self.get_json('/meters/instance:m1.tiny/statistics',
+            data = self.get_json('/meters/instance/statistics',
                                  q=[{'field': 'timestamp',
                                      'op': 'le',
                                      'value': self.early2.isoformat()},
