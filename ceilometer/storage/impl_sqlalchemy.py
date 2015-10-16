@@ -603,7 +603,22 @@ class Connection(base.Connection):
 
         session = self._engine_facade.get_session()
         engine = self._engine_facade.get_engine()
-        query = session.query(models.FullSample)
+        query = session.query(models.Sample.timestamp,
+                              models.Sample.recorded_at,
+                              models.Sample.message_id,
+                              models.Sample.message_signature,
+                              models.Sample.volume.label('counter_volume'),
+                              models.Meter.name.label('counter_name'),
+                              models.Meter.type.label('counter_type'),
+                              models.Meter.unit.label('counter_unit'),
+                              models.Resource.source_id,
+                              models.Resource.user_id,
+                              models.Resource.project_id,
+                              models.Resource.resource_metadata,
+                              models.Resource.resource_id).join(
+            models.Meter, models.Meter.id == models.Sample.meter_id).join(
+            models.Resource,
+            models.Resource.internal_id == models.Sample.resource_id)
         transformer = sql_utils.QueryTransformer(models.FullSample, query,
                                                  dialect=engine.dialect.name)
         if filter_expr is not None:
