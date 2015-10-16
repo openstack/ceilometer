@@ -98,6 +98,7 @@ class TestNetPollster(base.TestPollsterBase):
                                               'links': [{"rel": "bookmark",
                                                          'href': 2}]},
                                     'hostId': '1234-5678',
+                                    'OS-EXT-SRV-ATTR:host': 'host-test',
                                     'flavor': {'disk': 20,
                                                'ram': 512,
                                                'name': 'tiny',
