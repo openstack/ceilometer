@@ -60,7 +60,8 @@ def make_test_data(conn, start, end, interval, event_types):
             data.append(models.Event(str(uuid.uuid4()),
                                      'event_type%d' % i,
                                      timestamp,
-                                     traits))
+                                     traits,
+                                     {}))
             n += 1
         conn.record_events(data)
         timestamp = timestamp + increment
