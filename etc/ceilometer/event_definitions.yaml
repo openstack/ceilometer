@@ -8,15 +8,9 @@
     instance_id:
       fields: payload.instance_id
     host:
-      fields: publisher_id
-      plugin:
-        name: split
-        parameters:
-          segment: 1
-          max_split: 1
+      fields: publisher_id.`split(., 1, 1)`
     service:
-      fields: publisher_id
-      plugin: split
+      fields: publisher_id.`split(., 0, -1)`
     memory_mb:
       type: int
       fields: payload.memory_mb
