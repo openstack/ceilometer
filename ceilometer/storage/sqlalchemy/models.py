@@ -20,7 +20,7 @@ from oslo_utils import timeutils
 import six
 from sqlalchemy import (Column, Integer, String, ForeignKey, Index,
                         UniqueConstraint, BigInteger)
-from sqlalchemy import event, select
+from sqlalchemy import event
 from sqlalchemy import Float, Boolean, Text, DateTime
 from sqlalchemy.dialects.mysql import DECIMAL
 from sqlalchemy.ext.declarative import declarative_base
@@ -222,29 +222,23 @@ class Sample(Base):
     message_id = Column(String(128))
 
 
-class FullSample(Base):
-    """Mapper model.
-
-    It's needed as many of the filters work against raw data which is split
-    between Meter, Sample, and Resource tables
-    """
-    meter = Meter.__table__
-    sample = Sample.__table__
-    resource = Resource.__table__
-    __table__ = (select([sample.c.id, meter.c.name.label('counter_name'),
-                         meter.c.type.label('counter_type'),
-                         meter.c.unit.label('counter_unit'),
-                         sample.c.volume.label('counter_volume'),
-                         resource.c.resource_id, resource.c.source_id,
-                         resource.c.user_id, resource.c.project_id,
-                         resource.c.resource_metadata, resource.c.internal_id,
-                         sample.c.timestamp, sample.c.message_id,
-                         sample.c.message_signature, sample.c.recorded_at])
-                 .select_from(
-                     sample.join(meter, sample.c.meter_id == meter.c.id).join(
-                         resource,
-                         sample.c.resource_id == resource.c.internal_id))
-                 .alias())
+class FullSample(object):
+    """A fake model for query samples."""
+    id = Sample.id
+    timestamp = Sample.timestamp
+    message_id = Sample.message_id
+    message_signature = Sample.message_signature
+    recorded_at = Sample.recorded_at
+    counter_name = Meter.name
+    counter_type = Meter.type
+    counter_unit = Meter.unit
+    counter_volume = Sample.volume
+    resource_id = Resource.resource_id
+    source_id = Resource.source_id
+    user_id = Resource.user_id
+    project_id = Resource.project_id
+    resource_metadata = Resource.resource_metadata
+    internal_id = Resource.internal_id
 
 
 class Alarm(Base):
