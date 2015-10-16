@@ -213,23 +213,20 @@ function _ceilometer_configure_storage_backend {
         iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-        iniset $CEILOMETER_CONF collector workers $API_WORKERS
     elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
         # es is only supported for events. we will use sql for alarming/metering.
         iniset $CEILOMETER_CONF database alarm_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database event_connection es://localhost:9200
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-        iniset $CEILOMETER_CONF collector workers $API_WORKERS
         ${TOP_DIR}/pkg/elasticsearch.sh start
-        cleanup_ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
         iniset $CEILOMETER_CONF database alarm_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
-        cleanup_ceilometer
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
+    cleanup_ceilometer
 }
 
 # Configure Ceilometer
@@ -285,6 +282,7 @@ function configure_ceilometer {
 
     # Configure storage
     _ceilometer_configure_storage_backend
+    iniset $CEILOMETER_CONF collector workers $API_WORKERS
 
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
         iniset $CEILOMETER_CONF DEFAULT hypervisor_inspector vsphere
