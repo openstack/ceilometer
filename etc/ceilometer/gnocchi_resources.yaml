@@ -59,7 +59,7 @@ resources:
       - 'disk.usage'
     attributes:
       host: resource_metadata.host
-      image_ref: resource_metadata.image_ref_url
+      image_ref: resource_metadata.image_ref
       display_name: resource_metadata.display_name
       flavor_id: resource_metadata.(instance_flavor_id|(flavor.id))
       server_group: resource_metadata.user_metadata.server_group
