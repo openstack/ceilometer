@@ -65,14 +65,21 @@ class TestAPIUpgradePath(v2.FunctionalTest):
                                       "limit": 3
                                   }, status=410)
         self.assertIn(b'Gnocchi API', response.body)
+        sample_params = {
+            "counter_type": "gauge",
+            "counter_name": "fake_counter",
+            "resource_id": "fake_resource_id",
+            "counter_unit": "fake_unit",
+            "counter_volume": "1"
+        }
         self.post_json('/meters/fake_counter',
-                       params=[{
-                           "counter_type": "gauge",
-                           "counter_name": "fake_counter",
-                           "resource_id": "fake_resource_id",
-                           "counter_unit": "fake_unit",
-                           "counter_volume": "1"
-                       }], status=201)
+                       params=[sample_params],
+                       status=201)
+        response = self.post_json('/meters/fake_counter?direct=1',
+                                  params=[sample_params],
+                                  status=400)
+        self.assertIn(b'direct option cannot be true when Gnocchi is enabled',
+                      response.body)
 
     def _do_test_alarm_redirect(self):
         response = self.app.get(self.PATH_PREFIX + '/alarms',
