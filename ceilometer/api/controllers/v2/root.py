@@ -21,6 +21,7 @@
 from keystoneclient import exceptions
 from oslo_config import cfg
 from oslo_log import log
+from oslo_utils import strutils
 import pecan
 
 from ceilometer.api.controllers.v2 import alarms
@@ -30,7 +31,7 @@ from ceilometer.api.controllers.v2 import meters
 from ceilometer.api.controllers.v2 import query
 from ceilometer.api.controllers.v2 import resources
 from ceilometer.api.controllers.v2 import samples
-from ceilometer.i18n import _LW
+from ceilometer.i18n import _, _LW
 from ceilometer import keystone_client
 
 
@@ -157,6 +158,10 @@ class V2Controller(object):
         if (kind in ['meters', 'resources', 'samples']
                 and self.gnocchi_is_enabled):
             if kind == 'meters' and pecan.request.method == 'POST':
+                direct = pecan.request.params.get('direct', '')
+                if strutils.bool_from_string(direct):
+                    pecan.abort(400, _('direct option cannot be true when '
+                                       'Gnocchi is enabled.'))
                 return meters.MetersController(), remainder
             gnocchi_abort()
         elif kind == 'meters':
