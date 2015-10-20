@@ -62,16 +62,15 @@ if [ $EXIT_CODE -ne 0 ] ; then
     echo "* Nova instance list:"
     openstack server list
 
-    # TODO(sileht): replace by gnocchiclient when available
     echo "* Gnocchi instance list:"
-    curl -s -X GET -H 'Content-Type: application/json' -H "X-Auth-Token: $ADMIN_TOKEN" $GNOCCHI_SERVICE_URL/v1/resource/instance | python -m "json.tool"
+    gnocchi resource list -t instance
     for instance_id in $(openstack server list -f value -c ID); do
         echo "* Nova instance detail:"
         openstack server show $instance_id
-
+        echo "* Gnocchi instance detail:"
+        gnocchi resource show -t instance $instance_id
         echo "* Gnocchi measures for instance ${instance_id}:"
-        output=$(curl -s -X GET -H 'Content-Type: application/json' -H "X-Auth-Token: $ADMIN_TOKEN" $GNOCCHI_SERVICE_URL/v1/resource/instance/$instance_id/metric/cpu_util/measures)
-        echo $output | python -m "json.tool" || echo -e "\n$output"
+        gnocchi measures show -r $instance_id cpu_util
     done
 
     # Be sure to source Gnocchi settings before
