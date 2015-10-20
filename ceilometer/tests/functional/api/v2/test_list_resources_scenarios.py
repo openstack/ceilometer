@@ -234,6 +234,32 @@ class TestListResources(v2.FunctionalTest,
         sources = [r['source'] for r in data]
         self.assertEqual(['test_list_resources'], sources)
 
+    def test_resource_id_with_slash(self):
+        s = sample.Sample(
+            'storage.containers.objects',
+            'gauge',
+            '',
+            1,
+            '19fbed01c21f4912901057021b9e7111',
+            '45acc90399134206b3b41f3d3a0a06d6',
+            '29f809d9-88bb-4c40-b1ba-a77a1fcf8ceb/glance',
+            timestamp=datetime.datetime(2012, 7, 2, 10, 40).isoformat(),
+            resource_metadata={},
+            source='test_show_special_resource',
+        )
+
+        msg = utils.meter_message_from_counter(
+            s, self.CONF.publisher.telemetry_secret,
+        )
+        msg['timestamp'] = datetime.datetime(2012, 7, 2, 10, 40)
+        self.conn.record_metering_data(msg)
+
+        rid_encoded = '29f809d9-88bb-4c40-b1ba-a77a1fcf8ceb%252Fglance'
+        resp = self.get_json('/resources/%s' % rid_encoded)
+        self.assertEqual("19fbed01c21f4912901057021b9e7111", resp["user_id"])
+        self.assertEqual('29f809d9-88bb-4c40-b1ba-a77a1fcf8ceb/glance',
+                         resp["resource_id"])
+
     def test_with_invalid_resource_id(self):
         sample1 = sample.Sample(
             'instance',
