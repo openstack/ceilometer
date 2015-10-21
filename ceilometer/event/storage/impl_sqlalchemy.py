@@ -131,10 +131,6 @@ class Connection(base.Connection):
         options = dict(cfg.CONF.database.items())
         options['max_retries'] = 0
         self._engine_facade = db_session.EngineFacade(url, **options)
-        if self._engine_facade.get_engine().name == 'sqlite':
-            self.isolation_level = 'SERIALIZABLE'
-        else:
-            self.isolation_level = 'REPEATABLE READ'
 
     def upgrade(self):
         # NOTE(gordc): to minimise memory, only import migration when needed
@@ -216,9 +212,6 @@ class Connection(base.Connection):
             return
         session = self._engine_facade.get_session()
         with session.begin():
-            session.connection(
-                execution_options={'isolation_level': self.isolation_level})
-
             # Build up the join conditions
             event_join_conditions = [models.EventType.id ==
                                      models.Event.event_type_id]
@@ -341,9 +334,11 @@ class Connection(base.Connection):
                     trait_model = api_models.Trait(key, dtype, val)
                     event_list[id_].append_trait(trait_model)
                 except KeyError:
-                    LOG.warning('Trait key: %(key)s, val: %(val)s, for event: '
-                                '%(event)s not valid.' %
-                                {'key': key, 'val': val, 'event': id_})
+                    # NOTE(gordc): this is expected as we do not set REPEATABLE
+                    # READ (bug 1506717). if query is run while recording new
+                    # event data, trait query may return more data than event
+                    # query. they can be safely discarded.
+                    pass
 
             return event_list.values()
 
