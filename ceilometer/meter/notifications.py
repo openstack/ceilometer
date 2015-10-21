@@ -182,10 +182,17 @@ def setup_meters_config():
 def load_definitions(config_def):
     if not config_def:
         return []
-    return [MeterDefinition(event_def)
-            for event_def in reversed(config_def['metric'])
+    meter_defs = []
+    for event_def in reversed(config_def['metric']):
+        try:
             if (event_def['volume'] != 1 or
-                not cfg.CONF.notification.disable_non_metric_meters)]
+                    not cfg.CONF.notification.disable_non_metric_meters):
+                meter_defs.append(MeterDefinition(event_def))
+        except MeterDefinitionException as me:
+            errmsg = (_LE("Error loading meter definition : %(err)s")
+                      % dict(err=me.message))
+            LOG.error(errmsg)
+    return meter_defs
 
 
 class InvalidPayload(Exception):
