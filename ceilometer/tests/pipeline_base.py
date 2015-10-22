@@ -305,6 +305,72 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual('a_update', getattr(publisher.samples[0], "name"))
         self.assertEqual('b_update', getattr(publisher.samples[1], "name"))
 
+    @mock.patch('ceilometer.pipeline.LOG')
+    def test_none_volume_counter(self, log):
+        self._set_pipeline_cfg('counters', ['empty_volume'])
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+
+        test_s = sample.Sample(
+            name='empty_volume',
+            type=self.test_counter.type,
+            volume=None,
+            unit=self.test_counter.unit,
+            user_id=self.test_counter.user_id,
+            project_id=self.test_counter.project_id,
+            resource_id=self.test_counter.resource_id,
+            timestamp=self.test_counter.timestamp,
+            resource_metadata=self.test_counter.resource_metadata,
+        )
+
+        with pipeline_manager.publisher(None) as p:
+            p([test_s])
+
+        log.warning.assert_called_with(
+            'metering data %(counter_name)s for %(resource_id)s '
+            '@ %(timestamp)s has no volume (volume: %(counter_volume)s), the '
+            'sample will be dropped'
+            % {'counter_name': test_s.name,
+               'resource_id': test_s.resource_id,
+               'timestamp': test_s.timestamp,
+               'counter_volume': test_s.volume})
+
+        self.assertEqual(0, len(publisher.samples))
+
+    @mock.patch('ceilometer.pipeline.LOG')
+    def test_fake_volume_counter(self, log):
+        self._set_pipeline_cfg('counters', ['fake_volume'])
+        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
+                                                    self.transformer_manager)
+        publisher = pipeline_manager.pipelines[0].publishers[0]
+
+        test_s = sample.Sample(
+            name='fake_volume',
+            type=self.test_counter.type,
+            volume='fake_value',
+            unit=self.test_counter.unit,
+            user_id=self.test_counter.user_id,
+            project_id=self.test_counter.project_id,
+            resource_id=self.test_counter.resource_id,
+            timestamp=self.test_counter.timestamp,
+            resource_metadata=self.test_counter.resource_metadata,
+        )
+
+        with pipeline_manager.publisher(None) as p:
+            p([test_s])
+
+        log.warning.assert_called_with(
+            'metering data %(counter_name)s for %(resource_id)s '
+            '@ %(timestamp)s has volume which is not a number '
+            '(volume: %(counter_volume)s), the sample will be dropped'
+            % {'counter_name': test_s.name,
+               'resource_id': test_s.resource_id,
+               'timestamp': test_s.timestamp,
+               'counter_volume': test_s.volume})
+
+        self.assertEqual(0, len(publisher.samples))
+
     def test_counter_dont_match(self):
         counter_cfg = ['nomatch']
         self._set_pipeline_cfg('counters', counter_cfg)
