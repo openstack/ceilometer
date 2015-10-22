@@ -202,7 +202,7 @@ function cleanup_ceilometer {
     elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
         curl -XDELETE "localhost:9200/events_*"
     fi
-    if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
+    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
         _ceilometer_cleanup_apache_wsgi
     fi
 }
@@ -293,7 +293,7 @@ function configure_ceilometer {
 
     # NOTE: This must come after database configurate as those can
     # call cleanup_ceilometer which will wipe the WSGI config.
-    if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
+    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
         iniset $CEILOMETER_CONF api pecan_debug "False"
         _ceilometer_config_apache_wsgi
     fi
@@ -331,7 +331,10 @@ function install_ceilometer {
     _ceilometer_prepare_virt_drivers
     install_ceilometerclient
     setup_develop $CEILOMETER_DIR
-    sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR $CEILOMETER_API_LOG_DIR
+    sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
+    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "False" ]; then
+        sudo install -d -o $STACK_USER -m 755 $CEILOMETER_API_LOG_DIR
+    fi
 }
 
 # install_ceilometerclient() - Collect source and prepare
@@ -353,7 +356,7 @@ function start_ceilometer {
 
     if [[ "$CEILOMETER_USE_MOD_WSGI" == "False" ]]; then
         run_process ceilometer-api "$CEILOMETER_BIN_DIR/ceilometer-api -d -v --log-dir=$CEILOMETER_API_LOG_DIR --config-file $CEILOMETER_CONF"
-    else
+    elif is_service_enabled ceilometer-api; then
         enable_apache_site ceilometer
         restart_apache_server
         tail_log ceilometer /var/log/$APACHE_NAME/ceilometer.log
