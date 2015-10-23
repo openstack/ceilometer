@@ -17,13 +17,12 @@ from oslo_config import cfg
 
 # Register options for the service
 OPTS = [
-    cfg.IntOpt('port',
-               default=8777,
-               min=1, max=65535,
-               deprecated_name='metering_api_port',
-               deprecated_group='DEFAULT',
-               help='The port for the ceilometer API server.',
-               ),
+    cfg.PortOpt('port',
+                default=8777,
+                deprecated_name='metering_api_port',
+                deprecated_group='DEFAULT',
+                help='The port for the ceilometer API server.',
+                ),
     cfg.StrOpt('host',
                default='0.0.0.0',
                help='The listen IP for the ceilometer API server.',

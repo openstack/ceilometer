@@ -33,10 +33,9 @@ OPTS = [
                default='0.0.0.0',
                help='Address to which the UDP socket is bound. Set to '
                'an empty string to disable.'),
-    cfg.IntOpt('udp_port',
-               default=4952,
-               min=1, max=65535,
-               help='Port to which the UDP socket is bound.'),
+    cfg.PortOpt('udp_port',
+                default=4952,
+                help='Port to which the UDP socket is bound.'),
     cfg.BoolOpt('requeue_sample_on_dispatcher_error',
                 default=False,
                 help='Requeue the sample on the collector sample queue '
