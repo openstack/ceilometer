@@ -77,6 +77,7 @@ def list_opts():
                          ceilometer.sample.OPTS,
                          ceilometer.service.OPTS,
                          ceilometer.storage.OLD_OPTS,
+                         ceilometer.storage.CLI_OPTS,
                          ceilometer.utils.OPTS,)),
         ('alarm',
          itertools.chain(ceilometer.alarm.notifier.rest.OPTS,
