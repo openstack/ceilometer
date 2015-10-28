@@ -25,6 +25,13 @@ _ENFORCER = None
 CONF = cfg.CONF
 
 
+def reset():
+    global _ENFORCER
+    if _ENFORCER:
+        _ENFORCER.clear()
+        _ENFORCER = None
+
+
 def _has_rule(name):
     return name in _ENFORCER.rules.keys()
 

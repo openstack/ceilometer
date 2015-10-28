@@ -21,6 +21,7 @@ from oslo_policy import opts
 import pecan
 import pecan.testing
 
+from ceilometer.api import rbac
 from ceilometer.tests import db as db_test_base
 
 OPT_GROUP_NAME = 'keystone_authtoken'
@@ -70,6 +71,7 @@ class FunctionalTest(db_test_base.TestBase):
 
     def tearDown(self):
         super(FunctionalTest, self).tearDown()
+        rbac.reset()
         pecan.set_config({}, overwrite=True)
 
     def put_json(self, path, params, expect_errors=False, headers=None,
