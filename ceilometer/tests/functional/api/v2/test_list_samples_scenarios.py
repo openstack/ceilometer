@@ -23,12 +23,10 @@ import six
 
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2
 
 
-class TestListSamples(v2.FunctionalTest,
-                      tests_db.MixinTestsWithBackendScenarios):
+class TestListSamples(v2.FunctionalTest):
 
     def setUp(self):
         super(TestListSamples, self).setUp()

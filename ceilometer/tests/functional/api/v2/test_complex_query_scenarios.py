@@ -24,7 +24,6 @@ from oslo_utils import timeutils
 
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2 as tests_api
 
 
@@ -36,9 +35,7 @@ non_admin_header = {"X-Roles": "Member",
                     "project-id1"}
 
 
-class TestQueryMetersController(tests_api.FunctionalTest,
-                                tests_db.MixinTestsWithBackendScenarios):
-
+class TestQueryMetersController(tests_api.FunctionalTest):
     def setUp(self):
         super(TestQueryMetersController, self).setUp()
         self.url = '/query/samples'

@@ -23,12 +23,10 @@ import webtest.app
 
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2
 
 
-class TestListResources(v2.FunctionalTest,
-                        tests_db.MixinTestsWithBackendScenarios):
+class TestListResources(v2.FunctionalTest):
 
     def test_empty(self):
         data = self.get_json('/resources')
@@ -519,9 +517,7 @@ class TestListResources(v2.FunctionalTest,
                         in links[0]['href'])
 
 
-class TestListResourcesRestriction(v2.FunctionalTest,
-                                   tests_db.MixinTestsWithBackendScenarios):
-
+class TestListResourcesRestriction(v2.FunctionalTest):
     def setUp(self):
         super(TestListResourcesRestriction, self).setUp()
         self.CONF.set_override('default_api_return_limit', 10, group='api')

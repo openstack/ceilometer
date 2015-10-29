@@ -22,9 +22,7 @@ from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2
 
 
-class TestMaxProjectVolume(v2.FunctionalTest,
-                           tests_db.MixinTestsWithBackendScenarios):
-
+class TestMaxProjectVolume(v2.FunctionalTest):
     PATH = '/meters/volume.size/statistics'
 
     def setUp(self):
@@ -119,9 +117,7 @@ class TestMaxProjectVolume(v2.FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestMaxResourceVolume(v2.FunctionalTest,
-                            tests_db.MixinTestsWithBackendScenarios):
-
+class TestMaxResourceVolume(v2.FunctionalTest):
     PATH = '/meters/volume.size/statistics'
 
     def setUp(self):
@@ -248,8 +244,7 @@ class TestMaxResourceVolume(v2.FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestSumProjectVolume(v2.FunctionalTest,
-                           tests_db.MixinTestsWithBackendScenarios):
+class TestSumProjectVolume(v2.FunctionalTest):
 
     PATH = '/meters/volume.size/statistics'
 
@@ -347,8 +342,7 @@ class TestSumProjectVolume(v2.FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestSumResourceVolume(v2.FunctionalTest,
-                            tests_db.MixinTestsWithBackendScenarios):
+class TestSumResourceVolume(v2.FunctionalTest):
 
     PATH = '/meters/volume.size/statistics'
 
@@ -472,8 +466,7 @@ class TestSumResourceVolume(v2.FunctionalTest,
         self.assertEqual(1, data[0]['count'])
 
 
-class TestGroupByInstance(v2.FunctionalTest,
-                          tests_db.MixinTestsWithBackendScenarios):
+class TestGroupByInstance(v2.FunctionalTest):
 
     PATH = '/meters/instance/statistics'
 
@@ -1216,8 +1209,7 @@ class TestGroupByInstance(v2.FunctionalTest,
 
 
 @tests_db.run_with('mongodb', 'hbase', 'db2')
-class TestGroupBySource(v2.FunctionalTest,
-                        tests_db.MixinTestsWithBackendScenarios):
+class TestGroupBySource(v2.FunctionalTest):
 
     # FIXME(terriyu): We have to put test_group_by_source in its own class
     # because SQLAlchemy currently doesn't support group by source statistics.
@@ -1319,8 +1311,7 @@ class TestGroupBySource(v2.FunctionalTest,
                 self.assertEqual(4, r['avg'])
 
 
-class TestSelectableAggregates(v2.FunctionalTest,
-                               tests_db.MixinTestsWithBackendScenarios):
+class TestSelectableAggregates(v2.FunctionalTest):
 
     PATH = '/meters/instance/statistics'
 
@@ -1561,8 +1552,7 @@ class TestSelectableAggregates(v2.FunctionalTest,
 
 
 @tests_db.run_with('mongodb', 'hbase', 'db2')
-class TestUnparameterizedAggregates(v2.FunctionalTest,
-                                    tests_db.MixinTestsWithBackendScenarios):
+class TestUnparameterizedAggregates(v2.FunctionalTest):
 
     # We put the stddev test case in a separate class so that we
     # can easily exclude the sqlalchemy scenario, as sqlite doesn't

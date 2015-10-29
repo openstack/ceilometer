@@ -28,8 +28,7 @@ from ceilometer.tests import db as tests_db
 
 
 @tests_db.run_with('mongodb')
-class MongoDBConnection(tests_db.TestBase,
-                        tests_db.MixinTestsWithBackendScenarios):
+class MongoDBConnection(tests_db.TestBase):
     def test_connection_pooling(self):
         test_conn = impl_mongodb.Connection(self.db_manager.url)
         self.assertEqual(self.conn.conn, test_conn.conn)
@@ -51,8 +50,7 @@ class MongoDBConnection(tests_db.TestBase,
 
 
 @tests_db.run_with('mongodb')
-class IndexTest(tests_db.TestBase,
-                tests_db.MixinTestsWithBackendScenarios):
+class IndexTest(tests_db.TestBase):
 
     def _test_ttl_index_absent(self, conn, coll_name, ttl_opt):
         # create a fake index and check it is deleted

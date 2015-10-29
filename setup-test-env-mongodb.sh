@@ -21,12 +21,7 @@ mongod --maxConns 32 --nojournal --noprealloc --smallfiles --quiet --noauth --po
 wait_for_line "waiting for connections on port ${MONGO_PORT}" ${MONGO_DATA}/out
 # Read the fifo for ever otherwise mongod would block
 cat ${MONGO_DATA}/out > /dev/null &
-export CEILOMETER_TEST_MONGODB_URL="mongodb://localhost:${MONGO_PORT}/ceilometer"
-if test -n "$CEILOMETER_TEST_HBASE_URL"
-then
-    export CEILOMETER_TEST_HBASE_TABLE_PREFIX=$(hexdump -n 16 -v -e '/1 "%02X"' /dev/urandom)
-    python tools/test_hbase_table_utils.py --upgrade
-fi
+export CEILOMETER_TEST_STORAGE_URL="mongodb://localhost:${MONGO_PORT}/ceilometer"
 
 # Yield execution to venv command
 $*

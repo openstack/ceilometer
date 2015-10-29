@@ -22,12 +22,10 @@ import mock
 from oslo_utils import timeutils
 from oslotest import mockpatch
 
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2
 
 
-class TestPostSamples(v2.FunctionalTest,
-                      tests_db.MixinTestsWithBackendScenarios):
+class TestPostSamples(v2.FunctionalTest):
     def fake_notifier_sample(self, ctxt, event_type, payload):
         samples = payload['samples']
         for m in samples:

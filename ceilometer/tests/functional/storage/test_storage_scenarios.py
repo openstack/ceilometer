@@ -128,8 +128,7 @@ class DBTestBase(tests_db.TestBase):
             )
 
 
-class ResourceTest(DBTestBase,
-                   tests_db.MixinTestsWithBackendScenarios):
+class ResourceTest(DBTestBase):
     def prepare_data(self):
         super(ResourceTest, self).prepare_data()
 
@@ -307,8 +306,7 @@ class ResourceTest(DBTestBase,
         self.assertEqual(expected_tag, resource.metadata['tag'])
 
 
-class ResourceTestOrdering(DBTestBase,
-                           tests_db.MixinTestsWithBackendScenarios):
+class ResourceTestOrdering(DBTestBase):
     def prepare_data(self):
         sample_timings = [('resource-id-1', [(2013, 8, 10, 10, 43),
                                              (2013, 8, 10, 10, 44),
@@ -358,9 +356,7 @@ class ResourceTestOrdering(DBTestBase,
         self.assertEqual('sample-8', resource.metadata['tag'])
 
 
-class MeterTest(DBTestBase,
-                tests_db.MixinTestsWithBackendScenarios):
-
+class MeterTest(DBTestBase):
     def test_get_meters(self):
         msgs_sources = [msg['source'] for msg in self.msgs]
         results = list(self.conn.get_meters())
@@ -387,8 +383,7 @@ class MeterTest(DBTestBase,
         self.assertEqual(9, len(results))
 
 
-class RawSampleTest(DBTestBase,
-                    tests_db.MixinTestsWithBackendScenarios):
+class RawSampleTest(DBTestBase):
 
     def prepare_data(self):
         super(RawSampleTest, self).prepare_data()
@@ -678,8 +673,7 @@ class RawSampleTest(DBTestBase,
                 self.assertEqual(3, retry_sleep.call_count)
 
 
-class ComplexSampleQueryTest(DBTestBase,
-                             tests_db.MixinTestsWithBackendScenarios):
+class ComplexSampleQueryTest(DBTestBase):
     def setUp(self):
         super(ComplexSampleQueryTest, self).setUp()
         self.complex_filter = {
@@ -1079,9 +1073,7 @@ class ComplexSampleQueryTest(DBTestBase,
                           [0.41, 0.8, 0.81])
 
 
-class StatisticsTest(DBTestBase,
-                     tests_db.MixinTestsWithBackendScenarios):
-
+class StatisticsTest(DBTestBase):
     def prepare_data(self):
         for i in range(3):
             c = sample.Sample(
@@ -1335,9 +1327,7 @@ class StatisticsTest(DBTestBase,
         self.assertEqual([], results)
 
 
-class StatisticsGroupByTest(DBTestBase,
-                            tests_db.MixinTestsWithBackendScenarios):
-
+class StatisticsGroupByTest(DBTestBase):
     def prepare_data(self):
         test_sample_data = (
             {'volume': 2, 'user': 'user-1', 'project': 'project-1',
@@ -2569,8 +2559,7 @@ class StatisticsGroupByTest(DBTestBase,
                                     [r.groupby, r.period_start])
 
 
-class CounterDataTypeTest(DBTestBase,
-                          tests_db.MixinTestsWithBackendScenarios):
+class CounterDataTypeTest(DBTestBase):
     def prepare_data(self):
         c = sample.Sample(
             'dummyBigCounter',
@@ -2645,8 +2634,7 @@ class CounterDataTypeTest(DBTestBase,
         self.assertEqual(1938495037.53697, results[0].counter_volume)
 
 
-class EventTestBase(tests_db.TestBase,
-                    tests_db.MixinTestsWithBackendScenarios):
+class EventTestBase(tests_db.TestBase):
     """Separate test base class.
 
     We don't want to inherit all the Meter stuff.
@@ -3079,8 +3067,7 @@ class GetEventTest(EventTestBase):
             options.remove((trait.dtype, trait.value))
 
 
-class BigIntegerTest(tests_db.TestBase,
-                     tests_db.MixinTestsWithBackendScenarios):
+class BigIntegerTest(tests_db.TestBase):
     def test_metadata_bigint(self):
         metadata = {'bigint': 99999999999999}
         s = sample.Sample(name='name',
@@ -3098,9 +3085,7 @@ class BigIntegerTest(tests_db.TestBase,
 
 
 @tests_db.run_with('mongodb')
-class MongoAutoReconnectTest(DBTestBase,
-                             tests_db.MixinTestsWithBackendScenarios):
-
+class MongoAutoReconnectTest(DBTestBase):
     def setUp(self):
         super(MongoAutoReconnectTest, self).setUp()
         self.CONF.set_override('retry_interval', 0, group='database')
@@ -3172,7 +3157,7 @@ class MongoAutoReconnectTest(DBTestBase,
 
 
 @tests_db.run_with('mongodb')
-class MongoTimeToLiveTest(DBTestBase, tests_db.MixinTestsWithBackendScenarios):
+class MongoTimeToLiveTest(DBTestBase):
 
     def test_ensure_index(self):
         cfg.CONF.set_override('metering_time_to_live', 5, group='database')
@@ -3193,8 +3178,7 @@ class MongoTimeToLiveTest(DBTestBase, tests_db.MixinTestsWithBackendScenarios):
                          ['meter_ttl']['expireAfterSeconds'])
 
 
-class TestRecordUnicodeSamples(DBTestBase,
-                               tests_db.MixinTestsWithBackendScenarios):
+class TestRecordUnicodeSamples(DBTestBase):
     def prepare_data(self):
         self.msgs = []
         self.msgs.append(self.create_and_store_sample(

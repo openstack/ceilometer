@@ -22,9 +22,9 @@ from ceilometer import storage
 
 def main(argv):
     cfg.CONF([], project='ceilometer')
-    if os.getenv("CEILOMETER_TEST_HBASE_URL"):
+    if os.getenv("CEILOMETER_TEST_STORAGE_URL", "").startswith("hbase://"):
         url = ("%s?table_prefix=%s" %
-               (os.getenv("CEILOMETER_TEST_HBASE_URL"),
+               (os.getenv("CEILOMETER_TEST_STORAGE_URL"),
                 os.getenv("CEILOMETER_TEST_HBASE_TABLE_PREFIX", "test")))
         conn = storage.get_connection(url, 'ceilometer.metering.storage')
         event_conn = storage.get_connection(url, 'ceilometer.event.storage')

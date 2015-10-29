@@ -24,8 +24,7 @@ from ceilometer.tests.functional.storage import test_storage_scenarios
 
 
 @tests_db.run_with('mongodb', 'db2')
-class CompatibilityTest(test_storage_scenarios.DBTestBase,
-                        tests_db.MixinTestsWithBackendScenarios):
+class CompatibilityTest(test_storage_scenarios.DBTestBase):
 
     def prepare_data(self):
         def old_record_metering_data(self, data):

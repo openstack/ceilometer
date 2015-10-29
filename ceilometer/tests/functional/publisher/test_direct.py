@@ -26,8 +26,7 @@ from ceilometer import sample
 from ceilometer.tests import db as tests_db
 
 
-class TestDirectPublisher(tests_db.TestBase,
-                          tests_db.MixinTestsWithBackendScenarios):
+class TestDirectPublisher(tests_db.TestBase):
 
     resource_id = str(uuid.uuid4())
 
@@ -83,9 +82,7 @@ class TestDirectPublisher(tests_db.TestBase,
         self.assertEqual(['alpha', 'beta', 'gamma'], names)
 
 
-class TestEventDirectPublisher(tests_db.TestBase,
-                               tests_db.MixinTestsWithBackendScenarios):
-
+class TestEventDirectPublisher(tests_db.TestBase):
     test_data = [event.Event(message_id=str(uuid.uuid4()),
                              event_type='event_%d' % i,
                              generated=datetime.datetime.utcnow(),
