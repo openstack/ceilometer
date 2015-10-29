@@ -276,7 +276,7 @@ class AgentManager(service_base.BaseService):
         self.notifier = oslo_messaging.Notifier(
             messaging.get_transport(),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
-            publisher_id="ceilometer.api")
+            publisher_id="ceilometer.polling")
 
         self._keystone = None
         self._keystone_last_exception = None
