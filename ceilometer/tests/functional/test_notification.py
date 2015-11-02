@@ -16,7 +16,6 @@
 
 import shutil
 
-import eventlet
 import mock
 from oslo_config import fixture as fixture_config
 from oslo_context import context
@@ -255,7 +254,6 @@ class BaseRealNotification(tests_base.BaseTestCase):
             if (len(self.publisher.samples) >= self.expected_samples and
                     len(self.publisher.events) >= self.expected_events):
                 break
-            eventlet.sleep(0)
         self.assertNotEqual(self.srv.listeners, self.srv.pipeline_listeners)
         self.srv.stop()
 
@@ -284,114 +282,45 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.assertIn(pipeline_poller_call,
                       self.srv.tg.add_timer.call_args_list)
 
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_notification_reloaded_pipeline(self, fake_publisher_cls):
-        fake_publisher_cls.return_value = self.publisher
-
+    def test_notification_reloaded_pipeline(self):
         pipeline_cfg_file = self.setup_pipeline(['instance'])
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
 
-        self.expected_samples = 1
         self.srv.start()
 
-        notifier = messaging.get_notifier(self.transport,
-                                          "compute.vagrant-precise")
-        notifier.info(context.RequestContext(), 'compute.instance.create.end',
-                      TEST_NOTICE_PAYLOAD)
+        pipeline = self.srv.pipe_manager
 
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if (len(self.publisher.samples) >= self.expected_samples and
-                    len(self.publisher.events) >= self.expected_events):
-                break
-            eventlet.sleep(0)
-
-        self.assertEqual(self.expected_samples, len(self.publisher.samples))
-
-        # Flush publisher samples to test reloading
-        self.publisher.samples = []
         # Modify the collection targets
         updated_pipeline_cfg_file = self.setup_pipeline(['vcpus',
                                                          'disk.root.size'])
         # Move/re-name the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
+        self.srv.refresh_pipeline()
 
-        self.expected_samples = 2
-        # Random sleep to let the pipeline poller complete the reloading
-        eventlet.sleep(3)
-        # Send message again to verify the reload works
-        notifier = messaging.get_notifier(self.transport,
-                                          "compute.vagrant-precise")
-        notifier.info(context.RequestContext(), 'compute.instance.create.end',
-                      TEST_NOTICE_PAYLOAD)
+        self.assertNotEqual(pipeline, self.srv.pipe_manager)
 
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if (len(self.publisher.samples) >= self.expected_samples and
-                    len(self.publisher.events) >= self.expected_events):
-                break
-            eventlet.sleep(0)
-
-        self.assertEqual(self.expected_samples, len(self.publisher.samples))
-
-        (self.assertIn(sample.name, ['disk.root.size', 'vcpus'])
-         for sample in self.publisher.samples)
-
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_notification_reloaded_event_pipeline(self, fake_publisher_cls):
-        fake_publisher_cls.return_value = self.publisher
-
+    def test_notification_reloaded_event_pipeline(self):
         ev_pipeline_cfg_file = self.setup_event_pipeline(
             ['compute.instance.create.start'])
         self.CONF.set_override("event_pipeline_cfg_file", ev_pipeline_cfg_file)
 
         self.CONF.set_override("store_events", True, group="notification")
-        self.expected_events = 1
+
         self.srv.start()
 
-        notifier = messaging.get_notifier(self.transport,
-                                          "compute.vagrant-precise")
-        notifier.info(context.RequestContext(),
-                      'compute.instance.create.start',
-                      TEST_NOTICE_PAYLOAD)
+        pipeline = self.srv.event_pipe_manager
 
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if len(self.publisher.events) >= self.expected_events:
-                break
-            eventlet.sleep(0)
-
-        self.assertEqual(self.expected_events, len(self.publisher.events))
-
-        # Flush publisher events to test reloading
-        self.publisher.events = []
         # Modify the collection targets
         updated_ev_pipeline_cfg_file = self.setup_event_pipeline(
             ['compute.instance.*'])
+
         # Move/re-name the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_ev_pipeline_cfg_file, ev_pipeline_cfg_file)
+        self.srv.refresh_pipeline()
 
-        self.expected_events = 1
-        # Random sleep to let the pipeline poller complete the reloading
-        eventlet.sleep(3)
-        # Send message again to verify the reload works
-        notifier = messaging.get_notifier(self.transport,
-                                          "compute.vagrant-precise")
-        notifier.info(context.RequestContext(), 'compute.instance.create.end',
-                      TEST_NOTICE_PAYLOAD)
-
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if len(self.publisher.events) >= self.expected_events:
-                break
-            eventlet.sleep(0)
-
-        self.assertEqual(self.expected_events, len(self.publisher.events))
-
-        self.assertEqual(self.publisher.events[0].event_type,
-                         'compute.instance.create.end')
+        self.assertNotEqual(pipeline, self.srv.pipe_manager)
 
 
 class TestRealNotification(BaseRealNotification):
@@ -417,7 +346,6 @@ class TestRealNotification(BaseRealNotification):
         while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
             if len(self.publisher.events) >= self.expected_events:
                 break
-            eventlet.sleep(0)
         self.srv.stop()
         self.assertEqual(self.expected_events, len(self.publisher.events))
 
@@ -582,7 +510,6 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
                 if (len(self.publisher.samples + self.publisher2.samples) >=
                         self.expected_samples):
                     break
-                eventlet.sleep(0)
             self.srv.stop()
             self.srv2.stop()
 

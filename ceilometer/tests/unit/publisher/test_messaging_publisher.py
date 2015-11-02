@@ -17,7 +17,6 @@
 import datetime
 import uuid
 
-import eventlet
 import mock
 from oslo_config import fixture as fixture_config
 from oslo_context import context
@@ -116,7 +115,6 @@ class RpcOnlyPublisherTest(BasePublisherTestCase):
                                                      collector.stop())
 
         collector.start()
-        eventlet.sleep()
         publisher.publish_samples(context.RequestContext(),
                                   self.test_sample_data)
         collector.wait()
@@ -219,32 +217,6 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
 
 
 class TestPublisherPolicy(TestPublisher):
-    def test_published_concurrency(self):
-        """Test concurrent access to the local queue of the rpc publisher."""
-
-        publisher = self.publisher_cls(
-            netutils.urlsplit('%s://' % self.protocol))
-
-        with mock.patch.object(publisher, '_send') as fake_send:
-            def fake_send_wait(ctxt, topic, meters):
-                fake_send.side_effect = mock.Mock()
-                # Sleep to simulate concurrency and allow other threads to work
-                eventlet.sleep(0)
-
-            fake_send.side_effect = fake_send_wait
-
-            job1 = eventlet.spawn(getattr(publisher, self.pub_func),
-                                  mock.MagicMock(), self.test_data)
-            job2 = eventlet.spawn(getattr(publisher, self.pub_func),
-                                  mock.MagicMock(), self.test_data)
-
-            job1.wait()
-            job2.wait()
-
-        self.assertEqual('default', publisher.policy)
-        self.assertEqual(2, len(fake_send.mock_calls))
-        self.assertEqual(0, len(publisher.local_queue))
-
     @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_no_policy(self, mylog):
         publisher = self.publisher_cls(

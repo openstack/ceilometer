@@ -18,7 +18,6 @@
 import functools
 import os.path
 
-import eventlet
 import oslo_messaging.conffixture
 from oslo_utils import timeutils
 from oslotest import base
@@ -38,10 +37,6 @@ class BaseTestCase(base.BaseTestCase):
         if not exchange:
             exchange = 'ceilometer'
         conf.set_override("control_exchange", exchange)
-
-        # oslo.messaging fake driver needs time and thread
-        # to be patched, otherwise there are chances of deadlocks
-        eventlet.monkey_patch(time=True, thread=True)
 
         # NOTE(sileht): Ensure a new oslo.messaging driver is loaded
         # between each tests

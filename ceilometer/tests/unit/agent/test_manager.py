@@ -12,18 +12,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/central/manager.py
-"""
+"""Tests for ceilometer agent manager"""
 
 import shutil
 
-import eventlet
 from keystoneclient import exceptions as ks_exceptions
 import mock
 from novaclient import client as novaclient
 from oslo_service import service as os_service
 from oslo_utils import fileutils
-from oslo_utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
 import requests
@@ -408,11 +405,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
         self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
         self.mgr.start()
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if len(self.notified_samples) >= expected_samples:
-                break
-            eventlet.sleep(0)
+        # Manually executes callbacks
+        for timer in self.mgr.pollster_timers:
+            timer.f(*timer.args, **timer.kw)
 
         samples = self.notified_samples
         self.assertEqual(expected_samples, len(samples))
@@ -442,12 +437,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
         self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
         self.mgr.start()
-        expected_samples = 1
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if len(self.notified_samples) >= expected_samples:
-                break
-            eventlet.sleep(0)
 
         # we only got the old name of meters
         for sample in self.notified_samples:
@@ -475,19 +464,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         # file path as recorded in oslo config
         shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
 
-        # Random sleep to let the pipeline poller complete the reloading
-        eventlet.sleep(3)
-
         # Flush notified samples to test only new, nothing latent on
         # fake message bus.
         self.notified_samples = []
-
-        expected_samples = 1
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
-            if len(self.notified_samples) >= expected_samples:
-                break
-            eventlet.sleep(0)
 
         # we only got the new name of meters
         for sample in self.notified_samples:

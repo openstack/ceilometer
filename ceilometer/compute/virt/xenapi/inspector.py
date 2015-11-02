@@ -13,7 +13,6 @@
 # under the License.
 """Implementation of Inspector abstraction for XenAPI."""
 
-from eventlet import timeout
 from oslo_config import cfg
 from oslo_utils import units
 try:
@@ -38,9 +37,6 @@ OPTS = [
     cfg.StrOpt('connection_password',
                help='Password for connection to XenServer/Xen Cloud Platform.',
                secret=True),
-    cfg.IntOpt('login_timeout',
-               default=10,
-               help='Timeout in seconds for XenAPI login.'),
 ]
 
 CONF = cfg.CONF
@@ -63,13 +59,10 @@ def get_api_session():
         raise XenapiException(_('Must specify connection_url, and '
                                 'connection_password to use'))
 
-    exception = api.Failure(_("Unable to log in to XenAPI "
-                              "(is the Dom0 disk full?)"))
     try:
         session = (api.xapi_local() if url == 'unix://local'
                    else api.Session(url))
-        with timeout.Timeout(CONF.xenapi.login_timeout, exception):
-            session.login_with_password(username, password)
+        session.login_with_password(username, password)
     except api.Failure as e:
         msg = _("Could not connect to XenAPI: %s") % e.details[0]
         raise XenapiException(msg)
