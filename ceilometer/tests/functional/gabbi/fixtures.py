@@ -69,7 +69,7 @@ class ConfigFixture(fixture.GabbiFixture):
 
         # A special pipeline is required to use the direct publisher.
         conf.set_override('pipeline_cfg_file',
-                          'etc/ceilometer/gabbi_pipeline.yaml')
+                          'ceilometer/tests/functional/gabbi_pipeline.yaml')
 
         database_name = '%s-%s' % (db_url, str(uuid.uuid4()))
         conf.set_override('connection', database_name, group='database')
