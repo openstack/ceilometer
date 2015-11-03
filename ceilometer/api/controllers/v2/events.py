@@ -192,6 +192,12 @@ def _event_query_to_event_filter(q):
                      {'operator': i.op, 'supported': base.operation_kind})
             raise base.ClientSideError(error)
         if i.field in evt_model_filter:
+            if i.op != 'eq':
+                error = (_('operator %(operator)s is not supported. Only'
+                           ' equality operator is available for field'
+                           ' %(field)s') %
+                         {'operator': i.op, 'field': i.field})
+                raise base.ClientSideError(error)
             evt_model_filter[i.field] = i.value
         else:
             trait_type = i.type or 'string'
