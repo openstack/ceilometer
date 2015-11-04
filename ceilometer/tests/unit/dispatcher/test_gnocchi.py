@@ -28,6 +28,7 @@ import six
 import six.moves.urllib.parse as urlparse
 import testscenarios
 
+from ceilometer import declarative
 from ceilometer.dispatcher import gnocchi
 from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
@@ -133,7 +134,7 @@ class DispatcherTest(base.BaseTestCase):
             self.conf.config(filter_service_activity=False,
                              resources_definition_file=temp,
                              group='dispatcher_gnocchi')
-            self.assertRaises(gnocchi.ResourcesDefinitionException,
+            self.assertRaises(declarative.DefinitionException,
                               gnocchi.GnocchiDispatcher, self.conf.conf)
 
     @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'

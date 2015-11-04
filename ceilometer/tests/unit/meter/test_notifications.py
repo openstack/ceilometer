@@ -18,9 +18,11 @@ import six
 import yaml
 
 from oslo_config import fixture as fixture_config
+from oslo_utils import encodeutils
 from oslo_utils import fileutils
 from oslotest import mockpatch
 
+from ceilometer import declarative
 from ceilometer.meter import notifications
 from ceilometer import service as ceilometer_service
 from ceilometer.tests import base as test
@@ -223,31 +225,34 @@ class TestMeterDefinition(test.BaseTestCase):
                    volume="$.payload.volume",
                    resource_id="$.payload.resource_id",
                    project_id="$.payload.project_id")
-        handler = notifications.MeterDefinition(cfg)
+        handler = notifications.MeterDefinition(cfg, mock.Mock())
         self.assertTrue(handler.match_type("test.create"))
-        self.assertEqual(1.0, handler.parse_fields("volume", NOTIFICATION))
+        sample = list(handler.to_samples(NOTIFICATION))[0]
+        self.assertEqual(1.0, sample["volume"])
         self.assertEqual("bea70e51c7340cb9d555b15cbfcaec23",
-                         handler.parse_fields("resource_id", NOTIFICATION))
+                         sample["resource_id"])
         self.assertEqual("30be1fc9a03c4e94ab05c403a8a377f2",
-                         handler.parse_fields("project_id", NOTIFICATION))
+                         sample["project_id"])
 
     def test_config_required_missing_fields(self):
         cfg = dict()
         try:
-            notifications.MeterDefinition(cfg)
-        except notifications.MeterDefinitionException as e:
+            notifications.MeterDefinition(cfg, mock.Mock())
+        except declarative.DefinitionException as e:
             self.assertEqual("Required fields ['name', 'type', 'event_type',"
                              " 'unit', 'volume', 'resource_id']"
-                             " not specified", e.message)
+                             " not specified",
+                             encodeutils.exception_to_unicode(e))
 
     def test_bad_type_cfg_definition(self):
         cfg = dict(name="test", type="foo", event_type="bar.create",
                    unit="foo", volume="bar",
                    resource_id="bea70e51c7340cb9d555b15cbfcaec23")
         try:
-            notifications.MeterDefinition(cfg)
-        except notifications.MeterDefinitionException as e:
-            self.assertEqual("Invalid type foo specified", e.message)
+            notifications.MeterDefinition(cfg, mock.Mock())
+        except declarative.DefinitionException as e:
+            self.assertEqual("Invalid type foo specified",
+                             encodeutils.exception_to_unicode(e))
 
 
 class TestMeterProcessing(test.BaseTestCase):
@@ -601,7 +606,8 @@ class TestMeterProcessing(test.BaseTestCase):
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
         self.assertEqual(0, len(c))
-        LOG.warning.assert_called_with('Could not find %s values', 'volume')
+        LOG.warning.assert_called_with('Only 0 fetched meters contain '
+                                       '"volume" field instead of 2.')
 
     @mock.patch('ceilometer.meter.notifications.LOG')
     def test_multi_meter_payload_invalid_short(self, LOG):
@@ -620,8 +626,8 @@ class TestMeterProcessing(test.BaseTestCase):
             self.__setup_meter_def_file(cfg))
         c = list(self.handler.process_notification(event))
         self.assertEqual(0, len(c))
-        LOG.warning.assert_called_with('Not all fetched meters contain "%s" '
-                                       'field', 'volume')
+        LOG.warning.assert_called_with('Only 1 fetched meters contain '
+                                       '"volume" field instead of 2.')
 
     def test_arithmetic_expr_meter(self):
         cfg = yaml.dump(
