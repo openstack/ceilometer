@@ -274,6 +274,16 @@ class TestEventAPI(EventTestBase):
 
         self.assertEqual(0, len(data))
 
+    def test_get_events_multiple_filters_same_field_different_values(self):
+        data = self.get_json(self.PATH, headers=headers,
+                             q=[{'field': 'trait_A',
+                                 'value': 'my_Foo_text',
+                                 'type': 'string'},
+                                {'field': 'trait_A',
+                                 'value': 'my_Bar_text',
+                                 'type': 'string'}])
+        self.assertEqual(0, len(data))
+
     def test_get_events_not_filters(self):
         data = self.get_json(self.PATH, headers=headers,
                              q=[])
