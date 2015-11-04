@@ -45,7 +45,7 @@ dispatcher_opts = [
                default="http://localhost:8041",
                help='URL to Gnocchi.'),
     cfg.StrOpt('archive_policy',
-               default="low",
+               default=None,
                help='The archive policy to use when the dispatcher '
                'create a new metric.'),
     cfg.StrOpt('resources_definition_file',
@@ -138,9 +138,12 @@ class ResourcesDefinition(object):
     def metrics(self):
         metrics = {}
         for t in self.cfg['metrics']:
-            archive_policy = self.cfg.get('archive_policy')
-            metrics[t] = dict(archive_policy_name=archive_policy or
-                              self._default_archive_policy)
+            archive_policy = self.cfg.get('archive_policy',
+                                          self._default_archive_policy)
+            if archive_policy is None:
+                metrics[t] = {}
+            else:
+                metrics[t] = dict(archive_policy_name=archive_policy)
         return metrics
 
 
