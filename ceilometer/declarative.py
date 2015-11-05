@@ -11,11 +11,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
 
 from jsonpath_rw_ext import parser
+from oslo_config import cfg
+from oslo_log import log
 import six
+import yaml
 
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LI
+
+LOG = log.getLogger(__name__)
 
 
 class DefinitionException(Exception):
@@ -116,3 +122,45 @@ class Definition(object):
             return values
         else:
             return values[0] if values else None
+
+
+def load_definitions(defaults, config_file, fallback_file=None):
+    """Setup a definitions from yaml config file."""
+
+    if not os.path.exists(config_file):
+        config_file = cfg.CONF.find_file(config_file)
+    if not config_file and fallback_file is not None:
+        LOG.debug("No Definitions configuration file found!"
+                  "Using default config.")
+        config_file = fallback_file
+
+    if config_file is not None:
+        LOG.debug("Loading definitions configuration file: %s", config_file)
+
+        with open(config_file) as cf:
+            config = cf.read()
+
+        try:
+            definition_cfg = yaml.safe_load(config)
+        except yaml.YAMLError as err:
+            if hasattr(err, 'problem_mark'):
+                mark = err.problem_mark
+                errmsg = (_("Invalid YAML syntax in Definitions file "
+                            "%(file)s at line: %(line)s, column: %(column)s.")
+                          % dict(file=config_file,
+                                 line=mark.line + 1,
+                                 column=mark.column + 1))
+            else:
+                errmsg = (_("YAML error reading Definitions file "
+                            "%(file)s")
+                          % dict(file=config_file))
+            LOG.error(errmsg)
+            raise
+
+    else:
+        LOG.debug("No Definitions configuration file found!"
+                  "Using default config.")
+        definition_cfg = defaults
+
+    LOG.info(_LI("Definitions: %s"), definition_cfg)
+    return definition_cfg

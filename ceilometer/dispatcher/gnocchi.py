@@ -22,7 +22,6 @@ from oslo_config import cfg
 from oslo_log import log
 import six
 from stevedore import extension
-import yaml
 
 from ceilometer import declarative
 from ceilometer import dispatcher
@@ -152,16 +151,8 @@ class GnocchiDispatcher(dispatcher.Base):
     def _load_resources_definitions(cls, conf):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
-        res_def_file = cls._get_config_file(
-            conf, conf.dispatcher_gnocchi.resources_definition_file)
-        data = {}
-        if res_def_file is not None:
-            with open(res_def_file) as data_file:
-                try:
-                    data = yaml.safe_load(data_file)
-                except ValueError:
-                    data = {}
-
+        data = declarative.load_definitions(
+            {}, conf.dispatcher_gnocchi.resources_definition_file)
         return [ResourcesDefinition(r, conf.dispatcher_gnocchi.archive_policy,
                                     plugin_manager)
                 for r in data.get('resources', [])]
