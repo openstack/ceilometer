@@ -25,6 +25,14 @@ metric:
           matching_type: "type_exact"
           oid:  "1.3.6.1.4.1.2021.10.1.3.3"
           type: "lambda x: float(str(x))"
+
+    - name: hardware.cpu.util
+      unit: "%"
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_exact"
+          oid:  "1.3.6.1.4.1.2021.11.9.0"
+          type: "int"
 # disk
     - name: hardware.disk.size.total
       unit: KB
