@@ -12,11 +12,13 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import copy
 import fnmatch
 import itertools
 import operator
 import os
 import threading
+import uuid
 
 from oslo_config import cfg
 from oslo_log import log
@@ -26,9 +28,10 @@ from stevedore import extension
 from ceilometer import declarative
 from ceilometer import dispatcher
 from ceilometer.dispatcher import gnocchi_client
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _, _LE, _LW
 from ceilometer import keystone_client
 
+CACHE_NAMESPACE = uuid.uuid4()
 LOG = log.getLogger(__name__)
 
 dispatcher_opts = [
@@ -54,6 +57,13 @@ dispatcher_opts = [
 ]
 
 cfg.CONF.register_opts(dispatcher_opts, group="dispatcher_gnocchi")
+
+
+def cache_key_mangler(key):
+    """Construct an opaque cache key."""
+    if six.PY2:
+        key = key.encode('utf-8')
+    return uuid.uuid5(CACHE_NAMESPACE, key).hex
 
 
 def log_and_ignore_unexpected_workflow_error(func):
@@ -149,8 +159,27 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
         self._ks_client = keystone_client.get_client()
         self.resources_definition = self._load_resources_definitions(conf)
 
+        self.cache = None
+        try:
+            import oslo_cache
+            oslo_cache.configure(self.conf)
+            # NOTE(cdent): The default cache backend is a real but
+            # noop backend. We don't want to use that here because
+            # we want to avoid the cache pathways entirely if the
+            # cache has not been configured explicitly.
+            if 'null' not in self.conf.cache.backend:
+                cache_region = oslo_cache.create_region()
+                self.cache = oslo_cache.configure_cache_region(
+                    self.conf, cache_region)
+                self.cache.key_mangler = cache_key_mangler
+        except ImportError:
+            pass
+        except oslo_cache.exception.ConfigurationError as exc:
+            LOG.warn(_LW('unable to configure oslo_cache: %s') % exc)
+
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
+        self._gnocchi_resource_lock = threading.Lock()
 
         self._gnocchi = gnocchi_client.Client(conf.dispatcher_gnocchi.url)
 
@@ -279,13 +308,49 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                                    metric_name=metric_name))
 
         if resource_extra:
-            self._gnocchi.update_resource(resource_type, resource_id,
-                                          resource_extra)
+            if self.cache:
+                cache_key, attribute_hash = self._check_resource_cache(
+                    resource['id'], resource, 'update')
+                if attribute_hash:
+                    with self._gnocchi_resource_lock:
+                        self._gnocchi.update_resource(resource_type,
+                                                      resource_id,
+                                                      resource_extra)
+                        self.cache.set(cache_key, attribute_hash)
+                else:
+                    LOG.debug('resource cache hit for update %s',
+                              cache_key)
+            else:
+                self._gnocchi.update_resource(resource_type, resource_id,
+                                              resource_extra)
+
+    def _check_resource_cache(self, resource_id, resource_data, action):
+        cache_key = resource_id + action
+        resource_info = copy.deepcopy(resource_data)
+        if 'metrics' in resource_info:
+            del resource_info['metrics']
+        attribute_hash = hash(frozenset(resource_info.items()))
+        cached_hash = self.cache.get(cache_key)
+        if cached_hash != attribute_hash:
+            return cache_key, attribute_hash
+        return cache_key, None
 
     def _ensure_resource_and_metric(self, resource_type, resource,
                                     metric_name):
         try:
-            self._gnocchi.create_resource(resource_type, resource)
+            if self.cache:
+                cache_key, attribute_hash = self._check_resource_cache(
+                    resource['id'], resource, 'create')
+                if attribute_hash:
+                    with self._gnocchi_resource_lock:
+                        self._gnocchi.create_resource(resource_type,
+                                                      resource)
+                        self.cache.set(cache_key, attribute_hash)
+                else:
+                    LOG.debug('resource cache hit for create %s',
+                              cache_key)
+            else:
+                self._gnocchi.create_resource(resource_type, resource)
         except gnocchi_client.ResourceAlreadyExists:
             try:
                 archive_policy = resource['metrics'][metric_name]
