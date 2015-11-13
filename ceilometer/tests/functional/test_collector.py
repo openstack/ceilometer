@@ -102,7 +102,7 @@ class TestCollector(tests_base.BaseTestCase):
         ], propagate_map_exceptions=True)
         self.useFixture(mockpatch.Patch(
             'ceilometer.dispatcher.load_dispatcher_manager',
-            return_value=fake_dispatcher))
+            return_value=(fake_dispatcher, fake_dispatcher)))
         return plugin
 
     def _make_fake_socket(self, sample):
@@ -124,7 +124,8 @@ class TestCollector(tests_base.BaseTestCase):
 
     def test_record_metering_data(self):
         mock_dispatcher = self._setup_fake_dispatcher()
-        self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
+        dps = dispatcher.load_dispatcher_manager()
+        (self.srv.meter_manager, self.srv.manager) = dps
         self.srv.record_metering_data(None, self.counter)
         mock_dispatcher.record_metering_data.assert_called_once_with(
             data=self.counter)
@@ -187,6 +188,7 @@ class TestCollector(tests_base.BaseTestCase):
 
     def test_udp_receive_bad_decoding(self):
         self._setup_messaging(False)
+        self._setup_fake_dispatcher()
         udp_socket = self._make_fake_socket(self.counter)
         with mock.patch('socket.socket', return_value=udp_socket):
             with mock.patch('msgpack.loads', self._raise_error):
@@ -199,6 +201,7 @@ class TestCollector(tests_base.BaseTestCase):
     def test_only_udp(self, udp_start, rpc_start):
         """Check that only UDP is started if messaging transport is unset."""
         self._setup_messaging(False)
+        self._setup_fake_dispatcher()
         udp_socket = self._make_fake_socket(self.counter)
         with mock.patch('socket.socket', return_value=udp_socket):
             self.srv.start()
@@ -211,6 +214,7 @@ class TestCollector(tests_base.BaseTestCase):
         """Check that only RPC is started if udp_address is empty."""
         self.CONF.set_override('enable_rpc', True, group='collector')
         self.CONF.set_override('udp_address', '', group='collector')
+        self._setup_fake_dispatcher()
         self.srv.start()
         # two calls because two servers (notification and rpc)
         self.assertEqual(2, rpc_start.call_count)
@@ -231,14 +235,13 @@ class TestCollector(tests_base.BaseTestCase):
     def test_collector_no_mock(self, mylog):
         self.CONF.set_override('enable_rpc', True, group='collector')
         self.CONF.set_override('udp_address', '', group='collector')
-        self.srv.start()
         mylog.info.side_effect = lambda *args: self.srv.stop()
+        self.srv.start()
 
         client = messaging.get_rpc_client(self.transport, version='1.0')
         cclient = client.prepare(topic='metering')
         cclient.cast(context.RequestContext(),
                      'record_metering_data', data=[self.utf8_msg])
-
         self.srv.rpc_server.wait()
         mylog.info.assert_called_once_with(
             'metering data test for test_run_tasks: 1')

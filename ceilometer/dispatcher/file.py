@@ -35,12 +35,13 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group="dispatcher_file")
 
 
-class FileDispatcher(dispatcher.Base):
+class FileDispatcher(dispatcher.MeterDispatcherBase,
+                     dispatcher.EventDispatcherBase):
     """Dispatcher class for recording metering data to a file.
 
-    The dispatcher class which logs each meter into a file configured in
-    ceilometer configuration file. An example configuration may look like the
-    following:
+    The dispatcher class which logs each meter and/or event into a file
+    configured in ceilometer configuration file. An example configuration may
+    look like the following:
 
     [dispatcher_file]
     file_path = /tmp/meters
@@ -49,7 +50,8 @@ class FileDispatcher(dispatcher.Base):
     ceilometer.conf file
 
     [DEFAULT]
-    dispatcher = file
+    meter_dispatchers = file
+    event_dispatchers = file
     """
 
     def __init__(self, conf):

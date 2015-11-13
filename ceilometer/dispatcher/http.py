@@ -50,14 +50,16 @@ http_dispatcher_opts = [
 cfg.CONF.register_opts(http_dispatcher_opts, group="dispatcher_http")
 
 
-class HttpDispatcher(dispatcher.Base):
-    """Dispatcher class for posting metering data into a http target.
+class HttpDispatcher(dispatcher.MeterDispatcherBase,
+                     dispatcher.EventDispatcherBase):
+    """Dispatcher class for posting metering/event data into a http target.
 
     To enable this dispatcher, the following option needs to be present in
     ceilometer.conf file::
 
         [DEFAULT]
-        dispatcher = http
+        meter_dispatchers = http
+        event_dispatchers = http
 
     Dispatcher specific options can be added as follows::
 
@@ -67,6 +69,7 @@ class HttpDispatcher(dispatcher.Base):
         cadf_only = true
         timeout = 2
     """
+
     def __init__(self, conf):
         super(HttpDispatcher, self).__init__(conf)
         self.headers = {'Content-type': 'application/json'}
