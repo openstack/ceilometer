@@ -197,11 +197,14 @@ function _ceilometer_cleanup_apache_wsgi {
 # cleanup_ceilometer() - Remove residual data files, anything left over
 # from previous runs that a clean run would need to clean up
 function cleanup_ceilometer {
-    if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-        mongo ceilometer --eval "db.dropDatabase();"
-    elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-        curl -XDELETE "localhost:9200/events_*"
+    if is_service_enabled ceilometer-collector ceilometer-api ; then
+        if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
+            mongo ceilometer --eval "db.dropDatabase();"
+        elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
+            curl -XDELETE "localhost:9200/events_*"
+        fi
     fi
+
     if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
         _ceilometer_cleanup_apache_wsgi
     fi
@@ -281,8 +284,10 @@ function configure_ceilometer {
     iniset $CEILOMETER_CONF notification store_events $CEILOMETER_EVENTS
 
     # Configure storage
-    _ceilometer_configure_storage_backend
-    iniset $CEILOMETER_CONF collector workers $API_WORKERS
+    if is_service_enabled ceilometer-collector ceilometer-api; then
+        _ceilometer_configure_storage_backend
+        iniset $CEILOMETER_CONF collector workers $API_WORKERS
+    fi
 
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
         iniset $CEILOMETER_CONF DEFAULT hypervisor_inspector vsphere
@@ -312,7 +317,7 @@ function init_ceilometer {
     sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
     rm -f $CEILOMETER_AUTH_CACHE_DIR/*
 
-    if is_service_enabled mysql postgresql; then
+    if is_service_enabled ceilometer-collector ceilometer-api && is_service_enabled mysql postgresql ; then
         if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
             recreate_database ceilometer
             $CEILOMETER_BIN_DIR/ceilometer-dbsync
@@ -326,9 +331,18 @@ function init_ceilometer {
 # installed. The context is not active during preinstall (when it would
 # otherwise makes sense to do the backend services).
 function install_ceilometer {
-    _ceilometer_prepare_coordination
-    _ceilometer_prepare_storage_backend
-    _ceilometer_prepare_virt_drivers
+    if is_service_enabled ceilometer-acentral ceilometer-anotification ceilometer-alarm-evaluator ; then
+        _ceilometer_prepare_coordination
+    fi
+
+    if is_service_enabled ceilometer-collector ceilometer-api; then
+        _ceilometer_prepare_storage_backend
+    fi
+
+    if is_service_enabled ceilometer-acompute ; then
+        _ceilometer_prepare_virt_drivers
+    fi
+
     install_ceilometerclient
     setup_develop $CEILOMETER_DIR
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
@@ -390,11 +404,13 @@ function start_ceilometer {
 
 # stop_ceilometer() - Stop running processes
 function stop_ceilometer {
-    if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-        disable_apache_site ceilometer
-        restart_apache_server
-    else
-        stop_process ceilometer-api
+    if is_service_enabled ceilometer-api ; then
+        if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
+            disable_apache_site ceilometer
+            restart_apache_server
+        else
+            stop_process ceilometer-api
+        fi
     fi
 
     # Kill the ceilometer screen windows
