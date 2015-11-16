@@ -25,6 +25,7 @@ from sqlalchemy import desc
 from ceilometer.alarm.storage import base
 from ceilometer.alarm.storage import models as alarm_api_models
 from ceilometer.i18n import _LI
+from ceilometer import storage
 from ceilometer.storage.sqlalchemy import models
 from ceilometer.storage.sqlalchemy import utils as sql_utils
 from ceilometer import utils
@@ -85,6 +86,9 @@ class Connection(base.Connection):
         # in storage.__init__.get_connection_from_config function
         options = dict(cfg.CONF.database.items())
         options['max_retries'] = 0
+        # oslo.db doesn't support options defined by Ceilometer
+        for opt in storage.OPTS:
+            options.pop(opt.name, None)
         self._engine_facade = db_session.EngineFacade(url, **options)
 
     def upgrade(self):
