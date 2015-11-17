@@ -535,7 +535,7 @@ Notifications queues
 ========================
 
 .. index::
-   double: installing; notifications queues
+   double: installing; notifications queues; multiple topics
 
 By default, Ceilometer consumes notifications on the messaging bus sent to
 **notification_topics** by using a queue/pool name that is identical to the
@@ -543,6 +543,41 @@ topic name. You shouldn't have different applications consuming messages from
 this queue. If you want to also consume the topic notifications with a system
 other than Ceilometer, you should configure a separate queue that listens for
 the same messages.
+
+Ceilometer allows multiple topics to be configured so that polling agent can
+send the same messages of notifications to other queues. Notification agents
+also use **notification_topics** to configure which queue to listen for. If
+you use multiple topics, you should configure notification agent and polling
+agent seperately, otherwise Ceilometer collects duplicate samples.
+
+By default, the ceilometer.conf file is as follows::
+
+   [DEFAULT]
+   notification_topics = notifications
+
+To use multiple topics, you should give ceilometer-agent-notification and
+ceilometer-polling services different ceilometer.conf files. The Ceilometer
+configuration file ceilometer.conf is normally locate in the /etc/ceilometer
+directory. Make changes according to your requirments which may look like
+the following::
+
+For notification agent using ceilometer-notification.conf, settings like::
+
+   [DEFAULT]
+   notification_topics = notifications,xxx
+
+For polling agent using ceilometer-polling.conf, settings like::
+
+   [DEFAULT]
+   notification_topics = notifications,foo
+
+.. note::
+
+   notification_topics in ceilometer-notification.conf should only have one same
+   topic in ceilometer-polling.conf
+
+Doing this, it's easy to listen/receive data from multiple internal and external services.
+
 
 Using multiple dispatchers
 ================================
