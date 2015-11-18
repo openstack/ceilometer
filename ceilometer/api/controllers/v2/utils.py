@@ -41,14 +41,14 @@ cfg.CONF.import_opt('default_api_return_limit', 'ceilometer.api.app',
 
 
 def enforce_limit(limit):
-        """Ensure limit is defined and is valid. if not, set a default."""
-        if limit is None:
-            limit = cfg.CONF.api.default_api_return_limit
-            LOG.info(_LI('No limit value provided, result set will be'
-                         ' limited to %(limit)d.'), {'limit': limit})
-        if not limit or limit <= 0:
-            raise base.ClientSideError(_("Limit must be positive"))
-        return limit
+    """Ensure limit is defined and is valid. if not, set a default."""
+    if limit is None:
+        limit = cfg.CONF.api.default_api_return_limit
+        LOG.info(_LI('No limit value provided, result set will be'
+                     ' limited to %(limit)d.'), {'limit': limit})
+    if not limit or limit <= 0:
+        raise base.ClientSideError(_("Limit must be positive"))
+    return limit
 
 
 def get_auth_project(on_behalf_of=None):
