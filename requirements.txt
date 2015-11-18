@@ -12,7 +12,7 @@ keystonemiddleware!=2.4.0,>=2.0.0
 lxml>=2.3
 msgpack-python>=0.4.0
 oslo.context>=0.2.0 # Apache-2.0
-oslo.db>=3.0.0 # Apache-2.0
+oslo.db>=3.2.0 # Apache-2.0
 oslo.concurrency>=2.3.0 # Apache-2.0
 oslo.config>=2.6.0 # Apache-2.0
 oslo.i18n>=1.5.0 # Apache-2.0
@@ -27,9 +27,9 @@ pecan>=1.0.0
 oslo.messaging!=2.8.0,>2.6.1 # Apache-2.0
 oslo.middleware>=2.9.0 # Apache-2.0
 oslo.serialization>=1.10.0 # Apache-2.0
-oslo.utils!=2.6.0,>=2.4.0 # Apache-2.0
+oslo.utils>=2.8.0 # Apache-2.0
 pysnmp<5.0.0,>=4.2.1
-python-ceilometerclient>=1.5.0
+python-ceilometerclient>=2.0.0
 python-glanceclient>=0.18.0
 python-keystoneclient!=1.8.0,>=1.6.0
 python-neutronclient>=2.6.0
