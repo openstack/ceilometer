@@ -309,8 +309,9 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
 
         if resource_extra:
             if self.cache:
-                cache_key, attribute_hash = self._check_resource_cache(
-                    resource['id'], resource, 'update')
+                cache_key = resource['id']
+                attribute_hash = self._check_resource_cache(
+                    cache_key, resource)
                 if attribute_hash:
                     with self._gnocchi_resource_lock:
                         self._gnocchi.update_resource(resource_type,
@@ -324,23 +325,23 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 self._gnocchi.update_resource(resource_type, resource_id,
                                               resource_extra)
 
-    def _check_resource_cache(self, resource_id, resource_data, action):
-        cache_key = resource_id + action
+    def _check_resource_cache(self, key, resource_data):
         resource_info = copy.deepcopy(resource_data)
         if 'metrics' in resource_info:
             del resource_info['metrics']
         attribute_hash = hash(frozenset(resource_info.items()))
-        cached_hash = self.cache.get(cache_key)
+        cached_hash = self.cache.get(key)
         if cached_hash != attribute_hash:
-            return cache_key, attribute_hash
-        return cache_key, None
+            return attribute_hash
+        return None
 
     def _ensure_resource_and_metric(self, resource_type, resource,
                                     metric_name):
         try:
             if self.cache:
-                cache_key, attribute_hash = self._check_resource_cache(
-                    resource['id'], resource, 'create')
+                cache_key = resource['id']
+                attribute_hash = self._check_resource_cache(
+                    cache_key, resource)
                 if attribute_hash:
                     with self._gnocchi_resource_lock:
                         self._gnocchi.create_resource(resource_type,
