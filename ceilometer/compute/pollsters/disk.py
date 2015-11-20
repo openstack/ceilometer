@@ -115,6 +115,36 @@ class _Base(pollsters.BaseComputePollster):
     def _get_samples(instance, c_data):
         """Return one or more Sample."""
 
+    @staticmethod
+    def _get_sample_read_and_write(instance, _name, _unit, c_data,
+                                   _volume, _metadata):
+        """Read / write Pollster and return one Sample"""
+        return [util.make_sample_from_instance(
+            instance,
+            name=_name,
+            type=sample.TYPE_CUMULATIVE,
+            unit=_unit,
+            volume=getattr(c_data, _volume),
+            additional_metadata={
+                'device': c_data.per_disk_requests[_metadata].keys()},
+        )]
+
+    @staticmethod
+    def _get_samples_per_device(c_data, _attr, instance, _name, _unit):
+        """Return one or more Samples for meter 'disk.device.*'"""
+        samples = []
+        for disk, value in six.iteritems(c_data.per_disk_requests[_attr]):
+            samples.append(util.make_sample_from_instance(
+                instance,
+                name=_name,
+                type=sample.TYPE_CUMULATIVE,
+                unit=_unit,
+                volume=value,
+                resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
+            ))
+        return samples
+
     def get_samples(self, manager, cache, resources):
         for instance in resources:
             instance_name = util.instance_name(instance)
@@ -147,138 +177,66 @@ class _Base(pollsters.BaseComputePollster):
 
 class ReadRequestsPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.read.requests',
-            type=sample.TYPE_CUMULATIVE,
-            unit='request',
-            volume=c_data.r_requests,
-            additional_metadata={
-                'device': c_data.per_disk_requests['read_requests'].keys()}
-        )]
+    def _get_samples(self, instance, c_data):
+        return self._get_sample_read_and_write(
+            instance, 'disk.read.requests', 'request', c_data,
+            'r_requests', 'read_requests')
 
 
 class PerDeviceReadRequestsPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        samples = []
-        for disk, value in six.iteritems(c_data.per_disk_requests[
-                'read_requests']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.read.requests',
-                type=sample.TYPE_CUMULATIVE,
-                unit='request',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+    def _get_samples(self, instance, c_data):
+        return self._get_samples_per_device(
+            c_data, 'read_requests', instance,
+            'disk.device.read.requests', 'request')
 
 
 class ReadBytesPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.read.bytes',
-            type=sample.TYPE_CUMULATIVE,
-            unit='B',
-            volume=c_data.r_bytes,
-            additional_metadata={
-                'device': c_data.per_disk_requests['read_bytes'].keys()},
-        )]
+    def _get_samples(self, instance, c_data):
+        return self._get_sample_read_and_write(
+            instance, 'disk.read.bytes', 'B', c_data,
+            'r_bytes', 'read_bytes')
 
 
 class PerDeviceReadBytesPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        samples = []
-        for disk, value in six.iteritems(c_data.per_disk_requests[
-                'read_bytes']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.read.bytes',
-                type=sample.TYPE_CUMULATIVE,
-                unit='B',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+    def _get_samples(self, instance, c_data):
+        return self._get_samples_per_device(
+            c_data, 'read_bytes', instance,
+            'disk.device.read.bytes', 'B')
 
 
 class WriteRequestsPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.write.requests',
-            type=sample.TYPE_CUMULATIVE,
-            unit='request',
-            volume=c_data.w_requests,
-            additional_metadata={
-                'device': c_data.per_disk_requests['write_requests'].keys()},
-        )]
+    def _get_samples(self, instance, c_data):
+        return self._get_sample_read_and_write(
+            instance, 'disk.write.requests', 'request',
+            c_data, 'w_requests', 'write_requests')
 
 
 class PerDeviceWriteRequestsPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        samples = []
-        for disk, value in six.iteritems(c_data.per_disk_requests[
-                'write_requests']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.write.requests',
-                type=sample.TYPE_CUMULATIVE,
-                unit='request',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+    def _get_samples(self, instance, c_data):
+        return self._get_samples_per_device(
+            c_data, 'write_requests', instance,
+            'disk.device.write.requests', 'request')
 
 
 class WriteBytesPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.write.bytes',
-            type=sample.TYPE_CUMULATIVE,
-            unit='B',
-            volume=c_data.w_bytes,
-            additional_metadata={
-                'device': c_data.per_disk_requests['write_bytes'].keys()},
-        )]
+    def _get_samples(self, instance, c_data):
+        return self._get_sample_read_and_write(
+            instance, 'disk.write.bytes', 'B',
+            c_data, 'w_bytes', 'write_bytes')
 
 
 class PerDeviceWriteBytesPollster(_Base):
 
-    @staticmethod
-    def _get_samples(instance, c_data):
-        samples = []
-        for disk, value in six.iteritems(c_data.per_disk_requests[
-                'write_bytes']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.write.bytes',
-                type=sample.TYPE_CUMULATIVE,
-                unit='B',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+    def _get_samples(self, instance, c_data):
+        return self._get_samples_per_device(
+            c_data, 'write_bytes', instance,
+            'disk.device.write.bytes', 'B')
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -354,137 +312,99 @@ class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
                               {'name': instance_name, 'error': err})
 
+    def _get_samples_per_device(self, disk_rates_info, _attr, instance,
+                                _name, _unit):
+        """Return one or more Samples for meter 'disk.device.*'."""
+        samples = []
+        for disk, value in six.iteritems(disk_rates_info.per_disk_rate[
+                _attr]):
+            samples.append(util.make_sample_from_instance(
+                instance,
+                name=_name,
+                type=sample.TYPE_GAUGE,
+                unit=_unit,
+                volume=value,
+                resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
+            ))
+        return samples
+
+    def _get_sample_read_and_write(self, instance, _name, _unit, _element,
+                                   _attr1, _attr2):
+        """Read / write Pollster and return one Sample"""
+        return [util.make_sample_from_instance(
+            instance,
+            name=_name,
+            type=sample.TYPE_GAUGE,
+            unit=_unit,
+            volume=getattr(_element, _attr1),
+            additional_metadata={
+                'device': getattr(_element, _attr2)[_attr1].keys()},
+        )]
+
 
 class ReadBytesRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.read.bytes.rate',
-            type=sample.TYPE_GAUGE,
-            unit='B/s',
-            volume=disk_rates_info.read_bytes_rate,
-            additional_metadata={
-                'device': disk_rates_info.per_disk_rate[
-                    'read_bytes_rate'].keys()},
-        )]
+        return self._get_sample_read_and_write(
+            instance, 'disk.read.bytes.rate', 'B/s', disk_rates_info,
+            'read_bytes_rate', 'per_disk_rate')
 
 
 class PerDeviceReadBytesRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        samples = []
-        for disk, value in six.iteritems(disk_rates_info.per_disk_rate[
-                'read_bytes_rate']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.read.bytes.rate',
-                type=sample.TYPE_GAUGE,
-                unit='B/s',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_rates_info, 'read_bytes_rate', instance,
+            'disk.device.read.bytes.rate', 'B/s')
 
 
 class ReadRequestsRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.read.requests.rate',
-            type=sample.TYPE_GAUGE,
-            unit='requests/s',
-            volume=disk_rates_info.read_requests_rate,
-            additional_metadata={
-                'device': disk_rates_info.per_disk_rate[
-                    'read_requests_rate'].keys()},
-        )]
+        return self._get_sample_read_and_write(
+            instance, 'disk.read.requests.rate', 'requests/s', disk_rates_info,
+            'read_requests_rate', 'per_disk_rate')
 
 
 class PerDeviceReadRequestsRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        samples = []
-        for disk, value in six.iteritems(disk_rates_info.per_disk_rate[
-                'read_requests_rate']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.read.requests.rate',
-                type=sample.TYPE_GAUGE,
-                unit='requests/s',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_rates_info, 'read_requests_rate', instance,
+            'disk.device.read.requests.rate', 'requests/s')
 
 
 class WriteBytesRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.write.bytes.rate',
-            type=sample.TYPE_GAUGE,
-            unit='B/s',
-            volume=disk_rates_info.write_bytes_rate,
-            additional_metadata={
-                'device': disk_rates_info.per_disk_rate[
-                    'write_bytes_rate'].keys()},
-        )]
+        return self._get_sample_read_and_write(
+            instance, 'disk.write.bytes.rate', 'B/s', disk_rates_info,
+            'write_bytes_rate', 'per_disk_rate')
 
 
 class PerDeviceWriteBytesRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        samples = []
-        for disk, value in six.iteritems(disk_rates_info.per_disk_rate[
-                'write_bytes_rate']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.write.bytes.rate',
-                type=sample.TYPE_GAUGE,
-                unit='B/s',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_rates_info, 'write_bytes_rate', instance,
+            'disk.device.write.bytes.rate', 'B/s')
 
 
 class WriteRequestsRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.write.requests.rate',
-            type=sample.TYPE_GAUGE,
-            unit='requests/s',
-            volume=disk_rates_info.write_requests_rate,
-            additional_metadata={
-                'device': disk_rates_info.per_disk_rate[
-                    'write_requests_rate'].keys()},
-        )]
+        return self._get_sample_read_and_write(
+            instance, 'disk.write.requests.rate', 'requests/s',
+            disk_rates_info, 'write_requests_rate', 'per_disk_rate')
 
 
 class PerDeviceWriteRequestsRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
-        samples = []
-        for disk, value in six.iteritems(disk_rates_info.per_disk_rate[
-                'write_requests_rate']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.write.requests.rate',
-                type=sample.TYPE_GAUGE,
-                unit='requests/s',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_rates_info, 'write_requests_rate', instance,
+            'disk.device.write.requests.rate', 'requests/s')
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -694,6 +614,33 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
     def _get_samples(self, instance, disk_info):
         """Return one or more Sample."""
 
+    def _get_samples_per_device(self, disk_info, _attr, instance, _name):
+        """Return one or more Samples for meter 'disk.device.*'."""
+        samples = []
+        for disk, value in six.iteritems(disk_info.per_disk_info[_attr]):
+            samples.append(util.make_sample_from_instance(
+                instance,
+                name=_name,
+                type=sample.TYPE_GAUGE,
+                unit='B',
+                volume=value,
+                resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
+            ))
+        return samples
+
+    def _get_samples_task(self, instance, _name, disk_info, _attr1, _attr2):
+        """Return one or more Samples for meter 'disk.task.*'."""
+        return [util.make_sample_from_instance(
+            instance,
+            name=_name,
+            type=sample.TYPE_GAUGE,
+            unit='B',
+            volume=getattr(disk_info, _attr1),
+            additional_metadata={
+                'device': disk_info.per_disk_info[_attr2].keys()},
+        )]
+
     def get_samples(self, manager, cache, resources):
         for instance in resources:
             try:
@@ -730,97 +677,43 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
 class CapacityPollster(_DiskInfoPollsterBase):
 
     def _get_samples(self, instance, disk_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.capacity',
-            type=sample.TYPE_GAUGE,
-            unit='B',
-            volume=disk_info.capacity,
-            additional_metadata={
-                'device': disk_info.per_disk_info[
-                    'capacity'].keys()},
-        )]
+        return self._get_samples_task(
+            instance, 'disk.capacity', disk_info,
+            'capacity', 'capacity')
 
 
 class PerDeviceCapacityPollster(_DiskInfoPollsterBase):
 
     def _get_samples(self, instance, disk_info):
-        samples = []
-        for disk, value in six.iteritems(disk_info.per_disk_info[
-                'capacity']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.capacity',
-                type=sample.TYPE_GAUGE,
-                unit='B',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_info, 'capacity', instance, 'disk.device.capacity')
 
 
 class AllocationPollster(_DiskInfoPollsterBase):
 
     def _get_samples(self, instance, disk_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.allocation',
-            type=sample.TYPE_GAUGE,
-            unit='B',
-            volume=disk_info.allocation,
-            additional_metadata={
-                'device': disk_info.per_disk_info[
-                    'allocation'].keys()},
-        )]
+        return self._get_samples_task(
+            instance, 'disk.allocation', disk_info,
+            'allocation', 'allocation')
 
 
 class PerDeviceAllocationPollster(_DiskInfoPollsterBase):
 
     def _get_samples(self, instance, disk_info):
-        samples = []
-        for disk, value in six.iteritems(disk_info.per_disk_info[
-                'allocation']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.allocation',
-                type=sample.TYPE_GAUGE,
-                unit='B',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_info, 'allocation', instance, 'disk.device.allocation')
 
 
 class PhysicalPollster(_DiskInfoPollsterBase):
 
     def _get_samples(self, instance, disk_info):
-        return [util.make_sample_from_instance(
-            instance,
-            name='disk.usage',
-            type=sample.TYPE_GAUGE,
-            unit='B',
-            volume=disk_info.physical,
-            additional_metadata={
-                'device': disk_info.per_disk_info[
-                    'physical'].keys()},
-        )]
+        return self._get_samples_task(
+            instance, 'disk.usage', disk_info,
+            'physical', 'physical')
 
 
 class PerDevicePhysicalPollster(_DiskInfoPollsterBase):
 
     def _get_samples(self, instance, disk_info):
-        samples = []
-        for disk, value in six.iteritems(disk_info.per_disk_info[
-                'physical']):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name='disk.device.usage',
-                type=sample.TYPE_GAUGE,
-                unit='B',
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_device(
+            disk_info, 'physical', instance, 'disk.device.usage')
