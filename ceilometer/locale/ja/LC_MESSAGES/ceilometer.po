@@ -4,18 +4,18 @@
 #
 # Translators:
 # Tomoyuki KATO <tomo@dream.daynight.jp>, 2013
+# Akihiro Motoki <amotoki@gmail.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev108\n"
+"Project-Id-Version: ceilometer 5.0.1.dev26\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-05 06:13+0000\n"
+"POT-Creation-Date: 2015-11-20 06:12+0000\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: ja\n"
-"Language-Team: Japanese (http://www.transifex.com/openstack/ceilometer/"
-"language/ja/)\n"
+"Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -146,7 +146,7 @@ msgstr ""
 "ディスパッチャー・ターゲットが設定されておらず、メーターは通知されません。"
 "ceilometer.conf ファイルでターゲットを設定してください。"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "通知 %(type)s を除去しています (uuid:%(msgid)s)"
 
@@ -488,7 +488,7 @@ msgstr ""
 "%(count)d 個のサンプルの %(disposition)s しきい値が原因で%(state)s に遷移しま"
 "す。最新: %(most_recent)s"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
 msgstr ""
 "%(state)s に移行します。これは、アラーム %(alarm_ids)s の状態が %(state)s で"
@@ -498,6 +498,7 @@ msgstr ""
 msgid "UDP: Cannot decode data sent by %s"
 msgstr "UDP: %s から送信されたデータをデコードできません"
 
+#, fuzzy
 msgid "UDP: Unable to store meter"
 msgstr "UDP: 計測値を保管できません"
 
@@ -510,7 +511,7 @@ msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr "値 %(value)s を、予期されたデータ型 %(type)s に変換できません。"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Unable to discover resources: %s"
 msgstr "リソースをディスカバーできません: %s"
 
@@ -630,6 +631,7 @@ msgstr ""
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
 msgstr "アラーム %(id)s は %(state)s に遷移します。理由: %(reason)s"
 
+#, fuzzy
 msgid "alarm evaluation cycle failed"
 msgstr "アラーム評価サイクルで障害が発生しました"
 

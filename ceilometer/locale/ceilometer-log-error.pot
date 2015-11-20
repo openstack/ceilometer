@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0rc1\n"
+"Project-Id-Version: ceilometer 5.0.1.dev26\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-05 06:13+0000\n"
+"POT-Creation-Date: 2015-11-20 06:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,8 +105,8 @@ msgstr ""
 
 #: ceilometer/event/storage/impl_elasticsearch.py:110
 #: ceilometer/event/storage/impl_hbase.py:121
-#: ceilometer/event/storage/impl_sqlalchemy.py:203
-#: ceilometer/event/storage/impl_sqlalchemy.py:205
+#: ceilometer/event/storage/impl_sqlalchemy.py:199
+#: ceilometer/event/storage/impl_sqlalchemy.py:201
 #: ceilometer/event/storage/pymongo_base.py:69
 #, python-format
 msgid "Failed to record event: %s"
@@ -177,6 +177,11 @@ msgstr ""
 #: ceilometer/meter/notifications.py:177
 #, python-format
 msgid "Meter Definitions: %s"
+msgstr ""
+
+#: ceilometer/meter/notifications.py:192
+#, python-format
+msgid "Error loading meter definition : %(err)s"
 msgstr ""
 
 #: ceilometer/publisher/kafka_broker.py:83
