@@ -188,7 +188,6 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     DRIVER_MANAGERS = {
         'mongodb': MongoDbManager,
         'mysql': MySQLManager,
-        'mysql+pymysql': MySQLManager,
         'postgresql': PgSQLManager,
         'db2': MongoDbManager,
         'sqlite': SQLiteManager,
@@ -202,6 +201,9 @@ class TestBase(testscenarios.testcase.WithScenarios, test_base.BaseTestCase):
     def setUp(self):
         super(TestBase, self).setUp()
         engine = urlparse.urlparse(self.db_url).scheme
+        # in case some drivers have additional specification, for example:
+        # PyMySQL will have scheme mysql+pymysql
+        engine = engine.split('+')[0]
 
         # NOTE(Alexei_987) Shortcut to skip expensive db setUp
         test_method = self._get_test_method()
