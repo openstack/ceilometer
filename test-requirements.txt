@@ -31,3 +31,4 @@ testtools>=1.4.0
 gabbi>=1.1.4 # Apache-2.0
 requests-aws>=0.1.4 # BSD License (3 clause)
 tempest-lib>=0.8.0
+WebTest>=2.0
