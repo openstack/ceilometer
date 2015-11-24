@@ -1,9 +1,5 @@
 function clean_exit(){
     local error_code="$?"
-    if test -n "$CEILOMETER_TEST_HBASE_URL"
-    then
-            python tools/test_hbase_table_utils.py --clear
-    fi
     rm -rf "$1"
     kill $(jobs -p)
     return $error_code

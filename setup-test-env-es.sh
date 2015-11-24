@@ -32,7 +32,7 @@ elasticsearch -p ${ES_PID} -Des.http.port=${ES_PORT} -Des.path.logs=${ES_DATA}/l
 # Wait for ElasticSearch to start listening to connections
 sleep 3
 wait_for_line "started" ${ES_DATA}/out
-export CEILOMETER_TEST_ES_URL="es://localhost:${ES_PORT}"
+export CEILOMETER_TEST_STORAGE_URL="es://localhost:${ES_PORT}"
 
 # Yield execution to venv command
 $*

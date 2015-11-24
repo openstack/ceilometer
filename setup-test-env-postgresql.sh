@@ -28,7 +28,7 @@ ${PGSQL_PATH}/initdb -E UTF8 ${PGSQL_DATA}
 trap "clean_exit_pgsql ${PGSQL_PATH} ${PGSQL_DATA} ${PGSQL_PORT}" EXIT
 
 LANGUAGE=C ${PGSQL_PATH}/pg_ctl -w -D ${PGSQL_DATA} -o "-F -k ${PGSQL_DATA} -p ${PGSQL_PORT}" start
-export CEILOMETER_TEST_PGSQL_URL="postgresql:///?host=${PGSQL_DATA}&port=${PGSQL_PORT}&dbname=template1"
+export CEILOMETER_TEST_STORAGE_URL="postgresql:///?host=${PGSQL_DATA}&port=${PGSQL_PORT}&dbname=template1"
 
 # Yield execution to venv command
 $*

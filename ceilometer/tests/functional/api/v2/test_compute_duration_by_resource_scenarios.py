@@ -21,12 +21,10 @@ import mock
 from oslo_utils import timeutils
 
 from ceilometer.storage import models
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2
 
 
-class TestComputeDurationByResource(v2.FunctionalTest,
-                                    tests_db.MixinTestsWithBackendScenarios):
+class TestComputeDurationByResource(v2.FunctionalTest):
 
     def setUp(self):
         super(TestComputeDurationByResource, self).setUp()

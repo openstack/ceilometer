@@ -30,8 +30,7 @@ HEADERS = {"X-Roles": "admin",
            "X-Project-Id": PROJ_ID}
 
 
-class EventTestBase(v2.FunctionalTest,
-                    tests_db.MixinTestsWithBackendScenarios):
+class EventTestBase(v2.FunctionalTest):
 
     def setUp(self):
         super(EventTestBase, self).setUp()
@@ -466,8 +465,7 @@ class TestEventAPI(EventTestBase):
                               'op': 'el'}])
 
 
-class AclRestrictedEventTestBase(v2.FunctionalTest,
-                                 tests_db.MixinTestsWithBackendScenarios):
+class AclRestrictedEventTestBase(v2.FunctionalTest):
 
     def setUp(self):
         super(AclRestrictedEventTestBase, self).setUp()
@@ -595,8 +593,7 @@ class AclRestrictedEventTestBase(v2.FunctionalTest,
         self.assertEqual(0, len(data))
 
 
-class EventRestrictionTestBase(v2.FunctionalTest,
-                               tests_db.MixinTestsWithBackendScenarios):
+class EventRestrictionTestBase(v2.FunctionalTest):
 
     def setUp(self):
         super(EventRestrictionTestBase, self).setUp()

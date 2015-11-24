@@ -14,17 +14,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-import testscenarios
-
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.api import v2 as tests_api
 
-load_tests = testscenarios.load_tests_apply_scenarios
 
-
-class TestCapabilitiesController(tests_api.FunctionalTest,
-                                 tests_db.MixinTestsWithBackendScenarios):
+class TestCapabilitiesController(tests_api.FunctionalTest):
 
     def setUp(self):
             super(TestCapabilitiesController, self).setUp()

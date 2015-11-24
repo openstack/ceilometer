@@ -27,7 +27,6 @@ import webtest
 from ceilometer.api import app
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional import api as acl
 from ceilometer.tests.functional.api import v2
 
@@ -79,8 +78,7 @@ class FakeMemcache(object):
         pass
 
 
-class TestAPIACL(v2.FunctionalTest,
-                 tests_db.MixinTestsWithBackendScenarios):
+class TestAPIACL(v2.FunctionalTest):
 
     def setUp(self):
         super(TestAPIACL, self).setUp()
@@ -228,8 +226,7 @@ class TestAPIEventACL(TestAPIACL):
         self.assertEqual(401, data.status_int)
 
 
-class TestApiEventRBAC(v2.FunctionalTest,
-                       tests_db.MixinTestsWithBackendScenarios):
+class TestApiEventRBAC(v2.FunctionalTest):
 
     PATH = '/events'
 
