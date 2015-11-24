@@ -29,3 +29,4 @@ testscenarios>=0.4
 testtools!=1.2.0,>=0.9.36
 gabbi>=0.12.0 # Apache-2.0
 requests-aws>=0.1.4 # BSD License (3 clause)
+WebTest>=2.0
