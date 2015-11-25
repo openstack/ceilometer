@@ -13,8 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import fnmatch
-
 from debtcollector import moves
 from oslo_config import cfg
 from oslo_log import log
@@ -24,6 +22,7 @@ import six
 from ceilometer import declarative
 from ceilometer.event.storage import models
 from ceilometer.i18n import _
+from ceilometer import utils
 
 OPTS = [
     cfg.StrOpt('definitions_cfg_file',
@@ -131,13 +130,13 @@ class EventDefinition(object):
 
     def included_type(self, event_type):
         for t in self._included_types:
-            if fnmatch.fnmatch(event_type, t):
+            if utils.match(event_type, t):
                 return True
         return False
 
     def excluded_type(self, event_type):
         for t in self._excluded_types:
-            if fnmatch.fnmatch(event_type, t):
+            if utils.match(event_type, t):
                 return True
         return False
 
