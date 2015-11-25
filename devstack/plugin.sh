@@ -188,13 +188,14 @@ function preinstall_ceilometer {
 
 # Remove WSGI files, disable and remove Apache vhost file
 function _ceilometer_cleanup_apache_wsgi {
-    sudo rm -f $CEILOMETER_WSGI_DIR/*
-    sudo rm -f $(apache_site_config_for ceilometer)
+    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
+        sudo rm -f "$CEILOMETER_WSGI_DIR"/*
+        sudo rmdir "$CEILOMETER_WSGI_DIR"
+        sudo rm -f $(apache_site_config_for ceilometer)
+    fi
 }
 
-# cleanup_ceilometer() - Remove residual data files, anything left over
-# from previous runs that a clean run would need to clean up
-function cleanup_ceilometer {
+function _drop_database {
     if is_service_enabled ceilometer-collector ceilometer-api ; then
         if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
             mongo ceilometer --eval "db.dropDatabase();"
@@ -202,9 +203,18 @@ function cleanup_ceilometer {
             curl -XDELETE "localhost:9200/events_*"
         fi
     fi
+}
 
-    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-        _ceilometer_cleanup_apache_wsgi
+# cleanup_ceilometer() - Remove residual data files, anything left over
+# from previous runs that a clean run would need to clean up
+function cleanup_ceilometer {
+    _ceilometer_cleanup_apache_wsgi
+    _drop_database
+    sudo rm -f "$CEILOMETER_CONF_DIR"/*
+    sudo rmdir "$CEILOMETER_CONF_DIR"
+    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "False" ]; then
+        sudo rm -f "$CEILOMETER_API_LOG_DIR"/*
+        sudo rmdir "$CEILOMETER_API_LOG_DIR"
     fi
 }
 
@@ -224,7 +234,7 @@ function _ceilometer_configure_storage_backend {
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
-    cleanup_ceilometer
+    _drop_database
 }
 
 # Configure Ceilometer
@@ -290,8 +300,6 @@ function configure_ceilometer {
         iniset $CEILOMETER_CONF vmware host_password "$VMWAREAPI_PASSWORD"
     fi
 
-    # NOTE: This must come after database configurate as those can
-    # call cleanup_ceilometer which will wipe the WSGI config.
     if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
         iniset $CEILOMETER_CONF api pecan_debug "False"
         _ceilometer_config_apache_wsgi
