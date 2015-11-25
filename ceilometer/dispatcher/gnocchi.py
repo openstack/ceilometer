@@ -12,7 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import copy
 import itertools
 import operator
 import os
@@ -275,7 +274,6 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 "id": resource_id,
                 "user_id": samples[0]['user_id'],
                 "project_id": samples[0]['project_id'],
-                "metrics": rd.metrics,
             }
             measures = []
 
@@ -294,7 +292,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 # for 'resource doesn't exist' and for 'metric doesn't exist'
                 # https://bugs.launchpad.net/gnocchi/+bug/1476186
                 self._ensure_resource_and_metric(resource_type, resource,
-                                                 metric_name)
+                                                 rd.metrics, metric_name)
 
                 try:
                     self._gnocchi.post_measure(resource_type, resource_id,
@@ -324,16 +322,14 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                                               resource_extra)
 
     def _check_resource_cache(self, key, resource_data):
-        resource_info = copy.deepcopy(resource_data)
-        if 'metrics' in resource_info:
-            del resource_info['metrics']
-        attribute_hash = hash(frozenset(resource_info.items()))
         cached_hash = self.cache.get(key)
-        if cached_hash != attribute_hash:
-            return attribute_hash
+        if cached_hash:
+            attribute_hash = hash(frozenset(resource_data.items()))
+            if cached_hash != attribute_hash:
+                return attribute_hash
         return None
 
-    def _ensure_resource_and_metric(self, resource_type, resource,
+    def _ensure_resource_and_metric(self, resource_type, resource, metrics,
                                     metric_name):
         try:
             if self.cache:
@@ -342,6 +338,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                     cache_key, resource)
                 if attribute_hash:
                     with self._gnocchi_resource_lock:
+                        resource['metrics'] = metrics
                         self._gnocchi.create_resource(resource_type,
                                                       resource)
                         self.cache.set(cache_key, attribute_hash)
@@ -349,6 +346,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                     LOG.debug('resource cache hit for create %s',
                               cache_key)
             else:
+                resource['metrics'] = metrics
                 self._gnocchi.create_resource(resource_type, resource)
         except gnocchi_client.ResourceAlreadyExists:
             try:
