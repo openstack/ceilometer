@@ -108,6 +108,15 @@ class ResourcesDefinition(object):
             self._attributes[name] = declarative.Definition(name, attr_cfg,
                                                             plugin_manager)
 
+        self.metrics = {}
+        for t in self.cfg['metrics']:
+            archive_policy = self.cfg.get('archive_policy',
+                                          self._default_archive_policy)
+            if archive_policy is None:
+                self.metrics[t] = {}
+            else:
+                self.metrics[t] = dict(archive_policy_name=archive_policy)
+
     def match(self, metric_name):
         for t in self.cfg['metrics']:
             if utils.match(metric_name, t):
@@ -121,17 +130,6 @@ class ResourcesDefinition(object):
             if value is not None:
                 attrs[name] = value
         return attrs
-
-    def metrics(self):
-        metrics = {}
-        for t in self.cfg['metrics']:
-            archive_policy = self.cfg.get('archive_policy',
-                                          self._default_archive_policy)
-            if archive_policy is None:
-                metrics[t] = {}
-            else:
-                metrics[t] = dict(archive_policy_name=archive_policy)
-        return metrics
 
 
 class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
@@ -277,7 +275,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 "id": resource_id,
                 "user_id": samples[0]['user_id'],
                 "project_id": samples[0]['project_id'],
-                "metrics": rd.metrics(),
+                "metrics": rd.metrics,
             }
             measures = []
 
