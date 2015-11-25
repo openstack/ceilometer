@@ -162,10 +162,10 @@ class SNMPInspector(base.Inspector):
         if is_bulk:
             for var_bind_table_row in data:
                 for name, val in var_bind_table_row:
-                    oid_cache[name.prettyPrint()] = val
+                    oid_cache[str(name)] = val
         else:
             for name, val in data:
-                oid_cache[name.prettyPrint()] = val
+                oid_cache[str(name)] = val
 
     @staticmethod
     def find_matching_oids(oid_cache, oid, match_type, find_one=True):
