@@ -15,7 +15,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import fnmatch
 import functools
 import itertools
 import operator
@@ -32,6 +31,7 @@ from ceilometer import dispatcher
 from ceilometer.dispatcher import gnocchi_client
 from ceilometer.i18n import _, _LE
 from ceilometer import keystone_client
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -84,7 +84,7 @@ class LegacyArchivePolicyDefinition(object):
         if self.cfg is not None:
             for metric, policy in self.cfg.items():
                 # Support wild cards such as disk.*
-                if fnmatch.fnmatch(metric_name, metric):
+                if utils.match(metric_name, metric):
                     return policy
 
 
@@ -145,7 +145,7 @@ class ResourcesDefinition(object):
 
     def match(self, metric_name):
         for t in self.cfg['metrics']:
-            if fnmatch.fnmatch(metric_name, t):
+            if utils.match(metric_name, t):
                 return True
         return False
 

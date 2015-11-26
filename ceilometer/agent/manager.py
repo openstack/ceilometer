@@ -19,7 +19,6 @@
 # under the License.
 
 import collections
-import fnmatch
 import itertools
 import random
 
@@ -241,7 +240,7 @@ class AgentManager(service_base.BaseService):
 
         def _match(pollster):
             """Find out if pollster name matches to one of the list."""
-            return any(fnmatch.fnmatch(pollster.name, pattern) for
+            return any(utils.match(pollster.name, pattern) for
                        pattern in pollster_list)
 
         if type(namespaces) is not list:

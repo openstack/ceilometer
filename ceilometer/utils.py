@@ -23,8 +23,11 @@ import calendar
 import copy
 import datetime
 import decimal
+import fnmatch
 import hashlib
+import re
 import struct
+import sys
 
 from oslo_concurrency import processutils
 from oslo_config import cfg
@@ -254,3 +257,29 @@ def kill_listeners(listeners):
     for listener in listeners:
         listener.stop()
         listener.wait()
+
+
+if sys.version_info > (2, 7, 9):
+    match = fnmatch.fnmatch
+else:
+    _MATCH_CACHE = {}
+    _MATCH_CACHE_MAX = 100
+
+    def match(string, pattern):
+        """Thread safe fnmatch re-implementation.
+
+        Standard library fnmatch in Python versions <= 2.7.9 has thread safe
+        issue, this helper function is created for such case. see:
+        https://bugs.python.org/issue23191
+        """
+        string = string.lower()
+        pattern = pattern.lower()
+
+        cached_pattern = _MATCH_CACHE.get(pattern)
+        if cached_pattern is None:
+            translated_pattern = fnmatch.translate(pattern)
+            cached_pattern = re.compile(translated_pattern)
+            if len(_MATCH_CACHE) >= _MATCH_CACHE_MAX:
+                _MATCH_CACHE.clear()
+            _MATCH_CACHE[pattern] = cached_pattern
+        return cached_pattern.match(string) is not None
