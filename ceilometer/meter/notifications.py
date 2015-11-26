@@ -11,7 +11,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import fnmatch
 import itertools
 import pkg_resources
 import six
@@ -26,6 +25,7 @@ from ceilometer.agent import plugin_base
 from ceilometer import declarative
 from ceilometer.i18n import _LE
 from ceilometer import sample
+from ceilometer import utils
 
 OPTS = [
     cfg.StrOpt('meter_definitions_cfg_file',
@@ -97,7 +97,7 @@ class MeterDefinition(object):
 
     def match_type(self, meter_name):
         for t in self._event_type:
-            if fnmatch.fnmatch(meter_name, t):
+            if utils.match(meter_name, t):
                 return True
 
     def to_samples(self, message, all_values=False):

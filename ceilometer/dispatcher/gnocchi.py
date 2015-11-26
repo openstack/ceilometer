@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import copy
-import fnmatch
 import itertools
 import operator
 import os
@@ -30,6 +29,7 @@ from ceilometer import dispatcher
 from ceilometer.dispatcher import gnocchi_client
 from ceilometer.i18n import _, _LE, _LW
 from ceilometer import keystone_client
+from ceilometer import utils
 
 CACHE_NAMESPACE = uuid.uuid4()
 LOG = log.getLogger(__name__)
@@ -110,7 +110,7 @@ class ResourcesDefinition(object):
 
     def match(self, metric_name):
         for t in self.cfg['metrics']:
-            if fnmatch.fnmatch(metric_name, t):
+            if utils.match(metric_name, t):
                 return True
         return False
 
