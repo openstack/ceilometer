@@ -413,23 +413,10 @@ class _DiskLatencyPollsterBase(pollsters.BaseComputePollster):
     CACHE_KEY_DISK_LATENCY = 'disk-latency'
 
     def _populate_cache(self, inspector, cache, instance):
-        i_cache = cache.setdefault(self.CACHE_KEY_DISK_LATENCY, {})
-        if instance.id not in i_cache:
-            latency = 0
-            per_device_latency = {}
-            disk_rates = inspector.inspect_disk_latency(instance)
-            for disk, stats in disk_rates:
-                latency += stats.disk_latency
-                per_device_latency[disk.device] = (
-                    stats.disk_latency)
-            per_disk_latency = {
-                'disk_latency': per_device_latency
-            }
-            i_cache[instance.id] = DiskLatencyData(
-                latency,
-                per_disk_latency
-            )
-        return i_cache[instance.id]
+        return self._populate_cache_create(
+            cache.setdefault(self.CACHE_KEY_DISK_LATENCY, {}),
+            instance, inspector, DiskLatencyData,
+            'inspect_disk_latency', 'disk_latency')
 
     @abc.abstractmethod
     def _get_samples(self, instance, disk_rates_info):
@@ -496,22 +483,10 @@ class _DiskIOPSPollsterBase(pollsters.BaseComputePollster):
     CACHE_KEY_DISK_IOPS = 'disk-iops'
 
     def _populate_cache(self, inspector, cache, instance):
-        i_cache = cache.setdefault(self.CACHE_KEY_DISK_IOPS, {})
-        if instance.id not in i_cache:
-            iops = 0
-            per_device_iops = {}
-            disk_iops_count = inspector.inspect_disk_iops(instance)
-            for disk, stats in disk_iops_count:
-                iops += stats.iops_count
-                per_device_iops[disk.device] = (stats.iops_count)
-            per_disk_iops = {
-                'iops_count': per_device_iops
-            }
-            i_cache[instance.id] = DiskIOPSData(
-                iops,
-                per_disk_iops
-            )
-        return i_cache[instance.id]
+        return self._populate_cache_create(
+            cache.setdefault(self.CACHE_KEY_DISK_IOPS, {}),
+            instance, inspector, DiskIOPSData,
+            'inspect_disk_iops', 'iops_count')
 
     @abc.abstractmethod
     def _get_samples(self, instance, disk_rates_info):

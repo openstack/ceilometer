@@ -42,6 +42,27 @@ class BaseComputePollster(plugin_base.PollsterBase):
     def default_discovery(self):
         return 'local_instances'
 
+    @staticmethod
+    def _populate_cache_create(_i_cache, _instance, _inspector,
+                               _DiskData, _inspector_attr, _stats_attr):
+        """Settings and return cache."""
+        if _instance.id not in _i_cache:
+            _data = 0
+            _per_device_data = {}
+            disk_rates = getattr(_inspector, _inspector_attr)(_instance)
+            for disk, stats in disk_rates:
+                _data += getattr(stats, _stats_attr)
+                _per_device_data[disk.device] = (
+                    getattr(stats, _stats_attr))
+            _per_disk_data = {
+                _stats_attr: _per_device_data
+            }
+            _i_cache[_instance.id] = _DiskData(
+                _data,
+                _per_disk_data
+            )
+        return _i_cache[_instance.id]
+
     def _record_poll_time(self):
         """Method records current time as the poll time.
 
