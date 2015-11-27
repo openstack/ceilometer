@@ -404,6 +404,7 @@ class EventPipelineTestCase(base.BaseTestCase):
             mock.Mock(), pipeline_manager.pipelines[0])
 
         fake_publisher.publish_events.side_effect = Exception
-        ret = event_pipeline_endpoint.sample(None, 'compute.vagrant-precise',
-                                             'a', [test_data], None)
+        ret = event_pipeline_endpoint.sample([
+            {'ctxt': {}, 'publisher_id': 'compute.vagrant-precise',
+             'event_type': 'a', 'payload': [test_data], 'metadata': {}}])
         self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)

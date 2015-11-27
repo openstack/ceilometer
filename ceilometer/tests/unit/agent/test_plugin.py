@@ -37,13 +37,16 @@ class NotificationBaseTestCase(base.BaseTestCase):
     def test_plugin_info(self):
         plugin = self.FakePlugin(mock.Mock())
         plugin.to_samples_and_publish = mock.Mock()
-        ctxt = {'user_id': 'fake_user_id', 'project_id': 'fake_project_id'}
-        publisher_id = 'fake.publisher_id'
-        event_type = 'fake.event'
-        payload = {'foo': 'bar'}
-        metadata = {'message_id': '3577a84f-29ec-4904-9566-12c52289c2e8',
-                    'timestamp': '2015-06-1909:19:35.786893'}
-        plugin.info(ctxt, publisher_id, event_type, payload, metadata)
+        message = {
+            'ctxt': {'user_id': 'fake_user_id',
+                     'project_id': 'fake_project_id'},
+            'publisher_id': 'fake.publisher_id',
+            'event_type': 'fake.event',
+            'payload': {'foo': 'bar'},
+            'metadata': {'message_id': '3577a84f-29ec-4904-9566-12c52289c2e8',
+                         'timestamp': '2015-06-1909:19:35.786893'}
+        }
+        plugin.info([message])
         notification = {
             'priority': 'info',
             'event_type': 'fake.event',

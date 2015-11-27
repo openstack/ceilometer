@@ -19,6 +19,7 @@
 
 import abc
 import hashlib
+from itertools import chain
 import os
 
 from oslo_config import cfg
@@ -83,12 +84,13 @@ class PipelineEndpoint(object):
         self.publish_context = PublishContext(context, [pipeline])
 
     @abc.abstractmethod
-    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+    def sample(self, messages):
         pass
 
 
 class SamplePipelineEndpoint(PipelineEndpoint):
-    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+    def sample(self, messages):
+        samples = chain.from_iterable(m["payload"] for m in messages)
         samples = [
             sample_util.Sample(name=s['counter_name'],
                                type=s['counter_type'],
@@ -100,7 +102,7 @@ class SamplePipelineEndpoint(PipelineEndpoint):
                                timestamp=s['timestamp'],
                                resource_metadata=s['resource_metadata'],
                                source=s.get('source'))
-            for s in payload if publisher_utils.verify_signature(
+            for s in samples if publisher_utils.verify_signature(
                 s, cfg.CONF.publisher.telemetry_secret)
         ]
         with self.publish_context as p:
@@ -108,7 +110,8 @@ class SamplePipelineEndpoint(PipelineEndpoint):
 
 
 class EventPipelineEndpoint(PipelineEndpoint):
-    def sample(self, ctxt, publisher_id, event_type, payload, metadata):
+    def sample(self, messages):
+        events = chain.from_iterable(m["payload"] for m in messages)
         events = [
             models.Event(
                 message_id=ev['message_id'],
@@ -119,7 +122,7 @@ class EventPipelineEndpoint(PipelineEndpoint):
                                      models.Trait.convert_value(dtype, value))
                         for name, dtype, value in ev['traits']],
                 raw=ev.get('raw', {}))
-            for ev in payload if publisher_utils.verify_signature(
+            for ev in events if publisher_utils.verify_signature(
                 ev, cfg.CONF.publisher.telemetry_secret)
         ]
         try:

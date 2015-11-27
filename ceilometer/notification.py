@@ -66,6 +66,14 @@ OPTS = [
                          "Example: transport://user:pass@host1:port"
                          "[,hostN:portN]/virtual_host "
                          "(DEFAULT/transport_url is used if empty)"),
+    cfg.IntOpt('batch_size',
+               default=1,
+               help='Number of notification messages to wait before '
+               'publishing them'),
+    cfg.IntOpt('batch_timeout',
+               default=None,
+               help='Number of seconds to wait before publishing samples'
+               'when batch_size is not reached (None means indefinitely)'),
 ]
 
 cfg.CONF.register_opts(exchange_control.EXCHANGE_OPTS)
@@ -228,8 +236,10 @@ class NotificationService(service_base.BaseService):
         urls = cfg.CONF.notification.messaging_urls or [None]
         for url in urls:
             transport = messaging.get_transport(url)
-            listener = messaging.get_notification_listener(
-                transport, targets, endpoints)
+            listener = messaging.get_batch_notification_listener(
+                transport, targets, endpoints,
+                batch_size=cfg.CONF.notification.batch_size,
+                batch_timeout=cfg.CONF.notification.batch_timeout)
             listener.start()
             self.listeners.append(listener)
 
@@ -272,10 +282,12 @@ class NotificationService(service_base.BaseService):
             pipe_endpoint = (pipeline.EventPipelineEndpoint
                              if isinstance(pipe, pipeline.EventPipeline)
                              else pipeline.SamplePipelineEndpoint)
-            listener = messaging.get_notification_listener(
+            listener = messaging.get_batch_notification_listener(
                 transport,
                 [oslo_messaging.Target(topic=topic)],
-                [pipe_endpoint(self.ctxt, pipe)])
+                [pipe_endpoint(self.ctxt, pipe)],
+                batch_size=cfg.CONF.notification.batch_size,
+                batch_timeout=cfg.CONF.notification.batch_timeout)
             listener.start()
             self.pipeline_listeners.append(listener)
 

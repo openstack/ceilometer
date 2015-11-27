@@ -131,9 +131,11 @@ class TestNotification(tests_base.BaseTestCase):
         self._do_process_notification_manager_start()
         self.srv.pipeline_manager.pipelines[0] = mock.MagicMock()
 
-        self.plugin.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
-                         'compute.instance.create.end',
-                         TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+        self.plugin.info([{'ctxt': TEST_NOTICE_CTXT,
+                           'publisher_id': 'compute.vagrant-precise',
+                           'event_type': 'compute.instance.create.end',
+                           'payload': TEST_NOTICE_PAYLOAD,
+                           'metadata': TEST_NOTICE_METADATA}])
 
         self.assertEqual(1, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertTrue(self.srv.pipeline_manager.publisher.called)
@@ -415,9 +417,12 @@ class TestRealNotificationHA(BaseRealNotification):
                 not endpoint.filter_rule.match(None, None, 'nonmatching.end',
                                                None, None)):
                 continue
-            endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
-                          'nonmatching.end',
-                          TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+            endpoint.info([{
+                'ctxt': TEST_NOTICE_CTXT,
+                'publisher_id': 'compute.vagrant-precise',
+                'event_type': 'nonmatching.end',
+                'payload': TEST_NOTICE_PAYLOAD,
+                'metadata': TEST_NOTICE_METADATA}])
         self.assertFalse(mock_notifier.called)
         for endpoint in self.srv.listeners[0].dispatcher.endpoints:
             if (hasattr(endpoint, 'filter_rule') and
@@ -425,9 +430,13 @@ class TestRealNotificationHA(BaseRealNotification):
                                                'compute.instance.create.end',
                                                None, None)):
                 continue
-            endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
-                          'compute.instance.create.end',
-                          TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+            endpoint.info([{
+                'ctxt': TEST_NOTICE_CTXT,
+                'publisher_id': 'compute.vagrant-precise',
+                'event_type': 'compute.instance.create.end',
+                'payload': TEST_NOTICE_PAYLOAD,
+                'metadata': TEST_NOTICE_METADATA}])
+
         self.assertTrue(mock_notifier.called)
         self.assertEqual(3, mock_notifier.call_count)
         self.assertEqual('pipeline.event',

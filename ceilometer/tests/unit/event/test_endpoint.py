@@ -142,18 +142,23 @@ class TestEventEndpoint(tests_base.BaseTestCase):
 
     def test_message_to_event(self):
         self._setup_endpoint(['test://'])
-        self.endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
-                           'compute.instance.create.end',
-                           TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+        self.endpoint.info([{'ctxt': TEST_NOTICE_CTXT,
+                             'publisher_id': 'compute.vagrant-precise',
+                             'event_type': 'compute.instance.create.end',
+                             'payload': TEST_NOTICE_PAYLOAD,
+                             'metadata': TEST_NOTICE_METADATA}])
 
     def test_bad_event_non_ack_and_requeue(self):
         self._setup_endpoint(['test://'])
         self.fake_publisher.publish_events.side_effect = Exception
         self.CONF.set_override("ack_on_event_error", False,
                                group="notification")
-        ret = self.endpoint.info(TEST_NOTICE_CTXT, 'compute.vagrant-precise',
-                                 'compute.instance.create.end',
-                                 TEST_NOTICE_PAYLOAD, TEST_NOTICE_METADATA)
+        ret = self.endpoint.info([{'ctxt': TEST_NOTICE_CTXT,
+                                   'publisher_id': 'compute.vagrant-precise',
+                                   'event_type': 'compute.instance.create.end',
+                                   'payload': TEST_NOTICE_PAYLOAD,
+                                   'metadata': TEST_NOTICE_METADATA}])
+
         self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
 
     def test_message_to_event_bad_event(self):
@@ -162,9 +167,13 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF.set_override("ack_on_event_error", False,
                                group="notification")
 
-        message = {'event_type': "foo", 'message_id': "abc"}
+        message = {
+            'payload': {'event_type': "foo", 'message_id': "abc"},
+            'metadata': {},
+            'ctxt': {}
+        }
         with mock.patch("ceilometer.pipeline.LOG") as mock_logger:
-            ret = self.endpoint.process_notification(message)
+            ret = self.endpoint.process_notification('info', [message])
             self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
             exception_mock = mock_logger.exception
             self.assertIn('Exit after error from publisher',
@@ -178,10 +187,13 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF.set_override("ack_on_event_error", False,
                                group="notification")
 
-        message = {'event_type': "foo", 'message_id': "abc"}
-
+        message = {
+            'payload': {'event_type': "foo", 'message_id': "abc"},
+            'metadata': {},
+            'ctxt': {}
+        }
         with mock.patch("ceilometer.pipeline.LOG") as mock_logger:
-            ret = self.endpoint.process_notification(message)
+            ret = self.endpoint.process_notification('info', [message])
             self.assertEqual(oslo_messaging.NotificationResult.HANDLED, ret)
             exception_mock = mock_logger.exception
             self.assertIn('Continue after error from publisher',

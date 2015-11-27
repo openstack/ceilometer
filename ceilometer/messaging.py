@@ -105,16 +105,15 @@ def get_notifier(transport, publisher_id):
     return notifier.prepare(publisher_id=publisher_id)
 
 
-def convert_to_old_notification_format(priority, ctxt, publisher_id,
-                                       event_type, payload, metadata):
+def convert_to_old_notification_format(priority, notification):
     # FIXME(sileht): temporary convert notification to old format
     # to focus on oslo_messaging migration before refactoring the code to
     # use the new oslo_messaging facilities
-    notification = {'priority': priority,
-                    'payload': payload,
-                    'event_type': event_type,
-                    'publisher_id': publisher_id}
-    notification.update(metadata)
-    for k in ctxt:
-        notification['_context_' + k] = ctxt[k]
+    notification = notification.copy()
+    notification['priority'] = priority
+    notification.update(notification["metadata"])
+    for k in notification['ctxt']:
+        notification['_context_' + k] = notification['ctxt'][k]
+    del notification['ctxt']
+    del notification['metadata']
     return notification
