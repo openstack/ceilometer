@@ -41,6 +41,7 @@ resources:
       - 'memory.resident'
       - 'vcpus'
       - 'cpu'
+      - 'cpu.delta'
       - 'cpu_util'
       - 'disk.root.size'
       - 'disk.ephemeral.size'

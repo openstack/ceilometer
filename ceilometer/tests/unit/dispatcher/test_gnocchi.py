@@ -219,7 +219,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             metric_names=[
                 'instance', 'disk.root.size', 'disk.ephemeral.size',
                 'memory', 'vcpus', 'memory.usage', 'memory.resident',
-                'cpu', 'cpu_util', 'vcpus', 'disk.read.requests',
+                'cpu', 'cpu.delta', 'cpu_util', 'vcpus', 'disk.read.requests',
                 'disk.read.requests.rate', 'disk.write.requests',
                 'disk.write.requests.rate', 'disk.read.bytes',
                 'disk.read.bytes.rate', 'disk.write.bytes',
