@@ -338,6 +338,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
         expected_calls = [
             mock.call.session(),
+            mock.call.adapters.HTTPAdapter(pool_block=True),
             mock.call.session().mount('http://', mock.ANY),
             mock.call.session().mount('https://', mock.ANY),
             mock.call.session().post(
