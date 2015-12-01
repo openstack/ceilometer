@@ -1,0 +1,10 @@
+---
+features:
+  - >
+    Support resource caching in Gnocchi dispatcher to improve write
+    performance to avoid additional queries.
+other:
+  - >
+    A dogpile.cache supported backend is required to enable cache. Additional
+    configuration `options <http://docs.openstack.org/developer/oslo.cache/opts.html#cache>`_
+    are also required.

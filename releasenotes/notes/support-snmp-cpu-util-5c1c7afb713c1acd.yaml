@@ -1,0 +1,5 @@
+---
+features:
+  - >
+    [`bug 1513731 <https://bugs.launchpad.net/ceilometer/+bug/1513731>`_]
+    Add support for hardware cpu_util in snmp.yaml

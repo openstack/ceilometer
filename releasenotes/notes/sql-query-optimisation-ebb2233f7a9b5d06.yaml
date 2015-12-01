@@ -1,0 +1,6 @@
+---
+fixes:
+  - >
+    [`bug 1506738 <https://bugs.launchpad.net/ceilometer/+bug/1506738>`_]
+    [`bug 1509677 <https://bugs.launchpad.net/ceilometer/+bug/1509677>`_]
+    Optimise SQL backend queries to minimise query load
