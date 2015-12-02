@@ -28,7 +28,6 @@ from oslo_policy import opts
 from ceilometer.event.storage import models
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer import service
 from ceilometer import storage
 
 
@@ -56,9 +55,9 @@ class ConfigFixture(fixture.GabbiFixture):
         if db_url is None:
             raise case.SkipTest('No database connection configured')
 
-        service.prepare_service(argv=[], config_files=[])
         conf = fixture_config.Config().conf
         self.conf = conf
+        self.conf([], project='ceilometer', validate_default_values=True)
         opts.set_defaults(self.conf)
         conf.import_group('api', 'ceilometer.api.controllers.v2.root')
         conf.import_opt('store_events', 'ceilometer.notification',
