@@ -49,7 +49,6 @@ TYPES = {1: 'text',
 
 service.prepare_service()
 
-config_file = converter.get_config_file()
 output_file = cfg.CONF.output_file
 input_file = cfg.CONF.input_file
 
@@ -64,7 +63,7 @@ else:
     with open(input_file, 'r') as f:
         notifications = json.load(f)
 
-out.write("Definitions file: %s\n" % config_file)
+out.write("Definitions file: %s\n" % cfg.CONF.event.definitions_cfg_file)
 out.write("Notifications tested: %s\n" % len(notifications))
 
 event_converter = converter.setup_events(
@@ -77,7 +76,7 @@ for notification in notifications:
         out.write("Dropped notification: %s\n" %
                   notification['message_id'])
         continue
-    out.write("Event: %s at %s\n" % (event.event_name, event.generated))
+    out.write("Event: %s at %s\n" % (event.event_type, event.generated))
     for trait in event.traits:
         dtype = TYPES[trait.dtype]
         out.write("    Trait: name: %s, type: %s, value: %s\n" % (
