@@ -1,0 +1,6 @@
+---
+critical:
+  - >
+    [`bug 1519767 <https://bugs.launchpad.net/ceilometer/+bug/1519767>`_]
+    fnmatch functionality in python <= 2.7.9 is not threadsafe. this issue and 
+    its potential race conditions are now patched.

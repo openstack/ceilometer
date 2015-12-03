@@ -1,0 +1,10 @@
+---
+features:
+  - >
+    [`bug 1480333 <https://bugs.launchpad.net/ceilometer/+bug/1480333>`_]
+    Support ability to configure collector to capture events or meters mutally
+    exclusively, rather than capturing both always.
+other:
+  - >
+    Configure individual dispatchers by specifying meter_dispatchers and
+    event_dispatchers in configuration file.
