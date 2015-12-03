@@ -12,6 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from collections import defaultdict
 from hashlib import md5
 import itertools
 import operator
@@ -151,6 +152,26 @@ def GnocchiClient(conf):
                          endpoint_override=conf.dispatcher_gnocchi.url)
 
 
+class LockedDefaultDict(defaultdict):
+    """defaultdict with lock to handle threading
+
+    Dictionary only deletes if nothing is accessing dict and nothing is holding
+    lock to be deleted. If both cases are not true, it will skip delete.
+    """
+    def __init__(self, *args, **kwargs):
+        self.lock = threading.Lock()
+        super(LockedDefaultDict, self).__init__(*args, **kwargs)
+
+    def __getitem__(self, key):
+        with self.lock:
+            return super(LockedDefaultDict, self).__getitem__(key)
+
+    def __delitem__(self, key):
+        with self.lock:
+            with self.__getitem__(key)(blocking=False):
+                super(LockedDefaultDict, self).__delitem__(key)
+
+
 class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
     """Dispatcher class for recording metering data into database.
 
@@ -196,7 +217,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
 
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
-        self._gnocchi_resource_lock = threading.Lock()
+        self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
         self._gnocchi = GnocchiClient(conf)
 
@@ -355,9 +376,10 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             cache_key = resource['id']
             attribute_hash = self._check_resource_cache(cache_key, resource)
             if attribute_hash:
-                with self._gnocchi_resource_lock:
+                with self._gnocchi_resource_lock[cache_key]:
                     method(resource_type, resource, *args, **kwargs)
                     self.cache.set(cache_key, attribute_hash)
+                self._gnocchi_resource_lock.pop(cache_key, None)
             else:
                 LOG.debug('Resource cache hit for %s %s', operation, cache_key)
         else:
