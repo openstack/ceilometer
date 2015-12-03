@@ -28,8 +28,7 @@ cfg.CONF.import_opt('trove_control_exchange',
 class TroveMetricsNotificationBase(plugin_base.NotificationBase):
     """Base class for trove (dbaas) notifications."""
 
-    @staticmethod
-    def get_targets(conf):
+    def get_targets(self, conf):
         """Return a sequence of oslo.messaging.Target
 
         This sequence is defining the exchange and topics to be connected for
@@ -37,7 +36,7 @@ class TroveMetricsNotificationBase(plugin_base.NotificationBase):
         """
         return [oslo_messaging.Target(topic=topic,
                                       exchange=conf.trove_control_exchange)
-                for topic in conf.notification_topics]
+                for topic in self.get_notification_topics(conf)]
 
 
 class InstanceExists(TroveMetricsNotificationBase):

@@ -30,8 +30,7 @@ cfg.CONF.register_opts(OPTS)
 
 
 class ComputeNotificationBase(plugin_base.NotificationBase):
-    @staticmethod
-    def get_targets(conf):
+    def get_targets(self, conf):
         """Return a sequence of oslo_messaging.Target
 
         This sequence is defining the exchange and topics to be connected for
@@ -39,4 +38,4 @@ class ComputeNotificationBase(plugin_base.NotificationBase):
         """
         return [oslo_messaging.Target(topic=topic,
                                       exchange=conf.nova_control_exchange)
-                for topic in conf.notification_topics]
+                for topic in self.get_notification_topics(conf)]

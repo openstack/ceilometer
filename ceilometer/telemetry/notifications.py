@@ -30,8 +30,7 @@ cfg.CONF.register_opts(OPTS)
 class TelemetryBase(plugin_base.NotificationBase):
     """Convert telemetry notification into Samples."""
 
-    @staticmethod
-    def get_targets(conf):
+    def get_targets(self, conf):
         """Return a sequence of oslo_messaging.Target
 
         Sequence defining the exchange and topics to be connected for this
@@ -39,7 +38,7 @@ class TelemetryBase(plugin_base.NotificationBase):
         """
         return [oslo_messaging.Target(
                 topic=topic, exchange=conf.ceilometer_control_exchange)
-                for topic in conf.notification_topics]
+                for topic in self.get_notification_topics(conf)]
 
 
 class TelemetryIpc(TelemetryBase):

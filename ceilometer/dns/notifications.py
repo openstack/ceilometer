@@ -34,8 +34,7 @@ SERVICE = 'dns'
 class DnsMetricsNotificationBase(plugin_base.NotificationBase):
     """Base class for DNSaaS(Designate) notifications."""
 
-    @staticmethod
-    def get_targets(conf):
+    def get_targets(self, conf):
         """Return a sequence of oslo.messaging.Target
 
         This sequence is defining the exchange and topics to be connected for
@@ -43,7 +42,7 @@ class DnsMetricsNotificationBase(plugin_base.NotificationBase):
         """
         return [oslo_messaging.Target(topic=topic,
                                       exchange=conf.dns_control_exchange)
-                for topic in conf.notification_topics]
+                for topic in self.get_notification_topics(conf)]
 
 
 class DomainExists(DnsMetricsNotificationBase):

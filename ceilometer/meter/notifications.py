@@ -234,7 +234,8 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
         for exchange in exchanges:
             targets.extend(oslo_messaging.Target(topic=topic,
                                                  exchange=exchange)
-                           for topic in conf.notification_topics)
+                           for topic in
+                           self.get_notification_topics(conf))
         return targets
 
     @staticmethod
