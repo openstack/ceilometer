@@ -287,7 +287,7 @@ class AgentManager(service_base.BaseService):
             # Extension raising ExtensionLoadError can be ignored,
             # and ignore anything we can't import as a safety measure.
             if isinstance(exc, plugin_base.ExtensionLoadError):
-                LOG.error(_("Skip loading extension for %s") % ep.name)
+                LOG.exception(_("Skip loading extension for %s") % ep.name)
                 return
             if isinstance(exc, ImportError):
                 LOG.error(_("Failed to import extension for %(name)s: "
