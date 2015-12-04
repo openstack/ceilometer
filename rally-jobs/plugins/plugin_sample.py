@@ -13,7 +13,7 @@
 """ Sample of plugin for Ceilometer.
 
 For more Ceilometer related benchmarks take a look here:
-github.com/stackforge/rally/blob/master/rally/benchmark/scenarios/ceilometer/
+github.com/openstack/rally/blob/master/rally/benchmark/scenarios/ceilometer/
 
 About plugins: https://rally.readthedocs.org/en/latest/plugins.html
 
