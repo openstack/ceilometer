@@ -35,6 +35,7 @@ from ceilometer.tests import base
 load_tests = testscenarios.load_tests_apply_scenarios
 
 
+@mock.patch('gnocchiclient.v1.client.Client', mock.Mock())
 class DispatcherTest(base.BaseTestCase):
 
     def setUp(self):
@@ -313,8 +314,11 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         resource_id = self.sample['resource_id']  # .replace("/", "%2F"),
         metric_name = self.sample['counter_name']
 
-        expected_calls = [mock.call.metric.add_measures(
-            metric_name, self.measures_attributes, resource_id)]
+        expected_calls = [
+            mock.call.capabilities.list(),
+            mock.call.metric.add_measures(metric_name,
+                                          self.measures_attributes,
+                                          resource_id)]
 
         add_measures_side_effect = []
 
