@@ -91,8 +91,7 @@ corresponding sinks for transformation and publication of the samples.
 
 A source is a producer of samples, in effect a set of pollsters and/or
 notification handlers emitting samples for a set of matching meters.
-See :doc:`plugins` and :ref:`plugins-and-containers` for
-details on how to write and plug in your plugins.
+See :doc:`plugins` for details on how to write and plug in your plugins.
 
 Each source configuration encapsulates meter name matching, polling
 interval determination, optional resource enumeration or discovery,
