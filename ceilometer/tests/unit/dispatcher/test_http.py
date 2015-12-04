@@ -42,12 +42,10 @@ class TestDispatcherHttp(base.BaseTestCase):
     def test_http_dispatcher_config_options(self):
         self.CONF.dispatcher_http.target = 'fake'
         self.CONF.dispatcher_http.timeout = 2
-        self.CONF.dispatcher_http.cadf_only = True
         dispatcher = http.HttpDispatcher(self.CONF)
 
         self.assertEqual('fake', dispatcher.target)
         self.assertEqual(2, dispatcher.timeout)
-        self.assertEqual(True, dispatcher.cadf_only)
 
     def test_http_dispatcher_with_no_target(self):
         self.CONF.dispatcher_http.target = ''
@@ -65,58 +63,7 @@ class TestDispatcherHttp(base.BaseTestCase):
 
     def test_http_dispatcher_with_no_metadata(self):
         self.CONF.dispatcher_http.target = 'fake'
-        self.CONF.dispatcher_http.cadf_only = True
         dispatcher = http.HttpDispatcher(self.CONF)
-
-        with mock.patch.object(requests, 'post') as post:
-            dispatcher.record_metering_data(self.msg)
-
-        self.assertEqual(0, post.call_count)
-
-    def test_http_dispatcher_without_cadf_event(self):
-        self.CONF.dispatcher_http.target = 'fake'
-        self.CONF.dispatcher_http.cadf_only = True
-        dispatcher = http.HttpDispatcher(self.CONF)
-
-        self.msg['resource_metadata'] = {'request': {'NONE_CADF_EVENT': {
-            'q1': 'v1', 'q2': 'v2'}, }, }
-        self.msg['message_signature'] = utils.compute_signature(
-            self.msg, self.CONF.publisher.telemetry_secret,
-        )
-
-        with mock.patch.object(requests, 'post') as post:
-            dispatcher.record_metering_data(self.msg)
-
-        # Since the meter does not have metadata or CADF_EVENT, the method
-        # call count should be zero
-        self.assertEqual(0, post.call_count)
-
-    def test_http_dispatcher_with_cadf_event(self):
-        self.CONF.dispatcher_http.target = 'fake'
-        self.CONF.dispatcher_http.cadf_only = True
-        dispatcher = http.HttpDispatcher(self.CONF)
-
-        self.msg['resource_metadata'] = {'request': {'CADF_EVENT': {
-            'q1': 'v1', 'q2': 'v2'}, }, }
-        self.msg['message_signature'] = utils.compute_signature(
-            self.msg, self.CONF.publisher.telemetry_secret,
-        )
-
-        with mock.patch.object(requests, 'post') as post:
-            dispatcher.record_metering_data(self.msg)
-
-        self.assertEqual(1, post.call_count)
-
-    def test_http_dispatcher_with_none_cadf_event(self):
-        self.CONF.dispatcher_http.target = 'fake'
-        self.CONF.dispatcher_http.cadf_only = False
-        dispatcher = http.HttpDispatcher(self.CONF)
-
-        self.msg['resource_metadata'] = {'any': {'thing1': 'v1',
-                                                 'thing2': 'v2', }, }
-        self.msg['message_signature'] = utils.compute_signature(
-            self.msg, self.CONF.publisher.telemetry_secret,
-        )
 
         with mock.patch.object(requests, 'post') as post:
             dispatcher.record_metering_data(self.msg)
