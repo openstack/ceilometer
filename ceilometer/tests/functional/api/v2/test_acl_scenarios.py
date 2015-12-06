@@ -15,12 +15,11 @@
 """Test ACL."""
 
 import datetime
-import hashlib
-import json
 import os
+import uuid
 
+from keystonemiddleware import fixture as ksm_fixture
 from oslo_utils import fileutils
-from oslo_utils import timeutils
 import six
 import webtest
 
@@ -30,59 +29,33 @@ from ceilometer import sample
 from ceilometer.tests.functional import api as acl
 from ceilometer.tests.functional.api import v2
 
-VALID_TOKEN = '4562138218392831'
-VALID_TOKEN2 = '4562138218392832'
-
-
-class FakeMemcache(object):
-
-    TOKEN_HASH = hashlib.sha256(VALID_TOKEN.encode('utf-8')).hexdigest()
-    TOKEN2_HASH = hashlib.sha256(VALID_TOKEN2.encode('utf-8')).hexdigest()
-
-    def get(self, key):
-        if (key == "tokens/%s" % VALID_TOKEN or
-                key == "tokens/%s" % self.TOKEN_HASH):
-            dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
-            dt_isoformat = dt.isoformat()
-            return json.dumps(({'access': {
-                'token': {'id': VALID_TOKEN,
-                          'expires': dt_isoformat},
-                'user': {
-                    'id': 'user_id1',
-                    'name': 'user_name1',
-                    'tenantId': '123i2910',
-                    'tenantName': 'mytenant',
-                    'roles': [
-                        {'name': 'admin'},
-                    ]},
-            }}, dt_isoformat))
-        if (key == "tokens/%s" % VALID_TOKEN2 or
-                key == "tokens/%s" % self.TOKEN2_HASH):
-            dt = timeutils.utcnow() + datetime.timedelta(minutes=5)
-            dt_isoformat = dt.isoformat()
-            return json.dumps(({'access': {
-                'token': {'id': VALID_TOKEN2,
-                          'expires': dt_isoformat},
-                'user': {
-                    'id': 'user_id2',
-                    'name': 'user-good',
-                    'tenantId': 'project-good',
-                    'tenantName': 'goodies',
-                    'roles': [
-                        {'name': 'Member'},
-                    ]},
-            }}, dt_isoformat))
-
-    @staticmethod
-    def set(key, value, **kwargs):
-        pass
+VALID_TOKEN = uuid.uuid4().hex
+VALID_TOKEN2 = uuid.uuid4().hex
 
 
 class TestAPIACL(v2.FunctionalTest):
 
     def setUp(self):
         super(TestAPIACL, self).setUp()
-        self.environ = {'fake.cache': FakeMemcache()}
+        self.auth_token_fixture = self.useFixture(
+            ksm_fixture.AuthTokenFixture())
+        self.auth_token_fixture.add_token_data(
+            token_id=VALID_TOKEN,
+            # FIXME(morganfainberg): The project-id should be a proper uuid
+            project_id='123i2910',
+            role_list=['admin'],
+            user_name='user_id2',
+            user_id='user_id2',
+            is_v2=True
+        )
+        self.auth_token_fixture.add_token_data(
+            token_id=VALID_TOKEN2,
+            # FIXME(morganfainberg): The project-id should be a proper uuid
+            project_id='project-good',
+            role_list=['Member'],
+            user_name='user_id1',
+            user_id='user_id1',
+            is_v2=True)
 
         for cnt in [
                 sample.Sample(
@@ -119,7 +92,6 @@ class TestAPIACL(v2.FunctionalTest):
                                                 expect_errors=expect_errors,
                                                 headers=headers,
                                                 q=q or [],
-                                                extra_environ=self.environ,
                                                 **params)
 
     def _make_app(self):
@@ -162,7 +134,6 @@ class TestAPIACL(v2.FunctionalTest):
         data = self.get_json('/meters',
                              headers={"X-Auth-Token": VALID_TOKEN,
                                       "X-Roles": "admin",
-                                      "X-Tenant-Name": "admin",
                                       "X-Project-Id":
                                       "bc23a9d531064583ace8f67dad60f6bb",
                                       })
