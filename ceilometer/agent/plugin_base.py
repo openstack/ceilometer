@@ -48,6 +48,12 @@ class NotificationBase(PluginBase):
                 event_type='|'.join(self.event_types))
         self.manager = manager
 
+    @staticmethod
+    def get_notification_topics(conf):
+        if 'notification_topics' in conf:
+            return conf.notification_topics
+        return conf.oslo_messaging_notifications.topics
+
     @abc.abstractproperty
     def event_types(self):
         """Return a sequence of strings.
