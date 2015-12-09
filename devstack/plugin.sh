@@ -126,7 +126,7 @@ function _ceilometer_config_apache_wsgi {
 function _ceilometer_prepare_coordination {
     if echo $CEILOMETER_COORDINATION_URL | grep -q '^memcached:'; then
         install_package memcached
-    elif echo $CEILOMETER_COORDINATION_URL | grep -q '^redis:'; then
+    elif [[ "${CEILOMETER_COORDINATOR_URL%%:*}" == "redis" || "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" ]]; then
         _ceilometer_install_redis
     fi
 }
@@ -218,6 +218,20 @@ function cleanup_ceilometer {
     fi
 }
 
+# Set configuraiton for cache backend.
+# NOTE(cdent): This currently only works for redis. Still working
+# out how to express the other backends.
+function _ceilometer_configure_cache_backend {
+    iniset $CEILOMETER_CONF cache backend $CEILOMETER_CACHE_BACKEND
+    iniset $CEILOMETER_CONF cache backend_argument url:$CEILOMETER_CACHE_URL
+    iniadd_literal $CEILOMETER_CONF cache backend_argument distributed_lock:True
+    if [[ "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" ]]; then
+        iniadd_literal $CEILOMETER_CONF cache backend_argument db:0
+        iniadd_literal $CEILOMETER_CONF cache backend_argument redis_expiration_time:600
+    fi
+}
+
+
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
@@ -251,6 +265,10 @@ function configure_ceilometer {
     if [[ -n "$CEILOMETER_COORDINATION_URL" ]]; then
         iniset $CEILOMETER_CONF coordination backend_url $CEILOMETER_COORDINATION_URL
         iniset $CEILOMETER_CONF compute workload_partitioning True
+    fi
+
+    if [[ -n "$CEILOMETER_CACHE_BACKEND" ]]; then
+        _ceilometer_configure_cache_backend
     fi
 
     # Install the policy file and declarative configuration files to
