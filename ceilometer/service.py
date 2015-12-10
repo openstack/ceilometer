@@ -14,7 +14,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
 import socket
 import sys
 
@@ -23,9 +22,9 @@ import oslo_i18n
 from oslo_log import log
 from oslo_reports import guru_meditation_report as gmr
 
+from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import version
-
 
 OPTS = [
     cfg.StrOpt('host',
@@ -39,48 +38,6 @@ OPTS = [
                     'disable timeout.'),
 ]
 cfg.CONF.register_opts(OPTS)
-
-CLI_OPTS = [
-    cfg.StrOpt('os-username',
-               deprecated_group="DEFAULT",
-               default=os.environ.get('OS_USERNAME', 'ceilometer'),
-               help='User name to use for OpenStack service access.'),
-    cfg.StrOpt('os-password',
-               deprecated_group="DEFAULT",
-               secret=True,
-               default=os.environ.get('OS_PASSWORD', 'admin'),
-               help='Password to use for OpenStack service access.'),
-    cfg.StrOpt('os-tenant-id',
-               deprecated_group="DEFAULT",
-               default=os.environ.get('OS_TENANT_ID', ''),
-               help='Tenant ID to use for OpenStack service access.'),
-    cfg.StrOpt('os-tenant-name',
-               deprecated_group="DEFAULT",
-               default=os.environ.get('OS_TENANT_NAME', 'admin'),
-               help='Tenant name to use for OpenStack service access.'),
-    cfg.StrOpt('os-cacert',
-               default=os.environ.get('OS_CACERT'),
-               help='Certificate chain for SSL validation.'),
-    cfg.StrOpt('os-auth-url',
-               deprecated_group="DEFAULT",
-               default=os.environ.get('OS_AUTH_URL',
-                                      'http://localhost:5000/v2.0'),
-               help='Auth URL to use for OpenStack service access.'),
-    cfg.StrOpt('os-region-name',
-               deprecated_group="DEFAULT",
-               default=os.environ.get('OS_REGION_NAME'),
-               help='Region name to use for OpenStack service endpoints.'),
-    cfg.StrOpt('os-endpoint-type',
-               default=os.environ.get('OS_ENDPOINT_TYPE', 'publicURL'),
-               help='Type of endpoint in Identity service catalog to use for '
-                    'communication with OpenStack services.'),
-    cfg.BoolOpt('insecure',
-                default=False,
-                help='Disables X.509 certificate validation when an '
-                     'SSL connection to Identity Service is established.'),
-]
-
-cfg.CONF.register_cli_opts(CLI_OPTS, group="service_credentials")
 
 API_OPT = cfg.IntOpt('workers',
                      default=1,
@@ -108,6 +65,7 @@ COLL_OPT = cfg.IntOpt('workers',
                            'default value is 1.')
 cfg.CONF.register_opt(COLL_OPT, 'collector')
 
+keystone_client.register_keystoneauth_opts(cfg.CONF)
 
 LOG = log.getLogger(__name__)
 
@@ -119,11 +77,15 @@ def prepare_service(argv=None, config_files=None):
                   ['stevedore=INFO', 'keystoneclient=INFO',
                    'neutronclient=INFO'])
     log.set_defaults(default_log_levels=log_levels)
+
     if argv is None:
         argv = sys.argv
     cfg.CONF(argv[1:], project='ceilometer', validate_default_values=True,
              version=version.version_info.version_string(),
              default_config_files=config_files)
+
+    keystone_client.setup_keystoneauth(cfg.CONF)
+
     log.setup(cfg.CONF, 'ceilometer')
     # NOTE(liusheng): guru cannot run with service under apache daemon, so when
     # ceilometer-api running with mod_wsgi, the argv is [], we don't start

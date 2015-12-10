@@ -206,7 +206,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
         with self._gnocchi_project_id_lock:
             if self._gnocchi_project_id is None:
                 try:
-                    project = self._ks_client.tenants.find(
+                    project = self._ks_client.projects.find(
                         name=self.conf.dispatcher_gnocchi.filter_project)
                 except Exception:
                     LOG.exception('fail to retrieve user of Gnocchi service')

@@ -92,7 +92,7 @@ class DispatcherTest(base.BaseTestCase):
             }]
 
         ks_client = mock.Mock(auth_token='fake_token')
-        ks_client.tenants.find.return_value = mock.Mock(
+        ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
         self.useFixture(mockpatch.Patch(
             'ceilometer.keystone_client.get_client',
@@ -295,8 +295,10 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         # configuration.
         self.conf.config(url='http://localhost:8041',
                          group='dispatcher_gnocchi')
-        ks_client = mock.Mock(auth_token='fake_token')
-        ks_client.tenants.find.return_value = mock.Mock(
+        ks_client = mock.Mock()
+        ks_client.session.auth.get_access.return_value.auth_token = (
+            "fake_token")
+        ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
         self.useFixture(mockpatch.Patch(
             'ceilometer.keystone_client.get_client',
@@ -351,9 +353,11 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         post_responses.append(MockResponse(self.measure))
 
         if self.measure == 401:
-            type(self.ks_client).auth_token = mock.PropertyMock(
-                side_effect=['fake_token', 'new_token', 'new_token',
-                             'new_token', 'new_token'])
+
+            type(self.ks_client.session.auth.get_access.return_value
+                 ).auth_token = (mock.PropertyMock(
+                     side_effect=['fake_token', 'new_token', 'new_token',
+                                  'new_token', 'new_token']))
             headers = {'Content-Type': 'application/json',
                        'X-Auth-Token': 'new_token'}
 

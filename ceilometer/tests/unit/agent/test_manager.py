@@ -166,7 +166,7 @@ class TestManager(base.BaseTestCase):
 class TestPollsterKeystone(agentbase.TestPollster):
     def get_samples(self, manager, cache, resources):
         # Just try to use keystone, that will raise an exception
-        manager.keystone.tenants.list()
+        manager.keystone.projects.list()
 
 
 class TestPollsterPollingException(agentbase.TestPollster):

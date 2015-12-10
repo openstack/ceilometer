@@ -22,6 +22,7 @@ from oslo_config import cfg
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
+from ceilometer import keystone_client
 from ceilometer import sample
 
 
@@ -55,12 +56,10 @@ class _Base(plugin_base.PollsterBase):
     @staticmethod
     def get_glance_client(ksclient, endpoint):
         # hard-code v1 glance API version selection while v2 API matures
-        service_credentials = cfg.CONF.service_credentials
-        return glanceclient.Client('1', endpoint,
-                                   token=ksclient.auth_token,
-                                   cacert=service_credentials.os_cacert,
-                                   insecure=service_credentials.insecure,
-                                   timeout=cfg.CONF.http_timeout)
+        return glanceclient.Client('1',
+                                   session=keystone_client.get_session(),
+                                   endpoint=endpoint,
+                                   auth=ksclient.session.auth)
 
     def _get_images(self, ksclient, endpoint):
         client = self.get_glance_client(ksclient, endpoint)

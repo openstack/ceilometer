@@ -33,8 +33,10 @@ class _BaseTestVPNPollster(base.BaseTestCase):
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
         plugin_base._get_keystone = mock.Mock()
-        plugin_base._get_keystone.service_catalog.get_endpoints = (
-            mock.MagicMock(return_value={'network': mock.ANY}))
+        catalog = (plugin_base._get_keystone.session.auth.get_access.
+                   return_value.service_catalog)
+        catalog.get_endpoints = mock.MagicMock(
+            return_value={'network': mock.ANY})
 
 
 class TestVPNServicesPollster(_BaseTestVPNPollster):

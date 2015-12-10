@@ -31,7 +31,9 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.CONF.set_override('aodh_url', None, group='api')
         self.CONF.set_override('meter_dispatchers', ['database'])
         self.ks = mock.Mock()
-        self.ks.service_catalog.url_for.side_effect = self._url_for
+        self.catalog = (self.ks.session.auth.get_access.
+                        return_value.service_catalog)
+        self.catalog.url_for.side_effect = self._url_for
         self.useFixture(mockpatch.Patch(
             'ceilometer.keystone_client.get_client', return_value=self.ks))
 
@@ -115,7 +117,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
     def test_gnocchi_enabled_without_database_backend_keystone(self):
         self._setup_keystone_mock()
         self._do_test_gnocchi_enabled_without_database_backend()
-        self.ks.service_catalog.url_for.assert_has_calls([
+        self.catalog.url_for.assert_has_calls([
             mock.call(service_type="alarming"),
             mock.call(service_type="metric")],
             any_order=True)
@@ -128,7 +130,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self._setup_keystone_mock()
         self._do_test_alarm_redirect()
         self.assertEqual([mock.call(service_type="alarming")],
-                         self.ks.service_catalog.url_for.mock_calls)
+                         self.catalog.url_for.mock_calls)
 
     def test_alarm_redirect_configoptions(self):
         self._setup_osloconfig_options()
