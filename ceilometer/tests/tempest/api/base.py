@@ -13,15 +13,30 @@
 import time
 
 from oslo_utils import timeutils
-from tempest_lib import exceptions as lib_exc
-
 from tempest.common import compute
 from tempest.common.utils import data_utils
 from tempest import config
 from tempest import exceptions
+from tempest.lib import exceptions as lib_exc
 import tempest.test
 
+from ceilometer.tests.tempest.service import client
+
+
 CONF = config.CONF
+
+
+class ClientManager(client.Manager):
+
+    load_clients = [
+        'servers_client',
+        'compute_networks_client',
+        'compute_floating_ips_client',
+        'flavors_client',
+        'image_client',
+        'image_client_v2',
+        'telemetry_client',
+    ]
 
 
 class BaseTelemetryTest(tempest.test.BaseTestCase):
@@ -29,11 +44,12 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
     """Base test case class for all Telemetry API tests."""
 
     credentials = ['primary']
+    client_manager = ClientManager
 
     @classmethod
     def skip_checks(cls):
         super(BaseTelemetryTest, cls).skip_checks()
-        if not CONF.service_available.ceilometer:
+        if not CONF.service_available.ceilometer_plugin:
             raise cls.skipException("Ceilometer support is required")
 
     @classmethod
@@ -44,11 +60,11 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
     @classmethod
     def setup_clients(cls):
         super(BaseTelemetryTest, cls).setup_clients()
-        cls.telemetry_client = cls.os.telemetry_client
-        cls.servers_client = cls.os.servers_client
-        cls.flavors_client = cls.os.flavors_client
-        cls.image_client = cls.os.image_client
-        cls.image_client_v2 = cls.os.image_client_v2
+        cls.telemetry_client = cls.os_primary.telemetry_client
+        cls.servers_client = cls.os_primary.servers_client
+        cls.flavors_client = cls.os_primary.flavors_client
+        cls.image_client = cls.os_primary.image_client
+        cls.image_client_v2 = cls.os_primary.image_client_v2
 
     @classmethod
     def resource_setup(cls):
@@ -67,7 +83,7 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
     def create_server(cls):
         tenant_network = cls.get_tenant_network()
         body, server = compute.create_test_server(
-            cls.os,
+            cls.os_primary,
             tenant_network=tenant_network,
             name=data_utils.rand_name('ceilometer-instance'),
             wait_until='ACTIVE')
@@ -75,10 +91,11 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
         return body
 
     @classmethod
-    def create_image(cls, client):
-        body = client.create_image(
-            data_utils.rand_name('image'), container_format='bare',
-            disk_format='raw', visibility='private')
+    def create_image(cls, client, **kwargs):
+        body = client.create_image(name=data_utils.rand_name('image'),
+                                   container_format='bare',
+                                   disk_format='raw',
+                                   **kwargs)
         # TODO(jswarren) Move ['image'] up to initial body value assignment
         # once both v1 and v2 glance clients include the full response
         # object.
