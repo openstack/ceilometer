@@ -68,6 +68,7 @@ class TestLocationMetadata(base.BaseTestCase):
                                               'links': [{"rel": "bookmark",
                                                          'href': 2}]},
                                     'hostId': '1234-5678',
+                                    'OS-EXT-SRV-ATTR:host': 'host-test',
                                     'flavor': {'name': 'm1.tiny',
                                                'id': 1,
                                                'disk': 20,
@@ -89,6 +90,8 @@ class TestLocationMetadata(base.BaseTestCase):
                     prop = 'display_name'
                 elif prop == 'hostId':
                     prop = "host"
+                elif prop == 'OS-EXT-SRV-ATTR:host':
+                    prop = "instance_host"
                 elif prop == 'OS-EXT-SRV-ATTR:instance_name':
                     prop = 'name'
                 elif prop == "id":

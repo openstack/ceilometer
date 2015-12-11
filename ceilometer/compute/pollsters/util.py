@@ -40,6 +40,7 @@ def _get_metadata_from_object(instance):
         'instance_id': instance.id,
         'instance_type': instance_type,
         'host': instance.hostId,
+        'instance_host': getattr(instance, 'OS-EXT-SRV-ATTR:host', u''),
         'flavor': instance.flavor,
         'status': instance.status.lower(),
         'state': getattr(instance, 'OS-EXT-STS:vm_state', u''),
