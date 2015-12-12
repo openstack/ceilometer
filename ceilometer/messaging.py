@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 eNovance <licensing@enovance.com>
+# Copyright 2013-2015 eNovance <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,6 +14,7 @@
 # under the License.
 
 from oslo_config import cfg
+import oslo_context.context
 import oslo_messaging
 from oslo_messaging import serializer as oslo_serializer
 
@@ -54,24 +55,46 @@ def cleanup():
         del TRANSPORTS[url]
 
 
+class RequestContextSerializer(oslo_messaging.Serializer):
+
+    def __init__(self, base):
+        self._base = base
+
+    def serialize_entity(self, context, entity):
+        if not self._base:
+            return entity
+        return self._base.serialize_entity(context, entity)
+
+    def deserialize_entity(self, context, entity):
+        if not self._base:
+            return entity
+        return self._base.deserialize_entity(context, entity)
+
+    def serialize_context(self, context):
+        return context.to_dict()
+
+    def deserialize_context(self, context):
+        return oslo_context.context.RequestContext.from_dict(context)
+
+
+_SERIALIZER = RequestContextSerializer(
+    oslo_serializer.JsonPayloadSerializer())
+
+
 def get_rpc_server(transport, topic, endpoint):
     """Return a configured oslo_messaging rpc server."""
     cfg.CONF.import_opt('host', 'ceilometer.service')
     target = oslo_messaging.Target(server=cfg.CONF.host, topic=topic)
-    serializer = oslo_serializer.RequestContextSerializer(
-        oslo_serializer.JsonPayloadSerializer())
     return oslo_messaging.get_rpc_server(transport, target,
                                          [endpoint], executor='threading',
-                                         serializer=serializer)
+                                         serializer=_SERIALIZER)
 
 
 def get_rpc_client(transport, retry=None, **kwargs):
     """Return a configured oslo_messaging RPCClient."""
     target = oslo_messaging.Target(**kwargs)
-    serializer = oslo_serializer.RequestContextSerializer(
-        oslo_serializer.JsonPayloadSerializer())
     return oslo_messaging.RPCClient(transport, target,
-                                    serializer=serializer,
+                                    serializer=_SERIALIZER,
                                     retry=retry)
 
 
@@ -85,9 +108,7 @@ def get_notification_listener(transport, targets, endpoints,
 
 def get_notifier(transport, publisher_id):
     """Return a configured oslo_messaging notifier."""
-    serializer = oslo_serializer.RequestContextSerializer(
-        oslo_serializer.JsonPayloadSerializer())
-    notifier = oslo_messaging.Notifier(transport, serializer=serializer)
+    notifier = oslo_messaging.Notifier(transport, serializer=_SERIALIZER)
     return notifier.prepare(publisher_id=publisher_id)
 
 
