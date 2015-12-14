@@ -185,3 +185,25 @@ class TestSNMPInspector(test_base.BaseTestCase):
                          processed['metadata']['path'][0])
         self.assertEqual("4",
                          processed['metadata']['path'][1](4))
+
+    def test_pysnmp_ver43(self):
+        # Test pysnmp version >=4.3 compatibility of ObjectIdentifier
+        from distutils.version import StrictVersion
+        import pysnmp
+
+        has43 = StrictVersion(pysnmp.__version__) >= StrictVersion('4.3.0')
+        oid = '1.3.6.4.1.2021.11.57.0'
+
+        if has43:
+            from pysnmp.entity import engine
+            from pysnmp.smi import rfc1902
+            from pysnmp.smi import view
+            snmp_engine = engine.SnmpEngine()
+            mvc = view.MibViewController(snmp_engine.getMibBuilder())
+            name = rfc1902.ObjectIdentity(oid)
+            name.resolveWithMib(mvc)
+        else:
+            from pysnmp.proto import rfc1902
+            name = rfc1902.ObjectName(oid)
+
+        self.assertEqual(oid, str(name))
