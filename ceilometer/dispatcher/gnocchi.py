@@ -140,7 +140,7 @@ class ResourcesDefinition(object):
         return attrs
 
 
-def GnocchiClient(conf):
+def get_gnocchiclient(conf):
     requests_session = requests.session()
     for scheme in requests_session.adapters.keys():
         requests_session.mount(scheme, ka_session.TCPKeepAliveAdapter(
@@ -220,7 +220,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
         self._gnocchi_project_id_lock = threading.Lock()
         self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
-        self._gnocchi = GnocchiClient(conf)
+        self._gnocchi = get_gnocchiclient(conf)
         # Convert retry_interval secs to msecs for retry decorator
         retries = conf.storage.max_retries
 
