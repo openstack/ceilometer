@@ -15,17 +15,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import os
 import uuid
 
+from gnocchiclient import exceptions as gnocchi_exc
 import mock
 from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
 from oslotest import mockpatch
 import requests
 import six
-import six.moves.urllib.parse as urlparse
 import testscenarios
 
 from ceilometer import declarative
@@ -34,17 +33,6 @@ from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
 
 load_tests = testscenarios.load_tests_apply_scenarios
-
-
-class json_matcher(object):
-    def __init__(self, ref):
-        self.ref = ref
-
-    def __eq__(self, obj):
-        return self.ref == json.loads(obj)
-
-    def __repr__(self):
-        return "<json_matcher \"%s\">" % self.ref
 
 
 class DispatcherTest(base.BaseTestCase):
@@ -271,16 +259,14 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         ('resource_update_fail', dict(measure=204, post_resource=None,
                                       metric=None, measure_retry=None,
                                       patch_resource=500)),
-        ('new_metric', dict(measure=404, post_resource=409, metric=204,
+        ('new_metric', dict(measure=404, post_resource=None, metric=204,
                             measure_retry=204, patch_resource=204)),
-        ('new_metric_fail', dict(measure=404, post_resource=409, metric=500,
+        ('new_metric_fail', dict(measure=404, post_resource=None, metric=500,
                                  measure_retry=None, patch_resource=None)),
-        ('retry_fail', dict(measure=404, post_resource=409, metric=409,
+        ('retry_fail', dict(measure=404, post_resource=409, metric=None,
                             measure_retry=500, patch_resource=None)),
         ('measure_fail', dict(measure=500, post_resource=None, metric=None,
                               measure_retry=None, patch_resource=None)),
-        ('measure_auth', dict(measure=401, post_resource=None, metric=None,
-                              measure_retry=None, patch_resource=204)),
     ]
 
     @classmethod
@@ -296,8 +282,6 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.conf.config(url='http://localhost:8041',
                          group='dispatcher_gnocchi')
         ks_client = mock.Mock()
-        ks_client.session.auth.get_access.return_value.auth_token = (
-            "fake_token")
         ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
         self.useFixture(mockpatch.Patch(
@@ -315,60 +299,33 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.sample['resource_id'] = str(uuid.uuid4()) + "/foobar"
 
     @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
-    @mock.patch('ceilometer.dispatcher.gnocchi_client.LOG')
-    @mock.patch('ceilometer.dispatcher.gnocchi_client.requests')
-    def test_workflow(self, fake_requests, client_logger, logger):
+    @mock.patch('gnocchiclient.v1.client.Client')
+    def test_workflow(self, fakeclient_cls, logger):
         self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
 
-        base_url = self.dispatcher.conf.dispatcher_gnocchi.url
-        url_params = {
-            'url': urlparse.urljoin(base_url, '/v1/resource'),
-            # NOTE(sileht): we don't use urlparse.quote here
-            # to ensure / is converted in %2F
-            'resource_id': self.sample['resource_id'].replace("/", "%2F"),
-            'resource_type': self.resource_type,
-            'metric_name': self.sample['counter_name']
-        }
-        headers = {'Content-Type': 'application/json',
-                   'X-Auth-Token': 'fake_token'}
+        fakeclient = fakeclient_cls.return_value
 
-        patch_responses = []
-        post_responses = []
+        # FIXME(sileht): we don't use urlparse.quote here
+        # to ensure / is converted in %2F
+        # temporary disabled until we find a solution
+        # on gnocchi side. Current gnocchiclient doesn't
+        # encode the resource_id
+        resource_id = self.sample['resource_id']  # .replace("/", "%2F"),
+        metric_name = self.sample['counter_name']
 
-        # This is needed to mock Exception in py3
-        fake_requests.ConnectionError = requests.ConnectionError
+        expected_calls = [mock.call.metric.add_measures(
+            metric_name, self.measures_attributes, resource_id)]
 
-        expected_calls = [
-            mock.call.session(),
-            mock.call.adapters.HTTPAdapter(pool_block=True),
-            mock.call.session().mount('http://', mock.ANY),
-            mock.call.session().mount('https://', mock.ANY),
-            mock.call.session().post(
-                "%(url)s/%(resource_type)s/%(resource_id)s/"
-                "metric/%(metric_name)s/measures" % url_params,
-                headers=headers,
-                data=json_matcher(self.measures_attributes))
+        add_measures_side_effect = []
 
-        ]
-        post_responses.append(MockResponse(self.measure))
-
-        if self.measure == 401:
-
-            type(self.ks_client.session.auth.get_access.return_value
-                 ).auth_token = (mock.PropertyMock(
-                     side_effect=['fake_token', 'new_token', 'new_token',
-                                  'new_token', 'new_token']))
-            headers = {'Content-Type': 'application/json',
-                       'X-Auth-Token': 'new_token'}
-
-            expected_calls.append(
-                mock.call.session().post(
-                    "%(url)s/%(resource_type)s/%(resource_id)s/"
-                    "metric/%(metric_name)s/measures" % url_params,
-                    headers=headers,
-                    data=json_matcher(self.measures_attributes)))
-
-            post_responses.append(MockResponse(200))
+        if self.measure == 404 and self.post_resource:
+            add_measures_side_effect += [
+                gnocchi_exc.ResourceNotFound(404)]
+        elif self.measure == 404 and self.metric:
+            add_measures_side_effect += [
+                gnocchi_exc.MetricNotFound(404)]
+        elif self.measure == 500:
+            add_measures_side_effect += [Exception('boom!')]
 
         if self.post_resource:
             attributes = self.postable_attributes.copy()
@@ -376,79 +333,65 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             attributes['id'] = self.sample['resource_id']
             attributes['metrics'] = dict((metric_name, {})
                                          for metric_name in self.metric_names)
-            expected_calls.append(mock.call.session().post(
-                "%(url)s/%(resource_type)s" % url_params,
-                headers=headers,
-                data=json_matcher(attributes)),
-            )
-            post_responses.append(MockResponse(self.post_resource))
+            expected_calls.append(mock.call.resource.create(
+                self.resource_type, attributes))
+            if self.post_resource == 409:
+                fakeclient.resource.create.side_effect = [
+                    gnocchi_exc.ResourceAlreadyExists(409)]
+            elif self.post_resource == 500:
+                fakeclient.resource.create.side_effect = [Exception('boom!')]
 
         if self.metric:
-            expected_calls.append(mock.call.session().post(
-                "%(url)s/%(resource_type)s/%(resource_id)s/metric"
-                % url_params,
-                headers=headers,
-                data=json_matcher({self.sample['counter_name']: {}})
-            ))
-            post_responses.append(MockResponse(self.metric))
+            expected_calls.append(mock.call.metric.create({
+                'name': self.sample['counter_name'],
+                'resource_id': resource_id}))
+            if self.metric == 409:
+                fakeclient.metric.create.side_effect = [
+                    gnocchi_exc.NamedMetricAreadyExists(409)]
+            elif self.metric == 500:
+                fakeclient.metric.create.side_effect = [Exception('boom!')]
 
         if self.measure_retry:
-            expected_calls.append(mock.call.session().post(
-                "%(url)s/%(resource_type)s/%(resource_id)s/"
-                "metric/%(metric_name)s/measures" % url_params,
-                headers=headers,
-                data=json_matcher(self.measures_attributes))
-            )
-            post_responses.append(MockResponse(self.measure_retry))
+            expected_calls.append(mock.call.metric.add_measures(
+                metric_name,
+                self.measures_attributes,
+                resource_id))
+            if self.measure_retry == 204:
+                add_measures_side_effect += [None]
+            elif self.measure_retry == 500:
+                add_measures_side_effect += [
+                    Exception('boom!')]
+        else:
+            add_measures_side_effect += [None]
 
         if self.patch_resource and self.patchable_attributes:
-            expected_calls.append(mock.call.session().patch(
-                "%(url)s/%(resource_type)s/%(resource_id)s" % url_params,
-                headers=headers,
-                data=json_matcher(self.patchable_attributes)),
-            )
-            patch_responses.append(MockResponse(self.patch_resource))
+            expected_calls.append(mock.call.resource.update(
+                self.resource_type, resource_id,
+                self.patchable_attributes))
+            if self.patch_resource == 500:
+                fakeclient.resource.update.side_effect = [Exception('boom!')]
 
-        s = fake_requests.session.return_value
-        s.patch.side_effect = patch_responses
-        s.post.side_effect = post_responses
+        fakeclient.metric.add_measures.side_effect = add_measures_side_effect
 
         self.dispatcher.record_metering_data([self.sample])
 
         # Check that the last log message is the expected one
-        if self.measure == 500 or self.measure_retry == 500:
-            logger.error.assert_called_with(
-                "Fail to post measure on metric %s of resource %s "
-                "with status: %d: Internal Server Error" %
-                (self.sample['counter_name'],
-                 self.sample['resource_id'],
-                 500))
-
-        elif self.post_resource == 500 or (self.patch_resource == 500 and
-                                           self.patchable_attributes):
-            logger.error.assert_called_with(
-                "Resource %s %s failed with status: "
-                "%d: Internal Server Error" %
-                (self.sample['resource_id'],
-                 'update' if self.patch_resource else 'creation',
-                 500))
-        elif self.metric == 500:
-            logger.error.assert_called_with(
-                "Fail to create metric %s of resource %s "
-                "with status: %d: Internal Server Error" %
-                (self.sample['counter_name'],
-                 self.sample['resource_id'],
-                 500))
+        if (self.measure == 500 or self.measure_retry == 500 or
+                self.metric == 500 or self.post_resource == 500 or
+                (self.patch_resource == 500 and self.patchable_attributes)):
+            logger.error.assert_called_with('boom!', exc_info=True)
         elif self.patch_resource == 204 and self.patchable_attributes:
-            client_logger.debug.assert_called_with(
+            logger.debug.assert_called_with(
                 'Resource %s updated', self.sample['resource_id'])
+            self.assertEqual(0, logger.error.call_count)
         elif self.measure == 200:
-            client_logger.debug.assert_called_with(
+            logger.debug.assert_called_with(
                 "Measure posted on metric %s of resource %s",
                 self.sample['counter_name'],
                 self.sample['resource_id'])
+            self.assertEqual(0, logger.error.call_count)
 
-        self.assertEqual(expected_calls, fake_requests.mock_calls)
+        self.assertEqual(expected_calls, fakeclient.mock_calls)
 
 
 DispatcherWorkflowTest.generate_scenarios()
