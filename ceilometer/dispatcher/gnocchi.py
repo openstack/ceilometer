@@ -12,6 +12,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from hashlib import md5
 import itertools
 import operator
 import os
@@ -33,7 +34,8 @@ from ceilometer.i18n import _, _LE, _LW
 from ceilometer import keystone_client
 from ceilometer import utils
 
-CACHE_NAMESPACE = uuid.uuid4()
+NAME_ENCODED = __name__.encode('utf-8')
+CACHE_NAMESPACE = uuid.UUID(bytes=md5(NAME_ENCODED).digest())
 LOG = log.getLogger(__name__)
 
 dispatcher_opts = [
