@@ -294,6 +294,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 "id": resource_id,
                 "user_id": samples[0]['user_id'],
                 "project_id": samples[0]['project_id'],
+                "metrics": rd.metrics,
             }
             measures = []
 
@@ -310,7 +311,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                                                   resource_id)
             except gnocchi_exc.ResourceNotFound:
                 self._if_not_cached("create", resource_type, resource,
-                                    self._create_resource, rd.metrics)
+                                    self._create_resource)
 
             except gnocchi_exc.MetricNotFound:
                 metric = {'resource_id': resource['id'],
@@ -334,9 +335,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             self._if_not_cached("update", resource_type, resource,
                                 self._update_resource, resource_extra)
 
-    def _create_resource(self, resource_type, resource, metrics):
+    def _create_resource(self, resource_type, resource):
         try:
-            resource["metrics"] = metrics
             self._gnocchi.resource.create(resource_type, resource)
             LOG.debug('Resource %s created', resource["id"])
         except gnocchi_exc.ResourceAlreadyExists:
@@ -365,8 +365,9 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
 
     def _check_resource_cache(self, key, resource_data):
         cached_hash = self.cache.get(key)
-        if cached_hash:
-            attribute_hash = hash(frozenset(resource_data.items()))
-            if cached_hash != attribute_hash:
-                return attribute_hash
-        return None
+        attribute_hash = hash(frozenset(filter(lambda x: x[0] != "metrics",
+                                               resource_data.items())))
+        if not cached_hash or cached_hash != attribute_hash:
+            return attribute_hash
+        else:
+            return None
