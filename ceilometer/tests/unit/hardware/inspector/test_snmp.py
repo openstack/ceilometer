@@ -29,7 +29,7 @@ class FakeObjectName(object):
     def __init__(self, name):
         self.name = name
 
-    def prettyPrint(self):
+    def __str__(self):
         return str(self.name)
 
 
