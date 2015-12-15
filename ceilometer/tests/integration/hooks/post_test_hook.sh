@@ -53,6 +53,9 @@ set +e
 sudo -E -H -u ${STACK_USER:-${USER}} tox -eintegration
 EXIT_CODE=$?
 
+echo "* Message queue status:"
+sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
+
 if [ $EXIT_CODE -ne 0 ] ; then
     set +x
     echo "* Heat stack:"
