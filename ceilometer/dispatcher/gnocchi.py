@@ -392,8 +392,17 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             attribute_hash = self._check_resource_cache(cache_key, resource)
             if attribute_hash:
                 with self._gnocchi_resource_lock[cache_key]:
-                    method(resource_type, resource, *args, **kwargs)
-                    self.cache.set(cache_key, attribute_hash)
+                    # NOTE(luogangyi): there is a possibility that the
+                    # resource was already built in cache by another
+                    # ceilometer-collector when we get the lock here.
+                    attribute_hash = self._check_resource_cache(cache_key,
+                                                                resource)
+                    if attribute_hash:
+                        method(resource_type, resource, *args, **kwargs)
+                        self.cache.set(cache_key, attribute_hash)
+                    else:
+                        LOG.debug('resource cache recheck hit for '
+                                  '%s %s', operation, cache_key)
                 self._gnocchi_resource_lock.pop(cache_key, None)
             else:
                 LOG.debug('Resource cache hit for %s %s', operation, cache_key)
