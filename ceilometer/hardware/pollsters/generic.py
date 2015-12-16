@@ -14,9 +14,7 @@
 # under the License.
 
 import itertools
-import os
 import pkg_resources
-import yaml
 
 from oslo_config import cfg
 from oslo_log import log
@@ -24,9 +22,10 @@ from oslo_utils import netutils
 import six
 
 from ceilometer.agent import plugin_base
+from ceilometer import declarative
 from ceilometer.hardware import inspector as insloader
 from ceilometer.hardware.pollsters import util
-from ceilometer.i18n import _LE, _LI, _LW
+from ceilometer.i18n import _LE, _LW
 from ceilometer import sample
 
 OPTS = [
@@ -205,7 +204,10 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
     @classmethod
     def build_pollsters(cls):
         if not cls.mapping:
-            cls.mapping = load_definition(setup_meters_config())
+            definition_cfg = declarative.load_definitions(
+                {}, cfg.CONF.hardware.meter_definitions_file,
+                pkg_resources.resource_filename(__name__, "data/snmp.yaml"))
+            cls.mapping = load_definition(definition_cfg)
 
         pollsters = []
         for name in cls.mapping:
@@ -213,46 +215,6 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
             pollster._update_meter_definition(cls.mapping[name])
             pollsters.append((name, pollster))
         return pollsters
-
-
-def get_config_file():
-    config_file = cfg.CONF.hardware.meter_definitions_file
-    if not os.path.exists(config_file):
-        config_file = cfg.CONF.find_file(config_file)
-    if not config_file:
-        config_file = pkg_resources.resource_filename(
-            __name__, "data/snmp.yaml")
-    return config_file
-
-
-def setup_meters_config():
-    """load the meters definitions from yaml config file."""
-    config_file = get_config_file()
-
-    LOG.debug("Hardware snmp meter definition file: %s" % config_file)
-    with open(config_file) as cf:
-        config = cf.read()
-
-    try:
-        meters_config = yaml.safe_load(config)
-    except yaml.YAMLError as err:
-        if hasattr(err, 'problem_mark'):
-            mark = err.problem_mark
-            errmsg = (_LE("Invalid YAML syntax in Meter Definitions file "
-                      "%(file)s at line: %(line)s, column: %(column)s.")
-                      % dict(file=config_file,
-                             line=mark.line + 1,
-                             column=mark.column + 1))
-        else:
-            errmsg = (_LE("YAML error reading Meter Definitions file "
-                      "%(file)s")
-                      % dict(file=config_file))
-        LOG.error(errmsg)
-        raise
-
-    LOG.info(_LI("Meter Definitions: %s") % meters_config)
-
-    return meters_config
 
 
 def load_definition(config_def):

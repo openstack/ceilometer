@@ -21,6 +21,7 @@ from oslo_config import fixture as fixture_config
 from oslo_utils import fileutils
 from oslotest import mockpatch
 
+from ceilometer import declarative
 from ceilometer.hardware.inspector import base as inspector_base
 from ceilometer.hardware.pollsters import generic
 from ceilometer import sample
@@ -116,12 +117,6 @@ class TestGenericPollsters(test_base.BaseTestCase):
         ceilometer_service.prepare_service(argv=[], config_files=[])
         self.pollster = generic.GenericHardwareDeclarativePollster()
 
-    def test_fallback_meter_path(self):
-        self.useFixture(mockpatch.PatchObject(self.conf,
-                        'find_file', return_value=None))
-        fall_bak_path = generic.get_config_file()
-        self.assertIn("hardware/pollsters/data/snmp.yaml", fall_bak_path)
-
     def __setup_meter_def_file(self, cfg):
         if six.PY3:
             cfg = cfg.encode('utf-8')
@@ -131,7 +126,8 @@ class TestGenericPollsters(test_base.BaseTestCase):
         self.conf.set_override(
             'meter_definitions_file',
             meter_cfg_file, group='hardware')
-        cfg = generic.setup_meters_config()
+        cfg = declarative.load_definitions(
+            {}, self.conf.hardware.meter_definitions_file)
         return cfg
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
