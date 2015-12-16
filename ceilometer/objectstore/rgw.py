@@ -15,7 +15,7 @@
 """Common code for working with ceph object stores
 """
 
-from keystoneclient import exceptions
+from keystoneauth1 import exceptions
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
