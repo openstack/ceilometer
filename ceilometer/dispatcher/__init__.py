@@ -37,6 +37,19 @@ OPTS = [
 ]
 cfg.CONF.register_opts(OPTS)
 
+STORAGE_OPTS = [
+    cfg.IntOpt('max_retries',
+               default=10,
+               deprecated_group='database',
+               help='Maximum number of connection retries during startup. '
+                    'Set to -1 to specify an infinite retry count.'),
+    cfg.IntOpt('retry_interval',
+               default=10,
+               deprecated_group='database',
+               help='Interval (in seconds) between retries of connection.'),
+]
+cfg.CONF.register_opts(STORAGE_OPTS, group='storage')
+
 
 def _load_dispatcher_manager(dispatcher_type):
     namespace = 'ceilometer.dispatcher.%s' % dispatcher_type

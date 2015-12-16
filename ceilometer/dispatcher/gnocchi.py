@@ -26,6 +26,7 @@ from keystoneauth1 import session as ka_session
 from oslo_config import cfg
 from oslo_log import log
 import requests
+import retrying
 import six
 from stevedore import extension
 
@@ -220,6 +221,20 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
         self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
         self._gnocchi = GnocchiClient(conf)
+        # Convert retry_interval secs to msecs for retry decorator
+        retries = conf.storage.max_retries
+
+        @retrying.retry(wait_fixed=conf.storage.retry_interval * 1000,
+                        stop_max_attempt_number=(retries if retries >= 0
+                                                 else None))
+        def _get_connection():
+            self._gnocchi.capabilities.list()
+
+        try:
+            _get_connection()
+        except Exception:
+            LOG.error(_LE('Failed to connect to Gnocchi.'))
+            raise
 
     @staticmethod
     def _get_config_file(conf, config_file):
