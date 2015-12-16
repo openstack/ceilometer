@@ -57,6 +57,13 @@ class Connection(pymongo_base.Connection):
         if 'event' not in self.db.conn.collection_names():
             self.db.conn.create_collection('event')
         # Establish indexes
+        # NOTE(idegtiarov): This indexes cover get_events, get_event_types, and
+        # get_trait_types requests based on event_type and timestamp fields.
+        self.db.event.create_index(
+            [('event_type', pymongo.ASCENDING),
+             ('timestamp', pymongo.ASCENDING)],
+            name='event_type_idx'
+        )
         ttl = cfg.CONF.database.event_time_to_live
         impl_mongodb.Connection.update_ttl(ttl, 'event_ttl', 'timestamp',
                                            self.db.event)
