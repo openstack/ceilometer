@@ -16,7 +16,7 @@
 
 import collections
 
-from keystoneclient import exceptions
+from keystoneauth1 import exceptions
 import mock
 from oslotest import base
 from oslotest import mockpatch

@@ -14,7 +14,7 @@
 
 import datetime
 
-from keystoneclient import exceptions
+from keystoneauth1 import exceptions
 from oslo_config import cfg
 from oslo_log import log
 import requests

@@ -14,7 +14,7 @@
 
 import datetime
 
-from keystoneclient import exceptions
+from keystoneauth1 import exceptions
 import mock
 from oslo_context import context
 from oslotest import base
