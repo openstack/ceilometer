@@ -104,7 +104,6 @@ def list_opts():
         ('polling', ceilometer.agent.manager.OPTS),
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
-        ('publisher_rpc', ceilometer.publisher.messaging.RPC_OPTS),
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
         # NOTE(sileht): the configuration file contains only the options
         # for the password plugin that handles keystone v2 and v3 API

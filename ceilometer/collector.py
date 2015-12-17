@@ -45,16 +45,9 @@ OPTS = [
                 default=False,
                 help='Requeue the event on the collector event queue '
                 'when the collector fails to dispatch it.'),
-    cfg.BoolOpt('enable_rpc',
-                default=False,
-                help='Enable the RPC functionality of collector. This '
-                'functionality is now deprecated in favour of notifier '
-                'publisher and queues.')
 ]
 
 cfg.CONF.register_opts(OPTS, group="collector")
-cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
-                    group='publisher_rpc')
 cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')
 cfg.CONF.import_opt('event_topic', 'ceilometer.publisher.messaging',
@@ -73,7 +66,6 @@ class CollectorService(os_service.Service):
         # ensure dispatcher is configured before starting other services
         dispatcher_managers = dispatcher.load_dispatcher_manager()
         (self.meter_manager, self.event_manager) = dispatcher_managers
-        self.rpc_server = None
         self.sample_listener = None
         self.event_listener = None
         super(CollectorService, self).start()
@@ -83,12 +75,6 @@ class CollectorService(os_service.Service):
 
         transport = messaging.get_transport(optional=True)
         if transport:
-            if cfg.CONF.collector.enable_rpc:
-                LOG.warning('RPC collector is deprecated in favour of queues. '
-                            'Please switch to notifier publisher.')
-                self.rpc_server = messaging.get_rpc_server(
-                    transport, cfg.CONF.publisher_rpc.metering_topic, self)
-
             if list(self.meter_manager):
                 sample_target = oslo_messaging.Target(
                     topic=cfg.CONF.publisher_notifier.metering_topic)
@@ -108,9 +94,6 @@ class CollectorService(os_service.Service):
                     allow_requeue=(cfg.CONF.collector.
                                    requeue_event_on_dispatcher_error))
                 self.event_listener.start()
-
-            if cfg.CONF.collector.enable_rpc:
-                self.rpc_server.start()
 
             if not cfg.CONF.collector.udp_address:
                 # Add a dummy thread to have wait() working
@@ -144,8 +127,6 @@ class CollectorService(os_service.Service):
 
     def stop(self):
         self.udp_run = False
-        if cfg.CONF.collector.enable_rpc and self.rpc_server:
-            self.rpc_server.stop()
         if self.sample_listener:
             utils.kill_listeners([self.sample_listener])
         if self.event_listener:

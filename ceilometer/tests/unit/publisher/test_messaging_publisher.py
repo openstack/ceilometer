@@ -19,12 +19,10 @@ import uuid
 
 import mock
 from oslo_config import fixture as fixture_config
-from oslo_context import context
 from oslo_utils import netutils
 import testscenarios.testcase
 
 from ceilometer.event.storage import models as event
-from ceilometer import messaging
 from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
 from ceilometer.tests import base as tests_base
@@ -103,76 +101,6 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
         self.setup_messaging(self.CONF)
 
 
-class RpcOnlyPublisherTest(BasePublisherTestCase):
-    def test_published_no_mock(self):
-        publisher = msg_publisher.RPCPublisher(
-            netutils.urlsplit('rpc://'))
-
-        endpoint = mock.MagicMock(['record_metering_data'])
-        collector = messaging.get_rpc_server(
-            self.transport, self.CONF.publisher_rpc.metering_topic, endpoint)
-        endpoint.record_metering_data.side_effect = (lambda *args, **kwds:
-                                                     collector.stop())
-
-        collector.start()
-        publisher.publish_samples(context.RequestContext(),
-                                  self.test_sample_data)
-        collector.wait()
-
-        class Matcher(object):
-            @staticmethod
-            def __eq__(data):
-                for i, sample_item in enumerate(data):
-                    if (sample_item['counter_name'] !=
-                            self.test_sample_data[i].name):
-                        return False
-                return True
-
-        endpoint.record_metering_data.assert_called_once_with(
-            mock.ANY, data=Matcher())
-
-    def test_publish_target(self):
-        publisher = msg_publisher.RPCPublisher(
-            netutils.urlsplit('rpc://?target=custom_procedure_call'))
-        cast_context = mock.MagicMock()
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            prepare.return_value = cast_context
-            publisher.publish_samples(mock.MagicMock(),
-                                      self.test_sample_data)
-
-        prepare.assert_called_once_with(
-            topic=self.CONF.publisher_rpc.metering_topic)
-        cast_context.cast.assert_called_once_with(
-            mock.ANY, 'custom_procedure_call', data=mock.ANY)
-
-    def test_published_with_per_meter_topic(self):
-        publisher = msg_publisher.RPCPublisher(
-            netutils.urlsplit('rpc://?per_meter_topic=1'))
-        with mock.patch.object(publisher.rpc_client, 'prepare') as prepare:
-            publisher.publish_samples(mock.MagicMock(),
-                                      self.test_sample_data)
-
-            class MeterGroupMatcher(object):
-                def __eq__(self, meters):
-                    return len(set(meter['counter_name']
-                                   for meter in meters)) == 1
-
-            topic = self.CONF.publisher_rpc.metering_topic
-            expected = [mock.call(topic=topic),
-                        mock.call().cast(mock.ANY, 'record_metering_data',
-                                         data=mock.ANY),
-                        mock.call(topic=topic + '.test'),
-                        mock.call().cast(mock.ANY, 'record_metering_data',
-                                         data=MeterGroupMatcher()),
-                        mock.call(topic=topic + '.test2'),
-                        mock.call().cast(mock.ANY, 'record_metering_data',
-                                         data=MeterGroupMatcher()),
-                        mock.call(topic=topic + '.test3'),
-                        mock.call().cast(mock.ANY, 'record_metering_data',
-                                         data=MeterGroupMatcher())]
-            self.assertEqual(expected, prepare.mock_calls)
-
-
 class NotifierOnlyPublisherTest(BasePublisherTestCase):
 
     @mock.patch('oslo_messaging.Notifier')
@@ -203,17 +131,13 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
               publisher_cls=msg_publisher.EventNotifierPublisher,
               test_data=BasePublisherTestCase.test_event_data,
               pub_func='publish_events', attr='event_type')),
-        ('rpc', dict(protocol="rpc",
-                     publisher_cls=msg_publisher.RPCPublisher,
-                     test_data=BasePublisherTestCase.test_sample_data,
-                     pub_func='publish_samples', attr='source')),
     ]
 
     def setUp(self):
         super(TestPublisher, self).setUp()
         self.topic = (self.CONF.publisher_notifier.event_topic
                       if self.pub_func == 'publish_events' else
-                      self.CONF.publisher_rpc.metering_topic)
+                      self.CONF.publisher_notifier.metering_topic)
 
 
 class TestPublisherPolicy(TestPublisher):
