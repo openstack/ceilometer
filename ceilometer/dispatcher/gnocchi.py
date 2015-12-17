@@ -16,7 +16,6 @@ from collections import defaultdict
 from hashlib import md5
 import itertools
 import operator
-import os
 import threading
 import uuid
 
@@ -235,12 +234,6 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
         except Exception:
             LOG.error(_LE('Failed to connect to Gnocchi.'))
             raise
-
-    @staticmethod
-    def _get_config_file(conf, config_file):
-        if not os.path.exists(config_file):
-            config_file = cfg.CONF.find_file(config_file)
-        return config_file
 
     @classmethod
     def _load_resources_definitions(cls, conf):
