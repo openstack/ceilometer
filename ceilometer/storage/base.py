@@ -194,7 +194,7 @@ class Connection(object):
 
     @staticmethod
     def get_meters(user=None, project=None, resource=None, source=None,
-                   metaquery=None, limit=None):
+                   metaquery=None, limit=None, unique=False):
         """Return an iterable of model.Meter instances.
 
         Iterable items containing meter information.
@@ -204,6 +204,7 @@ class Connection(object):
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
         :param limit: Maximum number of results to return.
+        :param unique: If set to true, return only unique meter information.
         """
         raise ceilometer.NotImplementedError('Meters not implemented')
 

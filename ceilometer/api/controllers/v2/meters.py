@@ -477,11 +477,12 @@ class MetersController(rest.RestController):
     def _lookup(self, meter_name, *remainder):
         return MeterController(meter_name), remainder
 
-    @wsme_pecan.wsexpose([Meter], [base.Query], int)
-    def get_all(self, q=None, limit=None):
+    @wsme_pecan.wsexpose([Meter], [base.Query], int, str)
+    def get_all(self, q=None, limit=None, unique=''):
         """Return all known meters, based on the data recorded so far.
 
         :param q: Filter rules for the meters to be returned.
+        :param unique: flag to indicate unique meters to be returned.
         """
 
         rbac.enforce('get_meters', pecan.request)
@@ -494,5 +495,6 @@ class MetersController(rest.RestController):
             q, pecan.request.storage_conn.get_meters,
             ['limit'], allow_timestamps=False)
         return [Meter.from_db_model(m)
-                for m in pecan.request.storage_conn.get_meters(limit=limit,
-                                                               **kwargs)]
+                for m in pecan.request.storage_conn.get_meters(
+                limit=limit, unique=strutils.bool_from_string(unique),
+                **kwargs)]
