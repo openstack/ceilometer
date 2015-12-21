@@ -94,9 +94,9 @@ class SNMPInspector(base.Inspector):
      GetRequest for oids of 'metadata'.
 
      For matching_type of PREFIX, SNMP request GetBulkRequest
-     would be send to get values for oids of 'metric_oid' and
+     would be sent to get values for oids of 'metric_oid' and
      'metadata' of each item in the above mapping. And each item might
-     return multiple (value, metadata, extra) tuple, e.g.
+     return multiple (value, metadata, extra) tuples, e.g.
      Suppose we have the following mapping:
      MAPPING = {
       'disk.size.total': {
@@ -133,7 +133,7 @@ class SNMPInspector(base.Inspector):
         self._cmdGen = cmdgen.CommandGenerator()
 
     def _query_oids(self, host, oids, cache, is_bulk):
-        # send GetRequest or GetBulkRequest to get oid values and
+        # send GetRequest or GetBulkRequest to get oids values and
         # populate the values into cache
         authData = self._get_auth_strategy(host)
         transport = cmdgen.UdpTransportTarget((host.hostname,
