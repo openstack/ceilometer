@@ -11,7 +11,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from keystoneclient import exceptions
 import mock
 from oslotest import mockpatch
 
@@ -43,7 +42,6 @@ class TestAPIUpgradePath(v2.FunctionalTest):
             return 'http://gnocchi/'
         elif service_type == 'alarming':
             return 'http://alarm-endpoint:8008/'
-        raise exceptions.EndpointNotFound()
 
     def _do_test_gnocchi_enabled_without_database_backend(self):
         self.CONF.set_override('meter_dispatchers', 'gnocchi')

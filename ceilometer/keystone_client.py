@@ -15,7 +15,6 @@
 
 import os
 
-
 from keystoneauth1 import exceptions as ka_exception
 from keystoneauth1 import identity as ka_identity
 from keystoneauth1 import loading as ka_loading
