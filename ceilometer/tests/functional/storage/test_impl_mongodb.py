@@ -38,16 +38,6 @@ class MongoDBConnection(tests_db.TestBase):
         conn = impl_mongodb.Connection(url)
         self.assertTrue(conn.conn)
 
-    def test_recurse_sort_keys(self):
-        sort_keys = ['k1', 'k2', 'k3']
-        marker = {'k1': 'v1', 'k2': 'v2', 'k3': 'v3'}
-        flag = '$lt'
-        ret = impl_mongodb.Connection._recurse_sort_keys(sort_keys=sort_keys,
-                                                         marker=marker,
-                                                         flag=flag)
-        expect = {'k3': {'$lt': 'v3'}, 'k2': {'eq': 'v2'}, 'k1': {'eq': 'v1'}}
-        self.assertEqual(expect, ret)
-
 
 @tests_db.run_with('mongodb')
 class IndexTest(tests_db.TestBase):
