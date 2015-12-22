@@ -166,7 +166,7 @@ class BitfieldTraitPlugin(TraitPluginBase):
                             value: set bit if corresponding field's value
                                    matches this. If value is not provided,
                                    bit will be set if the field exists (and
-                                   is non-null), regardless of it's value.
+                                   is non-null), regardless of its value.
 
         """
         self.initial_bitfield = initial_bitfield

@@ -397,7 +397,7 @@ function start_ceilometer {
         tail_log ceilometer-api /var/log/$APACHE_NAME/ceilometer_access.log
     fi
 
-    # run the the collector after restarting apache as it needs
+    # run the collector after restarting apache as it needs
     # operational keystone if using gnocchi
     run_process ceilometer-collector "$CEILOMETER_BIN_DIR/ceilometer-collector --config-file $CEILOMETER_CONF"
 
