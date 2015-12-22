@@ -314,38 +314,6 @@ class Connection(pymongo_base.Connection):
         LOG.debug("Clearing expired metering data is based on native "
                   "MongoDB time to live feature and going in background.")
 
-    @staticmethod
-    def _get_marker(db_collection, marker_pairs):
-        """Return the mark document according to the attribute-value pairs.
-
-        :param db_collection: Database collection that be query.
-        :param maker_pairs: Attribute-value pairs filter.
-        """
-        if db_collection is None:
-            return
-        if not marker_pairs:
-            return
-        ret = db_collection.find(marker_pairs, limit=2)
-
-        if ret.count() == 0:
-            raise base.NoResultFound
-        elif ret.count() > 1:
-            raise base.MultipleResultsFound
-        else:
-            _ret = ret.__getitem__(0)
-            return _ret
-
-    @classmethod
-    def _recurse_sort_keys(cls, sort_keys, marker, flag):
-        _first = sort_keys[0]
-        value = marker[_first]
-        if len(sort_keys) == 1:
-            return {_first: {flag: value}}
-        else:
-            criteria_equ = {_first: {'eq': value}}
-            criteria_cmp = cls._recurse_sort_keys(sort_keys[1:], marker, flag)
-        return dict(criteria_equ, ** criteria_cmp)
-
     @classmethod
     def _build_sort_instructions(cls, sort_keys=None, sort_dir='desc'):
         """Returns a sort_instruction and paging operator.
