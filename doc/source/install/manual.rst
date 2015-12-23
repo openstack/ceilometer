@@ -554,7 +554,7 @@ Ceilometer allows multiple topics to be configured so that polling agent can
 send the same messages of notifications to other queues. Notification agents
 also use **notification_topics** to configure which queue to listen for. If
 you use multiple topics, you should configure notification agent and polling
-agent seperately, otherwise Ceilometer collects duplicate samples.
+agent separately, otherwise Ceilometer collects duplicate samples.
 
 By default, the ceilometer.conf file is as follows::
 
@@ -564,7 +564,7 @@ By default, the ceilometer.conf file is as follows::
 To use multiple topics, you should give ceilometer-agent-notification and
 ceilometer-polling services different ceilometer.conf files. The Ceilometer
 configuration file ceilometer.conf is normally locate in the /etc/ceilometer
-directory. Make changes according to your requirments which may look like
+directory. Make changes according to your requirements which may look like
 the following::
 
 For notification agent using ceilometer-notification.conf, settings like::

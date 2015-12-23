@@ -55,9 +55,9 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
     metering data under a topic name, 'ceilometer'. If the port number is not
     specified, this Kafka Publisher will use 9092 as the broker's port.
     This publisher has transmit options such as queue, drop, and retry. These
-    this option is specified using policy field of URL parameter. When queue
+    options are specified using policy field of URL parameter. When queue
     option could be selected, local queue length can be determined using
-    max_queue_length field as well. When the transfer fails with with retry
+    max_queue_length field as well. When the transfer fails with retry
     option, try to resend the data as many times as specified in max_retry
     field. If max_retry is not specified, default the number of retry is 100.
     """
