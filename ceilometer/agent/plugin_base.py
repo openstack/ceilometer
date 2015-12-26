@@ -19,14 +19,11 @@ import abc
 import collections
 
 from oslo_context import context
-from oslo_log import log
 import oslo_messaging
 import six
 from stevedore import extension
 
 from ceilometer import messaging
-
-LOG = log.getLogger(__name__)
 
 ExchangeTopics = collections.namedtuple('ExchangeTopics',
                                         ['exchange', 'topics'])

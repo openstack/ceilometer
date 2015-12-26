@@ -23,13 +23,11 @@ if sys.platform == 'win32':
     import wmi
 
 from oslo_config import cfg
-from oslo_log import log as logging
 
 from ceilometer.compute.virt import inspector
 from ceilometer.i18n import _
 
 CONF = cfg.CONF
-LOG = logging.getLogger(__name__)
 
 
 class HyperVException(inspector.InspectorException):

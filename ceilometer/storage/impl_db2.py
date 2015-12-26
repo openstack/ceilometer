@@ -25,7 +25,6 @@ import sys
 import bson.code
 import bson.objectid
 from oslo_config import cfg
-from oslo_log import log
 from oslo_utils import timeutils
 import pymongo
 import six
@@ -37,8 +36,6 @@ from ceilometer.storage import models
 from ceilometer.storage.mongo import utils as pymongo_utils
 from ceilometer.storage import pymongo_base
 from ceilometer import utils
-
-LOG = log.getLogger(__name__)
 
 
 AVAILABLE_CAPABILITIES = {
