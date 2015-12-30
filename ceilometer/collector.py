@@ -116,7 +116,7 @@ class CollectorService(os_service.Service):
             try:
                 sample = msgpack.loads(data, encoding='utf-8')
             except Exception:
-                LOG.warn(_("UDP: Cannot decode data sent by %s"), source)
+                LOG.warning(_("UDP: Cannot decode data sent by %s"), source)
             else:
                 try:
                     LOG.debug("UDP: Storing %s", sample)

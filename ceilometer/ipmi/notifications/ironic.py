@@ -151,7 +151,7 @@ class SensorNotification(plugin_base.NotificationBase):
                         project_id=info['project_id'])
 
             except InvalidSensorData as exc:
-                LOG.warn(
+                LOG.warning(
                     'invalid sensor data for %(resource)s: %(error)s' %
                     dict(resource=resource_id, error=exc)
                 )

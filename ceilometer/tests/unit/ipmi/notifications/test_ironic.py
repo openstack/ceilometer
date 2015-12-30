@@ -150,7 +150,7 @@ class TestNotifications(base.BaseTestCase):
         processor = ipmi.TemperatureSensorNotification(None)
 
         messages = []
-        mylog.warn = lambda *args: messages.extend(args)
+        mylog.warning = lambda *args: messages.extend(args)
 
         list(processor.process_notification(ipmi_test_data.MISSING_SENSOR))
 
@@ -166,7 +166,7 @@ class TestNotifications(base.BaseTestCase):
         processor = ipmi.TemperatureSensorNotification(None)
 
         messages = []
-        mylog.warn = lambda *args: messages.extend(args)
+        mylog.warning = lambda *args: messages.extend(args)
 
         list(processor.process_notification(ipmi_test_data.BAD_SENSOR))
 
@@ -187,7 +187,7 @@ class TestNotifications(base.BaseTestCase):
         processor = ipmi.TemperatureSensorNotification(None)
 
         messages = []
-        mylog.warn = lambda *args: messages.extend(args)
+        mylog.warning = lambda *args: messages.extend(args)
 
         list(processor.process_notification(ipmi_test_data.NO_NODE_ID))
 
@@ -203,7 +203,7 @@ class TestNotifications(base.BaseTestCase):
         processor = ipmi.TemperatureSensorNotification(None)
 
         messages = []
-        mylog.warn = lambda *args: messages.extend(args)
+        mylog.warning = lambda *args: messages.extend(args)
 
         list(processor.process_notification(ipmi_test_data.NO_SENSOR_ID))
 

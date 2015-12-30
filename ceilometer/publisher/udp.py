@@ -64,7 +64,7 @@ class UDPPublisher(publisher.PublisherBase):
                 self.socket.sendto(msgpack.dumps(msg),
                                    (self.host, self.port))
             except Exception as e:
-                LOG.warn(_("Unable to send sample over UDP"))
+                LOG.warning(_("Unable to send sample over UDP"))
                 LOG.exception(e)
 
     def publish_events(self, context, events):

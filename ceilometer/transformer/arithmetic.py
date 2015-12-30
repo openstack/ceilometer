@@ -54,8 +54,8 @@ class ArithmeticTransformer(transformer.TransformerBase):
             self.cache = collections.defaultdict(dict)
             self.latest_timestamp = None
         else:
-            LOG.warn(_('Arithmetic transformer must use at least one'
-                       ' meter in expression \'%s\''), self.expr)
+            LOG.warning(_('Arithmetic transformer must use at least one'
+                        ' meter in expression \'%s\''), self.expr)
 
     def _update_cache(self, _sample):
         """Update the cache with the latest sample."""
@@ -92,8 +92,8 @@ class ArithmeticTransformer(transformer.TransformerBase):
                 resource_metadata=reference_sample.resource_metadata
             )
         except Exception as e:
-            LOG.warn(_('Unable to evaluate expression %(expr)s: %(exc)s'),
-                     {'expr': self.expr, 'exc': e})
+            LOG.warning(_('Unable to evaluate expression %(expr)s: %(exc)s'),
+                        {'expr': self.expr, 'exc': e})
 
     def handle_sample(self, context, _sample):
         self._update_cache(_sample)

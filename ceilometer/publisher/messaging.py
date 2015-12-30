@@ -92,8 +92,8 @@ class MessagingPublisher(publisher.PublisherBase):
         if self.policy in ['default', 'queue', 'drop']:
             LOG.info(_LI('Publishing policy set to %s') % self.policy)
         else:
-            LOG.warn(_('Publishing policy is unknown (%s) force to default')
-                     % self.policy)
+            LOG.warning(_('Publishing policy is unknown (%s) force to '
+                          'default') % self.policy)
             self.policy = 'default'
 
         self.retry = 1 if self.policy in ['queue', 'drop'] else None
@@ -144,8 +144,8 @@ class MessagingPublisher(publisher.PublisherBase):
         if queue_length > self.max_queue_length > 0:
             count = queue_length - self.max_queue_length
             self.local_queue = self.local_queue[count:]
-            LOG.warn(_("Publisher max local_queue length is exceeded, "
-                     "dropping %d oldest samples") % count)
+            LOG.warning(_("Publisher max local_queue length is exceeded, "
+                        "dropping %d oldest samples") % count)
 
     def _process_queue(self, queue, policy):
         current_retry = 0
@@ -156,12 +156,12 @@ class MessagingPublisher(publisher.PublisherBase):
             except DeliveryFailure:
                 data = sum([len(m) for __, __, m in queue])
                 if policy == 'queue':
-                    LOG.warn(_("Failed to publish %d datapoints, queue them"),
-                             data)
+                    LOG.warning(_("Failed to publish %d datapoints, queue "
+                                  "them"), data)
                     return queue
                 elif policy == 'drop':
-                    LOG.warn(_("Failed to publish %d datapoints, "
-                               "dropping them"), data)
+                    LOG.warning(_("Failed to publish %d datapoints, "
+                                "dropping them"), data)
                     return []
                 current_retry += 1
                 if current_retry >= self.max_retry:

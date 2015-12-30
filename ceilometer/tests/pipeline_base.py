@@ -1157,7 +1157,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
         cpu_util_sample = publisher.samples[0]
         self.assertEqual(12.5, cpu_util_sample.volume)
-        the_log.warn.assert_called_with(
+        the_log.warning.assert_called_with(
             'dropping out of time order sample: %s',
             (counters[1],)
         )
@@ -1523,7 +1523,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             'target': {'name': 'aggregated-bytes'}
         }, expected_length=1)
         s = samples[0]
-        self.assertTrue(mylog.warn.called)
+        self.assertTrue(mylog.warning.called)
         self.assertEqual('aggregated-bytes', s.name)
         self.assertEqual(154, s.volume)
         self.assertEqual('test_user_bis', s.user_id)

@@ -45,9 +45,9 @@ class FirewallPollster(base.BaseServicesPollster):
             status = self.get_status_id(fw['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warn(_("Unknown status %(stat)s received on fw %(id)s,"
-                           "skipping sample") % {'stat': fw['status'],
-                                                 'id': fw['id']})
+                LOG.warning(_("Unknown status %(stat)s received on fw %(id)s,"
+                            "skipping sample") % {'stat': fw['status'],
+                                                  'id': fw['id']})
                 continue
 
             yield sample.Sample(
