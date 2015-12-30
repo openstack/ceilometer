@@ -245,6 +245,17 @@ function _ceilometer_configure_storage_backend {
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
+    elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
+        gnocchi_url=$(gnocchi_service_url)
+        iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
+        iniset $CEILOMETER_CONF dispatcher_gnocchi url $gnocchi_url
+        iniset $CEILOMETER_CONF dispatcher_gnocchi archive_policy ${GNOCCHI_ARCHIVE_POLICY}
+        if is_service_enabled swift && [[ "$GNOCCHI_STORAGE_BACKEND" = 'swift' ]] ; then
+            iniset $CEILOMETER_CONF dispatcher_gnocchi filter_service_activity "True"
+            iniset $CEILOMETER_CONF dispatcher_gnocchi filter_project "gnocchi_swift"
+        else
+            iniset $CEILOMETER_CONF dispatcher_gnocchi filter_service_activity "False"
+        fi
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
