@@ -292,7 +292,7 @@ class LBBytesInPollster(_LBStatsPollster):
         return make_sample_from_pool(
             pool,
             name='network.services.lb.incoming.bytes',
-            type=sample.TYPE_CUMULATIVE,
+            type=sample.TYPE_GAUGE,
             unit='B',
             volume=data.bytes_in,
         )
@@ -306,7 +306,7 @@ class LBBytesOutPollster(_LBStatsPollster):
         return make_sample_from_pool(
             pool,
             name='network.services.lb.outgoing.bytes',
-            type=sample.TYPE_CUMULATIVE,
+            type=sample.TYPE_GAUGE,
             unit='B',
             volume=data.bytes_out,
         )

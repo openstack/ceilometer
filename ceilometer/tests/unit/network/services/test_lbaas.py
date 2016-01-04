@@ -496,9 +496,9 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     def test_lb_incoming_bytes(self):
         self._check_get_samples(lbaas.LBBytesInPollster,
                                 'network.services.lb.incoming.bytes',
-                                1, 'cumulative')
+                                1, 'gauge')
 
     def test_lb_outgoing_bytes(self):
         self._check_get_samples(lbaas.LBBytesOutPollster,
                                 'network.services.lb.outgoing.bytes',
-                                3, 'cumulative')
+                                3, 'gauge')
