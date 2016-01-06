@@ -247,6 +247,9 @@ class AggregatorTransformer(ScalingTransformer):
         self.counts = collections.defaultdict(int)
         self.size = int(size) if size else None
         self.retention_time = float(retention_time) if retention_time else None
+        if not (self.size or self.retention_time):
+            self.size = 1
+
         self.initial_timestamp = None
         self.aggregated_samples = 0
 
@@ -309,7 +312,7 @@ class AggregatorTransformer(ScalingTransformer):
         expired = (self.retention_time and
                    timeutils.is_older_than(self.initial_timestamp,
                                            self.retention_time))
-        full = self.aggregated_samples >= self.size
+        full = self.size and self.aggregated_samples >= self.size
         if full or expired:
             x = list(self.samples.values())
             # gauge aggregates need to be averages
