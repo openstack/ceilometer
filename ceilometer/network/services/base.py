@@ -13,11 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_log import log
-
 from ceilometer.agent import plugin_base
-
-LOG = log.getLogger(__name__)
 
 
 # status map for converting metric status to volume int

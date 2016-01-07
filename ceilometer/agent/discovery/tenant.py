@@ -13,11 +13,8 @@
 # under the License.
 
 from oslo_config import cfg
-from oslo_log import log
 
 from ceilometer.agent import plugin_base as plugin
-
-LOG = log.getLogger(__name__)
 
 cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
 

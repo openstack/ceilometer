@@ -67,8 +67,6 @@ cfg.CONF.register_opt(COLL_OPT, 'collector')
 
 keystone_client.register_keystoneauth_opts(cfg.CONF)
 
-LOG = log.getLogger(__name__)
-
 
 def prepare_service(argv=None, config_files=None):
     oslo_i18n.enable_lazy()

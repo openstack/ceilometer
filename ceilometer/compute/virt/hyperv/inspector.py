@@ -14,7 +14,6 @@
 """Implementation of Inspector abstraction for Hyper-V"""
 
 from oslo_config import cfg
-from oslo_log import log
 from oslo_utils import units
 
 from ceilometer.compute.pollsters import util
@@ -23,7 +22,6 @@ from ceilometer.compute.virt import inspector as virt_inspector
 
 
 CONF = cfg.CONF
-LOG = log.getLogger(__name__)
 
 
 class HyperVInspector(virt_inspector.Inspector):

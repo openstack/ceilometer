@@ -18,7 +18,6 @@
 """
 
 from oslo_config import cfg
-from oslo_log import log
 import oslo_messaging
 
 from ceilometer.agent import plugin_base
@@ -32,8 +31,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS)
-
-LOG = log.getLogger(__name__)
 
 
 class NetworkNotificationBase(plugin_base.NotificationBase):
