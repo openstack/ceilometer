@@ -46,9 +46,9 @@ class VPNServicesPollster(base.BaseServicesPollster):
             status = self.get_status_id(vpn['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warn(_("Unknown status %(stat)s received on vpn %(id)s,"
-                           "skipping sample") % {'stat': vpn['status'],
-                                                 'id': vpn['id']})
+                LOG.warning(_("Unknown status %(stat)s received on vpn "
+                              "%(id)s, skipping sample")
+                            % {'stat': vpn['status'], 'id': vpn['id']})
                 continue
 
             yield sample.Sample(

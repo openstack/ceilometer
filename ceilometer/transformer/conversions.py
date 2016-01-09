@@ -195,7 +195,7 @@ class RateOfChangeTransformer(ScalingTransformer):
             time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
             # disallow violations of the arrow of time
             if time_delta < 0:
-                LOG.warn(_('dropping out of time order sample: %s'), (s,))
+                LOG.warning(_('dropping out of time order sample: %s'), (s,))
                 # Reset the cache to the newer sample.
                 self.cache[key] = prev
                 return None
@@ -213,8 +213,8 @@ class RateOfChangeTransformer(ScalingTransformer):
             s = self._convert(s, rate_of_change)
             LOG.debug('converted to: %s', s)
         else:
-            LOG.warn(_('dropping sample with no predecessor: %s'),
-                     (s,))
+            LOG.warning(_('dropping sample with no predecessor: %s'),
+                        (s,))
             s = None
         return s
 
@@ -262,7 +262,7 @@ class AggregatorTransformer(ScalingTransformer):
         drop = ['drop'] if is_droppable else []
         if value or mandatory:
             if value not in ['last', 'first'] + drop:
-                LOG.warn('%s is unknown (%s), using last' % (name, value))
+                LOG.warning('%s is unknown (%s), using last' % (name, value))
                 value = 'last'
             self.merged_attribute_policy[name] = value
         else:

@@ -213,7 +213,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
         except ImportError:
             pass
         except oslo_cache.exception.ConfigurationError as exc:
-            LOG.warn(_LW('unable to configure oslo_cache: %s') % exc)
+            LOG.warning(_LW('unable to configure oslo_cache: %s') % exc)
 
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
@@ -312,8 +312,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             samples = list(samples)
             rd = self._get_resource_definition(metric_name)
             if rd is None:
-                LOG.warn("metric %s is not handled by gnocchi" %
-                         metric_name)
+                LOG.warning("metric %s is not handled by gnocchi" %
+                            metric_name)
                 continue
             if rd.cfg.get("ignore"):
                 continue

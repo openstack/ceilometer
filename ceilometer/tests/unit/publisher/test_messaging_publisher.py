@@ -185,7 +185,7 @@ class TestPublisherPolicy(TestPublisher):
                 msg_publisher.DeliveryFailure,
                 getattr(publisher, self.pub_func),
                 mock.MagicMock(), self.test_data)
-            self.assertTrue(mylog.warn.called)
+            self.assertTrue(mylog.warning.called)
             self.assertEqual('default', publisher.policy)
             self.assertEqual(0, len(publisher.local_queue))
             fake_send.assert_called_once_with(

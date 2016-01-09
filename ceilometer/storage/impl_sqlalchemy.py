@@ -307,8 +307,9 @@ class Connection(base.Connection):
                                     {'id': internal_id, 'meta_key': key,
                                      'value': v})
                             except KeyError:
-                                LOG.warn(_("Unknown metadata type. Key (%s) "
-                                         "will not be queryable."), key)
+                                LOG.warning(_("Unknown metadata type. Key "
+                                              "(%s) will not be queryable."),
+                                            key)
                         for _model in meta_map.keys():
                             conn.execute(_model.__table__.insert(),
                                          meta_map[_model])

@@ -116,10 +116,10 @@ def register_keystoneauth_opts(conf):
 
 def setup_keystoneauth(conf):
     if conf[CFG_GROUP].auth_type == "password-ceilometer-legacy":
-        LOG.warn("Value 'password-ceilometer-legacy' for '[%s]/auth_type' "
-                 "is deprecated. And will be removed in Ceilometer 7.0. "
-                 "Use 'password' instead.",
-                 CFG_GROUP)
+        LOG.warning("Value 'password-ceilometer-legacy' for '[%s]/auth_type' "
+                    "is deprecated. And will be removed in Ceilometer 7.0. "
+                    "Use 'password' instead.",
+                    CFG_GROUP)
 
     ka_loading.load_auth_from_conf_options(conf, CFG_GROUP)
 

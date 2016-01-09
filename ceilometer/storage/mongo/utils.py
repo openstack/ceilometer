@@ -266,8 +266,8 @@ class ConnectionPool(object):
         try:
             return MongoProxy(pymongo.MongoClient(url))
         except pymongo.errors.ConnectionFailure as e:
-            LOG.warn(_('Unable to connect to the database server: '
-                       '%(errmsg)s.') % {'errmsg': e})
+            LOG.warning(_('Unable to connect to the database server: '
+                        '%(errmsg)s.') % {'errmsg': e})
             raise
 
 
@@ -412,10 +412,10 @@ def safe_mongo_call(call):
                                 'after %(retries)d retries. Giving up.') %
                               {'retries': max_retries})
                     raise
-                LOG.warn(_('Unable to reconnect to the primary mongodb: '
-                           '%(errmsg)s. Trying again in %(retry_interval)d '
-                           'seconds.') %
-                         {'errmsg': err, 'retry_interval': retry_interval})
+                LOG.warning(_('Unable to reconnect to the primary '
+                              'mongodb: %(errmsg)s. Trying again in '
+                              '%(retry_interval)d seconds.') %
+                            {'errmsg': err, 'retry_interval': retry_interval})
                 attempts += 1
                 time.sleep(retry_interval)
     return closure

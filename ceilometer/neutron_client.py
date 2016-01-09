@@ -41,9 +41,9 @@ def logged(func):
             return func(*args, **kwargs)
         except exceptions.NeutronClientException as e:
             if e.status_code == 404:
-                LOG.warn("The resource could not be found.")
+                LOG.warning("The resource could not be found.")
             else:
-                LOG.warn(e)
+                LOG.warning(e)
             return []
         except Exception as e:
             LOG.exception(e)
