@@ -217,7 +217,7 @@ class TestCollector(tests_base.BaseTestCase):
                 mock_dispatcher.method_calls[0][1][0],
                 "not-so-secret"))
 
-    def _test_collector_requeue(self, listener):
+    def _test_collector_requeue(self, listener, batch_listener=False):
 
         mock_dispatcher = self._setup_fake_dispatcher()
         self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
@@ -226,7 +226,9 @@ class TestCollector(tests_base.BaseTestCase):
 
         self.srv.start()
         endp = getattr(self.srv, listener).dispatcher.endpoints[0]
-        ret = endp.sample({}, 'pub_id', 'event', {}, {})
+        ret = endp.sample([{'ctxt': {}, 'publisher_id': 'pub_id',
+                            'event_type': 'event', 'payload': {},
+                            'metadata': {}}])
         self.assertEqual(oslo_messaging.NotificationResult.REQUEUE,
                          ret)
 
@@ -257,8 +259,9 @@ class TestCollector(tests_base.BaseTestCase):
 
         self.srv.start()
         endp = getattr(self.srv, listener).dispatcher.endpoints[0]
-        self.assertRaises(FakeException, endp.sample, {}, 'pub_id',
-                          'event', {}, {})
+        self.assertRaises(FakeException, endp.sample, [
+            {'ctxt': {}, 'publisher_id': 'pub_id', 'event_type': 'event',
+             'payload': {}, 'metadata': {}}])
 
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.Mock())

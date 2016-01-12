@@ -89,6 +89,16 @@ def get_notification_listener(transport, targets, endpoints,
         allow_requeue=allow_requeue)
 
 
+def get_batch_notification_listener(transport, targets, endpoints,
+                                    allow_requeue=False,
+                                    batch_size=1, batch_timeout=None):
+    """Return a configured oslo_messaging notification listener."""
+    return oslo_messaging.get_batch_notification_listener(
+        transport, targets, endpoints, executor='threading',
+        allow_requeue=allow_requeue,
+        batch_size=batch_size, batch_timeout=batch_timeout)
+
+
 def get_notifier(transport, publisher_id):
     """Return a configured oslo_messaging notifier."""
     notifier = oslo_messaging.Notifier(transport, serializer=_SERIALIZER)
