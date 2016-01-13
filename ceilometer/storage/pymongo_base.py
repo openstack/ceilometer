@@ -66,11 +66,17 @@ class Connection(base.Connection):
         metaquery = pymongo_utils.improve_keys(metaquery, metaquery=True) or {}
 
         q = {}
-        if user is not None:
+        if user == 'None':
+            q['user_id'] = None
+        elif user is not None:
             q['user_id'] = user
-        if project is not None:
+        if project == 'None':
+            q['project_id'] = None
+        elif project is not None:
             q['project_id'] = project
-        if resource is not None:
+        if resource == 'None':
+            q['_id'] = None
+        elif resource is not None:
             q['_id'] = resource
         if source is not None:
             q['source'] = source

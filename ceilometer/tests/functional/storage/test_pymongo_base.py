@@ -78,3 +78,69 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase):
     def test_counter_unit(self):
         meters = list(self.conn.get_meters())
         self.assertEqual(1, len(meters))
+
+
+# TODO(ananya) same test should be done for other databse
+@tests_db.run_with('mongodb', 'db2')
+class FilterQueryTestForMeters(test_storage_scenarios.DBTestBase):
+    def prepare_data(self):
+        def old_record_metering_data(self, data):
+            received_timestamp = datetime.datetime.utcnow()
+            self.db.resource.update(
+                {'_id': data['resource_id']},
+                {'$set': {'project_id': data['project_id'],
+                          'user_id': data['user_id'],
+                          # Current metadata being used and when it was
+                          # last updated.
+                          'timestamp': data['timestamp'],
+                          'received_timestamp': received_timestamp,
+                          'metadata': data['resource_metadata'],
+                          'source': data['source'],
+                          },
+                 '$addToSet': {'meter': {'counter_name': data['counter_name'],
+                                         'counter_type': data['counter_type'],
+                                         },
+                               },
+                 },
+                upsert=True,
+            )
+
+            record = copy.copy(data)
+            self.db.meter.insert(record)
+
+        # Stubout with the old version DB schema, the one w/o 'counter_unit'
+        with mock.patch.object(self.conn, 'record_metering_data',
+                               side_effect=old_record_metering_data):
+            self.counters = []
+            c = sample.Sample(
+                'volume.size',
+                'gauge',
+                'GiB',
+                5,
+                None,
+                None,
+                None,
+                timestamp=datetime.datetime(2012, 9, 25, 10, 30),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   },
+                source='test',
+            )
+
+            self.counters.append(c)
+            msg = utils.meter_message_from_counter(
+                c,
+                secret='not-so-secret')
+            self.conn.record_metering_data(self.conn, msg)
+
+    def test_get_meters_by_user(self):
+        meters = list(self.conn.get_meters(user='None'))
+        self.assertEqual(1, len(meters))
+
+    def test_get_meters_by_resource(self):
+        meters = list(self.conn.get_meters(resource='None'))
+        self.assertEqual(1, len(meters))
+
+    def test_get_meters_by_project(self):
+        meters = list(self.conn.get_meters(project='None'))
+        self.assertEqual(1, len(meters))
