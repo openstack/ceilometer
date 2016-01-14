@@ -92,6 +92,7 @@ class TestNotification(tests_base.BaseTestCase):
         super(TestNotification, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
+        self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("store_events", False, group="notification")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
@@ -227,6 +228,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
         self.expected_samples = 2
 
+        self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("store_events", True, group="notification")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
@@ -479,6 +481,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("store_events", False, group="notification")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
