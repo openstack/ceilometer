@@ -26,7 +26,6 @@ import webtest
 from ceilometer.api import app
 from ceilometer.publisher import utils
 from ceilometer import sample
-from ceilometer.tests.functional import api as acl
 from ceilometer.tests.functional.api import v2
 
 VALID_TOKEN = uuid.uuid4().hex
@@ -95,7 +94,6 @@ class TestAPIACL(v2.FunctionalTest):
                                                 **params)
 
     def _make_app(self):
-        self.CONF.set_override("cache", "fake.cache", group=acl.OPT_GROUP_NAME)
         file_name = self.path_get('etc/ceilometer/api_paste.ini')
         self.CONF.set_override("api_paste_config", file_name)
         return webtest.TestApp(app.load_app())
