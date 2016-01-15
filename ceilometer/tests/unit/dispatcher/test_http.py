@@ -71,6 +71,54 @@ class TestDispatcherHttp(base.BaseTestCase):
 
         self.assertEqual(1, post.call_count)
 
+    def test_http_dispatcher_with_ssl_default(self):
+        self.CONF.dispatcher_http.target = 'https://example.com'
+        self.CONF.dispatcher_http.verify_ssl = ''
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        self.assertEqual(True, dispatcher.verify_ssl)
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_metering_data(self.msg)
+
+        self.assertEqual(True, post.call_args[1]['verify'])
+
+    def test_http_dispatcher_with_ssl_true(self):
+        self.CONF.dispatcher_http.target = 'https://example.com'
+        self.CONF.dispatcher_http.verify_ssl = 'true'
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        self.assertEqual(True, dispatcher.verify_ssl)
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_metering_data(self.msg)
+
+        self.assertEqual(True, post.call_args[1]['verify'])
+
+    def test_http_dispatcher_with_ssl_false(self):
+        self.CONF.dispatcher_http.target = 'https://example.com'
+        self.CONF.dispatcher_http.verify_ssl = 'false'
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        self.assertEqual(False, dispatcher.verify_ssl)
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_metering_data(self.msg)
+
+        self.assertEqual(False, post.call_args[1]['verify'])
+
+    def test_http_dispatcher_with_ssl_path(self):
+        self.CONF.dispatcher_http.target = 'https://example.com'
+        self.CONF.dispatcher_http.verify_ssl = '/path/to/cert.crt'
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        self.assertEqual('/path/to/cert.crt', dispatcher.verify_ssl)
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_metering_data(self.msg)
+
+        self.assertEqual('/path/to/cert.crt', post.call_args[1]['verify'])
+
 
 class TestEventDispatcherHttp(base.BaseTestCase):
     """Test sending events with the http dispatcher"""
@@ -124,10 +172,22 @@ class TestEventDispatcherHttp(base.BaseTestCase):
         self.assertEqual(0, post.call_count)
 
     def test_http_dispatcher_share_target(self):
-        self.CONF.dispatcher_http.target = 'fake'
+        self.CONF.dispatcher_http.event_target = 'fake'
         dispatcher = http.HttpDispatcher(self.CONF)
 
         with mock.patch.object(requests, 'post') as post:
             dispatcher.record_events(self.event)
 
         self.assertEqual('fake', post.call_args[0][0])
+
+    def test_http_dispatcher_with_ssl_path(self):
+        self.CONF.dispatcher_http.event_target = 'https://example.com'
+        self.CONF.dispatcher_http.verify_ssl = '/path/to/cert.crt'
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        self.assertEqual('/path/to/cert.crt', dispatcher.verify_ssl)
+
+        with mock.patch.object(requests, 'post') as post:
+            dispatcher.record_events(self.event)
+
+        self.assertEqual('/path/to/cert.crt', post.call_args[1]['verify'])

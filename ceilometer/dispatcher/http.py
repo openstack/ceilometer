@@ -16,6 +16,7 @@ import json
 
 from oslo_config import cfg
 from oslo_log import log
+from oslo_utils import strutils
 import requests
 
 from ceilometer import dispatcher
@@ -37,6 +38,10 @@ http_dispatcher_opts = [
                default=5,
                help='The max time in seconds to wait for a request to '
                     'timeout.'),
+    cfg.StrOpt('verify_ssl',
+               help='The path to a server certificate or directory if the '
+                    'system CAs are not used or if a self-signed certificate '
+                    'is used. Set to False to ignore SSL cert verification.'),
 ]
 
 cfg.CONF.register_opts(http_dispatcher_opts, group="dispatcher_http")
@@ -59,6 +64,12 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
         target = www.example.com
         event_target = www.example.com
         timeout = 2
+        # No SSL verification
+        #verify_ssl = False
+        # SSL verification with system-installed CAs
+        verify_ssl = True
+        # SSL verification with specific CA or directory of certs
+        #verify_ssl = /path/to/ca_certificate.crt
     """
 
     def __init__(self, conf):
@@ -68,6 +79,11 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
         self.target = self.conf.dispatcher_http.target
         self.event_target = (self.conf.dispatcher_http.event_target or
                              self.target)
+        try:
+            self.verify_ssl = strutils.bool_from_string(
+                self.conf.dispatcher_http.verify_ssl, strict=True)
+        except ValueError:
+            self.verify_ssl = self.conf.dispatcher_http.verify_ssl or True
 
     def record_metering_data(self, data):
         if self.target == '':
@@ -96,6 +112,7 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                 res = requests.post(self.target,
                                     data=meter_json,
                                     headers=self.headers,
+                                    verify=self.verify_ssl,
                                     timeout=self.timeout)
                 LOG.debug('Meter message posting finished with status code '
                           '%d.', res.status_code)
@@ -123,6 +140,7 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                 res = requests.post(self.event_target,
                                     data=event_json,
                                     headers=self.headers,
+                                    verify=self.verify_ssl,
                                     timeout=self.timeout)
                 LOG.debug('Event Message posting finished with status code '
                           '%d.', res.status_code)

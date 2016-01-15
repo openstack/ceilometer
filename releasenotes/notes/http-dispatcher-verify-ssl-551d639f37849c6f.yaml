@@ -1,0 +1,11 @@
+---
+features:
+  - In the [dispatcher_http] section of ceilometer.conf, verify_ssl can be
+    set to True to use system-installed certificates (default value) or
+    False to ignore certificate verification (use in development only!).
+    verify_ssl can also be set to the location of a certificate file
+      e.g. /some/path/cert.crt (use for self-signed certs)
+    or to a directory of certificates.
+    The value is passed as the 'verify' option to the underlying requests
+    method, which is documented at
+    http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
