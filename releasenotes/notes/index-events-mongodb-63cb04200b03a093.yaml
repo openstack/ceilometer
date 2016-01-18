@@ -1,0 +1,8 @@
+---
+upgrade:
+  - >
+    Run db-sync to add new indices.
+fixes:
+  - >
+    [`bug 1526793 <https://bugs.launchpad.net/ceilometer/+bug/1526793>`_]
+    Additional indices were added to better support querying of event data.

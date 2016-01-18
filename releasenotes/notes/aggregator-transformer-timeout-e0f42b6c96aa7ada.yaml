@@ -1,0 +1,5 @@
+---
+fixes:
+  - >
+    [`bug 1531626 <https://bugs.launchpad.net/ceilometer/+bug/1531626>`_]
+    Ensure aggregator transformer timeout is honoured if size is not provided.

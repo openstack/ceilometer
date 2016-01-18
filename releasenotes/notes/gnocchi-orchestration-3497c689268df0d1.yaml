@@ -1,0 +1,7 @@
+---
+upgrade:
+  - >
+    gnocchi_resources.yaml in Ceilometer should be updated.
+fixes:
+  - >
+    Fix samples from Heat to map to correct Gnocchi resource type

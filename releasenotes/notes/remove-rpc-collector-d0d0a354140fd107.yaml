@@ -1,0 +1,9 @@
+---
+features:
+  - >
+    RPC collector support is dropped. The queue-based notifier publisher and
+    collector was added as the recommended alternative as of Icehouse cycle.
+upgrade:
+  - >
+    Pipeline.yaml files for agents should be updated to notifier:// or udp://
+    publishers. The rpc:// publisher is no longer supported.

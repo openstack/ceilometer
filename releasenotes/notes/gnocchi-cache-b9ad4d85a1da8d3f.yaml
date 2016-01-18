@@ -1,0 +1,6 @@
+---
+fixes:
+  - >
+    [`bug 255569 <https://bugs.launchpad.net/ceilometer/+bug/255569>`_]
+    Fix caching support in Gnocchi dispatcher. Added better locking support
+    to enable smoother cache access.

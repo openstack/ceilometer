@@ -1,0 +1,6 @@
+---
+fixes:
+  - >
+    [`bug 1530793 <https://bugs.launchpad.net/ceilometer/+bug/1530793>`_]
+    network.services.lb.incoming.bytes meter was previous set to incorrect
+    type. It should be a gauge meter.
