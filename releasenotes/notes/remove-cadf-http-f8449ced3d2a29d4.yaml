@@ -1,0 +1,9 @@
+---
+features:
+  - >
+    Support for CADF-only payload in HTTP dispatcher is dropped as
+    audit middleware in pyCADF was dropped in Kilo cycle.
+upgrade:
+  - >
+    audit middleware in keystonemiddleware library should be used for
+    similar support.

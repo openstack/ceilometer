@@ -1,0 +1,7 @@
+---
+features:
+  - >
+    Gnocchi dispatcher now uses client rather than direct http requests
+upgrade:
+  - >
+    gnocchiclient library is now a requirement if using ceilometer+gnocchi.
