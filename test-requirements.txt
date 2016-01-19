@@ -4,14 +4,14 @@
 
 # Hacking already pins down pep8, pyflakes and flake8
 hacking<0.11,>=0.10.0
-Babel>=1.3
+Babel>=1.3 # BSD
 contextlib2>=0.4.0 # PSF License
-coverage>=3.6
-elasticsearch<2.0,>=1.3.0
-fixtures>=1.3.1
-happybase!=0.7,>=0.5;python_version=='2.7'
-httplib2>=0.7.5
-mock>=1.2
+coverage>=3.6 # Apache-2.0
+elasticsearch<2.0,>=1.3.0 # Apache-2.0
+fixtures>=1.3.1 # Apache-2.0/BSD
+happybase!=0.7,>=0.5;python_version=='2.7' # MIT
+httplib2>=0.7.5 # MIT
+mock>=1.2 # BSD
 PyMySQL>=0.6.2 # MIT License
 oslo.cache>=0.8.0 # Apache-2.0
 # Docs Requirements
@@ -19,18 +19,18 @@ oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
 reno>=0.1.1 # Apache2
 oslotest>=1.10.0 # Apache-2.0
 oslo.vmware>=1.16.0 # Apache-2.0
-psycopg2>=2.5
+psycopg2>=2.5 # LGPL/ZPL
 pylint==1.4.5 # GNU GPL v2
-pymongo>=3.0.2
-gnocchiclient>=2.1.0
-python-subunit>=0.0.18
-sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2
-sphinxcontrib-httpdomain
-sphinxcontrib-pecanwsme>=0.8
-testrepository>=0.0.18
-testscenarios>=0.4
-testtools>=1.4.0
+pymongo>=3.0.2 # Apache-2.0
+gnocchiclient>=2.1.0 # Apache-2.0
+python-subunit>=0.0.18 # Apache-2.0/BSD
+sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2 # BSD
+sphinxcontrib-httpdomain # BSD
+sphinxcontrib-pecanwsme>=0.8 # Apache-2.0
+testrepository>=0.0.18 # Apache-2.0/BSD
+testscenarios>=0.4 # Apache-2.0/BSD
+testtools>=1.4.0 # MIT
 gabbi>=1.11.0 # Apache-2.0
 requests-aws>=0.1.4 # BSD License (3 clause)
-tempest-lib>=0.12.0
-WebTest>=2.0
+tempest-lib>=0.13.0 # Apache-2.0
+WebTest>=2.0 # MIT
