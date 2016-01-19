@@ -91,28 +91,43 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                  'counter_volume': meter['counter_volume']})
             try:
                 # Every meter should be posted to the target
+                meter_json = json.dumps(meter)
+                LOG.trace('Meter Message: %s', meter_json)
                 res = requests.post(self.target,
-                                    data=json.dumps(meter),
+                                    data=meter_json,
                                     headers=self.headers,
                                     timeout=self.timeout)
-                LOG.debug('Message posting finished with status code '
+                LOG.debug('Meter message posting finished with status code '
                           '%d.', res.status_code)
-            except Exception as err:
-                LOG.exception(_LE('Failed to record metering data: %s.'), err)
+                res.raise_for_status()
+            except requests.exceptions.HTTPError:
+                LOG.exception(_LE('Status Code: %{code}s. Failed to'
+                                  'dispatch meter: %{meter}s'),
+                              {'code': res.status_code, 'meter': meter})
 
     def record_events(self, events):
+        if self.event_target == '':
+            # if the event target was not set, do not do anything
+            LOG.error(_LE('Dispatcher event target was not set, no event will '
+                          'be posted. Set event_target in the ceilometer.conf '
+                          'file.'))
+            return
+
         if not isinstance(events, list):
             events = [events]
 
         for event in events:
-            res = None
             try:
-                res = requests.post(self.event_target, data=event,
+                event_json = json.dumps(event)
+                LOG.trace('Event Message: %s', event_json)
+                res = requests.post(self.event_target,
+                                    data=event_json,
                                     headers=self.headers,
                                     timeout=self.timeout)
+                LOG.debug('Event Message posting finished with status code '
+                          '%d.', res.status_code)
                 res.raise_for_status()
-            except Exception:
-                error_code = res.status_code if res else 'unknown'
+            except requests.exceptions.HTTPError:
                 LOG.exception(_LE('Status Code: %{code}s. Failed to'
                                   'dispatch event: %{event}s'),
-                              {'code': error_code, 'event': event})
+                              {'code': res.status_code, 'event': event})
