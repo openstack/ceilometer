@@ -76,7 +76,7 @@ class MessagingPublisher(publisher.PublisherBase):
 
     def __init__(self, parsed_url):
         options = urlparse.parse_qs(parsed_url.query)
-        # the values of the option is a list of url params values
+        # the value of options is a list of url param values
         # only take care of the latest one if the option
         # is provided more than once
         self.per_meter_topic = bool(int(
@@ -128,9 +128,9 @@ class MessagingPublisher(publisher.PublisherBase):
 
     def flush(self):
         # NOTE(sileht):
-        # this is why the self.local_queue, is emptied before processing the
+        # this is why the self.local_queue is emptied before processing the
         # queue and the remaining messages in the queue are added to
-        # self.local_queue after in case of a other call have already added
+        # self.local_queue after in case of another call having already added
         # something in the self.local_queue
         queue = self.local_queue
         self.local_queue = []
