@@ -248,6 +248,14 @@ function _ceilometer_configure_storage_backend {
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         gnocchi_url=$(gnocchi_service_url)
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
+        # FIXME(sileht): We shouldn't load event_dispatchers if store_event is False
+        iniset $CEILOMETER_CONF DEFAULT event_dispatchers ""
+        iniset $CEILOMETER_CONF notification store_events False
+        # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
+        iniset $CEILOMETER_CONF storage max_retries 20
+        # NOTE(gordc): set batching to better handle recording on a slow machine
+        iniset $CEILOMETER_CONF collector batch_size 10
+        iniset $CEILOMETER_CONF collector batch_timeout 5
         iniset $CEILOMETER_CONF dispatcher_gnocchi url $gnocchi_url
         iniset $CEILOMETER_CONF dispatcher_gnocchi archive_policy ${GNOCCHI_ARCHIVE_POLICY}
         if is_service_enabled swift && [[ "$GNOCCHI_STORAGE_BACKEND" = 'swift' ]] ; then
