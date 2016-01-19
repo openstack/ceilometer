@@ -1,0 +1,9 @@
+---
+features:
+  - >
+    Support for CORS is added. More information can be found
+    [`here <http://specs.openstack.org/openstack/openstack-specs/specs/cors-support.html>`_]
+upgrade:
+  - >
+    The api-paste.ini file can be modified to include or exclude the CORs
+    middleware. Additional configurations can be made to middleware as well.

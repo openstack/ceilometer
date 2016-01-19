@@ -1,0 +1,12 @@
+---
+features:
+  - >
+    Add support for batch processing of messages from queue. This will allow
+    the collector and notification agent to grab multiple messages per thread
+    to enable more efficient processing.
+upgrade:
+  - >
+    batch_size and batch_timeout configuration options are added to both
+    [notification] and [collector] sections of configuration. The batch_size
+    controls the number of messages to grab before processing. Similarly,
+    the batch_timeout defines the wait time before processing.
