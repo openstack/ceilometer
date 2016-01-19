@@ -32,5 +32,5 @@ def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
-                              intercept=app.setup_app,
+                              intercept=app.load_app,
                               fixture_module=fixture_module)
