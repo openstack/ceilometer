@@ -223,6 +223,9 @@ class Connection(base.Connection):
         # in storage.__init__.get_connection_from_config function
         options = dict(cfg.CONF.database.items())
         options['max_retries'] = 0
+        # oslo.db doesn't support options defined by Ceilometer
+        for opt in storage.OPTS:
+            options.pop(opt.name, None)
         self._engine_facade = db_session.EngineFacade(url, **options)
 
     def upgrade(self):

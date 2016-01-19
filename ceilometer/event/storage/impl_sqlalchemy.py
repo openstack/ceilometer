@@ -27,6 +27,7 @@ import sqlalchemy as sa
 from ceilometer.event.storage import base
 from ceilometer.event.storage import models as api_models
 from ceilometer.i18n import _LE, _LI
+from ceilometer import storage
 from ceilometer.storage.sqlalchemy import models
 from ceilometer import utils
 
@@ -130,6 +131,9 @@ class Connection(base.Connection):
         # in storage.__init__.get_connection_from_config function
         options = dict(cfg.CONF.database.items())
         options['max_retries'] = 0
+        # oslo.db doesn't support options defined by Ceilometer
+        for opt in storage.OPTS:
+            options.pop(opt.name, None)
         self._engine_facade = db_session.EngineFacade(url, **options)
 
     def upgrade(self):
