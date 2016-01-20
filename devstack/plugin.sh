@@ -227,6 +227,12 @@ function _ceilometer_configure_storage_backend {
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
         cleanup_ceilometer
+    elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
+        if is_service_enabled gnocchi-api; then
+            echo "Let Gnocchi plugin configure backend for Liberty."
+        else
+            die $LINENO "Gnocchi service not detected."
+        fi
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
@@ -372,7 +378,7 @@ function start_ceilometer {
     fi
 
     # Only die on API if it was actually intended to be turned on
-    if is_service_enabled ceilometer-api; then
+    if is_service_enabled ceilometer-api && [ "$CEILOMETER_BACKEND" != 'gnocchi' ] ; then
         echo "Waiting for ceilometer-api to start..."
         if ! wait_for_service $SERVICE_TIMEOUT $(ceilometer_service_url)/v2/; then
             die $LINENO "ceilometer-api did not start"
