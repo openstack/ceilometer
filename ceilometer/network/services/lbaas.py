@@ -16,6 +16,7 @@
 import abc
 import collections
 
+from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 import six
@@ -32,8 +33,32 @@ LBStatsData = collections.namedtuple(
     ['active_connections', 'total_connections', 'bytes_in', 'bytes_out']
 )
 
+LOAD_BALANCER_STATUS_V2 = {
+    'offline': 0,
+    'online': 1,
+    'no_monitor': 3,
+    'error': 4,
+    'degraded': 5
+}
 
-class LBPoolPollster(base.BaseServicesPollster):
+
+class BaseLBPollster(base.BaseServicesPollster):
+    """Base Class for Load Balancer pollster"""
+
+    def __init__(self):
+        super(BaseLBPollster, self).__init__()
+        self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
+
+    def get_load_balancer_status_id(self, value):
+        if self.lb_version == 'v1':
+            resource_status = self.get_status_id(value)
+        elif self.lb_version == 'v2':
+            status = value.lower()
+            resource_status = LOAD_BALANCER_STATUS_V2.get(status, -1)
+        return resource_status
+
+
+class LBPoolPollster(BaseLBPollster):
     """Pollster to capture Load Balancer pool status samples."""
 
     FIELDS = ['admin_state_up',
@@ -57,7 +82,7 @@ class LBPoolPollster(base.BaseServicesPollster):
 
         for pool in resources:
             LOG.debug("Load Balancer Pool : %s" % pool)
-            status = self.get_status_id(pool['status'])
+            status = self.get_load_balancer_status_id(pool['status'])
             if status == -1:
                 # unknown status, skip this sample
                 LOG.warning(_("Unknown status %(stat)s received on pool "
@@ -126,7 +151,7 @@ class LBVipPollster(base.BaseServicesPollster):
             )
 
 
-class LBMemberPollster(base.BaseServicesPollster):
+class LBMemberPollster(BaseLBPollster):
     """Pollster to capture Load Balancer Member status samples."""
 
     FIELDS = ['admin_state_up',
@@ -147,7 +172,7 @@ class LBMemberPollster(base.BaseServicesPollster):
 
         for member in resources:
             LOG.debug("Load Balancer Member : %s" % member)
-            status = self.get_status_id(member['status'])
+            status = self.get_load_balancer_status_id(member['status'])
             if status == -1:
                 LOG.warning(_("Unknown status %(stat)s received on member "
                               "%(id)s, skipping sample")

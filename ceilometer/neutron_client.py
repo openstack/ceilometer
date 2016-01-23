@@ -25,6 +25,10 @@ SERVICE_OPTS = [
     cfg.StrOpt('neutron',
                default='network',
                help='Neutron service type.'),
+    cfg.StrOpt('neutron_lbaas_version',
+               default='v2',
+               choices=('v1', 'v2'),
+               help='Neutron load balancer version.')
 ]
 
 cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
@@ -64,6 +68,7 @@ class Client(object):
             'service_type': cfg.CONF.service_types.neutron,
         }
         self.client = clientv20.Client(**params)
+        self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
 
     @logged
     def port_get_all(self):
@@ -77,18 +82,33 @@ class Client(object):
 
     @logged
     def pool_get_all(self):
-        resp = self.client.list_pools()
-        return resp.get('pools')
+        resources = []
+        if self.lb_version == 'v1':
+            resp = self.client.list_pools()
+            resources = resp.get('pools')
+        elif self.lb_version == 'v2':
+            resources = self.list_pools_v2()
+        return resources
 
     @logged
     def member_get_all(self):
-        resp = self.client.list_members()
-        return resp.get('members')
+        resources = []
+        if self.lb_version == 'v1':
+            resp = self.client.list_members()
+            resources = resp.get('members')
+        elif self.lb_version == 'v2':
+            resources = self.list_members_v2()
+        return resources
 
     @logged
     def health_monitor_get_all(self):
-        resp = self.client.list_health_monitors()
-        return resp.get('health_monitors')
+        resources = []
+        if self.lb_version == 'v1':
+            resp = self.client.list_health_monitors()
+            resources = resp.get('health_monitors')
+        elif self.lb_version == 'v2':
+            resources = self.list_health_monitors_v2()
+        return resources
 
     @logged
     def pool_stats(self, pool):
@@ -118,3 +138,250 @@ class Client(object):
     def fip_get_all(self):
         fips = self.client.list_floatingips()['floatingips']
         return fips
+
+    def list_pools_v2(self):
+        """This method is used to get the pools list.
+
+        This method uses Load Balancer v2_0 API to achieve
+        the detailed list of the pools.
+
+        :returns: The list of the pool resources
+        """
+        pool_status = dict()
+        resp = self.client.list_lbaas_pools()
+        temp_pools = resp.get('pools')
+        resources = []
+        pool_listener_dict = self._get_pool_and_listener_ids(temp_pools)
+        for k, v in pool_listener_dict.items():
+            loadbalancer_id = self._get_loadbalancer_id_with_listener_id(v)
+            status = self._get_pool_status(loadbalancer_id, v)
+            for k, v in status.items():
+                pool_status[k] = v
+
+        for pool in temp_pools:
+            pool_id = pool.get('id')
+            pool['status'] = pool_status[pool_id]
+            pool['lb_method'] = pool.get('lb_algorithm')
+            pool['status_description'] = pool['status']
+            # Based on the LBaaSv2 design, the properties 'vip_id'
+            # and 'subnet_id' should belong to the loadbalancer resource and
+            # not to the pool resource. However, because we don't want to
+            # change the metadata of the pool resource this release,
+            # we set them to empty values manually.
+            pool['provider'] = ''
+            pool['vip_id'] = ''
+            pool['subnet_id'] = ''
+            resources.append(pool)
+
+        return resources
+
+    def list_members_v2(self):
+        """Method is used to list the members info.
+
+        This method is used to get the detailed list of the members
+        with Load Balancer v2_0 API
+
+        :returns: The list of the member resources
+        """
+        resources = []
+        pools = self.client.list_lbaas_pools().get('pools')
+        for pool in pools:
+            pool_id = pool.get('id')
+            listener_id = pool.get('listeners')[0].get('id')
+            lb_id = self._get_loadbalancer_id_with_listener_id(listener_id)
+            status = self._get_member_status(lb_id, [listener_id, pool_id])
+            resp = self.client.list_lbaas_members(pool_id)
+            temp_members = resp.get('members')
+            for member in temp_members:
+                member['status'] = status[member.get('id')]
+                member['pool_id'] = pool_id
+                member['status_description'] = member['status']
+                resources.append(member)
+        return resources
+
+    def list_health_monitors_v2(self):
+        """Method is used to list the health monitors
+
+        This method is used to get the detailed list of the health
+        monitors with Load Balancer v2_0
+
+        :returns: The list of the health monitor resources
+        """
+        resp = self.client.list_lbaas_healthmonitors()
+        resources = resp.get('healthmonitors')
+        return resources
+
+    def _get_pool_and_listener_ids(self, pools):
+        """Method is used to get the mapping between pool and listener
+
+        This method is used to get the pool ids and listener ids
+        from the pool list.
+
+        :param pools: The list of the polls
+        :returns: The relationship between pool and listener.
+        It's a dictionary type. The key of this dict is
+        the id of pool and the value of it is the id of the first
+        listener which the pool belongs to
+        """
+        pool_listener_dict = dict()
+        for pool in pools:
+            key = pool.get("id")
+            value = pool.get('listeners')[0].get('id')
+            pool_listener_dict[key] = value
+        return pool_listener_dict
+
+    def _retrieve_loadbalancer_status_tree(self, loadbalancer_id):
+        """Method is used to get the status of a LB.
+
+        This method is used to get the status tree of a specific
+        Load Balancer.
+
+        :param loadbalancer_id: The ID of the specific Load
+        Balancer.
+        :returns: The status of the specific Load Balancer.
+        It consists of the load balancer and all of its
+        children's provisioning and operating statuses
+        """
+        lb_status_tree = self.client.retrieve_loadbalancer_status(
+            loadbalancer_id)
+        return lb_status_tree
+
+    def _get_loadbalancer_id_with_listener_id(self, listener_id):
+        """This method is used to get the loadbalancer id.
+
+        :param listener_id: The ID of the listener
+        :returns: The ID of the Loadbalancer
+        """
+        listener = self.client.show_listener(listener_id)
+        listener_lbs = listener.get('listener').get('loadbalancers')
+        loadbalancer_id = listener_lbs[0].get('id')
+        return loadbalancer_id
+
+    def _get_member_status(self, loadbalancer_id, parent_id):
+        """Method used to get the status of member resource.
+
+        This method is used to get the status of member
+        resource belonged to the specific Load Balancer.
+
+        :param loadbalancer_id: The ID of the Load Balancer.
+        :param parent_id: The parent ID list of the member resource.
+        For the member resource, the parent_id should be [listener_id,
+        pool_id].
+        :returns: The status dictionary of the member
+        resource. The key is the ID of the member. The value is
+        the operating statuse of the member resource.
+        """
+        # FIXME(liamji) the following meters are experimental and
+        # may generate a large load against neutron api. The future
+        # enhancements can be tracked against:
+        # https://review.openstack.org/#/c/218560.
+        # After it has been merged and the neutron client supports
+        # with the corresponding apis, will change to use the new
+        # method to get the status of the members.
+        resp = self._retrieve_loadbalancer_status_tree(loadbalancer_id)
+        status_tree = resp.get('statuses').get('loadbalancer')
+        status_dict = dict()
+
+        listeners_status = status_tree.get('listeners')
+        for listener_status in listeners_status:
+            listener_id = listener_status.get('id')
+            if listener_id == parent_id[0]:
+                pools_status = listener_status.get('pools')
+                for pool_status in pools_status:
+                    if pool_status.get('id') == parent_id[1]:
+                        members_status = pool_status.get('members')
+                        for member_status in members_status:
+                            key = member_status.get('id')
+                            # If the item has no the property 'id', skip
+                            # it.
+                            if key is None:
+                                continue
+                            # The situation that the property
+                            # 'operating_status' is none is handled in
+                            # the method get_sample() in lbaas.py.
+                            value = member_status.get('operating_status')
+                            status_dict[key] = value
+                        break
+                break
+
+        return status_dict
+
+    def _get_listener_status(self, loadbalancer_id):
+        """Method used to get the status of the listener resource.
+
+        This method is used to get the status of the listener
+        resources belonged to the specific Load Balancer.
+
+        :param loadbalancer_id: The ID of the Load Balancer.
+        :returns: The status dictionary of the listener
+        resource. The key is the ID of the listener resource. The
+        value is the operating statuse of the listener resource.
+        """
+        # FIXME(liamji) the following meters are experimental and
+        # may generate a large load against neutron api. The future
+        # enhancements can be tracked against:
+        # https://review.openstack.org/#/c/218560.
+        # After it has been merged and the neutron client supports
+        # with the corresponding apis, will change to use the new
+        # method to get the status of the listeners.
+        resp = self._retrieve_loadbalancer_status_tree(loadbalancer_id)
+        status_tree = resp.get('statuses').get('loadbalancer')
+        status_dict = dict()
+
+        listeners_status = status_tree.get('listeners')
+        for listener_status in listeners_status:
+            key = listener_status.get('id')
+            # If the item has no the property 'id', skip
+            # it.
+            if key is None:
+                continue
+            # The situation that the property
+            # 'operating_status' is none is handled in
+            # the method get_sample() in lbaas.py.
+            value = listener_status.get('operating_status')
+            status_dict[key] = value
+
+        return status_dict
+
+    def _get_pool_status(self, loadbalancer_id, parent_id):
+        """Method used to get the status of pool resource.
+
+        This method is used to get the status of the pool
+        resources belonged to the specific Load Balancer.
+
+        :param loadbalancer_id: The ID of the Load Balancer.
+        :param parent_id: The parent ID of the pool resource.
+        :returns: The status dictionary of the pool resource.
+        The key is the ID of the pool resource. The value is
+        the operating statuse of the pool resource.
+        """
+        # FIXME(liamji) the following meters are experimental and
+        # may generate a large load against neutron api. The future
+        # enhancements can be tracked against:
+        # https://review.openstack.org/#/c/218560.
+        # After it has been merged and the neutron client supports
+        # with the corresponding apis, will change to use the new
+        # method to get the status of the pools.
+        resp = self._retrieve_loadbalancer_status_tree(loadbalancer_id)
+        status_tree = resp.get('statuses').get('loadbalancer')
+        status_dict = dict()
+
+        listeners_status = status_tree.get('listeners')
+        for listener_status in listeners_status:
+            listener_id = listener_status.get('id')
+            if listener_id == parent_id:
+                pools_status = listener_status.get('pools')
+                for pool_status in pools_status:
+                    key = pool_status.get('id')
+                    # If the item has no the property 'id', skip
+                    # it.
+                    if key is None:
+                        continue
+                    # The situation that the property
+                    # 'operating_status' is none is handled in
+                    # the method get_sample() in lbaas.py.
+                    value = pool_status.get('operating_status')
+                    status_dict[key] = value
+                break
+
+        return status_dict
