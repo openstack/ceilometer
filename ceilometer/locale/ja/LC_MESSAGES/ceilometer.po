@@ -1,4 +1,4 @@
-# Japanese translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -8,79 +8,23 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev69\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-22 06:14+0000\n"
+"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-10-12 06:50+0000\n"
 "Last-Translator: Akihiro Motoki <amotoki@gmail.com>\n"
 "Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
 "Language-Team: Japanese\n"
-"Plural-Forms: nplurals=1; plural=0\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr "%(entity)s %(id)s が見つかりません"
-
-#, python-format
-msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "%(type)s タイプのアラームに %(rule)s を設定する必要があります"
-
-#, python-format
-msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
-msgstr "%(rule1)s と %(rule2)s を同時に設定することはできません"
-
-#, python-format
-msgid "%d datapoints are unknown"
-msgstr "%d データポイントが不明です"
-
-#, python-format
-msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
-msgstr ""
-"アラーム %(alarm_id)s のアクション %(scheme)s が不明なため、通知できません"
-
-#, python-format
-msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "アラーム %(alarm_id)s がプロジェクト %(project)s には見つかりません"
-
-#, python-format
-msgid "Alarm %s not found"
-msgstr "アラーム %s が見つかりません"
-
-msgid "Alarm combination rule should contain at least two different alarm ids."
-msgstr ""
-"アラーム組み合わせルールには、少なくとも 2 つの異なるアラーム ID が含まれてい"
-"る必要があります。"
-
-msgid "Alarm incorrect"
-msgstr "アラームが正しくありません"
-
-#, python-format
-msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr "プロジェクト %(p)s のユーザー %(u)s のアラームクォータを超過しました"
-
-#, python-format
-msgid ""
-"Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
-"%(threshold)s over %(period)s seconds"
-msgstr ""
-"%(period)s 秒にわたる %(meter_name)s と %(threshold)s の %(statistic)s の比較"
-"が %(comparison_operator)s である場合のアラーム"
-
-#, python-format
-msgid "Alarm with name=%s exists"
-msgstr "name=%s のアラームは存在します"
-
-#, python-format
-msgid "Alarm with name='%s' exists"
-msgstr "name='%s' のアラームは存在します"
-
-#, python-format
-msgid "Alarms %(alarm_ids)s are in unknown state"
-msgstr "アラーム %(alarm_ids)s は不明な状態にあります"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -93,14 +37,6 @@ msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr ""
 "テーブル %(table_name)s は既に存在するため、作成できません。エラーを無視しま"
 "す"
-
-#, python-format
-msgid "Cannot specify alarm %s itself in combination rule"
-msgstr "アラーム %s 自体を組み合わせルールに指定することはできません"
-
-#, python-format
-msgid "Combined state of alarms %s"
-msgstr "アラーム %s の結合状態"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -153,23 +89,11 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "HTTP 応答を解析している際にエラーが発生しました: %s"
 
-#, python-format
-msgid "Error while posting alarm: %s"
-msgstr "アラームを通知するときにエラーが発生しました: %s"
-
-#, python-format
-msgid "Error while putting alarm: %s"
-msgstr "アラームを配置するときにエラーが発生しました: %s"
-
 msgid "Event"
 msgstr "イベント"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "式が NaN 値に評価されました。"
-
-#, python-format
-msgid "Failed to evaluate alarm %s"
-msgstr "アラーム %s の評価に失敗しました"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
@@ -198,10 +122,6 @@ msgid ""
 msgstr ""
 "インスタンス <name=%(name)s, id=%(id)s> のメモリー使用状況を検査できませんで"
 "した。libvirt から情報を取得できません。"
-
-#, python-format
-msgid "Failed to load any dispatchers for %s"
-msgstr "%s のディスパッチャーをロードできませんでした"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -240,14 +160,6 @@ msgid "Ignoring pool %(pool_id)s: %(error)s"
 msgstr "プール %(pool_id)s を無視しています: %(error)s"
 
 #, python-format
-msgid ""
-"Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
-"column: %(column)s."
-msgstr ""
-"イベント定義ファイル %(file)s に無効な YAML 構文があります: %(line)s 行目の "
-"%(column)s 桁目。"
-
-#, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "無効な期間 %(period)s: %(err)s"
 
@@ -270,10 +182,6 @@ msgid "Must specify connection_url, and connection_password to use"
 msgstr ""
 "connection_url と、使用する connection_password を指定する必要があります"
 
-#, python-format
-msgid "No plugin named %(plugin)s available for trait %(trait)s"
-msgstr "特性 %(trait)s に対して使用できるプラグイン %(plugin)s はありません"
-
 msgid "Node Manager init failed"
 msgstr "ノードマネージャーの初期化に失敗しました"
 
@@ -292,12 +200,6 @@ msgstr "Opencontrail API から %(status)s %(reason)s が返されました"
 #, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "order-by 式が無効です: %s"
-
-#, python-format
-msgid ""
-"Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: %(err)s"
-msgstr ""
-"%(trait)s の JSONPath 指定 '%(jsonpath)s' で解析エラーが発生しました: %(err)s"
 
 msgid "Period must be positive."
 msgstr "期間は正の数でなければなりません。"
@@ -323,18 +225,8 @@ msgstr ""
 "ラーが発生した後に終了します"
 
 #, python-format
-msgid "Plugin specified, but no plugin name supplied for trait %s"
-msgstr ""
-"特性 %s に対してプラグインが指定されましたが、プラグイン名が指定されませんで"
-"した"
-
-#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "センサー %(mtr)s のポーリングが %(cnt)s 回失敗しました"
-
-#, python-format
-msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr "%(name)s のポーリングが %(cnt)s 回失敗しましたstar"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -361,30 +253,12 @@ msgstr "パブリッシュポリシーが不明です (%s)。強制的にデフ�
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API から %(status)s %(reason)s が返されました"
 
-#, python-format
-msgid ""
-"Remaining as %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"%(count)d 個のサンプル %(disposition)s しきい値が原因で %(state)s のままで"
-"す。最新: %(most_recent)s"
-
-#, python-format
-msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr ""
-"%(state)s のままです。アラーム %(alarm_ids)s の状態が %(state)s であるためで"
-"す"
-
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
 msgstr "NorthBound REST API を使用した OpenDaylight への接続要求が失敗しました"
 
 #, python-format
 msgid "Required field %s not specified"
 msgstr "必須フィールド %s が指定されていません"
-
-#, python-format
-msgid "Required field in trait definition not specified: '%s'"
-msgstr "特性定義における必須フィールドが指定されていません: '%s'"
 
 msgid "Resource"
 msgstr "リソース"
@@ -410,27 +284,6 @@ msgstr ""
 
 msgid "The path for the file publisher is required"
 msgstr "ファイルパブリッシャーのパスが必要です"
-
-msgid "Time constraint names must be unique for a given alarm."
-msgstr "時間制約の名前は、指定されたアラームで一意でなければなりません。"
-
-#, python-format
-msgid "Timezone %s is not valid"
-msgstr "タイムゾーン %s が無効です"
-
-#, python-format
-msgid ""
-"Transition to %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"%(count)d 個のサンプルの %(disposition)s しきい値が原因で%(state)s に遷移しま"
-"す。最新: %(most_recent)s"
-
-#, fuzzy, python-format
-msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr ""
-"%(state)s に移行します。アラーム %(alarm_ids)s の状態が %(state)s であるため"
-"です"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -460,24 +313,6 @@ msgstr "パブリッシャー %s をロードできません"
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "ハイパーバイザーインスペクターをロードできません: %s"
-
-msgid "Unable to log in to XenAPI (is the Dom0 disk full?)"
-msgstr "XenAPI にログインできません (Dom0 ディスクフル?)"
-
-#, python-format
-msgid "Unable to notify alarm %s"
-msgstr "アラーム %s を通知できません"
-
-msgid "Unable to notify for an alarm with no action"
-msgstr "アクションのないアラームは通知できません"
-
-#, python-format
-msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
-msgstr "アラーム %(alarm_id)s のアクション %(action)s を解析できません"
-
-#, python-format
-msgid "Unable to parse action %s"
-msgstr "アクション %s を解析できません"
 
 #, python-format
 msgid ""
@@ -519,12 +354,6 @@ msgstr ""
 "キップします"
 
 #, python-format
-msgid "Unknown status %(stat)s received on member %(id)s,skipping sample"
-msgstr ""
-"メンバー %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップしま"
-"す"
-
-#, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr ""
 "プール %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップします"
@@ -533,15 +362,6 @@ msgstr ""
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
 "仮想 IP %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップします"
-
-#, python-format
-msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
-msgstr ""
-"VPN %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップします"
-
-#, python-format
-msgid "Unsupported action %s"
-msgstr "サポートされないアクション %s"
 
 #, python-format
 msgid "VM %s not found in XenServer"
@@ -556,28 +376,6 @@ msgstr "センサー種別が正しくありません"
 
 msgid "XenAPI not installed"
 msgstr "XenAPI がインストールされていません"
-
-#, python-format
-msgid "YAML error reading Event Definitions file %(file)s"
-msgstr ""
-"イベント定義ファイル %(file)s を読み取るときに YAML エラーが発生しました"
-
-#, fuzzy
-msgid "alarm evaluation cycle failed"
-msgstr "アラーム評価サイクルで障害が発生しました"
-
-msgid "alarm retrieval failed"
-msgstr "アラームを取得できませんでした"
-
-msgid "alarm state update failed"
-msgstr "アラームの状態を更新できませんでした"
-
-msgid "alarm stats retrieval failed"
-msgstr "アラーム統計の取得に失敗しました"
-
-#, python-format
-msgid "alarm stats retrieval failed: %s"
-msgstr "アラーム統計の取得に失敗しました: %s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
@@ -607,12 +405,3 @@ msgstr "IPMI センサーデータの解析に失敗しました。不明なセ�
 
 msgid "running ipmitool failure"
 msgstr "ipmitool の実行に失敗しました"
-
-msgid "state invalid"
-msgstr "状態が無効です"
-
-msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp は datetime オブジェクトでなければなりません"
-
-msgid "timestamp should be datetime object"
-msgstr "タイムスタンプは datetime オブジェクトでなければなりません"

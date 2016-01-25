@@ -1,4 +1,4 @@
-# Spanish translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -9,81 +9,23 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev69\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-22 06:14+0000\n"
+"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
 "Language-Team: Spanish\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr "%(entity)s %(id)s No encontrado"
-
-#, python-format
-msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "%(rule)s debe establecerse para la alarma de tipo %(type)s"
-
-#, python-format
-msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
-msgstr "%(rule1)s y %(rule2)s no se pueden establecer al mismo tiempo"
-
-#, python-format
-msgid "%d datapoints are unknown"
-msgstr "puntos de datos %d son desconocidos"
-
-#, python-format
-msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
-msgstr ""
-"La acción %(scheme)s para la alarma %(alarm_id)s es desconocida, no se puede "
-"notificar"
-
-#, python-format
-msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "La alarma %(alarm_id)s no se ha encontrado en el proyecto %(project)s"
-
-#, python-format
-msgid "Alarm %s not found"
-msgstr "No se ha encontrado la alarma %s"
-
-msgid "Alarm combination rule should contain at least two different alarm ids."
-msgstr ""
-"La regla de combinación de alarma debe contener al menos dos ID de alarma "
-"diferentes."
-
-msgid "Alarm incorrect"
-msgstr "Alarma incorrecta"
-
-#, python-format
-msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr ""
-"La cuota de alarma se ha excedido para el usuario %(u)s en el proyecto %(p)s"
-
-#, python-format
-msgid ""
-"Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
-"%(threshold)s over %(period)s seconds"
-msgstr ""
-"Alarma cuando %(meter_name)s es %(comparison_operator)s un %(statistic)s de "
-"%(threshold)s por encima de %(period)s segundos"
-
-#, python-format
-msgid "Alarm with name=%s exists"
-msgstr "Ya existe la alarma con el nombre=%s"
-
-#, python-format
-msgid "Alarm with name='%s' exists"
-msgstr "Existe alarma con nombre='%s'"
-
-#, python-format
-msgid "Alarms %(alarm_ids)s are in unknown state"
-msgstr "Las alarmas %(alarm_ids)s están en estado desconocido"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -95,14 +37,6 @@ msgstr ""
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr ""
 "No se puede crear la tabla %(table_name)s, ya existe. Se ignorará el error."
-
-#, python-format
-msgid "Cannot specify alarm %s itself in combination rule"
-msgstr "No se puede especificar la propia alarma %s en la regla de combinación"
-
-#, python-format
-msgid "Combined state of alarms %s"
-msgstr "Estado combinado de alarmas %s"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -155,23 +89,11 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "Error analizándo respuesta HTTP: %s."
 
-#, python-format
-msgid "Error while posting alarm: %s"
-msgstr "Error al contabilizar alarma: %s"
-
-#, python-format
-msgid "Error while putting alarm: %s"
-msgstr "Error al poner alarma: %s"
-
 msgid "Event"
 msgstr "Suceso"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "La expresión se ha evaluado en un valor NaN."
-
-#, python-format
-msgid "Failed to evaluate alarm %s"
-msgstr "No se ha podido evaluar la alarma %s"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
@@ -200,10 +122,6 @@ msgid ""
 msgstr ""
 "No se ha podido analizar el uso de memoria de la instancia <name=%(name)s, "
 "id=%(id)s>, no se puede obtener información de libvirt."
-
-#, python-format
-msgid "Failed to load any dispatchers for %s"
-msgstr "No se ha podido cargar ningún asignador para %s"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -242,14 +160,6 @@ msgid "Ignoring pool %(pool_id)s: %(error)s"
 msgstr "Se ignora la agrupación %(pool_id)s: %(error)s"
 
 #, python-format
-msgid ""
-"Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
-"column: %(column)s."
-msgstr ""
-"Sintaxis de YAML no válida en archivo de definiciones de sucesos %(file)s en "
-"la línea: %(line)s, columna: %(column)s."
-
-#, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "Periodo no válido %(period)s: %(err)s"
 
@@ -273,12 +183,6 @@ msgid "Must specify connection_url, and connection_password to use"
 msgstr ""
 "Debe especificar el url_conexión y la contraseña_conexión para utilizar"
 
-#, python-format
-msgid "No plugin named %(plugin)s available for trait %(trait)s"
-msgstr ""
-"No hay ningún plug-in denominado %(plugin)s disponible para el rasgo "
-"%(trait)s"
-
 msgid "Node Manager init failed"
 msgstr "El inicio de Gestor de nodos ha fallado"
 
@@ -297,13 +201,6 @@ msgstr "La API Opencontrail ha devuelto %(status)s %(reason)s"
 #, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "Expresión de ordenar por no válida: %s"
-
-#, python-format
-msgid ""
-"Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: %(err)s"
-msgstr ""
-"Error de análisis en especificación de JSONPath '%(jsonpath)s' para "
-"%(trait)s: %(err)s"
 
 msgid "Period must be positive."
 msgstr "El período debe ser positivo."
@@ -327,18 +224,8 @@ msgstr ""
 "para %(smp)s"
 
 #, python-format
-msgid "Plugin specified, but no plugin name supplied for trait %s"
-msgstr ""
-"Se ha especificado plug-in, pero no se ha proporcionado ningún nombre de "
-"plug-in para el rasgo %s"
-
-#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "¡El sensor de sondeo %(mtr)s ha fallado %(cnt)s veces!"
-
-#, python-format
-msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr "¡El sondeo %(name)s ha fallado %(cnt)s veces!"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -365,20 +252,6 @@ msgstr ""
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "La API de RGW AdminOps ha devuelto %(status)s %(reason)s"
 
-#, python-format
-msgid ""
-"Remaining as %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"Restante como %(state)s debido a %(count)d muestras %(disposition)s umbral, "
-"más reciente: %(most_recent)s"
-
-#, python-format
-msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr ""
-"Permaneciendo como %(state)s debido a las alarmas %(alarm_ids)s en el estado "
-"%(state)s"
-
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
 msgstr ""
 "La solicitud no ha podido conectar con OpenDaylight con la API REST "
@@ -387,10 +260,6 @@ msgstr ""
 #, python-format
 msgid "Required field %s not specified"
 msgstr "Campo necesario %s no especificado"
-
-#, python-format
-msgid "Required field in trait definition not specified: '%s'"
-msgstr "Campo necesario en definición de rasgo no especificado: '%s'"
 
 msgid "Resource"
 msgstr "Recurso"
@@ -417,28 +286,6 @@ msgstr ""
 msgid "The path for the file publisher is required"
 msgstr ""
 "La vía de acceso para la aplicación de publicación de archivos es necesaria"
-
-msgid "Time constraint names must be unique for a given alarm."
-msgstr ""
-"Los nombres de restricción de tiempo deben ser exclusivos para una "
-"determinada alarma."
-
-#, python-format
-msgid "Timezone %s is not valid"
-msgstr "El huso horario %s no es válido"
-
-#, python-format
-msgid ""
-"Transition to %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"La transición a %(state)s debido a %(count)d muestras %(disposition)s "
-"umbral, más reciente: %(most_recent)s"
-
-#, python-format
-msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr ""
-"Transición a %(state)s debido a las alarmas %(alarm_ids)s en estado %(state)s"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -473,24 +320,6 @@ msgstr "No se puede cargar la aplicación de publicación %s"
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "No se puede cargar el inspector de hipervisor: %s"
-
-msgid "Unable to log in to XenAPI (is the Dom0 disk full?)"
-msgstr "No se puede iniciar la sesión en XenAPI (¿está el disco Dom0 lleno?) "
-
-#, python-format
-msgid "Unable to notify alarm %s"
-msgstr "No se puede notificar la alarma %s"
-
-msgid "Unable to notify for an alarm with no action"
-msgstr "No se puede notificar una alarma sin acción"
-
-#, python-format
-msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
-msgstr "No se puede analizar la acción %(action)s para la alarma %(alarm_id)s"
-
-#, python-format
-msgid "Unable to parse action %s"
-msgstr "No se puede analizar la acción %s"
 
 #, python-format
 msgid ""
@@ -533,12 +362,6 @@ msgstr ""
 "ejemplo"
 
 #, python-format
-msgid "Unknown status %(stat)s received on member %(id)s,skipping sample"
-msgstr ""
-"Se ha recibido un estado desconocido %(stat)s en el miembro %(id)s, se omite "
-"el ejemplo"
-
-#, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr ""
 "Se ha recibido un estado desconocido %(stat)s en la agrupación %(id)s, se "
@@ -549,16 +372,6 @@ msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
 "Se ha recibido un estado desconocido %(stat)s en vip %(id)s, se omite el "
 "ejemplo"
-
-#, python-format
-msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
-msgstr ""
-"Se ha recibido un estado desconocido %(stat)s en vpn %(id)s, se omite el "
-"ejemplo"
-
-#, python-format
-msgid "Unsupported action %s"
-msgstr "Acción %s no admitida"
 
 #, python-format
 msgid "VM %s not found in XenServer"
@@ -573,26 +386,6 @@ msgstr "Tipo de sensor incorrecto"
 
 msgid "XenAPI not installed"
 msgstr "XenAPI no está instalado"
-
-#, python-format
-msgid "YAML error reading Event Definitions file %(file)s"
-msgstr "Error de YAML al leer el archivo de definiciones de sucesos %(file)s"
-
-msgid "alarm evaluation cycle failed"
-msgstr "ha fallado el ciclo de evaluación de alarma"
-
-msgid "alarm retrieval failed"
-msgstr "ha fallado la recuperación de alarma"
-
-msgid "alarm state update failed"
-msgstr "ha fallado la actualización de estado de la alarma"
-
-msgid "alarm stats retrieval failed"
-msgstr "ha fallado la recuperación de estadísticas de la alarma"
-
-#, python-format
-msgid "alarm stats retrieval failed: %s"
-msgstr "la recuperación de estadísticas de la alarma ha fallado %s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
@@ -623,13 +416,3 @@ msgstr ""
 
 msgid "running ipmitool failure"
 msgstr "fallo de ejecución de ipmitool"
-
-msgid "state invalid"
-msgstr "estado no válido"
-
-msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp debe ser el objeto datetime"
-
-msgid "timestamp should be datetime object"
-msgstr ""
-"La indicación de fecha y hora debe ser el objeto datetime (fecha y hora)"

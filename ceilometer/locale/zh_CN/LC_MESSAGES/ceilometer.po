@@ -1,4 +1,4 @@
-# Chinese (Simplified, China) translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -7,85 +7,31 @@
 # yelu <yelu@unitedstack.com>, 2013
 # Tom Fifield <tom@openstack.org>, 2013
 # 颜海峰 <yanheven@gmail.com>, 2014
+# yelu <yelu@unitedstack.com>, 2013
 # Yu Zhang, 2013
+# Yu Zhang, 2013
+# 颜海峰 <yanheven@gmail.com>, 2014
 # Lucas Palm <lapalm@us.ibm.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev69\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-22 06:14+0000\n"
+"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language: zh_Hans_CN\n"
+"Language: zh-CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
 "Language-Team: Chinese (China)\n"
-"Plural-Forms: nplurals=1; plural=0\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr "无法找到%(entity)s %(id)s "
-
-#, python-format
-msgid "%(name)s count exceeds maximum value %(maximum)d"
-msgstr "%(name)s数量超过最大值%(maximum)d"
-
-#, python-format
-msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "类型为%(type)s的告警必须设置%(rule)s"
-
-#, python-format
-msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
-msgstr "%(rule1)s和%(rule2)s无法同时被设置"
-
-#, python-format
-msgid "%d datapoints are unknown"
-msgstr "%d 数据点为未知"
-
-#, python-format
-msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
-msgstr "警报 %(alarm_id)s 的动作 %(scheme)s 未知，无法通知"
-
-#, python-format
-msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "告警%(alarm_id)s在项目%(project)s中未找到"
-
-#, python-format
-msgid "Alarm %s not found"
-msgstr "告警%s没有找到"
-
-msgid "Alarm combination rule should contain at least two different alarm ids."
-msgstr "告警组合规则必须包含至少两个不同的告警id"
-
-msgid "Alarm incorrect"
-msgstr "警报不正确"
-
-#, python-format
-msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr "用户%(u)s在项目%(p)s中的告警配额已溢出"
-
-#, python-format
-msgid ""
-"Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
-"%(threshold)s over %(period)s seconds"
-msgstr ""
-"请在 %(meter_name)s 是 %(comparison_operator)s（%(threshold)s 的 "
-"%(statistic)s）的时间超过 %(period)s 秒时发出警报"
-
-#, python-format
-msgid "Alarm with name=%s exists"
-msgstr "名称为%s的告警已存在"
-
-#, python-format
-msgid "Alarm with name='%s' exists"
-msgstr "名称为'%s'的告警已经存在"
-
-#, python-format
-msgid "Alarms %(alarm_ids)s are in unknown state"
-msgstr "告警%(alarm_ids)s处于未知的状态"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -94,14 +40,6 @@ msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr "表%(table_name)s已经存在，无法创建。忽略此错误继续执行。"
-
-#, python-format
-msgid "Cannot specify alarm %s itself in combination rule"
-msgstr "无法在组合规则中指定告警%s自身"
-
-#, python-format
-msgid "Combined state of alarms %s"
-msgstr "将告警%s的状态进行组合"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -152,23 +90,11 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "解析HTTP响应失败: %s"
 
-#, python-format
-msgid "Error while posting alarm: %s"
-msgstr "创建告警%s时遇到错误"
-
-#, python-format
-msgid "Error while putting alarm: %s"
-msgstr "修改告警%s时遇到错误"
-
 msgid "Event"
 msgstr "事件"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "表达式计算结果为NaN！"
-
-#, python-format
-msgid "Failed to evaluate alarm %s"
-msgstr "评估告警%s时失败了"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
@@ -196,10 +122,6 @@ msgid ""
 msgstr ""
 "为虚拟机<name=%(name)s, id=%(id)s>采集内存使用指标失败了，无法从libvirt获取信"
 "息。"
-
-#, python-format
-msgid "Failed to load any dispatchers for %s"
-msgstr "无法为%s加载任何分发器"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -238,12 +160,6 @@ msgid "Ignoring pool %(pool_id)s: %(error)s"
 msgstr "忽略pool %(pool_id)s：%(error)s"
 
 #, python-format
-msgid ""
-"Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
-"column: %(column)s."
-msgstr "事件定义文件%(file)s中有非法YAML语法，行：%(line)s，列%(column)s。"
-
-#, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "非法的间隔%(period)s: %(err)s"
 
@@ -265,10 +181,6 @@ msgstr "多个虚拟机%s在XenServer中被找到"
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "使用时必须指定connection_url和connection_password"
 
-#, python-format
-msgid "No plugin named %(plugin)s available for trait %(trait)s"
-msgstr "特征%(trait)s缺少可用的名为%(plugin)s的插件"
-
 msgid "Node Manager init failed"
 msgstr "节点管理器初始化失败"
 
@@ -288,11 +200,6 @@ msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
 msgid "Order-by expression not valid: %s"
 msgstr "orderby表达式不合法：%s"
 
-#, python-format
-msgid ""
-"Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: %(err)s"
-msgstr "%(trait)s 的 JSONPath 规范“%(jsonpath)s”中存在解析错误：%(err)s"
-
 msgid "Period must be positive."
 msgstr "period 参数必须是正数"
 
@@ -311,16 +218,8 @@ msgid ""
 msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
 
 #, python-format
-msgid "Plugin specified, but no plugin name supplied for trait %s"
-msgstr "特征%s指定了插件但是没有提供插件的名称"
-
-#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
-
-#, python-format
-msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr "拉取%(name)s失败了%(cnt)s次！"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -343,28 +242,12 @@ msgstr "未知的发布策略(%s)，强制使用默认策略"
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps接口返回%(status)s %(reason)s"
 
-#, python-format
-msgid ""
-"Remaining as %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"有%(count)d个数据满足%(disposition)s阈值，因而状态保持为%(state)s，最近的一次"
-"数据：%(most_recent)s"
-
-#, python-format
-msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr "停留在状态%(state)s因为告警%(alarm_ids)s处于状态%(state)s"
-
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
 msgstr "请求无法连接到OpenDaylight的北向REST接口"
 
 #, python-format
 msgid "Required field %s not specified"
 msgstr "必填项%s没有填写"
-
-#, python-format
-msgid "Required field in trait definition not specified: '%s'"
-msgstr "在特征定义中的必填项没有填写：'%s'"
 
 msgid "Resource"
 msgstr "资源"
@@ -388,25 +271,6 @@ msgstr "数据类型%(type)s不被支持。支持的数据类型列表：%(suppo
 
 msgid "The path for the file publisher is required"
 msgstr "文件发布器必须设置文件路径"
-
-msgid "Time constraint names must be unique for a given alarm."
-msgstr "一个指定的告警的时间约束名称必须唯一"
-
-#, python-format
-msgid "Timezone %s is not valid"
-msgstr "时区%s不合法"
-
-#, python-format
-msgid ""
-"Transition to %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"有%(count)d个数据满足%(disposition)s阈值，因而状态迁移到%(state)s，最近的一次"
-"数据：%(most_recent)s"
-
-#, python-format
-msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr "迁移到状态%(state)s，因为告警%(alarm_ids)s处于状态%(state)s"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -439,24 +303,6 @@ msgstr "无法加载发布器%s"
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "无法加载管理程序的探测器：%s"
-
-msgid "Unable to log in to XenAPI (is the Dom0 disk full?)"
-msgstr "无法登录到XenAPI(Dom0磁盘是空么？)"
-
-#, python-format
-msgid "Unable to notify alarm %s"
-msgstr "无法通知警报 %s"
-
-msgid "Unable to notify for an alarm with no action"
-msgstr "无法为一个没有动作的警报进行通知"
-
-#, python-format
-msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
-msgstr "无法为警报 %(alarm_id)s 解析动作 %(action)s "
-
-#, python-format
-msgid "Unable to parse action %s"
-msgstr "无法解析动作%s"
 
 #, python-format
 msgid ""
@@ -492,24 +338,12 @@ msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr "从fw %(id)s收到未知的状态%(stat)s，跳过该采样数据"
 
 #, python-format
-msgid "Unknown status %(stat)s received on member %(id)s,skipping sample"
-msgstr "从member %(id)s收到未知的状态%(stat)s，跳过该采样数据"
-
-#, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr "从pool %(id)s收到未知的状态%(stat)s，跳过该采样数据"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr "从vip %(id)s收到未知的状态%(stat)s，跳过该采样数据"
-
-#, python-format
-msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
-msgstr "从VPN%(id)s收到未知的状态%(stat)s，跳过该采样数据"
-
-#, python-format
-msgid "Unsupported action %s"
-msgstr "动作%s不支持"
 
 #, python-format
 msgid "VM %s not found in XenServer"
@@ -524,30 +358,6 @@ msgstr "错误的传感器类型"
 
 msgid "XenAPI not installed"
 msgstr "XenAPI没有安装"
-
-#, python-format
-msgid "YAML error reading Event Definitions file %(file)s"
-msgstr "读取事件定义文件%(file)s时遇到YAML错误"
-
-#, python-format
-msgid "You are not authorized to create action: %s"
-msgstr "你没有权限创建动作：%s"
-
-msgid "alarm evaluation cycle failed"
-msgstr "警报周期评估失败"
-
-msgid "alarm retrieval failed"
-msgstr "获取警报失败"
-
-msgid "alarm state update failed"
-msgstr "警报状态更新失败"
-
-msgid "alarm stats retrieval failed"
-msgstr "警报统计信息获取失败"
-
-#, python-format
-msgid "alarm stats retrieval failed: %s"
-msgstr "告警状态检索失败：%s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
@@ -575,12 +385,3 @@ msgstr "解析IPMI传感器数据失败，未知的传感器类型"
 
 msgid "running ipmitool failure"
 msgstr "运行ipmitool时失败了"
-
-msgid "state invalid"
-msgstr "状态无效"
-
-msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp必须是datetime对象"
-
-msgid "timestamp should be datetime object"
-msgstr "timestamp必须是datatime对象"

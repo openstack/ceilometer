@@ -1,87 +1,34 @@
-# Korean (South Korea) translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
 # Translators:
 # Seong-ho Cho <darkcircle.0426@gmail.com>, 2014
 # Seunghyo Chun <seunghyo.chun@gmail.com>, 2013
+# Seunghyo Chun <seunghyo.chun@gmail.com>, 2013
+# Sungjin Kang <potopro@gmail.com>, 2013
 # Sungjin Kang <potopro@gmail.com>, 2013
 # Lucas Palm <lapalm@us.ibm.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev69\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-22 06:14+0000\n"
+"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language: ko_KR\n"
+"Language: ko-KR\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
 "Language-Team: Korean (South Korea)\n"
-"Plural-Forms: nplurals=1; plural=0\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr "%(entity)s %(id)s을(를) 찾을 수 없음"
-
-#, python-format
-msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "%(type)s 유형 알람에 %(rule)s을(를) 설정해야 함"
-
-#, python-format
-msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
-msgstr "%(rule1)s 및 %(rule2)s을(를) 동시에 설정할 수 없음"
-
-#, python-format
-msgid "%d datapoints are unknown"
-msgstr "%d 데이터포인트를 알 수 없습니다. "
-
-#, python-format
-msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
-msgstr ""
-"%(alarm_id)s 알람에 대한 %(scheme)s 조치를 알 수 없어 알림을 전송할 수 없습니"
-"다. "
-
-#, python-format
-msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "%(alarm_id)s 알람이 %(project)s 프로젝트에 없음"
-
-#, python-format
-msgid "Alarm %s not found"
-msgstr "%s 알람을 찾을 수 없음"
-
-msgid "Alarm combination rule should contain at least two different alarm ids."
-msgstr "알람 조합 규칙에 서로 다른 알람 ID가 둘 이상 포함되어야 합니다."
-
-msgid "Alarm incorrect"
-msgstr "알림이 올바르지 않습니다"
-
-#, python-format
-msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr "%(p)s 프로젝트의 %(u)s 사용자에 대한 알람 할당량 초과"
-
-#, python-format
-msgid ""
-"Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
-"%(threshold)s over %(period)s seconds"
-msgstr ""
-"%(meter_name)s이(가) %(comparison_operator)s %(statistic)s %(threshold)s인 경"
-"우 알람(%(period)s초 동안)"
-
-#, python-format
-msgid "Alarm with name=%s exists"
-msgstr "이름=%s인 알람이 있음"
-
-#, python-format
-msgid "Alarm with name='%s' exists"
-msgstr "이름='%s'인 알람이 존재함"
-
-#, python-format
-msgid "Alarms %(alarm_ids)s are in unknown state"
-msgstr "알람 %(alarm_ids)s이(가) 알 수 없는 상태임"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -90,14 +37,6 @@ msgstr "'%s' 표현식에서 산술 변환기는 하나 이상의 미터를 사�
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr "%(table_name)s 테이블을 작성할 수 없음, 이미 존재합니다. 오류 무시"
-
-#, python-format
-msgid "Cannot specify alarm %s itself in combination rule"
-msgstr "조합 규칙에 %s 알람 자체를 지정할 수 없음"
-
-#, python-format
-msgid "Combined state of alarms %s"
-msgstr "알람 %s의 결합된 상태"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -150,23 +89,11 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "HTTP 응답 구문 분석 중 오류 발생: %s"
 
-#, python-format
-msgid "Error while posting alarm: %s"
-msgstr "알람 게시 중 오류 발생: %s"
-
-#, python-format
-msgid "Error while putting alarm: %s"
-msgstr "알람 설정 중 오류 발생: %s"
-
 msgid "Event"
 msgstr "이벤트"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "표현식이 NaN 값으로 평가되었습니다!"
-
-#, python-format
-msgid "Failed to evaluate alarm %s"
-msgstr "알람 %s 평가 실패"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
@@ -195,10 +122,6 @@ msgid ""
 msgstr ""
 "인스턴스 <이름=%(name)s, id=%(id)s>의 메모리 사용량 검사 실패, libvirt에서 정"
 "보를 가져올 수 없습니다."
-
-#, python-format
-msgid "Failed to load any dispatchers for %s"
-msgstr "%s에 대한 디스패처 로드 실패"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -237,14 +160,6 @@ msgid "Ignoring pool %(pool_id)s: %(error)s"
 msgstr "풀 %(pool_id)s 무시 중: %(error)s"
 
 #, python-format
-msgid ""
-"Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
-"column: %(column)s."
-msgstr ""
-"다음에서 이벤트 정의 파일 %(file)s의 올바르지 않은 YAML 구문: 행: %(line)s, "
-"열: %(column)s"
-
-#, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "올바르지 않은 기간 %(period)s: %(err)s"
 
@@ -266,10 +181,6 @@ msgstr "여러 VM %s을(를) XenServer에서 찾음 "
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "사용할 connection_url 및 connection_password를 지정해야 함 "
 
-#, python-format
-msgid "No plugin named %(plugin)s available for trait %(trait)s"
-msgstr "특성 %(trait)s에 대해 이름이 %(plugin)s인 사용 가능한 플러그인이 없음"
-
 msgid "Node Manager init failed"
 msgstr "노드 관리자 초기화 실패"
 
@@ -289,12 +200,6 @@ msgstr "Opencontrail API가 %(status)s 리턴: %(reason)s"
 msgid "Order-by expression not valid: %s"
 msgstr "Order-by 표현식이 올바르지 않음: %s"
 
-#, python-format
-msgid ""
-"Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: %(err)s"
-msgstr ""
-"%(trait)s에 대한 JSONPath 스펙 '%(jsonpath)s'의 구문 분석 오류: %(err)s"
-
 msgid "Period must be positive."
 msgstr "기간은 양수여야 합니다. "
 
@@ -313,16 +218,8 @@ msgid ""
 msgstr "파이프라인 %(pipeline)s: %(smp)s의 변환기 %(trans)s에서 오류 후 종료"
 
 #, python-format
-msgid "Plugin specified, but no plugin name supplied for trait %s"
-msgstr "플러그인이 지정되었으나 특성 %s에 대해 플러그인 이름이 제공되지 않음"
-
-#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "폴링 %(mtr)s 센서가 %(cnt)s번 실패했습니다!"
-
-#, python-format
-msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr "폴링 %(name)s이(가) %(cnt)s번 실패했습니다!"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -346,29 +243,12 @@ msgstr "공개 정책을 알 수 없음(%s). 기본값으로 강제 설정함"
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API가 %(status)s %(reason)s을(를) 리턴함"
 
-#, python-format
-msgid ""
-"Remaining as %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"%(count)d개 샘플의 %(disposition)s(으)로 인해 %(state)s(으)로 남아 있음 임계"
-"값, 가장 최근: %(most_recent)s"
-
-#, python-format
-msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr ""
-"상태 %(state)s에 있는 알람 %(alarm_ids)s(으)로 인해 %(state)s(으)로 남음"
-
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
 msgstr "요청이 NorthBound REST API로 OpenDaylight에 연결하는 데 실패함"
 
 #, python-format
 msgid "Required field %s not specified"
 msgstr "필수 필드 %s이(가) 지정되지 않음"
-
-#, python-format
-msgid "Required field in trait definition not specified: '%s'"
-msgstr "특성 정의에서 필요한 필드가 지정되지 않음: '%s'"
 
 msgid "Resource"
 msgstr "리소스"
@@ -394,26 +274,6 @@ msgstr ""
 
 msgid "The path for the file publisher is required"
 msgstr "파일 공개자의 경로가 필요함"
-
-msgid "Time constraint names must be unique for a given alarm."
-msgstr "시간 제한조건 이름은 지정된 알람에 고유해야 합니다."
-
-#, python-format
-msgid "Timezone %s is not valid"
-msgstr "시간대 %s이(가) 올바르지 않음"
-
-#, python-format
-msgid ""
-"Transition to %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"%(count)d개 샘플의 %(disposition)s(으)로 인해 %(state)s(으)로 전환되었습니"
-"다. 임계값, 가장 최근: %(most_recent)s"
-
-#, python-format
-msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr ""
-"상태 %(state)s에 있는 알람 %(alarm_ids)s(으)로 인해 %(state)s(으)로 상태 전이"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -446,24 +306,6 @@ msgstr "공개자 %s을(를) 로드할 수 없음"
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "하이퍼바이저 검사기를 로드할 수 없음: %s"
-
-msgid "Unable to log in to XenAPI (is the Dom0 disk full?)"
-msgstr "XenAPI에 로그인할 수 없음(Dom0 디스크가 가득 찼습니까?)"
-
-#, python-format
-msgid "Unable to notify alarm %s"
-msgstr "%s 알람에 대한 알림을 전송할 수 없습니다. "
-
-msgid "Unable to notify for an alarm with no action"
-msgstr "조치없이 알람을 전송할 수 없습니다. "
-
-#, python-format
-msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
-msgstr "%(alarm_id)s에 대한 %(action)s 조치를 구문 분석할 수 없습니다. "
-
-#, python-format
-msgid "Unable to parse action %s"
-msgstr "%s 조치를 구문 분석할 수 없음"
 
 #, python-format
 msgid ""
@@ -505,11 +347,6 @@ msgstr ""
 "fw %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
 
 #, python-format
-msgid "Unknown status %(stat)s received on member %(id)s,skipping sample"
-msgstr ""
-"멤버 %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
-
-#, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr ""
 "풀 %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
@@ -518,15 +355,6 @@ msgstr ""
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
 "vip %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
-
-#, python-format
-msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
-msgstr ""
-"vpn %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
-
-#, python-format
-msgid "Unsupported action %s"
-msgstr "지원되지 않는 조치 %s"
 
 #, python-format
 msgid "VM %s not found in XenServer"
@@ -541,26 +369,6 @@ msgstr "잘못된 센서 유형"
 
 msgid "XenAPI not installed"
 msgstr "XenAPI가 설치되지 않음"
-
-#, python-format
-msgid "YAML error reading Event Definitions file %(file)s"
-msgstr "이벤트 정의 파일 %(file)s을(를) 읽는 중에 YAML 오류 발생"
-
-msgid "alarm evaluation cycle failed"
-msgstr "알람 평가 주기 실패"
-
-msgid "alarm retrieval failed"
-msgstr "알림 전송에 실패했습니다"
-
-msgid "alarm state update failed"
-msgstr "알람 상태 업데이트에 실패했습니다. "
-
-msgid "alarm stats retrieval failed"
-msgstr "알람 통계 검색에 실패했습니다. "
-
-#, python-format
-msgid "alarm stats retrieval failed: %s"
-msgstr "알람 상태 검색 실패: %s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
@@ -589,12 +397,3 @@ msgstr "IPMI 센서 데이터 구문 분석에 실패했음, 알 수 없는 센�
 
 msgid "running ipmitool failure"
 msgstr "ipmitool 실행 실패"
-
-msgid "state invalid"
-msgstr "상태가 잘못되었습니다"
-
-msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp는 Datetime 오브젝트여야 함"
-
-msgid "timestamp should be datetime object"
-msgstr "시간소인은 Datetime 오브젝트여야 함"
