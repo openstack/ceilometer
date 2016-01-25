@@ -191,7 +191,7 @@ def load_definitions(config_def):
             continue
 
         try:
-            if (event_def['volume'] != 1 or
+            if (event_def.get('volume') != 1 or
                     not cfg.CONF.notification.disable_non_metric_meters):
                 md = MeterDefinition(event_def)
                 meter_defs[event_def['name']] = md
