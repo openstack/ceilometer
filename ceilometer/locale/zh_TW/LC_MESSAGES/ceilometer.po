@@ -1,4 +1,4 @@
-# Chinese (Traditional, Taiwan) translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -8,76 +8,23 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev69\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-22 06:14+0000\n"
+"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language: zh_Hant_TW\n"
+"Language: zh-TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
 "Language-Team: Chinese (Taiwan)\n"
-"Plural-Forms: nplurals=1; plural=0\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr "找不到 %(entity)s %(id)s"
-
-#, python-format
-msgid "%(rule)s must be set for %(type)s type alarm"
-msgstr "必須為 %(type)s 類型警示設定 %(rule)s"
-
-#, python-format
-msgid "%(rule1)s and %(rule2)s cannot be set at the same time"
-msgstr "無法同時設定 %(rule1)s 和 %(rule2)s"
-
-#, python-format
-msgid "%d datapoints are unknown"
-msgstr "%d 個資料點不明"
-
-#, python-format
-msgid "Action %(scheme)s for alarm %(alarm_id)s is unknown, cannot notify"
-msgstr "警示 %(alarm_id)s 的動作 %(scheme)s 不明，無法通知"
-
-#, python-format
-msgid "Alarm %(alarm_id)s not found in project %(project)s"
-msgstr "在專案 %(project)s 中找不到警示 %(alarm_id)s"
-
-#, python-format
-msgid "Alarm %s not found"
-msgstr "找不到警示 %s"
-
-msgid "Alarm combination rule should contain at least two different alarm ids."
-msgstr "警示組合規則應該至少包含兩個不同的警示 ID。"
-
-msgid "Alarm incorrect"
-msgstr "警示不正確"
-
-#, python-format
-msgid "Alarm quota exceeded for user %(u)s on project %(p)s"
-msgstr "在專案 %(p)s 上，針對使用者 %(u)s 已超出的警示配額"
-
-#, python-format
-msgid ""
-"Alarm when %(meter_name)s is %(comparison_operator)s a %(statistic)s of "
-"%(threshold)s over %(period)s seconds"
-msgstr ""
-"如果 %(meter_name)s 在 %(period)s 秒內 %(comparison_operator)s %(threshold)s "
-"的%(statistic)s，則會出現警示"
-
-#, python-format
-msgid "Alarm with name=%s exists"
-msgstr "名稱為 %s 的警示已存在"
-
-#, python-format
-msgid "Alarm with name='%s' exists"
-msgstr "名稱為 '%s' 的警示已存在"
-
-#, python-format
-msgid "Alarms %(alarm_ids)s are in unknown state"
-msgstr "警示 %(alarm_ids)s 處於不明狀態"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -86,14 +33,6 @@ msgstr "在表示式 '%s' 中，算術轉換器必須至少使用一種計量"
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr "無法建立表格 %(table_name)s，該表格已經存在。將忽略錯誤"
-
-#, python-format
-msgid "Cannot specify alarm %s itself in combination rule"
-msgstr "無法在組合規則中指定警示 %s 本身"
-
-#, python-format
-msgid "Combined state of alarms %s"
-msgstr "警示 %s 的合併狀態"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -144,23 +83,11 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "剖析 HTTP 回應時發生錯誤：%s"
 
-#, python-format
-msgid "Error while posting alarm: %s"
-msgstr "公佈警示時發生錯誤：%s"
-
-#, python-format
-msgid "Error while putting alarm: %s"
-msgstr "放置警示時發生錯誤：%s"
-
 msgid "Event"
 msgstr "事件"
 
 msgid "Expression evaluated to a NaN value!"
 msgstr "表示式已求值為非數字值！"
-
-#, python-format
-msgid "Failed to evaluate alarm %s"
-msgstr "無法評估警示 %s"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
@@ -186,10 +113,6 @@ msgid ""
 msgstr ""
 "無法檢查實例 <名稱=%(name)s，ID=%(id)s> 的記憶體用量，無法從 libVirt 取得資"
 "訊。"
-
-#, python-format
-msgid "Failed to load any dispatchers for %s"
-msgstr "無法載入 %s 的任何分派器"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -228,12 +151,6 @@ msgid "Ignoring pool %(pool_id)s: %(error)s"
 msgstr "正在忽略儲存區 %(pool_id)s：%(error)s"
 
 #, python-format
-msgid ""
-"Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
-"column: %(column)s."
-msgstr "事件定義檔 %(file)s 第 %(line)s 行第 %(column)s 欄的 YAML 語法無效。"
-
-#, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "期間 %(period)s 無效：%(err)s"
 
@@ -255,10 +172,6 @@ msgstr "在 XenServer 中找到多個 VM %s"
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "必須指定 connection_url 和 connection_password，才能使用"
 
-#, python-format
-msgid "No plugin named %(plugin)s available for trait %(trait)s"
-msgstr "特徵 %(trait)s 無法使用任何名稱為 %(plugin)s 的外掛程式 "
-
 msgid "Node Manager init failed"
 msgstr "節點管理程式起始設定失敗"
 
@@ -278,11 +191,6 @@ msgstr "Opencontrail API 傳回了 %(status)s %(reason)s"
 msgid "Order-by expression not valid: %s"
 msgstr "排序方式表示式無效：%s"
 
-#, python-format
-msgid ""
-"Parse error in JSONPath specification '%(jsonpath)s' for %(trait)s: %(err)s"
-msgstr "%(trait)s 的 JSONPath 規格 '%(jsonpath)s' 發生剖析錯誤：%(err)s"
-
 msgid "Period must be positive."
 msgstr "期間必須是正數。"
 
@@ -301,16 +209,8 @@ msgid ""
 msgstr "管線 %(pipeline)s：%(smp)s 的轉換器 %(trans)s傳回錯誤後結束"
 
 #, python-format
-msgid "Plugin specified, but no plugin name supplied for trait %s"
-msgstr "指定了外掛程式，但沒有提供任何外掛程式名稱給特徵 %s"
-
-#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "輪詢 %(mtr)s 感應器已失敗 %(cnt)s 次！"
-
-#, python-format
-msgid "Polling %(name)s faild for %(cnt)s times!"
-msgstr "輪詢 %(name)s 已失敗 %(cnt)s 次！"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -333,28 +233,12 @@ msgstr "發佈原則不明 (%s)，強制設為預設值"
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API 傳回了 %(status)s %(reason)s"
 
-#, python-format
-msgid ""
-"Remaining as %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"保持 %(state)s，因為有 %(count)d 個樣本 %(disposition)s 臨界值，最新："
-"%(most_recent)s"
-
-#, python-format
-msgid "Remaining as %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr "保持 %(state)s，因為警示 %(alarm_ids)s 處於狀態 %(state)s"
-
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
 msgstr "要求無法使用 NorthBound REST API 來連接至 OpenDaylight"
 
 #, python-format
 msgid "Required field %s not specified"
 msgstr "未指定必要欄位 %s"
-
-#, python-format
-msgid "Required field in trait definition not specified: '%s'"
-msgstr "未指定特徵定義中的必要欄位：'%s'"
 
 msgid "Resource"
 msgstr "資源"
@@ -378,25 +262,6 @@ msgstr "不支援資料類型 %(type)s。支援的資料類型清單為：%(supp
 
 msgid "The path for the file publisher is required"
 msgstr "需要檔案發佈者的路徑"
-
-msgid "Time constraint names must be unique for a given alarm."
-msgstr "針對給定的警示，時間限制名稱必須是唯一的。"
-
-#, python-format
-msgid "Timezone %s is not valid"
-msgstr "時區 %s 無效"
-
-#, python-format
-msgid ""
-"Transition to %(state)s due to %(count)d samples %(disposition)s threshold, "
-"most recent: %(most_recent)s"
-msgstr ""
-"轉移到 %(state)s，由於 %(count)d 個樣本 %(disposition)s 臨界值，最新："
-"%(most_recent)s"
-
-#, python-format
-msgid "Transition to %(state)s due to alarms %(alarm_ids)s in state %(state)s"
-msgstr "轉移至 %(state)s，因為警示 %(alarm_ids)s 處於狀態 %(state)s"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -429,24 +294,6 @@ msgstr "無法載入發佈者 %s"
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr "無法載入 Hypervisor 檢查程式：%s"
-
-msgid "Unable to log in to XenAPI (is the Dom0 disk full?)"
-msgstr "無法登入 XenAPI（Dom0 磁碟已滿？）"
-
-#, python-format
-msgid "Unable to notify alarm %s"
-msgstr "無法通知警示 %s"
-
-msgid "Unable to notify for an alarm with no action"
-msgstr "在不使用任何動作的情況下，無法通知警示"
-
-#, python-format
-msgid "Unable to parse action %(action)s for alarm %(alarm_id)s"
-msgstr "無法剖析警示 %(alarm_id)s 的動作 %(action)s"
-
-#, python-format
-msgid "Unable to parse action %s"
-msgstr "無法剖析動作 %s"
 
 #, python-format
 msgid ""
@@ -483,24 +330,12 @@ msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr "在防火牆 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
-msgid "Unknown status %(stat)s received on member %(id)s,skipping sample"
-msgstr "在成員 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
-
-#, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr "在儲存區 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr "在 VIP %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
-
-#, python-format
-msgid "Unknown status %(stat)s received on vpn %(id)s,skipping sample"
-msgstr "在 VPN %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
-
-#, python-format
-msgid "Unsupported action %s"
-msgstr "不受支援的動作 %s"
 
 #, python-format
 msgid "VM %s not found in XenServer"
@@ -515,26 +350,6 @@ msgstr "感應器類型錯誤"
 
 msgid "XenAPI not installed"
 msgstr "未安裝 XenAPI"
-
-#, python-format
-msgid "YAML error reading Event Definitions file %(file)s"
-msgstr "讀取事件定義檔 %(file)s 時發生 YAML 錯誤"
-
-msgid "alarm evaluation cycle failed"
-msgstr "警示評估週期失敗"
-
-msgid "alarm retrieval failed"
-msgstr "警示擷取失敗"
-
-msgid "alarm state update failed"
-msgstr "警示狀態更新失敗"
-
-msgid "alarm stats retrieval failed"
-msgstr "警示統計資料擷取失敗"
-
-#, python-format
-msgid "alarm stats retrieval failed: %s"
-msgstr "警示統計資料擷取失敗：%s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
@@ -562,12 +377,3 @@ msgstr "剖析 IPMI 感應器資料失敗，感應器類型不明"
 
 msgid "running ipmitool failure"
 msgstr "執行 ipmitool 失敗"
-
-msgid "state invalid"
-msgstr "狀態無效"
-
-msgid "state_timestamp should be datetime object"
-msgstr "state_timestamp 應該為日期時間物件"
-
-msgid "timestamp should be datetime object"
-msgstr "時間戳記應該為日期時間物件"

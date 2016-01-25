@@ -1,21 +1,21 @@
 # Translations template for ceilometer.
-# Copyright (C) 2015 ORGANIZATION
+# Copyright (C) 2016 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.dev48\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-10 06:16+0000\n"
+"POT-Creation-Date: 2016-01-25 06:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"Generated-By: Babel 2.2.0\n"
 
 #: ceilometer/coordination.py:74
 msgid "Coordination backend started successfully."
@@ -31,22 +31,27 @@ msgstr ""
 msgid "Left partitioning group %s"
 msgstr ""
 
-#: ceilometer/notification.py:289
+#: ceilometer/declarative.py:165
+#, python-format
+msgid "Definitions: %s"
+msgstr ""
+
+#: ceilometer/notification.py:301
 msgid "Reloading notification agent and listeners."
 msgstr ""
 
-#: ceilometer/pipeline.py:415
+#: ceilometer/pipeline.py:409
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter"
 " %(param)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:712 ceilometer/pipeline.py:774
+#: ceilometer/pipeline.py:705 ceilometer/pipeline.py:767
 msgid "detected decoupled pipeline config format"
 msgstr ""
 
-#: ceilometer/pipeline.py:798 ceilometer/pipeline.py:817
+#: ceilometer/pipeline.py:791 ceilometer/pipeline.py:810
 #, python-format
 msgid "Pipeline config: %s"
 msgstr ""
@@ -69,67 +74,27 @@ msgstr ""
 msgid "Polling pollster %(poll)s in the context of %(src)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:484
+#: ceilometer/agent/manager.py:487
 msgid "Reconfiguring polling tasks."
 msgstr ""
 
-#: ceilometer/alarm/service.py:94
-#, python-format
-msgid "initiating evaluation cycle on %d alarms"
-msgstr ""
-
-#: ceilometer/alarm/evaluator/__init__.py:75
-#, python-format
-msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
-msgstr ""
-
-#: ceilometer/alarm/notifier/log.py:31
-#, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s of %(severity)s priority from"
-" %(previous)s to %(current)s with action %(action)s because %(reason)s."
-msgstr ""
-
-#: ceilometer/alarm/notifier/rest.py:68
-#, python-format
-msgid ""
-"Notifying alarm %(alarm_name)s %(alarm_id)s with severity %(severity)s "
-"from %(previous)s to %(current)s with action %(action)s because "
-"%(reason)s. request-id: %(request_id)s "
-msgstr ""
-
-#: ceilometer/alarm/storage/impl_log.py:60
-#, python-format
-msgid "Dropping alarm history data with TTL %d"
-msgstr ""
-
-#: ceilometer/alarm/storage/impl_sqlalchemy.py:342
-#, python-format
-msgid "%d alarm histories are removed from database"
-msgstr ""
-
-#: ceilometer/api/app.py:132
+#: ceilometer/api/app.py:109
 #, python-format
 msgid "Starting server in PID %s"
 msgstr ""
 
-#: ceilometer/api/app.py:133
+#: ceilometer/api/app.py:110
 msgid "Configuration:"
 msgstr ""
 
-#: ceilometer/api/app.py:137
+#: ceilometer/api/app.py:114
 #, python-format
 msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
 msgstr ""
 
-#: ceilometer/api/app.py:141
+#: ceilometer/api/app.py:118
 #, python-format
 msgid "serving on http://%(host)s:%(port)s"
-msgstr ""
-
-#: ceilometer/api/controllers/v2/alarms.py:329
-#, python-format
-msgid "duplicate actions are found: %s, remove duplicate ones"
 msgstr ""
 
 #: ceilometer/api/controllers/v2/utils.py:47
@@ -137,21 +102,12 @@ msgstr ""
 msgid "No limit value provided, result set will be limited to %(limit)d."
 msgstr ""
 
-#: ceilometer/cmd/eventlet/storage.py:45
+#: ceilometer/cmd/storage.py:44
 msgid "Nothing to clean, database metering time to live is disabled"
 msgstr ""
 
-#: ceilometer/cmd/eventlet/storage.py:54
+#: ceilometer/cmd/storage.py:53
 msgid "Nothing to clean, database event time to live is disabled"
-msgstr ""
-
-#: ceilometer/cmd/eventlet/storage.py:63
-msgid "Nothing to clean, database alarm history time to live is disabled"
-msgstr ""
-
-#: ceilometer/event/converter.py:407
-#, python-format
-msgid "Event Definitions: %s"
 msgstr ""
 
 #: ceilometer/event/storage/impl_elasticsearch.py:107
@@ -166,23 +122,17 @@ msgstr ""
 msgid "Dropping event data with TTL %d"
 msgstr ""
 
-#: ceilometer/event/storage/impl_sqlalchemy.py:440
+#: ceilometer/event/storage/impl_sqlalchemy.py:439
 #, python-format
 msgid "%d events are removed from database"
 msgstr ""
 
-#: ceilometer/hardware/pollsters/generic.py:253
-#: ceilometer/meter/notifications.py:177
-#, python-format
-msgid "Meter Definitions: %s"
-msgstr ""
-
-#: ceilometer/network/floatingip.py:54
+#: ceilometer/network/floatingip.py:55
 #, python-format
 msgid "FLOATING IP USAGE: %s"
 msgstr ""
 
-#: ceilometer/publisher/messaging.py:104
+#: ceilometer/publisher/messaging.py:93
 #, python-format
 msgid "Publishing policy set to %s"
 msgstr ""
@@ -197,21 +147,21 @@ msgstr ""
 msgid "Dropping metering data with TTL %d"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:364
+#: ceilometer/storage/impl_sqlalchemy.py:368
 #, python-format
 msgid "%d samples removed from database"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:400
+#: ceilometer/storage/impl_sqlalchemy.py:404
 msgid "Expired residual resource and meter definition data"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:264
+#: ceilometer/storage/mongo/utils.py:259
 #, python-format
 msgid "Connecting to %(db)s on %(nodelist)s"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:464
+#: ceilometer/storage/mongo/utils.py:462
 #, python-format
 msgid "Index %s will be recreate."
 msgstr ""
