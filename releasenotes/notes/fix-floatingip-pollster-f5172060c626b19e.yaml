@@ -1,0 +1,9 @@
+---
+fixes:
+    - >
+      [`bug 1536338 <https://bugs.launchpad.net/ceilometer/+bug/1536338>`_]
+      Patch was added to fix the broken floatingip pollster
+      that polled data from nova api, but since the nova api
+      filtered the data by tenant, ceilometer was not getting
+      any data back. The fix changes the pollster to use the
+      neutron api instead to get the floating ip info.
