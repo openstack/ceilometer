@@ -1,0 +1,8 @@
+---
+fixes:
+    - >
+      [`bug 1536699 <https://bugs.launchpad.net/ceilometer/+bug/1536699>`_]
+      Patch to fix volume field lookup in meter definition file. In case
+      the field is missing in the definition, it raises a keyerror and
+      aborts. Instead we should skip the missing field meter and continue
+      with the rest of the definitions.
