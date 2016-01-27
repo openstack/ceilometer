@@ -25,4 +25,5 @@
    dbreco
    development
    manual
+   upgrade
    mod_wsgi
