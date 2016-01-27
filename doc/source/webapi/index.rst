@@ -5,7 +5,6 @@
 .. toctree::
    :maxdepth: 2
 
-   v1
    v2
 
 You can get API version list via request to endpoint root path. For example::

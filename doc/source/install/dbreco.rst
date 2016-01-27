@@ -15,9 +15,17 @@
 
 .. _choosing_db_backend:
 
-=============================
- Choosing a database backend
-=============================
+=====================================
+ Choosing a database backend - Legacy
+=====================================
+
+.. note:
+
+   Ceilometer's existing database capabilities is intended for post processing
+   and auditing purposes where responsiveness is not a requirement. It
+   captures the full fidelity of each datapoint and thus is not designed
+   for low latency use cases. For more responsive use cases, it's recommended
+   to store data in an alternative source such as Gnocchi_
 
 Selecting a database backend for Ceilometer should not be done lightly for
 numerous reasons:
@@ -49,3 +57,5 @@ MySQL              Yes                           Yes                 Yes
 PostgreSQL         Yes                           Yes                 Yes
 HBase              Yes                           Yes, except groupby Yes
 ================== ============================= =================== ======
+
+.. _Gnocchi: http://gnocchi.xyz

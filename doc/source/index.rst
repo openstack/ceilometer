@@ -17,25 +17,13 @@
 Welcome to the Ceilometer developer documentation!
 ==================================================
 
-The :term:`Ceilometer` project aims to deliver a unique point of
-contact for billing systems to acquire all of the measurements they
-need to establish customer billing, across all current OpenStack core
+The :term:`Ceilometer` project is a data collection service that provides the
+ability to normalise and transform data across all current OpenStack core
 components with work underway to support future OpenStack components.
 
-What is the purpose of the project and vision for it?
-=====================================================
-
-* Provide efficient collection of metering data, in terms of CPU and
-  network costs.
-* Allow deployers to integrate with the metering system directly or by
-  replacing components.
-* Data may be collected by monitoring notifications sent from existing
-  services or by polling the infrastructure.
-* Allow deployers to configure the type of data collected to meet
-  their operating requirements.
-* The data collected by the metering system is made visible to some
-  users through a REST API.
-* The metering messages are signed and :term:`non-repudiable`.
+Ceilometer is a component of the Telemetry project. Its data can be used to
+provide customer billing, resource tracking, and alarming capabilities
+across all OpenStack core components.
 
 This documentation offers information on how Ceilometer works and how to
 contribute to the project.
