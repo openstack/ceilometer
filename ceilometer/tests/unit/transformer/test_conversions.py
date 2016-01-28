@@ -63,6 +63,32 @@ class AggregatorTransformerTestCase(base.BaseTestCase):
         self.assertRaises(ValueError, conversions.AggregatorTransformer,
                           "2", "abc", None, None, None)
 
+    def test_init_no_timestamp(self):
+        aggregator = conversions.AggregatorTransformer("1", "1", None,
+                                                       None, None)
+        self.assertEqual("first", aggregator.timestamp)
+
+    def test_init_timestamp_none(self):
+        aggregator = conversions.AggregatorTransformer("1", "1", None,
+                                                       None, None, None)
+        self.assertEqual("first", aggregator.timestamp)
+
+    def test_init_timestamp_first(self):
+        aggregator = conversions.AggregatorTransformer("1", "1", None,
+                                                       None, None, "first")
+        self.assertEqual("first", aggregator.timestamp)
+
+    def test_init_timestamp_last(self):
+        aggregator = conversions.AggregatorTransformer("1", "1", None,
+                                                       None, None, "last")
+        self.assertEqual("last", aggregator.timestamp)
+
+    def test_init_timestamp_invalid(self):
+        aggregator = conversions.AggregatorTransformer("1", "1", None,
+                                                       None, None,
+                                                       "invalid_option")
+        self.assertEqual("first", aggregator.timestamp)
+
     def test_size_unbounded(self):
         aggregator = conversions.AggregatorTransformer(size="0",
                                                        retention_time="300")

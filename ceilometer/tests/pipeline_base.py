@@ -18,10 +18,12 @@
 # under the License.
 
 import abc
+import copy
 import datetime
 import traceback
 
 import mock
+from oslo_context import context
 from oslo_utils import timeutils
 from oslotest import base
 from oslotest import mockpatch
@@ -1659,6 +1661,65 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual(42, getattr(publisher.samples[0], 'volume'))
         self.assertEqual("test_resource", getattr(publisher.samples[0],
                                                   'resource_id'))
+
+    def test_aggregator_to_rate_of_change_transformer_two_resources(self):
+        resource_id = ['1ca738a1-c49c-4401-8346-5c60ebdb03f4',
+                       '5dd418a6-c6a9-49c9-9cef-b357d72c71dd']
+
+        aggregator = conversions.AggregatorTransformer(size="2",
+                                                       timestamp="last")
+
+        rate_of_change_transformer = conversions.RateOfChangeTransformer()
+
+        counter_time = timeutils.parse_isotime('2016-01-01T12:00:00+00:00')
+
+        for offset in range(2):
+            counter = copy.copy(self.test_counter)
+            counter.timestamp = timeutils.isotime(counter_time)
+            counter.resource_id = resource_id[0]
+            counter.volume = offset
+            counter.type = sample.TYPE_CUMULATIVE
+            counter.unit = 'ns'
+            aggregator.handle_sample(context.get_admin_context(), counter)
+
+            if offset == 1:
+                test_time = counter_time
+
+            counter_time = counter_time + datetime.timedelta(0, 1)
+
+        aggregated_counters = aggregator.flush(context.get_admin_context())
+        self.assertEqual(len(aggregated_counters), 1)
+        self.assertEqual(aggregated_counters[0].timestamp,
+                         timeutils.isotime(test_time))
+
+        rate_of_change_transformer.handle_sample(context.get_admin_context(),
+                                                 aggregated_counters[0])
+
+        for offset in range(2):
+            counter = copy.copy(self.test_counter)
+            counter.timestamp = timeutils.isotime(counter_time)
+            counter.resource_id = resource_id[offset]
+            counter.volume = 2
+            counter.type = sample.TYPE_CUMULATIVE
+            counter.unit = 'ns'
+            aggregator.handle_sample(context.get_admin_context(), counter)
+
+            if offset == 0:
+                test_time = counter_time
+
+            counter_time = counter_time + datetime.timedelta(0, 1)
+
+        aggregated_counters = aggregator.flush(context.get_admin_context())
+        self.assertEqual(len(aggregated_counters), 2)
+
+        for counter in aggregated_counters:
+            if counter.resource_id == resource_id[0]:
+                rateOfChange = rate_of_change_transformer.handle_sample(
+                    context.get_admin_context(), counter)
+                self.assertEqual(counter.timestamp,
+                                 timeutils.isotime(test_time))
+
+        self.assertEqual(rateOfChange.volume, 1)
 
     def _do_test_arithmetic_expr_parse(self, expr, expected):
         actual = arithmetic.ArithmeticTransformer.parse_expr(expr)

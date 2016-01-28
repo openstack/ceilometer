@@ -236,11 +236,17 @@ class AggregatorTransformer(ScalingTransformer):
 
         AggregatorTransformer(size=15, user_id='first',
                               resource_metadata='drop')
+
+      To keep the timestamp of the last received sample rather
+      than the first:
+
+        AggregatorTransformer(timestamp="last")
+
     """
 
     def __init__(self, size=1, retention_time=None,
                  project_id=None, user_id=None, resource_metadata="last",
-                 **kwargs):
+                 timestamp="first", **kwargs):
         super(AggregatorTransformer, self).__init__(**kwargs)
         self.samples = {}
         self.counts = collections.defaultdict(int)
@@ -248,6 +254,11 @@ class AggregatorTransformer(ScalingTransformer):
         self.retention_time = float(retention_time) if retention_time else None
         if not (self.size or self.retention_time):
             self.size = 1
+
+        if timestamp in ["first", "last"]:
+            self.timestamp = timestamp
+        else:
+            self.timestamp = "first"
 
         self.initial_timestamp = None
         self.aggregated_samples = 0
@@ -295,6 +306,8 @@ class AggregatorTransformer(ScalingTransformer):
                     'resource_metadata'] == 'drop':
                 self.samples[key].resource_metadata = {}
         else:
+            if self.timestamp == "last":
+                self.samples[key].timestamp = sample_.timestamp
             if sample_.type == sample.TYPE_CUMULATIVE:
                 self.samples[key].volume = self._scale(sample_)
             else:
