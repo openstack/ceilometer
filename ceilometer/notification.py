@@ -96,13 +96,6 @@ class NotificationService(service_base.BaseService):
     NOTIFICATION_NAMESPACE = 'ceilometer.notification'
     NOTIFICATION_IPC = 'ceilometer-pipe'
 
-    def __init__(self, *args, **kwargs):
-        super(NotificationService, self).__init__(*args, **kwargs)
-        self.partition_coordinator = None
-        self.listeners, self.pipeline_listeners = [], []
-        self.coord_lock = threading.Lock()
-        self.group_id = None
-
     @classmethod
     def _get_notifications_manager(cls, pm):
         return extension.ExtensionManager(
@@ -151,6 +144,9 @@ class NotificationService(service_base.BaseService):
 
     def start(self):
         super(NotificationService, self).start()
+        self.partition_coordinator = None
+        self.coord_lock = threading.Lock()
+        self.listeners, self.pipeline_listeners = [], []
 
         self.pipeline_manager = pipeline.setup_pipeline()
 
@@ -296,9 +292,14 @@ class NotificationService(service_base.BaseService):
                 self.pipeline_listeners.append(listener)
 
     def stop(self):
-        if self.partition_coordinator:
+        if getattr(self, 'partition_coordinator', None):
             self.partition_coordinator.stop()
-        utils.kill_listeners(self.listeners + self.pipeline_listeners)
+        listeners = []
+        if getattr(self, 'listeners', None):
+            listeners.extend(self.listeners)
+        if getattr(self, 'pipeline_listeners', None):
+            listeners.extend(self.pipeline_listeners)
+        utils.kill_listeners(listeners)
         super(NotificationService, self).stop()
 
     def reload_pipeline(self):
