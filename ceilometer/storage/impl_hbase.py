@@ -241,7 +241,7 @@ class Connection(hbase_base.Connection, base.Connection):
                     metadata=md)
 
     def get_meters(self, user=None, project=None, resource=None, source=None,
-                   metaquery=None, limit=None):
+                   metaquery=None, limit=None, unique=False):
         """Return an iterable of models.Meter instances
 
         :param user: Optional ID for user that owns the resource.
@@ -250,6 +250,7 @@ class Connection(hbase_base.Connection, base.Connection):
         :param source: Optional source filter.
         :param metaquery: Optional dict with metadata to match on.
         :param limit: Maximum number of results to return.
+        :param unique: If set to true, return only unique meter information.
         """
         if limit == 0:
             return
@@ -276,18 +277,32 @@ class Connection(hbase_base.Connection, base.Connection):
                     if limit and len(result) >= limit:
                         return
                     _m_rts, m_source, name, m_type, unit = m[0]
-                    meter_dict = {'name': name,
-                                  'type': m_type,
-                                  'unit': unit,
-                                  'resource_id': flatten_result['resource_id'],
-                                  'project_id': flatten_result['project_id'],
-                                  'user_id': flatten_result['user_id']}
+                    if unique:
+                        meter_dict = {'name': name,
+                                      'type': m_type,
+                                      'unit': unit,
+                                      'resource_id': None,
+                                      'project_id': None,
+                                      'user_id': None,
+                                      'source': None}
+                    else:
+                        meter_dict = {'name': name,
+                                      'type': m_type,
+                                      'unit': unit,
+                                      'resource_id':
+                                          flatten_result['resource_id'],
+                                      'project_id':
+                                          flatten_result['project_id'],
+                                      'user_id':
+                                          flatten_result['user_id']}
+
                     frozen_meter = frozenset(meter_dict.items())
                     if frozen_meter in result:
                         continue
                     result.add(frozen_meter)
-                    meter_dict.update({'source': m_source
-                                       if m_source else None})
+                    if not unique:
+                        meter_dict.update({'source': m_source
+                                           if m_source else None})
 
                     yield models.Meter(**meter_dict)
 

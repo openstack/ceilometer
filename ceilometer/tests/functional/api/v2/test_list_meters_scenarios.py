@@ -271,6 +271,13 @@ class TestListMeters(v2.FunctionalTest):
         self.assertEqual(set(['test_source', 'test_source1']),
                          set(r['source'] for r in data))
 
+    def test_list_unique_meters(self):
+        data = self.get_json('/meters?unique=True')
+        self.assertEqual(4, len(data))
+        self.assertEqual(set(['meter.test', 'meter.mine', 'meter.test.new',
+                              u'meter.accent\xe9\u0437']),
+                         set(r['name'] for r in data))
+
     def test_meters_query_with_timestamp(self):
         date_time = datetime.datetime(2012, 7, 2, 10, 41)
         isotime = date_time.isoformat()

@@ -379,7 +379,7 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
         exc = self.assertRaises(
             wsme.exc.UnknownArgument,
             utils.query_to_kwargs,
-            q, storage_base.Connection.get_meters, ['limit'])
+            q, storage_base.Connection.get_meters, ['limit', 'unique'])
         valid_keys = ['project', 'resource', 'source', 'user']
         msg = ("unrecognized field in query: %s, "
                "valid keys: %s") % (q, valid_keys)
