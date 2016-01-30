@@ -233,6 +233,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
     def __init__(self):
         super(_LBStatsPollster, self).__init__()
         self.client = neutron_client.Client()
+        self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
 
     @staticmethod
     def make_sample_from_pool(pool, name, type, unit, volume,
@@ -263,22 +264,49 @@ class _LBStatsPollster(base.BaseServicesPollster):
             )
         return i_cache[pool_id]
 
+    def _populate_stats_cache_v2(self, loadbalancer_id, cache):
+        i_cache = cache.setdefault("lbstats", {})
+        if loadbalancer_id not in i_cache:
+            stats = self.client.get_loadbalancer_stats(loadbalancer_id)
+            i_cache[loadbalancer_id] = LBStatsData(
+                active_connections=stats['active_connections'],
+                total_connections=stats['total_connections'],
+                bytes_in=stats['bytes_in'],
+                bytes_out=stats['bytes_out'],
+            )
+        return i_cache[loadbalancer_id]
+
     @property
     def default_discovery(self):
-        return 'lb_pools'
+        discovery_resource = 'lb_pools'
+        if self.lb_version == 'v2':
+            discovery_resource = 'lb_loadbalancers'
+        return discovery_resource
 
     @abc.abstractmethod
     def _get_sample(pool, c_data):
         """Return one Sample."""
 
     def get_samples(self, manager, cache, resources):
-        for pool in resources:
-            try:
-                c_data = self._populate_stats_cache(pool['id'], cache)
-                yield self._get_sample(pool, c_data)
-            except Exception as err:
-                LOG.exception(_('Ignoring pool %(pool_id)s: %(error)s'),
-                              {'pool_id': pool['id'], 'error': err})
+        if self.lb_version == 'v1':
+            for pool in resources:
+                try:
+                    c_data = self._populate_stats_cache(pool['id'], cache)
+                    yield self._get_sample(pool, c_data)
+                except Exception:
+                    LOG.exception(_('Ignoring pool %(pool_id)s'),
+                                  {'pool_id': pool['id']})
+        elif self.lb_version == 'v2':
+            for loadbalancer in resources:
+                try:
+                    c_data = self._populate_stats_cache_v2(loadbalancer['id'],
+                                                           cache)
+                    yield self._get_sample(loadbalancer, c_data)
+                except Exception:
+                    LOG.exception(
+                        _('Ignoring '
+                          'loadbalancer %(loadbalancer_id)s'),
+                        {'loadbalancer_id': loadbalancer['id']})
 
 
 class LBActiveConnectionsPollster(_LBStatsPollster):
@@ -352,3 +380,94 @@ def make_sample_from_pool(pool, name, type, unit, volume,
         timestamp=timeutils.utcnow().isoformat(),
         resource_metadata=resource_metadata,
     )
+
+
+class LBListenerPollster(BaseLBPollster):
+    """Pollster to capture Load Balancer Listener status samples."""
+
+    FIELDS = ['admin_state_up',
+              'connection_limit',
+              'description',
+              'name',
+              'default_pool_id',
+              'protocol',
+              'protocol_port',
+              'operating_status',
+              'loadbalancers'
+              ]
+
+    @property
+    def default_discovery(self):
+        return 'lb_listeners'
+
+    def get_samples(self, manager, cache, resources):
+        resources = resources or []
+
+        for listener in resources:
+            LOG.debug("Load Balancer Listener : %s" % listener)
+            status = self.get_load_balancer_status_id(
+                listener['operating_status'])
+            if status == -1:
+                # unknown status, skip this sample
+                LOG.warning(_("Unknown status %(stat)s received on listener "
+                              "%(id)s, skipping sample")
+                            % {'stat': listener['operating_status'],
+                               'id': listener['id']})
+                continue
+
+            yield sample.Sample(
+                name='network.services.lb.listener',
+                type=sample.TYPE_GAUGE,
+                unit='listener',
+                volume=status,
+                user_id=None,
+                project_id=listener['tenant_id'],
+                resource_id=listener['id'],
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata=self.extract_metadata(listener)
+            )
+
+
+class LBLoadBalancerPollster(BaseLBPollster):
+    """Pollster to capture Load Balancer status samples."""
+
+    FIELDS = ['admin_state_up',
+              'description',
+              'vip_address',
+              'listeners',
+              'name',
+              'vip_subnet_id',
+              'operating_status',
+              ]
+
+    @property
+    def default_discovery(self):
+        return 'lb_loadbalancers'
+
+    def get_samples(self, manager, cache, resources):
+        resources = resources or []
+
+        for loadbalancer in resources:
+            LOG.debug("Load Balancer: %s" % loadbalancer)
+            status = self.get_load_balancer_status_id(
+                loadbalancer['operating_status'])
+            if status == -1:
+                # unknown status, skip this sample
+                LOG.warning(_("Unknown status %(stat)s received "
+                              "on Load Balancer "
+                              "%(id)s, skipping sample")
+                            % {'stat': loadbalancer['operating_status'],
+                               'id': loadbalancer['id']})
+                continue
+
+            yield sample.Sample(
+                name='network.services.lb.loadbalancer',
+                type=sample.TYPE_GAUGE,
+                unit='loadbalancer',
+                volume=status,
+                user_id=None,
+                project_id=loadbalancer['tenant_id'],
+                resource_id=loadbalancer['id'],
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata=self.extract_metadata(loadbalancer)
+            )

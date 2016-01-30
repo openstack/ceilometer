@@ -474,7 +474,6 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     def _check_get_samples(self, factory, sample_name, expected_volume,
                            expected_type):
         pollster = factory()
-
         cache = {}
         samples = list(pollster.get_samples(self.manager, cache,
                                             self.fake_get_pools()))
