@@ -1,4 +1,4 @@
-# French translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -10,28 +10,34 @@
 # EVEILLARD <stephane.eveillard@gmail.com>, 2013-2014
 # Francesco Vollero <fvollero@redhat.com>, 2015
 # Jonathan Dupart <jonathan+transifex@dupart.org>, 2014
+# CHABERT Loic <chabert.loic.74@gmail.com>, 2013
 # Maxime COQUEREL <max.coquerel@gmail.com>, 2014
+# Nick Barcet <nicolas@barcet.com>, 2013
 # Nick Barcet <nicolas@barcet.com>, 2013
 # Andrew Melim <nokostya.translation@gmail.com>, 2014
 # Patrice LACHANCE <patlachance@gmail.com>, 2013
+# Patrice LACHANCE <patlachance@gmail.com>, 2013
 # Rémi Le Trocquer <remi.letrocquer@orange.com>, 2014
 # EVEILLARD <stephane.eveillard@gmail.com>, 2013
+# Corinne Verheyde <cverheyd@hotmail.com>, 2013
+# Corinne Verheyde <cverheyd@hotmail.com>, 2013
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.1.dev26\n"
+"Project-Id-Version: ceilometer 5.0.2.dev15\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-20 06:12+0000\n"
+"POT-Creation-Date: 2016-01-22 20:25+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-09-04 06:32+0000\n"
 "Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
 "Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
 "Language-Team: French\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"

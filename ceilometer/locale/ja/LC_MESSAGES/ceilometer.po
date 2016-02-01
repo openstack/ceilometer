@@ -1,4 +1,4 @@
-# Japanese translations for ceilometer.
+# Translations template for ceilometer.
 # Copyright (C) 2015 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
 #
@@ -7,20 +7,22 @@
 # Akihiro Motoki <amotoki@gmail.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
+# Yuta Hono <yuta.hono@ntt.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.1.dev26\n"
+"Project-Id-Version: ceilometer 5.0.2.dev15\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-11-20 06:12+0000\n"
-"PO-Revision-Date: 2015-09-04 06:32+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
-"Language: ja\n"
-"Language-Team: Japanese\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"POT-Creation-Date: 2016-01-22 20:25+0000\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.1.1\n"
+"PO-Revision-Date: 2016-01-19 04:48+0000\n"
+"Last-Translator: Yuta Hono <yuta.hono@ntt.com>\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
+"Language-Team: Japanese\n"
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
@@ -170,6 +172,9 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "HTTP 応答を解析しているときにエラーが発生しました: %s"
 
+msgid "Error stopping pollster."
+msgstr "pollster停止エラー。"
+
 #, python-format
 msgid "Error while posting alarm: %s"
 msgstr "アラームを通知するときにエラーが発生しました: %s"
@@ -268,6 +273,10 @@ msgid "Ignoring pool %(pool_id)s: %(error)s"
 msgstr "プール %(pool_id)s を無視しています: %(error)s"
 
 #, python-format
+msgid "Index %s will be recreate."
+msgstr "インデックス %s は再作成されます。"
+
+#, python-format
 msgid ""
 "Invalid YAML syntax in Event Definitions file %(file)s at line: %(line)s, "
 "column: %(column)s."
@@ -338,6 +347,12 @@ msgstr ""
 
 msgid "Period must be positive."
 msgstr "期間は正数でなければなりません。"
+
+#, python-format
+msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
+msgstr ""
+"パイプライン %(pipeline)s: パブリッシャー %(pub)s からのエラーの後 "
+"%(status)s "
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
@@ -450,9 +465,18 @@ msgstr "リソース"
 msgid "Sample"
 msgstr "サンプル"
 
+msgid "Samples should be included in request body"
+msgstr "サンプルはリクエストボティーに含まれるべきです"
+
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "%s の拡張機能のロードをスキップします"
+
+#, python-format
+msgid "Skip pollster %(name)s, no %(p_context)sresources found this cycle"
+msgstr ""
+"%(p_context)sresources がこのサイクルでみつかりません。pollster %(name)s をス"
+"キップします。"
 
 #, python-format
 msgid "Starting server in PID %s"
@@ -461,6 +485,15 @@ msgstr "PID %s でサーバーを始動しています"
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "ストリング %s は無効な isotime です"
+
+msgid ""
+"The Yaml file that defines mapping between samples and gnocchi resources/"
+"metrics"
+msgstr ""
+"サンプルとgnocchi リソース/メトリクスの間のマッピングを定義したYamlファイル"
+
+msgid "The Yaml file that defines per metric archive policies."
+msgstr "メトリックアーカイブポリシーごとのYaml定義ファイル。"
 
 #, python-format
 msgid ""
@@ -609,6 +642,10 @@ msgid "Unsupported action %s"
 msgstr "サポートされないアクション %s"
 
 #, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "VMware vSphereで VM %s が見つかりません"
+
+#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s が XenServer に見つかりません"
 
@@ -626,6 +663,10 @@ msgstr "XenAPI がインストールされていません"
 msgid "YAML error reading Event Definitions file %(file)s"
 msgstr ""
 "イベント定義ファイル %(file)s を読み取るときに YAML エラーが発生しました"
+
+#, python-format
+msgid "You are not authorized to create action: %s"
+msgstr "アクションの作成を許可されていません: %s"
 
 #, python-format
 msgid "alarm %(id)s transitioning to %(state)s because %(reason)s"
