@@ -341,12 +341,11 @@ class TestMeterProcessing(test.BaseTestCase):
                              project_id="$.payload.project_id")]})
         self.handler.definitions = notifications.load_definitions(
             self.__setup_meter_def_file(cfg))
-        c = list(self.handler.process_notification(NOTIFICATION))
-        self.assertEqual(2, len(c))
-        s1 = c[0].as_dict()
-        self.assertEqual('test2', s1['name'])
-        s2 = c[1].as_dict()
-        self.assertEqual('test1', s2['name'])
+        data = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(2, len(data))
+        expected_names = ['test1', 'test2']
+        for s in data:
+            self.assertTrue(s.as_dict()['name'] in expected_names)
 
     def test_unmatched_meter(self):
         cfg = yaml.dump(
@@ -682,3 +681,24 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(1600, s1['volume'])
         self.assertEqual("prefix-tianst.sh.intel.com",
                          s1['resource_id'])
+
+    def test_duplicate_meter(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="test1",
+                             event_type="test.create",
+                             type="delta",
+                             unit="B",
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id"),
+                        dict(name="test1",
+                             event_type="test.create",
+                             type="delta",
+                             unit="B",
+                             volume="$.payload.volume",
+                             resource_id="$.payload.resource_id",
+                             project_id="$.payload.project_id")]})
+        self.handler.definitions = notifications.load_definitions(
+            self.__setup_meter_def_file(cfg))
+        c = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(1, len(c))
