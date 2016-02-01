@@ -15,16 +15,18 @@
 
 import os
 
-from ceilometer.tests.tempest import config as tempest_config
 from tempest import config
 from tempest.test_discover import plugins
+
+import ceilometer
+from ceilometer.tests.tempest import config as tempest_config
 
 
 class CeilometerTempestPlugin(plugins.TempestPlugin):
 
     def load_tests(self):
         base_path = os.path.split(os.path.dirname(
-            os.path.abspath(__file__)))[0]
+            os.path.abspath(ceilometer.__file__)))[0]
         test_dir = "ceilometer/tests/tempest"
         full_test_dir = os.path.join(base_path, test_dir)
         return full_test_dir, base_path
