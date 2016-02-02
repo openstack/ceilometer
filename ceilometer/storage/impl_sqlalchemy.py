@@ -157,8 +157,12 @@ def make_query_from_filter(session, query, sample_filter, require_meter=True):
         else:
             query = query.filter(models.Sample.timestamp < ts_end)
     if sample_filter.user:
+        if sample_filter.user == 'None':
+            sample_filter.user = None
         query = query.filter(models.Resource.user_id == sample_filter.user)
     if sample_filter.project:
+        if sample_filter.project == 'None':
+            sample_filter.project = None
         query = query.filter(
             models.Resource.project_id == sample_filter.project)
     if sample_filter.resource:
