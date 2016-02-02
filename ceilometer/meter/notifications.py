@@ -184,7 +184,7 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
 
         definitions = []
         for meter_cfg in reversed(meters_cfg['metric']):
-            if (meter_cfg['volume'] != 1
+            if (meter_cfg.get('volume') != 1
                     or not cfg.CONF.notification.disable_non_metric_meters):
                 try:
                     md = MeterDefinition(meter_cfg, plugin_manager)
