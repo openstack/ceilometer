@@ -166,10 +166,14 @@ class LockedDefaultDict(defaultdict):
         with self.lock:
             return super(LockedDefaultDict, self).__getitem__(key)
 
-    def __delitem__(self, key):
+    def pop(self, key, *args):
         with self.lock:
-            with self.__getitem__(key)(blocking=False):
-                super(LockedDefaultDict, self).__delitem__(key)
+            key_lock = super(LockedDefaultDict, self).__getitem__(key)
+            if key_lock.acquire(False):
+                try:
+                    super(LockedDefaultDict, self).pop(key, *args)
+                finally:
+                    key_lock.release()
 
 
 class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
