@@ -24,7 +24,7 @@ import copy
 import uuid
 
 from oslo_config import cfg
-
+from oslo_utils import timeutils
 
 OPTS = [
     cfg.StrOpt('sample_source',
@@ -98,6 +98,10 @@ class Sample(object):
 
     def set_timestamp(self, timestamp):
         self.timestamp = timestamp
+
+    def get_iso_timestamp(self):
+        return timeutils.parse_isotime(self.timestamp)
+
 
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'
