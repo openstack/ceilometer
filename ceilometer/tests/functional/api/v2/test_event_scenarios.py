@@ -217,7 +217,7 @@ class TestEventAPI(EventTestBase):
                                  'op': 'whats-up'}],
                              expect_errors=True)
         self.assertEqual(400, resp.status_code)
-        self.assertEqual("operator whats-up is not supported. the "
+        self.assertEqual("Operator whats-up is not supported. The "
                          "supported operators are: (\'lt\', \'le\', "
                          "\'eq\', \'ne\', \'ge\', \'gt\')",
                          resp.json['error_message']['faultstring'])
