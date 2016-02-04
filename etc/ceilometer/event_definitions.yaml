@@ -243,7 +243,7 @@
       fields: _context_user_id
     project_id:
       fields: _context_tenant
-- event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'pool.*', 'vip.*', 'member.*', 'health_monitor.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
+- event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'pool.*', 'vip.*', 'member.*', 'health_monitor.*', 'healthmonitor.*', 'listener.*', 'loadbalancer.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
   traits: &network_traits
     user_id:
       fields: _context_user_id
@@ -294,6 +294,21 @@
     <<: *network_traits
     resource_id:
       fields: ['payload.health_monitor.id', 'payload.id']
+- event_type: healthmonitor.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.healthmonitor.id', 'payload.id']
+- event_type: listener.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.listener.id', 'payload.id']
+- event_type: loadbalancer.*
+  traits:
+    <<: *network_traits
+    resource_id:
+      fields: ['payload.loadbalancer.id', 'payload.id']
 - event_type: firewall.*
   traits:
     <<: *network_traits
