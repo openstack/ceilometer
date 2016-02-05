@@ -1,0 +1,8 @@
+---
+fixes:
+    - >
+      [`bug 1542189 <https://bugs.launchpad.net/ceilometer/+bug/1542189>`_]
+      Handle malformed resource definitions in gnocchi_resources.yaml
+      gracefully. Currently we raise an exception once we hit a bad
+      resource and skip the rest. Instead the patch skips the bad
+      resource and proceeds with rest of the definitions.

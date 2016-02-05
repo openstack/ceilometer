@@ -208,9 +208,17 @@ class GnocchiDispatcher(dispatcher.Base):
                     data = {}
 
         legacy_archive_policies = cls._load_archive_policy(conf)
-        return [ResourcesDefinition(r, conf.dispatcher_gnocchi.archive_policy,
-                                    legacy_archive_policies)
-                for r in data.get('resources', [])]
+        resource_defs = []
+        for resource in data.get('resources', []):
+            try:
+                resource_defs.append(ResourcesDefinition(
+                    resource,
+                    conf.dispatcher_gnocchi.archive_policy,
+                    legacy_archive_policies))
+            except Exception as exc:
+                LOG.error(_LE("Failed to load resource due to error %s") %
+                          exc)
+        return resource_defs
 
     @classmethod
     def _load_archive_policy(cls, conf):
