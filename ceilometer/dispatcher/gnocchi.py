@@ -245,9 +245,16 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             namespace='ceilometer.event.trait_plugin')
         data = declarative.load_definitions(
             {}, conf.dispatcher_gnocchi.resources_definition_file)
-        return [ResourcesDefinition(r, conf.dispatcher_gnocchi.archive_policy,
-                                    plugin_manager)
-                for r in data.get('resources', [])]
+        resource_defs = []
+        for resource in data.get('resources', []):
+            try:
+                resource_defs.append(ResourcesDefinition(
+                    resource,
+                    conf.dispatcher_gnocchi.archive_policy, plugin_manager))
+            except Exception as exc:
+                LOG.error(_LE("Failed to load resource due to error %s") %
+                          exc)
+        return resource_defs
 
     @property
     def gnocchi_project_id(self):
