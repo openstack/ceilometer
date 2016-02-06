@@ -26,15 +26,16 @@ High-Level Architecture
 
 Each of Ceilometer's services are designed to scale horizontally. Additional
 workers and nodes can be added depending on the expected load. Ceilometer
-offers five core services, the data agents designed to work independently from
+offers three core services, the data agents designed to work independently from
 collection, but also designed to work together as a complete solution:
 
 1. polling agent - daemon designed to poll OpenStack services and build Meters.
 2. notification agent - daemon designed to listen to notifications on message queue,
    convert them to Events and Samples, and apply pipeline actions.
-3. collector - daemon designed to gather and record event and metering data
-   created by notification and polling agents.
-4. api - service to query and view data recorded by collector service.
+3. (optional) collector - daemon designed to gather and record event and metering data
+   created by notification and polling agents (if using Gnocchi or full-fidelity storage).
+4. (optional) api - service to query and view data recorded by collector
+   in internal full-fidelity database (if enabled).
 
 As Ceilometer has grown to capture more data, it became apparent that data
 storage would need to be optimised. To address this, Gnocchi_ (resource metering
@@ -42,7 +43,7 @@ as a service) was developed to capture the data in a time series database to
 optimise storage and querying. Gnocchi is intended to replace the existing
 metering database interface.
 
-.. _Gnocchi: https://wiki.openstack.org/wiki/Gnocchi
+.. _Gnocchi: http://docs.openstack.org/developer/gnocchi/
 
 .. figure:: ./ceilo-gnocchi-arch.png
    :width: 100%
@@ -255,11 +256,23 @@ divide the data into their own databases, tailored for its purpose. For
 example, a deployer could choose to store alarms in an SQL backend while
 storing events and metering data in a NoSQL backend.
 
+Ceilometer's storage service is designed to handle use cases where full-fidelity
+of the data is required (e.g. auditing). To handle responsive, long-term data
+queries, solutions that strip away some of the data's resolution, such as
+Gnocchi, are recommended.
+
+.. note::
+
+   As of Liberty, alarming support, and subsequently its database, is handled
+   by Aodh_.
+
 .. note::
 
    We do not guarantee that we won't change the DB schema, so it is
    highly recommended to access the database through the API and not use
    direct queries.
+
+_Aodh: http://docs.openstack.org/developer/aodh/
 
 
 Accessing the data
@@ -268,7 +281,7 @@ Accessing the data
 API Service
 -----------
 
-If the collected data from polling and notification agents are stored in supported
+If the collected data from polling and notification agents are stored in Ceilometer's
 database(s) (see the section :ref:`which-db`), it is possible that the schema of
 these database(s) may evolve over time. For this reasons, we offer a REST API
 and recommend that you access the collected data via the API rather than by

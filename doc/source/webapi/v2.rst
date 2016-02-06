@@ -40,14 +40,27 @@ Samples and Statistics
 .. autotype:: ceilometer.api.controllers.v2.meters.Statistics
    :members:
 
-When a simple statistics request is invoked (using GET /v2/meters/<meter_name>/statistics), it will return the standard set of *Statistics*: *avg*, *sum*,
-*min*, *max*, and *count*.
+When a simple statistics request is invoked (using GET /v2/meters/<meter_name>/statistics),
+it will return the standard set of *Statistics*: *avg*, *sum*, *min*, *max*, and *count*.
+
+.. note::
+
+   If using Ceilometer data for statistics, it's recommended to use a backend
+   such as Gnocchi_ rather than Ceilometer's interface. Gnocchi is designed
+   specifically for this use case by providing a light-weight, aggregated model.
+   As they manage data differently, the API models returned by Ceilometer and Gnocchi
+   are different. The Gnocchi API can be found here_.
+
+.. _Gnocchi: http://docs.openstack.org/developer/gnocchi/
+.. _here: http://docs.openstack.org/developer/gnocchi/rest.html
 
 Selectable Aggregates
 +++++++++++++++++++++
 
-The Statistics API has been extended to include the aggregate functions *stddev* and *cardinality*. You can explicitly select these functions or any from the
-standard set by specifying an aggregate function in the statistics query::
+The Statistics API has been extended to include the aggregate functions
+*stddev* and *cardinality*. You can explicitly select these functions or any
+from the standard set by specifying an aggregate function in the statistics
+query::
 
     GET /v2/meters/<meter_name>/statistics?aggregate.func=<name>&aggregate.param=<value>
 
@@ -59,7 +72,9 @@ Duplicate aggregate function and parameter pairs are silently discarded from the
 
 are, on the other hand, both allowed by the API and supported by the storage drivers.  See the :ref:`functional-examples` section for more detail.
 
-.. note:: Currently only *cardinality* needs aggregate.param to be specified.
+.. note::
+
+   Currently only *cardinality* needs aggregate.param to be specified.
 
 .. autotype:: ceilometer.api.controllers.v2.meters.Aggregate
    :members:
@@ -116,7 +131,9 @@ nature of *resource_metadata* field, there is no practical or consistent way
 to validate the query fields under *metadata* domain like it is done for
 all other fields.
 
-.. note:: The API call will return HTTP 200 OK status for both of the
+.. note::
+
+   The API call will return HTTP 200 OK status for both of the
    following cases: when a query with *metadata.<field>* does not match its
    value, and when *<field>* itself does not exist in any of the records being
    queried.
@@ -156,7 +173,9 @@ supported: *=*, *!=*, *<*, *<=*, *>*, *>=* and *in*; and the following logical
 operators can be used: *and* *or* and *not*. The field names are validated
 against the database models. See :ref:`api-queries` for how to query the API.
 
-.. note:: The *not* operator has different meaning in MongoDB and in SQL DB engine.
+.. note::
+
+   The *not* operator has different meaning in MongoDB and in SQL DB engine.
    If the *not* operator is applied on a non existent metadata field then
    the result depends on the DB engine. For example if
    {"not": {"metadata.nonexistent_field" : "some value"}} filter is used in a query
@@ -195,8 +214,11 @@ Ceilometer CLI Commands::
 
      $ ceilometer --debug --os-username <username_here> --os-password <password_here> --os-auth-url http://localhost:5000/v2.0/ --os-tenant-name admin  meter-list
 
-.. note:: The *username*, *password*, and *tenant-name* options are required to be present in these commands or specified via environment variables. Note that the in-line commands will override the environment variables.
+.. note::
 
+   The *username*, *password*, and *tenant-name* options are required to be
+   present in these arguments or specified via environment variables. Note that
+   the in-line arguments will override the environment variables.
 
 .. _api-queries:
 
@@ -205,7 +227,13 @@ API Queries
 
 Ceilometer API calls:
 
-.. note:: To successfully query the Ceilometer you must first get a project-specific token from the Keystone service and add it to any API calls that you execute against that project. See the `OpenStack credentials documentation <http://docs.openstack.org/api/quick-start/content/index.html#getting-credentials-a00665>`_ for additional details.
+.. note::
+
+   To successfully query Ceilometer you must first get a project-specific
+   token from the Keystone service and add it to any API calls that you
+   execute against that project. See the
+   `OpenStack credentials documentation <http://docs.openstack.org/api/quick-start/content/index.html#getting-credentials-a00665>`_
+    for additional details.
 
 A simple query to return a list of available meters::
 
@@ -251,7 +279,11 @@ the CPU utilization for a given instance (identified by *resource_id*)::
        "http://localhost:8777/v2/meters/cpu_util/statistics?aggregate.func=max&aggregate.func=stddev"\
        "&q.field=resource_id&q.op=eq&q.value=64da755c-9120-4236-bee1-54acafe24980"
 
-.. note:: If any of the requested aggregates are not supported by the storage driver, a HTTP 400 error code will be returned along with an appropriate error message.
+.. note::
+
+   If any of the requested aggregates are not supported by the storage driver,
+   a HTTP 400 error code will be returned along with an appropriate error
+   message.
 
 JSON based example::
 
