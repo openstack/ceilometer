@@ -6,16 +6,17 @@
 # Stefano Maffulli <smaffulli@gmail.com>, 2013
 # Lucas Palm <lapalm@us.ibm.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
+# Lucas Palm <lapalm@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"POT-Creation-Date: 2016-02-06 03:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2015-09-04 06:32+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"PO-Revision-Date: 2016-02-03 05:50+0000\n"
+"Last-Translator: Lucas Palm <lapalm@us.ibm.com>\n"
 "Language: zh-TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
@@ -82,6 +83,9 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "剖析 HTTP 回應時發生錯誤：%s"
+
+msgid "Error stopping pollster."
+msgstr "停止 pollster 時發生錯誤。"
 
 msgid "Event"
 msgstr "事件"
@@ -195,6 +199,10 @@ msgid "Period must be positive."
 msgstr "期間必須是正數。"
 
 #, python-format
+msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
+msgstr "管線 %(pipeline)s：在發佈者 %(pub)s 傳回錯誤後處於%(status)s狀態"
+
+#, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "管線 %(pipeline)s：在發佈者 %(pub)s 傳回錯誤後繼續"
 
@@ -246,6 +254,9 @@ msgstr "資源"
 msgid "Sample"
 msgstr "樣本"
 
+msgid "Samples should be included in request body"
+msgstr "要求內文中應該包括範例"
+
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "跳過載入 %s 的延伸"
@@ -253,6 +264,11 @@ msgstr "跳過載入 %s 的延伸"
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "字串 %s 不是有效的 ISO 時間"
+
+msgid ""
+"The Yaml file that defines mapping between samples and gnocchi resources/"
+"metrics"
+msgstr "用來在範例與 gnocchi 資源/度量之間定義對映的Yaml 檔案"
 
 #, python-format
 msgid ""
@@ -338,6 +354,10 @@ msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr "在 VIP %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 #, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "在 VMware vSphere 中找不到 VM %s"
+
+#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "在 XenServer 中找不到 VM %s"
 
@@ -354,6 +374,10 @@ msgstr "未安裝 XenAPI"
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "無法取得 %(id)s 的 CPU 時間：%(e)s"
+
+#, python-format
+msgid "dropping out of time order sample: %s"
+msgstr "正在刪除不在時間順序內的範例：%s"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"

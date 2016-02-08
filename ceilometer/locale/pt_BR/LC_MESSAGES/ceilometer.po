@@ -8,16 +8,17 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2015. #zanata
 # Lucas Palm <lapalm@us.ibm.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
+# Lucas Palm <lapalm@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"POT-Creation-Date: 2016-02-06 03:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2015-09-22 11:03+0000\n"
-"Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
+"PO-Revision-Date: 2016-02-03 05:50+0000\n"
+"Last-Translator: Lucas Palm <lapalm@us.ibm.com>\n"
 "Language: pt-BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -88,6 +89,9 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "Erro ao analisar a resposta de HTTP: %s"
+
+msgid "Error stopping pollster."
+msgstr "Erro ao parar pesquisador. "
 
 msgid "Event"
 msgstr "Evento"
@@ -205,6 +209,10 @@ msgid "Period must be positive."
 msgstr "Período deve ser positivo."
 
 #, python-format
+msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
+msgstr "Pipeline %(pipeline)s: %(status)s após erro do publicador %(pub)s"
+
+#, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "Pipeline %(pipeline)s: Continue após erro do publicador %(pub)s"
 
@@ -260,6 +268,9 @@ msgstr "Recurso"
 msgid "Sample"
 msgstr "Amostra"
 
+msgid "Samples should be included in request body"
+msgstr "As amostras devem ser incluídas no corpo da solicitação"
+
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "Ignorar a extensão de carregamento para %s"
@@ -267,6 +278,13 @@ msgstr "Ignorar a extensão de carregamento para %s"
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "Sequência %s não é um isotime válido"
+
+msgid ""
+"The Yaml file that defines mapping between samples and gnocchi resources/"
+"metrics"
+msgstr ""
+"O arquivo Yaml que define o mapeamento entre amostras e recursos gnocchi/"
+"métrica"
 
 #, python-format
 msgid ""
@@ -364,6 +382,10 @@ msgstr ""
 "Status desconhecido %(stat)s recebido em vip %(id)s, ignorando a amostra"
 
 #, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "VM %s não localizado no VMware vSphere"
+
+#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "Máquina virtual %s não localizada no XenServer"
 
@@ -380,6 +402,10 @@ msgstr "XenAPI não instalado"
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "não pôde obter o tempo de CPU para %(id)s: %(e)s"
+
+#, python-format
+msgid "dropping out of time order sample: %s"
+msgstr "eliminando amostra fora de ordem de tempo: %s"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-25 06:09+0000\n"
+"POT-Creation-Date: 2016-02-08 06:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
 
-#: ceilometer/notification.py:195
+#: ceilometer/coordination.py:187
+msgid ""
+"Cannot extract tasks because agent failed to join group properly. "
+"Rejoining group."
+msgstr ""
+
+#: ceilometer/notification.py:194
 msgid ""
 "Non-metric meters may be collected. It is highly advisable to disable "
 "these meters using ceilometer.conf or the pipeline.yaml"
@@ -113,7 +119,7 @@ msgstr ""
 msgid "event signature invalid, discarding event: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:216
+#: ceilometer/dispatcher/gnocchi.py:220
 #, python-format
 msgid "unable to configure oslo_cache: %s"
 msgstr ""
@@ -128,6 +134,11 @@ msgstr ""
 #: ceilometer/hardware/pollsters/generic.py:65
 #, python-format
 msgid "Ignore unrecognized field %s"
+msgstr ""
+
+#: ceilometer/network/floatingip.py:66
+#, python-format
+msgid "Invalid status, skipping IP address %s"
 msgstr ""
 
 #: ceilometer/transformer/conversions.py:88

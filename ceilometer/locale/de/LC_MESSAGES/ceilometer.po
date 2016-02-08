@@ -8,11 +8,12 @@
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
+# Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"POT-Creation-Date: 2016-02-06 03:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -90,6 +91,9 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "Fehler bei Auswertung der HTTP-Antwort %s"
+
+msgid "Error stopping pollster."
+msgstr "Fehler beim Stoppen des Pollster."
 
 msgid "Event"
 msgstr "Ereignis"
@@ -210,6 +214,10 @@ msgid "Period must be positive."
 msgstr "Zeitraum muss positiv sein."
 
 #, python-format
+msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
+msgstr "Pipeline %(pipeline)s: %(status)s nach Fehler von Publisher %(pub)s"
+
+#, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "Pipeline %(pipeline)s: Fortsetzen nach Fehler von Publisher %(pub)s"
 
@@ -271,6 +279,9 @@ msgstr "Resource"
 msgid "Sample"
 msgstr "Beispiel"
 
+msgid "Samples should be included in request body"
+msgstr "Beispiele sollten in Anforderungshauptteil enthalten sein"
+
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "Laden der Ausnahme für %s überspringen"
@@ -278,6 +289,13 @@ msgstr "Laden der Ausnahme für %s überspringen"
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "Zeichenfolge %s ist kein gültiger Wert für 'isotime'"
+
+msgid ""
+"The Yaml file that defines mapping between samples and gnocchi resources/"
+"metrics"
+msgstr ""
+"Die YAML-Datei mit der Definition der Zuordnung zwischen Beispielen und "
+"gnocchi-Ressourcen/Metriken"
 
 #, python-format
 msgid ""
@@ -378,6 +396,10 @@ msgstr ""
 "übersprungen"
 
 #, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "VM %s in VMware vSphere nicht gefunden"
+
+#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s in XenServer nicht gefunden"
 
@@ -394,6 +416,11 @@ msgstr "XenAPI nicht installiert"
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "Abruf von CPU-Zeit nicht möglich für %(id)s: %(e)s"
+
+#, python-format
+msgid "dropping out of time order sample: %s"
+msgstr ""
+"Löschen des nicht in die zeitliche Reihenfolge gehörenden Beispiels: %s"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"

@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-25 06:09+0000\n"
+"POT-Creation-Date: 2016-02-08 06:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,20 +22,26 @@ msgstr ""
 msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr ""
 
-#: ceilometer/coordination.py:76 ceilometer/coordination.py:88
+#: ceilometer/coordination.py:51
+msgid ""
+"Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: Current agent "
+"is not part of group and cannot take tasks"
+msgstr ""
+
+#: ceilometer/coordination.py:89 ceilometer/coordination.py:101
 msgid "Error connecting to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:103
+#: ceilometer/coordination.py:116
 msgid "Error sending a heartbeat to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:134
+#: ceilometer/coordination.py:147
 #, python-format
 msgid "Error joining partitioning group %s, re-trying"
 msgstr ""
 
-#: ceilometer/coordination.py:177
+#: ceilometer/coordination.py:199
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
@@ -93,7 +99,7 @@ msgstr ""
 msgid "Required field %(field)s should be a %(type)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:235
+#: ceilometer/dispatcher/gnocchi.py:239
 msgid "Failed to connect to Gnocchi."
 msgstr ""
 

@@ -6,16 +6,17 @@
 # Stefano Maffulli <smaffulli@gmail.com>, 2013
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
+# Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"POT-Creation-Date: 2016-02-06 03:16+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2015-09-04 06:32+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"PO-Revision-Date: 2016-02-02 10:02+0000\n"
+"Last-Translator: Tom Cocozzello <tjcocozz@us.ibm.com>\n"
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -88,6 +89,9 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "Errore durante l'analisi della risposta HTTP: %s"
+
+msgid "Error stopping pollster."
+msgstr "Errore durante l'arresto del sondaggio. "
 
 msgid "Event"
 msgstr "Evento"
@@ -206,6 +210,10 @@ msgid "Period must be positive."
 msgstr "Il periodo deve essere positivo"
 
 #, python-format
+msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
+msgstr "Pipeline %(pipeline)s: %(status)s dopo errore da publisher %(pub)s"
+
+#, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr "Pipeline %(pipeline)s: Continuare dopo errore da publisher %(pub)s"
 
@@ -267,6 +275,9 @@ msgstr "Risorsa"
 msgid "Sample"
 msgstr "Esempio"
 
+msgid "Samples should be included in request body"
+msgstr "I campioni devono essere inclusi nel corpo della richiesta "
+
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr "Ignora caricamento dell'estensione per %s"
@@ -274,6 +285,13 @@ msgstr "Ignora caricamento dell'estensione per %s"
 #, python-format
 msgid "String %s is not a valid isotime"
 msgstr "La stringa %s non è un orario standard (isotime) valido"
+
+msgid ""
+"The Yaml file that defines mapping between samples and gnocchi resources/"
+"metrics"
+msgstr ""
+"Il file Yaml che definisce l'associazione tra i campioni e le risorse "
+"gnocchi/metriche"
 
 #, python-format
 msgid ""
@@ -371,6 +389,10 @@ msgstr ""
 "Stato non conosciuto %(stat)s ricevuto su vip %(id)s, ignorare l'esempio"
 
 #, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "VM %s non trovata in VMware vSphere"
+
+#, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s non trovata in XenServer"
 
@@ -387,6 +409,10 @@ msgstr "XenAPI non installato"
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "impossibile ricevere l'ora CPU per %(id)s: %(e)s"
+
+#, python-format
+msgid "dropping out of time order sample: %s"
+msgstr "rilascio campione ordinamento fuori tempo: %s"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"
