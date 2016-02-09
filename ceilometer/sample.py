@@ -32,7 +32,6 @@ from oslo_config import cfg
 OPTS = [
     cfg.StrOpt('sample_source',
                default='openstack',
-               deprecated_name='counter_source',
                help='Source for samples emitted on this instance.'),
 ]
 
