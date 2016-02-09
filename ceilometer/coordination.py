@@ -167,7 +167,7 @@ class PartitionCoordinator(object):
             self.join_group(group_id)
         try:
             members = self._get_members(group_id)
-            LOG.debug('Members of group: %s', members)
+            LOG.debug('Members of group: %s, Me: %s', members, self._my_id)
             hr = utils.HashRing(members)
             filtered = [v for v in iterable
                         if hr.get_node(str(v)) == self._my_id]

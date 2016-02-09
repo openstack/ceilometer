@@ -1,0 +1,9 @@
+---
+critical:
+  - >
+    [`bug 1533787 <https://bugs.launchpad.net/ceilometer/+bug/1533787>`_]
+    Fix an issue where agents are not properly getting registered to group
+    when multiple notification agents are deployed. This can result in
+    bad transformation as the agents are not coordinated. It is still
+    recommended to set heartbeat_timeout_threshold = 0 in
+    [oslo_messaging_rabbit] section when deploying multiple agents.
