@@ -166,14 +166,13 @@ function _ceilometer_create_accounts {
 
         create_service_user "ceilometer" "admin"
 
-        if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
-            get_or_create_service "ceilometer" "metering" "OpenStack Telemetry Service"
-            get_or_create_endpoint "metering" \
-                "$REGION_NAME" \
-                "$(ceilometer_service_url)" \
-                "$(ceilometer_service_url)" \
-                "$(ceilometer_service_url)"
-        fi
+        get_or_create_service "ceilometer" "metering" "OpenStack Telemetry Service"
+        get_or_create_endpoint "metering" \
+            "$REGION_NAME" \
+            "$(ceilometer_service_url)" \
+            "$(ceilometer_service_url)" \
+            "$(ceilometer_service_url)"
+
         if is_service_enabled swift; then
             # Ceilometer needs ResellerAdmin role to access Swift account stats.
             get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_TENANT_NAME
