@@ -214,7 +214,7 @@ class Connection(hbase_base.Connection, base.Connection):
             LOG.debug("Query Resource table: %s", q)
             for resource_id, data in resource_table.scan(filter=q,
                                                          limit=limit):
-                f_res, sources, meters, md = hbase_utils.deserialize_entry(
+                f_res, meters, md = hbase_utils.deserialize_entry(
                     data)
                 resource_id = hbase_utils.encode_unicode(resource_id)
                 # Unfortunately happybase doesn't keep ordered result from
@@ -230,7 +230,7 @@ class Connection(hbase_base.Connection, base.Connection):
                     row = resource_table.row(
                         resource_id, columns=['f:project_id', 'f:user_id',
                                               'f:resource_metadata'])
-                    f_res, _s, _m, md = hbase_utils.deserialize_entry(row)
+                    f_res, _m, md = hbase_utils.deserialize_entry(row)
                 yield models.Resource(
                     resource_id=resource_id,
                     first_sample_timestamp=first_ts,
@@ -271,7 +271,7 @@ class Connection(hbase_base.Connection, base.Connection):
             # https://bugs.launchpad.net/ceilometer/+bug/1301371
             result = set()
             for ignored, data in gen:
-                flatten_result, s, meters, md = hbase_utils.deserialize_entry(
+                flatten_result, meters, md = hbase_utils.deserialize_entry(
                     data)
                 for m in meters:
                     if limit and len(result) >= limit:

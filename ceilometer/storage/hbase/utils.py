@@ -385,7 +385,7 @@ def deserialize_entry(entry, get_raw_meta=True):
     else:
         metadata = metadata_flattened
 
-    return flatten_result, sources, meters, metadata
+    return flatten_result, meters, metadata
 
 
 def serialize_entry(data=None, **kwargs):
