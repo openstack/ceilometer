@@ -76,10 +76,13 @@ if [ $EXIT_CODE -ne 0 ] ; then
         gnocchi measures show -r $instance_id cpu_util
     done
 
+    gnocchi status
+
     # Be sure to source Gnocchi settings before
     source $BASE/new/gnocchi/devstack/settings
     echo "* Unprocessed measures:"
-    find $GNOCCHI_DATA_DIR/measures
+    find $GNOCCHI_DATA_DIR
+
     set -x
 fi
 
