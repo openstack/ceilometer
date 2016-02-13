@@ -272,7 +272,7 @@ Gnocchi, are recommended.
    highly recommended to access the database through the API and not use
    direct queries.
 
-_Aodh: http://docs.openstack.org/developer/aodh/
+.. _Aodh: http://docs.openstack.org/developer/aodh/
 
 
 Accessing the data
