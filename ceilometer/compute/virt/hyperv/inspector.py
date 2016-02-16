@@ -13,15 +13,11 @@
 # under the License.
 """Implementation of Inspector abstraction for Hyper-V"""
 
-from oslo_config import cfg
 from oslo_utils import units
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt.hyperv import utilsv2
 from ceilometer.compute.virt import inspector as virt_inspector
-
-
-CONF = cfg.CONF
 
 
 class HyperVInspector(virt_inspector.Inspector):
