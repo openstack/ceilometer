@@ -52,7 +52,6 @@ dispatcher_opts = [
                deprecated_for_removal=True,
                help='URL to Gnocchi. default: autodetection'),
     cfg.StrOpt('archive_policy',
-               default=None,
                help='The archive policy to use when the dispatcher '
                'create a new metric.'),
     cfg.StrOpt('resources_definition_file',
