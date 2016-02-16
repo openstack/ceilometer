@@ -28,6 +28,8 @@ from six.moves import reprlib
 
 from ceilometer.event.storage import impl_sqlalchemy as impl_sqla_event
 from ceilometer.event.storage import models
+from ceilometer.publisher import utils
+from ceilometer import sample
 from ceilometer.storage import impl_sqlalchemy
 from ceilometer.storage.sqlalchemy import models as sql_models
 from ceilometer.tests import base as test_base
@@ -190,3 +192,37 @@ class CapabilitiesTest(test_base.BaseTestCase):
         actual_capabilities = (impl_sqlalchemy.
                                Connection.get_storage_capabilities())
         self.assertEqual(expected_capabilities, actual_capabilities)
+
+
+@tests_db.run_with('sqlite', 'mysql', 'pgsql')
+class FilterQueryTestForMeters(scenarios.DBTestBase):
+    def prepare_data(self):
+            self.counters = []
+            c = sample.Sample(
+                'volume.size',
+                'gauge',
+                'GiB',
+                5,
+                user_id=None,
+                project_id=None,
+                resource_id='fake_id',
+                timestamp=datetime.datetime(2012, 9, 25, 10, 30),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.counter',
+                                   },
+                source='test',
+            )
+
+            self.counters.append(c)
+            msg = utils.meter_message_from_counter(
+                c,
+                secret='not-so-secret')
+            self.conn.record_metering_data(msg)
+
+    def test_get_meters_by_user(self):
+        meters = list(self.conn.get_meters(user='None'))
+        self.assertEqual(1, len(meters))
+
+    def test_get_meters_by_project(self):
+        meters = list(self.conn.get_meters(project='None'))
+        self.assertEqual(1, len(meters))
