@@ -27,7 +27,6 @@ LOG = log.getLogger(__name__)
 
 OPTS = [
     cfg.StrOpt('backend_url',
-               default=None,
                help='The backend URL to use for distributed coordination. If '
                     'left empty, per-deployment central agent and per-host '
                     'compute agent won\'t do workload '

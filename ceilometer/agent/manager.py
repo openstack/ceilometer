@@ -59,7 +59,6 @@ OPTS = [
 
 POLLING_OPTS = [
     cfg.StrOpt('partitioning_group_prefix',
-               default=None,
                deprecated_group='central',
                help='Work-load partitioning group prefix. Use only if you '
                     'want to run multiple polling agents with different '

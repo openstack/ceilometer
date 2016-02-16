@@ -51,12 +51,10 @@ OPTS = [
                      "in the database for (<= 0 means forever).")),
     cfg.StrOpt('metering_connection',
                secret=True,
-               default=None,
                help='The connection string used to connect to the metering '
                'database. (if unset, connection is used)'),
     cfg.StrOpt('event_connection',
                secret=True,
-               default=None,
                help='The connection string used to connect to the event '
                'database. (if unset, connection is used)'),
     cfg.IntOpt('db2nosql_resource_id_maxlen',
