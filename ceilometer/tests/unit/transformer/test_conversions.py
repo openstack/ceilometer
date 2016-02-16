@@ -48,12 +48,12 @@ class AggregatorTransformerTestCase(base.BaseTestCase):
     def test_init_no_size_or_rention_time(self):
         aggregator = conversions.AggregatorTransformer()
         self.assertEqual(1, aggregator.size)
-        self.assertEqual(None, aggregator.retention_time)
+        self.assertIsNone(aggregator.retention_time)
 
     def test_init_size_zero(self):
         aggregator = conversions.AggregatorTransformer(size="0")
         self.assertEqual(1, aggregator.size)
-        self.assertEqual(None, aggregator.retention_time)
+        self.assertIsNone(aggregator.retention_time)
 
     def test_init_input_validation_size_invalid(self):
         self.assertRaises(ValueError, conversions.AggregatorTransformer,
