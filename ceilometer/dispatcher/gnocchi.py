@@ -90,12 +90,8 @@ class LegacyArchivePolicyDefinition(object):
 
 class ResourcesDefinitionException(Exception):
     def __init__(self, message, definition_cfg):
-        super(ResourcesDefinitionException, self).__init__(message)
-        self.definition_cfg = definition_cfg
-
-    def __str__(self):
-        return '%s %s: %s' % (self.__class__.__name__,
-                              self.definition_cfg, self.message)
+        msg = '%s %s: %s' % (self.__class__.__name__, definition_cfg, message)
+        super(ResourcesDefinitionException, self).__init__(msg)
 
 
 class ResourcesDefinition(object):
