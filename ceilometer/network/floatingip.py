@@ -63,8 +63,8 @@ class FloatingIPPollster(plugin_base.PollsterBase):
         for fip in self.neutron_cli.fip_get_all():
             status = self.STATUS.get(fip['status'].lower())
             if status is None:
-                LOG.warn(_LW("Invalid status, skipping IP address %s") %
-                         fip['floating_ip_address'])
+                LOG.warning(_LW("Invalid status, skipping IP address %s") %
+                            fip['floating_ip_address'])
                 continue
             res_metadata = self._form_metadata_for_fip(fip)
             yield sample.Sample(
