@@ -27,7 +27,7 @@ from oslo_utils import excutils
 import six
 import six.moves.urllib.parse as urlparse
 
-from ceilometer.i18n import _, _LI, _LE
+from ceilometer.i18n import _, _LE, _LI
 from ceilometer import messaging
 from ceilometer import publisher
 from ceilometer.publisher import utils

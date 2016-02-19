@@ -24,8 +24,8 @@ from stevedore import extension
 from ceilometer.agent import plugin_base as base
 from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer.i18n import _, _LI, _LW
 from ceilometer import exchange_control
+from ceilometer.i18n import _, _LI, _LW
 from ceilometer import messaging
 from ceilometer import pipeline
 from ceilometer import service_base

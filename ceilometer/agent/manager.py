@@ -34,7 +34,7 @@ from stevedore import extension
 
 from ceilometer.agent import plugin_base
 from ceilometer import coordination
-from ceilometer.i18n import _, _LI, _LE, _LW
+from ceilometer.i18n import _, _LE, _LI, _LW
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
