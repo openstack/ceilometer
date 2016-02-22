@@ -592,19 +592,27 @@ Using multiple dispatchers
    double: installing; multiple dispatchers
 
 The Ceilometer collector allows multiple dispatchers to be configured so that
-metering data can be easily sent to multiple internal and external systems.
+data can be easily sent to multiple internal and external systems. Dispatchers
+are divided between ``event_dispatchers`` and ``meter_dispatchers`` which can
+each be provided with their own set of receiving systems.
 
-Ceilometer by default only saves metering data in a database, to allow
-Ceilometer to send metering data to other systems in addition to the
-database, multiple dispatchers can be developed and enabled by modifying
+.. note::
+   In Liberty and prior the configuration option for all data was
+   ``dispatcher`` but this was changed for the Mitaka release to break out
+   separate destination systems by type of data.
+
+By default, Ceilometer only saves event and meter data in a database. If you
+want Ceilometer to send data to other systems, instead of or in addition to
+the Ceilometer database, multiple dispatchers can be enabled by modifying the
 Ceilometer configuration file.
 
-Ceilometer ships multiple dispatchers currently. They are `database`, `file`, `http`
-and `gnocchi` dispatcher. As the names imply, database dispatcher sends metering data
-to a database, file dispatcher logs meters into a file, http dispatcher posts
-the meters onto a http target, gnocchi dispatcher posts the meters onto Gnocchi_
-backend. Each dispatcher can have its own configuration parameters. Please see
-available configuration parameters at the beginning of each dispatcher file.
+Ceilometer ships multiple dispatchers currently. They are ``database``,
+``file``, ``http`` and ``gnocchi`` dispatcher. As the names imply, database
+dispatcher sends metering data to a database, file dispatcher logs meters into
+a file, http dispatcher posts the meters onto a http target, gnocchi
+dispatcher posts the meters onto Gnocchi_ backend. Each dispatcher can have
+its own configuration parameters. Please see available configuration
+parameters at the beginning of each dispatcher file.
 
 .. _Gnocchi: http://gnocchi.readthedocs.org/en/latest/basic.html
 
@@ -627,36 +635,36 @@ To use multiple dispatchers on a Ceilometer collector service, add multiple
 dispatcher lines in ceilometer.conf file like the following::
 
    [DEFAULT]
-   dispatcher=database
-   dispatcher=file
-
-.. note::
-
-    dispatcher is in [collector] section in Havana release, but it is
-    deprecated in Icehouse.
+   meter_dispatchers=database
+   meter_dispatchers=file
 
 If there is no dispatcher present, database dispatcher is used as the
 default. If in some cases such as traffic tests, no dispatcher is needed,
-one can configure the line like the following::
+one can configure the line without a dispatcher, like the following::
 
-   dispatcher=
+   event_dispatchers=
 
-With above configuration, no dispatcher is used by the Ceilometer collector
-service, all metering data received by Ceilometer collector will be dropped.
+With the above configuration, no event dispatcher is used by the Ceilometer
+collector service, all event data received by Ceilometer collector will be
+dropped.
 
 For Gnocchi dispatcher, the following configuration settings should be added::
 
     [DEFAULT]
-    dispatcher = gnocchi
+    meter_dispatchers = gnocchi
+
+    [dispatcher_gnocchi]
+    archive_policy = low
+
+The value specified for ``archive_policy`` should correspond to the name of an
+``archive_policy`` configured within Gnocchi.
+
+For Gnocchi dispatcher backed by Swift storage, the following additional
+configuration settings should be added::
 
     [dispatcher_gnocchi]
     filter_project = gnocchi_swift
     filter_service_activity = True
-    archive_policy = low
-    url = http://localhost:8041
-
-The `url` in the above configuration is a Gnocchi endpoint url and depends on your
-deployment.
 
 .. note::
    If gnocchi dispatcher is enabled, Ceilometer api calls will return a 410 with
