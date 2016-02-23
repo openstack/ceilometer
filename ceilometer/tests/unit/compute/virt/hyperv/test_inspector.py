@@ -15,37 +15,83 @@
 Tests for Hyper-V inspector.
 """
 
+import sys
+
 import mock
+from os_win import exceptions as os_win_exc
 from oslo_utils import units
 from oslotest import base
 
 from ceilometer.compute.virt.hyperv import inspector as hyperv_inspector
+from ceilometer.compute.virt import inspector as virt_inspector
 
 
 class TestHyperVInspection(base.BaseTestCase):
 
-    def setUp(self):
+    @mock.patch.object(hyperv_inspector, 'utilsfactory', mock.MagicMock())
+    @mock.patch.object(hyperv_inspector.HyperVInspector,
+                       '_compute_host_max_cpu_clock')
+    def setUp(self, mock_compute_host_cpu_clock):
         self._inspector = hyperv_inspector.HyperVInspector()
         self._inspector._utils = mock.MagicMock()
 
         super(TestHyperVInspection, self).setUp()
 
+    def test_converted_exception(self):
+        self._inspector._utils.get_cpu_metrics.side_effect = (
+            os_win_exc.OSWinException)
+        self.assertRaises(virt_inspector.InspectorException,
+                          self._inspector.inspect_cpus, mock.sentinel.instance)
+
+        self._inspector._utils.get_cpu_metrics.side_effect = (
+            os_win_exc.HyperVException)
+        self.assertRaises(virt_inspector.InspectorException,
+                          self._inspector.inspect_cpus, mock.sentinel.instance)
+
+        self._inspector._utils.get_cpu_metrics.side_effect = (
+            os_win_exc.NotFound(resource='foofoo'))
+        self.assertRaises(virt_inspector.InstanceNotFoundException,
+                          self._inspector.inspect_cpus, mock.sentinel.instance)
+
+    def test_assert_original_traceback_maintained(self):
+        def bar(self):
+            foo = "foofoo"
+            raise os_win_exc.NotFound(resource=foo)
+
+        self._inspector._utils.get_cpu_metrics.side_effect = bar
+        try:
+            self._inspector.inspect_cpus(mock.sentinel.instance)
+            self.fail("Test expected exception, but it was not raised.")
+        except virt_inspector.InstanceNotFoundException:
+            # exception has been raised as expected.
+            _, _, trace = sys.exc_info()
+            while trace.tb_next:
+                # iterate until the original exception source, bar.
+                trace = trace.tb_next
+
+            # original frame will contain the 'foo' variable.
+            self.assertEqual('foofoo', trace.tb_frame.f_locals['foo'])
+
+    @mock.patch.object(hyperv_inspector, 'utilsfactory')
+    def test_compute_host_max_cpu_clock(self, mock_utilsfactory):
+        mock_cpu = {'MaxClockSpeed': 1000}
+        hostutils = mock_utilsfactory.get_hostutils.return_value.get_cpus_info
+        hostutils.return_value = [mock_cpu, mock_cpu]
+
+        cpu_clock = self._inspector._compute_host_max_cpu_clock()
+        self.assertEqual(2000.0, cpu_clock)
+
     def test_inspect_cpus(self):
         fake_instance_name = 'fake_instance_name'
-        fake_host_cpu_clock = 1000
-        fake_host_cpu_count = 2
         fake_cpu_clock_used = 2000
         fake_cpu_count = 3000
         fake_uptime = 4000
 
+        self._inspector._host_max_cpu_clock = 4000.0
         fake_cpu_percent_used = (fake_cpu_clock_used /
-                                 float(fake_host_cpu_clock * fake_cpu_count))
+                                 self._inspector._host_max_cpu_clock)
         fake_cpu_time = (int(fake_uptime * fake_cpu_percent_used) *
                          1000)
-
-        self._inspector._utils.get_host_cpu_info.return_value = (
-            fake_host_cpu_clock, fake_host_cpu_count)
-
         self._inspector._utils.get_cpu_metrics.return_value = (
             fake_cpu_clock_used, fake_cpu_count, fake_uptime)
 
@@ -54,9 +100,7 @@ class TestHyperVInspection(base.BaseTestCase):
         self.assertEqual(fake_cpu_count, cpu_stats.number)
         self.assertEqual(fake_cpu_time, cpu_stats.time)
 
-    @mock.patch('ceilometer.compute.virt.hyperv.utilsv2.UtilsV2.'
-                'get_memory_metrics')
-    def test_inspect_memory_usage(self, mock_get_memory_metrics):
+    def test_inspect_memory_usage(self):
         fake_usage = self._inspector._utils.get_memory_metrics.return_value
         usage = self._inspector.inspect_memory_usage(
             mock.sentinel.FAKE_INSTANCE, mock.sentinel.FAKE_DURATION)

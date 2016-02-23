@@ -13,27 +13,91 @@
 # under the License.
 """Implementation of Inspector abstraction for Hyper-V"""
 
+import collections
+import functools
+import sys
+
+from os_win import exceptions as os_win_exc
+from os_win import utilsfactory
 from oslo_utils import units
+import six
 
 from ceilometer.compute.pollsters import util
-from ceilometer.compute.virt.hyperv import utilsv2
 from ceilometer.compute.virt import inspector as virt_inspector
 
 
+def convert_exceptions(function, exception_map):
+    expected_exceptions = tuple(exception_map.keys())
+
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except expected_exceptions as ex:
+            # exception might be a subclass of an expected exception.
+            for expected in expected_exceptions:
+                if isinstance(ex, expected):
+                    raised_exception = exception_map[expected]
+                    break
+
+            exc_info = sys.exc_info()
+            # NOTE(claudiub): Python 3 raises the exception object given as
+            # the second argument in six.reraise.
+            # The original message will be maintained by passing the original
+            # exception.
+            exc = raised_exception(six.text_type(exc_info[1]))
+            six.reraise(raised_exception, exc, exc_info[2])
+    return wrapper
+
+
+def decorate_all_methods(decorator, *args, **kwargs):
+    def decorate(cls):
+        for attr in cls.__dict__:
+            class_member = getattr(cls, attr)
+            if callable(class_member):
+                setattr(cls, attr, decorator(class_member, *args, **kwargs))
+        return cls
+
+    return decorate
+
+
+exception_conversion_map = collections.OrderedDict([
+    # NOTE(claudiub): order should be from the most specialized exception type
+    # to the most generic exception type.
+    # (expected_exception, converted_exception)
+    (os_win_exc.NotFound, virt_inspector.InstanceNotFoundException),
+    (os_win_exc.OSWinException, virt_inspector.InspectorException),
+])
+
+# NOTE(claudiub): the purpose of the decorator below is to prevent any
+# os_win exceptions (subclasses of OSWinException) to leak outside of the
+# HyperVInspector.
+
+
+@decorate_all_methods(convert_exceptions, exception_conversion_map)
 class HyperVInspector(virt_inspector.Inspector):
 
     def __init__(self):
         super(HyperVInspector, self).__init__()
-        self._utils = utilsv2.UtilsV2()
+        self._utils = utilsfactory.get_metricsutils()
+        self._host_max_cpu_clock = self._compute_host_max_cpu_clock()
+
+    def _compute_host_max_cpu_clock(self):
+        hostutils = utilsfactory.get_hostutils()
+        # host's number of CPUs and CPU clock speed will not change.
+        cpu_info = hostutils.get_cpus_info()
+        host_cpu_count = len(cpu_info)
+        host_cpu_clock = cpu_info[0]['MaxClockSpeed']
+
+        return float(host_cpu_clock * host_cpu_count)
 
     def inspect_cpus(self, instance):
         instance_name = util.instance_name(instance)
         (cpu_clock_used,
          cpu_count, uptime) = self._utils.get_cpu_metrics(instance_name)
-        host_cpu_clock, host_cpu_count = self._utils.get_host_cpu_info()
 
-        cpu_percent_used = (cpu_clock_used /
-                            float(host_cpu_clock * cpu_count))
+        cpu_percent_used = cpu_clock_used / self._host_max_cpu_clock
+
         # Nanoseconds
         cpu_time = (int(uptime * cpu_percent_used) * units.k)
 
