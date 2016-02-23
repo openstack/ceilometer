@@ -13,6 +13,7 @@
 # under the License.
 
 import mock
+
 from oslotest import base
 
 from ceilometer import neutron_client
@@ -23,6 +24,7 @@ class TestNeutronClient(base.BaseTestCase):
     def setUp(self):
         super(TestNeutronClient, self).setUp()
         self.nc = neutron_client.Client()
+        self.nc.lb_version = 'v1'
 
     @staticmethod
     def fake_ports_list():

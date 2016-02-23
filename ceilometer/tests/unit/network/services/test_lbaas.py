@@ -14,6 +14,8 @@
 # under the License.
 
 import mock
+
+from oslo_config import cfg
 from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
@@ -32,6 +34,9 @@ class _BaseTestLBPollster(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
         self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
+        cfg.CONF.set_override('neutron_lbaas_version',
+                              'v1',
+                              group='service_types')
         plugin_base._get_keystone = mock.Mock()
         catalog = (plugin_base._get_keystone.session.auth.get_access.
                    return_value.service_catalog)
