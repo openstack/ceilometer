@@ -40,6 +40,8 @@
 # Save trace setting
 XTRACE=$(set +o | grep xtrace)
 set -o xtrace
+# TODO(liusheng) Temporarily add this to avoid integration test failue, see bug1548634
+export SERVICE_TENANT_NAME=$SERVICE_PROJECT_NAME
 
 # Support potential entry-points console scripts in VENV or not
 if [[ ${USE_VENV} = True ]]; then
@@ -175,7 +177,7 @@ function _ceilometer_create_accounts {
 
         if is_service_enabled swift; then
             # Ceilometer needs ResellerAdmin role to access Swift account stats.
-            get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_TENANT_NAME
+            get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
         fi
     fi
 }
@@ -318,7 +320,7 @@ function configure_ceilometer {
     iniset $CEILOMETER_CONF service_credentials auth_type password
     iniset $CEILOMETER_CONF service_credentials user_domain_id default
     iniset $CEILOMETER_CONF service_credentials project_domain_id default
-    iniset $CEILOMETER_CONF service_credentials project_name $SERVICE_TENANT_NAME
+    iniset $CEILOMETER_CONF service_credentials project_name $SERVICE_PROJECT_NAME
     iniset $CEILOMETER_CONF service_credentials username ceilometer
     iniset $CEILOMETER_CONF service_credentials password $SERVICE_PASSWORD
     iniset $CEILOMETER_CONF service_credentials region_name $REGION_NAME
