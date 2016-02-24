@@ -25,8 +25,8 @@ from oslo_utils import netutils
 from oslo_utils import units
 
 from ceilometer import dispatcher
-from ceilometer import messaging
 from ceilometer.i18n import _, _LE
+from ceilometer import messaging
 from ceilometer import utils
 
 OPTS = [

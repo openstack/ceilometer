@@ -19,7 +19,7 @@ import ceilometer
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _, _LW, _LE
+from ceilometer.i18n import _, _LE, _LW
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
