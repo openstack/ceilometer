@@ -269,6 +269,19 @@ class BinApiTestCase(base.BaseTestCase):
 class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinCeilometerPollingServiceTestCase, self).setUp()
+        self.tempfile = None
+        self.subp = None
+
+    def tearDown(self):
+        if self.subp:
+            try:
+                self.subp.kill()
+            except OSError:
+                pass
+        os.remove(self.tempfile)
+        super(BinCeilometerPollingServiceTestCase, self).tearDown()
+
+    def test_starting_with_duplication_namespaces(self):
         content = ("[DEFAULT]\n"
                    "rpc_backend=fake\n"
                    "[database]\n"
@@ -278,15 +291,6 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
                                                     suffix='.conf')
-        self.subp = None
-
-    def tearDown(self):
-        super(BinCeilometerPollingServiceTestCase, self).tearDown()
-        if self.subp:
-            self.subp.kill()
-        os.remove(self.tempfile)
-
-    def test_starting_with_duplication_namespaces(self):
         self.subp = subprocess.Popen(['ceilometer-polling',
                                       "--config-file=%s" % self.tempfile,
                                       "--polling-namespaces",
@@ -295,4 +299,23 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
                                      stderr=subprocess.PIPE)
         out = self.subp.stderr.read(1024)
         self.assertIn(b'Duplicated values: [\'compute\', \'compute\'] '
-                      b'found in CLI options, auto de-duplidated', out)
+                      b'found in CLI options, auto de-duplicated', out)
+
+    def test_polling_namespaces_invalid_value_in_config(self):
+        content = ("[DEFAULT]\n"
+                   "rpc_backend=fake\n"
+                   "polling_namespaces = ['central']\n"
+                   "[database]\n"
+                   "connection=log://localhost\n")
+        if six.PY3:
+            content = content.encode('utf-8')
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='ceilometer',
+                                                    suffix='.conf')
+        self.subp = subprocess.Popen(
+            ["ceilometer-polling", "--config-file=%s" % self.tempfile],
+            stderr=subprocess.PIPE)
+        __, err = self.subp.communicate()
+        expected = ("Exception: Valid values are ['compute', 'central', "
+                    "'ipmi'], but found [\"['central']\"]")
+        self.assertIn(expected, err)
