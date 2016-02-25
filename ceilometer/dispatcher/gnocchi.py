@@ -354,7 +354,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 metric.update(rd.metrics[metric_name])
                 try:
                     self._gnocchi.metric.create(metric)
-                except gnocchi_exc.NamedMetricAreadyExists:
+                except gnocchi_exc.NamedMetricAlreadyExists:
                     # NOTE(sileht): metric created in the meantime
                     pass
             else:
