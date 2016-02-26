@@ -284,6 +284,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         pipeline_poller_call = mock.call(1, self.srv.refresh_pipeline)
         self.assertIn(pipeline_poller_call,
                       self.srv.tg.add_timer.call_args_list)
+        self.srv.stop()
 
     def test_notification_reloaded_pipeline(self):
         pipeline_cfg_file = self.setup_pipeline(['instance'])
@@ -302,6 +303,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.srv.refresh_pipeline()
 
         self.assertNotEqual(pipeline, self.srv.pipe_manager)
+        self.srv.stop()
 
     def test_notification_reloaded_event_pipeline(self):
         ev_pipeline_cfg_file = self.setup_event_pipeline(
@@ -324,6 +326,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.srv.refresh_pipeline()
 
         self.assertNotEqual(pipeline, self.srv.pipe_manager)
+        self.srv.stop()
 
 
 class TestRealNotification(BaseRealNotification):
