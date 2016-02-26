@@ -282,6 +282,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         pipeline_poller_call = mock.call(1, self.srv.refresh_pipeline)
         self.assertIn(pipeline_poller_call,
                       self.srv.tg.add_timer.call_args_list)
+        self.srv.stop()
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_reloaded_pipeline(self, fake_publisher_cls):
@@ -336,6 +337,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
 
         (self.assertIn(sample.name, ['disk.root.size', 'vcpus'])
          for sample in self.publisher.samples)
+        self.srv.stop()
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_reloaded_event_pipeline(self, fake_publisher_cls):
@@ -391,6 +393,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
 
         self.assertEqual(self.publisher.events[0].event_type,
                          'compute.instance.create.end')
+        self.srv.stop()
 
 
 class TestRealNotification(BaseRealNotification):
