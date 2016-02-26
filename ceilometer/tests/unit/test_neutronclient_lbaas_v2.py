@@ -197,6 +197,24 @@ class TestNeutronClientLBaaSV2(base.BaseTestCase):
                 }
             }
 
+    @staticmethod
+    def fake_list_lbaas_listeners():
+        return {
+            'listeners': [{
+                'default_pool_id': None,
+                'protocol': 'HTTP',
+                'description': '',
+                'admin_state_up': True,
+                'loadbalancers': [{
+                    'id': 'a9729389-6147-41a3-ab22-a24aed8692b2'
+                    }],
+                'tenant_id': '3e4d8bec50a845fcb09e03a4375c691d',
+                'connection_limit': 100,
+                'protocol_port': 80,
+                'id': '35cb8516-1173-4035-8dae-0dae3453f37f',
+                'name': 'listener_one'
+                }]}
+
     @mock.patch.object(client.Client,
                        'list_lbaas_pools')
     @mock.patch.object(client.Client,
@@ -300,3 +318,19 @@ class TestNeutronClientLBaaSV2(base.BaseTestCase):
         for key in result_status.keys():
             self.assertIn(key, expected_keys)
             self.assertEqual(excepted_status[key], result_status[key])
+
+    @mock.patch.object(client.Client,
+                       'list_listeners')
+    @mock.patch.object(neutron_client.Client,
+                       '_retrieve_loadbalancer_status_tree')
+    def test_list_listener(self, mock_status, mock_list_listeners):
+        mock_list_listeners.return_value = (
+            self.fake_list_lbaas_listeners())
+        mock_status.return_value = (
+            self.fake_retrieve_loadbalancer_status())
+        listeners = self.nc.list_listener()
+        expected_key = '35cb8516-1173-4035-8dae-0dae3453f37f'
+        expected_status = 'ONLINE'
+        self.assertEqual(1, len(listeners))
+        self.assertEqual(expected_key, listeners[0]['id'])
+        self.assertEqual(expected_status, listeners[0]['operating_status'])

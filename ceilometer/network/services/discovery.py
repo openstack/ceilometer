@@ -52,6 +52,24 @@ class LBMembersDiscovery(_BaseServicesDiscovery):
                 if i.get('status', None) != 'error']
 
 
+class LBListenersDiscovery(_BaseServicesDiscovery):
+    def discover(self, manager, param=None):
+        """Discover load balancer listener resources to monitor."""
+
+        listeners = self.neutron_cli.list_listener()
+        return [i for i in listeners
+                if i.get('operating_status', None) != 'error']
+
+
+class LBLoadBalancersDiscovery(_BaseServicesDiscovery):
+    def discover(self, manager, param=None):
+        """Discover load balancer resources to monitor."""
+
+        loadbalancers = self.neutron_cli.list_loadbalancer()
+        return [i for i in loadbalancers
+                if i.get('operating_status', None) != 'error']
+
+
 class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
     def discover(self, manager, param=None):
         """Discover resources to monitor."""

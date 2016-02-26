@@ -385,3 +385,28 @@ class Client(object):
                 break
 
         return status_dict
+
+    def list_listener(self):
+        """This method is used to get the list of the listeners."""
+        resp = self.client.list_listeners()
+        resources = resp.get('listeners')
+        for listener in resources:
+            loadbalancer_id = listener.get('loadbalancers')[0].get('id')
+            status = self._get_listener_status(loadbalancer_id)
+            listener['operating_status'] = status[listener.get('id')]
+        return resources
+
+    def list_loadbalancer(self):
+        """This method is used to get the list of the loadbalancers."""
+        resp = self.client.list_loadbalancers()
+        resources = resp.get('loadbalancers')
+        return resources
+
+    def get_loadbalancer_stats(self, loadbalancer_id):
+        """This method is used to get the statistics of the loadbalancer.
+
+        :param loadbalancer_id: the ID of the specified loadbalancer
+        """
+        resp = self.client.retrieve_loadbalancer_stats(loadbalancer_id)
+        resource = resp.get('stats')
+        return resource
