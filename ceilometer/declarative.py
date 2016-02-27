@@ -111,7 +111,7 @@ class Definition(object):
             if return_all_values and not self.plugin.support_return_all_values:
                 raise DefinitionException("Plugin %s don't allows to "
                                           "return multiple values" %
-                                          self.cfg["plugin"]["name"])
+                                          self.cfg["plugin"]["name"], self.cfg)
             values_map = [('.'.join(self._get_path(match)), match.value) for
                           match in values]
             values = [v for v in self.plugin.trait_values(values_map)
