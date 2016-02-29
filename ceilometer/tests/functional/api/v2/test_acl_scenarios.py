@@ -24,6 +24,7 @@ import six
 import webtest
 
 from ceilometer.api import app
+from ceilometer.event.storage import models as ev_model
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.functional.api import v2
@@ -195,51 +196,18 @@ class TestAPIEventACL(TestAPIACL):
         self.assertEqual(401, data.status_int)
 
 
-class TestApiEventRBAC(v2.FunctionalTest):
+class TestBaseApiEventRBAC(v2.FunctionalTest):
 
     PATH = '/events'
 
     def setUp(self):
-        super(TestApiEventRBAC, self).setUp()
-        content = ('{"context_is_admin": "role:admin",'
-                   '"segregation": "rule:context_is_admin",'
-                   '"default" : "!",'
-                   '"telemetry:events:index": "rule:context_is_admin",'
-                   '"telemetry:events:show": "rule:context_is_admin"}')
-        if six.PY3:
-            content = content.encode('utf-8')
-        self.tempfile = fileutils.write_to_tempfile(content=content,
-                                                    prefix='policy',
-                                                    suffix='.json')
-
-        self.CONF.set_override("policy_file",
-                               self.path_get(self.tempfile),
-                               group='oslo_policy')
-        self.app = self._make_app()
-
-    def tearDown(self):
-        os.remove(self.tempfile)
-        super(TestApiEventRBAC, self).tearDown()
-
-    def test_get_event_by_message_rbac(self):
-        headers_rbac = {"X-Roles": "non-admin"}
-        data = self.get_json(self.PATH + "/100",
-                             expect_errors=True,
-                             headers=headers_rbac,
-                             status=403)
-        self.assertEqual(u'403 Forbidden\n\nAccess was denied to this '
-                         'resource.\n\n RBAC Authorization Failed  ',
-                         data.json['error_message'])
-
-    def test_get_events_rbac(self):
-        headers_rbac = {"X-Roles": "non-admin"}
-        data = self.get_json(self.PATH,
-                             expect_errors=True,
-                             headers=headers_rbac,
-                             status=403)
-        self.assertEqual(u'403 Forbidden\n\nAccess was denied to this '
-                         'resource.\n\n RBAC Authorization Failed  ',
-                         data.json['error_message'])
+        super(TestBaseApiEventRBAC, self).setUp()
+        traits = [ev_model.Trait('project_id', 1, 'project-good'),
+                  ev_model.Trait('user_id', 1, 'user-good')]
+        self.message_id = str(uuid.uuid4())
+        ev = ev_model.Event(self.message_id, 'event_type',
+                            datetime.datetime.now(), traits, {})
+        self.event_conn.record_events([ev])
 
     def test_get_events_without_project(self):
         headers_no_proj = {"X-Roles": "admin", "X-User-Id": "user-good"}
@@ -260,3 +228,57 @@ class TestApiEventRBAC(v2.FunctionalTest):
                              headers=headers_no_user_proj,
                              status=403)
         self.assertEqual(403, resp.status_int)
+
+    def test_get_events(self):
+        headers = {"X-Roles": "Member", "X-User-Id": "user-good",
+                   "X-Project-Id": "project-good"}
+        self.get_json(self.PATH, headers=headers, status=200)
+
+    def test_get_event(self):
+        headers = {"X-Roles": "Member", "X-User-Id": "user-good",
+                   "X-Project-Id": "project-good"}
+        self.get_json(self.PATH + "/" + self.message_id, headers=headers,
+                      status=200)
+
+
+class TestApiEventAdminRBAC(TestBaseApiEventRBAC):
+
+    def _make_app(self, enable_acl=False):
+        content = ('{"context_is_admin": "role:admin",'
+                   '"telemetry:events:index": "rule:context_is_admin",'
+                   '"telemetry:events:show": "rule:context_is_admin"}')
+        if six.PY3:
+            content = content.encode('utf-8')
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='policy',
+                                                    suffix='.json')
+
+        self.CONF.set_override("policy_file", self.tempfile,
+                               group='oslo_policy')
+        return super(TestApiEventAdminRBAC, self)._make_app()
+
+    def tearDown(self):
+        os.remove(self.tempfile)
+        super(TestApiEventAdminRBAC, self).tearDown()
+
+    def test_get_events(self):
+        headers_rbac = {"X-Roles": "admin", "X-User-Id": "user-good",
+                        "X-Project-Id": "project-good"}
+        self.get_json(self.PATH, headers=headers_rbac, status=200)
+
+    def test_get_events_bad(self):
+        headers_rbac = {"X-Roles": "Member", "X-User-Id": "user-good",
+                        "X-Project-Id": "project-good"}
+        self.get_json(self.PATH, headers=headers_rbac, status=403)
+
+    def test_get_event(self):
+        headers = {"X-Roles": "admin", "X-User-Id": "user-good",
+                   "X-Project-Id": "project-good"}
+        self.get_json(self.PATH + "/" + self.message_id, headers=headers,
+                      status=200)
+
+    def test_get_event_bad(self):
+        headers = {"X-Roles": "Member", "X-User-Id": "user-good",
+                   "X-Project-Id": "project-good"}
+        self.get_json(self.PATH + "/" + self.message_id, headers=headers,
+                      status=403)

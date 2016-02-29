@@ -17,10 +17,13 @@
 
 import copy
 import datetime
+import os
 
 import mock
+from oslo_utils import fileutils
 from oslo_utils import timeutils
 from oslotest import mockpatch
+import six
 
 from ceilometer.tests.functional.api import v2
 
@@ -31,6 +34,23 @@ class TestPostSamples(v2.FunctionalTest):
         for m in samples:
             del m['message_signature']
         self.published.append(samples)
+
+    def _make_app(self, enable_acl=False):
+        content = ('{"context_is_project": "project_id:%(project_id)s",'
+                   '"default" : "!",'
+                   '"telemetry:create_samples": ""}')
+        if six.PY3:
+            content = content.encode('utf-8')
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='policy',
+                                                    suffix='.json')
+        self.CONF.set_override("policy_file", self.tempfile,
+                               group='oslo_policy')
+        return super(TestPostSamples, self)._make_app()
+
+    def tearDown(self):
+        os.remove(self.tempfile)
+        super(TestPostSamples, self).tearDown()
 
     def setUp(self):
         self.published = []

@@ -12,12 +12,25 @@
 # under the License.
 
 import mock
+from oslo_utils import fileutils
 from oslotest import mockpatch
+import six
 
 from ceilometer.tests.functional.api import v2
 
 
 class TestAPIUpgradePath(v2.FunctionalTest):
+    def _make_app(self):
+        content = ('{"default": ""}')
+        if six.PY3:
+            content = content.encode('utf-8')
+        self.tempfile = fileutils.write_to_tempfile(content=content,
+                                                    prefix='policy',
+                                                    suffix='.json')
+        self.CONF.set_override("policy_file", self.tempfile,
+                               group='oslo_policy')
+        return super(TestAPIUpgradePath, self)._make_app()
+
     def _setup_osloconfig_options(self):
         self.CONF.set_override('gnocchi_is_enabled', True, group='api')
         self.CONF.set_override('aodh_is_enabled', True, group='api')
