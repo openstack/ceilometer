@@ -224,7 +224,7 @@ class TestGnocchiThresholdEvaluate(base.TestEvaluatorBase):
             mock.call(url='http://localhost:8041/v1/aggregation/metric',
                       params={'aggregation': 'max',
                               'start': start_alarm2, 'end': end,
-                              'metric[]': [
+                              'metric': [
                                   '0bb1604d-1193-4c0a-b4b8-74b170e35e83',
                                   '9ddc209f-42f8-41e1-b8f1-8804f59c4053']},
                       headers=expected_headers)],
