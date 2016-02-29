@@ -42,7 +42,6 @@ extensions = [
     'sphinxcontrib.autohttp.flask',
     'wsmeext.sphinxext',
     'sphinx.ext.coverage',
-    'sphinx.ext.pngmath',
     'sphinx.ext.viewcode',
     'sphinxcontrib.pecanwsme.rest',
     'oslosphinx',
