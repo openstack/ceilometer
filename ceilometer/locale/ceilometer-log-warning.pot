@@ -1,23 +1,29 @@
 # Translations template for ceilometer.
-# Copyright (C) 2015 ORGANIZATION
+# Copyright (C) 2016 ORGANIZATION
 # This file is distributed under the same license as the ceilometer project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.0.0b4.dev128\n"
+"Project-Id-Version: ceilometer 5.0.3.dev10\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-09-23 14:39+0000\n"
+"POT-Creation-Date: 2016-03-01 06:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.0\n"
+"Generated-By: Babel 2.2.0\n"
 
-#: ceilometer/notification.py:187
+#: ceilometer/coordination.py:187
+msgid ""
+"Cannot extract tasks because agent failed to join group properly. "
+"Rejoining group."
+msgstr ""
+
+#: ceilometer/notification.py:190
 msgid ""
 "Non-metric meters may be collected. It is highly advisable to disable "
 "these meters using ceilometer.conf or the pipeline.yaml"
@@ -38,7 +44,7 @@ msgid ""
 "will be dropped"
 msgstr ""
 
-#: ceilometer/agent/manager.py:451
+#: ceilometer/agent/manager.py:450
 #, python-format
 msgid "Skipping %(name)s, %(service_type)s service is not registered in keystone"
 msgstr ""

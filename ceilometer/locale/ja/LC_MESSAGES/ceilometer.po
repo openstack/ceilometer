@@ -7,17 +7,18 @@
 # Akihiro Motoki <amotoki@gmail.com>, 2015. #zanata
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
+# Shinichi Take <chantake33@gmail.com>, 2016. #zanata
 # Yuta Hono <yuta.hono@ntt.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 5.0.2.dev15\n"
+"Project-Id-Version: ceilometer 5.0.3.dev10\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-22 20:25+0000\n"
+"POT-Creation-Date: 2016-02-27 04:07+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-01-19 04:48+0000\n"
-"Last-Translator: Yuta Hono <yuta.hono@ntt.com>\n"
+"PO-Revision-Date: 2016-02-16 01:17+0000\n"
+"Last-Translator: Shinichi Take <chantake33@gmail.com>\n"
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
@@ -27,6 +28,10 @@ msgstr ""
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
 msgstr "%(entity)s %(id)s が見つかりません"
+
+#, python-format
+msgid "%(name)s count exceeds maximum value %(maximum)d"
+msgstr "%(name)s が最大値 %(maximum)d を超えています"
 
 #, python-format
 msgid "%(rule)s must be set for %(type)s type alarm"
@@ -462,6 +467,19 @@ msgstr "特性定義における必須フィールドが指定されていませ
 msgid "Resource"
 msgstr "リソース"
 
+#, python-format
+msgid ""
+"Resource %(resource_id)s creation failed with status: %(status_code)d: "
+"%(msg)s"
+msgstr ""
+"リソース %(resource_id)s の作成に失敗しました。%(status_code)d: %(msg)s"
+
+#, python-format
+msgid ""
+"Resource %(resource_id)s update failed with status: %(status_code)d: %(msg)s"
+msgstr ""
+"リソース %(resource_id)s の更新に失敗しました。%(status_code)d: %(msg)s"
+
 msgid "Sample"
 msgstr "サンプル"
 
@@ -717,6 +735,12 @@ msgstr "メッセージ・シグニチャーが無効です。メッセージを
 #, python-format
 msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
 msgstr "%(resource_id)s の計測データ %(counter_name)s: %(counter_volume)s"
+
+#, python-format
+msgid ""
+"operator %(operator)s is not supported. the supported operators are: "
+"%(supported)s"
+msgstr "%(operator)s はサポートされていません。サポート: %(supported)s"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
