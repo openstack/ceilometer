@@ -22,6 +22,7 @@ import oslo_i18n
 from oslo_log import log
 from oslo_reports import guru_meditation_report as gmr
 
+from ceilometer.conf import defaults
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import version
@@ -75,6 +76,7 @@ def prepare_service(argv=None, config_files=None):
                   ['stevedore=INFO', 'keystoneclient=INFO',
                    'neutronclient=INFO'])
     log.set_defaults(default_log_levels=log_levels)
+    defaults.set_cors_middleware_defaults()
 
     if argv is None:
         argv = sys.argv
