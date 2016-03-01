@@ -1,0 +1,10 @@
+
+
+---
+fixes:
+  - >
+    [`bug 1536498 <https://bugs.launchpad.net/ceilometer/+bug/1536498>`_]
+    Patch to fix duplicate meter definitions causing duplicate samples.
+    If a duplicate is found, log a warning and skip the meter definition.
+    Note that the first occurance of a meter will be used and any following
+    duplicates will be skipped from processing.

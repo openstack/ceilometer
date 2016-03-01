@@ -24,7 +24,7 @@ from oslo_log import log
 import oslo_messaging
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _LE
+from ceilometer.i18n import _LE, _LW
 from ceilometer import sample
 from ceilometer import utils
 
@@ -182,17 +182,24 @@ def setup_meters_config():
 def load_definitions(config_def):
     if not config_def:
         return []
-    meter_defs = []
+    meter_defs = {}
     for event_def in reversed(config_def['metric']):
+        if event_def.get('name') in meter_defs:
+            # skip duplicate meters
+            LOG.warning(_LW("Skipping duplicate meter definition %s")
+                        % event_def)
+            continue
+
         try:
             if (event_def['volume'] != 1 or
                     not cfg.CONF.notification.disable_non_metric_meters):
-                meter_defs.append(MeterDefinition(event_def))
+                md = MeterDefinition(event_def)
+                meter_defs[event_def['name']] = md
         except MeterDefinitionException as me:
             errmsg = (_LE("Error loading meter definition : %(err)s")
                       % dict(err=me.message))
             LOG.error(errmsg)
-    return meter_defs
+    return meter_defs.values()
 
 
 class InvalidPayload(Exception):
