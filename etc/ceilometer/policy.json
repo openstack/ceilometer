@@ -5,7 +5,7 @@
     "telemetry:get_samples": "",
     "telemetry:get_sample": "",
     "telemetry:query_sample": "",
-    "telemetry:create_samples": "rule:context_is_admin",
+    "telemetry:create_samples": "",
 
     "telemetry:compute_statistics": "",
     "telemetry:get_meters": "",
