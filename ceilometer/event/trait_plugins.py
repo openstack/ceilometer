@@ -17,6 +17,7 @@ import abc
 
 from debtcollector import moves
 from oslo_log import log
+from oslo_utils import timeutils
 import six
 
 from ceilometer.i18n import _LW
@@ -188,3 +189,42 @@ class BitfieldTraitPlugin(TraitPluginBase):
                 else:
                     bitfield |= bit
         return [bitfield]
+
+
+class TimedeltaPluginMissedFields(Exception):
+    def __init__(self):
+        msg = ('It is required to use two timestamp field with Timedelta '
+               'plugin.')
+        super(TimedeltaPluginMissedFields, self).__init__(msg)
+
+
+class TimedeltaPlugin(TraitPluginBase):
+    """Setup timedelta meter volume of two timestamps fields.
+
+    Example::
+
+        trait's fields definition: ['payload.created_at',
+                                    'payload.launched_at']
+        value is been created as total seconds between 'launched_at' and
+        'created_at' timestamps.
+    """
+    # TODO(idegtiarov): refactor code to have meter_plugins separate from
+    # trait_plugins
+
+    def trait_value(self, match_list):
+        if len(match_list) != 2:
+            LOG.warning(_LW('Timedelta plugin is required two timestamp fields'
+                            ' to create timedelta value.'))
+            return
+        start, end = match_list
+        try:
+            start_time = timeutils.parse_isotime(start[1])
+            end_time = timeutils.parse_isotime(end[1])
+        except Exception as err:
+            LOG.warning(_LW('Failed to parse date from set fields, both '
+                            'fields %(start)s and %(end)s must be datetime: '
+                            '%(err)s') %
+                        dict(start=start[0], end=end[0], err=err)
+                        )
+            return
+        return abs((end_time - start_time).total_seconds())

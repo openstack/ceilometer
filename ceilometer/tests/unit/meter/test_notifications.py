@@ -33,7 +33,9 @@ NOTIFICATION = {
     'timestamp': u'2015-06-1909: 19: 35.786893',
     'payload': {u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
                 u'resource_id': u'bea70e51c7340cb9d555b15cbfcaec23',
-                u'timestamp': u'2015-06-19T09: 19: 35.785330',
+                u'timestamp': u'2015-06-19T09:19:35.785330',
+                u'created_at': u'2015-06-19T09:25:35.785330',
+                u'launched_at': u'2015-06-19T09:25:40.785330',
                 u'message_signature': u'fake_signature1',
                 u'resource_metadata': {u'foo': u'bar'},
                 u'source': u'30be1fc9a03c4e94ab05c403a8a377f2: openstack',
@@ -454,6 +456,23 @@ class TestMeterProcessing(test.BaseTestCase):
         meta['host'] = NOTIFICATION['publisher_id']
         meta['event_type'] = NOTIFICATION['event_type']
         self.assertEqual(meta, s1['resource_metadata'])
+
+    def test_datetime_plugin(self):
+        cfg = yaml.dump(
+            {'metric': [dict(name="test1",
+                        event_type="test.*",
+                        type="gauge",
+                        unit="sec",
+                        volume={"fields": ["$.payload.created_at",
+                                           "$.payload.launched_at"],
+                                "plugin": "timedelta"},
+                        resource_id="$.payload.resource_id",
+                        project_id="$.payload.project_id")]})
+        self._load_meter_def_file(cfg)
+        c = list(self.handler.process_notification(NOTIFICATION))
+        self.assertEqual(1, len(c))
+        s1 = c[0].as_dict()
+        self.assertEqual(5.0, s1['volume'])
 
     def test_custom_metadata(self):
         cfg = yaml.dump(
