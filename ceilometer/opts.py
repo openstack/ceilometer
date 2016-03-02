@@ -32,6 +32,7 @@ import ceilometer.compute.virt.xenapi.inspector
 import ceilometer.coordination
 import ceilometer.dispatcher
 import ceilometer.dispatcher.file
+import ceilometer.dispatcher.gnocchi
 import ceilometer.energy.kwapi
 import ceilometer.event.converter
 import ceilometer.hardware.discovery
@@ -97,6 +98,7 @@ def list_opts():
         ('coordination', ceilometer.coordination.OPTS),
         ('database', ceilometer.storage.OPTS),
         ('dispatcher_file', ceilometer.dispatcher.file.OPTS),
+        ('dispatcher_gnocchi', ceilometer.dispatcher.gnocchi.dispatcher_opts),
         ('event', ceilometer.event.converter.OPTS),
         ('exchange_control', ceilometer.exchange_control.EXCHANGE_OPTS),
         ('hardware', ceilometer.hardware.discovery.OPTS),
