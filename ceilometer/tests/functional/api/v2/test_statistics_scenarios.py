@@ -1659,3 +1659,45 @@ class TestUnparameterizedAggregates(v2.FunctionalTest,
                                            places=4)
                     for a in standard_aggregates:
                         self.assertNotIn(a, r)
+
+
+@tests_db.run_with('mongodb')
+class TestBigValueStatistics(v2.FunctionalTest):
+
+    PATH = '/meters/volume.size/statistics'
+
+    def setUp(self):
+        super(TestBigValueStatistics, self).setUp()
+        for i in range(0, 3):
+            s = sample.Sample(
+                'volume.size',
+                'gauge',
+                'GiB',
+                (i + 1) * (10 ** 12),
+                'user-id',
+                'project1',
+                'resource-id',
+                timestamp=datetime.datetime(2012, 9, 25, 10 + i, 30 + i),
+                resource_metadata={'display_name': 'test-volume',
+                                   'tag': 'self.sample',
+                                   },
+                source='source1',
+            )
+            msg = utils.meter_message_from_counter(
+                s, self.CONF.publisher.telemetry_secret,
+            )
+            self.conn.record_metering_data(msg)
+
+    def test_big_value_statistics(self):
+        data = self.get_json(self.PATH)
+
+        expected_values = {'count': 3,
+                           'min': 10 ** 12,
+                           'max': 3 * 10 ** 12,
+                           'sum': 6 * 10 ** 12,
+                           'avg': 2 * 10 ** 12}
+        self.assertEqual(1, len(data))
+        for d in data:
+            for name, expected_value in expected_values.items():
+                self.assertIn(name, d)
+                self.assertEqual(expected_value, d[name])

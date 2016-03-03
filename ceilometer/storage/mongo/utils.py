@@ -48,7 +48,8 @@ OP_SIGN = {'lt': '$lt', 'le': '$lte', 'ne': '$ne', 'gt': '$gt', 'ge': '$gte'}
 MINIMUM_COMPATIBLE_MONGODB_VERSION = [2, 4]
 COMPLETE_AGGREGATE_COMPATIBLE_VERSION = [2, 6]
 
-FINALIZE_AGGREGATION_LAMBDA = lambda result, param=None: float(result)
+FINALIZE_FLOAT_LAMBDA = lambda result, param=None: float(result)
+FINALIZE_INT_LAMBDA = lambda result, param=None: int(result)
 CARDINALITY_VALIDATION = (lambda name, param: param in ['resource_id',
                                                         'user_id',
                                                         'project_id',
@@ -525,7 +526,7 @@ class AggregationFields(object):
                  finalize=None,
                  parametrized=False,
                  validate=None):
-        self._finalize = finalize or FINALIZE_AGGREGATION_LAMBDA
+        self._finalize = finalize or FINALIZE_FLOAT_LAMBDA
         self.group = lambda *args: group(*args) if parametrized else group
         self.project = (lambda *args: project(*args)
                         if parametrized else project)
@@ -576,23 +577,28 @@ class Aggregation(object):
 SUM_AGGREGATION = Aggregation(
     "sum", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
                              {"sum": {"$sum": "$counter_volume"}},
-                             {"sum": "$sum"}))
+                             {"sum": "$sum"},
+                             ))
 AVG_AGGREGATION = Aggregation(
     "avg", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
                              {"avg": {"$avg": "$counter_volume"}},
-                             {"avg": "$avg"}))
+                             {"avg": "$avg"},
+                             ))
 MIN_AGGREGATION = Aggregation(
     "min", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
                              {"min": {"$min": "$counter_volume"}},
-                             {"min": "$min"}))
+                             {"min": "$min"},
+                             ))
 MAX_AGGREGATION = Aggregation(
     "max", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
                              {"max": {"$max": "$counter_volume"}},
-                             {"max": "$max"}))
+                             {"max": "$max"},
+                             ))
 COUNT_AGGREGATION = Aggregation(
     "count", AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,
                                {"count": {"$sum": 1}},
-                               {"count": "$count"}))
+                               {"count": "$count"},
+                               FINALIZE_INT_LAMBDA))
 STDDEV_AGGREGATION = Aggregation(
     "stddev",
     AggregationFields(MINIMUM_COMPATIBLE_MONGODB_VERSION,

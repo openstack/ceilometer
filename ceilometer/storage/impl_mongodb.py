@@ -623,9 +623,10 @@ class Connection(pymongo_base.Connection):
 
     def _stats_result_aggregates(self, result, aggregate):
         stats_args = {}
-        for attr in Connection.STANDARD_AGGREGATES.keys():
+        for attr, func in Connection.STANDARD_AGGREGATES.items():
             if attr in result:
-                stats_args[attr] = result[attr]
+                stats_args.update(func.finalize(result,
+                                                version_array=self.version))
 
         if aggregate:
             stats_args['aggregate'] = {}
