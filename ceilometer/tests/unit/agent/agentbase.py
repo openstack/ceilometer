@@ -249,6 +249,12 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.CONF.set_override(
+            'pipeline_cfg_file',
+            self.path_get('etc/ceilometer/pipeline.yaml')
+        )
+        self.CONF(args=[])
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
         self.mgr.partition_coordinator = mock.MagicMock()
@@ -269,11 +275,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                 'publishers': ["test"]}]
         }
         self.setup_polling()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF.set_override(
-            'pipeline_cfg_file',
-            self.path_get('etc/ceilometer/pipeline.yaml')
-        )
         self.useFixture(mockpatch.PatchObject(
             publisher, 'get_publisher', side_effect=self.get_publisher))
 

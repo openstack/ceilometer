@@ -25,7 +25,6 @@ from ceilometer import declarative
 from ceilometer.hardware.inspector import base as inspector_base
 from ceilometer.hardware.pollsters import generic
 from ceilometer import sample
-from ceilometer import service as ceilometer_service
 from ceilometer.tests import base as test_base
 
 
@@ -114,7 +113,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.hardware.inspector.get_inspector',
             self.faux_get_inspector))
-        ceilometer_service.prepare_service(argv=[], config_files=[])
+        self.conf(args=[])
         self.pollster = generic.GenericHardwareDeclarativePollster()
 
     def __setup_meter_def_file(self, cfg):
@@ -130,7 +129,6 @@ class TestGenericPollsters(test_base.BaseTestCase):
             {}, self.conf.hardware.meter_definitions_file)
         return cfg
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, name, definition,
                            expected_value, expected_type, expected_unit=None):
         self.pollster._update_meter_definition(definition)
@@ -178,6 +176,8 @@ class TestGenericPollsters(test_base.BaseTestCase):
                         snmp_inspector=param)]})
         self.__setup_meter_def_file(meter_cfg)
         pollster = generic.GenericHardwareDeclarativePollster
+        # Clear cached mapping
+        pollster.mapping = None
         exts = pollster.get_pollsters_extensions()
         self.assertEqual(2, len(exts))
         self.assertIn(exts[0].name, ['hardware.test1', 'hardware.test2.abc'])
