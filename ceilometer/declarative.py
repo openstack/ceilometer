@@ -32,6 +32,7 @@ class DefinitionException(Exception):
 
 class Definition(object):
     JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
+    GETTERS_CACHE = {}
 
     def __init__(self, name, cfg, plugin_manager):
         self.cfg = cfg
@@ -85,7 +86,7 @@ class Definition(object):
             self.getter = fields
         else:
             try:
-                self.getter = self.JSONPATH_RW_PARSER.parse(fields).find
+                self.getter = self.make_getter(fields)
             except Exception as e:
                 raise DefinitionException(
                     _("Parse error in JSONPath specification "
@@ -122,6 +123,14 @@ class Definition(object):
             return values
         else:
             return values[0] if values else None
+
+    def make_getter(self, fields):
+        if fields in self.GETTERS_CACHE:
+            return self.GETTERS_CACHE[fields]
+        else:
+            getter = self.JSONPATH_RW_PARSER.parse(fields).find
+            self.GETTERS_CACHE[fields] = getter
+            return getter
 
 
 def load_definitions(defaults, config_file, fallback_file=None):
