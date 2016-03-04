@@ -108,7 +108,8 @@ class DispatcherTest(base.BaseTestCase):
         self.assertIn('instance', names)
         self.assertIn('volume', names)
 
-    def test_broken_config_load(self):
+    @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
+    def test_broken_config_load(self, mylog):
         contents = [("---\n"
                      "resources:\n"
                      "  - resource_type: foobar\n"),
@@ -135,8 +136,9 @@ class DispatcherTest(base.BaseTestCase):
             self.conf.config(filter_service_activity=False,
                              resources_definition_file=temp,
                              group='dispatcher_gnocchi')
-            self.assertRaises(gnocchi.ResourcesDefinitionException,
-                              gnocchi.GnocchiDispatcher, self.conf.conf)
+            d = gnocchi.GnocchiDispatcher(self.conf.conf)
+            self.assertTrue(mylog.error.called)
+            self.assertEqual(0, len(d.resources_definition))
 
     @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
                 '._process_resource')
