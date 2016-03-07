@@ -64,6 +64,17 @@ class MongoDbManager(fixtures.Fixture):
 
 
 class SQLManager(fixtures.Fixture):
+    def __init__(self, url):
+        db_name = 'ceilometer_%s' % uuid.uuid4().hex
+        engine = sqlalchemy.create_engine(url)
+        conn = engine.connect()
+        self._create_database(conn, db_name)
+        conn.close()
+        engine.dispose()
+        parsed = list(urlparse.urlparse(url))
+        parsed[2] = '/' + db_name
+        self.url = urlparse.urlunparse(parsed)
+
     def setUp(self):
         super(SQLManager, self).setUp()
         self.connection = storage.get_connection(
@@ -71,37 +82,19 @@ class SQLManager(fixtures.Fixture):
         self.event_connection = storage.get_connection(
             self.url, 'ceilometer.event.storage')
 
-    @property
-    def url(self):
-        return self._url.replace('template1', self._db_name)
-
 
 class PgSQLManager(SQLManager):
-
-    def __init__(self, url):
-        self._url = url
-        self._db_name = 'ceilometer_%s' % uuid.uuid4().hex
-        self._engine = sqlalchemy.create_engine(self._url)
-        self._conn = self._engine.connect()
-        self._conn.connection.set_isolation_level(0)
-        self._conn.execute(
-            'CREATE DATABASE %s WITH TEMPLATE template0;' % self._db_name)
-        self._conn.connection.set_isolation_level(1)
-        self._conn.close()
-        self._engine.dispose()
+    @staticmethod
+    def _create_database(conn, db_name):
+        conn.connection.set_isolation_level(0)
+        conn.execute('CREATE DATABASE %s WITH TEMPLATE template0;' % db_name)
+        conn.connection.set_isolation_level(1)
 
 
 class MySQLManager(SQLManager):
-
-    def __init__(self, url):
-        self._url = url
-        self._db_name = 'ceilometer_%s' % uuid.uuid4().hex
-        self._engine = sqlalchemy.create_engine(
-            self._url.replace('template1', ''))
-        self._conn = self._engine.connect()
-        self._conn.execute('CREATE DATABASE %s;' % self._db_name)
-        self._conn.close()
-        self._engine.dispose()
+    @staticmethod
+    def _create_database(conn, db_name):
+        conn.execute('CREATE DATABASE %s;' % db_name)
 
 
 class ElasticSearchManager(fixtures.Fixture):
@@ -188,8 +181,8 @@ class TestBase(test_base.BaseTestCase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        db_url = os.environ.get('CEILOMETER_TEST_STORAGE_URL',
-                                "sqlite://")
+        db_url = os.environ.get('OVERTEST_URL', "sqlite://").replace(
+            "mysql://", "mysql+pymysql://")
 
         engine = urlparse.urlparse(db_url).scheme
         # in case some drivers have additional specification, for example:

@@ -49,7 +49,8 @@ class ConfigFixture(fixture.GabbiFixture):
         self.conf = None
 
         # Determine the database connection.
-        db_url = os.environ.get('CEILOMETER_TEST_STORAGE_URL')
+        db_url = os.environ.get('OVERTEST_URL', "sqlite://").replace(
+            "mysql://", "mysql+pymysql://")
         if not db_url:
             raise case.SkipTest('No database connection configured')
 
