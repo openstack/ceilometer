@@ -110,7 +110,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             raise virt_inspector.InstanceNotFoundException(msg)
 
     def inspect_cpus(self, instance):
-        domain = self._lookup_by_uuid(instance)
+        domain = self._get_domain_not_shut_off_or_raise(instance)
         dom_info = domain.info()
         return virt_inspector.CPUStats(number=dom_info[3], time=dom_info[4])
 
