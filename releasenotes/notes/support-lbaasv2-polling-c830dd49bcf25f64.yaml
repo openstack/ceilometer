@@ -1,0 +1,15 @@
+---
+features:
+  - >
+    Support for polling Neutron's LBaaS v2 API was added as v1 API in Neutron
+    is deprecated. The same metrics are available between v1 and v2.
+issues:
+  - >
+    Neutron API is not designed to be polled against. When polling against
+    Neutron is enabled, Ceilometer's polling agents may generage a significant
+    load against the Neutron API. It is recommended that a dedicated API be
+    enabled for polling while Neutron's API is improved to handle polling.
+upgrade:
+  - >
+    By default, Ceilometer will poll the v2 API. To poll legacy v1 API,
+    add neutron_lbaas_version=v1 option to configuration file.

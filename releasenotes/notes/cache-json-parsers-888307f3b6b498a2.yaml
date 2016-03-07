@@ -1,0 +1,6 @@
+---
+fixes:
+  - >
+    [`bug 1550436 <https://bugs.launchpad.net/ceilometer/+bug/1550436>`_]
+    Cache json parsers when building parsing logic to handle event and
+    meter definitions. This will improve agent startup and setup time.

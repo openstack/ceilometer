@@ -1,0 +1,5 @@
+---
+fixes:
+  - >
+    [`bug 1388680 <https://bugs.launchpad.net/ceilometer/+bug/1388680>`_]
+    Suppose ability to query for None value when using SQL backend.

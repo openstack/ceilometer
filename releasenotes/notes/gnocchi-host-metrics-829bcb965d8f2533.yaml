@@ -1,0 +1,6 @@
+---
+features:
+  - >
+    [`bug 1518338 <https://bugs.launchpad.net/ceilometer/+bug/1518338>`_]
+    Add support for storing SNMP metrics in Gnocchi.This functionality requires
+    Gnocchi v2.1.0 to be installed.
