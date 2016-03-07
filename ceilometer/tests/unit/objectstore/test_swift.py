@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright 2012 eNovance <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may

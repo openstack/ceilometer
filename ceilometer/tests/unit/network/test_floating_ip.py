@@ -1,5 +1,3 @@
-# #!/usr/bin/env python
-#
 # Copyright 2016 Sungard Availability Services
 # Copyright 2016 Red Hat
 # All Rights Reserved
