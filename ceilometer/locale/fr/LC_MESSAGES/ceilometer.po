@@ -26,9 +26,9 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-06 03:16+0000\n"
+"POT-Creation-Date: 2016-03-04 20:29+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -91,10 +91,6 @@ msgstr ""
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "Suppression du %(type)s de notification (uuid:%(msgid)s)"
-
-#, python-format
-msgid "Duplicate VM name found: %s"
-msgstr "Nom de machine virtuelle en double trouvé : %s"
 
 #, python-format
 msgid ""
@@ -178,10 +174,6 @@ msgstr "L'instance %(name)s est ignorée (%(instance_id)s) : %(error)s"
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "instance %(name)s: %(error)s ignoré"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s: %(error)s"
-msgstr "Le pool %(pool_id)s est ignoré : %(error)s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -409,10 +401,6 @@ msgstr "La machine virtuelle %s est introuvable dans VMware vSphere"
 #, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s non trouvé dans XenServer"
-
-#, python-format
-msgid "VM %s not found on Hyper-V"
-msgstr "VM %s introuvable sur l'Hyper-V"
 
 msgid "Wrong sensor type"
 msgstr "Type de détecteur incorrect"
