@@ -1,0 +1,265 @@
+metric:
+  # LBaaS V2
+  - name: "loadbalancer.create"
+    event_type:
+      - "loadbalancer.create.end"
+    type: "delta"
+    unit: "loadbalancer"
+    volume: 1
+    resource_id: $.payload.loadbalancer.id
+    project_id: $.payload.loadbalancer.tenant_id
+    metadata:
+      name: $.payload.loadbalancer.name
+      description: $.payload.loadbalancer.description
+      listeners: $.payload.loadbalancer.listeners
+      operating_status: $.payload.loadbalancer.operating_status
+      vip_address: $.payload.loadbalancer.vip_address
+      vip_subnet_id: $.payload.loadbalancer.vip_subnet_id
+      admin_state_up: $.payload.loadbalancer.admin_state_up
+
+  - name: "loadbalancer.update"
+    event_type:
+      - "loadbalancer.update.end"
+    type: "delta"
+    unit: "loadbalancer"
+    volume: 1
+    resource_id: $.payload.loadbalancer.id
+    project_id: $.payload.loadbalancer.tenant_id
+    metadata:
+      name: $.payload.loadbalancer.name
+      description: $.payload.loadbalancer.description
+      listeners: $.payload.loadbalancer.listeners
+      operating_status: $.payload.loadbalancer.operating_status
+      vip_address: $.payload.loadbalancer.vip_address
+      vip_subnet_id: $.payload.loadbalancer.vip_subnet_id
+      admin_state_up: $.payload.loadbalancer.admin_state_up
+
+  - name: "loadbalancer.delete"
+    event_type:
+      - "loadbalancer.delete.end"
+    type: "delta"
+    unit: "loadbalancer"
+    volume: 1
+    resource_id: $.payload.loadbalancer.id
+    project_id: $.payload.loadbalancer.tenant_id
+    metadata:
+      name: $.payload.loadbalancer.name
+      description: $.payload.loadbalancer.description
+      listeners: $.payload.loadbalancer.listeners
+      operating_status: $.payload.loadbalancer.operating_status
+      vip_address: $.payload.loadbalancer.vip_address
+      vip_subnet_id: $.payload.loadbalancer.vip_subnet_id
+      admin_state_up: $.payload.loadbalancer.admin_state_up
+
+  - name: "listener.create"
+    event_type:
+      - "listener.create.end"
+    type: "delta"
+    unit: "listener"
+    volume: 1
+    resource_id: $.payload.listener.id
+    project_id: $.payload.listener.tenant_id
+    metadata:
+      name: $.payload.listener.name
+      description: $.payload.listener.description
+      admin_state_up: $.payload.listener.admin_state_up
+      loadbalancers: $.payload.listener.loadbalancers
+      default_pool_id: $.payload.listener.default_pool_id
+      protocol: $.payload.listener.protocol
+      connection_limit: $.payload.listener.connection_limit
+
+  - name: "listener.update"
+    event_type:
+      - "listener.update.end"
+    type: "delta"
+    unit: "listener"
+    volume: 1
+    resource_id: $.payload.listener.id
+    project_id: $.payload.listener.tenant_id
+    metadata:
+      name: $.payload.listener.name
+      description: $.payload.listener.description
+      admin_state_up: $.payload.listener.admin_state_up
+      loadbalancers: $.payload.listener.loadbalancers
+      default_pool_id: $.payload.listener.default_pool_id
+      protocol: $.payload.listener.protocol
+      connection_limit: $.payload.listener.connection_limit
+
+  - name: "listener.delete"
+    event_type:
+      - "listener.delete.end"
+    type: "delta"
+    unit: "listener"
+    volume: 1
+    resource_id: $.payload.listener.id
+    project_id: $.payload.listener.tenant_id
+    metadata:
+      name: $.payload.listener.name
+      description: $.payload.listener.description
+      admin_state_up: $.payload.listener.admin_state_up
+      loadbalancers: $.payload.listener.loadbalancers
+      default_pool_id: $.payload.listener.default_pool_id
+      protocol: $.payload.listener.protocol
+      connection_limit: $.payload.listener.connection_limit
+
+  - name: "healthmonitor.create"
+    event_type:
+      - "healthmonitor.create.end"
+    type: "delta"
+    unit: "healthmonitor"
+    volume: 1
+    resource_id: $.payload.healthmonitor.id
+    project_id: $.payload.healthmonitor.tenant_id
+    metadata:
+      name: $.payload.healthmonitor.name
+      description: $.payload.healthmonitor.description
+      admin_state_up: $.payload.healthmonitor.admin_state_up
+      max_retries: $.payload.healthmonitor.max_retries
+      delay: $.payload.healthmonitor.delay
+      timeout: $.payload.healthmonitor.timeout
+      pools: $.payload.healthmonitor.pools
+      type: $.payload.healthmonitor.type
+
+  - name: "healthmonitor.update"
+    event_type:
+      - "healthmonitor.update.end"
+    type: "delta"
+    unit: "healthmonitor"
+    volume: 1
+    resource_id: $.payload.healthmonitor.id
+    project_id: $.payload.healthmonitor.tenant_id
+    metadata:
+      name: $.payload.healthmonitor.name
+      description: $.payload.healthmonitor.description
+      admin_state_up: $.payload.healthmonitor.admin_state_up
+      max_retries: $.payload.healthmonitor.max_retries
+      delay: $.payload.healthmonitor.delay
+      timeout: $.payload.healthmonitor.timeout
+      pools: $.payload.healthmonitor.pools
+      type: $.payload.healthmonitor.type
+
+  - name: "healthmonitor.delete"
+    event_type:
+      - "healthmonitor.delete.end"
+    type: "delta"
+    unit: "healthmonitor"
+    volume: 1
+    resource_id: $.payload.healthmonitor.id
+    project_id: $.payload.healthmonitor.tenant_id
+    metadata:
+      name: $.payload.healthmonitor.name
+      description: $.payload.healthmonitor.description
+      admin_state_up: $.payload.healthmonitor.admin_state_up
+      max_retries: $.payload.healthmonitor.max_retries
+      delay: $.payload.healthmonitor.delay
+      timeout: $.payload.healthmonitor.timeout
+      pools: $.payload.healthmonitor.pools
+      type: $.payload.healthmonitor.type
+
+  - name: "pool.create"
+    event_type:
+      - "pool.create.end"
+    type: "delta"
+    unit: "pool"
+    volume: 1
+    resource_id: $.payload.pool.id
+    project_id: $.payload.pool.tenant_id
+    metadata:
+      name: $.payload.pool.name
+      description: $.payload.pool.description
+      admin_state_up: $.payload.pool.admin_state_up
+      lb_method: $.payload.pool.lb_method
+      protocol: $.payload.pool.protocol
+      subnet_id: $.payload.pool.subnet_id
+      vip_id: $.payload.pool.vip_id
+      status: $.payload.pool.status
+      status_description: $.payload.pool.status_description
+
+  - name: "pool.update"
+    event_type:
+      - "pool.update.end"
+    type: "delta"
+    unit: "pool"
+    volume: 1
+    resource_id: $.payload.pool.id
+    project_id: $.payload.pool.tenant_id
+    metadata:
+      name: $.payload.pool.name
+      description: $.payload.pool.description
+      admin_state_up: $.payload.pool.admin_state_up
+      lb_method: $.payload.pool.lb_method
+      protocol: $.payload.pool.protocol
+      subnet_id: $.payload.pool.subnet_id
+      vip_id: $.payload.pool.vip_id
+      status: $.payload.pool.status
+      status_description: $.payload.pool.status_description
+
+  - name: "pool.delete"
+    event_type:
+      - "pool.delete.end"
+    type: "delta"
+    unit: "pool"
+    volume: 1
+    resource_id: $.payload.pool.id
+    project_id: $.payload.pool.tenant_id
+    metadata:
+      name: $.payload.pool.name
+      description: $.payload.pool.description
+      admin_state_up: $.payload.pool.admin_state_up
+      lb_method: $.payload.pool.lb_method
+      protocol: $.payload.pool.protocol
+      subnet_id: $.payload.pool.subnet_id
+      vip_id: $.payload.pool.vip_id
+      status: $.payload.pool.status
+      status_description: $.payload.pool.status_description
+
+  - name: "member.create"
+    event_type:
+      - "member.create.end"
+    type: "delta"
+    unit: "member"
+    volume: 1
+    resource_id: $.payload.member.id
+    project_id: $.payload.member.tenant_id
+    metadata:
+      address: $.payload.member.address
+      status: $.payload.member.status
+      status_description: $.payload.member.status_description
+      weight: $.payload.member.weight
+      admin_state_up: $.payload.member.admin_state_up
+      protocol_port: $.payload.member.protocol_port
+      pool_id: $.payload.member.pool_id
+
+  - name: "member.update"
+    event_type:
+      - "member.update.end"
+    type: "delta"
+    unit: "member"
+    volume: 1
+    resource_id: $.payload.member.id
+    project_id: $.payload.member.tenant_id
+    metadata:
+      address: $.payload.member.address
+      status: $.payload.member.status
+      status_description: $.payload.member.status_description
+      weight: $.payload.member.weight
+      admin_state_up: $.payload.member.admin_state_up
+      protocol_port: $.payload.member.protocol_port
+      pool_id: $.payload.member.pool_id
+
+  - name: "member.delete"
+    event_type:
+      - "member.delete.end"
+    type: "delta"
+    unit: "member"
+    volume: 1
+    resource_id: $.payload.member.id
+    project_id: $.payload.member.tenant_id
+    metadata:
+      address: $.payload.member.address
+      status: $.payload.member.status
+      status_description: $.payload.member.status_description
+      weight: $.payload.member.weight
+      admin_state_up: $.payload.member.admin_state_up
+      protocol_port: $.payload.member.protocol_port
+      pool_id: $.payload.member.pool_id
