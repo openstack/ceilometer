@@ -174,3 +174,40 @@ resources:
       - 'volume.detach'
     attributes:
       display_name: resource_metadata.display_name
+
+  - resource_type: host
+    metrics:
+      - 'hardware.cpu.load.1min'
+      - 'hardware.cpu.load.5min'
+      - 'hardware.cpu.load.15min'
+      - 'hardware.cpu.util'
+      - 'hardware.memory.total'
+      - 'hardware.memory.used'
+      - 'hardware.memory.swap.total'
+      - 'hardware.memory.swap.avail'
+      - 'hardware.memory.buffer'
+      - 'hardware.memory.cached'
+      - 'hardware.network.ip.outgoing.datagrams'
+      - 'hardware.network.ip.incoming.datagrams'
+      - 'hardware.system_stats.cpu.idle'
+      - 'hardware.system_stats.io.outgoing.blocks'
+      - 'hardware.system_stats.io.incoming.blocks'
+    attributes:
+      host_name: resource_metadata.resource_url
+
+  - resource_type: host_disk
+    metrics:
+      - 'hardware.disk.size.total'
+      - 'hardware.disk.size.used'
+    attributes:
+      host_name: resource_metadata.resource_url
+      device_name: resource_metadata.device
+
+  - resource_type: host_network_interface
+    metrics:
+      - 'hardware.network.incoming.bytes'
+      - 'hardware.network.outgoing.bytes'
+      - 'hardware.network.outgoing.errors'
+    attributes:
+      host_name: resource_metadata.resource_url
+      device_name: resource_metadata.name
