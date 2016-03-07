@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-08 06:51+0000\n"
+"POT-Creation-Date: 2016-03-07 06:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,34 +26,34 @@ msgstr ""
 msgid "UDP: Unable to store meter"
 msgstr ""
 
-#: ceilometer/declarative.py:43
+#: ceilometer/declarative.py:44
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr ""
 
-#: ceilometer/declarative.py:56
+#: ceilometer/declarative.py:57
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr ""
 
-#: ceilometer/declarative.py:65
+#: ceilometer/declarative.py:66
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
 msgstr ""
 
-#: ceilometer/declarative.py:91
+#: ceilometer/declarative.py:92
 #, python-format
 msgid "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
 msgstr ""
 
-#: ceilometer/declarative.py:148
+#: ceilometer/declarative.py:157
 #, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, "
 "column: %(column)s."
 msgstr ""
 
-#: ceilometer/declarative.py:154
+#: ceilometer/declarative.py:163
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr ""
@@ -90,37 +90,37 @@ msgstr ""
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:208
+#: ceilometer/agent/manager.py:207
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
 
-#: ceilometer/agent/manager.py:214
+#: ceilometer/agent/manager.py:213
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:290
+#: ceilometer/agent/manager.py:289
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:293
+#: ceilometer/agent/manager.py:292
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:471
+#: ceilometer/agent/manager.py:470
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:473
+#: ceilometer/agent/manager.py:472
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:482
+#: ceilometer/agent/manager.py:481
 msgid "Error stopping pollster."
 msgstr ""
 
@@ -264,16 +264,6 @@ msgstr ""
 msgid "Unable to load the hypervisor inspector: %s"
 msgstr ""
 
-#: ceilometer/compute/virt/hyperv/utilsv2.py:221
-#, python-format
-msgid "VM %s not found on Hyper-V"
-msgstr ""
-
-#: ceilometer/compute/virt/hyperv/utilsv2.py:223
-#, python-format
-msgid "Duplicate VM name found: %s"
-msgstr ""
-
 #: ceilometer/compute/virt/libvirt/inspector.py:103
 #, python-format
 msgid ""
@@ -338,7 +328,7 @@ msgstr ""
 msgid "Could not get VM %s CPU Utilization"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:60
+#: ceilometer/dispatcher/gnocchi.py:59
 msgid ""
 "The Yaml file that defines mapping between samples and gnocchi "
 "resources/metrics"
@@ -424,24 +414,39 @@ msgstr ""
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr ""
 
-#: ceilometer/network/services/lbaas.py:63
+#: ceilometer/network/services/lbaas.py:88
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr ""
 
-#: ceilometer/network/services/lbaas.py:111
+#: ceilometer/network/services/lbaas.py:136
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
 
-#: ceilometer/network/services/lbaas.py:152
+#: ceilometer/network/services/lbaas.py:177
 #, python-format
 msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
 msgstr ""
 
-#: ceilometer/network/services/lbaas.py:255
+#: ceilometer/network/services/lbaas.py:297
 #, python-format
-msgid "Ignoring pool %(pool_id)s: %(error)s"
+msgid "Ignoring pool %(pool_id)s"
+msgstr ""
+
+#: ceilometer/network/services/lbaas.py:307
+#, python-format
+msgid "Ignoring loadbalancer %(loadbalancer_id)s"
+msgstr ""
+
+#: ceilometer/network/services/lbaas.py:412
+#, python-format
+msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
+msgstr ""
+
+#: ceilometer/network/services/lbaas.py:456
+#, python-format
+msgid "Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
 msgstr ""
 
 #: ceilometer/network/services/vpnaas.py:49
@@ -501,7 +506,7 @@ msgstr ""
 msgid "Unable to send sample over UDP"
 msgstr ""
 
-#: ceilometer/storage/impl_sqlalchemy.py:310
+#: ceilometer/storage/impl_sqlalchemy.py:314
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr ""
@@ -511,19 +516,19 @@ msgstr ""
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:269
+#: ceilometer/storage/mongo/utils.py:270
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:411
+#: ceilometer/storage/mongo/utils.py:412
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. "
 "Giving up."
 msgstr ""
 
-#: ceilometer/storage/mongo/utils.py:415
+#: ceilometer/storage/mongo/utils.py:416
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "

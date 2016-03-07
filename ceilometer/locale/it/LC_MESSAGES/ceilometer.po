@@ -4,14 +4,13 @@
 #
 # Translators:
 # Stefano Maffulli <smaffulli@gmail.com>, 2013
-# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-06 03:16+0000\n"
+"POT-Creation-Date: 2016-03-04 20:29+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -73,10 +72,6 @@ msgstr ""
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "Eliminazione della notifica %(type)s (uuid:%(msgid)s)"
-
-#, python-format
-msgid "Duplicate VM name found: %s"
-msgstr "Trovato nome VM duplicato: %s"
 
 #, python-format
 msgid ""
@@ -158,10 +153,6 @@ msgstr "L'istanza %(name)s (%(instance_id)s) viene ignorata: %(error)s"
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "Si sta ignorando l'istanza %(name)s: %(error)s"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s: %(error)s"
-msgstr "Ignora pool %(pool_id)s: %(error)s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -395,10 +386,6 @@ msgstr "VM %s non trovata in VMware vSphere"
 #, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s non trovata in XenServer"
-
-#, python-format
-msgid "VM %s not found on Hyper-V"
-msgstr "VM %s non trovato su Hyper-V"
 
 msgid "Wrong sensor type"
 msgstr "Tipo di sensore errato"

@@ -1,0 +1,159 @@
+# Monika Wolf <vcomas3@de.ibm.com>, 2016. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-03-04 20:29+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-03-03 03:37+0000\n"
+"Last-Translator: Monika Wolf <vcomas3@de.ibm.com>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"X-Generator: Zanata 3.7.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#, python-format
+msgid "Cannot load inspector %(name)s: %(err)s"
+msgstr "Inspector %(name)s kann nicht geladen werden: %(err)s"
+
+#, python-format
+msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
+msgstr ""
+"Die Verwendung des residenten Speichers für %(id)s konnte nicht abgerufen "
+"werden: %(e)s"
+
+#, python-format
+msgid "Dispatcher failed to handle the %s, requeue it."
+msgstr ""
+"Dispatcher konnte %s nicht verarbeiten. Erneut in Warteschlange stellen."
+
+msgid "Error connecting to coordination backend."
+msgstr "Fehler beim Herstellen einer Verbindung zum Koordinierungs-Back-End."
+
+msgid "Error getting group membership info from coordination backend."
+msgstr ""
+"Fehler beim Abrufen von Mitgliedschaftsinformationen vom Koordinierungs-Back-"
+"End."
+
+#, python-format
+msgid "Error joining partitioning group %s, re-trying"
+msgstr ""
+"Fehler beim Beitreten zur Partitionierungsgruppe %s. Operation wird "
+"wiederholt."
+
+#, python-format
+msgid "Error loading meter definition : %(err)s"
+msgstr "Fehler beim Laden der Messdefinition : %(err)s"
+
+#, python-format
+msgid "Error processing event and it will be dropped: %s"
+msgstr "Fehler beim Verarbeiten des Ereignisses und es wird gelöscht: %s"
+
+msgid "Error sending a heartbeat to coordination backend."
+msgstr ""
+"Fehler beim Senden eines Überwachungssignals an das Koordinierungs-Back-End."
+
+msgid "Fail to process a notification"
+msgstr "Eine Benachrichtigung konnte nicht verarbeitet werden."
+
+msgid "Fail to process notification"
+msgstr "Benachrichtigung konnte nicht verarbeitet werden."
+
+msgid "Failed to connect to Gnocchi."
+msgstr "Fehler beim Herstellen einer Verbindung zu Gnocchi."
+
+#, python-format
+msgid "Failed to connect to Kafka service: %s"
+msgstr "Fehler beim Herstellen einer Verbindung zum Kafka-Service: %s"
+
+#, python-format
+msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
+msgstr ""
+"Fehler beim Herstellen einer Verbindung zur Datenbank. Zweck: %(purpose)s "
+"Später erneut versuchen: %(err)s"
+
+#, python-format
+msgid "Failed to connect to db, purpose %(purpose)s retry later: %(err)s"
+msgstr ""
+"Fehler beim Herstellen einer Verbindung zur Datenbank. Zweck: %(purpose)s "
+"Später erneut versuchen: %(err)s"
+
+#, python-format
+msgid "Failed to load resource due to error %s"
+msgstr "Fehler beim Laden der Ressource aufgrund des folgenden Fehlers %s"
+
+#, python-format
+msgid "Failed to record event: %s"
+msgstr "Das Ereignis konnte nicht aufgezeichnet werden:  %s"
+
+#, python-format
+msgid "Failed to record metering data: %s"
+msgstr "Messdaten wurden nicht aufgezeichnet: %s"
+
+#, fuzzy
+msgid "Failed to retry to send sample data with max_retry times"
+msgstr ""
+"Fehler bei dem Wiederholungsversuch, Beispieldaten mit max_retry times zu "
+"senden."
+
+#, fuzzy
+msgid ""
+"Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: Current agent is "
+"not part of group and cannot take tasks"
+msgstr ""
+"Gruppen-ID: %{group_id}s, Mitglieder: %{members}s, Ich: %{me}s: Der aktuelle "
+"Agent ist nicht Teil der Gruppe und kann keine Tasks übernehmen."
+
+#, python-format
+msgid "Invalid type %s specified"
+msgstr "Ungültigen Typ %s angegeben"
+
+#, python-format
+msgid "Missing field %s"
+msgstr "Fehlendes Feld %s"
+
+msgid "Passed resource dict must contain keys resource_id and resource_url."
+msgstr ""
+"Das übergebene Ressourcenwörterverzeichnis muss die Schlüssel für "
+"resource_id und resource_url enthalten."
+
+#, python-format
+msgid "Required field %(field)s should be a %(type)s"
+msgstr "Erforderliches Feld %(field)s muss %(type)s sein."
+
+#, python-format
+msgid "Required field %s not specified"
+msgstr "Erforderliches Feld %s nicht angegeben."
+
+#, python-format
+msgid "Required fields %s not specified"
+msgstr "Erforderliche Felder %s nicht angegeben."
+
+#, python-format
+msgid "Skip invalid resource %s"
+msgstr "Ungültige Ressource %s überspringen"
+
+#, python-format
+msgid "Skipping %(name)s, keystone issue: %(exc)s"
+msgstr "%(name)s wird übersprungen, Keystone-Problem: %(exc)s"
+
+msgid "Status Code: %{code}s. Failed todispatch event: %{event}s"
+msgstr "Statuscode: %{code}s. Fehler beim Versenden des Ereignisses: %{event}s"
+
+#, python-format
+msgid "Unable to load changed event pipeline: %s"
+msgstr "Die geänderte Ereignispipeline konnte nicht geladen werden: %s"
+
+#, python-format
+msgid "Unable to load changed pipeline: %s"
+msgstr "Die geänderte Pipeline konnte nicht geladen werden:  %s"
+
+#, python-format
+msgid "Unrecognized type value %s"
+msgstr "Nicht erkannter Typwert %s"
+
+#, python-format
+msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
+msgstr "Inspector-Aufruf fehlgeschlagen für %(ident)s Host %(host)s: %(err)s"

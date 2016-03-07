@@ -8,9 +8,9 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev4\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-01-22 05:03+0000\n"
+"POT-Creation-Date: 2016-03-04 20:29+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -72,10 +72,6 @@ msgstr ""
 #, fuzzy, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "通知 %(type)s を除去しています (uuid:%(msgid)s)"
-
-#, python-format
-msgid "Duplicate VM name found: %s"
-msgstr "重複する VM 名が検出されました: %s"
 
 #, python-format
 msgid ""
@@ -154,10 +150,6 @@ msgstr "インスタンス %(name)s (%(instance_id)s) を無視しています: 
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "インスタンス %(name)s を無視しています: %(error)s"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s: %(error)s"
-msgstr "プール %(pool_id)s を無視しています: %(error)s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -366,10 +358,6 @@ msgstr ""
 #, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s が XenServer に見つかりません"
-
-#, python-format
-msgid "VM %s not found on Hyper-V"
-msgstr "Hyper-V で VM %s が見つかりません"
 
 msgid "Wrong sensor type"
 msgstr "センサー種別が正しくありません"

@@ -9,9 +9,9 @@
 # Lucas Palm <lapalm@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b3.dev49\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-02-06 03:16+0000\n"
+"POT-Creation-Date: 2016-03-04 20:29+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -67,10 +67,6 @@ msgstr "未設定分派器目標，將不公佈任何計量。請在ceilometer.c
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "正在捨棄通知 %(type)s（UUID：%(msgid)s）"
-
-#, python-format
-msgid "Duplicate VM name found: %s"
-msgstr "發現重複的 VM 名稱：%s"
 
 #, python-format
 msgid ""
@@ -149,10 +145,6 @@ msgstr "正在忽略實例 %(name)s (%(instance_id)s)：%(error)s"
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "正在忽略實例 %(name)s：%(error)s"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s: %(error)s"
-msgstr "正在忽略儲存區 %(pool_id)s：%(error)s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -360,10 +352,6 @@ msgstr "在 VMware vSphere 中找不到 VM %s"
 #, python-format
 msgid "VM %s not found in XenServer"
 msgstr "在 XenServer 中找不到 VM %s"
-
-#, python-format
-msgid "VM %s not found on Hyper-V"
-msgstr "在 Hyper-V 上找不到 VM %s"
 
 msgid "Wrong sensor type"
 msgstr "感應器類型錯誤"
