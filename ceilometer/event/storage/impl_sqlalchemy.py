@@ -155,14 +155,18 @@ class Connection(base.Connection):
 
         If not, we create it and return the record. This may result in a flush.
         """
-        if session is None:
-            session = self._engine_facade.get_session()
-        with session.begin(subtransactions=True):
-            et = session.query(models.EventType).filter(
-                models.EventType.desc == event_type).first()
-            if not et:
-                et = models.EventType(event_type)
-                session.add(et)
+        try:
+            if session is None:
+                session = self._engine_facade.get_session()
+            with session.begin(subtransactions=True):
+                et = session.query(models.EventType).filter(
+                    models.EventType.desc == event_type).first()
+                if not et:
+                    et = models.EventType(event_type)
+                    session.add(et)
+        except dbexc.DBDuplicateEntry:
+            et = self._get_or_create_event_type(event_type, session)
+
         return et
 
     def record_events(self, event_models):
