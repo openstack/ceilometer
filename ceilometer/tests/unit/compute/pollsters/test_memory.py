@@ -49,7 +49,8 @@ class TestMemoryPollster(base.TestPollsterBase):
         pollster = memory.MemoryUsagePollster()
 
         @mock.patch('ceilometer.compute.pollsters.memory.LOG')
-        def _verify_memory_metering(expected_count, expected_memory_mb, mylog):
+        def _verify_memory_metering(expected_count, expected_memory_mb,
+                                    expected_warnings, mylog):
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(expected_count, len(samples))
             if expected_count > 0:
@@ -57,13 +58,13 @@ class TestMemoryPollster(base.TestPollsterBase):
                                  set([s.name for s in samples]))
                 self.assertEqual(expected_memory_mb, samples[0].volume)
             else:
-                self.assertEqual(1, mylog.warning.call_count)
+                self.assertEqual(expected_warnings, mylog.warning.call_count)
             self.assertEqual(0, mylog.exception.call_count)
 
-        _verify_memory_metering(1, 1.0)
-        _verify_memory_metering(1, 2.0)
-        _verify_memory_metering(0, 0)
-        _verify_memory_metering(0, 0)
+        _verify_memory_metering(1, 1.0, 0)
+        _verify_memory_metering(1, 2.0, 0)
+        _verify_memory_metering(0, 0, 1)
+        _verify_memory_metering(0, 0, 0)
 
 
 class TestResidentMemoryPollster(base.TestPollsterBase):
@@ -96,7 +97,7 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
         @mock.patch('ceilometer.compute.pollsters.memory.LOG')
         def _verify_resident_memory_metering(expected_count,
                                              expected_resident_memory_mb,
-                                             mylog):
+                                             expected_warnings, mylog):
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(expected_count, len(samples))
             if expected_count > 0:
@@ -105,10 +106,10 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
                 self.assertEqual(expected_resident_memory_mb,
                                  samples[0].volume)
             else:
-                self.assertEqual(1, mylog.warning.call_count)
+                self.assertEqual(expected_warnings, mylog.warning.call_count)
             self.assertEqual(0, mylog.exception.call_count)
 
-        _verify_resident_memory_metering(1, 1.0)
-        _verify_resident_memory_metering(1, 2.0)
-        _verify_resident_memory_metering(0, 0)
-        _verify_resident_memory_metering(0, 0)
+        _verify_resident_memory_metering(1, 1.0, 0)
+        _verify_resident_memory_metering(1, 2.0, 0)
+        _verify_resident_memory_metering(0, 0, 1)
+        _verify_resident_memory_metering(0, 0, 0)
