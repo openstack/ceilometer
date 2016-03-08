@@ -19,6 +19,7 @@ import os
 import uuid
 
 from gnocchiclient import exceptions as gnocchi_exc
+from gnocchiclient import utils as gnocchi_utils
 import mock
 from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
@@ -128,36 +129,29 @@ class DispatcherTest(base.BaseTestCase):
             self.assertEqual(0, len(d.resources_definition))
 
     @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
-                '._process_resource')
-    def _do_test_activity_filter(self, expected_samples,
-                                 fake_process_resource):
-
-        def assert_samples(resource_id, metric_grouped_samples):
-            samples = []
-            for metric_name, s in metric_grouped_samples:
-                samples.extend(list(s))
-            self.assertEqual(expected_samples, samples)
-
-        fake_process_resource.side_effect = assert_samples
+                '._if_not_cached')
+    @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
+                '.batch_measures')
+    def _do_test_activity_filter(self, expected_measures, fake_batch, __):
 
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
         d.record_metering_data(self.samples)
-
-        fake_process_resource.assert_called_with(self.resource_id,
-                                                 mock.ANY)
+        fake_batch.assert_called_with(
+            mock.ANY, mock.ANY,
+            {'metrics': 1, 'resources': 1, 'measures': expected_measures})
 
     def test_activity_filter_match_project_id(self):
         self.samples[0]['project_id'] = (
             'a2d42c23-d518-46b6-96ab-3fba2e146859')
-        self._do_test_activity_filter([self.samples[1]])
+        self._do_test_activity_filter(1)
 
     def test_activity_filter_match_swift_event(self):
         self.samples[0]['counter_name'] = 'storage.api.request'
         self.samples[0]['resource_id'] = 'a2d42c23-d518-46b6-96ab-3fba2e146859'
-        self._do_test_activity_filter([self.samples[1]])
+        self._do_test_activity_filter(1)
 
     def test_activity_filter_nomatch(self):
-        self._do_test_activity_filter(self.samples)
+        self._do_test_activity_filter(2)
 
 
 class MockResponse(mock.NonCallableMock):
@@ -251,30 +245,36 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             resource_type='ipmi')),
     ]
 
-    worflow_scenarios = [
-        ('normal_workflow', dict(measure=204, post_resource=None, metric=None,
-                                 measure_retry=None, patch_resource=204)),
-        ('new_resource', dict(measure=404, post_resource=204, metric=None,
-                              measure_retry=204, patch_resource=204)),
-        ('new_resource_fail', dict(measure=404, post_resource=500, metric=None,
-                                   measure_retry=None, patch_resource=None)),
-        ('resource_update_fail', dict(measure=204, post_resource=None,
-                                      metric=None, measure_retry=None,
-                                      patch_resource=500)),
-        ('new_metric', dict(measure=404, post_resource=None, metric=204,
-                            measure_retry=204, patch_resource=204)),
-        ('new_metric_fail', dict(measure=404, post_resource=None, metric=500,
-                                 measure_retry=None, patch_resource=None)),
-        ('retry_fail', dict(measure=404, post_resource=409, metric=None,
-                            measure_retry=500, patch_resource=None)),
-        ('measure_fail', dict(measure=500, post_resource=None, metric=None,
-                              measure_retry=None, patch_resource=None)),
+    default_workflow = dict(resource_exists=True,
+                            metric_exists=True,
+                            post_measure_fail=False,
+                            create_resource_fail=False,
+                            create_metric_fail=False,
+                            update_resource_fail=False,
+                            retry_post_measures_fail=False)
+    workflow_scenarios = [
+        ('normal_workflow', {}),
+        ('new_resource', dict(resource_exists=False)),
+        ('new_resource_fail', dict(resource_exists=False,
+                                   create_resource_fail=True)),
+        ('resource_update_fail', dict(update_resource_fail=True)),
+        ('new_metric', dict(metric_exists=False)),
+        ('new_metric_fail', dict(metric_exists=False,
+                                 create_metric_fail=True)),
+        ('retry_fail', dict(resource_exists=False,
+                            retry_post_measures_fail=True)),
+        ('measure_fail', dict(post_measure_fail=True)),
     ]
 
     @classmethod
     def generate_scenarios(cls):
+        workflow_scenarios = []
+        for name, wf_change in cls.workflow_scenarios:
+            wf = cls.default_workflow.copy()
+            wf.update(wf_change)
+            workflow_scenarios.append((name, wf))
         cls.scenarios = testscenarios.multiply_scenarios(cls.sample_scenarios,
-                                                         cls.worflow_scenarios)
+                                                         workflow_scenarios)
 
     def setUp(self):
         super(DispatcherWorkflowTest, self).setUp()
@@ -314,25 +314,27 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         # encode the resource_id
         resource_id = self.sample['resource_id']  # .replace("/", "%2F"),
         metric_name = self.sample['counter_name']
+        gnocchi_id = gnocchi_utils.encode_resource_id(resource_id)
 
         expected_calls = [
             mock.call.capabilities.list(),
-            mock.call.metric.add_measures(metric_name,
-                                          self.measures_attributes,
-                                          resource_id)]
+            mock.call.metric.batch_resources_metrics_measures(
+                {gnocchi_id: {metric_name: self.measures_attributes}})
+        ]
+        expected_debug = [
+            mock.call('gnocchi project found: %s',
+                      'a2d42c23-d518-46b6-96ab-3fba2e146859'),
+        ]
 
-        add_measures_side_effect = []
-
-        if self.measure == 404 and self.post_resource:
-            add_measures_side_effect += [
-                gnocchi_exc.ResourceNotFound(404)]
-        elif self.measure == 404 and self.metric:
-            add_measures_side_effect += [
-                gnocchi_exc.MetricNotFound(404)]
-        elif self.measure == 500:
-            add_measures_side_effect += [Exception('boom!')]
-
-        if self.post_resource:
+        measures_posted = False
+        batch_side_effect = []
+        if self.post_measure_fail:
+            batch_side_effect += [Exception('boom!')]
+        elif not self.resource_exists or not self.metric_exists:
+            batch_side_effect += [
+                gnocchi_exc.BadRequest(
+                    400, "Unknown metrics: %s/%s" % (gnocchi_id,
+                                                     metric_name))]
             attributes = self.postable_attributes.copy()
             attributes.update(self.patchable_attributes)
             attributes['id'] = self.sample['resource_id']
@@ -340,63 +342,75 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                                          for metric_name in self.metric_names)
             expected_calls.append(mock.call.resource.create(
                 self.resource_type, attributes))
-            if self.post_resource == 409:
+
+            if self.create_resource_fail:
+                fakeclient.resource.create.side_effect = [Exception('boom!')]
+            elif self.resource_exists:
                 fakeclient.resource.create.side_effect = [
                     gnocchi_exc.ResourceAlreadyExists(409)]
-            elif self.post_resource == 500:
-                fakeclient.resource.create.side_effect = [Exception('boom!')]
 
-        if self.metric:
-            expected_calls.append(mock.call.metric.create({
-                'name': self.sample['counter_name'],
-                'resource_id': resource_id}))
-            if self.metric == 409:
-                fakeclient.metric.create.side_effect = [
-                    gnocchi_exc.NamedMetricAreadyExists(409)]
-            elif self.metric == 500:
-                fakeclient.metric.create.side_effect = [Exception('boom!')]
+                expected_calls.append(mock.call.metric.create({
+                    'name': self.sample['counter_name'],
+                    'resource_id': resource_id}))
+                if self.create_metric_fail:
+                    fakeclient.metric.create.side_effect = [Exception('boom!')]
+                elif self.metric_exists:
+                    fakeclient.metric.create.side_effect = [
+                        gnocchi_exc.NamedMetricAreadyExists(409)]
+                else:
+                    fakeclient.metric.create.side_effect = [None]
 
-        if self.measure_retry:
-            expected_calls.append(mock.call.metric.add_measures(
-                metric_name,
-                self.measures_attributes,
-                resource_id))
-            if self.measure_retry == 204:
-                add_measures_side_effect += [None]
-            elif self.measure_retry == 500:
-                add_measures_side_effect += [
-                    Exception('boom!')]
+            else:  # not resource_exists
+                expected_debug.append(mock.call(
+                    'Resource %s created', self.sample['resource_id']))
+
+            if not self.create_resource_fail and not self.create_metric_fail:
+                expected_calls.append(
+                    mock.call.metric.batch_resources_metrics_measures(
+                        {gnocchi_id: {metric_name: self.measures_attributes}})
+                )
+
+                if self.retry_post_measures_fail:
+                    batch_side_effect += [Exception('boom!')]
+                else:
+                    measures_posted = True
+
         else:
-            add_measures_side_effect += [None]
+            measures_posted = True
 
-        if self.patch_resource and self.patchable_attributes:
+        if measures_posted:
+            batch_side_effect += [None]
+            expected_debug.append(
+                mock.call("%(measures)d measures posted against %(metrics)d "
+                          "metrics through %(resources)d resources", dict(
+                              measures=len(self.measures_attributes),
+                              metrics=1, resources=1))
+            )
+
+        if self.patchable_attributes:
             expected_calls.append(mock.call.resource.update(
                 self.resource_type, resource_id,
                 self.patchable_attributes))
-            if self.patch_resource == 500:
+            if self.update_resource_fail:
                 fakeclient.resource.update.side_effect = [Exception('boom!')]
+            else:
+                expected_debug.append(mock.call(
+                    'Resource %s updated', self.sample['resource_id']))
 
-        fakeclient.metric.add_measures.side_effect = add_measures_side_effect
+        batch = fakeclient.metric.batch_resources_metrics_measures
+        batch.side_effect = batch_side_effect
 
         self.dispatcher.record_metering_data([self.sample])
 
         # Check that the last log message is the expected one
-        if (self.measure == 500 or self.measure_retry == 500 or
-                self.metric == 500 or self.post_resource == 500 or
-                (self.patch_resource == 500 and self.patchable_attributes)):
+        if (self.post_measure_fail or self.create_metric_fail
+                or self.create_resource_fail
+                or self.retry_post_measures_fail
+                or (self.update_resource_fail and self.patchable_attributes)):
             logger.error.assert_called_with('boom!', exc_info=True)
-        elif self.patch_resource == 204 and self.patchable_attributes:
-            logger.debug.assert_called_with(
-                'Resource %s updated', self.sample['resource_id'])
+        else:
             self.assertEqual(0, logger.error.call_count)
-        elif self.measure == 200:
-            logger.debug.assert_called_with(
-                "Measure posted on metric %s of resource %s",
-                self.sample['counter_name'],
-                self.sample['resource_id'])
-            self.assertEqual(0, logger.error.call_count)
-
         self.assertEqual(expected_calls, fakeclient.mock_calls)
-
+        self.assertEqual(expected_debug, logger.debug.mock_calls)
 
 DispatcherWorkflowTest.generate_scenarios()
