@@ -29,9 +29,8 @@ CONF = cfg.CONF
 
 class MultiChoicesOpt(cfg.Opt):
     def __init__(self, name, choices=None, **kwargs):
-        super(MultiChoicesOpt, self).__init__(name,
-                                              type=DeduplicatedCfgList(),
-                                              **kwargs)
+        super(MultiChoicesOpt, self).__init__(
+            name, type=DeduplicatedCfgList(choices), **kwargs)
         self.choices = choices
 
     def _get_argparse_kwargs(self, group, **kwargs):
@@ -45,12 +44,20 @@ class MultiChoicesOpt(cfg.Opt):
 
 
 class DeduplicatedCfgList(cfg.types.List):
+    def __init__(self, choices=None, **kwargs):
+        super(DeduplicatedCfgList, self).__init__(**kwargs)
+        self.choices = choices or []
+
     def __call__(self, *args, **kwargs):
         result = super(DeduplicatedCfgList, self).__call__(*args, **kwargs)
-        if len(result) != len(set(result)):
+        result_set = set(result)
+        if len(result) != len(result_set):
             LOG.warning(_LW("Duplicated values: %s found in CLI options, "
-                            "auto de-duplidated"), result)
-            result = list(set(result))
+                            "auto de-duplicated"), result)
+            result = list(result_set)
+        if self.choices and not (result_set <= set(self.choices)):
+            raise Exception('Valid values are %s, but found %s'
+                            % (self.choices, result))
         return result
 
 
