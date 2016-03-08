@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev21\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-07 06:07+0000\n"
+"POT-Creation-Date: 2016-03-08 06:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -300,30 +300,35 @@ msgstr ""
 msgid "VM %s not found in VMware vSphere"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:53
+#: ceilometer/compute/virt/xenapi/inspector.py:66
 msgid "XenAPI not installed"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:59
+#: ceilometer/compute/virt/xenapi/inspector.py:72
 msgid "Must specify connection_url, and connection_password to use"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:67
+#: ceilometer/compute/virt/xenapi/inspector.py:87
 #, python-format
-msgid "Could not connect to XenAPI: %s"
+msgid "Could not connect slave host: %s "
 msgstr ""
 
 #: ceilometer/compute/virt/xenapi/inspector.py:90
 #, python-format
+msgid "Could not connect to XenAPI: %s"
+msgstr ""
+
+#: ceilometer/compute/virt/xenapi/inspector.py:113
+#, python-format
 msgid "VM %s not found in XenServer"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:93
+#: ceilometer/compute/virt/xenapi/inspector.py:116
 #, python-format
 msgid "Multiple VM %s found in XenServer"
 msgstr ""
 
-#: ceilometer/compute/virt/xenapi/inspector.py:106
+#: ceilometer/compute/virt/xenapi/inspector.py:129
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
 msgstr ""
