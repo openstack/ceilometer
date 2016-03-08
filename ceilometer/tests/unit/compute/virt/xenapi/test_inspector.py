@@ -21,6 +21,33 @@ from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector
 
 
+class TestSwapXapiHost(base.BaseTestCase):
+
+    def test_swapping(self):
+        self.assertEqual(
+            "http://otherserver:8765/somepath",
+            xenapi_inspector.swap_xapi_host(
+                "http://someserver:8765/somepath", 'otherserver'))
+
+    def test_no_port(self):
+        self.assertEqual(
+            "http://otherserver/somepath",
+            xenapi_inspector.swap_xapi_host(
+                "http://someserver/somepath", 'otherserver'))
+
+    def test_no_path(self):
+        self.assertEqual(
+            "http://otherserver",
+            xenapi_inspector.swap_xapi_host(
+                "http://someserver", 'otherserver'))
+
+    def test_same_hostname_path(self):
+        self.assertEqual(
+            "http://other:80/some",
+            xenapi_inspector.swap_xapi_host(
+                "http://some:80/some", 'other'))
+
+
 class TestXenapiInspection(base.BaseTestCase):
 
     def setUp(self):

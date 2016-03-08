@@ -15,6 +15,7 @@
 
 from oslo_config import cfg
 from oslo_utils import units
+import six.moves.urllib.parse as urlparse
 try:
     import XenAPI as api
 except ImportError:
@@ -48,6 +49,18 @@ class XenapiException(virt_inspector.InspectorException):
     pass
 
 
+def swap_xapi_host(url, host_addr):
+    """Replace the XenServer address present in 'url' with 'host_addr'."""
+    temp_url = urlparse.urlparse(url)
+    # The connection URL is served by XAPI and doesn't support having a
+    # path for the connection url after the port. And username/password
+    # will be pass separately. So the URL like "http://abc:abc@abc:433/abc"
+    # should not appear for XAPI case.
+    temp_netloc = temp_url.netloc.replace(temp_url.hostname, '%s' % host_addr)
+    replaced = temp_url._replace(netloc=temp_netloc)
+    return urlparse.urlunparse(replaced)
+
+
 def get_api_session():
     if not api:
         raise ImportError(_('XenAPI not installed'))
@@ -64,8 +77,18 @@ def get_api_session():
                    else api.Session(url))
         session.login_with_password(username, password)
     except api.Failure as e:
-        msg = _("Could not connect to XenAPI: %s") % e.details[0]
-        raise XenapiException(msg)
+        if e.details[0] == 'HOST_IS_SLAVE':
+            master = e.details[1]
+            url = swap_xapi_host(url, master)
+            try:
+                session = api.Session(url)
+                session.login_with_password(username, password)
+            except api.Failure as es:
+                raise XenapiException(_('Could not connect slave host: %s ') %
+                                      es.details[0])
+        else:
+            msg = _("Could not connect to XenAPI: %s") % e.details[0]
+            raise XenapiException(msg)
     return session
 
 
