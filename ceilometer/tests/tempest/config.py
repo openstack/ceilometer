@@ -20,12 +20,12 @@ service_available_group = cfg.OptGroup(name="service_available",
                                        title="Available OpenStack Services")
 
 ServiceAvailableGroup = [
-    cfg.BoolOpt('ceilometer',
+    cfg.BoolOpt('ceilometer_plugin',
                 default=True,
                 help="Whether or not Ceilometer is expected to be available"),
 ]
 
-telemetry_group = cfg.OptGroup(name='telemetry',
+telemetry_group = cfg.OptGroup(name='telemetry_plugin',
                                title='Telemetry Service Options')
 
 TelemetryGroup = [
@@ -37,4 +37,7 @@ TelemetryGroup = [
                choices=['public', 'admin', 'internal',
                         'publicURL', 'adminURL', 'internalURL'],
                help="The endpoint type to use for the telemetry service."),
+    cfg.BoolOpt('event_enabled',
+                default=True,
+                help="Runs Ceilometer event-related tests"),
 ]
