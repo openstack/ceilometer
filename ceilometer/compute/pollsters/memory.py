@@ -48,10 +48,10 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
-                LOG.warning(_LW('Instance %(instance_id)s was shut off while '
-                                'getting samples of %(pollster)s: %(exc)s'),
-                            {'instance_id': instance.id,
-                             'pollster': self.__class__.__name__, 'exc': e})
+                LOG.debug('Instance %(instance_id)s was shut off while '
+                          'getting samples of %(pollster)s: %(exc)s',
+                          {'instance_id': instance.id,
+                           'pollster': self.__class__.__name__, 'exc': e})
             except virt_inspector.NoDataException as e:
                 LOG.warning(_LW('Cannot inspect data of %(pollster)s for '
                                 '%(instance_id)s, non-fatal reason: %(exc)s'),
@@ -91,10 +91,10 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug('Exception while getting samples %s', err)
             except virt_inspector.InstanceShutOffException as e:
-                LOG.warning(_LW('Instance %(instance_id)s was shut off while '
-                                'getting samples of %(pollster)s: %(exc)s'),
-                            {'instance_id': instance.id,
-                             'pollster': self.__class__.__name__, 'exc': e})
+                LOG.debug('Instance %(instance_id)s was shut off while '
+                          'getting samples of %(pollster)s: %(exc)s',
+                          {'instance_id': instance.id,
+                           'pollster': self.__class__.__name__, 'exc': e})
             except virt_inspector.NoDataException as e:
                 LOG.warning(_LW('Cannot inspect data of %(pollster)s for '
                                 '%(instance_id)s, non-fatal reason: %(exc)s'),
