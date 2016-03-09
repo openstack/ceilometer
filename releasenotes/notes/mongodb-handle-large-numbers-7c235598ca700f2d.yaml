@@ -1,0 +1,7 @@
+---
+fixes:
+  - >
+    [`bug 1532661 <https://bugs.launchpad.net/ceilometer/+bug/1532661>`_]
+    Fix statistics query failures due to large numbers stored in MongoDB. Data
+    from MongoDB is returned as Int64 for big numbers when int and float types
+    are expected. The data is cast to appropriate type to handle large data.

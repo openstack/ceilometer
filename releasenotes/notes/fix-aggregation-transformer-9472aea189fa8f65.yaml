@@ -1,0 +1,7 @@
+---
+fixes:
+  - >
+    [`bug 1539163 <https://bugs.launchpad.net/ceilometer/+bug/1539163>`_]
+    Add ability to define whether to use first or last timestamps when
+    aggregating samples. This will allow more flexibility when chaining
+    transformers.

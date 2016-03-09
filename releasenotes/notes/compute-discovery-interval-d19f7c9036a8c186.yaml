@@ -1,0 +1,9 @@
+---
+features:
+  - >
+    To minimise load on Nova API, an additional configuration option was added
+    to control discovery interval vs metric polling interval. If
+    resource_update_interval option is configured in compute section, the
+    compute agent will discover new instances based on defined interval. The
+    agent will continue to poll the discovered instances at the interval
+    defined by pipeline.

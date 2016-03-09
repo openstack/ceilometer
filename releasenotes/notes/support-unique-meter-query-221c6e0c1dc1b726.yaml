@@ -1,0 +1,7 @@
+---
+features:
+  - >
+    [`bug 1506959 <https://bugs.launchpad.net/ceilometer/+bug/1506959>`_]
+    Add support to query unique set of meter names rather than meters
+    associated with each resource. The list is available by adding unique=True
+    option to request.

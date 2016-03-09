@@ -1,0 +1,11 @@
+---
+upgrade:
+  - >
+    To utilize the new policy support. The policy.json file
+    should be updated accordingly. The pre-existing policy.json
+    file will continue to function as it does if policy changes
+    are not required.
+fixes:
+  - >
+    [`bug 1504495 <https://bugs.launchpad.net/ceilometer/+bug/1504495>`_]
+    Configure ceilometer to handle policy.json rules when possible.
