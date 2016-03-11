@@ -23,17 +23,18 @@
 # Corinne Verheyde <cverheyd@hotmail.com>, 2013
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
+# Corinne Verheyde <cverheyd@gmail.com>, 2016. #zanata
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev34\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-04 20:29+0000\n"
+"POT-Creation-Date: 2016-03-09 20:26+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2015-09-04 06:32+0000\n"
-"Last-Translator: openstackjenkins <jenkins@openstack.org>\n"
+"PO-Revision-Date: 2016-03-09 05:03+0000\n"
+"Last-Translator: Corinne Verheyde <cverheyd@gmail.com>\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -59,6 +60,10 @@ msgstr ""
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continue après l'erreur %(name)s: %(error)s "
+
+#, python-format
+msgid "Could not connect slave host: %s "
+msgstr "Impossible de se connecter à l'hôte slave: %s "
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -176,6 +181,22 @@ msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "instance %(name)s: %(error)s ignoré"
 
 #, python-format
+msgid "Ignoring loadbalancer %(loadbalancer_id)s"
+msgstr "Loadbalancer %(loadbalancer_id)s ignoré"
+
+#, python-format
+msgid "Ignoring pool %(pool_id)s"
+msgstr "Pool %(pool_id)s ignoré"
+
+#, python-format
+msgid ""
+"Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
+"%(column)s."
+msgstr ""
+"Syntaxe YAML non valide dans le fichier de définitions %(file)s à la ligne : "
+"%(line)s, colonne : %(column)s."
+
+#, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr "Période %(period)s non valide : %(err)s"
 
@@ -199,6 +220,10 @@ msgstr "Plusieurs machines virtuelles %s trouvées dans XenServer"
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "Il faut indiquer connection_url et connection_password pour utiliser"
 
+#, python-format
+msgid "No plugin named %(plugin)s available for %(name)s"
+msgstr "Aucun plugin nommé %(plugin)s n'est disponible pour %(name)s"
+
 msgid "Node Manager init failed"
 msgstr "Echec de l'initialisation du gestionnaire de noeud"
 
@@ -215,8 +240,31 @@ msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "L'API Opencontrail a renvoyé %(status)s %(reason)s"
 
 #, python-format
+msgid ""
+"Operator %(operator)s is not supported. Only equality operator is available "
+"for field %(field)s"
+msgstr ""
+"Opérateur %(operator)s non supporté. Seul l'opérateur égalité est disponible "
+"pour le champ %(field)s"
+
+#, python-format
+msgid ""
+"Operator %(operator)s is not supported. The supported operators are: "
+"%(supported)s"
+msgstr ""
+"L'opérateur %(operator)s n'est pas supporté. Les opérateurs supportés sont: "
+"%(supported)s"
+
+#, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "L'expression de tri n'est pas valide : %s"
+
+#, python-format
+msgid ""
+"Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
+msgstr ""
+"Erreur d'analyse dans la spécification JSONPath '%(jsonpath)s' pour "
+"%(name)s : %(err)s"
 
 msgid "Period must be positive."
 msgstr "La période doit être positive."
@@ -243,8 +291,16 @@ msgstr ""
 "%(smp)s"
 
 #, python-format
+msgid "Plugin specified, but no plugin name supplied for %s"
+msgstr "Plugin spécifié, mais aucun nom de plugin n'est fourni pour %s"
+
+#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "L'interrogation du capteur %(mtr)s a échoué %(cnt)s fois !"
+
+#, python-format
+msgid "Polling %(name)s failed for %(cnt)s times!"
+msgstr "Sondage de %(name)s %(cnt)s fois en échec!"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -309,6 +365,10 @@ msgid ""
 msgstr ""
 "Le type de données %(type)s n'est pas supporté. Les types de données "
 "supportés sont: %(supported)s"
+
+#, python-format
+msgid "The field 'fields' is required for %s"
+msgstr "Le champ 'fields' est requis pour  %s"
 
 msgid "The path for the file publisher is required"
 msgstr "Le chemin du éditeur de fichier est obligatoire "
@@ -382,8 +442,22 @@ msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "Type de métadonnées inconnu, la clé (%s) n'est pas requêtable"
 
 #, python-format
+msgid ""
+"Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
+msgstr ""
+"Statut %(stat)s inconnu reçu sur le Load Balancer %(id)s,  échantillon ignoré"
+
+#, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr "Etat %(stat)s inconnu reçu sur le pare-feu %(id)s, échantillon ignoré"
+
+#, python-format
+msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
+msgstr "Etat %(stat)s inconnu reçu sur le listener %(id)s, échantillon ignoré"
+
+#, python-format
+msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
+msgstr "Etat %(stat)s inconnu reçu sur le membre %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
@@ -393,6 +467,10 @@ msgstr "Etat %(stat)s inconnu reçu sur le pool %(id)s, échantillon ignoré"
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
 "Etat %(stat)s inconnu reçu sur l'IP virtuelle %(id)s, échantillon ignoré"
+
+#, python-format
+msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
+msgstr "Etat %(stat)s inconnu reçu sur le vpn %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
@@ -409,8 +487,15 @@ msgid "XenAPI not installed"
 msgstr "XenAPI n'est pas installé"
 
 #, python-format
+msgid "YAML error reading Definitions file %(file)s"
+msgstr "Erreur YAML lors de la lecture du fichier de définitions %(file)s"
+
+#, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "impossible d'obtenir le temps UC pour %(id)s : %(e)s"
+
+msgid "direct option cannot be true when Gnocchi is enabled."
+msgstr "L'option directe ne peut pas être à vrai si Gnocchi est activé."
 
 #, python-format
 msgid "dropping out of time order sample: %s"
