@@ -19,6 +19,7 @@ import shutil
 from keystoneclient import exceptions as ks_exceptions
 import mock
 from novaclient import client as novaclient
+from oslo_config import fixture as fixture_config
 from oslo_service import service as os_service
 from oslo_utils import fileutils
 from oslotest import base
@@ -49,6 +50,10 @@ class TestPollsterBuilder(agentbase.TestPollster):
             'BaseComputePollster.setup_environment',
             mock.Mock(return_value=None))
 class TestManager(base.BaseTestCase):
+    def setUp(self):
+        super(TestManager, self).setUp()
+        self.conf = self.useFixture(fixture_config.Config()).conf
+        self.conf(args=[])
 
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def test_load_plugins(self):
