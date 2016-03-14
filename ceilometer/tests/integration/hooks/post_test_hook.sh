@@ -81,7 +81,7 @@ if [ $EXIT_CODE -ne 0 ] ; then
     # Be sure to source Gnocchi settings before
     source $BASE/new/gnocchi/devstack/settings
     echo "* Unprocessed measures:"
-    find $GNOCCHI_DATA_DIR
+    sudo find $GNOCCHI_DATA_DIR
 
     set -x
 fi
