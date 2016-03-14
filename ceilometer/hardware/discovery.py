@@ -63,7 +63,7 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
                 self.instances.pop(instance.id, None)
             else:
                 self.instances[instance.id] = instance
-        self.last_run = timeutils.utcnow(True).isoformat()
+        self.last_run = timeutils.utcnow().isoformat()
 
         resources = []
         for instance in self.instances.values():

@@ -45,7 +45,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 self.instances.pop(instance.id, None)
             else:
                 self.instances[instance.id] = instance
-        self.last_run = timeutils.utcnow(True).isoformat()
+        self.last_run = timeutils.utcnow().isoformat()
         return self.instances.values()
 
     @property
