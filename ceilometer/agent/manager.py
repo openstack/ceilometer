@@ -88,6 +88,13 @@ class PollsterListForbidden(Exception):
         super(PollsterListForbidden, self).__init__(msg)
 
 
+class EmptyPollstersList(Exception):
+    def __init__(self):
+        msg = ('No valid pollsters can be loaded with the startup parameters'
+               ' polling-namespaces and pollster-list.')
+        super(EmptyPollstersList, self).__init__(msg)
+
+
 class Resources(object):
     def __init__(self, agent_manager):
         self.agent_manager = agent_manager
@@ -261,6 +268,9 @@ class AgentManager(service_base.BaseService):
 
         self.extensions = list(itertools.chain(*list(extensions))) + list(
             itertools.chain(*list(extensions_fb)))
+
+        if self.extensions == []:
+            raise EmptyPollstersList()
 
         self.discovery_manager = self._extensions('discover')
         self.context = context.RequestContext('admin', 'admin', is_admin=True)

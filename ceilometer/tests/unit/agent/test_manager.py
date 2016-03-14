@@ -65,12 +65,27 @@ class TestManager(base.BaseTestCase):
         # currently we do have 26 disk-related pollsters
         self.assertEqual(26, len(list(mgr.extensions)))
 
+    def test_load_invalid_plugins_pollster_list(self):
+        # if no valid pollsters have been loaded, the ceilometer
+        # polling program should exit
+        self.assertRaisesRegexp(
+            manager.EmptyPollstersList,
+            'No valid pollsters can be loaded with the startup parameters'
+            ' polling-namespaces and pollster-list.',
+            manager.AgentManager,
+            pollster_list=['aaa'])
+
     def test_load_plugins_no_intersection(self):
         # Let's test nothing will be polled if namespace and pollsters
         # list have no intersection.
-        mgr = manager.AgentManager(namespaces=['compute'],
-                                   pollster_list=['storage.*'])
-        self.assertEqual(0, len(list(mgr.extensions)))
+        parameters = dict(namespaces=['compute'],
+                          pollster_list=['storage.*'])
+        self.assertRaisesRegexp(
+            manager.EmptyPollstersList,
+            'No valid pollsters can be loaded with the startup parameters'
+            ' polling-namespaces and pollster-list.',
+            manager.AgentManager,
+            parameters)
 
     # Test plugin load behavior based on Node Manager pollsters.
     # pollster_list is just a filter, so sensor pollsters under 'ipmi'
@@ -94,17 +109,16 @@ class TestManager(base.BaseTestCase):
     def test_load_failed_plugins(self, LOG):
         # Here we additionally check that namespaces will be converted to the
         # list if param was not set as a list.
-        mgr = manager.AgentManager(namespaces='ipmi',
-                                   pollster_list=['hardware.ipmi.node.*'])
-        # 0 pollsters
-        self.assertEqual(0, len(mgr.extensions))
-
-        err_msg = 'Skip loading extension for hardware.ipmi.node.%s'
-        pollster_names = [
-            'power', 'temperature', 'outlet_temperature',
-            'airflow', 'cups', 'cpu_util', 'mem_util', 'io_util']
-        calls = [mock.call(err_msg % n) for n in pollster_names]
-        LOG.exception.assert_has_calls(calls=calls, any_order=True)
+        try:
+            manager.AgentManager(namespaces='ipmi',
+                                 pollster_list=['hardware.ipmi.node.*'])
+        except manager.EmptyPollstersList:
+            err_msg = 'Skip loading extension for hardware.ipmi.node.%s'
+            pollster_names = [
+                'power', 'temperature', 'outlet_temperature',
+                'airflow', 'cups', 'cpu_util', 'mem_util', 'io_util']
+            calls = [mock.call(err_msg % n) for n in pollster_names]
+            LOG.exception.assert_has_calls(calls=calls, any_order=True)
 
     # Skip loading pollster upon ImportError
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
@@ -112,10 +126,14 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
     def test_import_error_in_plugin(self):
-        mgr = manager.AgentManager(namespaces=['ipmi'],
-                                   pollster_list=['hardware.ipmi.node.*'])
-        # 0 pollsters
-        self.assertEqual(0, len(mgr.extensions))
+        parameters = dict(namespaces=['ipmi'],
+                          pollster_list=['hardware.ipmi.node.*'])
+        self.assertRaisesRegexp(
+            manager.EmptyPollstersList,
+            'No valid pollsters can be loaded with the startup parameters'
+            ' polling-namespaces and pollster-list.',
+            manager.AgentManager,
+            parameters)
 
     # Exceptions other than ExtensionLoadError are propagated
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
