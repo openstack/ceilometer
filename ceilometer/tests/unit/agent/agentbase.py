@@ -354,7 +354,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def test_setup_polling_tasks(self):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertTrue(60 in polling_tasks.keys())
+        self.assertIn(60, polling_tasks.keys())
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(1, len(per_task_resources))
         self.assertEqual(set(self.pipeline_cfg['sources'][0]['resources']),
@@ -371,8 +371,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(2, len(polling_tasks))
-        self.assertTrue(60 in polling_tasks.keys())
-        self.assertTrue(10 in polling_tasks.keys())
+        self.assertIn(60, polling_tasks.keys())
+        self.assertIn(10, polling_tasks.keys())
 
     def test_setup_polling_tasks_mismatch_counter(self):
         self.pipeline_cfg['sources'].append({
@@ -384,8 +384,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         })
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertTrue(60 in polling_tasks.keys())
-        self.assertFalse(10 in polling_tasks.keys())
+        self.assertIn(60, polling_tasks.keys())
+        self.assertNotIn(10, polling_tasks.keys())
 
     def test_setup_polling_task_same_interval(self):
         self.pipeline_cfg['sources'].append({
@@ -554,7 +554,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertTrue(60 in polling_tasks.keys())
+        self.assertIn(60, polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual([None], self.Discovery.params)
         self.assertEqual([None], self.DiscoveryAnother.params)
@@ -593,7 +593,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertTrue(60 in polling_tasks.keys())
+        self.assertIn(60, polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual(1, len(self.Pollster.samples))
         self.assertEqual(['discovered_1', 'discovered_2'],
@@ -620,7 +620,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
-        self.assertTrue(60 in polling_tasks.keys())
+        self.assertIn(60, polling_tasks.keys())
         self.mgr.interval_task(polling_tasks.get(60))
         self.assertEqual(1, len(self.Pollster.samples))
         self.assertEqual(['discovered_1', 'discovered_2'],
