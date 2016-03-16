@@ -263,6 +263,40 @@ metric:
       host: $.publisher_id
       source: $.payload.metrics[?(@.name='cpu.percent')].source
 
+  # DNS
+  - name: 'dns.domain.exists'
+    event_type: 'dns.domain.exists'
+    type: 'cumulative'
+    unit: 's'
+    volume:
+      fields: [$.payload.audit_period_beginning, $.payload.audit_period_ending]
+      plugin: 'timedelta'
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.id
+    user_id: $._context_user
+    metadata:
+      status: $.payload.status
+      pool_id: $.payload.pool_id
+      host: $.publisher_id
+
+  # Trove
+  - name: 'trove.instance.exists'
+    event_type: 'trove.instance.exists'
+    type: 'cumulative'
+    unit: 's'
+    volume:
+      fields: [$.payload.audit_period_beginning, $.payload.audit_period_ending]
+      plugin: 'timedelta'
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.instance_id
+    user_id: $.payload.user_id
+    metadata:
+      nova_instance_id: $.payload.nova_instance_id
+      state: $.payload.state
+      service_id: $.payload.service_id
+      instance_type: $.payload.instance_type
+      instance_type_id: $.payload.instance_type_id
+
 
 # NOTE: non-metric meters are generally events/existence meters
 # These are DEPRECATED in current release and expected to be

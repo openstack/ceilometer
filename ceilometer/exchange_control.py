@@ -44,4 +44,7 @@ EXCHANGE_OPTS = [
     cfg.StrOpt('zaqar_control_exchange',
                default='zaqar',
                help="Exchange name for Messaging service notifications."),
+    cfg.StrOpt('dns_control_exchange',
+               default='central',
+               help="Exchange name for DNS service notifications."),
 ]
