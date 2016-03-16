@@ -1,0 +1,5 @@
+---
+fixes:
+  - >
+    [`bug 1254800 <https://bugs.launchpad.net/ceilometer/+bug/1254800>`_]
+    Add better support to catch race conditions when creating event_types
