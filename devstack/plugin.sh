@@ -278,8 +278,7 @@ function configure_ceilometer {
 
     iniset_rpc_backend ceilometer $CEILOMETER_CONF
 
-    iniset $CEILOMETER_CONF DEFAULT notification_topics "$CEILOMETER_NOTIFICATION_TOPICS"
-    iniset $CEILOMETER_CONF DEFAULT verbose True
+    iniset $CEILOMETER_CONF oslo_messaging_notifications topics "$CEILOMETER_NOTIFICATION_TOPICS"
     iniset $CEILOMETER_CONF DEFAULT debug "$ENABLE_DEBUG_LOG_LEVEL"
 
     if [[ -n "$CEILOMETER_COORDINATION_URL" ]]; then
@@ -376,7 +375,7 @@ function init_ceilometer {
 # installed. The context is not active during preinstall (when it would
 # otherwise makes sense to do the backend services).
 function install_ceilometer {
-    if is_service_enabled ceilometer-acentral ceilometer-anotification ceilometer-alarm-evaluator ; then
+    if is_service_enabled ceilometer-acentral ceilometer-anotification ; then
         _ceilometer_prepare_coordination
     fi
 
