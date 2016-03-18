@@ -163,8 +163,12 @@ function _ceilometer_prepare_virt_drivers {
 
 
 # Create ceilometer related accounts in Keystone
-function _ceilometer_create_accounts {
+function ceilometer_create_accounts {
     if is_service_enabled ceilometer-api; then
+        # At this time, the /etc/openstack/clouds.yaml is available,
+        # we could leverage that by setting OS_CLOUD
+        OLD_OS_CLOUD=$OS_CLOUD
+        export OS_CLOUD='devstack-admin'
 
         create_service_user "ceilometer" "admin"
 
@@ -179,6 +183,8 @@ function _ceilometer_create_accounts {
             # Ceilometer needs ResellerAdmin role to access Swift account stats.
             get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
         fi
+
+        export OS_CLOUD=$OLD_OS_CLOUD
     fi
 }
 
@@ -356,8 +362,6 @@ function configure_ceilometer {
 
 # init_ceilometer() - Initialize etc.
 function init_ceilometer {
-    # Get ceilometer keystone settings in place
-    _ceilometer_create_accounts
     # Create cache dir
     sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
     rm -f $CEILOMETER_AUTH_CACHE_DIR/*
@@ -474,6 +478,8 @@ if is_service_enabled ceilometer; then
     elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
         echo_summary "Configuring Ceilometer"
         configure_ceilometer
+        # Get ceilometer keystone settings in place
+        ceilometer_create_accounts
     elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
         echo_summary "Initializing Ceilometer"
         # Tidy base for ceilometer
