@@ -40,8 +40,6 @@
 # Save trace setting
 XTRACE=$(set +o | grep xtrace)
 set -o xtrace
-# TODO(liusheng) Temporarily add this to avoid integration test failue, see bug1548634
-export SERVICE_TENANT_NAME=$SERVICE_PROJECT_NAME
 
 # Support potential entry-points console scripts in VENV or not
 if [[ ${USE_VENV} = True ]]; then
