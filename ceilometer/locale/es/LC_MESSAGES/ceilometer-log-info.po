@@ -1,0 +1,139 @@
+# Eugènia Torrella <tester03@es.ibm.com>, 2016. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev50\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-03-19 00:57+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-03-18 02:45+0000\n"
+"Last-Translator: Eugènia Torrella <tester03@es.ibm.com>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"X-Generator: Zanata 3.7.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#, python-format
+msgid "%d events are removed from database"
+msgstr "Se han eliminado %d sucesos de la base de datos"
+
+#, python-format
+msgid "%d samples removed from database"
+msgstr "Se han eliminado %d ejemplos de la base de datos"
+
+msgid "Configuration:"
+msgstr "Configuración:"
+
+#, python-format
+msgid "Connecting to %(db)s on %(nodelist)s"
+msgstr "Se está estableciendo conexión con %(db)s en %(nodelist)s"
+
+msgid "Coordination backend started successfully."
+msgstr "El servidor coordinador se ha iniciado satisfactoriamente."
+
+#, python-format
+msgid "Definitions: %s"
+msgstr "Definiciones: %s"
+
+msgid "Detected change in pipeline configuration."
+msgstr "Se ha detectado un cambio en la configuración de la interconexión."
+
+#, python-format
+msgid "Dropping event data with TTL %d"
+msgstr "Descartando datos de sucesos con TTL %d"
+
+#, python-format
+msgid "Dropping metering data with TTL %d"
+msgstr "Descartando datos de calibración con TTL %d"
+
+#, python-format
+msgid "Duplicate event detected, skipping it: %s"
+msgstr "Se ha detectado un suceso duplicado, se omitirá: %s"
+
+msgid "Expired residual resource and meter definition data"
+msgstr "El recurso residual y los datos de definición del medidor han caducado"
+
+#, python-format
+msgid "Index %s will be recreate."
+msgstr "Se volverá a crear el índice %s."
+
+#, python-format
+msgid "Joined partitioning group %s"
+msgstr "Se ha unido al grupo de partición %s"
+
+#, python-format
+msgid "Left partitioning group %s"
+msgstr "Ha dejado el grupo de partición %s"
+
+#, python-format
+msgid "No limit value provided, result set will be limited to %(limit)d."
+msgstr ""
+"No se ha proporcionado ningún valor límite, el conjunto de resultados estará "
+"limitado a %(limit)d."
+
+msgid "Nothing to clean, database event time to live is disabled"
+msgstr ""
+"No hay nada que limpiar, el tiempo de vida de sucesos de base de datos está "
+"inhabilitado"
+
+msgid "Nothing to clean, database metering time to live is disabled"
+msgstr ""
+"No hay nada que limpiar, el tiempo de vida de medición de base de datos está "
+"inhabilitado"
+
+#, python-format
+msgid ""
+"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
+"%(param)s"
+msgstr ""
+"Interconexión %(pipeline)s: Configure la instancia de transformador %(name)s "
+"con el parámetro %(param)s"
+
+#, python-format
+msgid "Pipeline config: %s"
+msgstr "Configuración de interconexión: %s"
+
+msgid "Pipeline configuration file has been updated."
+msgstr "Se ha actualizado el archivo de configuración de la interconexión."
+
+#, python-format
+msgid "Polling pollster %(poll)s in the context of %(src)s"
+msgstr "Sondeando pollster %(poll)s en el contexto de %(src)s"
+
+#, python-format
+msgid "Publishing policy set to %s"
+msgstr "Política de publicación establecida en %s"
+
+msgid "Reconfiguring polling tasks."
+msgstr "Reconfigurando las tareas de sondeo."
+
+msgid "Reloading notification agent and listeners."
+msgstr "Recargando la notificación, el agente y los escuchas."
+
+#, python-format
+msgid "Skip pollster %(name)s, no %(p_context)sresources found this cycle"
+msgstr ""
+"Omitir  pollster %(name)s, ningún recurso de  %(p_context)s ha encontrado "
+"este ciclo"
+
+#, python-format
+msgid "Starting server in PID %s"
+msgstr "Iniciando servidor en PID %s"
+
+msgid "detected decoupled pipeline config format"
+msgstr ""
+"se ha detectado un formato de configuración de interconexión desacoplado"
+
+#, python-format
+msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
+msgstr ""
+"datos de medición %(counter_name)s para %(resource_id)s: %(counter_volume)s"
+
+#, python-format
+msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
+msgstr "sirviendo en 0.0.0.0:%(sport)s, vista en http://127.0.0.1:%(vport)s"
+
+#, python-format
+msgid "serving on http://%(host)s:%(port)s"
+msgstr "sirviendo en http://%(host)s:%(port)s"
