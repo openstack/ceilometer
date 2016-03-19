@@ -12,14 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import os
-import random
-import socket
 import subprocess
-import time
 
-import httplib2
 from oslo_utils import fileutils
 import six
 
@@ -113,119 +108,6 @@ class BinSendSampleTestCase(base.BaseTestCase):
                                  "--sample-resource=someuuid",
                                  "--sample-name=mycounter"])
         self.assertEqual(0, subp.wait())
-
-
-class BinApiTestCase(base.BaseTestCase):
-
-    def setUp(self):
-        super(BinApiTestCase, self).setUp()
-        # create api_paste.ini file without authentication
-        content = ("[pipeline:main]\n"
-                   "pipeline = api-server\n"
-                   "[app:api-server]\n"
-                   "paste.app_factory = ceilometer.api.app:app_factory\n")
-        if six.PY3:
-            content = content.encode('utf-8')
-        self.paste = fileutils.write_to_tempfile(content=content,
-                                                 prefix='api_paste',
-                                                 suffix='.ini')
-
-        # create ceilometer.conf file
-        self.api_port = random.randint(10000, 11000)
-        self.http = httplib2.Http(proxy_info=None)
-        self.pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
-        self.policy_file = self.path_get('etc/ceilometer/policy.json')
-
-    def tearDown(self):
-        super(BinApiTestCase, self).tearDown()
-        try:
-            self.subp.kill()
-            self.subp.wait()
-        except OSError:
-            pass
-        os.remove(self.tempfile)
-
-    def get_response(self, path):
-        url = 'http://%s:%d/%s' % ('127.0.0.1', self.api_port, path)
-
-        for x in range(10):
-            try:
-                r, c = self.http.request(url, 'GET')
-            except socket.error:
-                time.sleep(.5)
-                self.assertIsNone(self.subp.poll())
-            else:
-                return r, c
-        return None, None
-
-    def run_api(self, content, err_pipe=None):
-        if six.PY3:
-            content = content.encode('utf-8')
-
-        self.tempfile = fileutils.write_to_tempfile(content=content,
-                                                    prefix='ceilometer',
-                                                    suffix='.conf')
-        if err_pipe:
-            return subprocess.Popen(['ceilometer-api',
-                                    "--config-file=%s" % self.tempfile],
-                                    stderr=subprocess.PIPE)
-        else:
-            return subprocess.Popen(['ceilometer-api',
-                                    "--config-file=%s" % self.tempfile])
-
-    def test_v2(self):
-
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "auth_strategy=noauth\n"
-                   "debug=true\n"
-                   "pipeline_cfg_file={0}\n"
-                   "api_paste_config={2}\n"
-                   "[api]\n"
-                   "port={3}\n"
-                   "[oslo_policy]\n"
-                   "policy_file={1}\n"
-                   "[database]\n"
-                   "connection=log://localhost\n".
-                   format(self.pipeline_cfg_file,
-                          self.policy_file,
-                          self.paste,
-                          self.api_port))
-
-        self.subp = self.run_api(content)
-
-        response, content = self.get_response('v2/meters')
-        self.assertEqual(200, response.status)
-        if six.PY3:
-            content = content.decode('utf-8')
-        self.assertEqual([], json.loads(content))
-
-    def test_v2_with_all_bad_conns(self):
-
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "auth_strategy=noauth\n"
-                   "debug=true\n"
-                   "pipeline_cfg_file={0}\n"
-                   "policy_file={1}\n"
-                   "api_paste_config={2}\n"
-                   "[api]\n"
-                   "port={3}\n"
-                   "[database]\n"
-                   "max_retries=1\n"
-                   "connection=dummy://localhost\n"
-                   "event_connection=dummy://localhost\n".
-                   format(self.pipeline_cfg_file,
-                          self.policy_file,
-                          self.paste,
-                          self.api_port))
-
-        self.subp = self.run_api(content, err_pipe=True)
-
-        __, err = self.subp.communicate()
-
-        self.assertIn(b"Api failed to start. Failed to connect to"
-                      b" databases, purpose:  metering, event", err)
 
 
 class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
