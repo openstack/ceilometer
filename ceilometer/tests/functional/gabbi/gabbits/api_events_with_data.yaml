@@ -14,7 +14,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events
   response_json_paths:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
@@ -48,7 +47,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
   response_json_paths:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
@@ -70,7 +68,6 @@ tests:
           value: cookies_chocolate.chip
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events
   response_json_paths:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
@@ -85,7 +82,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
   response_strings:
       - "[]"
 
@@ -106,7 +102,6 @@ tests:
           value: cookies_chocolate.chip
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events
   response_strings:
       - "[]"
 
@@ -135,7 +130,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events/fea1b15a-1d47-4175-85a5-a4bb2c729240
   response_json_paths:
       $.event_type: cookies_chocolate.chip
       $.traits.[0].value: chocolate.chip
@@ -159,7 +153,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types
   response_strings:
       - cookies_chocolate.chip
       - cookies_peanut.butter
@@ -192,7 +185,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits
   response_json_paths:
       $.[0].type: string
       $.[1].name: ate
@@ -206,7 +198,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/bad_event_type/traits
   response_strings:
       - "[]"
 
@@ -220,7 +211,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits/ate
   response_json_paths:
       $.[0].name: ate
       $.[0].value: '0'
@@ -235,7 +225,6 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/bad_event_type/traits/ate
   response_strings:
       - "[]"
 
@@ -249,6 +238,5 @@ tests:
       X-Project-Id: project1
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits/bad_trait_name
   response_strings:
       - "[]"
