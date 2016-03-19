@@ -12,13 +12,13 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev50\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-04 20:29+0000\n"
+"POT-Creation-Date: 2016-03-19 00:57+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-03 03:01+0000\n"
+"PO-Revision-Date: 2016-03-14 08:40+0000\n"
 "Last-Translator: Monika Wolf <vcomas3@de.ibm.com>\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -45,6 +45,11 @@ msgstr ""
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Fortfahren nach Fehler von %(name)s: %(error)s"
+
+#, python-format
+msgid "Could not connect slave host: %s "
+msgstr ""
+"Es konnte keine Verbindung zum untergeordneten Host hergestellt werden: %s "
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -348,7 +353,7 @@ msgstr ""
 "Der Datentyp %(type)s wird nicht unterstützt. Die Liste der unterstützten "
 "Datentypen lautet: %(supported)s"
 
-#, fuzzy, python-format
+#, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Das Feld 'fields' ist erforderlich für %s"
 
@@ -489,10 +494,10 @@ msgstr "YAML-Fehler beim Lesen von Definitionsdatei %(file)s."
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "Abruf von CPU-Zeit nicht möglich für %(id)s: %(e)s"
 
-#, fuzzy
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr ""
-"Wenn Gnocci aktiviert ist, kann die Option direct nicht den Wert true haben. "
+"Wenn Gnocci aktiviert ist, kann die Option 'direct' nicht den Wert 'true' "
+"haben. "
 
 #, python-format
 msgid "dropping out of time order sample: %s"

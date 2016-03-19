@@ -16,16 +16,17 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 # Alex Eng <loones1595@gmail.com>, 2016. #zanata
 # Daisy <guoyingc@cn.ibm.com>, 2016. #zanata
+# Linda <duleish@cn.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Project-Id-Version: ceilometer 6.0.0.0b4.dev50\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-04 20:29+0000\n"
+"POT-Creation-Date: 2016-03-19 00:57+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-02-02 03:46+0000\n"
-"Last-Translator: Daisy <guoyingc@cn.ibm.com>\n"
+"PO-Revision-Date: 2016-03-16 12:12+0000\n"
+"Last-Translator: Linda <duleish@cn.ibm.com>\n"
 "Language: zh-CN\n"
 "Language-Team: Chinese (China)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -47,6 +48,10 @@ msgstr "表%(table_name)s已经存在，无法创建。忽略此错误继续执�
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "遇到错误%(name)s：%(error)s，继续执行"
+
+#, python-format
+msgid "Could not connect slave host: %s "
+msgstr "无法连接伺服主机：%s "
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -158,6 +163,14 @@ msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "忽略虚拟机%(name)s：%(error)s"
 
 #, python-format
+msgid "Ignoring loadbalancer %(loadbalancer_id)s"
+msgstr "正在忽略负载均衡器 %(loadbalancer_id)s"
+
+#, python-format
+msgid "Ignoring pool %(pool_id)s"
+msgstr "正在忽略池 %(pool_id)s"
+
+#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -185,6 +198,10 @@ msgstr "多个虚拟机%s在XenServer中被找到"
 msgid "Must specify connection_url, and connection_password to use"
 msgstr "使用时必须指定connection_url和connection_password"
 
+#, python-format
+msgid "No plugin named %(plugin)s available for %(name)s"
+msgstr "未对 %(name)s 提供名为  %(plugin)s 的插件"
+
 msgid "Node Manager init failed"
 msgstr "节点管理器初始化失败"
 
@@ -201,8 +218,25 @@ msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
 
 #, python-format
+msgid ""
+"Operator %(operator)s is not supported. Only equality operator is available "
+"for field %(field)s"
+msgstr "运算符 %(operator)s 不受支持。对于字段 %(field)s，只能使用等号运算符"
+
+#, python-format
+msgid ""
+"Operator %(operator)s is not supported. The supported operators are: "
+"%(supported)s"
+msgstr "运算符 %(operator)s 不受支持。受支持的运算符为：%(supported)s"
+
+#, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "orderby表达式不合法：%s"
+
+#, python-format
+msgid ""
+"Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
+msgstr "对 %(name)s 指定的 JSONPath（即“%(jsonpath)s”）存在解析错误：%(err)s"
 
 msgid "Period must be positive."
 msgstr "period 参数必须是正数"
@@ -227,8 +261,16 @@ msgid ""
 msgstr "流水线%(pipeline)s：数据%(smp)s的变形器%(trans)s遇到错误，退出"
 
 #, python-format
+msgid "Plugin specified, but no plugin name supplied for %s"
+msgstr "指定了插件，但未对 %s 提供插件名"
+
+#, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
+
+#, python-format
+msgid "Polling %(name)s failed for %(cnt)s times!"
+msgstr "轮询 %(name)s 已失败 %(cnt)s 次！"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -285,6 +327,10 @@ msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
 msgstr "数据类型%(type)s不被支持。支持的数据类型列表：%(supported)s"
+
+#, python-format
+msgid "The field 'fields' is required for %s"
+msgstr "%s 需要字段“fields”"
 
 msgid "The path for the file publisher is required"
 msgstr "文件发布器必须设置文件路径"
@@ -351,8 +397,21 @@ msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "未知的元数据类型。键(%s)将无法进行查询。"
 
 #, python-format
+msgid ""
+"Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
+msgstr "在负载均衡器 %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
+
+#, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr "从fw %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+
+#, python-format
+msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
+msgstr "在侦听器 %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
+
+#, python-format
+msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
+msgstr "在成员 %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
@@ -361,6 +420,10 @@ msgstr "从pool %(id)s收到未知的状态%(stat)s，跳过该采样数据"
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr "从vip %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+
+#, python-format
+msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
+msgstr "在 VPN %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
@@ -383,6 +446,9 @@ msgstr "读取定义文件%(file)s时遇到YAML错误"
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
+
+msgid "direct option cannot be true when Gnocchi is enabled."
+msgstr "启用 Gnocchi 后，direct 选项不能为 true。"
 
 #, python-format
 msgid "dropping out of time order sample: %s"
