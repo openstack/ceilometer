@@ -355,7 +355,7 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(2, len(data))
         expected_names = ['test1', 'test2']
         for s in data:
-            self.assertTrue(s.as_dict()['name'] in expected_names)
+            self.assertIn(s.as_dict()['name'], expected_names)
 
     def test_unmatched_meter(self):
         cfg = yaml.dump(

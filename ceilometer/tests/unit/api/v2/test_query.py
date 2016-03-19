@@ -330,7 +330,7 @@ class TestQueryToKwArgs(tests_base.BaseTestCase):
             request.headers.return_value = {'X-ProjectId': 'foobar'}
             kwargs = utils.query_to_kwargs(queries,
                                            storage.SampleFilter.__init__)
-            self.assertFalse('self' in kwargs)
+            self.assertNotIn('self', kwargs)
 
     def test_sample_filter_translation(self):
         queries = [v2_base.Query(field=f,
