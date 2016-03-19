@@ -11,7 +11,6 @@ tests:
   url: /v2/events
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events
   response_strings:
       - "[]"
 
@@ -26,7 +25,6 @@ tests:
   url: /v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events?q.field=event_type&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
   response_strings:
       - "[]"
 
@@ -44,7 +42,6 @@ tests:
           value: cookies_chocolate.chip
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events
   response_strings:
       - "[]"
 
@@ -54,7 +51,6 @@ tests:
   url: /v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events?q.field=bad_field&q.op=eq&q.type=string&q.value=cookies_chocolate.chip
   response_strings:
       - "[]"
 
@@ -72,7 +68,6 @@ tests:
           value: cookies_chocolate.chip
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/events
   response_strings:
       - "[]"
 
@@ -114,7 +109,6 @@ tests:
   url: /v2/event_types
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types
   response_strings:
       - "[]"
 
@@ -128,7 +122,6 @@ tests:
   url: /v2/event_types/cookies_chocolate.chip/traits
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits
   response_strings:
       - "[]"
 
@@ -137,6 +130,5 @@ tests:
   url: /v2/event_types/cookies_chocolate.chip/traits/ate
   response_headers:
       content-type: application/json; charset=UTF-8
-      content-location: $SCHEME://$NETLOC/v2/event_types/cookies_chocolate.chip/traits/ate
   response_strings:
       - "[]"
