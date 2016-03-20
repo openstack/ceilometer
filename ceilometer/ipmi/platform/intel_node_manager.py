@@ -169,9 +169,9 @@ class NodeManager(object):
         """Parse the dumped file to get slave address and channel number.
 
         :param file_path: file path of dumped SDR file.
-        :return: slave address and channel number of target device.
+        :return: slave address and channel number of target device or None if
+                 not found.
         """
-        ret = None
         prefix = INTEL_PREFIX
         # According to Intel Node Manager spec, section 4.5, for Intel NM
         # discovery OEM SDR records are type C0h. It contains manufacture ID
@@ -179,20 +179,17 @@ class NodeManager(object):
         # 0-2 bytes are OEM ID, byte 3 is 0Dh and byte 4 is 01h. Byte 5, 6
         # is Intel NM device slave address and channel number/sensor owner LUN.
         with open(file_path, 'rb') as bin_fp:
-            for line in bin_fp.readlines():
-                if line:
-                    data_str = binascii.hexlify(line)
-                    if six.PY3:
-                        data_str = data_str.decode('ascii')
-                    if prefix in data_str:
-                        oem_id_index = data_str.index(prefix)
-                        ret = data_str[oem_id_index + len(prefix):
-                                       oem_id_index + len(prefix) + 4]
-                        # Byte 5 is slave address. [7:4] from byte 6 is channel
-                        # number, so just pick ret[2] here.
-                        ret = (ret[0:2], ret[2])
-                        break
-        return ret
+            data_str = binascii.hexlify(bin_fp.read())
+
+        if six.PY3:
+            data_str = data_str.decode('ascii')
+        oem_id_index = data_str.find(prefix)
+        if oem_id_index != -1:
+            ret = data_str[oem_id_index + len(prefix):
+                           oem_id_index + len(prefix) + 4]
+            # Byte 5 is slave address. [7:4] from byte 6 is channel
+            # number, so just pick ret[2] here.
+            return (ret[0:2], ret[2])
 
     @ipmitool.execute_ipmi_cmd(BMC_INFO_TEMPLATE)
     def get_device_id(self):

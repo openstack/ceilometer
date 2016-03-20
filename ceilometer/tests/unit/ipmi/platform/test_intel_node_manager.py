@@ -13,6 +13,7 @@
 # under the License.
 
 import abc
+import tempfile
 
 import mock
 from oslotest import base
@@ -166,3 +167,26 @@ class TestNonNodeManager(_Base):
 
         # Non-Node Manager platform return empty data
         self.assertEqual({}, temperature)
+
+
+class ParseSDRFileTestCase(base.BaseTestCase):
+
+    def setUp(self):
+        super(ParseSDRFileTestCase, self).setUp()
+        self.temp_file = tempfile.NamedTemporaryFile().name
+
+    def test_parsing_found(self):
+        data = b'\x00\xFF\x00\xFF\x57\x01\x00\x0D\x01\x0A\xB2\x00\xFF'
+        with open(self.temp_file, 'wb') as f:
+            f.write(data)
+        result = node_manager.NodeManager._parse_slave_and_channel(
+            self.temp_file)
+        self.assertEqual(('0a', 'b'), result)
+
+    def test_parsing_not_found(self):
+        data = b'\x00\xFF\x00\xFF\x52\x01\x80\x0D\x01\x6A\xB7\x00\xFF'
+        with open(self.temp_file, 'wb') as f:
+            f.write(data)
+        result = node_manager.NodeManager._parse_slave_and_channel(
+            self.temp_file)
+        self.assertIsNone(result)
