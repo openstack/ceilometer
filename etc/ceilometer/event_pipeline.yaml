@@ -8,6 +8,5 @@ sources:
 sinks:
     - name: event_sink
       transformers:
-      triggers:
       publishers:
           - notifier://
