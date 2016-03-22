@@ -332,7 +332,7 @@ class Connection(base.Connection):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
-                     ceilometer.meter.meter_message_from_counter
+                     ceilometer.publisher.utils.meter_message_from_counter
         """
         engine = self._engine_facade.get_engine()
         with engine.begin() as conn:

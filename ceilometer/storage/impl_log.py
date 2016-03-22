@@ -104,7 +104,7 @@ class Connection(base.Connection):
         """Return an iterable of samples.
 
         Items are created by
-        :func:`ceilometer.meter.meter_message_from_counter`.
+        ceilometer.publisher.utils.meter_message_from_counter.
         """
         return []
 
