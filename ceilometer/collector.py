@@ -37,15 +37,6 @@ OPTS = [
     cfg.PortOpt('udp_port',
                 default=4952,
                 help='Port to which the UDP socket is bound.'),
-    cfg.BoolOpt('requeue_sample_on_dispatcher_error',
-                default=False,
-                help='Requeue the sample on the collector sample queue '
-                'when the collector fails to dispatch it. This is only valid '
-                'if the sample come from the notifier publisher.'),
-    cfg.BoolOpt('requeue_event_on_dispatcher_error',
-                default=False,
-                help='Requeue the event on the collector event queue '
-                'when the collector fails to dispatch it.'),
     cfg.IntOpt('batch_size',
                default=1,
                help='Number of notification messages to wait before '
@@ -91,8 +82,7 @@ class CollectorService(os_service.Service):
                     messaging.get_batch_notification_listener(
                         transport, [sample_target],
                         [SampleEndpoint(self.meter_manager)],
-                        allow_requeue=(cfg.CONF.collector.
-                                       requeue_sample_on_dispatcher_error),
+                        allow_requeue=True,
                         batch_size=cfg.CONF.collector.batch_size,
                         batch_timeout=cfg.CONF.collector.batch_timeout))
                 self.sample_listener.start()
@@ -104,8 +94,7 @@ class CollectorService(os_service.Service):
                     messaging.get_batch_notification_listener(
                         transport, [event_target],
                         [EventEndpoint(self.event_manager)],
-                        allow_requeue=(cfg.CONF.collector.
-                                       requeue_event_on_dispatcher_error),
+                        allow_requeue=True,
                         batch_size=cfg.CONF.collector.batch_size,
                         batch_timeout=cfg.CONF.collector.batch_timeout))
                 self.event_listener.start()
@@ -158,9 +147,8 @@ class CollectorService(os_service.Service):
 
 
 class CollectorEndpoint(object):
-    def __init__(self, dispatcher_manager, requeue_on_error):
+    def __init__(self, dispatcher_manager):
         self.dispatcher_manager = dispatcher_manager
-        self.requeue_on_error = requeue_on_error
 
     def sample(self, messages):
         """RPC endpoint for notification messages
@@ -172,28 +160,16 @@ class CollectorEndpoint(object):
         try:
             self.dispatcher_manager.map_method(self.method, samples)
         except Exception:
-            if self.requeue_on_error:
-                LOG.exception(_LE("Dispatcher failed to handle the %s, "
-                                  "requeue it."), self.ep_type)
-                return oslo_messaging.NotificationResult.REQUEUE
-            raise
+            LOG.exception(_LE("Dispatcher failed to handle the %s, "
+                              "requeue it."), self.ep_type)
+            return oslo_messaging.NotificationResult.REQUEUE
 
 
 class SampleEndpoint(CollectorEndpoint):
     method = 'record_metering_data'
     ep_type = 'sample'
 
-    def __init__(self, dispatcher_manager):
-        super(SampleEndpoint, self).__init__(
-            dispatcher_manager,
-            cfg.CONF.collector.requeue_sample_on_dispatcher_error)
-
 
 class EventEndpoint(CollectorEndpoint):
     method = 'record_events'
     ep_type = 'event'
-
-    def __init__(self, dispatcher_manager):
-        super(EventEndpoint, self).__init__(
-            dispatcher_manager,
-            cfg.CONF.collector.requeue_event_on_dispatcher_error)
