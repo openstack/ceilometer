@@ -144,7 +144,7 @@ class Connection(hbase_base.Connection, base.Connection):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
-          ceilometer.meter.meter_message_from_counter
+          ceilometer.publisher.utils.meter_message_from_counter
         """
         with self.conn_pool.connection() as conn:
             resource_table = conn.table(self.RESOURCE_TABLE)

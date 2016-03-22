@@ -219,7 +219,7 @@ class Connection(pymongo_base.Connection):
         """Write the data to the backend storage system.
 
         :param data: a dictionary such as returned by
-                     ceilometer.meter.meter_message_from_counter
+                     ceilometer.publisher.utils.meter_message_from_counter
         """
         # Record the updated resource metadata
         data = copy.deepcopy(data)
