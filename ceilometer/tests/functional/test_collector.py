@@ -236,46 +236,11 @@ class TestCollector(tests_base.BaseTestCase):
                        mock.Mock())
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_sample_requeue(self):
-        self.CONF.set_override('requeue_sample_on_dispatcher_error', True,
-                               group='collector')
         self._test_collector_requeue('sample_listener')
 
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
                        mock.Mock())
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_event_requeue(self):
-        self.CONF.set_override('requeue_event_on_dispatcher_error', True,
-                               group='collector')
         self.CONF.set_override('store_events', True, group='notification')
         self._test_collector_requeue('event_listener')
-
-    def _test_collector_no_requeue(self, listener):
-        mock_dispatcher = self._setup_fake_dispatcher()
-        self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
-        mock_dispatcher.record_metering_data.side_effect = (FakeException
-                                                            ('boom'))
-        mock_dispatcher.record_events.side_effect = (FakeException
-                                                     ('boom'))
-
-        self.srv.start()
-        endp = getattr(self.srv, listener).dispatcher.endpoints[0]
-        self.assertRaises(FakeException, endp.sample, [
-            {'ctxt': {}, 'publisher_id': 'pub_id', 'event_type': 'event',
-             'payload': {}, 'metadata': {}}])
-
-    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
-                       mock.Mock())
-    @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
-    def test_collector_sample_no_requeue(self):
-        self.CONF.set_override('requeue_sample_on_dispatcher_error', False,
-                               group='collector')
-        self._test_collector_no_requeue('sample_listener')
-
-    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start',
-                       mock.Mock())
-    @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
-    def test_collector_event_no_requeue(self):
-        self.CONF.set_override('requeue_event_on_dispatcher_error', False,
-                               group='collector')
-        self.CONF.set_override('store_events', True, group='notification')
-        self._test_collector_no_requeue('event_listener')
