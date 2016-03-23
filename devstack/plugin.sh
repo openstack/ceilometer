@@ -373,7 +373,7 @@ function init_ceilometer {
 # installed. The context is not active during preinstall (when it would
 # otherwise makes sense to do the backend services).
 function install_ceilometer {
-    if is_service_enabled ceilometer-acentral ceilometer-anotification ; then
+    if is_service_enabled ceilometer-acentral ceilometer-acompute ceilometer-anotification ; then
         _ceilometer_prepare_coordination
     fi
 
