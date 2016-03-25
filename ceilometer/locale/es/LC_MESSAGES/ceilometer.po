@@ -11,13 +11,13 @@
 # Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0rc2.dev2\n"
+"Project-Id-Version: ceilometer 6.0.0.0rc2.dev7\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-21 10:45+0000\n"
+"POT-Creation-Date: 2016-03-23 09:32+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-21 01:58+0000\n"
+"PO-Revision-Date: 2016-03-24 11:03+0000\n"
 "Last-Translator: Eugènia Torrella <tester03@es.ibm.com>\n"
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -43,6 +43,10 @@ msgstr ""
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "Continuar después de error desde %(name)s: %(error)s"
+
+#, python-format
+msgid "Could not connect slave host: %s "
+msgstr "No se ha podido conectar con el host esclavo: %s"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -157,6 +161,14 @@ msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "Ignorando la instancia %(name)s: %(error)s"
 
 #, python-format
+msgid "Ignoring loadbalancer %(loadbalancer_id)s"
+msgstr "Se ignorará el equilibrador de carga %(loadbalancer_id)s"
+
+#, python-format
+msgid "Ignoring pool %(pool_id)s"
+msgstr "Se ignorará la agrupación %(pool_id)s"
+
+#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -206,6 +218,14 @@ msgstr "La API OpenDaylitght ha devuelto %(status)s %(reason)s"
 #, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "La API Opencontrail ha devuelto %(status)s %(reason)s"
+
+#, python-format
+msgid ""
+"Operator %(operator)s is not supported. Only equality operator is available "
+"for field %(field)s"
+msgstr ""
+"El operador %(operator)s no se admite. Solo hay disponible el operador de "
+"igualdad para el campo %(field)s"
 
 #, python-format
 msgid ""
@@ -262,6 +282,10 @@ msgstr ""
 #, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "¡El sensor de sondeo %(mtr)s ha fallado %(cnt)s veces!"
+
+#, python-format
+msgid "Polling %(name)s failed for %(cnt)s times!"
+msgstr "El sondeo %(name)s ha fallado %(cnt)s veces."
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -339,7 +363,7 @@ msgstr ""
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
-msgstr "UDP: no se puede decodificar los datos enviados por %s"
+msgstr "UDP: no se pueden decodificar los datos enviados por %s"
 
 msgid "UDP: Unable to store meter"
 msgstr "UDP: no se puede almacenar el medidor"
@@ -406,21 +430,46 @@ msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "Tipo de metadatos desconocido. La clave (%s) no se podrá consultar."
 
 #, python-format
+msgid ""
+"Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
+msgstr ""
+"Se ha recibido un estado desconocido %(stat)s en el equilibrador de carga "
+"%(id)s, se omitirá el ejemplo"
+
+#, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr ""
-"Se ha recibido un estado desconocido %(stat)s en fw %(id)s, se omite el "
+"Se ha recibido un estado desconocido %(stat)s en fw %(id)s, se omitirá el "
 "ejemplo"
+
+#, python-format
+msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
+msgstr ""
+"Se ha recibido un estado desconocido %(stat)s en el escucha %(id)s, se "
+"omitirá el ejemplo"
+
+#, python-format
+msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
+msgstr ""
+"Se ha recibido un estado desconocido %(stat)s en el miembro %(id)s, se "
+"omitirá el ejemplo"
 
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
 msgstr ""
 "Se ha recibido un estado desconocido %(stat)s en la agrupación %(id)s, se "
-"omite el ejemplo"
+"omitirá el ejemplo"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
-"Se ha recibido un estado desconocido %(stat)s en vip %(id)s, se omite el "
+"Se ha recibido un estado desconocido %(stat)s en vip %(id)s, se omitirá el "
+"ejemplo"
+
+#, python-format
+msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
+msgstr ""
+"Se ha recibido un estado desconocido %(stat)s en vpn %(id)s, se omitirá el "
 "ejemplo"
 
 #, python-format
@@ -444,6 +493,11 @@ msgstr "Error de YAML al leer el archivo de definiciones %(file)s"
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr "no se ha podido obtener tiempo de CPU para %(id)s: %(e)s"
+
+msgid "direct option cannot be true when Gnocchi is enabled."
+msgstr ""
+"la opción directo no puede estar definida como true cuando Gnocchi esté "
+"habilitado."
 
 #, python-format
 msgid "dropping out of time order sample: %s"
