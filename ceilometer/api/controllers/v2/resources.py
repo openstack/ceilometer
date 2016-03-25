@@ -19,6 +19,7 @@
 # under the License.
 
 import datetime
+import urllib
 
 import pecan
 from pecan import rest
@@ -120,6 +121,10 @@ class ResourcesController(rest.RestController):
         """
 
         rbac.enforce('get_resource', pecan.request)
+        # In case we have special character in resource id, for example, swift
+        # can generate samples with resource id like
+        # 29f809d9-88bb-4c40-b1ba-a77a1fcf8ceb/glance
+        resource_id = urllib.unquote(resource_id)
 
         authorized_project = rbac.get_limited_to_project(pecan.request.headers)
         resources = list(pecan.request.storage_conn.get_resources(
