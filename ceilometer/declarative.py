@@ -151,7 +151,7 @@ def load_definitions(conf, defaults, config_file, fallback_file=None):
     if not os.path.exists(config_file):
         config_file = conf.find_file(config_file)
     if not config_file and fallback_file is not None:
-        LOG.debug("No Definitions configuration file found!"
+        LOG.debug("No Definitions configuration file found! "
                   "Using default config.")
         config_file = fallback_file
 
@@ -179,7 +179,7 @@ def load_definitions(conf, defaults, config_file, fallback_file=None):
             raise
 
     else:
-        LOG.debug("No Definitions configuration file found!"
+        LOG.debug("No Definitions configuration file found! "
                   "Using default config.")
         definition_cfg = defaults
 

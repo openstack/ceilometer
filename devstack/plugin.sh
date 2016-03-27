@@ -300,8 +300,7 @@ function configure_ceilometer {
     # ceilometer.conf settings that have already been made.
     # Anyway, explicit is better than implicit.
     for conffile in policy.json api_paste.ini pipeline.yaml \
-                    event_definitions.yaml event_pipeline.yaml \
-                    gnocchi_resources.yaml; do
+                    event_definitions.yaml event_pipeline.yaml; do
         cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
     done
 

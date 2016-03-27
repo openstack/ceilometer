@@ -16,6 +16,7 @@ from collections import defaultdict
 import hashlib
 import itertools
 import operator
+import pkg_resources
 import re
 import threading
 import uuid
@@ -252,7 +253,9 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
         data = declarative.load_definitions(
-            conf, {}, conf.dispatcher_gnocchi.resources_definition_file)
+            conf, {}, conf.dispatcher_gnocchi.resources_definition_file,
+            pkg_resources.resource_filename(__name__,
+                                            "data/gnocchi_resources.yaml"))
         resource_defs = []
         for resource in data.get('resources', []):
             try:
