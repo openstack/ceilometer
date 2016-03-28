@@ -62,6 +62,11 @@ def gnocchi_abort():
                       "the metric endpoint to retrieve data."))
 
 
+def aodh_abort():
+    pecan.abort(410, _("alarms URLs is unavailable when Aodh is "
+                       "disabled or unavailable."))
+
+
 def aodh_redirect(url):
     # NOTE(sileht): we use 307 and not 301 or 302 to allow
     # client to redirect POST/PUT/DELETE/...
@@ -82,7 +87,7 @@ class QueryController(object):
         if kind == 'alarms' and self.aodh_url:
             aodh_redirect(self.aodh_url)
         elif kind == 'alarms':
-            return query.QueryAlarmsController(), remainder
+            aodh_abort()
         elif kind == 'samples' and self.gnocchi_is_enabled:
             gnocchi_abort()
         elif kind == 'samples':
@@ -176,6 +181,8 @@ class V2Controller(object):
                 gnocchi_is_enabled=self.gnocchi_is_enabled,
                 aodh_url=self.aodh_url,
             ), remainder
+        elif kind == 'alarms' and (not self.aodh_url):
+            aodh_abort()
         elif kind == 'alarms' and self.aodh_url:
             aodh_redirect(self.aodh_url)
         else:
