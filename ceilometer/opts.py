@@ -111,7 +111,7 @@ def list_opts():
         # for the password plugin that handles keystone v2 and v3 API
         # with discovery. But other options are possible.
         # Also, the default loaded plugin is password-ceilometer-legacy for
-        # backward compatibily
+        # backward compatibility
         ('service_credentials', (
             ceilometer.keystone_client.CLI_OPTS +
             loading.get_auth_common_conf_options() +

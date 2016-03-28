@@ -144,7 +144,7 @@ def sanitize_timestamp(timestamp):
 
 
 def stringify_timestamps(data):
-    """Stringify any datetimes in given dict."""
+    """Stringify any datetime in given dict."""
     isa_timestamp = lambda v: isinstance(v, datetime.datetime)
     return dict((k, v.isoformat() if isa_timestamp(v) else v)
                 for (k, v) in six.iteritems(data))

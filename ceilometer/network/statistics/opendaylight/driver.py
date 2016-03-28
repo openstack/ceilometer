@@ -70,7 +70,7 @@ class OpenDayLightDriver(driver.Driver):
       This is password that is used by auth.(default None)
     * container_name:
       Name of container of OpenDaylight.(default "default")
-      This parameter allows multi vaues.
+      This parameter allows multi values.
 
     e.g.::
 

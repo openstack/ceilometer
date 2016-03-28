@@ -297,7 +297,7 @@ def make_meter_query_for_resource(start_timestamp, start_timestamp_op,
     if mq:
         meter_q = " AND ".join(mq)
         # If there is a filtering on time_range we need to point that
-        # qualifiers should start with m_. Overwise in case e.g.
+        # qualifiers should start with m_. Otherwise in case e.g.
         # QualifierFilter (>=, 'binaryprefix:m_9222030811134775808')
         # qualifier 's_test' satisfies the filter and will be returned.
         meter_q = _QualifierFilter("=", '') + " AND " + meter_q

@@ -16,7 +16,7 @@
 """Node manager engine to collect power and temperature of compute node.
 
 Intel Node Manager Technology enables the datacenter IT to monitor and control
-actual server power, thermal and compute utlization behavior through industry
+actual server power, thermal and compute utilization behavior through industry
 defined standard IPMI. This file provides Node Manager engine to get simple
 system power and temperature data based on ipmitool.
 """

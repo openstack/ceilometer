@@ -223,7 +223,7 @@ class Connection(hbase_base.Connection, base.Connection):
                 first_ts = min(meters, key=operator.itemgetter(1))[1]
                 last_ts = max(meters, key=operator.itemgetter(1))[1]
                 source = meters[0][0][1]
-                # If we use QualifierFilter then HBase returnes only
+                # If we use QualifierFilter then HBase returns only
                 # qualifiers filtered by. It will not return the whole entry.
                 # That's why if we need to ask additional qualifiers manually.
                 if 'project_id' not in f_res and 'user_id' not in f_res:
