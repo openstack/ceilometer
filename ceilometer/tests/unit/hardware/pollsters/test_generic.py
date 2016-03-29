@@ -116,7 +116,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
         self.conf(args=[])
         self.pollster = generic.GenericHardwareDeclarativePollster()
 
-    def __setup_meter_def_file(self, cfg):
+    def _setup_meter_def_file(self, cfg):
         if six.PY3:
             cfg = cfg.encode('utf-8')
         meter_cfg_file = fileutils.write_to_tempfile(content=cfg,
@@ -174,7 +174,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
                         name='hardware.test2.abc',
                         unit='process',
                         snmp_inspector=param)]})
-        self.__setup_meter_def_file(meter_cfg)
+        self._setup_meter_def_file(meter_cfg)
         pollster = generic.GenericHardwareDeclarativePollster
         # Clear cached mapping
         pollster.mapping = None
