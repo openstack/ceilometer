@@ -10,13 +10,13 @@
 # 笹原 昌美 <ebb0de1@jp.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev50\n"
+"Project-Id-Version: ceilometer 6.0.0.0rc2.dev9\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-19 00:57+0000\n"
+"POT-Creation-Date: 2016-03-28 22:52+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-18 03:57+0000\n"
+"PO-Revision-Date: 2016-03-28 11:41+0000\n"
 "Last-Translator: 笹原 昌美 <ebb0de1@jp.ibm.com>\n"
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -44,7 +44,7 @@ msgstr ""
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr "%(name)s からのエラーの後で続行します: %(error)s"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Could not connect slave host: %s "
 msgstr "スレーブホストに接続できませんでした: %s "
 
@@ -91,7 +91,6 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "HTTP 応答を解析している際にエラーが発生しました: %s"
 
-#, fuzzy
 msgid "Error stopping pollster."
 msgstr "pollster 停止エラー。"
 
@@ -161,11 +160,11 @@ msgstr "インスタンス %(name)s (%(instance_id)s) を無視しています: 
 msgid "Ignoring instance %(name)s: %(error)s"
 msgstr "インスタンス %(name)s を無視しています: %(error)s"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Ignoring loadbalancer %(loadbalancer_id)s"
 msgstr "ロードバランサー %(loadbalancer_id)s を無視しています"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Ignoring pool %(pool_id)s"
 msgstr "プール %(pool_id)s を無視しています"
 
@@ -374,9 +373,9 @@ msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr "値 %(value)s を、想定されるデータ型 %(type)s に変換できません。"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to discover resources: %s"
-msgstr "リソースをディスカバーできません: %s"
+msgstr "リソースを検出できません: %s"
 
 #, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
@@ -397,7 +396,7 @@ msgid ""
 msgstr ""
 "%(retries)d 回の再試行後、1 次 mongodb に再接続できません。中止します。"
 
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
@@ -423,7 +422,7 @@ msgstr "不明なディスカバリーエクステンション: %s"
 msgid "Unknown metadata type. Key (%s) will not be queryable."
 msgstr "不明なメタデータ種別です。キー (%s) は照会不可になります。"
 
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
 msgstr ""
@@ -442,7 +441,7 @@ msgstr ""
 "リスナー %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップしま"
 "す"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
 msgstr ""
 "メンバー %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップしま"
@@ -458,7 +457,7 @@ msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
 "仮想 IP %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップします"
 
-#, fuzzy, python-format
+#, python-format
 msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
 msgstr ""
 "vpn %(id)s で不明な状態 %(stat)s を受信しました。サンプルをスキップします"
@@ -480,6 +479,10 @@ msgstr "XenAPI がインストールされていません"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "定義ファイル %(file)s での読み取りの YAML エラー"
+
+msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
+msgstr ""
+"Aodh が無効化されるか使用不可の場合、URL が使用できないことを警告します。"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
