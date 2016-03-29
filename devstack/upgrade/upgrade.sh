@@ -74,9 +74,11 @@ $CEILOMETER_BIN_DIR/ceilometer-dbsync || die $LINENO "DB sync error"
 start_ceilometer
 
 # Note these are process names, not service names
+# Note(liamji): Disable the test for
+# "ceilometer-polling --polling-namespaces ipmi". In the test environment,
+# the impi is not ready. The ceilometer-polling should fail.
 ensure_services_started "ceilometer-polling --polling-namespaces compute" \
                         "ceilometer-polling --polling-namespaces central" \
-                        "ceilometer-polling --polling-namespaces ipmi" \
                         ceilometer-agent-notification \
                         ceilometer-api \
                         ceilometer-collector
