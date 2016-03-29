@@ -138,7 +138,7 @@ class HostTrackerAPIClient(_Base):
     base_url = '/hosttracker/%(container_name)s'
 
     def get_active_hosts(self, container_name):
-        """Get active hosts informatinos
+        """Get active hosts information
 
         URL:
             {Base URL}/hosts/active

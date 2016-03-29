@@ -125,7 +125,7 @@ class MeterDefinition(object):
             if parser is not None:
                 value = parser.parse(message, bool(self.lookup))
                 # NOTE(sileht): If we expect multiple samples
-                # some attributes and overriden even we doesn't get any
+                # some attributes are overridden even we don't get any
                 # result. Also note in this case value is always a list
                 if ((not self.lookup and value is not None) or
                         (self.lookup and ((name in self.lookup + ["name"])

@@ -269,7 +269,7 @@ class Client(object):
         pool_id].
         :returns: The status dictionary of the member
         resource. The key is the ID of the member. The value is
-        the operating statuse of the member resource.
+        the operating status of the member resource.
         """
         # FIXME(liamji) the following meters are experimental and
         # may generate a large load against neutron api. The future
@@ -315,7 +315,7 @@ class Client(object):
         :param loadbalancer_id: The ID of the Load Balancer.
         :returns: The status dictionary of the listener
         resource. The key is the ID of the listener resource. The
-        value is the operating statuse of the listener resource.
+        value is the operating status of the listener resource.
         """
         # FIXME(liamji) the following meters are experimental and
         # may generate a large load against neutron api. The future
@@ -353,7 +353,7 @@ class Client(object):
         :param parent_id: The parent ID of the pool resource.
         :returns: The status dictionary of the pool resource.
         The key is the ID of the pool resource. The value is
-        the operating statuse of the pool resource.
+        the operating status of the pool resource.
         """
         # FIXME(liamji) the following meters are experimental and
         # may generate a large load against neutron api. The future

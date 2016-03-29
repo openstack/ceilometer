@@ -31,7 +31,7 @@ OPTS = [
                default=0,
                help="Number of items to request in "
                     "each paginated Glance API request "
-                    "(parameter used by glancecelient). "
+                    "(parameter used by glanceclient). "
                     "If this is less than or equal to 0, "
                     "page size is not specified "
                     "(default value in glanceclient is used)."),

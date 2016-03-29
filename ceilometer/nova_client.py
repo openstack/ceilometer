@@ -24,7 +24,7 @@ from ceilometer import keystone_client
 OPTS = [
     cfg.BoolOpt('nova_http_log_debug',
                 default=False,
-                # Added in Mikita
+                # Added in Mitaka
                 deprecated_for_removal=True,
                 help=('Allow novaclient\'s debug log output. '
                       '(Use default_log_levels instead)')),
