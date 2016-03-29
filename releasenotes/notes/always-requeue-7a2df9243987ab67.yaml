@@ -1,0 +1,15 @@
+---
+critical:
+  - >
+    The previous configuration options default for
+    `requeue_sample_on_dispatcher_error' and
+    `requeue_event_on_dispatcher_error' allowed to lose data very easily: if
+    the dispatcher failed to send data to the backend (e.g. Gnocchi is down),
+    then the dispatcher raised and the data were lost forever. This was
+    completely unacceptable, and nobody should be able to configure Ceilometer
+    in that way."
+
+upgrade:
+  - >
+    The options `requeue_event_on_dispatcher_error' and
+    `requeue_sample_on_dispatcher_error' have been enabled and removed.
