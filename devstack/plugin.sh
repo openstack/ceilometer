@@ -6,9 +6,9 @@
 # [[local|localrc]]
 # enable_plugin ceilometer git://git.openstack.org/openstack/ceilometer
 #
-# By default all ceilometer services are started (see
-# devstack/settings). To disable a specific service use the
-# disable_service function.
+# By default all ceilometer services are started (see devstack/settings)
+# except for the ceilometer-aipmi service. To disable a specific service
+# use the disable_service function.
 #
 # NOTE: Currently, there are two ways to get the IPMI based meters in
 # OpenStack. One way is to configure Ironic conductor to report those meters
@@ -17,13 +17,15 @@
 # functionality. So in order to do so, users need to set the option of
 # conductor.send_sensor_data to true in the ironic.conf configuration file
 # for the Ironic conductor service, and also enable the
-# ceilometer-anotification service. If you do this disable the IPMI
-# polling agent:
-#
-# disable_service ceilometer-aipmi
+# ceilometer-anotification service.
 #
 # The other way is to use Ceilometer ipmi agent only to get the IPMI based
-# meters. To avoid duplicated meters, users need to make sure to set the
+# meters. To make use of the Ceilometer ipmi agent, it must be explicitly
+# enabled with the following setting:
+#
+# enable_service ceilometer-aipmi
+#
+# To avoid duplicated meters, users need to make sure to set the
 # option of conductor.send_sensor_data to false in the ironic.conf
 # configuration file if the node on which Ceilometer ipmi agent is running
 # is also managed by Ironic.

@@ -1,6 +1,6 @@
-# turn on all the ceilometer services by default
+# turn on all the ceilometer services by default (except for ipmi pollster)
 # Pollsters
-enable_service ceilometer-acompute ceilometer-acentral ceilometer-aipmi
+enable_service ceilometer-acompute ceilometer-acentral
 # Notification Agent
 enable_service ceilometer-anotification
 # Data Collector
