@@ -19,13 +19,13 @@
 # Linda <duleish@cn.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev50\n"
+"Project-Id-Version: ceilometer 6.0.0.0rc4.dev1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-19 00:57+0000\n"
+"POT-Creation-Date: 2016-03-30 10:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-16 12:12+0000\n"
+"PO-Revision-Date: 2016-03-31 03:32+0000\n"
 "Last-Translator: Linda <duleish@cn.ibm.com>\n"
 "Language: zh-CN\n"
 "Language-Team: Chinese (China)\n"
@@ -442,6 +442,9 @@ msgstr "XenAPI没有安装"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "读取定义文件%(file)s时遇到YAML错误"
+
+msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
+msgstr "Aodh 被禁用或不可用时，警报 URL 不可用。"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
