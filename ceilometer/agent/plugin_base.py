@@ -18,7 +18,6 @@
 import abc
 import collections
 
-from oslo_context import context
 from oslo_log import log
 import oslo_messaging
 import six
@@ -103,19 +102,18 @@ class NotificationBase(PluginBase):
             try:
                 notification = messaging.convert_to_old_notification_format(
                     priority, notification)
-                self.to_samples_and_publish(context.get_admin_context(),
-                                            notification)
+                self.to_samples_and_publish(notification)
             except Exception:
                 LOG.error(_LE('Fail to process notification'), exc_info=True)
 
-    def to_samples_and_publish(self, context, notification):
+    def to_samples_and_publish(self, notification):
         """Return samples produced by *process_notification*.
 
         Samples produced for the given notification.
         :param context: Execution context from the service or RPC call
         :param notification: The notification to process.
         """
-        with self.manager.publisher(context) as p:
+        with self.manager.publisher() as p:
             p(list(self.process_notification(notification)))
 
 

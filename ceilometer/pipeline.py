@@ -80,8 +80,8 @@ class PipelineException(Exception):
 @six.add_metaclass(abc.ABCMeta)
 class PipelineEndpoint(object):
 
-    def __init__(self, context, pipeline):
-        self.publish_context = PublishContext(context, [pipeline])
+    def __init__(self, pipeline):
+        self.publish_context = PublishContext([pipeline])
 
     @abc.abstractmethod
     def sample(self, messages):
@@ -149,7 +149,7 @@ class _PipelineTransportManager(object):
     def add_transporter(self, transporter):
         self.transporters.append(transporter)
 
-    def publisher(self, context):
+    def publisher(self):
         serializer = self.serializer
         hash_grouping = self.hash_grouping
         transporters = self.transporters
@@ -171,7 +171,7 @@ class _PipelineTransportManager(object):
                                                      grouping_keys)
                                        % len(notifiers))
                                 notifier = notifiers[key]
-                                notifier.sample(context.to_dict(),
+                                notifier.sample({},
                                                 event_type=event_type,
                                                 payload=[serialized_data])
                 return p
@@ -204,10 +204,9 @@ class EventPipelineTransportManager(_PipelineTransportManager):
 
 class PublishContext(object):
 
-    def __init__(self, context, pipelines=None):
+    def __init__(self, pipelines=None):
         pipelines = pipelines or []
         self.pipelines = set(pipelines)
-        self.context = context
 
     def add_pipelines(self, pipelines):
         self.pipelines.update(pipelines)
@@ -215,12 +214,12 @@ class PublishContext(object):
     def __enter__(self):
         def p(data):
             for p in self.pipelines:
-                p.publish_data(self.context, data)
+                p.publish_data(data)
         return p
 
     def __exit__(self, exc_type, exc_value, traceback):
         for p in self.pipelines:
-            p.flush(self.context)
+            p.flush()
 
 
 class Source(object):
@@ -419,11 +418,11 @@ class EventSink(Sink):
 
     NAMESPACE = 'ceilometer.event.publisher'
 
-    def publish_events(self, ctxt, events):
+    def publish_events(self, events):
         if events:
             for p in self.publishers:
                 try:
-                    p.publish_events(ctxt, events)
+                    p.publish_events(events)
                 except Exception:
                     LOG.exception(_("Pipeline %(pipeline)s: %(status)s"
                                     " after error from publisher %(pub)s") %
@@ -433,19 +432,19 @@ class EventSink(Sink):
                     if not self.multi_publish:
                         raise
 
-    def flush(self, ctxt):
+    @staticmethod
+    def flush():
         """Flush data after all events have been injected to pipeline."""
-        pass
 
 
 class SampleSink(Sink):
 
     NAMESPACE = 'ceilometer.publisher'
 
-    def _transform_sample(self, start, ctxt, sample):
+    def _transform_sample(self, start, sample):
         try:
             for transformer in self.transformers[start:]:
-                sample = transformer.handle_sample(ctxt, sample)
+                sample = transformer.handle_sample(sample)
                 if not sample:
                     LOG.debug(
                         "Pipeline %(pipeline)s: Sample dropped by "
@@ -462,13 +461,12 @@ class SampleSink(Sink):
                                                        'smp': sample}))
             LOG.exception(err)
 
-    def _publish_samples(self, start, ctxt, samples):
+    def _publish_samples(self, start, samples):
         """Push samples into pipeline for publishing.
 
         :param start: The first transformer that the sample will be injected.
                       This is mainly for flush() invocation that transformer
                       may emit samples.
-        :param ctxt: Execution context from the manager or service.
         :param samples: Sample list.
 
         """
@@ -483,30 +481,30 @@ class SampleSink(Sink):
                     "%(smp)s from %(trans)s transformer", {'pipeline': self,
                                                            'smp': sample,
                                                            'trans': start})
-                sample = self._transform_sample(start, ctxt, sample)
+                sample = self._transform_sample(start, sample)
                 if sample:
                     transformed_samples.append(sample)
 
         if transformed_samples:
             for p in self.publishers:
                 try:
-                    p.publish_samples(ctxt, transformed_samples)
+                    p.publish_samples(transformed_samples)
                 except Exception:
                     LOG.exception(_(
                         "Pipeline %(pipeline)s: Continue after error "
                         "from publisher %(pub)s") % ({'pipeline': self,
                                                       'pub': p}))
 
-    def publish_samples(self, ctxt, samples):
-        self._publish_samples(0, ctxt, samples)
+    def publish_samples(self, samples):
+        self._publish_samples(0, samples)
 
-    def flush(self, ctxt):
+    def flush(self):
         """Flush data after all samples have been injected to pipeline."""
 
         for (i, transformer) in enumerate(self.transformers):
             try:
-                self._publish_samples(i + 1, ctxt,
-                                      list(transformer.flush(ctxt)))
+                self._publish_samples(i + 1,
+                                      list(transformer.flush()))
             except Exception as err:
                 LOG.warning(_(
                     "Pipeline %(pipeline)s: Error flushing "
@@ -528,15 +526,15 @@ class Pipeline(object):
         return (self.source.name if self.source.name == self.sink.name
                 else '%s:%s' % (self.source.name, self.sink.name))
 
-    def flush(self, ctxt):
-        self.sink.flush(ctxt)
+    def flush(self):
+        self.sink.flush()
 
     @property
     def publishers(self):
         return self.sink.publishers
 
     @abc.abstractmethod
-    def publish_data(self, ctxt, data):
+    def publish_data(self, data):
         """Publish data from pipeline."""
 
 
@@ -551,12 +549,12 @@ class EventPipeline(Pipeline):
     def support_event(self, event_type):
         return self.source.support_event(event_type)
 
-    def publish_data(self, ctxt, events):
+    def publish_data(self, events):
         if not isinstance(events, list):
             events = [events]
         supported = [e for e in events
                      if self.source.support_event(e.event_type)]
-        self.sink.publish_events(ctxt, supported)
+        self.sink.publish_events(supported)
 
 
 class SamplePipeline(Pipeline):
@@ -605,12 +603,12 @@ class SamplePipeline(Pipeline):
                 return False
         return True
 
-    def publish_data(self, ctxt, samples):
+    def publish_data(self, samples):
         if not isinstance(samples, list):
             samples = [samples]
         supported = [s for s in samples if self.source.support_meter(s.name)
                      and self._validate_volume(s)]
-        self.sink.publish_samples(ctxt, supported)
+        self.sink.publish_samples(supported)
 
 
 SAMPLE_TYPE = {'pipeline': SamplePipeline,
@@ -741,12 +739,12 @@ class PipelineManager(object):
                     self.pipelines.append(pipe)
         unique_names.clear()
 
-    def publisher(self, context):
+    def publisher(self):
         """Build a new Publisher for these manager pipelines.
 
         :param context: The context.
         """
-        return PublishContext(context, self.pipelines)
+        return PublishContext(self.pipelines)
 
 
 class PollingManager(object):

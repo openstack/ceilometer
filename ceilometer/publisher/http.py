@@ -119,19 +119,17 @@ class HttpPublisher(publisher.PublisherBase):
             LOG.error(_LE('Data post failed with status code %s') %
                       res.status_code)
 
-    def publish_samples(self, context, samples):
+    def publish_samples(self, samples):
         """Send a metering message for publishing
 
-        :param context: Execution context from the service or RPC call
         :param samples: Samples from pipeline after transformation
         """
         data = [sample.as_dict() for sample in samples]
         self._do_post(data)
 
-    def publish_events(self, context, events):
+    def publish_events(self, events):
         """Send an event message for publishing
 
-        :param context: Execution context from the service or RPC call
         :param events: events from pipeline after transformation
         """
         data = [evt.as_dict()['raw']['payload'] for evt in events

@@ -95,11 +95,11 @@ class ArithmeticTransformer(transformer.TransformerBase):
             LOG.warning(_('Unable to evaluate expression %(expr)s: %(exc)s'),
                         {'expr': self.expr, 'exc': e})
 
-    def handle_sample(self, context, _sample):
+    def handle_sample(self, _sample):
         self._update_cache(_sample)
         self.latest_timestamp = _sample.timestamp
 
-    def flush(self, context):
+    def flush(self):
         new_samples = []
         cache_clean_list = []
         if not self.misconfigured:

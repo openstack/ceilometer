@@ -16,7 +16,6 @@ import itertools
 import threading
 
 from oslo_config import cfg
-from oslo_context import context
 from oslo_log import log
 import oslo_messaging
 from stevedore import extension
@@ -156,7 +155,6 @@ class NotificationService(service_base.BaseService):
         self.transport = messaging.get_transport()
 
         if cfg.CONF.notification.workload_partitioning:
-            self.ctxt = context.get_admin_context()
             self.group_id = self.NOTIFICATION_NAMESPACE
             self.partition_coordinator = coordination.PartitionCoordinator()
             self.partition_coordinator.start()
@@ -285,7 +283,7 @@ class NotificationService(service_base.BaseService):
                 listener = messaging.get_batch_notification_listener(
                     transport,
                     [oslo_messaging.Target(topic=topic)],
-                    [pipe_endpoint(self.ctxt, pipe)],
+                    [pipe_endpoint(pipe)],
                     batch_size=cfg.CONF.notification.batch_size,
                     batch_timeout=cfg.CONF.notification.batch_timeout)
                 listener.start()

@@ -15,7 +15,6 @@
 import logging
 
 from oslo_config import cfg
-from oslo_context import context
 import oslo_messaging
 from stevedore import extension
 
@@ -30,7 +29,6 @@ class EventsNotificationEndpoint(object):
     def __init__(self, manager):
         super(EventsNotificationEndpoint, self).__init__()
         LOG.debug('Loading event definitions')
-        self.ctxt = context.get_admin_context()
         self.event_converter = event_converter.setup_events(
             extension.ExtensionManager(
                 namespace='ceilometer.event.trait_plugin'))
@@ -61,7 +59,7 @@ class EventsNotificationEndpoint(object):
             try:
                 event = self.event_converter.to_event(notification)
                 if event is not None:
-                    with self.manager.publisher(self.ctxt) as p:
+                    with self.manager.publisher() as p:
                         p(event)
             except Exception:
                 if not cfg.CONF.notification.ack_on_event_error:

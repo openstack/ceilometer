@@ -151,12 +151,12 @@ class TestPublisherPolicy(TestPublisher):
             self.assertRaises(
                 msg_publisher.DeliveryFailure,
                 getattr(publisher, self.pub_func),
-                mock.MagicMock(), self.test_data)
+                self.test_data)
             self.assertTrue(mylog.info.called)
             self.assertEqual('default', publisher.policy)
             self.assertEqual(0, len(publisher.local_queue))
             fake_send.assert_called_once_with(
-                mock.ANY, self.topic, mock.ANY)
+                self.topic, mock.ANY)
 
     @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_policy_block(self, mylog):
@@ -168,11 +168,11 @@ class TestPublisherPolicy(TestPublisher):
             self.assertRaises(
                 msg_publisher.DeliveryFailure,
                 getattr(publisher, self.pub_func),
-                mock.MagicMock(), self.test_data)
+                self.test_data)
             self.assertTrue(mylog.info.called)
             self.assertEqual(0, len(publisher.local_queue))
             fake_send.assert_called_once_with(
-                mock.ANY, self.topic, mock.ANY)
+                self.topic, mock.ANY)
 
     @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_policy_incorrect(self, mylog):
@@ -184,12 +184,12 @@ class TestPublisherPolicy(TestPublisher):
             self.assertRaises(
                 msg_publisher.DeliveryFailure,
                 getattr(publisher, self.pub_func),
-                mock.MagicMock(), self.test_data)
+                self.test_data)
             self.assertTrue(mylog.warning.called)
             self.assertEqual('default', publisher.policy)
             self.assertEqual(0, len(publisher.local_queue))
             fake_send.assert_called_once_with(
-                mock.ANY, self.topic, mock.ANY)
+                self.topic, mock.ANY)
 
 
 @mock.patch('ceilometer.publisher.messaging.LOG', mock.Mock())
@@ -201,11 +201,10 @@ class TestPublisherPolicyReactions(TestPublisher):
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
-            getattr(publisher, self.pub_func)(mock.MagicMock(),
-                                              self.test_data)
+            getattr(publisher, self.pub_func)(self.test_data)
             self.assertEqual(0, len(publisher.local_queue))
             fake_send.assert_called_once_with(
-                mock.ANY, self.topic, mock.ANY)
+                self.topic, mock.ANY)
 
     def test_published_with_policy_queue_and_rpc_down(self):
         publisher = self.publisher_cls(
@@ -214,11 +213,10 @@ class TestPublisherPolicyReactions(TestPublisher):
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
 
-            getattr(publisher, self.pub_func)(mock.MagicMock(),
-                                              self.test_data)
+            getattr(publisher, self.pub_func)(self.test_data)
             self.assertEqual(1, len(publisher.local_queue))
             fake_send.assert_called_once_with(
-                mock.ANY, self.topic, mock.ANY)
+                self.topic, mock.ANY)
 
     def test_published_with_policy_queue_and_rpc_down_up(self):
         self.rpc_unreachable = True
@@ -228,21 +226,19 @@ class TestPublisherPolicyReactions(TestPublisher):
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
             fake_send.side_effect = side_effect
-            getattr(publisher, self.pub_func)(mock.MagicMock(),
-                                              self.test_data)
+            getattr(publisher, self.pub_func)(self.test_data)
 
             self.assertEqual(1, len(publisher.local_queue))
 
             fake_send.side_effect = mock.MagicMock()
-            getattr(publisher, self.pub_func)(mock.MagicMock(),
-                                              self.test_data)
+            getattr(publisher, self.pub_func)(self.test_data)
 
             self.assertEqual(0, len(publisher.local_queue))
 
             topic = self.topic
-            expected = [mock.call(mock.ANY, topic, mock.ANY),
-                        mock.call(mock.ANY, topic, mock.ANY),
-                        mock.call(mock.ANY, topic, mock.ANY)]
+            expected = [mock.call(topic, mock.ANY),
+                        mock.call(topic, mock.ANY),
+                        mock.call(topic, mock.ANY)]
             self.assertEqual(expected, fake_send.mock_calls)
 
     def test_published_with_policy_sized_queue_and_rpc_down(self):
@@ -255,21 +251,20 @@ class TestPublisherPolicyReactions(TestPublisher):
             for i in range(0, 5):
                 for s in self.test_data:
                     setattr(s, self.attr, 'test-%d' % i)
-                getattr(publisher, self.pub_func)(mock.MagicMock(),
-                                                  self.test_data)
+                getattr(publisher, self.pub_func)(self.test_data)
 
         self.assertEqual(3, len(publisher.local_queue))
         self.assertEqual(
             'test-2',
-            publisher.local_queue[0][2][0][self.attr]
+            publisher.local_queue[0][1][0][self.attr]
         )
         self.assertEqual(
             'test-3',
-            publisher.local_queue[1][2][0][self.attr]
+            publisher.local_queue[1][1][0][self.attr]
         )
         self.assertEqual(
             'test-4',
-            publisher.local_queue[2][2][0][self.attr]
+            publisher.local_queue[2][1][0][self.attr]
         )
 
     def test_published_with_policy_default_sized_queue_and_rpc_down(self):
@@ -282,15 +277,14 @@ class TestPublisherPolicyReactions(TestPublisher):
             for i in range(0, 2000):
                 for s in self.test_data:
                     setattr(s, self.attr, 'test-%d' % i)
-                getattr(publisher, self.pub_func)(mock.MagicMock(),
-                                                  self.test_data)
+                getattr(publisher, self.pub_func)(self.test_data)
 
         self.assertEqual(1024, len(publisher.local_queue))
         self.assertEqual(
             'test-976',
-            publisher.local_queue[0][2][0][self.attr]
+            publisher.local_queue[0][1][0][self.attr]
         )
         self.assertEqual(
             'test-1999',
-            publisher.local_queue[1023][2][0][self.attr]
+            publisher.local_queue[1023][1][0][self.attr]
         )

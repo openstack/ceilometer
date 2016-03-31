@@ -35,7 +35,7 @@ class DirectPublisher(publisher.PublisherBase):
         self.meter_conn = dispatcher.meter_conn
         self.event_conn = dispatcher.event_conn
 
-    def publish_samples(self, context, samples):
+    def publish_samples(self, samples):
         if not isinstance(samples, list):
             samples = [samples]
 
@@ -52,7 +52,7 @@ class DirectPublisher(publisher.PublisherBase):
                 meter['timestamp'] = timeutils.normalize_time(ts)
             self.meter_conn.record_metering_data(meter)
 
-    def publish_events(self, context, events):
+    def publish_events(self, events):
         if not isinstance(events, list):
             events = [events]
 

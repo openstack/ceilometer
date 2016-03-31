@@ -98,10 +98,9 @@ class MessagingPublisher(publisher.PublisherBase):
 
         self.retry = 1 if self.policy in ['queue', 'drop'] else None
 
-    def publish_samples(self, context, samples):
+    def publish_samples(self, samples):
         """Publish samples on RPC.
 
-        :param context: Execution context from the service or RPC call.
         :param samples: Samples from pipeline after transformation.
 
         """
@@ -112,7 +111,7 @@ class MessagingPublisher(publisher.PublisherBase):
             for sample in samples
         ]
         topic = cfg.CONF.publisher_notifier.metering_topic
-        self.local_queue.append((context, topic, meters))
+        self.local_queue.append((topic, meters))
 
         if self.per_meter_topic:
             for meter_name, meter_list in itertools.groupby(
@@ -122,7 +121,7 @@ class MessagingPublisher(publisher.PublisherBase):
                 topic_name = topic + '.' + meter_name
                 LOG.debug('Publishing %(m)d samples on %(n)s',
                           {'m': len(meter_list), 'n': topic_name})
-                self.local_queue.append((context, topic_name, meter_list))
+                self.local_queue.append((topic_name, meter_list))
 
         self.flush()
 
@@ -150,11 +149,11 @@ class MessagingPublisher(publisher.PublisherBase):
     def _process_queue(self, queue, policy):
         current_retry = 0
         while queue:
-            context, topic, data = queue[0]
+            topic, data = queue[0]
             try:
-                self._send(context, topic, data)
+                self._send(topic, data)
             except DeliveryFailure:
-                data = sum([len(m) for __, __, m in queue])
+                data = sum([len(m) for __, m in queue])
                 if policy == 'queue':
                     LOG.warning(_("Failed to publish %d datapoints, queue "
                                   "them"), data)
@@ -172,21 +171,20 @@ class MessagingPublisher(publisher.PublisherBase):
                 queue.pop(0)
         return []
 
-    def publish_events(self, context, events):
+    def publish_events(self, events):
         """Send an event message for publishing
 
-        :param context: Execution context from the service or RPC call
         :param events: events from pipeline after transformation
         """
         ev_list = [utils.message_from_event(
             event, cfg.CONF.publisher.telemetry_secret) for event in events]
 
         topic = cfg.CONF.publisher_notifier.event_topic
-        self.local_queue.append((context, topic, ev_list))
+        self.local_queue.append((topic, ev_list))
         self.flush()
 
     @abc.abstractmethod
-    def _send(self, context, topic, meters):
+    def _send(self, topic, meters):
         """Send the meters to the messaging topic."""
 
 
@@ -203,9 +201,9 @@ class NotifierPublisher(MessagingPublisher):
             retry=self.retry
         )
 
-    def _send(self, context, event_type, data):
+    def _send(self, event_type, data):
         try:
-            self.notifier.sample(context.to_dict(), event_type=event_type,
+            self.notifier.sample({}, event_type=event_type,
                                  payload=data)
         except oslo_messaging.MessageDeliveryFailure as e:
             raise_delivery_failure(e)

@@ -123,14 +123,14 @@ class TestHttpPublisher(base.BaseTestCase):
         res = mock.Mock()
         res.status_code = 200
         with mock.patch.object(Session, 'post', return_value=res) as m_req:
-            publisher.publish_samples(None, self.sample_data)
+            publisher.publish_samples(self.sample_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertFalse(thelog.error.called)
 
         res.status_code = 401
         with mock.patch.object(Session, 'post', return_value=res) as m_req:
-            publisher.publish_samples(None, self.sample_data)
+            publisher.publish_samples(self.sample_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertTrue(thelog.error.called)
@@ -144,14 +144,14 @@ class TestHttpPublisher(base.BaseTestCase):
         res = mock.Mock()
         res.status_code = 200
         with mock.patch.object(Session, 'post', return_value=res) as m_req:
-            publisher.publish_events(None, self.event_data)
+            publisher.publish_events(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertFalse(thelog.error.called)
 
         res.status_code = 401
         with mock.patch.object(Session, 'post', return_value=res) as m_req:
-            publisher.publish_samples(None, self.event_data)
+            publisher.publish_samples(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertTrue(thelog.error.called)
@@ -164,7 +164,7 @@ class TestHttpPublisher(base.BaseTestCase):
         res = mock.Mock()
         res.status_code = 200
         with mock.patch.object(Session, 'post', return_value=res) as m_req:
-            publisher.publish_events(None, self.empty_event_data)
+            publisher.publish_events(self.empty_event_data)
 
         self.assertEqual(0, m_req.call_count)
         self.assertTrue(thelog.debug.called)

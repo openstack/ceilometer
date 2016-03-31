@@ -72,7 +72,7 @@ class DeltaTransformer(BaseConversionTransformer):
         self.growth_only = growth_only
         self.cache = {}
 
-    def handle_sample(self, context, s):
+    def handle_sample(self, s):
         """Handle a sample, converting if necessary."""
         key = s.name + s.resource_id
         prev = self.cache.get(key)
@@ -159,7 +159,7 @@ class ScalingTransformer(BaseConversionTransformer):
             resource_metadata=s.resource_metadata
         )
 
-    def handle_sample(self, context, s):
+    def handle_sample(self, s):
         """Handle a sample, converting if necessary."""
         LOG.debug('handling sample %s', s)
         if self.source.get('unit', s.unit) == s.unit:
@@ -181,7 +181,7 @@ class RateOfChangeTransformer(ScalingTransformer):
         self.cache = {}
         self.scale = self.scale or '1'
 
-    def handle_sample(self, context, s):
+    def handle_sample(self, s):
         """Handle a sample, converting if necessary."""
         LOG.debug('handling sample %s', s)
         key = s.name + s.resource_id
@@ -293,7 +293,7 @@ class AggregatorTransformer(ScalingTransformer):
         # NOTE(sileht): it assumes, a meter always have the same unit/type
         return "%s-%s-%s" % (s.name, s.resource_id, non_aggregated_keys)
 
-    def handle_sample(self, context, sample_):
+    def handle_sample(self, sample_):
         if not self.initial_timestamp:
             self.initial_timestamp = timeutils.parse_isotime(sample_.timestamp)
 
@@ -317,7 +317,7 @@ class AggregatorTransformer(ScalingTransformer):
                     setattr(self.samples[key], field,
                             getattr(sample_, field))
 
-    def flush(self, context):
+    def flush(self):
         if not self.initial_timestamp:
             return []
 
