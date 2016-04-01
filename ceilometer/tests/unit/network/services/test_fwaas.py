@@ -14,7 +14,6 @@
 # under the License.
 
 import mock
-from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
 
@@ -30,7 +29,6 @@ class _BaseTestFWPollster(base.BaseTestCase):
     def setUp(self):
         super(_BaseTestFWPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        self.context = context.get_admin_context()
         self.manager = manager.AgentManager()
         plugin_base._get_keystone = mock.Mock()
         catalog = (plugin_base._get_keystone.session.auth.get_access.
