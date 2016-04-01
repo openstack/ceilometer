@@ -16,7 +16,6 @@ import datetime
 
 from keystoneauth1 import exceptions
 import mock
-from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
 import six
@@ -60,7 +59,6 @@ class _BaseTestCase(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestCase, self).setUp()
-        self.context = context.get_admin_context()
         self.manager = TestManager()
 
 
