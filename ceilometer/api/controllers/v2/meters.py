@@ -22,7 +22,6 @@ import base64
 import datetime
 
 from oslo_config import cfg
-from oslo_context import context
 from oslo_log import log
 from oslo_utils import strutils
 from oslo_utils import timeutils
@@ -363,12 +362,12 @@ class MeterController(rest.RestController):
             else:
                 published_samples.append(sample_dict)
         if not direct:
-            ctxt = context.RequestContext(user=def_user_id,
-                                          tenant=def_project_id,
-                                          is_admin=True)
-            notifier = pecan.request.notifier
-            notifier.sample(ctxt.to_dict(), 'telemetry.api',
-                            {'samples': published_samples})
+            pecan.request.notifier.sample(
+                {'user': def_user_id,
+                 'tenant': def_project_id,
+                 'is_admin': True},
+                'telemetry.api',
+                {'samples': published_samples})
 
         return samples
 
