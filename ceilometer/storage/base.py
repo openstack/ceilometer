@@ -113,18 +113,15 @@ class Connection(object):
     # A dictionary representing the capabilities of this driver.
     CAPABILITIES = {
         'meters': {'query': {'simple': False,
-                             'metadata': False,
-                             'complex': False}},
+                             'metadata': False}},
         'resources': {'query': {'simple': False,
-                                'metadata': False,
-                                'complex': False}},
+                                'metadata': False}},
         'samples': {'query': {'simple': False,
                               'metadata': False,
                               'complex': False}},
         'statistics': {'groupby': False,
                        'query': {'simple': False,
-                                 'metadata': False,
-                                 'complex': False},
+                                 'metadata': False},
                        'aggregation': {'standard': False,
                                        'selectable': {
                                            'max': False,

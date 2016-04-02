@@ -49,18 +49,15 @@ class Capabilities(base.Base):
         return cls(
             api=_flatten_capabilities({
                 'meters': {'query': {'simple': True,
-                                     'metadata': True,
-                                     'complex': False}},
+                                     'metadata': True}},
                 'resources': {'query': {'simple': True,
-                                        'metadata': True,
-                                        'complex': False}},
+                                        'metadata': True}},
                 'samples': {'query': {'simple': True,
                                       'metadata': True,
                                       'complex': True}},
                 'statistics': {'groupby': True,
                                'query': {'simple': True,
-                                         'metadata': True,
-                                         'complex': False},
+                                         'metadata': True},
                                'aggregation': {'standard': True,
                                                'selectable': {
                                                    'max': True,
