@@ -25,7 +25,6 @@ import random
 from keystoneauth1 import exceptions as ka_exceptions
 from keystoneclient import exceptions as ks_exceptions
 from oslo_config import cfg
-from oslo_context import context
 from oslo_log import log
 import oslo_messaging
 from six import moves
@@ -224,7 +223,7 @@ class PollingTask(object):
 
     def _send_notification(self, samples):
         self.manager.notifier.sample(
-            self.manager.context.to_dict(),
+            {},
             'telemetry.polling',
             {'samples': samples}
         )
@@ -273,7 +272,6 @@ class AgentManager(service_base.BaseService):
             raise EmptyPollstersList()
 
         self.discovery_manager = self._extensions('discover')
-        self.context = context.RequestContext('admin', 'admin', is_admin=True)
         self.partition_coordinator = coordination.PartitionCoordinator()
 
         # Compose coordination group prefix.
