@@ -66,8 +66,7 @@ class _Base(plugin_base.PollsterBase):
             LOG.warning(_('Polling %(name)s failed for %(cnt)s times!')
                         % ({'name': self.NAME,
                             'cnt': self.polling_failures}))
-            if (CONF.ipmi.polling_retry >= 0 and
-                    self.polling_failures > CONF.ipmi.polling_retry):
+            if 0 <= CONF.ipmi.polling_retry < self.polling_failures:
                 LOG.warning(_('Pollster for %s is disabled!') % self.NAME)
                 raise plugin_base.PollsterPermanentError(resources)
             else:
