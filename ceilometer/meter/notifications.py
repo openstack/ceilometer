@@ -220,7 +220,6 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
             conf.trove_control_exchange,
             conf.zaqar_control_exchange,
             conf.swift_control_exchange,
-            conf.magnetodb_control_exchange,
             conf.ceilometer_control_exchange,
             conf.magnum_control_exchange,
             conf.dns_control_exchange,
