@@ -252,14 +252,6 @@
       fields: payload.target.metadata.object
     observer_id:
       fields: payload.observer.id
-- event_type: magnetodb.table.*
-  traits: &kv_store
-    resource_id:
-      fields: payload.table_uuid
-    user_id:
-      fields: _context_user_id
-    project_id:
-      fields: _context_tenant
 - event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'pool.*', 'vip.*', 'member.*', 'health_monitor.*', 'healthmonitor.*', 'listener.*', 'loadbalancer.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
   traits: &network_traits
     user_id:

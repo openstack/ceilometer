@@ -524,21 +524,8 @@ details about any other options you might want to modify before starting the
 service.
 
 
-Configuring MagnetoDB to send notifications
-===========================================
-
-Configure the driver in ``magnetodb-async-task-executor.conf``
-
-   ::
-
-        notification_driver=messagingv2
-
-You also would need to restart the service magnetodb-async-task-executor
-(if it's already running) after changing the above configuration file.
-
-
 Notifications queues
-========================
+====================
 
 .. index::
    double: installing; notifications queues; multiple topics
@@ -586,7 +573,7 @@ Doing this, it's easy to listen/receive data from multiple internal and external
 
 
 Using multiple dispatchers
-================================
+==========================
 
 .. index::
    double: installing; multiple dispatchers

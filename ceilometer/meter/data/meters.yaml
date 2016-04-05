@@ -30,15 +30,6 @@ metric:
     resource_id: $.payload.image_id
     project_id: $.payload.owner_id
 
-  # MagnetoDB
-  - name: 'magnetodb.table.index.count'
-    type: 'gauge'
-    unit: 'index'
-    event_type: 'magnetodb.table.create.end'
-    volume: $.payload.index_count
-    resource_id: $.payload.table_uuid
-    user_id: $._context_user
-
   - name: 'volume.size'
     event_type:
       - 'volume.exists'
@@ -391,25 +382,6 @@ metric:
     user_id: _context_trustor_user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.stack_identity
-
-  # MagnetoDB
-  - name: 'magnetodb.table.create'
-    type: 'gauge'
-    unit: 'table'
-    volume: 1
-    event_type: 'magnetodb.table.create.end'
-    resource_id: $.payload.table_uuid
-    user_id: _context_user
-    project_id: _context_tenant
-
-  - name: 'magnetodb.table.delete'
-    type: 'gauge'
-    unit: 'table'
-    volume: 1
-    event_type: 'magnetodb.table.delete.end'
-    resource_id: $.payload.table_uuid
-    user_id: _context_user
-    project_id: _context_tenant
 
   # Volume
   - name: 'volume'
