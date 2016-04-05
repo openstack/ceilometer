@@ -264,21 +264,20 @@ Installing the Polling Agent
 
 5. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
-   role to your ``os_username`` user for tenant ``os_tenant_name``:
+   role to your ``os_username`` user for tenant ``os_tenant_name``::
 
-   ::
+     $ openstack role create --name=ResellerAdmin
+     +-----------+----------------------------------+
+     | Field     | Value                            |
+     +-----------+----------------------------------+
+     | domain_id | None                             |
+     | id        | f5153dae801244e8bb4948f0a6fb73b7 |
+     | name      | ResellerAdmin                    |
+     +-----------+----------------------------------+
 
-     $ keystone role-create --name=ResellerAdmin
-     +----------+----------------------------------+
-     | Property |              Value               |
-     +----------+----------------------------------+
-     |    id    | 462fa46c13fd4798a95a3bfbe27b5e54 |
-     |   name   |          ResellerAdmin           |
-     +----------+----------------------------------+
-
-     $ keystone user-role-add --tenant_id $SERVICE_TENANT \
-                              --user_id $CEILOMETER_USER \
-                              --role_id 462fa46c13fd4798a95a3bfbe27b5e54
+     $ openstack role add f5153dae801244e8bb4948f0a6fb73b7 \
+                          --project $SERVICE_TENANT \
+                          --user $CEILOMETER_USER
 
 6. Start the agent::
 
@@ -335,17 +334,16 @@ Installing the API Server
 
 5. Create a service for ceilometer in keystone::
 
-     $ keystone service-create --name=ceilometer \
-                               --type=metering \
-                               --description="Ceilometer Service"
+     $ openstack service create metering --name=ceilometer \
+                                         --description="Ceilometer Service"
 
 6. Create an endpoint in keystone for ceilometer::
 
-     $ keystone endpoint-create --region RegionOne \
-                                --service_id $CEILOMETER_SERVICE \
-                                --publicurl "http://$SERVICE_HOST:8777/" \
-                                --adminurl "http://$SERVICE_HOST:8777/" \
-                                --internalurl "http://$SERVICE_HOST:8777/"
+     $ openstack endpoint create $CEILOMETER_SERVICE \
+                                 --region RegionOne \
+                                 --publicurl "http://$SERVICE_HOST:8777/" \
+                                 --adminurl "http://$SERVICE_HOST:8777/" \
+                                 --internalurl "http://$SERVICE_HOST:8777/"
 
    .. note::
 
