@@ -20,7 +20,6 @@ import logging
 import sys
 
 from oslo_config import cfg
-from oslo_context import context
 from oslo_utils import timeutils
 from stevedore import extension
 
@@ -80,7 +79,7 @@ def send_sample():
     pipeline_manager = pipeline.setup_pipeline(
         extension.ExtensionManager('ceilometer.transformer'))
 
-    with pipeline_manager.publisher(context.get_admin_context()) as p:
+    with pipeline_manager.publisher() as p:
         p([sample.Sample(
             name=cfg.CONF.sample_name,
             type=cfg.CONF.sample_type,

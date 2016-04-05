@@ -40,9 +40,9 @@ class PublisherBase(object):
         pass
 
     @abc.abstractmethod
-    def publish_samples(self, context, samples):
+    def publish_samples(self, samples):
         """Publish samples into final conduit."""
 
     @abc.abstractmethod
-    def publish_events(self, context, events):
+    def publish_events(self, events):
         """Publish events into final conduit."""

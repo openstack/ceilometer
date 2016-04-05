@@ -36,10 +36,9 @@ class TransformerBase(object):
         super(TransformerBase, self).__init__()
 
     @abc.abstractmethod
-    def handle_sample(self, context, sample):
+    def handle_sample(self, sample):
         """Transform a sample.
 
-        :param context: Passed from the data collector.
         :param sample: A sample.
         """
 
@@ -47,11 +46,9 @@ class TransformerBase(object):
     def grouping_keys(self):
         """Keys used to group transformer."""
 
-    def flush(self, context):
-        """Flush samples cached previously.
-
-        :param context: Passed from the data collector.
-        """
+    @staticmethod
+    def flush():
+        """Flush samples cached previously."""
         return []
 
 

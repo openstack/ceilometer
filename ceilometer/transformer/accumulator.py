@@ -30,13 +30,13 @@ class TransformerAccumulator(transformer.TransformerBase):
         self.size = size
         super(TransformerAccumulator, self).__init__(**kwargs)
 
-    def handle_sample(self, context, sample):
+    def handle_sample(self, sample):
         if self.size >= 1:
             self.samples.append(sample)
         else:
             return sample
 
-    def flush(self, context):
+    def flush(self):
         if len(self.samples) >= self.size:
             x = self.samples
             self.samples = []

@@ -139,7 +139,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
 
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_counter])
 
         self.test_counter = sample.Sample(
@@ -154,7 +154,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             resource_metadata=self.test_counter.resource_metadata,
         )
 
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_counter])
 
         self.assertEqual(2, len(pipeline_manager.pipelines))
@@ -182,7 +182,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
 
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_counter])
 
         self.test_counter = sample.Sample(
@@ -197,7 +197,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             resource_metadata=self.test_counter.resource_metadata,
         )
 
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_counter])
 
         self.assertEqual(2, len(pipeline_manager.pipelines))

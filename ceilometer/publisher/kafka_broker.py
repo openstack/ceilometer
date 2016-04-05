@@ -84,7 +84,7 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
             raise messaging.DeliveryFailure('Kafka Client is not available, '
                                             'please restart Kafka client')
 
-    def _send(self, context, event_type, data):
+    def _send(self, event_type, data):
         self._ensure_connection()
         # TODO(sileht): don't split the payload into multiple network
         # message ... but how to do that without breaking consuming

@@ -37,10 +37,10 @@ class EventPipelineTestCase(base.BaseTestCase):
         return fake_drivers[url](url)
 
     class PublisherClassException(publisher.PublisherBase):
-        def publish_samples(self, ctxt, samples):
+        def publish_samples(self, samples):
             pass
 
-        def publish_events(self, ctxt, events):
+        def publish_events(self, events):
             raise Exception()
 
     def setUp(self):
@@ -199,13 +199,13 @@ class EventPipelineTestCase(base.BaseTestCase):
                                                     self.transformer_manager,
                                                     self.p_type)
 
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
 
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(1, len(publisher.events))
 
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event2])
 
         self.assertEqual(2, len(publisher.events))
@@ -218,7 +218,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager,
                                                     self.p_type)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
 
         publisher = pipeline_manager.pipelines[0].publishers[0]
@@ -231,7 +231,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager,
                                                     self.p_type)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
 
         publisher = pipeline_manager.pipelines[0].publishers[0]
@@ -252,7 +252,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager,
                                                     self.p_type)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(1, len(publisher.events))
@@ -264,7 +264,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager,
                                                     self.p_type)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
 
         publisher = pipeline_manager.pipelines[0].publishers[0]
@@ -324,7 +324,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager,
                                                     self.p_type)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event, self.test_event2])
 
         publisher = pipeline_manager.pipelines[0].publishers[0]
@@ -342,7 +342,7 @@ class EventPipelineTestCase(base.BaseTestCase):
                                                     self.transformer_manager,
                                                     self.p_type)
 
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
 
         publisher = pipeline_manager.pipelines[0].publishers[0]
@@ -358,7 +358,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
                                                     self.transformer_manager,
                                                     self.p_type)
-        with pipeline_manager.publisher(None) as p:
+        with pipeline_manager.publisher() as p:
             p([self.test_event])
 
         publisher = pipeline_manager.pipelines[0].publishers[1]
@@ -401,7 +401,7 @@ class EventPipelineTestCase(base.BaseTestCase):
                                                     self.transformer_manager,
                                                     self.p_type)
         event_pipeline_endpoint = pipeline.EventPipelineEndpoint(
-            mock.Mock(), pipeline_manager.pipelines[0])
+            pipeline_manager.pipelines[0])
 
         fake_publisher.publish_events.side_effect = Exception
         ret = event_pipeline_endpoint.sample([

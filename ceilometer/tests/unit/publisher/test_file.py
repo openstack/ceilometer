@@ -72,8 +72,7 @@ class TestFilePublisher(base.BaseTestCase):
         parsed_url = netutils.urlsplit('file://%s?max_bytes=50&backup_count=3'
                                        % name)
         publisher = file.FilePublisher(parsed_url)
-        publisher.publish_samples(None,
-                                  self.test_data)
+        publisher.publish_samples(self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
         self.assertIsInstance(handler,
@@ -90,8 +89,7 @@ class TestFilePublisher(base.BaseTestCase):
         name = '%s/log_file_plain' % tempdir
         parsed_url = netutils.urlsplit('file://%s' % name)
         publisher = file.FilePublisher(parsed_url)
-        publisher.publish_samples(None,
-                                  self.test_data)
+        publisher.publish_samples(self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
         self.assertIsInstance(handler,
@@ -114,7 +112,6 @@ class TestFilePublisher(base.BaseTestCase):
             'file://%s/log_file_bad'
             '?max_bytes=yus&backup_count=5y' % tempdir)
         publisher = file.FilePublisher(parsed_url)
-        publisher.publish_samples(None,
-                                  self.test_data)
+        publisher.publish_samples(self.test_data)
 
         self.assertIsNone(publisher.publisher_logger)

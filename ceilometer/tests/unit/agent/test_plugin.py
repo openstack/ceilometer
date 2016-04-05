@@ -57,5 +57,4 @@ class NotificationBaseTestCase(base.BaseTestCase):
             'payload': {'foo': 'bar'},
             'message_id': '3577a84f-29ec-4904-9566-12c52289c2e8'
         }
-        plugin.to_samples_and_publish.assert_called_with(mock.ANY,
-                                                         notification)
+        plugin.to_samples_and_publish.assert_called_with(notification)

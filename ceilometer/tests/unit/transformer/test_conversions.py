@@ -14,7 +14,6 @@
 # under the License.
 import copy
 
-from oslo_context import context
 from oslo_utils import timeutils
 from oslotest import base
 
@@ -94,7 +93,7 @@ class AggregatorTransformerTestCase(base.BaseTestCase):
                                                        retention_time="300")
         self._insert_sample_data(aggregator)
 
-        samples = aggregator.flush(context.get_admin_context())
+        samples = aggregator.flush()
 
         self.assertEqual([], samples)
 
@@ -102,7 +101,7 @@ class AggregatorTransformerTestCase(base.BaseTestCase):
         aggregator = conversions.AggregatorTransformer(size="100")
         self._insert_sample_data(aggregator)
 
-        samples = aggregator.flush(context.get_admin_context())
+        samples = aggregator.flush()
 
         self.assertEqual(100, len(samples))
 
@@ -111,5 +110,5 @@ class AggregatorTransformerTestCase(base.BaseTestCase):
             sample = copy.copy(self.SAMPLE)
             sample.resource_id = sample.resource_id + str(self._sample_offset)
             sample.timestamp = timeutils.isotime()
-            aggregator.handle_sample(context.get_admin_context(), sample)
+            aggregator.handle_sample(sample)
             self._sample_offset += 1

@@ -87,20 +87,18 @@ class FilePublisher(publisher.PublisherBase):
         rfh.setLevel(logging.INFO)
         self.publisher_logger.addHandler(rfh)
 
-    def publish_samples(self, context, samples):
+    def publish_samples(self, samples):
         """Send a metering message for publishing
 
-        :param context: Execution context from the service or RPC call
         :param samples: Samples from pipeline after transformation
         """
         if self.publisher_logger:
             for sample in samples:
                 self.publisher_logger.info(sample.as_dict())
 
-    def publish_events(self, context, events):
+    def publish_events(self, events):
         """Send an event message for publishing
 
-        :param context: Execution context from the service or RPC call
         :param events: events from pipeline after transformation
         """
         raise ceilometer.NotImplementedError
