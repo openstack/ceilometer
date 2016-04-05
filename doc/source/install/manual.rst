@@ -27,6 +27,67 @@ Storage Backend Installation
 This step is a prerequisite for the collector and API services. You may use
 one of the listed database backends below to store Ceilometer data.
 
+Gnocchi
+-------
+
+1. Follow `Gnocchi installation`_ instructions
+
+2. Initialize Gnocchi for Ceilometer::
+
+     gnocchi-upgrade --create-legacy-resource-types
+
+   .. note::
+
+      Prior to Gnocchi 2.1, Ceilometer resource types were included, therefore
+      --create-legacy-resource-types flag is not needed.
+
+3. Edit `/etc/ceilometer/ceilometer.conf` for the collector service::
+
+     [DEFAULT]
+     meter_dispatchers = gnocchi
+     event_dispatchers =
+
+     [notification]
+     store_events = False
+
+     [dispatcher_gnocchi]
+     filter_service_activity = False # Enable if using swift backend
+     filter_project = <project name associated with gnocchi user> # if using swift backend
+
+     [service_credentials]
+     auth_url = <auth_url>:5000
+     region_name = RegionOne
+     password = password
+     username = ceilometer
+     project_name = service
+     project_domain_id = default
+     user_domain_id = default
+     auth_type = password
+
+4. Copy gnocchi_resources.yaml to config directory (e.g./etc/ceilometer)
+
+5. To minimize data requests, caching and batch processing should be enabled:
+
+   1. Enable resource caching (oslo.cache_ should be installed)::
+
+        [cache]
+        backend_argument = redis_expiration_time:600
+        backend_argument = db:0
+        backend_argument = distributed_lock:True
+        backend_argument = url:redis://localhost:6379
+        backend = dogpile.cache.redis
+
+   2. Enable batch processing::
+
+        [collector]
+        batch_size = 100
+        batch_timeout = 5
+
+6. Start collector service
+
+.. _oslo.cache: http://docs.openstack.org/developer/oslo.cache/opts.html
+
+
 MongoDB
 -------
 
@@ -98,6 +159,7 @@ HBase
     [database]
     connection = hbase://hbase-thrift-host:9090?table_prefix=ceilo&table_prefix_separator=.
 
+.. _`Gnocchi installation`: http://docs.openstack.org/developer/gnocchi/install.html
 .. _HappyBase: http://happybase.readthedocs.org/en/latest/index.html#
 .. _MongoDB: http://www.mongodb.org/
 .. _pymongo: https://pypi.python.org/pypi/pymongo/
