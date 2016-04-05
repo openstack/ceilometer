@@ -22,47 +22,6 @@ order to set up the services please see the
 `Telemetry section <http://docs.openstack.org/trunk/config-reference/content/ch_configuring-openstack-telemetry.html>`_
 in the OpenStack Manuals Configuration Reference.
 
-HBase
-===================
-
-This storage implementation uses Thrift HBase interface. The default Thrift
-connection settings should be changed to support using ConnectionPool in HBase.
-To ensure proper configuration, please add the following lines to the
-`hbase-site.xml` configuration file::
-
-    <property>
-      <name>hbase.thrift.minWorkerThreads</name>
-      <value>200</value>
-    </property>
-
-For pure development purposes, you can use HBase from Apache_ or some other
-vendor like Cloudera or Hortonworks. To verify your installation, you can use
-the `list` command in `HBase shell`, to list the tables in your
-HBase server, as follows::
-
-    $ ${HBASE_HOME}/bin/hbase shell
-
-    hbase> list
-
-.. note::
-    This driver has been tested against HBase 0.94.2/CDH 4.2.0,
-    HBase 0.94.4/HDP 1.2, HBase 0.94.18/Apache, HBase 0.94.5/Apache,
-    HBase 0.96.2/Apache and HBase 0.98.0/Apache.
-    Versions earlier than 0.92.1 are not supported due to feature incompatibility.
-
-To find out more about supported storage backends please take a look on the
-:doc:`install/manual/` guide.
-
-.. note::
-
-    If you are changing the configuration on the fly to use HBase, as a storage
-    backend, you will need to restart the Ceilometer services that use the
-    database to allow the changes to take affect, i.e. the collector and API
-    services.
-
-.. _Apache: https://hbase.apache.org/book/quickstart.html
-
-
 Sample Configuration file
 =========================
 
@@ -71,15 +30,6 @@ etc/ceilometer/ceilometer.conf.sample, was removed from version control after
 the Icehouse release. For more details, please read the file
 etc/ceilometer/README-ceilometer.conf.txt. You can generate this sample
 configuration file by running ``tox -e genconfig``.
-
-.. note::
-    tox version 1.7.0 and 1.7.1 have a `backward compatibility issue`_
-    with OpenStack projects. If you meet the "tox.ConfigError: ConfigError:
-    substitution key 'posargs' not found" problem, run
-    ``sudo pip install -U "tox>=1.6.1,!=1.7.0,!=1.7.1"`` to get a proper
-    version, then try ``tox -e genconfig`` again.
-
-.. _`backward compatibility issue`: https://bitbucket.org/hpk42/tox/issue/150/posargs-configerror
 
 .. _Pipeline-Configuration:
 

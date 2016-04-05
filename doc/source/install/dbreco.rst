@@ -27,6 +27,13 @@
    for low latency use cases. For more responsive use cases, it's recommended
    to store data in an alternative source such as Gnocchi_
 
+.. note::
+
+   As of Liberty, alarming support, and subsequently its database, is handled
+   by Aodh_.
+
+.. _Aodh: http://docs.openstack.org/developer/aodh/
+
 Selecting a database backend for Ceilometer should not be done lightly for
 numerous reasons:
 

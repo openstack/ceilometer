@@ -159,6 +159,14 @@ HBase
     [database]
     connection = hbase://hbase-thrift-host:9090?table_prefix=ceilo&table_prefix_separator=.
 
+   To ensure proper configuration, please add the following lines to the
+   `hbase-site.xml` configuration file::
+
+    <property>
+      <name>hbase.thrift.minWorkerThreads</name>
+      <value>200</value>
+    </property>
+
 .. _`Gnocchi installation`: http://docs.openstack.org/developer/gnocchi/install.html
 .. _HappyBase: http://happybase.readthedocs.org/en/latest/index.html#
 .. _MongoDB: http://www.mongodb.org/

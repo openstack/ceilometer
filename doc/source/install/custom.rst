@@ -150,3 +150,16 @@ configuration settings should be added::
 .. note::
    If gnocchi dispatcher is enabled, Ceilometer api calls will return a 410 with
    an empty result. The Gnocchi Api should be used instead to access the data.
+
+Efficient polling
+=================
+
+- There is an optional config called ``shuffle_time_before_polling_task``
+  in ceilometer.conf. Enable this by setting an integer greater than zero to
+  shuffle polling time for agents. This will add some random jitter to the time
+  of sending requests to Nova or other components to avoid large number of
+  requests in a short time period.
+- There is an option to stream samples to minimise latency (at the
+  expense of load) by setting ``batch_polled_samples`` to ``False`` in
+  ceilometer.conf.
+

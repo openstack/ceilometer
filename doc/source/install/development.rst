@@ -20,19 +20,12 @@
 
 Ceilometer has several daemons. The basic are: :term:`polling agent` running
 either on the Nova compute node(s) or :term:`polling agent` running on the
-central management node(s), :term:`collector`
-and :term:`notification agent` running on the cloud's management node(s).
+central management node(s), :term:`collector` and :term:`notification agent`
+running on the cloud's management node(s).
+
 In a development environment created by devstack_, these services are
-typically running on the same server. They do not have to be, though, so some
-of the instructions below are duplicated. Skip the steps you have already done.
+typically running on the same server.
 
-.. note::
-
-   In fact, previously ceilometer had separated compute and central agents, and
-   their support is implemented in devstack_ right now, not one agent variant.
-   For now we do have deprecated cmd scripts emulating old compute/central
-   behavior using namespaces option passed to polling agent, which will be
-   maintained for a transitional period.
 
 Configuring devstack
 ====================
@@ -58,15 +51,7 @@ Configuring devstack
       # Enable the Ceilometer devstack plugin
       enable_plugin ceilometer https://git.openstack.org/openstack/ceilometer.git
 
-5. Nova does not generate the periodic notifications for all known
-   instances by default. To enable these auditing events, set
-   ``instance_usage_audit`` to true in the nova configuration file and restart
-   the service.
-
-6. Cinder does not generate notifications by default. To enable
-   these auditing events, set the following in the cinder configuration file
-   and restart the service::
-
-      notification_driver=messagingv2
+   By default, all ceilometer services except for ceilometer-ipmi agent will
+   be enabled
 
 .. _devstack: http://www.devstack.org/
