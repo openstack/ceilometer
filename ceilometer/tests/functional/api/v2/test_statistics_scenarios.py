@@ -172,7 +172,7 @@ class TestMaxResourceVolume(v2.FunctionalTest):
                              period=-1)
         self.assertEqual(400, resp.status_code)
 
-    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase')
     def test_period_with_large_value(self):
         resp = self.get_json(self.PATH, expect_errors=True,
                              q=[{'field': 'user_id',
@@ -1208,7 +1208,7 @@ class TestGroupByInstance(v2.FunctionalTest):
                                      u'2013-08-01T14:00:00'])
 
 
-@tests_db.run_with('mongodb', 'hbase', 'db2')
+@tests_db.run_with('mongodb', 'hbase')
 class TestGroupBySource(v2.FunctionalTest):
 
     # FIXME(terriyu): We have to put test_group_by_source in its own class
@@ -1551,7 +1551,7 @@ class TestSelectableAggregates(v2.FunctionalTest):
                          'Bad aggregate: cardinality.injection_attack')
 
 
-@tests_db.run_with('mongodb', 'hbase', 'db2')
+@tests_db.run_with('mongodb', 'hbase')
 class TestUnparameterizedAggregates(v2.FunctionalTest):
 
     # We put the stddev test case in a separate class so that we
@@ -1559,7 +1559,7 @@ class TestUnparameterizedAggregates(v2.FunctionalTest):
     # support the stddev_pop function and fails ungracefully with
     # OperationalError when it is used. However we still want to
     # test the corresponding functionality in the mongo driver.
-    # For hbase & db2, the skip on NotImplementedError logic works
+    # For hbase, the skip on NotImplementedError logic works
     # in the usual way.
 
     PATH = '/meters/instance/statistics'
