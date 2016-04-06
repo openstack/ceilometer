@@ -634,12 +634,6 @@ CARDINALITY_AGGREGATION = Aggregation(
 )
 
 
-def to_unix_timestamp(timestamp):
-    if isinstance(timestamp, datetime.datetime):
-        return int(time.mktime(timestamp.timetuple()))
-    return timestamp
-
-
 def from_unix_timestamp(timestamp):
     if (isinstance(timestamp, six.integer_types) or
             isinstance(timestamp, float)):
