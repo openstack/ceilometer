@@ -23,9 +23,9 @@ Existing meters
 ===============
 
 For the list of existing meters see the tables under the
-`Measurements page`_ of Ceilometer in the Cloud Administrator Guide.
+`Measurements page`_ of Ceilometer in the Administrator Guide.
 
-.. _Measurements page: http://docs.openstack.org/admin-guide-cloud/telemetry-measurements.html
+.. _Measurements page: http://docs.openstack.org/admin-guide/telemetry-measurements.html
 
 Adding new meters
 =================
