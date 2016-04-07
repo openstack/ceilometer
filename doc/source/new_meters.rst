@@ -99,7 +99,7 @@ specific topics.
 A detailed description of how to use meter definition is illustrated in
 the `admin_guide`_.
 
-.. _admin_guide: http://docs.openstack.org/admin-guide-cloud/telemetry-data-collection.html#meter-definitions
+.. _admin_guide: http://docs.openstack.org/admin-guide/telemetry-data-collection.html#meter-definitions
 
 Non-metric meters and events
 ----------------------------
