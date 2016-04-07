@@ -39,10 +39,23 @@ OPTS = [
     cfg.FloatOpt('check_watchers',
                  default=10.0,
                  help='Number of seconds between checks to see if group '
-                      'membership has changed')
-
+                      'membership has changed'),
+    cfg.IntOpt('retry_backoff',
+               default=1,
+               help='Retry backoff factor when retrying to connect with'
+                    'coordination backend'),
+    cfg.IntOpt('max_retry_interval',
+               default=30,
+               help='Maximum number of seconds between retry to join '
+                    'partitioning group')
 ]
 cfg.CONF.register_opts(OPTS, group='coordination')
+
+
+class ErrorJoiningPartitioningGroup(Exception):
+    def __init__(self):
+        super(ErrorJoiningPartitioningGroup, self).__init__(_LE(
+            'Coordination join_group Error joining partitioning group'))
 
 
 class MemberNotInGroupError(Exception):
@@ -51,6 +64,10 @@ class MemberNotInGroupError(Exception):
             'Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: '
             'Current agent is not part of group and cannot take tasks') %
             {'group_id': group_id, 'members': members, 'me': my_id})
+
+
+def retry_on_error_joining_partition(exception):
+    return isinstance(exception, ErrorJoiningPartitioningGroup)
 
 
 def retry_on_member_not_in_group(exception):
@@ -128,12 +145,20 @@ class PartitionCoordinator(object):
         if (not self._coordinator or not self._coordinator.is_started
                 or not group_id):
             return
-        while True:
+
+        retry_backoff = cfg.CONF.coordination.retry_backoff * 1000
+        max_retry_interval = cfg.CONF.coordination.max_retry_interval * 1000
+
+        @retrying.retry(
+            wait_exponential_multiplier=retry_backoff,
+            wait_exponential_max=max_retry_interval,
+            retry_on_exception=retry_on_error_joining_partition,
+            wrap_exception=True)
+        def _inner():
             try:
                 join_req = self._coordinator.join_group(group_id)
                 join_req.get()
                 LOG.info(_LI('Joined partitioning group %s'), group_id)
-                break
             except tooz.coordination.MemberAlreadyExist:
                 return
             except tooz.coordination.GroupNotCreated:
@@ -142,10 +167,14 @@ class PartitionCoordinator(object):
                     create_grp_req.get()
                 except tooz.coordination.GroupAlreadyExist:
                     pass
+                raise ErrorJoiningPartitioningGroup()
             except tooz.coordination.ToozError:
                 LOG.exception(_LE('Error joining partitioning group %s,'
                                   ' re-trying'), group_id)
-        self._groups.add(group_id)
+                raise ErrorJoiningPartitioningGroup()
+            self._groups.add(group_id)
+
+        return _inner()
 
     def leave_group(self, group_id):
         if group_id not in self._groups:
