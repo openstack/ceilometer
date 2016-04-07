@@ -172,7 +172,6 @@ class TestBase(test_base.BaseTestCase):
         'mongodb': MongoDbManager,
         'mysql': MySQLManager,
         'postgresql': PgSQLManager,
-        'db2': MongoDbManager,
         'sqlite': SQLiteManager,
         'es': ElasticSearchManager,
     }

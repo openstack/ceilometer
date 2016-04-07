@@ -57,11 +57,6 @@ OPTS = [
                secret=True,
                help='The connection string used to connect to the event '
                'database. (if unset, connection is used)'),
-    cfg.IntOpt('db2nosql_resource_id_maxlen',
-               default=512,
-               help="The max length of resources id in DB2 nosql, "
-                    "the value should be larger than len(hostname) * 2 "
-                    "as compute node's resource id is <hostname>_<nodename>."),
 ]
 
 cfg.CONF.register_opts(OPTS, group='database')
@@ -117,12 +112,6 @@ def get_connection(url, namespace):
     # SqlAlchemy connections specify may specify a 'dialect' or
     # 'dialect+driver'. Handle the case where driver is specified.
     engine_name = connection_scheme.split('+')[0]
-    if engine_name == 'db2':
-        import warnings
-        warnings.simplefilter("always")
-        import debtcollector
-        debtcollector.deprecate("The DB2nosql driver is no longer supported",
-                                version="Liberty", removal_version="N*-cycle")
     # NOTE: translation not applied bug #1446983
     LOG.debug('looking for %(name)r driver in %(namespace)r',
               {'name': engine_name, 'namespace': namespace})

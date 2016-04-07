@@ -575,7 +575,7 @@ class RawSampleTest(DBTestBase):
         results = list(self.conn.get_samples(f))
         self.assertEqual(2, len(results))
 
-    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase')
     def test_clear_metering_data(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
@@ -588,7 +588,7 @@ class RawSampleTest(DBTestBase):
         results = list(self.conn.get_resources())
         self.assertEqual(5, len(results))
 
-    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase', 'db2')
+    @tests_db.run_with('sqlite', 'mysql', 'pgsql', 'hbase')
     def test_clear_metering_data_no_data_to_remove(self):
         # NOTE(jd) Override this test in MongoDB because our code doesn't clear
         # the collections, this is handled by MongoDB TTL feature.
@@ -2690,7 +2690,7 @@ class EventTTLTest(EventTestBase):
             self.assertEqual(4, len(traits))
 
 
-@tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb', 'db2')
+@tests_db.run_with('sqlite', 'mysql', 'pgsql', 'mongodb')
 class EventTest(EventTestBase):
     def test_duplicate_message_id(self):
         now = datetime.datetime.utcnow()

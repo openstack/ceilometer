@@ -9,7 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests the mongodb and db2 common functionality
+"""Tests the mongodb functionality
 """
 
 import copy
@@ -23,7 +23,7 @@ from ceilometer.tests import db as tests_db
 from ceilometer.tests.functional.storage import test_storage_scenarios
 
 
-@tests_db.run_with('mongodb', 'db2')
+@tests_db.run_with('mongodb')
 class CompatibilityTest(test_storage_scenarios.DBTestBase):
 
     def prepare_data(self):
@@ -81,7 +81,7 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase):
 
 
 # TODO(ananya) same test should be done for other databse
-@tests_db.run_with('mongodb', 'db2')
+@tests_db.run_with('mongodb')
 class FilterQueryTestForMeters(test_storage_scenarios.DBTestBase):
     def prepare_data(self):
         def old_record_metering_data(self, data):
