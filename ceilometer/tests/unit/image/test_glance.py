@@ -15,7 +15,6 @@
 
 import mock
 from oslo_config import fixture as fixture_config
-from oslo_context import context
 from oslotest import base
 from oslotest import mockpatch
 
@@ -134,7 +133,6 @@ class TestImagePollsterPageSize(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollsterPageSize, self).setUp()
-        self.context = context.get_admin_context()
         self.manager = TestManager()
         self.useFixture(mockpatch.PatchObject(
             glance._Base, 'get_glance_client',
@@ -175,7 +173,6 @@ class TestImagePollster(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollster, self).setUp()
-        self.context = context.get_admin_context()
         self.manager = TestManager()
         self.useFixture(mockpatch.PatchObject(
             glance._Base, 'get_glance_client',
