@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev21\n"
+"Project-Id-Version: ceilometer 6.0.1.dev26\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-08 06:07+0000\n"
+"POT-Creation-Date: 2016-04-08 06:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
 
-#: ceilometer/collector.py:134
+#: ceilometer/collector.py:123
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
 msgstr ""
 
-#: ceilometer/collector.py:141
+#: ceilometer/collector.py:130
 msgid "UDP: Unable to store meter"
 msgstr ""
 
@@ -58,69 +58,69 @@ msgstr ""
 msgid "YAML error reading Definitions file %(file)s"
 msgstr ""
 
-#: ceilometer/notification.py:206
+#: ceilometer/notification.py:204
 #, python-format
 msgid "Failed to load any notification handlers for %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:390
+#: ceilometer/pipeline.py:389
 #, python-format
 msgid "Unable to load publisher %s"
 msgstr ""
 
-#: ceilometer/pipeline.py:428
+#: ceilometer/pipeline.py:427
 #, python-format
 msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:458
+#: ceilometer/pipeline.py:457
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:495
+#: ceilometer/pipeline.py:493
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
 msgstr ""
 
-#: ceilometer/pipeline.py:511
+#: ceilometer/pipeline.py:509
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:207
+#: ceilometer/agent/manager.py:213
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
 
-#: ceilometer/agent/manager.py:213
+#: ceilometer/agent/manager.py:219
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:289
+#: ceilometer/agent/manager.py:297
 #, python-format
 msgid "Skip loading extension for %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:292
+#: ceilometer/agent/manager.py:300
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:470
+#: ceilometer/agent/manager.py:478
 #, python-format
 msgid "Unable to discover resources: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:472
+#: ceilometer/agent/manager.py:480
 #, python-format
 msgid "Unknown discovery extension: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:481
+#: ceilometer/agent/manager.py:489
 msgid "Error stopping pollster."
 msgstr ""
 
@@ -181,15 +181,15 @@ msgstr ""
 msgid "More than one event with id %s returned from storage driver"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/meters.py:308
+#: ceilometer/api/controllers/v2/meters.py:307
 msgid "Samples should be included in request body"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/meters.py:394
+#: ceilometer/api/controllers/v2/meters.py:393
 msgid "Period must be positive."
 msgstr ""
 
-#: ceilometer/api/controllers/v2/meters.py:423
+#: ceilometer/api/controllers/v2/meters.py:422
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
 msgstr ""
@@ -214,11 +214,15 @@ msgstr ""
 msgid "Failed to parse the timestamp value %s"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/resources.py:128
+#: ceilometer/api/controllers/v2/resources.py:133
 msgid "Resource"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/root.py:164
+#: ceilometer/api/controllers/v2/root.py:66
+msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
+msgstr ""
+
+#: ceilometer/api/controllers/v2/root.py:169
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr ""
 
@@ -230,12 +234,12 @@ msgstr ""
 msgid "Limit must be positive"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:56
+#: ceilometer/compute/pollsters/cpu.py:61
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
 msgstr ""
 
-#: ceilometer/compute/pollsters/cpu.py:87
+#: ceilometer/compute/pollsters/cpu.py:92
 #, python-format
 msgid "Could not get CPU Util for %(id)s: %(e)s"
 msgstr ""
@@ -333,7 +337,7 @@ msgstr ""
 msgid "Could not get VM %s CPU Utilization"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:59
+#: ceilometer/dispatcher/gnocchi.py:61
 msgid ""
 "The Yaml file that defines mapping between samples and gnocchi "
 "resources/metrics"
@@ -375,7 +379,7 @@ msgstr ""
 msgid "Couldn't obtain IP address of instance %s"
 msgstr ""
 
-#: ceilometer/ipmi/platform/intel_node_manager.py:300
+#: ceilometer/ipmi/platform/intel_node_manager.py:297
 msgid "Node Manager init failed"
 msgstr ""
 
@@ -404,7 +408,7 @@ msgstr ""
 msgid "Polling %(name)s failed for %(cnt)s times!"
 msgstr ""
 
-#: ceilometer/ipmi/pollsters/node.py:71 ceilometer/ipmi/pollsters/sensor.py:74
+#: ceilometer/ipmi/pollsters/node.py:70 ceilometer/ipmi/pollsters/sensor.py:73
 #, python-format
 msgid "Pollster for %s is disabled!"
 msgstr ""
@@ -492,22 +496,22 @@ msgstr ""
 msgid "Publishing policy is unknown (%s) force to default"
 msgstr ""
 
-#: ceilometer/publisher/messaging.py:147
+#: ceilometer/publisher/messaging.py:146
 #, python-format
 msgid "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr ""
 
-#: ceilometer/publisher/messaging.py:159
+#: ceilometer/publisher/messaging.py:158
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr ""
 
-#: ceilometer/publisher/messaging.py:163
+#: ceilometer/publisher/messaging.py:162
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
 msgstr ""
 
-#: ceilometer/publisher/udp.py:67
+#: ceilometer/publisher/udp.py:66
 msgid "Unable to send sample over UDP"
 msgstr ""
 

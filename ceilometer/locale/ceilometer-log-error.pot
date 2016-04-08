@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Project-Id-Version: ceilometer 6.0.1.dev26\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-07 06:08+0000\n"
+"POT-Creation-Date: 2016-04-08 06:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,31 +17,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
 
-#: ceilometer/collector.py:176
+#: ceilometer/collector.py:163
 #, python-format
 msgid "Dispatcher failed to handle the %s, requeue it."
 msgstr ""
 
-#: ceilometer/coordination.py:50
+#: ceilometer/coordination.py:57
+msgid "Coordination join_group Error joining partitioning group"
+msgstr ""
+
+#: ceilometer/coordination.py:63
 msgid ""
 "Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: Current agent "
 "is not part of group and cannot take tasks"
 msgstr ""
 
-#: ceilometer/coordination.py:88 ceilometer/coordination.py:100
+#: ceilometer/coordination.py:105 ceilometer/coordination.py:117
 msgid "Error connecting to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:115
+#: ceilometer/coordination.py:132
 msgid "Error sending a heartbeat to coordination backend."
 msgstr ""
 
-#: ceilometer/coordination.py:146
+#: ceilometer/coordination.py:172
 #, python-format
 msgid "Error joining partitioning group %s, re-trying"
 msgstr ""
 
-#: ceilometer/coordination.py:198
+#: ceilometer/coordination.py:227
 msgid "Error getting group membership info from coordination backend."
 msgstr ""
 
@@ -55,12 +59,12 @@ msgstr ""
 msgid "Unable to load changed event pipeline: %s"
 msgstr ""
 
-#: ceilometer/agent/manager.py:467
+#: ceilometer/agent/manager.py:475
 #, python-format
 msgid "Skipping %(name)s, keystone issue: %(exc)s"
 msgstr ""
 
-#: ceilometer/agent/plugin_base.py:109
+#: ceilometer/agent/plugin_base.py:107
 msgid "Fail to process notification"
 msgstr ""
 
@@ -89,21 +93,21 @@ msgstr ""
 msgid "Error processing event and it will be dropped: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:102
+#: ceilometer/dispatcher/gnocchi.py:93
 #, python-format
 msgid "Required field %s not specified"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:105
+#: ceilometer/dispatcher/gnocchi.py:96
 #, python-format
 msgid "Required field %(field)s should be a %(type)s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:234
+#: ceilometer/dispatcher/gnocchi.py:225
 msgid "Failed to connect to Gnocchi."
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:250
+#: ceilometer/dispatcher/gnocchi.py:241
 #, python-format
 msgid "Failed to load resource due to error %s"
 msgstr ""
@@ -112,14 +116,14 @@ msgstr ""
 msgid "Status Code: %{code}s. Failed todispatch event: %{event}s"
 msgstr ""
 
-#: ceilometer/event/endpoint.py:69
+#: ceilometer/event/endpoint.py:67
 msgid "Fail to process a notification"
 msgstr ""
 
 #: ceilometer/event/storage/impl_elasticsearch.py:110
 #: ceilometer/event/storage/impl_hbase.py:121
-#: ceilometer/event/storage/impl_sqlalchemy.py:203
-#: ceilometer/event/storage/impl_sqlalchemy.py:205
+#: ceilometer/event/storage/impl_sqlalchemy.py:207
+#: ceilometer/event/storage/impl_sqlalchemy.py:209
 #: ceilometer/event/storage/pymongo_base.py:69
 #, python-format
 msgid "Failed to record event: %s"
@@ -170,12 +174,17 @@ msgstr ""
 msgid "Invalid type %s specified"
 msgstr ""
 
+#: ceilometer/publisher/http.py:119
+#, python-format
+msgid "Data post failed with status code %s"
+msgstr ""
+
 #: ceilometer/publisher/kafka_broker.py:83
 #, python-format
 msgid "Failed to connect to Kafka service: %s"
 msgstr ""
 
-#: ceilometer/publisher/messaging.py:168
+#: ceilometer/publisher/messaging.py:167
 msgid "Failed to retry to send sample data with max_retry times"
 msgstr ""
 
