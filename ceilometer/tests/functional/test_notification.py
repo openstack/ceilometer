@@ -18,7 +18,6 @@ import shutil
 
 import mock
 from oslo_config import fixture as fixture_config
-from oslo_context import context
 import oslo_messaging
 import oslo_messaging.conffixture
 import oslo_service.service
@@ -250,7 +249,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
         notifier = messaging.get_notifier(self.transport,
                                           "compute.vagrant-precise")
-        notifier.info(context.RequestContext(), 'compute.instance.create.end',
+        notifier.info({}, 'compute.instance.create.end',
                       TEST_NOTICE_PAYLOAD)
         start = timeutils.utcnow()
         while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
@@ -346,7 +345,7 @@ class TestRealNotification(BaseRealNotification):
         self.srv.start()
         notifier = messaging.get_notifier(self.transport,
                                           'compute.vagrant-precise')
-        notifier.error(context.RequestContext(), 'compute.instance.error',
+        notifier.error({}, 'compute.instance.error',
                        TEST_NOTICE_PAYLOAD)
         start = timeutils.utcnow()
         while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
@@ -511,12 +510,10 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
                                           "compute.vagrant-precise")
         payload1 = TEST_NOTICE_PAYLOAD.copy()
         payload1['instance_id'] = '0'
-        notifier.info(context.RequestContext(), 'compute.instance.create.end',
-                      payload1)
+        notifier.info({}, 'compute.instance.create.end', payload1)
         payload2 = TEST_NOTICE_PAYLOAD.copy()
         payload2['instance_id'] = '1'
-        notifier.info(context.RequestContext(), 'compute.instance.create.end',
-                      payload2)
+        notifier.info({}, 'compute.instance.create.end', payload2)
         self.expected_samples = 4
         start = timeutils.utcnow()
         with mock.patch('six.moves.builtins.hash', lambda x: int(x)):
