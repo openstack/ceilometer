@@ -63,18 +63,15 @@ class CapabilitiesTest(test_base.BaseTestCase):
     def test_capabilities(self):
         expected_capabilities = {
             'meters': {'query': {'simple': True,
-                                 'metadata': True,
-                                 'complex': False}},
+                                 'metadata': True}},
             'resources': {'query': {'simple': True,
-                                    'metadata': True,
-                                    'complex': False}},
+                                    'metadata': True}},
             'samples': {'query': {'simple': True,
                                   'metadata': True,
                                   'complex': False}},
             'statistics': {'groupby': False,
                            'query': {'simple': True,
-                                     'metadata': True,
-                                     'complex': False},
+                                     'metadata': True},
                            'aggregation': {'standard': True,
                                            'selectable': {
                                                'max': False,
