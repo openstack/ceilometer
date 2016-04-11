@@ -15,17 +15,18 @@
 
 .. _choosing_db_backend:
 
-=====================================
- Choosing a database backend - Legacy
-=====================================
+============================
+ Choosing a database backend
+============================
 
 .. note::
 
-   Ceilometer's existing database capabilities is intended for post processing
+   Ceilometer's native database capabilities is intended for post processing
    and auditing purposes where responsiveness is not a requirement. It
    captures the full fidelity of each datapoint and thus is not designed
    for low latency use cases. For more responsive use cases, it's recommended
-   to store data in an alternative source such as Gnocchi_
+   to store data in an alternative source such as Gnocchi_. Please see
+   `Moving from Ceilometer to Gnocchi`_ to find more information.
 
 .. note::
 
@@ -65,4 +66,24 @@ PostgreSQL         Yes                           Yes                 Yes
 HBase              Yes                           Yes, except groupby Yes
 ================== ============================= =================== ======
 
+
+Moving from Ceilometer to Gnocchi
+=================================
+
+Gnocchi represents a fundamental change in how data is represented and stored.
+Installation and configuration can be found in :ref:`installing_manually`.
+Differences between APIs can be found here_.
+
+There currently exists no migration tool between the services. To transition
+to Gnocchi, multiple dispatchers can be enabled in the Collector to capture
+data in both the native Ceilometer database and Gnocchi. This will allow you
+to test Gnocchi and transition to it fully when comfortable. The following
+should be included in addition to the required configurations for each
+backend::
+
+  [DEFAULT]
+  meter_dispatchers=database
+  meter_dispatchers=gnocchi
+
 .. _Gnocchi: http://gnocchi.xyz
+.. _here: https://docs.google.com/presentation/d/1PefouoeMVd27p2OGDfNQpx18mY-Wk5l0P1Ke2Vt5LwA/edit?usp=sharing
