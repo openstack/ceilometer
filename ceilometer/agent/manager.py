@@ -27,6 +27,7 @@ from keystoneclient import exceptions as ks_exceptions
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
+from oslo_utils import fnmatch
 from six import moves
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
@@ -246,7 +247,7 @@ class AgentManager(service_base.BaseService):
 
         def _match(pollster):
             """Find out if pollster name matches to one of the list."""
-            return any(utils.match(pollster.name, pattern) for
+            return any(fnmatch.fnmatch(pollster.name, pattern) for
                        pattern in pollster_list)
 
         if type(namespaces) is not list:

@@ -19,13 +19,13 @@ from debtcollector import moves
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
+from oslo_utils import fnmatch
 from stevedore import extension
 
 from ceilometer.agent import plugin_base
 from ceilometer import declarative
 from ceilometer.i18n import _LE, _LW
 from ceilometer import sample
-from ceilometer import utils
 
 OPTS = [
     cfg.StrOpt('meter_definitions_cfg_file',
@@ -97,7 +97,7 @@ class MeterDefinition(object):
 
     def match_type(self, meter_name):
         for t in self._event_type:
-            if utils.match(meter_name, t):
+            if fnmatch.fnmatch(meter_name, t):
                 return True
 
     def to_samples(self, message, all_values=False):

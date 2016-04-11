@@ -25,6 +25,7 @@ import os
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
+from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import six
 from stevedore import extension
@@ -36,7 +37,6 @@ from ceilometer.i18n import _, _LI, _LW
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
-from ceilometer import utils
 
 
 OPTS = [
@@ -274,11 +274,11 @@ class Source(object):
     def is_supported(dataset, data_name):
         # Support wildcard like storage.* and !disk.*
         # Start with negation, we consider that the order is deny, allow
-        if any(utils.match(data_name, datapoint[1:])
+        if any(fnmatch.fnmatch(data_name, datapoint[1:])
                for datapoint in dataset if datapoint[0] == '!'):
             return False
 
-        if any(utils.match(data_name, datapoint)
+        if any(fnmatch.fnmatch(data_name, datapoint)
                for datapoint in dataset if datapoint[0] != '!'):
             return True
 

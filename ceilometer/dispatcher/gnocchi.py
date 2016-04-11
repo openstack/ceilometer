@@ -26,6 +26,7 @@ from gnocchiclient import utils as gnocchi_utils
 from keystoneauth1 import session as ka_session
 from oslo_config import cfg
 from oslo_log import log
+from oslo_utils import fnmatch
 import requests
 import retrying
 import six
@@ -35,7 +36,6 @@ from ceilometer import declarative
 from ceilometer import dispatcher
 from ceilometer.i18n import _, _LE, _LW
 from ceilometer import keystone_client
-from ceilometer import utils
 
 NAME_ENCODED = __name__.encode('utf-8')
 CACHE_NAMESPACE = uuid.UUID(bytes=md5(NAME_ENCODED).digest())
@@ -112,7 +112,7 @@ class ResourcesDefinition(object):
 
     def match(self, metric_name):
         for t in self.cfg['metrics']:
-            if utils.match(metric_name, t):
+            if fnmatch.fnmatch(metric_name, t):
                 return True
         return False
 
