@@ -19,7 +19,7 @@
  Choosing a database backend - Legacy
 =====================================
 
-.. note:
+.. note::
 
    Ceilometer's existing database capabilities is intended for post processing
    and auditing purposes where responsiveness is not a requirement. It
