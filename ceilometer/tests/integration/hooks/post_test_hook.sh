@@ -46,10 +46,29 @@ export NOVA_SERVICE_URL=$(openstack catalog show compute -c endpoints -f value |
 export GLANCE_IMAGE_NAME=$(openstack image list | awk '/ cirros.*uec /{print $4}')
 export ADMIN_TOKEN=$(openstack token issue -c id -f value)
 
-# Run tests
+if [ -d $BASE/new/devstack ]; then
+    # NOTE(sileht): on swift job permissions are wrong, I don't known why
+    sudo chown -R tempest:stack $BASE/new/tempest
+    sudo chown -R tempest:stack $BASE/data/tempest
+
+    # Run tests with tempest
+    cd $BASE/new/tempest
+    set +e
+    sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_autoscaling --concurrency=$TEMPEST_CONCURRENCY
+    TEMPEST_EXIT_CODE=$?
+    set -e
+    if [[ $TEMPEST_EXIT_CODE != 0 ]]; then
+        # Collect and parse result
+        generate_testr_results
+        exit $TEMPEST_EXIT_CODE
+    fi
+
+    cd $CEILOMETER_DIR
+fi
+
+# Run tests with gabbi
 echo "Running telemetry integration test suite"
 set +e
-
 sudo -E -H -u ${STACK_USER:-${USER}} tox -eintegration
 EXIT_CODE=$?
 
