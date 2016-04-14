@@ -134,9 +134,9 @@ class Manager(manager.Manager):
     image_params.update(default_params)
 
     telemetry_params = {
-        'service': CONF.telemetry_plugin.catalog_type,
+        'service': CONF.telemetry.catalog_type,
         'region': CONF.identity.region,
-        'endpoint_type': CONF.telemetry_plugin.endpoint_type,
+        'endpoint_type': CONF.telemetry.endpoint_type,
     }
     telemetry_params.update(default_params)
 
