@@ -20,6 +20,7 @@ import uuid
 
 from gnocchiclient import exceptions as gnocchi_exc
 from gnocchiclient import utils as gnocchi_utils
+from keystoneauth1 import exceptions as ka_exceptions
 import mock
 from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
@@ -86,6 +87,7 @@ class DispatcherTest(base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
+        self.ks_client = ks_client
         self.conf.conf.dispatcher_gnocchi.filter_service_activity = True
 
     def test_config_load(self):
@@ -144,6 +146,14 @@ class DispatcherTest(base.BaseTestCase):
         self.samples[0]['project_id'] = (
             'a2d42c23-d518-46b6-96ab-3fba2e146859')
         self._do_test_activity_filter(1)
+
+    @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
+    def test_activity_gnocchi_project_not_found(self, logger):
+        self.ks_client.projects.find.side_effect = ka_exceptions.NotFound
+        self._do_test_activity_filter(2)
+        logger.warning.assert_called_with('gnocchi project not found in '
+                                          'keystone, ignoring the '
+                                          'filter_service_activity option')
 
     def test_activity_filter_match_swift_event(self):
         self.samples[0]['counter_name'] = 'storage.api.request'

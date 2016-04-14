@@ -23,6 +23,7 @@ import uuid
 from gnocchiclient import client
 from gnocchiclient import exceptions as gnocchi_exc
 from gnocchiclient import utils as gnocchi_utils
+from keystoneauth1 import exceptions as ka_exceptions
 from keystoneauth1 import session as ka_session
 from oslo_config import cfg
 from oslo_log import log
@@ -251,6 +252,12 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                 try:
                     project = self._ks_client.projects.find(
                         name=self.conf.dispatcher_gnocchi.filter_project)
+                except ka_exceptions.NotFound:
+                    LOG.warning(_LW('gnocchi project not found in keystone,'
+                                    ' ignoring the filter_service_activity '
+                                    'option'))
+                    self.filter_service_activity = False
+                    return None
                 except Exception:
                     LOG.exception('fail to retrieve user of Gnocchi service')
                     raise
@@ -264,7 +271,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                      and rd.match(sample['counter_name'])])
 
     def _is_gnocchi_activity(self, sample):
-        return (self.filter_service_activity and (
+        return (self.filter_service_activity and self.gnocchi_project_id and (
             # avoid anything from the user used by gnocchi
             sample['project_id'] == self.gnocchi_project_id or
             # avoid anything in the swift account used by gnocchi
