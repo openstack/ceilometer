@@ -353,6 +353,24 @@ tests:
       response_json_paths:
           $[0].aggregate.max: 3.0
 
+    - name: get sample statistics select aggregate multiple
+      url: /v2/meters/apples/statistics?aggregate.func=max&aggregate.func=count
+      response_json_paths:
+          $[0].aggregate.max: 3.0
+          $[0].aggregate.count: 4
+
+    - name: get sample statistics select aggregate bad function
+      url: /v2/meters/apples/statistics?aggregate.func=mmm
+      status: 400
+      response_strings:
+          - 'Invalid aggregation function: mmm'
+
+    - name: get sample statistics select aggregate good function and bad function
+      url: /v2/meters/apples/statistics?aggregate.func=max&aggregate.func=mmm
+      status: 400
+      response_strings:
+          - 'Invalid aggregation function: mmm'
+
 # limit meters results
 
     - name: get meters ulimited

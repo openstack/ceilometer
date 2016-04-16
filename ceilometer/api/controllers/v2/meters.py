@@ -39,6 +39,7 @@ from ceilometer.i18n import _
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample
 from ceilometer import storage
+from ceilometer.storage import base as storage_base
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
@@ -234,6 +235,11 @@ class Aggregate(base.Base):
 
     @staticmethod
     def validate(aggregate):
+        valid_agg = (storage_base.Connection.CAPABILITIES.get('statistics', {})
+                     .get('aggregation', {}).get('selectable', {}).keys())
+        if aggregate.func not in valid_agg:
+            msg = _('Invalid aggregation function: %s') % aggregate.func
+            raise base.ClientSideError(msg)
         return aggregate
 
     @classmethod
