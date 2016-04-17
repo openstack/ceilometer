@@ -1,13 +1,14 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
+# Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev26\n"
+"Project-Id-Version: ceilometer 6.0.1.dev52\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-04-07 17:36+0000\n"
+"POT-Creation-Date: 2016-04-12 18:26+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-21 04:18+0000\n"
+"PO-Revision-Date: 2016-04-07 03:34+0000\n"
 "Last-Translator: SeYeon Lee <sy_lee@kr.ibm.com>\n"
 "Language-Team: Korean (South Korea)\n"
 "Language: ko-KR\n"
@@ -16,12 +17,12 @@ msgstr ""
 
 msgid "Can't connect to keystone, assuming aodh is disabled and retry later."
 msgstr ""
-"keystone에 연결할 수 없습니다 . aodh가 사용되지 않는다고 가정하여 나중에 다"
+"Keystone에 연결할 수 없습니다 . Aodh가 사용되지 않는다고 가정하여 나중에 다"
 "시 시도합니다."
 
 msgid "Can't connect to keystone, assuming gnocchi is disabled and retry later"
 msgstr ""
-"keystone에 연결할 수 없습니다. gnocchi가 사용되지 않는다고 가정하여 나중에 다"
+"Keystone에 연결할 수 없습니다. Gnocchi가 사용되지 않는다고 가정하여 나중에 다"
 "시 시도합니다."
 
 msgid ""
@@ -60,7 +61,7 @@ msgid ""
 "Failed to parse date from set fields, both fields %(start)s and %(end)s must "
 "be datetime: %(err)s"
 msgstr ""
-"설정 필드에서 데이터를 구문 분석하는 데 실패, 두 필드 %(start)s 및 %(end)s은"
+"설정 필드에서 데이터를 구문 분석하는 데 실패, 두 필드 %(start)s 와 %(end)s은"
 "(는) 모두 datetime임: %(err)s"
 
 #, python-format
@@ -92,7 +93,7 @@ msgstr " %(name)s, %(service_type)s 서비스 건너뛰기는 keystone에 등록
 
 #, python-format
 msgid "Skipping duplicate meter definition %s"
-msgstr "중복 미터 정의 %s 건너뛰기"
+msgstr "중복 측정 정의 %s 건너뛰기"
 
 msgid ""
 "Timedelta plugin is required two timestamp fields to create timedelta value."
@@ -104,14 +105,14 @@ msgid ""
 "ceilometer-api started with aodh enabled. Alarms URLs will be redirected to "
 "aodh endpoint."
 msgstr ""
-"aodh가 사용된 상태로 ceilometer-api가 시작되었습니다. 알람 URL이 aodh 엔드포"
+"Aodh가 사용된 상태로 ceilometer-api가 시작되었습니다. 알람 URL이 aodh 엔드포"
 "인트로 경로가 재지정됩니다."
 
 msgid ""
 "ceilometer-api started with gnocchi enabled. The resources/meters/samples "
 "URLs are disabled."
 msgstr ""
-"gnocchi를 사용한 상태로 ceilometer-api가 시작되었습니다. 자원/미터/샘플 URL"
+"Gnocchi를 사용한 상태로 ceilometer-api가 시작되었습니다. 자원/측정/샘플 URL"
 "을 사용하지 않습니다."
 
 #, python-format

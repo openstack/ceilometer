@@ -6,20 +6,17 @@
 # Carsten Duch <cad@teuto.net>, 2014
 # Christian Berendt <berendt@b1-systems.de>, 2014
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
-# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
-# Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
-# Monika Wolf <vcomas3@de.ibm.com>, 2016. #zanata
-# Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
+# Frank Kloeker <eumel@arcor.de>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev26\n"
+"Project-Id-Version: ceilometer 6.0.1.dev52\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-04-07 17:36+0000\n"
+"POT-Creation-Date: 2016-04-12 18:26+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-04 05:03+0000\n"
+"PO-Revision-Date: 2016-04-04 05:01+0000\n"
 "Last-Translator: Monika Wolf <vcomas3@de.ibm.com>\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -490,6 +487,11 @@ msgstr "XenAPI nicht installiert"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "YAML-Fehler beim Lesen von Definitionsdatei %(file)s."
+
+msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
+msgstr ""
+"Alarm-URLs sind nicht verfügbar, wenn Aodh inaktiviert oder nicht verfügbar "
+"ist."
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"

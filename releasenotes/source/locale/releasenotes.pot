@@ -1,0 +1,640 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2015, Ceilometer Developers
+# This file is distributed under the same license as the Ceilometer Release Notes package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Ceilometer Release Notes 6.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-17 07:04+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# ad4a633fa0434d7e98c6eead7d29c231
+#: ../../<reno.sphinxext>:1
+msgid "5.0.1"
+msgstr ""
+
+# 5057732c23ea4eaba62b3e9423d8850e
+#: ../../<reno.sphinxext>:1
+msgid "5.0.2"
+msgstr ""
+
+# 69e1c662163c423292e3dc931010d956
+#: ../../<reno.sphinxext>:1
+msgid "5.0.2-23"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# fa370727455d41fd83becd4b6bcf5b24
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# bbfffd47fa374cbaacb7e1e712c1f824
+#: ../../<reno.sphinxext>:1
+msgid "6.0.0"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 6fe0b01cba52475785723874d8ef356f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 590fa40547ea4c57b4ea3a8ecbd0c7f8
+#: ../../<reno.sphinxext>:1
+msgid ""
+"A dogpile.cache supported backend is required to enable cache. Additional "
+"configuration `options <http://docs.openstack.org/developer/oslo.cache/opts."
+"html#cache>`_ are also required."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 9b7cd9c69d564cbcb1c39a249767416f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 248ae82df625446a98d3b044443cb5c2
+#: ../../<reno.sphinxext>:1
+msgid "Add support for Keystone v3 authentication"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f2769c3dd6254fbfb4367ca12feabe20
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 5dda21534e744095ba356f71109e21f3
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Add support for batch processing of messages from queue. This will allow the "
+"collector and notification agent to grab multiple messages per thread to "
+"enable more efficient processing."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 12cfee50aaf542d18dfd69e25d439e0b
+# 0bd05af39e8d410bad34231d7f801750
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# c5d7a613ec2543dca0944e7e38911a69
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d3a224b540794f2db3766cc0e1ab19fe
+#: ../../<reno.sphinxext>:1
+msgid "Bug Fixes"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# fc340b7df2ee4f99b29df1ac8e3b8052
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 3bc453e9288d4b6cb66079bec491611d
+#: ../../<reno.sphinxext>:1
+msgid ""
+"By default, Ceilometer will poll the v2 API. To poll legacy v1 API, add "
+"neutron_lbaas_version=v1 option to configuration file."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 521b93cfda0c478cb64a0b8b4c964d8e
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 4a0da20e3358415da5aeb42b3c87ac17
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Ceilometer alarms code is now fully removed from code base. Equivalent "
+"functionality is handled by Aodh."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# a215d3a62a31409cb5bd0266d16e8530
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 6b936bd842814eb9a5b2a12c3f4be2b5
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Configure individual dispatchers by specifying meter_dispatchers and "
+"event_dispatchers in configuration file."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 28874bcd680f46468a3e07c8054c2571
+# 75f4cd565a46489a99be9ed51cd6be60
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 683f2fb79ed4498ca45274482d6398b4
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 610b40b16f15461ebc4fea548ad62c3e
+#: ../../<reno.sphinxext>:1
+msgid "Critical Issues"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# cd1cd44b17ff4aaebe0462d459f75267
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# e4457076dcf54bac914eae561fea0326
+#: ../../<reno.sphinxext>:1
+msgid "Fix samples from Heat to map to correct Gnocchi resource type"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# c1d84be0e64e41cc95d597e41a6ba024
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 788e746fd8374de78d964c1f11e1755a
+#: ../../<reno.sphinxext>:1
+msgid "Gnocchi dispatcher now uses client rather than direct http requests"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 988be0f1dca44901b1186487c3d284db
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 6aced336397849eb9b90ff7997336671
+#: ../../<reno.sphinxext>:1
+msgid "Known Issues"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# eddd0266abc84e96ac6f84003a4fdf51
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 8b4ec9c463a048769c5752e4c6a95d5c
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Neutron API is not designed to be polled against. When polling against "
+"Neutron is enabled, Ceilometer's polling agents may generage a significant "
+"load against the Neutron API. It is recommended that a dedicated API be "
+"enabled for polling while Neutron's API is improved to handle polling."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 94b5b1c37be54e9e9148e5da13a9218f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# fec37779655d45b78936bdd788169ac9
+#: ../../<reno.sphinxext>:1
+msgid "New Features"
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 62938ed49bf04cbe80dea6077543fb28
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 9c771f6f5252415c88eecbe0a6a262a1
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 9dd60429ae184b6bbe49b6a6c393f028
+#: ../../<reno.sphinxext>:1
+msgid "Other Notes"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f5222019e5de44628194beed0a491be7
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# ae585e3e7335459b8685b8b651712517
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Pipeline.yaml files for agents should be updated to notifier:// or udp:// "
+"publishers. The rpc:// publisher is no longer supported."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# a14789d9baa5414f96e46c57b5d82763
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f5dc71493f064b829668e2dc15856399
+#: ../../<reno.sphinxext>:1
+msgid ""
+"RPC collector support is dropped. The queue-based notifier publisher and "
+"collector was added as the recommended alternative as of Icehouse cycle."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# e6b84fd70e6547f6b4de75a54cacd7e9
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# ca1e7cc8d33e4bebb29bd9adc4176903
+#: ../../<reno.sphinxext>:1
+msgid "Remove eventlet from Ceilometer in favour of threaded approach"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 0cbc082f0da94e8b812b0d5dc0816bfb
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 55ec293c7be14e0bb37d210977195ca9
+#: ../../<reno.sphinxext>:1
+msgid "Run db-sync to add new indices."
+msgstr ""
+
+# 619f605a851144258c9669c31ae495e3
+#: ../../<reno.sphinxext>:1
+msgid "Start using reno to manage release notes."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# b7c987502d0f4dfabb99b424b59ef146
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 0ad54f6954cb4479b423019550fdb7f1
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Support for CADF-only payload in HTTP dispatcher is dropped as audit "
+"middleware in pyCADF was dropped in Kilo cycle."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# e5e5633798804163b6b504a7cc63ee49
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f64409d4c83a4472b028642061453ddc
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Support for CORS is added. More information can be found [`here <http://"
+"specs.openstack.org/openstack/openstack-specs/specs/cors-support.html>`_]"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# faee2cf5522a4557a7ad2dc706d658a1
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 3831587050094c078d66e346ccc426c8
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Support for polling Neutron's LBaaS v2 API was added as v1 API in Neutron is "
+"deprecated. The same metrics are available between v1 and v2."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d2c492094c8b4787a34d55e1be6a730f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# cb75c255114e42868cc1e6af514ce3cd
+#: ../../<reno.sphinxext>:1
+msgid ""
+"Support resource caching in Gnocchi dispatcher to improve write performance "
+"to avoid additional queries."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 39fcbe4563c24070ba7140294900b7a3
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 2d8a5183972e49c3bfb7c8dbf2c2a510
+#: ../../<reno.sphinxext>:1
+msgid ""
+"The api-paste.ini file can be modified to include or exclude the CORs "
+"middleware. Additional configurations can be made to middleware as well."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d6e7356c9cc641df916b8fbb25110076
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# fa3759e22c934fe8a651bd3d77cd0f82
+#: ../../<reno.sphinxext>:1
+msgid ""
+"The options `requeue_event_on_dispatcher_error' and "
+"`requeue_sample_on_dispatcher_error' have been enabled and removed."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d22d7e90920e4a599ae07fca526106fe
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 4aac973bea324ba9823d87861bcc4076
+#: ../../<reno.sphinxext>:1
+msgid ""
+"The previous configuration options default for "
+"`requeue_sample_on_dispatcher_error' and `requeue_event_on_dispatcher_error' "
+"allowed to lose data very easily: if the dispatcher failed to send data to "
+"the backend (e.g. Gnocchi is down), then the dispatcher raised and the data "
+"were lost forever. This was completely unacceptable, and nobody should be "
+"able to configure Ceilometer in that way.\""
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 44cfbf59ada44653b17aadece8828f00
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# c3682b3fd80041d5a98af9c49549f230
+#: ../../<reno.sphinxext>:1
+msgid ""
+"To minimise load on Nova API, an additional configuration option was added "
+"to control discovery interval vs metric polling interval. If "
+"resource_update_interval option is configured in compute section, the "
+"compute agent will discover new instances based on defined interval. The "
+"agent will continue to poll the discovered instances at the interval defined "
+"by pipeline."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# a12f2239b6bf48a8a0a6dd0bfd2afe88
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 90ea1b2a34704d6bbb389af063db8743
+#: ../../<reno.sphinxext>:1
+msgid ""
+"To utilize the new policy support. The policy.json file should be updated "
+"accordingly. The pre-existing policy.json file will continue to function as "
+"it does if policy changes are not required."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# ce5ca6c8b64548a58a1851e91bbb77a7
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f5a78847d08b402aa47098559489d27c
+#: ../../<reno.sphinxext>:1
+msgid "Upgrade Notes"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# a2b54198d36b4a8ea59714811c40c815
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# edb810511be349cf8dd7908249f538d4
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1254800 <https://bugs.launchpad.net/ceilometer/+bug/1254800>`_] Add "
+"better support to catch race conditions when creating event_types"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 3c9edbbe98924bd4bb92c9265dce43a6
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 7c75220caca645ceb143be51418d2f66
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1388680 <https://bugs.launchpad.net/ceilometer/+bug/1388680>`_] "
+"Suppose ability to query for None value when using SQL backend."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 2d2e2f0595db4cf1964f07e85b3e5224
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# eda0fcae54f044cc81e2061564d6e3b6
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1480333 <https://bugs.launchpad.net/ceilometer/+bug/1480333>`_] "
+"Support ability to configure collector to capture events or meters mutally "
+"exclusively, rather than capturing both always."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 7341e67c9f02414395512e3cf52d5da6
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 2562f40f88dc4b0abba3f5e826308c28
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1504495 <https://bugs.launchpad.net/ceilometer/+bug/1504495>`_] "
+"Configure ceilometer to handle policy.json rules when possible."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# c9274cab70f643dd8978d6665031607f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 10cb131f17234268843c1dcbacd63449
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1506738 <https://bugs.launchpad.net/ceilometer/+bug/1506738>`_] [`bug "
+"1509677 <https://bugs.launchpad.net/ceilometer/+bug/1509677>`_] Optimise SQL "
+"backend queries to minimise query load"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 5381bf77182d4633a3b5a23595336eae
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 630aca50eebf4408bd9a525291c4c993
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1506959 <https://bugs.launchpad.net/ceilometer/+bug/1506959>`_] Add "
+"support to query unique set of meter names rather than meters associated "
+"with each resource. The list is available by adding unique=True option to "
+"request."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 1a6d7ba8b4db43b0affa0bc5e9094344
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# cc16a410920d4aefac0e83000b0d5799
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1513731 <https://bugs.launchpad.net/ceilometer/+bug/1513731>`_] Add "
+"support for hardware cpu_util in snmp.yaml"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 816f0ba9e7ae4ca58bc5370b0f8f456b
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d5fdc7cee1e5487f8eb4f76e8bb4df08
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1518338 <https://bugs.launchpad.net/ceilometer/+bug/1518338>`_] Add "
+"support for storing SNMP metrics in Gnocchi.This functionality requires "
+"Gnocchi v2.1.0 to be installed."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 0cad7d09c9764dc79d044d3f0b37386e
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# ae0e27a4a63c40069e9072f9643134e0
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f6e41699d3994a448ce0cb361dc4e002
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1519767 <https://bugs.launchpad.net/ceilometer/+bug/1519767>`_] "
+"fnmatch functionality in python <= 2.7.9 is not threadsafe. this issue and  "
+"its potential race conditions are now patched."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 1062da9f9cd2417caeb68245ad194d5f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 5391951525624a708d2974817beacac1
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1523124 <https://bugs.launchpad.net/ceilometer/+bug/1523124>`_] Fix "
+"gnocchi dispatcher to support UDP collector"
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# bc17f345609b43fc89e260a96ff5b0d9
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 4fbb23db769143b9beaab3db1d70202c
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1526793 <https://bugs.launchpad.net/ceilometer/+bug/1526793>`_] "
+"Additional indices were added to better support querying of event data."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 5e85212adaf140ba99e6eb0cd759f6be
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d9a53dff28cf4588817823634a1d4823
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1530793 <https://bugs.launchpad.net/ceilometer/+bug/1530793>`_] "
+"network.services.lb.incoming.bytes meter was previous set to incorrect type. "
+"It should be a gauge meter."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 8c385bea62b141718dd20def2397a639
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# decdff603f2b4b58a44594de8907d0eb
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 10e2ba995dae4785949f0a064508da56
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1531626 <https://bugs.launchpad.net/ceilometer/+bug/1531626>`_] Ensure "
+"aggregator transformer timeout is honoured if size is not provided."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# dae0f98d1ff744aeb939e36cb1a8188f
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# c8da02e2a46c4d9fbbe4ec4890f0f0be
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1532661 <https://bugs.launchpad.net/ceilometer/+bug/1532661>`_] Fix "
+"statistics query failures due to large numbers stored in MongoDB. Data from "
+"MongoDB is returned as Int64 for big numbers when int and float types are "
+"expected. The data is cast to appropriate type to handle large data."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 8572c072746042e0884fe9144c35bdd4
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# b3f63493a6284ee297881adf5153872b
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 11d7a1f9d8584baba3b345f50e5214b5
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1533787 <https://bugs.launchpad.net/ceilometer/+bug/1533787>`_] Fix an "
+"issue where agents are not properly getting registered to group when "
+"multiple notification agents are deployed. This can result in bad "
+"transformation as the agents are not coordinated. It is still recommended to "
+"set heartbeat_timeout_threshold = 0 in [oslo_messaging_rabbit] section when "
+"deploying multiple agents."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# dd448a3e2124425e89ed052d1ddb02b7
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 85c71517c7f34b6b991928d3b111e5a9
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1536338 <https://bugs.launchpad.net/ceilometer/+bug/1536338>`_] Patch "
+"was added to fix the broken floatingip pollster that polled data from nova "
+"api, but since the nova api filtered the data by tenant, ceilometer was not "
+"getting any data back. The fix changes the pollster to use the neutron api "
+"instead to get the floating ip info."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# d4f434917f9847c1814c1ff3800193e7
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 0e6a5e320c4b46819dabb3e9e1ba605b
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 67c67084c735487385ab0553fa1aae8a
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1536498 <https://bugs.launchpad.net/ceilometer/+bug/1536498>`_] Patch "
+"to fix duplicate meter definitions causing duplicate samples. If a duplicate "
+"is found, log a warning and skip the meter definition. Note that the first "
+"occurance of a meter will be used and any following duplicates will be "
+"skipped from processing."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 3feea741271f4ac09427ecee71bf9c1b
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 6e9f2453c9f84b5e9974ac8344f3df06
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1536699 <https://bugs.launchpad.net/ceilometer/+bug/1536699>`_] Patch "
+"to fix volume field lookup in meter definition file. In case the field is "
+"missing in the definition, it raises a keyerror and aborts. Instead we "
+"should skip the missing field meter and continue with the rest of the "
+"definitions."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# b77ace94ff674756a792dd47d939c7ca
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# b77e8116dada45938d139d6e30667c5a
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1539163 <https://bugs.launchpad.net/ceilometer/+bug/1539163>`_] Add "
+"ability to define whether to use first or last timestamps when aggregating "
+"samples. This will allow more flexibility when chaining transformers."
+msgstr ""
+
+# #-#-#-#-#  liberty.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 7023cf97b33c4eed8b471564ddff29be
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 73d2916bfd0347cd891a1ab76b35f9b1
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 7fc725db11d646afbf8ddcdea41a86e0
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1542189 <https://bugs.launchpad.net/ceilometer/+bug/1542189>`_] Handle "
+"malformed resource definitions in gnocchi_resources.yaml gracefully. "
+"Currently we raise an exception once we hit a bad resource and skip the "
+"rest. Instead the patch skips the bad resource and proceeds with rest of the "
+"definitions."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 078b9e4624734d8993e638fe23548803
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 69192ba770be47da8b8bdea6354ca96a
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 1550436 <https://bugs.launchpad.net/ceilometer/+bug/1550436>`_] Cache "
+"json parsers when building parsing logic to handle event and meter "
+"definitions. This will improve agent startup and setup time."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# e43ee287f0aa4b0d863ca1655e2c9677
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 6a48b5b879e34841bedf1f02ea2ad195
+#: ../../<reno.sphinxext>:1
+msgid ""
+"[`bug 255569 <https://bugs.launchpad.net/ceilometer/+bug/255569>`_] Fix "
+"caching support in Gnocchi dispatcher. Added better locking support to "
+"enable smoother cache access."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# c88ae5bd260847398d2583d1aae0513c
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 653324066ed749c1a3e23027d51fbf08
+#: ../../<reno.sphinxext>:1
+msgid ""
+"audit middleware in keystonemiddleware library should be used for similar "
+"support."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# e6e02509f85e49d4a98dd18e9156661a
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 5187a7c34d454853ba50d6636b439c57
+#: ../../<reno.sphinxext>:1
+msgid ""
+"batch_size and batch_timeout configuration options are added to both "
+"[notification] and [collector] sections of configuration. The batch_size "
+"controls the number of messages to grab before processing. Similarly, the "
+"batch_timeout defines the wait time before processing."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 9444dc61a43843aebbb7788573087111
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# 9198e4a6ef024ba0a6c2a16d8b7b449f
+#: ../../<reno.sphinxext>:1
+msgid "gnocchi_resources.yaml in Ceilometer should be updated."
+msgstr ""
+
+# #-#-#-#-#  mitaka.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# f1e633ff97e442ddb07564b93ce09420
+# #-#-#-#-#  unreleased.pot (Ceilometer Release Notes 6.0.1)  #-#-#-#-#
+# ab9f5214efc84dbeb01d877961c1d018
+#: ../../<reno.sphinxext>:1
+msgid "gnocchiclient library is now a requirement if using ceilometer+gnocchi."
+msgstr ""
+
+# 5b4828b2322743788127be4aacd16bca
+#: ../source/index.rst:3
+msgid "Ceilometer Release Notes"
+msgstr ""
+
+# 5f8591d88e1c4091a3706bd304eb1602
+#: ../source/liberty.rst:3
+msgid "Liberty Series Release Notes"
+msgstr ""
+
+# dd92d55bf21e40038961ba9fb2041d68
+#: ../source/mitaka.rst:3
+msgid "Mitaka Series Release Notes"
+msgstr ""
+
+# b89d7ca4ef604acc86d4c3f92cc8c68b
+#: ../source/unreleased.rst:3
+msgid "Current Series Release Notes"
+msgstr ""
