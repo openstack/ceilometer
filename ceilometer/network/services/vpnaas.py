@@ -80,6 +80,7 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
               'vpnservice_id',
               'mtu',
               'admin_state_up',
+              'status',
               'tenant_id'
               ]
 
