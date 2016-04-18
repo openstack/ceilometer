@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev26\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-04-08 06:42+0000\n"
+"Project-Id-Version: ceilometer 6.0.1.dev57\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-04-18 07:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgid ""
 "will be dropped"
 msgstr ""
 
-#: ceilometer/agent/manager.py:460
+#: ceilometer/agent/manager.py:461
 #, python-format
 msgid "Skipping %(name)s, %(service_type)s service is not registered in keystone"
 msgstr ""
@@ -108,12 +108,18 @@ msgstr ""
 msgid "event signature invalid, discarding event: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:206
+#: ceilometer/dispatcher/gnocchi.py:207
 #, python-format
 msgid "unable to configure oslo_cache: %s"
 msgstr ""
 
-#: ceilometer/dispatcher/gnocchi.py:318
+#: ceilometer/dispatcher/gnocchi.py:256
+msgid ""
+"gnocchi project not found in keystone, ignoring the "
+"filter_service_activity option"
+msgstr ""
+
+#: ceilometer/dispatcher/gnocchi.py:325
 #, python-format
 msgid "metric %s is not handled by Gnocchi"
 msgstr ""
