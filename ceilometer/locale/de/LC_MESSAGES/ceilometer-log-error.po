@@ -1,13 +1,14 @@
+# Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Monika Wolf <vcomas3@de.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev6\n"
+"Project-Id-Version: ceilometer 6.0.1.dev52\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-04 20:29+0000\n"
+"POT-Creation-Date: 2016-04-12 18:26+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-03 03:37+0000\n"
+"PO-Revision-Date: 2016-03-03 03:36+0000\n"
 "Last-Translator: Monika Wolf <vcomas3@de.ibm.com>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -91,20 +92,6 @@ msgstr "Das Ereignis konnte nicht aufgezeichnet werden:  %s"
 #, python-format
 msgid "Failed to record metering data: %s"
 msgstr "Messdaten wurden nicht aufgezeichnet: %s"
-
-#, fuzzy
-msgid "Failed to retry to send sample data with max_retry times"
-msgstr ""
-"Fehler bei dem Wiederholungsversuch, Beispieldaten mit max_retry times zu "
-"senden."
-
-#, fuzzy
-msgid ""
-"Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: Current agent is "
-"not part of group and cannot take tasks"
-msgstr ""
-"Gruppen-ID: %{group_id}s, Mitglieder: %{members}s, Ich: %{me}s: Der aktuelle "
-"Agent ist nicht Teil der Gruppe und kann keine Tasks übernehmen."
 
 #, python-format
 msgid "Invalid type %s specified"

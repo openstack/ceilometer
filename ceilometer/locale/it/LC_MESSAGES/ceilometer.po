@@ -4,20 +4,17 @@
 #
 # Translators:
 # Stefano Maffulli <smaffulli@gmail.com>, 2013
-# Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
-# Alessandra <alessandra@translated.net>, 2016. #zanata
-# Remo Mattei <remo@rm.ht>, 2016. #zanata
-# Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
+# Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev26\n"
+"Project-Id-Version: ceilometer 6.0.1.dev52\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-04-07 17:36+0000\n"
+"POT-Creation-Date: 2016-04-12 18:26+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-07 03:50+0000\n"
-"Last-Translator: Remo Mattei <remo@rm.ht>\n"
+"PO-Revision-Date: 2016-04-12 02:04+0000\n"
+"Last-Translator: Alessandra <alessandra@translated.net>\n"
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -109,7 +106,7 @@ msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
 msgstr ""
-"Impossibile ispezionare i dati dell'istanza = <nome=%(name)s, id=%(id)s>, "
+"Impossibile ispezionare i dati dell'istanza  <name=%(name)s, id=%(id)s>, "
 "stato dominio SHUTOFF."
 
 #, python-format
@@ -125,8 +122,8 @@ msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
 "not get info from libvirt."
 msgstr ""
-"Impossibile ispezionare l'utilizzo della memoria da parte dell'istanza = "
-"<nome=%(name)s, id=%(id)s>, impossibile ottenere informazioni da libvirt."
+"Impossibile ispezionare l'utilizzo della memoria da parte dell'istanza <name="
+"%(name)s, id=%(id)s>, impossibile ottenere informazioni da libvirt."
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
