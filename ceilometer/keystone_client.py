@@ -15,7 +15,6 @@
 
 import os
 
-from keystoneauth1 import identity as ka_identity
 from keystoneauth1 import loading as ka_loading
 from keystoneclient.v3 import client as ks_client_v3
 from oslo_config import cfg
@@ -77,63 +76,3 @@ def register_keystoneauth_opts(conf):
             cfg.DeprecatedOpt('os-cacert', group=CFG_GROUP),
             cfg.DeprecatedOpt('os-cacert', group="DEFAULT")]
         })
-    conf.set_default("auth_type", default="password-ceilometer-legacy",
-                     group=CFG_GROUP)
-
-
-def setup_keystoneauth(conf):
-    if conf[CFG_GROUP].auth_type == "password-ceilometer-legacy":
-        LOG.warning("Value 'password-ceilometer-legacy' for '[%s]/auth_type' "
-                    "is deprecated. And will be removed in Ceilometer 7.0. "
-                    "Use 'password' instead.",
-                    CFG_GROUP)
-
-    ka_loading.load_auth_from_conf_options(conf, CFG_GROUP)
-
-
-class LegacyCeilometerKeystoneLoader(ka_loading.BaseLoader):
-    @property
-    def plugin_class(self):
-        return ka_identity.V2Password
-
-    def get_options(self):
-        options = super(LegacyCeilometerKeystoneLoader, self).get_options()
-        options.extend([
-            ka_loading.Opt(
-                'os-username',
-                default=os.environ.get('OS_USERNAME', 'ceilometer'),
-                help='User name to use for OpenStack service access.'),
-            ka_loading.Opt(
-                'os-password',
-                secret=True,
-                default=os.environ.get('OS_PASSWORD', 'admin'),
-                help='Password to use for OpenStack service access.'),
-            ka_loading.Opt(
-                'os-tenant-id',
-                default=os.environ.get('OS_TENANT_ID', ''),
-                help='Tenant ID to use for OpenStack service access.'),
-            ka_loading.Opt(
-                'os-tenant-name',
-                default=os.environ.get('OS_TENANT_NAME', 'admin'),
-                help='Tenant name to use for OpenStack service access.'),
-            ka_loading.Opt(
-                'os-auth-url',
-                default=os.environ.get('OS_AUTH_URL',
-                                       'http://localhost:5000/v2.0'),
-                help='Auth URL to use for OpenStack service access.'),
-        ])
-        return options
-
-    def load_from_options(self, **kwargs):
-        options_map = {
-            'os_auth_url': 'auth_url',
-            'os_username': 'username',
-            'os_password': 'password',
-            'os_tenant_name': 'tenant_name',
-            'os_tenant_id': 'tenant_id',
-        }
-        identity_kwargs = dict((options_map[o.dest],
-                                kwargs.get(o.dest) or o.default)
-                               for o in self.get_options()
-                               if o.dest in options_map)
-        return self.plugin_class(**identity_kwargs)
