@@ -242,10 +242,10 @@ class TestMeterDefinition(test.BaseTestCase):
         try:
             notifications.MeterDefinition(cfg, mock.Mock())
         except declarative.DefinitionException as e:
-            self.assertEqual("Required fields ['name', 'type', 'event_type',"
-                             " 'unit', 'volume', 'resource_id']"
-                             " not specified",
-                             encodeutils.exception_to_unicode(e))
+            self.assertIn("Required fields ['name', 'type', 'event_type',"
+                          " 'unit', 'volume', 'resource_id']"
+                          " not specified",
+                          encodeutils.exception_to_unicode(e))
 
     def test_bad_type_cfg_definition(self):
         cfg = dict(name="test", type="foo", event_type="bar.create",
@@ -254,8 +254,8 @@ class TestMeterDefinition(test.BaseTestCase):
         try:
             notifications.MeterDefinition(cfg, mock.Mock())
         except declarative.DefinitionException as e:
-            self.assertEqual("Invalid type foo specified",
-                             encodeutils.exception_to_unicode(e))
+            self.assertIn("Invalid type foo specified",
+                          encodeutils.exception_to_unicode(e))
 
 
 class TestMeterProcessing(test.BaseTestCase):
@@ -312,9 +312,9 @@ class TestMeterProcessing(test.BaseTestCase):
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
         self.assertEqual(2, len(self.handler.definitions))
-        LOG.error.assert_called_with(
-            "Error loading meter definition : "
-            "Invalid type bad_type specified")
+        args, kwargs = LOG.error.call_args_list[0]
+        self.assertEqual("Error loading meter definition: %s", args[0])
+        self.assertTrue(args[1].endswith("Invalid type bad_type specified"))
 
     def test_jsonpath_values_parsed(self):
         cfg = yaml.dump(

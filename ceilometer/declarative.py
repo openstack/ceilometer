@@ -26,8 +26,21 @@ LOG = log.getLogger(__name__)
 
 class DefinitionException(Exception):
     def __init__(self, message, definition_cfg):
-        super(DefinitionException, self).__init__(message)
-        self.definition_cfg = definition_cfg
+        msg = '%s %s: %s' % (self.__class__.__name__, definition_cfg, message)
+        super(DefinitionException, self).__init__(msg)
+        self.brief_message = message
+
+
+class MeterDefinitionException(DefinitionException):
+    pass
+
+
+class EventDefinitionException(DefinitionException):
+    pass
+
+
+class ResourceDefinitionException(DefinitionException):
+    pass
 
 
 class Definition(object):

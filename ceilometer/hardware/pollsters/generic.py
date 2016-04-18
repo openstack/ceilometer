@@ -40,17 +40,6 @@ cfg.CONF.register_opts(OPTS, group='hardware')
 LOG = log.getLogger(__name__)
 
 
-class MeterDefinitionException(Exception):
-    def __init__(self, message, definition_cfg):
-        super(MeterDefinitionException, self).__init__(message)
-        self.message = message
-        self.definition_cfg = definition_cfg
-
-    def __str__(self):
-        return '%s %s: %s' % (self.__class__.__name__,
-                              self.definition_cfg, self.message)
-
-
 class MeterDefinition(object):
     required_fields = ['name', 'unit', 'type']
 
@@ -65,10 +54,10 @@ class MeterDefinition(object):
                 LOG.warning(_LW("Ignore unrecognized field %s"), fname)
         for fname in self.required_fields:
             if not getattr(self, fname, None):
-                raise MeterDefinitionException(
+                raise declarative.MeterDefinitionException(
                     _LE("Missing field %s") % fname, self.cfg)
         if self.type not in sample.TYPES:
-            raise MeterDefinitionException(
+            raise declarative.MeterDefinitionException(
                 _LE("Unrecognized type value %s") % self.type, self.cfg)
 
 
@@ -223,8 +212,7 @@ def load_definition(config_def):
         try:
             meter = MeterDefinition(meter_def)
             mappings[meter.name] = meter
-        except MeterDefinitionException as me:
-            errmsg = (_LE("Error loading meter definition : %(err)s")
-                      % dict(err=me.message))
-            LOG.error(errmsg)
+        except declarative.DefinitionException as e:
+            errmsg = _LE("Error loading meter definition: %s")
+            LOG.error(errmsg, e.brief_message)
     return mappings

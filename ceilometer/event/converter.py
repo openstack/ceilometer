@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from debtcollector import moves
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import fnmatch
@@ -44,12 +43,6 @@ cfg.CONF.register_opts(OPTS, group='event')
 
 LOG = log.getLogger(__name__)
 
-EventDefinitionException = moves.moved_class(declarative.DefinitionException,
-                                             'EventDefinitionException',
-                                             __name__,
-                                             version=6.0,
-                                             removal_version="?")
-
 
 class TraitDefinition(declarative.Definition):
     def __init__(self, name, trait_cfg, plugin_manager):
@@ -58,7 +51,7 @@ class TraitDefinition(declarative.Definition):
                      if isinstance(trait_cfg, dict) else 'text')
         self.trait_type = models.Trait.get_type_by_name(type_name)
         if self.trait_type is None:
-            raise declarative.DefinitionException(
+            raise declarative.EventDefinitionException(
                 _("Invalid trait type '%(type)s' for trait %(trait)s")
                 % dict(type=type_name, trait=name), self.cfg)
 
@@ -102,7 +95,7 @@ class EventDefinition(object):
             event_type = definition_cfg['event_type']
             traits = definition_cfg['traits']
         except KeyError as err:
-            raise declarative.DefinitionException(
+            raise declarative.EventDefinitionException(
                 _("Required field %s not specified") % err.args[0], self.cfg)
 
         if isinstance(event_type, six.string_types):

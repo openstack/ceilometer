@@ -73,12 +73,6 @@ def cache_key_mangler(key):
     return uuid.uuid5(CACHE_NAMESPACE, key).hex
 
 
-class ResourcesDefinitionException(Exception):
-    def __init__(self, message, definition_cfg):
-        msg = '%s %s: %s' % (self.__class__.__name__, definition_cfg, message)
-        super(ResourcesDefinitionException, self).__init__(msg)
-
-
 class ResourcesDefinition(object):
 
     MANDATORY_FIELDS = {'resource_type': six.string_types,
@@ -90,10 +84,10 @@ class ResourcesDefinition(object):
 
         for field, field_type in self.MANDATORY_FIELDS.items():
             if field not in self.cfg:
-                raise declarative.DefinitionException(
+                raise declarative.ResourceDefinitionException(
                     _LE("Required field %s not specified") % field, self.cfg)
             if not isinstance(self.cfg[field], field_type):
-                raise declarative.DefinitionException(
+                raise declarative.ResourceDefinitionException(
                     _LE("Required field %(field)s should be a %(type)s") %
                     {'field': field, 'type': field_type}, self.cfg)
 

@@ -44,8 +44,8 @@ class TestMeterDefinition(test_base.BaseTestCase):
         cfg = dict(name='test', type='gauge')
         try:
             generic.MeterDefinition(cfg)
-        except generic.MeterDefinitionException as e:
-            self.assertEqual("Missing field unit", e.message)
+        except declarative.MeterDefinitionException as e:
+            self.assertEqual("Missing field unit", e.brief_message)
 
     def test_config_invalid_field(self):
         cfg = dict(name='test',
@@ -62,8 +62,9 @@ class TestMeterDefinition(test_base.BaseTestCase):
                    snmp_inspector={})
         try:
             generic.MeterDefinition(cfg)
-        except generic.MeterDefinitionException as e:
-            self.assertEqual("Unrecognized type value invalid", e.message)
+        except declarative.MeterDefinitionException as e:
+            self.assertEqual("Unrecognized type value invalid",
+                             e.brief_message)
 
     @mock.patch('ceilometer.hardware.pollsters.generic.LOG')
     def test_bad_metric_skip(self, LOG):
@@ -82,7 +83,7 @@ class TestMeterDefinition(test_base.BaseTestCase):
         data = generic.load_definition(cfg)
         self.assertEqual(2, len(data))
         LOG.error.assert_called_with(
-            "Error loading meter definition : "
+            "Error loading meter definition: %s",
             "Unrecognized type value invalid")
 
 
