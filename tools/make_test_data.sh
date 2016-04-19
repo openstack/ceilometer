@@ -16,10 +16,10 @@ else
 fi
 
 # Convert a possible project name to an id, if we have
-# keystone installed.
-if which keystone >/dev/null
+# openstack cli installed.
+if which openstack >/dev/null
 then
-    project=$(keystone tenant-list | grep " $project_name " | cut -f2 -d'|' | cut -f2 -d' ')
+    project=$(openstack project show "$project_name" -c id -f value)
 else
     # Assume they gave us the project id as argument.
     project="$project_name"
