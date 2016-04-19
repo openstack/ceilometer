@@ -109,7 +109,7 @@ class NotificationService(service_base.BaseService):
             notifiers.append(oslo_messaging.Notifier(
                 transport,
                 driver=cfg.CONF.publisher_notifier.telemetry_driver,
-                publisher_id='ceilometer.notification',
+                publisher_id=pipe.name,
                 topic='%s-%s-%s' % (self.NOTIFICATION_IPC, pipe.name, x)))
         return notifiers
 
@@ -145,7 +145,12 @@ class NotificationService(service_base.BaseService):
         super(NotificationService, self).start()
         self.partition_coordinator = None
         self.coord_lock = threading.Lock()
-        self.listeners, self.pipeline_listeners = [], []
+
+        self.listeners = []
+
+        # NOTE(kbespalov): for the pipeline queues used a single amqp host
+        # hence only one listener is required
+        self.pipeline_listener = None
 
         self.pipeline_manager = pipeline.setup_pipeline()
 
@@ -172,7 +177,6 @@ class NotificationService(service_base.BaseService):
         self.event_pipe_manager = self._get_event_pipeline_manager(
             self.transport)
 
-        self.listeners, self.pipeline_listeners = [], []
         self._configure_main_queue_listeners(self.pipe_manager,
                                              self.event_pipe_manager)
 
@@ -186,7 +190,7 @@ class NotificationService(service_base.BaseService):
             self.tg.add_timer(cfg.CONF.coordination.check_watchers,
                               self.partition_coordinator.run_watchers)
             # configure pipelines after all coordination is configured.
-            self._configure_pipeline_listeners()
+            self._configure_pipeline_listener()
 
         if not cfg.CONF.notification.disable_non_metric_meters:
             LOG.warning(_LW('Non-metric meters may be collected. It is highly '
@@ -241,9 +245,9 @@ class NotificationService(service_base.BaseService):
             self.listeners.append(listener)
 
     def _refresh_agent(self, event):
-        self._configure_pipeline_listeners(True)
+        self._configure_pipeline_listener()
 
-    def _configure_pipeline_listeners(self, reuse_listeners=False):
+    def _configure_pipeline_listener(self):
         with self.coord_lock:
             ev_pipes = []
             if cfg.CONF.notification.store_events:
@@ -254,40 +258,33 @@ class NotificationService(service_base.BaseService):
                 self.group_id,
                 range(cfg.CONF.notification.pipeline_processing_queues))
 
-            queue_set = {}
+            endpoints = []
+            targets = []
+
+            for pipe in pipelines:
+                if isinstance(pipe, pipeline.EventPipeline):
+                    endpoints.append(pipeline.EventPipelineEndpoint(pipe))
+                else:
+                    endpoints.append(pipeline.SamplePipelineEndpoint(pipe))
+
             for pipe_set, pipe in itertools.product(partitioned, pipelines):
-                queue_set['%s-%s-%s' %
-                          (self.NOTIFICATION_IPC, pipe.name, pipe_set)] = pipe
+                LOG.debug('Pipeline endpoint: %s from set: %s',
+                          pipe.name, pipe_set)
+                topic = '%s-%s-%s' % (self.NOTIFICATION_IPC,
+                                      pipe.name, pipe_set)
+                targets.append(oslo_messaging.Target(topic=topic))
 
-            if reuse_listeners:
-                topics = queue_set.keys()
-                kill_list = []
-                for listener in self.pipeline_listeners:
-                    if listener.dispatcher.targets[0].topic in topics:
-                        queue_set.pop(listener.dispatcher.targets[0].topic)
-                    else:
-                        kill_list.append(listener)
-                for listener in kill_list:
-                    utils.kill_listeners([listener])
-                    self.pipeline_listeners.remove(listener)
-            else:
-                utils.kill_listeners(self.pipeline_listeners)
-                self.pipeline_listeners = []
+            if self.pipeline_listener:
+                self.pipeline_listener.stop()
+                self.pipeline_listener.wait()
 
-            for topic, pipe in queue_set.items():
-                LOG.debug('Pipeline endpoint: %s from set: %s', pipe.name,
-                          pipe_set)
-                pipe_endpoint = (pipeline.EventPipelineEndpoint
-                                 if isinstance(pipe, pipeline.EventPipeline)
-                                 else pipeline.SamplePipelineEndpoint)
-                listener = messaging.get_batch_notification_listener(
-                    transport,
-                    [oslo_messaging.Target(topic=topic)],
-                    [pipe_endpoint(pipe)],
-                    batch_size=cfg.CONF.notification.batch_size,
-                    batch_timeout=cfg.CONF.notification.batch_timeout)
-                listener.start()
-                self.pipeline_listeners.append(listener)
+            self.pipeline_listener = messaging.get_batch_notification_listener(
+                transport,
+                targets,
+                endpoints,
+                batch_size=cfg.CONF.notification.batch_size,
+                batch_timeout=cfg.CONF.notification.batch_timeout)
+            self.pipeline_listener.start()
 
     def stop(self):
         if getattr(self, 'partition_coordinator', None):
@@ -295,8 +292,8 @@ class NotificationService(service_base.BaseService):
         listeners = []
         if getattr(self, 'listeners', None):
             listeners.extend(self.listeners)
-        if getattr(self, 'pipeline_listeners', None):
-            listeners.extend(self.pipeline_listeners)
+        if getattr(self, 'pipeline_listener', None):
+            listeners.append(self.pipeline_listener)
         utils.kill_listeners(listeners)
         super(NotificationService, self).stop()
 
@@ -319,4 +316,4 @@ class NotificationService(service_base.BaseService):
         # re-start the pipeline listeners if workload partitioning
         # is enabled.
         if cfg.CONF.notification.workload_partitioning:
-            self._configure_pipeline_listeners()
+            self._configure_pipeline_listener()

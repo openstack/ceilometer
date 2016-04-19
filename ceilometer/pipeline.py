@@ -81,6 +81,8 @@ class PipelineException(Exception):
 class PipelineEndpoint(object):
 
     def __init__(self, pipeline):
+        self.filter_rule = oslo_messaging.NotificationFilter(
+            publisher_id=pipeline.name)
         self.publish_context = PublishContext([pipeline])
 
     @abc.abstractmethod
