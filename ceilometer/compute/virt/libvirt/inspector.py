@@ -47,6 +47,9 @@ def retry_on_disconnect(function):
     def decorator(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
+        except ImportError:
+            # NOTE(sileht): in case of libvirt failed to be imported
+            raise
         except libvirt.libvirtError as e:
             if (e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
                                        libvirt.VIR_ERR_INTERNAL_ERROR) and
