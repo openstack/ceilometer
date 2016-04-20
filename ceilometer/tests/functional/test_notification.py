@@ -257,7 +257,6 @@ class BaseRealNotification(tests_base.BaseTestCase):
             if (len(self.publisher.samples) >= self.expected_samples and
                     len(self.publisher.events) >= self.expected_events):
                 break
-        self.assertNotEqual(self.srv.listeners, self.srv.pipeline_listeners)
         self.srv.stop()
 
         resources = list(set(s.resource_id for s in self.publisher.samples))
@@ -387,31 +386,56 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
-    def test_reset_listeners_on_refresh(self):
+    def test_reset_listener_on_refresh(self):
         self.srv.start()
-        listeners = self.srv.pipeline_listeners
-        self.assertEqual(20, len(listeners))
-        self.srv._configure_pipeline_listeners()
-        self.assertEqual(20, len(self.srv.pipeline_listeners))
-        for listener in listeners:
-            self.assertNotIn(listeners, set(self.srv.pipeline_listeners))
+        listener = self.srv.pipeline_listener
+        self.assertEqual(20,
+                         len(self.srv.pipeline_listener.dispatcher.targets))
+        self.srv._configure_pipeline_listener()
+        self.assertEqual(20,
+                         len(self.srv.pipeline_listener.dispatcher.targets))
+        self.assertIsNot(listener, self.srv.pipeline_listener)
         self.srv.stop()
 
-    def test_retain_common_listeners_on_refresh(self):
+    def test_retain_common_targets_on_refresh(self):
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '.extract_my_subset', return_value=[1, 2]):
             self.srv.start()
-        self.assertEqual(4, len(self.srv.pipeline_listeners))
-        listeners = [listener for listener in self.srv.pipeline_listeners]
+        listened_before = [target.topic for target in
+                           self.srv.pipeline_listener.dispatcher.targets]
+        self.assertEqual(4, len(listened_before))
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '.extract_my_subset', return_value=[1, 3]):
             self.srv._refresh_agent(None)
-        self.assertEqual(4, len(self.srv.pipeline_listeners))
-        for listener in listeners:
-            if listener.dispatcher.targets[0].topic.endswith('1'):
-                self.assertIn(listener, set(self.srv.pipeline_listeners))
-            else:
-                self.assertNotIn(listener, set(self.srv.pipeline_listeners))
+        listened_after = [target.topic for target in
+                          self.srv.pipeline_listener.dispatcher.targets]
+        self.assertEqual(4, len(listened_after))
+        common = set(listened_before) & set(listened_after)
+        for topic in common:
+            self.assertTrue(topic.endswith('1'))
+        self.srv.stop()
+
+    def test_notify_to_relevant_endpoint(self):
+        self.srv.start()
+        dispatcher = self.srv.pipeline_listener.dispatcher
+        self.assertIsNotEmpty(dispatcher.targets)
+
+        endpoints = {}
+
+        for endpoint in dispatcher.endpoints:
+            self.assertEqual(1, len(endpoint.publish_context.pipelines))
+            pipe = list(endpoint.publish_context.pipelines)[0]
+            endpoints[pipe.name] = endpoint
+
+        notifiers = []
+        notifiers.extend(self.srv.pipe_manager.transporters[0][2])
+        notifiers.extend(self.srv.event_pipe_manager.transporters[0][2])
+        for notifier in notifiers:
+            filter_rule = endpoints[notifier.publisher_id].filter_rule
+            self.assertEqual(True, filter_rule.match(None,
+                                                     notifier.publisher_id,
+                                                     None, None, None))
+
         self.srv.stop()
 
     @mock.patch('oslo_messaging.Notifier.sample')
