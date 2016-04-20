@@ -336,7 +336,7 @@ Installing the Polling Agent
    access to swift with ``ResellerAdmin`` role. You should give this
    role to your ``os_username`` user for tenant ``os_tenant_name``::
 
-     $ openstack role create --name=ResellerAdmin
+     $ openstack role create ResellerAdmin
      +-----------+----------------------------------+
      | Field     | Value                            |
      +-----------+----------------------------------+
@@ -411,9 +411,9 @@ Installing the API Server
 
      $ openstack endpoint create $CEILOMETER_SERVICE \
                                  --region RegionOne \
-                                 --publicurl "http://$SERVICE_HOST:8777/" \
-                                 --adminurl "http://$SERVICE_HOST:8777/" \
-                                 --internalurl "http://$SERVICE_HOST:8777/"
+                                 --publicurl "http://$SERVICE_HOST:8777" \
+                                 --adminurl "http://$SERVICE_HOST:8777" \
+                                 --internalurl "http://$SERVICE_HOST:8777"
 
    .. note::
 
