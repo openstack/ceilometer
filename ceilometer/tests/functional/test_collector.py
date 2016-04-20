@@ -38,6 +38,17 @@ class FakeConnection(object):
         pass
 
 
+class FakeThread(object):
+    def __init__(self, target):
+        self.target = target
+
+    def start(self):
+        self.target()
+
+    def join(self):
+        pass
+
+
 class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
@@ -77,13 +88,8 @@ class TestCollector(tests_base.BaseTestCase):
 
         self.srv = collector.CollectorService()
 
-        self.useFixture(mockpatch.PatchObject(
-            self.srv.tg, 'add_thread',
-            side_effect=self._dummy_thread_group_add_thread))
-
-    @staticmethod
-    def _dummy_thread_group_add_thread(method):
-        method()
+        self.useFixture(mockpatch.Patch(
+            "threading.Thread", side_effect=FakeThread))
 
     def _setup_messaging(self, enabled=True):
         if enabled:
