@@ -21,6 +21,7 @@ from oslotest import mockpatch
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
 from ceilometer.network import floatingip
+from ceilometer.network.services import discovery
 
 
 class _BaseTestFloatingIPPollster(base.BaseTestCase):
@@ -72,30 +73,29 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
                  'port_id': '67a0d2c7-a397-444c-9d75-d2ac89b6f209',
                  'id': '90ca27bf-72bc-40c8-9c13-414d564ea367'}]
 
-    def test_default_discovery(self):
-        self.assertEqual('endpoint:network', self.pollster.default_discovery)
-
     def test_fip_get_samples(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=['http://localhost:9696/']))
-        self.assertEqual(1, len(samples))
-        self.assertEqual('18ca27bf-72bc-40c8-9c13-414d564ea367',
-                         samples[0].resource_id)
-        self.assertEqual("65.79.162.11", samples[0].resource_metadata[
-            "floating_ip_address"])
-        self.assertEqual("10.0.0.6", samples[0].resource_metadata[
-            "fixed_ip_address"])
+                       self.manager, {},
+                       resources=self.fake_get_fip_service()))
+        self.assertEqual(3, len(samples))
+        for field in self.pollster.FIELDS:
+            self.assertEqual(self.fake_get_fip_service()[0][field],
+                             samples[0].resource_metadata[field])
 
     def test_fip_volume(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=['http://localhost:9696/']))
+                       self.manager, {},
+                       resources=self.fake_get_fip_service()))
         self.assertEqual(1, samples[0].volume)
 
     def test_get_fip_meter_names(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=['http://localhost:9696/']))
+                       self.manager, {},
+                       resources=self.fake_get_fip_service()))
         self.assertEqual(set(['ip.floating']),
                          set([s.name for s in samples]))
+
+    def test_fip_discovery(self):
+        discovered_fips = discovery.FloatingIPDiscovery().discover(
+            self.manager)
+        self.assertEqual(3, len(discovered_fips))
