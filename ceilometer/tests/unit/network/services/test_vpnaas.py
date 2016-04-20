@@ -148,6 +148,7 @@ class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
                  'ipsecpolicy_id': 'fce3d818-fdcb-fg4b-de7f-7850dc8a9d7a',
                  'vpnservice_id': 'dce3d818-fdcb-fg4b-de7f-5650dc8a9d7a',
                  'admin_state_up': True,
+                 'status': 'ACTIVE',
                  'tenant_id': 'abe3d818-fdcb-fg4b-de7f-6650dc8a9d7a',
                  'id': 'fdfbcec-fdcb-fg4b-de7f-6650dc8a9d7a'}
                 ]
