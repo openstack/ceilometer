@@ -143,7 +143,7 @@ class Event(base.Base):
     def sample(cls):
         return cls(
             event_type='compute.instance.update',
-            generated=datetime.datetime(2015, 1, 1, 12, 30, 59, 123456),
+            generated=datetime.datetime(2015, 1, 1, 12, 0, 0, 0),
             message_id='94834db1-8f1b-404d-b2ec-c35901f1b7f0',
             traits={
                 Trait(name='request_id',

@@ -21,7 +21,6 @@
 import datetime
 import uuid
 
-from oslo_utils import timeutils
 import pecan
 from pecan import rest
 from wsme import types as wtypes
@@ -99,8 +98,8 @@ class Sample(base.Base):
                    resource_id='bd9431c1-8d69-4ad3-803a-8d4a6b89fd36',
                    project_id='35b17138-b364-4e6a-a131-8f3099c5be68',
                    user_id='efd87807-12d2-4b38-9c70-5f5c2ac427ff',
-                   timestamp=timeutils.utcnow(),
-                   recorded_at=datetime.datetime.utcnow(),
+                   timestamp=datetime.datetime(2015, 1, 1, 12, 0, 0, 0),
+                   recorded_at=datetime.datetime(2015, 1, 1, 12, 0, 0, 0),
                    source='openstack',
                    metadata={'name1': 'value1',
                              'name2': 'value2'},
