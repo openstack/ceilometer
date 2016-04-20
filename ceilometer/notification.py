@@ -15,6 +15,8 @@
 import itertools
 import threading
 
+from concurrent import futures
+from futurist import periodics
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
@@ -181,10 +183,27 @@ class NotificationService(service_base.BaseService):
             self.partition_coordinator.join_group(self.group_id)
             self.partition_coordinator.watch_group(self.group_id,
                                                    self._refresh_agent)
-            self.tg.add_timer(cfg.CONF.coordination.heartbeat,
-                              self.partition_coordinator.heartbeat)
-            self.tg.add_timer(cfg.CONF.coordination.check_watchers,
-                              self.partition_coordinator.run_watchers)
+
+            @periodics.periodic(spacing=cfg.CONF.coordination.heartbeat,
+                                run_immediately=True)
+            def heartbeat():
+                self.partition_coordinator.heartbeat()
+
+            @periodics.periodic(spacing=cfg.CONF.coordination.check_watchers,
+                                run_immediately=True)
+            def run_watchers():
+                self.partition_coordinator.run_watchers()
+
+            self.periodic = periodics.PeriodicWorker.create(
+                [], executor_factory=lambda:
+                futures.ThreadPoolExecutor(max_workers=10))
+            self.periodic.add(heartbeat)
+            self.periodic.add(run_watchers)
+
+            t = threading.Thread(target=self.periodic.start)
+            t.daemon = True
+            t.start()
+
             # configure pipelines after all coordination is configured.
             self._configure_pipeline_listeners()
 
@@ -192,6 +211,9 @@ class NotificationService(service_base.BaseService):
             LOG.warning(_LW('Non-metric meters may be collected. It is highly '
                             'advisable to disable these meters using '
                             'ceilometer.conf or the pipeline.yaml'))
+
+        # NOTE(sileht): We have to drop eventlet to drop this last eventlet
+        # thread.
         # Add a dummy thread to have wait() working
         self.tg.add_timer(604800, lambda: None)
 
@@ -290,6 +312,9 @@ class NotificationService(service_base.BaseService):
                 self.pipeline_listeners.append(listener)
 
     def stop(self):
+        if getattr(self, 'periodic', None):
+            self.periodic.stop()
+            self.periodic.wait()
         if getattr(self, 'partition_coordinator', None):
             self.partition_coordinator.stop()
         listeners = []
