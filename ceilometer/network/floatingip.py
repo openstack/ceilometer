@@ -20,9 +20,8 @@ from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 
-from ceilometer.agent import plugin_base
 from ceilometer.i18n import _LW
-from ceilometer import neutron_client
+from ceilometer.network.services import base
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -30,43 +29,28 @@ LOG = log.getLogger(__name__)
 cfg.CONF.import_group('service_types', 'ceilometer.neutron_client')
 
 
-class FloatingIPPollster(plugin_base.PollsterBase):
+class FloatingIPPollster(base.BaseServicesPollster):
 
-    STATUS = {
-        'inactive': 0,
-        'active': 1,
-        'pending_create': 2,
-    }
-
-    def __init__(self):
-        self.neutron_cli = neutron_client.Client()
+    FIELDS = ['router_id',
+              'status',
+              'floating_network_id',
+              'fixed_ip_address',
+              'port_id',
+              'floating_ip_address',
+              ]
 
     @property
     def default_discovery(self):
-        return 'endpoint:%s' % cfg.CONF.service_types.neutron
-
-    @staticmethod
-    def _form_metadata_for_fip(fip):
-        """Return a metadata dictionary for the fip usage data."""
-        metadata = {
-            'router_id': fip.get("router_id"),
-            'status': fip.get("status"),
-            'floating_network_id': fip.get("floating_network_id"),
-            'fixed_ip_address': fip.get("fixed_ip_address"),
-            'port_id': fip.get("port_id"),
-            'floating_ip_address': fip.get("floating_ip_address")
-        }
-        return metadata
+        return 'fip_services'
 
     def get_samples(self, manager, cache, resources):
 
-        for fip in self.neutron_cli.fip_get_all():
-            status = self.STATUS.get(fip['status'].lower())
-            if status is None:
+        for fip in resources or []:
+            if fip['status'] is None:
                 LOG.warning(_LW("Invalid status, skipping IP address %s") %
                             fip['floating_ip_address'])
                 continue
-            res_metadata = self._form_metadata_for_fip(fip)
+            status = self.get_status_id(fip['status'])
             yield sample.Sample(
                 name='ip.floating',
                 type=sample.TYPE_GAUGE,
@@ -76,5 +60,5 @@ class FloatingIPPollster(plugin_base.PollsterBase):
                 project_id=fip['tenant_id'],
                 resource_id=fip['id'],
                 timestamp=timeutils.utcnow().isoformat(),
-                resource_metadata=res_metadata
+                resource_metadata=self.extract_metadata(fip)
             )
