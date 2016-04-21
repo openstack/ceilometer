@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0b4.dev34\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-11 06:17+0000\n"
+"Project-Id-Version: ceilometer 6.0.1.dev3\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-04-21 07:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,21 +60,21 @@ msgid ""
 "with False"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/root.py:123
+#: ceilometer/api/controllers/v2/root.py:128
 msgid "Can't connect to keystone, assuming gnocchi is disabled and retry later"
 msgstr ""
 
-#: ceilometer/api/controllers/v2/root.py:127
+#: ceilometer/api/controllers/v2/root.py:132
 msgid ""
 "ceilometer-api started with gnocchi enabled. The resources/meters/samples"
 " URLs are disabled."
 msgstr ""
 
-#: ceilometer/api/controllers/v2/root.py:149
+#: ceilometer/api/controllers/v2/root.py:154
 msgid "Can't connect to keystone, assuming aodh is disabled and retry later."
 msgstr ""
 
-#: ceilometer/api/controllers/v2/root.py:152
+#: ceilometer/api/controllers/v2/root.py:157
 msgid ""
 "ceilometer-api started with aodh enabled. Alarms URLs will be redirected "
 "to aodh endpoint."

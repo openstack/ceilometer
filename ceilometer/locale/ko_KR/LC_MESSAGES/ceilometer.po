@@ -8,20 +8,17 @@
 # Seunghyo Chun <seunghyo.chun@gmail.com>, 2013
 # Sungjin Kang <potopro@gmail.com>, 2013
 # Sungjin Kang <potopro@gmail.com>, 2013
-# Lucas Palm <lapalm@us.ibm.com>, 2015. #zanata
-# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
-# Lucas Palm <lapalm@us.ibm.com>, 2016. #zanata
-# SeYeon Lee <sy_lee@kr.ibm.com>, 2016. #zanata
+# Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0rc3.dev2\n"
+"Project-Id-Version: ceilometer 6.0.1.dev3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-30 00:07+0000\n"
+"POT-Creation-Date: 2016-04-07 10:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-29 04:06+0000\n"
-"Last-Translator: SeYeon Lee <sy_lee@kr.ibm.com>\n"
+"PO-Revision-Date: 2016-04-07 03:48+0000\n"
+"Last-Translator: Lucas Palm <lapalm@us.ibm.com>\n"
 "Language: ko-KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
@@ -66,7 +63,7 @@ msgstr "VM %s CPU 이용률을 가져올 수 없음"
 
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
-msgstr "%s 인스턴스의 IP 주소를 얻을 수 없음"
+msgstr "%s 인스턴스 IP 주소를 얻을 수 없음"
 
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in "
@@ -92,7 +89,7 @@ msgid "Error parsing HTTP response: %s"
 msgstr "HTTP 응답 구문 분석 중 오류 발생: %s"
 
 msgid "Error stopping pollster."
-msgstr "의견조사자를 중지하는 중에 오류가 발생했습니다. "
+msgstr "pollster를 중지하는 중에 오류가 발생했습니다. "
 
 msgid "Event"
 msgstr "이벤트"
@@ -109,15 +106,15 @@ msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
 msgstr ""
-"인스턴스 <이름=%(name)s, id=%(id)s>의 데이터 검사 실패, 도메인 상태가 SHUTOFF"
-"입니다."
+"인스턴스 <name=%(name)s, id=%(id)s> 데이터 검사 실패, 도메인 상태가 SHUTOFF입"
+"니다."
 
 #, python-format
 msgid ""
 "Failed to inspect memory usage of %(instance_uuid)s, can not get info from "
 "libvirt: %(error)s"
 msgstr ""
-"%(instance_uuid)s의 메모리 사용량 검사 실패, libvirt에서 정보를 가져올 수 없"
+"%(instance_uuid)s 메모리 사용량 검사 실패, libvirt에서 정보를 가져올 수 없"
 "음: %(error)s"
 
 #, python-format
@@ -125,16 +122,16 @@ msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
 "not get info from libvirt."
 msgstr ""
-"인스턴스 <이름=%(name)s, id=%(id)s>의 메모리 사용량 검사 실패, libvirt에서 정"
-"보를 가져올 수 없습니다."
+"인스턴스 <name=%(name)s, id=%(id)s> 메모리 사용량 검사 실패, libvirt에서 정보"
+"를 가져올 수 없습니다."
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
-msgstr "%s의 알림 핸들러 로드 실패"
+msgstr "%s 알림 핸들러 로드 실패"
 
 #, python-format
 msgid "Failed to parse the timestamp value %s"
-msgstr "시간소인 값 %s 구문 분석 실패"
+msgstr "Timestamp 값 %s 구문 분석 실패"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
@@ -196,7 +193,7 @@ msgid "Multiple VM %s found in XenServer"
 msgstr "여러 VM %s을(를) XenServer에서 찾음 "
 
 msgid "Must specify connection_url, and connection_password to use"
-msgstr "사용할 connection_url 및 connection_password를 지정해야 함 "
+msgstr "사용할 connection_url와 connection_password를 지정해야 함 "
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
@@ -235,7 +232,7 @@ msgstr ""
 
 #, python-format
 msgid "Order-by expression not valid: %s"
-msgstr "Order-by 표현식이 올바르지 않음: %s"
+msgstr "정렬 표현식이 올바르지 않음: %s"
 
 #, python-format
 msgid ""
@@ -248,21 +245,23 @@ msgstr "기간은 양수여야 합니다. "
 
 #, python-format
 msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
-msgstr "파이프라인 %(pipeline)s: 공개자 %(pub)s에서 오류 후 %(status)s"
+msgstr "파이프라인 %(pipeline)s: Publisher %(pub)s에서 오류 후 %(status)s"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "파이프라인 %(pipeline)s: 공개자 %(pub)s에서 오류 후 계속"
+msgstr "파이프라인 %(pipeline)s: Publisher %(pub)s에서 오류 후 계속"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr "파이프라인 %(pipeline)s: 변환기 %(trans)s을(를) 비우는 중 오류 발생"
+msgstr ""
+"파이프라인 %(pipeline)s: Transformer %(trans)s을(를) 비우는 중 오류 발생"
 
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
-msgstr "파이프라인 %(pipeline)s: %(smp)s의 변환기 %(trans)s에서 오류 후 종료"
+msgstr ""
+"파이프라인 %(pipeline)s: %(smp)s의 transformer %(trans)s에서 오류 후 종료"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -278,12 +277,12 @@ msgstr "폴링 %(name)s이(가) %(cnt)s번 실패했습니다!"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
-msgstr "%s의 의견조사자가 사용 안함으로 설정되어 있습니다!"
+msgstr "%s pollster가 사용 안함으로 설정되어 있습니다!"
 
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
 msgstr ""
-"의견조사자 %(name)s이(가) 소스 %(source)s를 더 이상 폴링하지 않도록 하십시오!"
+"Pollster %(name)s이(가) 소스 %(source)s를 더 이상 폴링하지 않도록 하십시오!"
 
 #, python-format
 msgid ""
@@ -325,7 +324,7 @@ msgstr "문자열 %s이(가) 올바른 등시간이 아님"
 msgid ""
 "The Yaml file that defines mapping between samples and gnocchi resources/"
 "metrics"
-msgstr "샘플과 gnocchi resources/ 메트릭 간 맵핑을 정의하는 Yaml 파일"
+msgstr "샘플과 gnocchi resources/ metric 간 맵핑을 정의하는 Yaml 파일"
 
 #, python-format
 msgid ""
@@ -368,7 +367,7 @@ msgstr "%(expr)s 표현식을 평가할 수 없음: %(exc)s"
 
 #, python-format
 msgid "Unable to load publisher %s"
-msgstr "공개자 %s을(를) 로드할 수 없음"
+msgstr "Publisher %s을(를) 로드할 수 없음"
 
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
@@ -379,15 +378,15 @@ msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
 "up."
 msgstr ""
-"%(retries)d회 재시도한 이후에는 1차 mongodb에 다시 연결할 수 없습니다. 포기하"
-"는 중입니다."
+"%(retries)d 회 재시도한 이후에는 1차 mongodb에 다시 연결할 수 없습니다. 포기"
+"하는 중입니다."
 
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
 msgstr ""
-"1차 mongodb에 다시 연결할 수 없음: %(errmsg)s. %(retry_interval)d초 후에 다"
+"1차 mongodb에 다시 연결할 수 없음: %(errmsg)s. %(retry_interval)d 초 후에 다"
 "시 시도합니다."
 
 msgid "Unable to send sample over UDP"
@@ -436,11 +435,11 @@ msgstr ""
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
-"vip %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
+"vIP %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
-msgstr "vpn%(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플 건너뛰기"
+msgstr "VPN %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플 건너뛰기"
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
@@ -481,7 +480,7 @@ msgid "dropping sample with no predecessor: %s"
 msgstr "선행 작업이 없는 샘플 삭제: %s"
 
 msgid "ipmitool output length mismatch"
-msgstr "ipmitool 출력 길이 불일치"
+msgstr "Ipmitool 출력 길이 불일치"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes 및 backup_count는 숫자여야 합니다."
@@ -498,4 +497,4 @@ msgid "parse IPMI sensor data failed,unknown sensor type"
 msgstr "IPMI 센서 데이터 구문 분석에 실패했음, 알 수 없는 센서 유형"
 
 msgid "running ipmitool failure"
-msgstr "ipmitool 실행 실패"
+msgstr "Ipmitool 실행 실패"
