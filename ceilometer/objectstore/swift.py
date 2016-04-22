@@ -102,7 +102,7 @@ class _Base(plugin_base.PollsterBase):
 
 
 class ObjectsPollster(_Base):
-    """Iterate over all accounts, using keystone."""
+    """Collect the total objects count for each project."""
     def get_samples(self, manager, cache, resources):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
@@ -121,7 +121,7 @@ class ObjectsPollster(_Base):
 
 
 class ObjectsSizePollster(_Base):
-    """Iterate over all accounts, using keystone."""
+    """Collect the total objects size of each project."""
     def get_samples(self, manager, cache, resources):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
@@ -140,7 +140,7 @@ class ObjectsSizePollster(_Base):
 
 
 class ObjectsContainersPollster(_Base):
-    """Iterate over all accounts, using keystone."""
+    """Collect the container count for each project."""
     def get_samples(self, manager, cache, resources):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
@@ -159,7 +159,7 @@ class ObjectsContainersPollster(_Base):
 
 
 class ContainersObjectsPollster(_Base):
-    """Get info about containers using Swift API."""
+    """Collect the objects count per container for each project."""
 
     METHOD = 'get'
 
@@ -183,7 +183,7 @@ class ContainersObjectsPollster(_Base):
 
 
 class ContainersSizePollster(_Base):
-    """Get info about containers using Swift API."""
+    """Collect the total objects size per container for each project."""
 
     METHOD = 'get'
 
