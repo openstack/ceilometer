@@ -36,6 +36,10 @@ from ceilometer import pipeline
 from ceilometer.tests.unit.agent import agentbase
 
 
+def fakedelayed(delay, target, *args, **kwargs):
+    return target(*args, **kwargs)
+
+
 class PollingException(Exception):
     pass
 
@@ -408,6 +412,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self._batching_samples(4, 1)
 
     def _batching_samples(self, expected_samples, call_count):
+        self.useFixture(mockpatch.PatchObject(manager.utils, 'delayed',
+                                              side_effect=fakedelayed))
         pipeline = yaml.dump({
             'sources': [{
                 'name': 'test_pipeline',
@@ -425,12 +431,11 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
 
-        self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
         self.mgr.start()
         self.addCleanup(self.mgr.stop)
         # Manually executes callbacks
-        for timer in self.mgr.pollster_timers:
-            timer.f(*timer.args, **timer.kw)
+        for cb, __, args, kwargs in self.mgr.polling_periodics._callables:
+            cb(*args, **kwargs)
 
         samples = self.notified_samples
         self.assertEqual(expected_samples, len(samples))

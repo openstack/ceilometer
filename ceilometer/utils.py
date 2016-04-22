@@ -26,7 +26,10 @@ import decimal
 import hashlib
 import struct
 import threading
+import time
 
+from concurrent import futures
+from futurist import periodics
 from oslo_concurrency import processutils
 from oslo_config import cfg
 from oslo_utils import timeutils
@@ -257,8 +260,22 @@ def kill_listeners(listeners):
         listener.wait()
 
 
+def delayed(delay, target, *args, **kwargs):
+    time.sleep(delay)
+    return target(*args, **kwargs)
+
+
 def spawn_thread(target, *args, **kwargs):
     t = threading.Thread(target=target, args=args, kwargs=kwargs)
     t.daemon = True
     t.start()
     return t
+
+
+def create_periodic(target, spacing, run_immediately=True, *args, **kwargs):
+    p = periodics.PeriodicWorker.create(
+        [], executor_factory=lambda: futures.ThreadPoolExecutor(max_workers=1))
+    p.add(periodics.periodic(
+        spacing=spacing, run_immediately=run_immediately)(
+            lambda: target(*args, **kwargs)))
+    return p

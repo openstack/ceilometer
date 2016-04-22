@@ -148,6 +148,7 @@ class NotificationService(service_base.PipelineBasedService):
 
     def start(self):
         super(NotificationService, self).start()
+        self.shutdown = False
         self.periodic = None
         self.partition_coordinator = None
         self.coord_lock = threading.Lock()
@@ -211,7 +212,8 @@ class NotificationService(service_base.PipelineBasedService):
             utils.spawn_thread(self.periodic.start)
 
             # configure pipelines after all coordination is configured.
-            self._configure_pipeline_listener()
+            with self.coord_lock:
+                self._configure_pipeline_listener()
 
         if not cfg.CONF.notification.disable_non_metric_meters:
             LOG.warning(_LW('Non-metric meters may be collected. It is highly '
@@ -264,57 +266,63 @@ class NotificationService(service_base.PipelineBasedService):
             self.listeners.append(listener)
 
     def _refresh_agent(self, event):
-        self._configure_pipeline_listener()
+        with self.coord_lock:
+            if self.shutdown:
+                # NOTE(sileht): We are going to shutdown we everything will be
+                # stopped, we should not restart them
+                return
+            self._configure_pipeline_listener()
 
     def _configure_pipeline_listener(self):
-        with self.coord_lock:
-            ev_pipes = []
-            if cfg.CONF.notification.store_events:
-                ev_pipes = self.event_pipeline_manager.pipelines
-            pipelines = self.pipeline_manager.pipelines + ev_pipes
-            transport = messaging.get_transport()
-            partitioned = self.partition_coordinator.extract_my_subset(
-                self.group_id,
-                range(cfg.CONF.notification.pipeline_processing_queues))
+        ev_pipes = []
+        if cfg.CONF.notification.store_events:
+            ev_pipes = self.event_pipeline_manager.pipelines
+        pipelines = self.pipeline_manager.pipelines + ev_pipes
+        transport = messaging.get_transport()
+        partitioned = self.partition_coordinator.extract_my_subset(
+            self.group_id,
+            range(cfg.CONF.notification.pipeline_processing_queues))
 
-            endpoints = []
-            targets = []
+        endpoints = []
+        targets = []
 
-            for pipe in pipelines:
-                if isinstance(pipe, pipeline.EventPipeline):
-                    endpoints.append(pipeline.EventPipelineEndpoint(pipe))
-                else:
-                    endpoints.append(pipeline.SamplePipelineEndpoint(pipe))
+        for pipe in pipelines:
+            if isinstance(pipe, pipeline.EventPipeline):
+                endpoints.append(pipeline.EventPipelineEndpoint(pipe))
+            else:
+                endpoints.append(pipeline.SamplePipelineEndpoint(pipe))
 
-            for pipe_set, pipe in itertools.product(partitioned, pipelines):
-                LOG.debug('Pipeline endpoint: %s from set: %s',
-                          pipe.name, pipe_set)
-                topic = '%s-%s-%s' % (self.NOTIFICATION_IPC,
-                                      pipe.name, pipe_set)
-                targets.append(oslo_messaging.Target(topic=topic))
+        for pipe_set, pipe in itertools.product(partitioned, pipelines):
+            LOG.debug('Pipeline endpoint: %s from set: %s',
+                      pipe.name, pipe_set)
+            topic = '%s-%s-%s' % (self.NOTIFICATION_IPC,
+                                  pipe.name, pipe_set)
+            targets.append(oslo_messaging.Target(topic=topic))
 
-            if self.pipeline_listener:
-                self.pipeline_listener.stop()
-                self.pipeline_listener.wait()
+        if self.pipeline_listener:
+            self.pipeline_listener.stop()
+            self.pipeline_listener.wait()
 
-            self.pipeline_listener = messaging.get_batch_notification_listener(
-                transport,
-                targets,
-                endpoints,
-                batch_size=cfg.CONF.notification.batch_size,
-                batch_timeout=cfg.CONF.notification.batch_timeout)
-            self.pipeline_listener.start()
+        self.pipeline_listener = messaging.get_batch_notification_listener(
+            transport,
+            targets,
+            endpoints,
+            batch_size=cfg.CONF.notification.batch_size,
+            batch_timeout=cfg.CONF.notification.batch_timeout)
+        self.pipeline_listener.start()
 
     def stop(self):
         if self.started:
+            self.shutdown = True
             if self.periodic:
                 self.periodic.stop()
                 self.periodic.wait()
             if self.partition_coordinator:
                 self.partition_coordinator.stop()
-            if self.pipeline_listener:
-                utils.kill_listeners([self.pipeline_listener])
-            utils.kill_listeners(self.listeners)
+            with self.coord_lock:
+                if self.pipeline_listener:
+                    utils.kill_listeners([self.pipeline_listener])
+                utils.kill_listeners(self.listeners)
         super(NotificationService, self).stop()
 
     def reload_pipeline(self):
@@ -328,12 +336,18 @@ class NotificationService(service_base.PipelineBasedService):
             self.event_pipe_manager = self._get_event_pipeline_manager(
                 self.transport)
 
-        # restart the main queue listeners.
-        utils.kill_listeners(self.listeners)
-        self._configure_main_queue_listeners(
-            self.pipe_manager, self.event_pipe_manager)
+        with self.coord_lock:
+            if self.shutdown:
+                # NOTE(sileht): We are going to shutdown we everything will be
+                # stopped, we should not restart them
+                return
 
-        # restart the pipeline listeners if workload partitioning
-        # is enabled.
-        if cfg.CONF.notification.workload_partitioning:
-            self._configure_pipeline_listener()
+            # restart the main queue listeners.
+            utils.kill_listeners(self.listeners)
+            self._configure_main_queue_listeners(
+                self.pipe_manager, self.event_pipe_manager)
+
+            # restart the pipeline listeners if workload partitioning
+            # is enabled.
+            if cfg.CONF.notification.workload_partitioning:
+                self._configure_pipeline_listener()

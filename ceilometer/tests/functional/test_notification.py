@@ -276,13 +276,9 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_pipeline_poller(self, fake_publisher_cls):
         fake_publisher_cls.return_value = self.publisher
-        self.srv.tg = mock.MagicMock()
         self.srv.start()
         self.addCleanup(self.srv.stop)
-
-        pipeline_poller_call = mock.call(1, self.srv.refresh_pipeline)
-        self.assertIn(pipeline_poller_call,
-                      self.srv.tg.add_timer.call_args_list)
+        self.assertIsNotNone(self.srv.refresh_pipeline_periodic)
 
     def test_notification_reloaded_pipeline(self):
         pipeline_cfg_file = self.setup_pipeline(['instance'])
