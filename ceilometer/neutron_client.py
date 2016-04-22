@@ -139,6 +139,7 @@ class Client(object):
         fips = self.client.list_floatingips()['floatingips']
         return fips
 
+    @logged
     def list_pools_v2(self):
         """This method is used to get the pools list.
 
@@ -175,6 +176,7 @@ class Client(object):
 
         return resources
 
+    @logged
     def list_members_v2(self):
         """Method is used to list the members info.
 
@@ -199,6 +201,7 @@ class Client(object):
                 resources.append(member)
         return resources
 
+    @logged
     def list_health_monitors_v2(self):
         """Method is used to list the health monitors
 
@@ -386,6 +389,7 @@ class Client(object):
 
         return status_dict
 
+    @logged
     def list_listener(self):
         """This method is used to get the list of the listeners."""
         resp = self.client.list_listeners()
@@ -396,12 +400,14 @@ class Client(object):
             listener['operating_status'] = status[listener.get('id')]
         return resources
 
+    @logged
     def list_loadbalancer(self):
         """This method is used to get the list of the loadbalancers."""
         resp = self.client.list_loadbalancers()
         resources = resp.get('loadbalancers')
         return resources
 
+    @logged
     def get_loadbalancer_stats(self, loadbalancer_id):
         """This method is used to get the statistics of the loadbalancer.
 
