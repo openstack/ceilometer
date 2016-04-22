@@ -15,19 +15,18 @@
 
 from itertools import chain
 import socket
-import threading
 
 import msgpack
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
-from oslo_service import service as os_service
 from oslo_utils import netutils
 from oslo_utils import units
 
 from ceilometer import dispatcher
 from ceilometer.i18n import _, _LE
 from ceilometer import messaging
+from ceilometer import service_base
 from ceilometer import utils
 
 OPTS = [
@@ -60,7 +59,7 @@ cfg.CONF.import_opt('store_events', 'ceilometer.notification',
 LOG = log.getLogger(__name__)
 
 
-class CollectorService(os_service.Service):
+class CollectorService(service_base.ServiceBase):
     """Listener for the collector service."""
     def start(self):
         """Bind the UDP socket and handle incoming data."""
@@ -73,9 +72,7 @@ class CollectorService(os_service.Service):
         super(CollectorService, self).start()
 
         if cfg.CONF.collector.udp_address:
-            self.udp_thread = threading.Thread(target=self.start_udp)
-            self.udp_thread.daemon = True
-            self.udp_thread.start()
+            self.udp_thread = utils.spawn_thread(self.start_udp)
 
         transport = messaging.get_transport(optional=True)
         if transport:
@@ -102,12 +99,6 @@ class CollectorService(os_service.Service):
                         batch_size=cfg.CONF.collector.batch_size,
                         batch_timeout=cfg.CONF.collector.batch_timeout))
                 self.event_listener.start()
-
-            if not cfg.CONF.collector.udp_address:
-                # NOTE(sileht): We have to drop oslo.service to remove this
-                # last eventlet thread
-                # Add a dummy thread to have wait() working
-                self.tg.add_timer(604800, lambda: None)
 
     def start_udp(self):
         address_family = socket.AF_INET

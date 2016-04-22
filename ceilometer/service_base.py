@@ -26,9 +26,18 @@ from ceilometer import pipeline
 LOG = log.getLogger(__name__)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BaseService(os_service.Service):
+class ServiceBase(os_service.Service):
+    def __init__(self):
+        self.started = False
+        super(ServiceBase, self).__init__()
 
+    def start(self):
+        self.started = True
+        super(ServiceBase, self).start()
+
+
+@six.add_metaclass(abc.ABCMeta)
+class PipelineBasedService(ServiceBase):
     def clear_pipeline_validation_status(self):
         """Clears pipeline validation status flags."""
         self.pipeline_validated = False
@@ -36,7 +45,6 @@ class BaseService(os_service.Service):
 
     def init_pipeline_refresh(self):
         """Initializes pipeline refresh state."""
-
         self.clear_pipeline_validation_status()
         if cfg.CONF.refresh_pipeline_cfg:
             self.set_pipeline_mtime(pipeline.get_pipeline_mtime())

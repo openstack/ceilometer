@@ -25,6 +25,7 @@ import datetime
 import decimal
 import hashlib
 import struct
+import threading
 
 from oslo_concurrency import processutils
 from oslo_config import cfg
@@ -254,3 +255,10 @@ def kill_listeners(listeners):
     for listener in listeners:
         listener.stop()
         listener.wait()
+
+
+def spawn_thread(target, *args, **kwargs):
+    t = threading.Thread(target=target, args=args, kwargs=kwargs)
+    t.daemon = True
+    t.start()
+    return t

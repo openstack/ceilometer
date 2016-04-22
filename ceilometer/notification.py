@@ -84,7 +84,7 @@ cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')
 
 
-class NotificationService(service_base.BaseService):
+class NotificationService(service_base.PipelineBasedService):
     """Notification service.
 
     When running multiple agents, additional queuing sequence is required for
@@ -145,6 +145,7 @@ class NotificationService(service_base.BaseService):
 
     def start(self):
         super(NotificationService, self).start()
+        self.periodic = None
         self.partition_coordinator = None
         self.coord_lock = threading.Lock()
 
@@ -204,9 +205,7 @@ class NotificationService(service_base.BaseService):
             self.periodic.add(heartbeat)
             self.periodic.add(run_watchers)
 
-            t = threading.Thread(target=self.periodic.start)
-            t.daemon = True
-            t.start()
+            utils.spawn_thread(self.periodic.start)
 
             # configure pipelines after all coordination is configured.
             self._configure_pipeline_listener()
@@ -215,11 +214,6 @@ class NotificationService(service_base.BaseService):
             LOG.warning(_LW('Non-metric meters may be collected. It is highly '
                             'advisable to disable these meters using '
                             'ceilometer.conf or the pipeline.yaml'))
-
-        # NOTE(sileht): We have to drop eventlet to drop this last eventlet
-        # thread.
-        # Add a dummy thread to have wait() working
-        self.tg.add_timer(604800, lambda: None)
 
         self.init_pipeline_refresh()
 
@@ -309,17 +303,15 @@ class NotificationService(service_base.BaseService):
             self.pipeline_listener.start()
 
     def stop(self):
-        if getattr(self, 'periodic', None):
-            self.periodic.stop()
-            self.periodic.wait()
-        if getattr(self, 'partition_coordinator', None):
-            self.partition_coordinator.stop()
-        listeners = []
-        if getattr(self, 'listeners', None):
-            listeners.extend(self.listeners)
-        if getattr(self, 'pipeline_listener', None):
-            listeners.append(self.pipeline_listener)
-        utils.kill_listeners(listeners)
+        if self.started:
+            if self.periodic:
+                self.periodic.stop()
+                self.periodic.wait()
+            if self.partition_coordinator:
+                self.partition_coordinator.stop()
+            if self.pipeline_listener:
+                utils.kill_listeners([self.pipeline_listener])
+            utils.kill_listeners(self.listeners)
         super(NotificationService, self).stop()
 
     def reload_pipeline(self):

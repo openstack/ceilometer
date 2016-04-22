@@ -38,17 +38,6 @@ class FakeConnection(object):
         pass
 
 
-class FakeThread(object):
-    def __init__(self, target):
-        self.target = target
-
-    def start(self):
-        self.target()
-
-    def join(self):
-        pass
-
-
 class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
@@ -88,9 +77,6 @@ class TestCollector(tests_base.BaseTestCase):
 
         self.srv = collector.CollectorService()
 
-        self.useFixture(mockpatch.Patch(
-            "threading.Thread", side_effect=FakeThread))
-
     def _setup_messaging(self, enabled=True):
         if enabled:
             self.setup_messaging(self.CONF)
@@ -112,7 +98,7 @@ class TestCollector(tests_base.BaseTestCase):
     def _make_fake_socket(self, sample):
         def recvfrom(size):
             # Make the loop stop
-            self.srv.stop()
+            self.srv.udp_run = False
             return msgpack.dumps(sample), ('127.0.0.1', 12345)
 
         sock = mock.Mock()
@@ -148,10 +134,11 @@ class TestCollector(tests_base.BaseTestCase):
         with mock.patch('socket.socket') as mock_socket:
             mock_socket.return_value = udp_socket
             self.srv.start()
+            self.srv.udp_thread.join(5)
+            self.assertFalse(self.srv.udp_thread.is_alive())
             mock_socket.assert_called_with(socket.AF_INET, socket.SOCK_DGRAM)
 
         self._verify_udp_socket(udp_socket)
-
         mock_dispatcher.record_metering_data.assert_called_once_with(
             self.counter)
 
@@ -164,6 +151,8 @@ class TestCollector(tests_base.BaseTestCase):
         with mock.patch.object(socket, 'socket') as mock_socket:
             mock_socket.return_value = sock
             self.srv.start()
+            self.srv.udp_thread.join(5)
+            self.assertFalse(self.srv.udp_thread.is_alive())
             mock_socket.assert_called_with(socket.AF_INET6, socket.SOCK_DGRAM)
 
     def test_udp_receive_storage_error(self):
@@ -180,6 +169,8 @@ class TestCollector(tests_base.BaseTestCase):
         udp_socket = self._make_fake_socket(self.counter)
         with mock.patch('socket.socket', return_value=udp_socket):
             self.srv.start()
+            self.srv.udp_thread.join(5)
+            self.assertFalse(self.srv.udp_thread.is_alive())
 
         self._verify_udp_socket(udp_socket)
 
@@ -197,6 +188,8 @@ class TestCollector(tests_base.BaseTestCase):
         with mock.patch('socket.socket', return_value=udp_socket):
             with mock.patch('msgpack.loads', self._raise_error):
                 self.srv.start()
+                self.srv.udp_thread.join(5)
+                self.assertFalse(self.srv.udp_thread.is_alive())
 
         self._verify_udp_socket(udp_socket)
 
@@ -209,6 +202,8 @@ class TestCollector(tests_base.BaseTestCase):
         udp_socket = self._make_fake_socket(self.counter)
         with mock.patch('socket.socket', return_value=udp_socket):
             self.srv.start()
+            self.srv.udp_thread.join(5)
+            self.assertFalse(self.srv.udp_thread.is_alive())
             self.assertEqual(0, rpc_start.call_count)
             self.assertEqual(1, udp_start.call_count)
 
@@ -219,6 +214,8 @@ class TestCollector(tests_base.BaseTestCase):
         with mock.patch('socket.socket',
                         return_value=self._make_fake_socket(self.utf8_msg)):
             self.srv.start()
+            self.srv.udp_thread.join(5)
+            self.assertFalse(self.srv.udp_thread.is_alive())
             self.assertTrue(utils.verify_signature(
                 mock_dispatcher.method_calls[0][1][0],
                 "not-so-secret"))

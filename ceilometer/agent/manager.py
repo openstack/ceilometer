@@ -230,7 +230,7 @@ class PollingTask(object):
         )
 
 
-class AgentManager(service_base.BaseService):
+class AgentManager(service_base.PipelineBasedService):
 
     def __init__(self, namespaces=None, pollster_list=None):
         namespaces = namespaces or ['compute', 'central']
@@ -388,6 +388,7 @@ class AgentManager(service_base.BaseService):
         return pollster_timers
 
     def start(self):
+        super(AgentManager, self).start()
         self.polling_manager = pipeline.setup_polling()
 
         self.partition_coordinator.start()
@@ -398,7 +399,7 @@ class AgentManager(service_base.BaseService):
         self.init_pipeline_refresh()
 
     def stop(self):
-        if self.partition_coordinator:
+        if self.started:
             self.partition_coordinator.stop()
         super(AgentManager, self).stop()
 
