@@ -80,7 +80,6 @@ class CompatibilityTest(test_storage_scenarios.DBTestBase):
         self.assertEqual(1, len(meters))
 
 
-# TODO(ananya) same test should be done for other databse
 @tests_db.run_with('mongodb')
 class FilterQueryTestForMeters(test_storage_scenarios.DBTestBase):
     def prepare_data(self):
