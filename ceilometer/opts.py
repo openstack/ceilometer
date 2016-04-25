@@ -76,7 +76,6 @@ def list_opts():
                          ceilometer.pipeline.OPTS,
                          ceilometer.sample.OPTS,
                          ceilometer.service.OPTS,
-                         ceilometer.storage.OLD_OPTS,
                          ceilometer.storage.CLI_OPTS,
                          ceilometer.utils.OPTS,)),
         ('api',

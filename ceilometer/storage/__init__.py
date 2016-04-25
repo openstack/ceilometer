@@ -28,15 +28,6 @@ from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
-OLD_OPTS = [
-    cfg.StrOpt('database_connection',
-               secret=True,
-               help='DEPRECATED - Database connection string.',
-               ),
-]
-
-cfg.CONF.register_opts(OLD_OPTS)
-
 
 OPTS = [
     cfg.IntOpt('metering_time_to_live',
@@ -95,9 +86,6 @@ def get_connection_from_config(conf, purpose='metering'):
     @retrying.retry(wait_fixed=conf.database.retry_interval * 1000,
                     stop_max_attempt_number=retries if retries >= 0 else None)
     def _inner():
-        if conf.database_connection:
-            conf.set_override('connection', conf.database_connection,
-                              group='database')
         namespace = 'ceilometer.%s.storage' % purpose
         url = (getattr(conf.database, '%s_connection' % purpose) or
                conf.database.connection)
