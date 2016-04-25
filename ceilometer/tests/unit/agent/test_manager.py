@@ -427,6 +427,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
         self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
         self.mgr.start()
+        self.addCleanup(self.mgr.stop)
         # Manually executes callbacks
         for timer in self.mgr.pollster_timers:
             timer.f(*timer.args, **timer.kw)
@@ -459,6 +460,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
         self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
         self.mgr.start()
+        self.addCleanup(self.mgr.stop)
 
         # we only got the old name of meters
         for sample in self.notified_samples:

@@ -329,6 +329,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.CONF.set_override('refresh_pipeline_cfg', True)
         self.CONF.set_override('pipeline_polling_interval', 5)
         self.mgr.start()
+        self.addCleanup(self.mgr.stop)
         setup_polling.assert_called_once_with()
         self.mgr.partition_coordinator.start.assert_called_once_with()
         self.mgr.join_partitioning_groups.assert_called_once_with()
@@ -415,6 +416,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mgr.create_polling_task = mock.MagicMock()
         mgr.tg = mock.MagicMock()
         mgr.start()
+        self.addCleanup(mgr.stop)
         self.assertTrue(mgr.tg.add_timer.called)
 
     def test_manager_exception_persistency(self):
