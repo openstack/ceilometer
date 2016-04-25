@@ -12,7 +12,6 @@
 # under the License.
 
 import functools
-import logging
 
 import novaclient
 from novaclient import client as nova_client
@@ -66,8 +65,8 @@ class Client(object):
 
         logger = None
         if cfg.CONF.nova_http_log_debug:
-            logger = logging.getLogger("novaclient-debug")
-            logger.setLevel(log.DEBUG)
+            logger = log.getLogger("novaclient-debug")
+            logger.logger.setLevel(log.DEBUG)
 
         self.nova_client = nova_client.Client(
             version=2,

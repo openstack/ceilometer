@@ -12,9 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import logging
-
 from oslo_config import cfg
+from oslo_log import log
 import oslo_messaging
 from stevedore import extension
 
@@ -22,7 +21,7 @@ from ceilometer.event import converter as event_converter
 from ceilometer.i18n import _LE
 from ceilometer import messaging
 
-LOG = logging.getLogger(__name__)
+LOG = log.getLogger(__name__)
 
 
 class EventsNotificationEndpoint(object):
