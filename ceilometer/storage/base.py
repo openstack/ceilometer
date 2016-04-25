@@ -71,14 +71,6 @@ def _handle_sort_key(model_name, sort_key=None):
     return sort_keys
 
 
-class MultipleResultsFound(Exception):
-    pass
-
-
-class NoResultFound(Exception):
-    pass
-
-
 class Model(object):
     """Base class for storage API models."""
 
