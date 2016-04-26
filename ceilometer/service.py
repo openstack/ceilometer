@@ -71,8 +71,8 @@ def prepare_service(argv=None, config_files=None):
     oslo_i18n.enable_lazy()
     log.register_options(cfg.CONF)
     log_levels = (cfg.CONF.default_log_levels +
-                  ['stevedore=INFO', 'keystoneclient=INFO',
-                   'neutronclient=INFO'])
+                  ['futurist=INFO', 'neutronclient=INFO',
+                   'keystoneclient=INFO'])
     log.set_defaults(default_log_levels=log_levels)
     defaults.set_cors_middleware_defaults()
 
