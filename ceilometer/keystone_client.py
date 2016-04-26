@@ -15,7 +15,6 @@
 
 import os
 
-from keystoneauth1 import exceptions as ka_exception
 from keystoneauth1 import identity as ka_identity
 from keystoneauth1 import loading as ka_loading
 from keystoneclient.v3 import client as ks_client_v3
@@ -48,38 +47,6 @@ def get_service_catalog(client):
 
 def get_auth_token(client):
     return client.session.auth.get_access(client.session).auth_token
-
-
-def get_client_on_behalf_user(auth_plugin, trust_id=None,
-                              requests_session=None):
-    """Return a client for keystone v3 endpoint, optionally using a trust."""
-    session = ka_loading.load_session_from_conf_options(
-        cfg.CONF, CFG_GROUP, auth=auth_plugin, session=requests_session
-    )
-    return ks_client_v3.Client(session=session, trust_id=trust_id)
-
-
-def create_trust_id(trustor_user_id, trustor_project_id, roles, auth_plugin):
-    """Create a new trust using the ceilometer service user."""
-    admin_client = get_client()
-    trustee_user_id = admin_client.auth_ref.user_id
-
-    client = get_client_on_behalf_user(auth_plugin=auth_plugin)
-    trust = client.trusts.create(trustor_user=trustor_user_id,
-                                 trustee_user=trustee_user_id,
-                                 project=trustor_project_id,
-                                 impersonation=True,
-                                 role_names=roles)
-    return trust.id
-
-
-def delete_trust_id(trust_id, auth_plugin):
-    """Delete a trust previously setup for the ceilometer user."""
-    client = get_client_on_behalf_user(auth_plugin=auth_plugin)
-    try:
-        client.trusts.delete(trust_id)
-    except ka_exception.NotFound:
-        pass
 
 
 CLI_OPTS = [
