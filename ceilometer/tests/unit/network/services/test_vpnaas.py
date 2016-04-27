@@ -89,7 +89,7 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
         samples = list(self.pollster.get_samples(
             self.manager, {},
             resources=self.fake_get_vpn_service()))
-        self.assertEqual(3, len(samples))
+        self.assertEqual(4, len(samples))
         for field in self.pollster.FIELDS:
             self.assertEqual(self.fake_get_vpn_service()[0][field],
                              samples[0].resource_metadata[field])
