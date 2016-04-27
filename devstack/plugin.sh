@@ -213,10 +213,6 @@ function cleanup_ceilometer {
     _drop_database
     sudo rm -f "$CEILOMETER_CONF_DIR"/*
     sudo rmdir "$CEILOMETER_CONF_DIR"
-    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "False" ]; then
-        sudo rm -f "$CEILOMETER_API_LOG_DIR"/*
-        sudo rmdir "$CEILOMETER_API_LOG_DIR"
-    fi
 }
 
 # Set configuraiton for cache backend.
@@ -390,9 +386,6 @@ function install_ceilometer {
     install_ceilometerclient
     setup_develop $CEILOMETER_DIR
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
-    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "False" ]; then
-        sudo install -d -o $STACK_USER -m 755 $CEILOMETER_API_LOG_DIR
-    fi
 }
 
 # install_ceilometerclient() - Collect source and prepare
@@ -413,7 +406,7 @@ function start_ceilometer {
     run_process ceilometer-aipmi "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces ipmi --config-file $CEILOMETER_CONF"
 
     if [[ "$CEILOMETER_USE_MOD_WSGI" == "False" ]]; then
-        run_process ceilometer-api "$CEILOMETER_BIN_DIR/ceilometer-api -d -v --log-dir=$CEILOMETER_API_LOG_DIR --config-file $CEILOMETER_CONF"
+        run_process ceilometer-api "$CEILOMETER_BIN_DIR/ceilometer-api -d -v --config-file $CEILOMETER_CONF"
     elif is_service_enabled ceilometer-api; then
         enable_apache_site ceilometer
         restart_apache_server
