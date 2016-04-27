@@ -21,6 +21,11 @@ STATUS = {
     'inactive': 0,
     'active': 1,
     'pending_create': 2,
+    'down': 3,
+    'created': 4,
+    'pending_update': 5,
+    'pending_delete': 6,
+    'error': 7,
 }
 
 
