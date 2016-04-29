@@ -1,0 +1,7 @@
+---
+fixes:
+  - >
+    [`bug 1491509 <https://bugs.launchpad.net/ceilometer/+bug/1491509>`_]
+    Patch to unify timestamp in samples polled by pollsters. Set the time
+    point polling starts as timestamp of samples, and drop timetamping in
+    pollsters.

@@ -86,7 +86,7 @@ class _Base(plugin_base.PollsterBase):
                 if not isinstance(data, list):
                     data = [data]
                 for (volume, resource_id,
-                     resource_metadata, timestamp) in data:
+                     resource_metadata) in data:
 
                     yield sample.Sample(
                         name=self.meter_name,
@@ -96,6 +96,5 @@ class _Base(plugin_base.PollsterBase):
                         user_id=None,
                         project_id=None,
                         resource_id=resource_id,
-                        timestamp=timestamp,
                         resource_metadata=resource_metadata
                     )

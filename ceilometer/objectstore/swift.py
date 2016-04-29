@@ -20,7 +20,6 @@ from __future__ import absolute_import
 from keystoneauth1 import exceptions
 from oslo_config import cfg
 from oslo_log import log
-from oslo_utils import timeutils
 import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 
@@ -115,7 +114,6 @@ class ObjectsPollster(_Base):
                 user_id=None,
                 project_id=tenant,
                 resource_id=tenant,
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=None,
             )
 
@@ -134,7 +132,6 @@ class ObjectsSizePollster(_Base):
                 user_id=None,
                 project_id=tenant,
                 resource_id=tenant,
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=None,
             )
 
@@ -153,7 +150,6 @@ class ObjectsContainersPollster(_Base):
                 user_id=None,
                 project_id=tenant,
                 resource_id=tenant,
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=None,
             )
 
@@ -177,7 +173,6 @@ class ContainersObjectsPollster(_Base):
                     user_id=None,
                     project_id=tenant,
                     resource_id=tenant + '/' + container['name'],
-                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata=None,
                 )
 
@@ -201,6 +196,5 @@ class ContainersSizePollster(_Base):
                     user_id=None,
                     project_id=tenant,
                     resource_id=tenant + '/' + container['name'],
-                    timestamp=timeutils.utcnow().isoformat(),
                     resource_metadata=None,
                 )

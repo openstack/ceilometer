@@ -16,7 +16,6 @@ import abc
 
 from oslo_config import cfg
 from oslo_log import log
-from oslo_utils import timeutils
 import six
 
 from ceilometer.agent import plugin_base
@@ -89,7 +88,6 @@ class _Base(plugin_base.PollsterBase):
                 user_id=None,
                 project_id=None,
                 resource_id=CONF.host,
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=metadata)
 
 

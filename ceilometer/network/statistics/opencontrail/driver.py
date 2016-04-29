@@ -14,7 +14,6 @@
 
 import re
 
-from oslo_utils import timeutils
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
@@ -104,7 +103,6 @@ class OpencontrailDriver(driver.Driver):
         fqdn_uuid = params.get('fqdn_uuid', ['*'])[0]
         virtual_network = params.get('virtual_network', [None])[0]
 
-        timestamp = timeutils.utcnow().isoformat()
         statistics = data['o_client'].networks.get_vm_statistics(fqdn_uuid)
         if not statistics:
             return
@@ -113,7 +111,7 @@ class OpencontrailDriver(driver.Driver):
             for sample in iter(extractor, value, ports_map,
                                resource, virtual_network):
                 if sample is not None:
-                    yield sample + (timestamp, )
+                    yield sample
 
     def _get_iter(self, meter_name):
         if meter_name.startswith('switch.port'):

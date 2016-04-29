@@ -14,7 +14,6 @@
 
 from oslo_config import cfg
 from oslo_log import log
-from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
 from ceilometer.i18n import _
@@ -112,7 +111,6 @@ class SensorPollster(plugin_base.PollsterBase):
                 user_id=None,
                 project_id=None,
                 resource_id=resource_id,
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=metadata)
 
 

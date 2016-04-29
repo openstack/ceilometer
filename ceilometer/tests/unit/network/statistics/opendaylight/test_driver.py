@@ -122,7 +122,6 @@ class _Base(base.BaseTestCase):
             self.assertEqual(expected[0], sample[0])  # check volume
             self.assertEqual(expected[1], sample[1])  # check resource id
             self.assertEqual(expected[2], sample[2])  # check resource metadata
-            self.assertIsNotNone(sample[3])  # timestamp
 
 
 class TestOpenDayLightDriverSpecial(_Base):

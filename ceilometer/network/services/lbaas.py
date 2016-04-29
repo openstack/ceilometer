@@ -18,7 +18,6 @@ import collections
 
 from oslo_config import cfg
 from oslo_log import log
-from oslo_utils import timeutils
 import six
 
 from ceilometer.i18n import _
@@ -98,7 +97,6 @@ class LBPoolPollster(BaseLBPollster):
                 user_id=None,
                 project_id=pool['tenant_id'],
                 resource_id=pool['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(pool)
             )
 
@@ -146,7 +144,6 @@ class LBVipPollster(base.BaseServicesPollster):
                 user_id=None,
                 project_id=vip['tenant_id'],
                 resource_id=vip['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(vip)
             )
 
@@ -186,7 +183,6 @@ class LBMemberPollster(BaseLBPollster):
                 user_id=None,
                 project_id=member['tenant_id'],
                 resource_id=member['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(member)
             )
 
@@ -217,7 +213,6 @@ class LBHealthMonitorPollster(base.BaseServicesPollster):
                 user_id=None,
                 project_id=probe['tenant_id'],
                 resource_id=probe['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(probe)
             )
 
@@ -248,7 +243,6 @@ class _LBStatsPollster(base.BaseServicesPollster):
             user_id=None,
             project_id=pool['tenant_id'],
             resource_id=pool['id'],
-            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata=resource_metadata,
         )
 
@@ -377,7 +371,6 @@ def make_sample_from_pool(pool, name, type, unit, volume,
         user_id=None,
         project_id=pool['tenant_id'],
         resource_id=pool['id'],
-        timestamp=timeutils.utcnow().isoformat(),
         resource_metadata=resource_metadata,
     )
 
@@ -423,7 +416,6 @@ class LBListenerPollster(BaseLBPollster):
                 user_id=None,
                 project_id=listener['tenant_id'],
                 resource_id=listener['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(listener)
             )
 
@@ -468,6 +460,5 @@ class LBLoadBalancerPollster(BaseLBPollster):
                 user_id=None,
                 project_id=loadbalancer['tenant_id'],
                 resource_id=loadbalancer['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(loadbalancer)
             )

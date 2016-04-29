@@ -135,8 +135,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'if_stats_list'},
-                     mock.ANY),
+                      'resource': 'if_stats_list'},),
                     (13,
                      '96d49cc3-4e01-40ce-9cac-c0e32642a442',
                      {'device_owner_id':
@@ -145,8 +144,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'if_stats_list'},
-                     mock.ANY)]
+                      'resource': 'if_stats_list'},)]
         self._test_meter('switch.port.receive.packets', expected,
                          self.fake_port_stats_with_node())
 
@@ -159,8 +157,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'if_stats_list'},
-                     mock.ANY)]
+                      'resource': 'if_stats_list'},)]
         self._test_meter('switch.port.receive.packets', expected)
 
     def test_switch_port_transmit_packets(self):
@@ -172,8 +169,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'if_stats_list'},
-                     mock.ANY)]
+                      'resource': 'if_stats_list'},)]
         self._test_meter('switch.port.transmit.packets', expected)
 
     def test_switch_port_receive_bytes(self):
@@ -185,8 +181,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'if_stats_list'},
-                     mock.ANY)]
+                      'resource': 'if_stats_list'},)]
         self._test_meter('switch.port.receive.bytes', expected)
 
     def test_switch_port_transmit_bytes(self):
@@ -198,8 +193,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'if_stats_list'},
-                     mock.ANY)]
+                      'resource': 'if_stats_list'},)]
         self._test_meter('switch.port.transmit.bytes', expected)
 
     def test_switch_port_receive_packets_fip(self):
@@ -212,8 +206,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'fip_stats_list'},
-                     mock.ANY)]
+                      'resource': 'fip_stats_list'},)]
         self._test_meter('switch.port.receive.packets', expected)
 
     def test_switch_port_transmit_packets_fip(self):
@@ -226,8 +219,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'fip_stats_list'},
-                     mock.ANY)]
+                      'resource': 'fip_stats_list'},)]
         self._test_meter('switch.port.transmit.packets', expected)
 
     def test_switch_port_receive_bytes_fip(self):
@@ -240,8 +232,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'fip_stats_list'},
-                     mock.ANY)]
+                      'resource': 'fip_stats_list'},)]
         self._test_meter('switch.port.receive.bytes', expected)
 
     def test_switch_port_transmit_bytes_fip(self):
@@ -254,8 +245,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                       'network_id': '298a3088-a446-4d5a-bad8-f92ecacd786b',
                       'project': 'demo',
                       'project_id': '89271fa581ab4380bf172f868c3615f9',
-                      'resource': 'fip_stats_list'},
-                     mock.ANY)]
+                      'resource': 'fip_stats_list'},)]
         self._test_meter('switch.port.transmit.bytes', expected)
 
     def test_switch_port_transmit_bytes_non_existing_network(self):
