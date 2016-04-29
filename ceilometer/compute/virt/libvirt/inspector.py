@@ -68,32 +68,31 @@ class LibvirtInspector(virt_inspector.Inspector):
     per_type_uris = dict(uml='uml:///system', xen='xen:///', lxc='lxc:///')
 
     def __init__(self):
-        self.uri = self._get_uri()
-        self.connection = None
+        self._connection = None
 
-    def _get_uri(self):
-        return CONF.libvirt_uri or self.per_type_uris.get(CONF.libvirt_type,
-                                                          'qemu:///system')
-
-    def _get_connection(self):
-        if not self.connection:
+    @property
+    def connection(self):
+        if not self._connection:
             global libvirt
             if libvirt is None:
                 libvirt = __import__('libvirt')
-            LOG.debug('Connecting to libvirt: %s', self.uri)
-            self.connection = libvirt.openReadOnly(self.uri)
 
-        return self.connection
+            uri = (CONF.libvirt_uri or
+                   self.per_type_uris.get(CONF.libvirt_type, 'qemu:///system'))
+            LOG.debug('Connecting to libvirt: %s', uri)
+            self._connection = libvirt.openReadOnly(uri)
+
+        return self._connection
 
     def check_sanity(self):
-        if not self._get_connection():
+        if not self.connection:
             raise virt_inspector.NoSanityException()
 
     @retry_on_disconnect
     def _lookup_by_uuid(self, instance):
         instance_name = util.instance_name(instance)
         try:
-            return self._get_connection().lookupByUUIDString(instance.id)
+            return self.connection.lookupByUUIDString(instance.id)
         except Exception as ex:
             if not libvirt or not isinstance(ex, libvirt.libvirtError):
                 raise virt_inspector.InspectorException(six.text_type(ex))

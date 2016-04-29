@@ -41,7 +41,6 @@ class TestLibvirtInspection(base.BaseTestCase):
             name = 'instance-00000001'
         self.instance = VMInstance
         self.inspector = libvirt_inspector.LibvirtInspector()
-        self.inspector.connection = mock.Mock()
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.VIR_DOMAIN_SHUTOFF = 5
         libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
@@ -338,14 +337,10 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
         self.inspector = libvirt_inspector.LibvirtInspector()
         self.useFixture(fixtures.MonkeyPatch(
             'ceilometer.compute.virt.libvirt.inspector.'
-            'LibvirtInspector._get_connection',
-            self._dummy_get_connection))
+            'LibvirtInspector.connection',
+            mock.MagicMock(side_effect=Exception('dummy'))))
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
-
-    @staticmethod
-    def _dummy_get_connection(*args, **kwargs):
-        raise Exception('dummy')
 
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,
@@ -359,16 +354,15 @@ class TestLibvirtInitWithError(base.BaseTestCase):
         self.inspector = libvirt_inspector.LibvirtInspector()
         libvirt_inspector.libvirt = mock.Mock()
 
-    @mock.patch('ceilometer.compute.virt.libvirt.inspector.'
-                'LibvirtInspector._get_connection',
-                mock.Mock(return_value=None))
     def test_init_error(self):
-        self.assertRaises(virt_inspector.NoSanityException,
-                          self.inspector.check_sanity)
+        with mock.patch.object(libvirt_inspector.libvirt,
+                               'openReadOnly',
+                               return_value=None):
+            self.assertRaises(virt_inspector.NoSanityException,
+                              self.inspector.check_sanity)
 
-    @mock.patch('ceilometer.compute.virt.libvirt.inspector.'
-                'LibvirtInspector._get_connection',
-                mock.Mock(side_effect=virt_inspector.NoDataException))
     def test_init_exception(self):
-        self.assertRaises(virt_inspector.NoDataException,
-                          self.inspector.check_sanity)
+        with mock.patch.object(libvirt_inspector.libvirt,
+                               'openReadOnly',
+                               side_effect=ImportError):
+            self.assertRaises(ImportError, self.inspector.check_sanity)
