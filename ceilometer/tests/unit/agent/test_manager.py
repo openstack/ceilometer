@@ -347,8 +347,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                                   None,
                                   None,
                                   discovery.NodesDiscoveryTripleO())
-        self.mgr.discovery_manager = (extension.ExtensionManager
-                                      .make_test_instance([ext]))
+        self.mgr.discoveries = (extension.ExtensionManager
+                                .make_test_instance([ext]))
 
         self.pipeline_cfg = {
             'sources': [{
