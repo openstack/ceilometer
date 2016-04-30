@@ -21,6 +21,7 @@ import six
 from stevedore import named
 
 from ceilometer.i18n import _LW
+from ceilometer.publisher import utils
 
 
 LOG = log.getLogger(__name__)
@@ -91,4 +92,16 @@ class MeterDispatcherBase(Base):
 class EventDispatcherBase(Base):
     @abc.abstractmethod
     def record_events(self, events):
-        """Recording events interface."""
+        """Record events."""
+
+    def verify_and_record_events(self, events):
+        """Verify event signature and record them."""
+        goods = []
+        for event in events:
+            if utils.verify_signature(
+                    event, self.conf.publisher.telemetry_secret):
+                goods.append(event)
+            else:
+                LOG.warning(_LW(
+                    'event signature invalid, discarding event: %s'), event)
+        return self.record_events(goods)

@@ -58,12 +58,12 @@ class TestDispatcherDB(base.BaseTestCase):
         with mock.patch.object(self.dispatcher.event_conn,
                                'record_events') as record_events:
             event['message_signature'] = 'bad_signature'
-            self.dispatcher.record_events(event)
+            self.dispatcher.verify_and_record_events([event])
             self.assertEqual([], record_events.call_args_list[0][0][0])
             del event['message_signature']
             event['message_signature'] = utils.compute_signature(
                 event, self.CONF.publisher.telemetry_secret)
-            self.dispatcher.record_events(event)
+            self.dispatcher.verify_and_record_events([event])
             self.assertEqual(1, len(record_events.call_args_list[1][0][0]))
 
     def test_valid_message(self):

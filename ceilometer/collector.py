@@ -179,5 +179,5 @@ class SampleEndpoint(CollectorEndpoint):
 
 
 class EventEndpoint(CollectorEndpoint):
-    method = 'record_events'
+    method = 'verify_and_record_events'
     ep_type = 'event'

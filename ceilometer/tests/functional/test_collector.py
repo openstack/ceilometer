@@ -228,7 +228,8 @@ class TestCollector(tests_base.BaseTestCase):
         mock_dispatcher = self._setup_fake_dispatcher()
         self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
         mock_dispatcher.record_metering_data.side_effect = Exception('boom')
-        mock_dispatcher.record_events.side_effect = Exception('boom')
+        mock_dispatcher.verify_and_record_events.side_effect = Exception(
+            'boom')
 
         self.srv.start()
         endp = getattr(self.srv, listener).dispatcher.endpoints[0]
