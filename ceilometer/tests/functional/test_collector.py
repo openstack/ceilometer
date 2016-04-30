@@ -132,8 +132,8 @@ class TestCollector(tests_base.BaseTestCase):
             mock_socket.assert_called_with(socket.AF_INET, socket.SOCK_DGRAM)
 
         self._verify_udp_socket(udp_socket)
-        mock_dispatcher.record_metering_data.assert_called_once_with(
-            self.counter)
+        mock_record = mock_dispatcher.verify_and_record_metering_data
+        mock_record.assert_called_once_with(self.counter)
 
     def test_udp_socket_ipv6(self):
         self._setup_messaging(False)
@@ -152,7 +152,8 @@ class TestCollector(tests_base.BaseTestCase):
     def test_udp_receive_storage_error(self):
         self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
-        mock_dispatcher.record_metering_data.side_effect = self._raise_error
+        mock_record = mock_dispatcher.verify_and_record_metering_data
+        mock_record.side_effect = self._raise_error
 
         self.counter['source'] = 'mysource'
         self.counter['counter_name'] = self.counter['name']
@@ -169,8 +170,7 @@ class TestCollector(tests_base.BaseTestCase):
 
         self._verify_udp_socket(udp_socket)
 
-        mock_dispatcher.record_metering_data.assert_called_once_with(
-            self.counter)
+        mock_record.assert_called_once_with(self.counter)
 
     @staticmethod
     def _raise_error(*args, **kwargs):
@@ -224,7 +224,8 @@ class TestCollector(tests_base.BaseTestCase):
 
         mock_dispatcher = self._setup_fake_dispatcher()
         self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
-        mock_dispatcher.record_metering_data.side_effect = Exception('boom')
+        mock_record = mock_dispatcher.verify_and_record_metering_data
+        mock_record.side_effect = Exception('boom')
         mock_dispatcher.verify_and_record_events.side_effect = Exception(
             'boom')
 
