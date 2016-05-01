@@ -303,34 +303,36 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_polling')
     def test_start(self, setup_polling):
-        self.mgr.join_partitioning_groups = mock.MagicMock()
         self.mgr.setup_polling_tasks = mock.MagicMock()
+        mpc = self.mgr.partition_coordinator
+        mpc.is_active.return_value = False
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.mgr.start()
         setup_polling.assert_called_once_with()
-        self.mgr.partition_coordinator.start.assert_called_once_with()
-        self.mgr.join_partitioning_groups.assert_called_once_with()
+        mpc.start.assert_called_once_with()
+        self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
-        timer_call = mock.call(1.0, self.mgr.partition_coordinator.heartbeat)
+        timer_call = mock.call(1.0, mpc.heartbeat)
         self.assertEqual([timer_call], self.mgr.tg.add_timer.call_args_list)
         self.mgr.stop()
-        self.mgr.partition_coordinator.stop.assert_called_once_with()
+        mpc.stop.assert_called_once_with()
 
     @mock.patch('ceilometer.pipeline.setup_polling')
     def test_start_with_pipeline_poller(self, setup_polling):
-        self.mgr.join_partitioning_groups = mock.MagicMock()
         self.mgr.setup_polling_tasks = mock.MagicMock()
-
+        mpc = self.mgr.partition_coordinator
+        mpc.is_active.return_value = False
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.CONF.set_override('refresh_pipeline_cfg', True)
         self.CONF.set_override('pipeline_polling_interval', 5)
+        self.addCleanup(self.mgr.stop)
         self.mgr.start()
         self.addCleanup(self.mgr.stop)
         setup_polling.assert_called_once_with()
-        self.mgr.partition_coordinator.start.assert_called_once_with()
-        self.mgr.join_partitioning_groups.assert_called_once_with()
+        mpc.start.assert_called_once_with()
+        self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
-        timer_call = mock.call(1.0, self.mgr.partition_coordinator.heartbeat)
+        timer_call = mock.call(1.0, mpc.heartbeat)
         pipeline_poller_call = mock.call(5, self.mgr.refresh_pipeline)
         self.assertEqual([timer_call, pipeline_poller_call],
                          self.mgr.tg.add_timer.call_args_list)
