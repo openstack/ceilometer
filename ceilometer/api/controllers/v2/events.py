@@ -31,9 +31,9 @@ import wsmeext.pecan as wsme_pecan
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
+from ceilometer.event import storage
 from ceilometer.event.storage import models as event_models
 from ceilometer.i18n import _
-from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 
