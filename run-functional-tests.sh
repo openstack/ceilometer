@@ -7,5 +7,5 @@ if [ -z $CEILOMETER_TEST_BACKEND ]; then
 fi
 
 for backend in $CEILOMETER_TEST_BACKEND; do
-    overtest $backend ./tools/pretty_tox.sh $*
+    pifpaf run $backend ./tools/pretty_tox.sh $*
 done

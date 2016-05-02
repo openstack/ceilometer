@@ -180,7 +180,7 @@ class TestBase(test_base.BaseTestCase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        db_url = os.environ.get('OVERTEST_URL', "sqlite://").replace(
+        db_url = os.environ.get('PIFPAF_URL', "sqlite://").replace(
             "mysql://", "mysql+pymysql://")
 
         engine = urlparse.urlparse(db_url).scheme
