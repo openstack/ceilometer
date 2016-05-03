@@ -20,7 +20,6 @@ from keystoneclient import exceptions as ks_exceptions
 import mock
 from novaclient import client as novaclient
 from oslo_config import fixture as fixture_config
-from oslo_service import service as os_service
 from oslo_utils import fileutils
 from oslotest import base
 from oslotest import mockpatch
@@ -431,8 +430,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
 
-        self.mgr.start()
-        self.addCleanup(self.mgr.stop)
+        self.mgr.run()
+        self.addCleanup(self.mgr.terminate)
         # Manually executes callbacks
         for cb, __, args, kwargs in self.mgr.polling_periodics._callables:
             cb(*args, **kwargs)
@@ -463,9 +462,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         pipeline_cfg_file = self.setup_pipeline_file(pipeline)
 
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
-        self.mgr.tg = os_service.threadgroup.ThreadGroup(1000)
-        self.mgr.start()
-        self.addCleanup(self.mgr.stop)
+        self.mgr.run()
+        self.addCleanup(self.mgr.terminate)
 
         # we only got the old name of meters
         for sample in self.notified_samples:

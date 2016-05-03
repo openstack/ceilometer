@@ -76,7 +76,7 @@ class TestCollector(tests_base.BaseTestCase):
             ),
             'not-so-secret')
 
-        self.srv = collector.CollectorService()
+        self.srv = collector.CollectorService(0)
 
     def _setup_messaging(self, enabled=True):
         if enabled:
@@ -121,8 +121,8 @@ class TestCollector(tests_base.BaseTestCase):
 
         with mock.patch('socket.socket') as mock_socket:
             mock_socket.return_value = udp_socket
-            self.srv.start()
-            self.addCleanup(self.srv.stop)
+            self.srv.run()
+            self.addCleanup(self.srv.terminate)
             self.srv.udp_thread.join(5)
             self.assertFalse(self.srv.udp_thread.is_alive())
             mock_socket.assert_called_with(socket.AF_INET, socket.SOCK_DGRAM)
@@ -139,8 +139,8 @@ class TestCollector(tests_base.BaseTestCase):
 
         with mock.patch.object(socket, 'socket') as mock_socket:
             mock_socket.return_value = sock
-            self.srv.start()
-            self.addCleanup(self.srv.stop)
+            self.srv.run()
+            self.addCleanup(self.srv.terminate)
             self.srv.udp_thread.join(5)
             self.assertFalse(self.srv.udp_thread.is_alive())
             mock_socket.assert_called_with(socket.AF_INET6, socket.SOCK_DGRAM)
@@ -153,8 +153,8 @@ class TestCollector(tests_base.BaseTestCase):
 
         udp_socket = self._make_fake_socket(self.sample)
         with mock.patch('socket.socket', return_value=udp_socket):
-            self.srv.start()
-            self.addCleanup(self.srv.stop)
+            self.srv.run()
+            self.addCleanup(self.srv.terminate)
             self.srv.udp_thread.join(5)
             self.assertFalse(self.srv.udp_thread.is_alive())
 
@@ -172,8 +172,8 @@ class TestCollector(tests_base.BaseTestCase):
         udp_socket = self._make_fake_socket(self.sample)
         with mock.patch('socket.socket', return_value=udp_socket):
             with mock.patch('msgpack.loads', self._raise_error):
-                self.srv.start()
-                self.addCleanup(self.srv.stop)
+                self.srv.run()
+                self.addCleanup(self.srv.terminate)
                 self.srv.udp_thread.join(5)
                 self.assertFalse(self.srv.udp_thread.is_alive())
 
@@ -189,8 +189,8 @@ class TestCollector(tests_base.BaseTestCase):
         with mock.patch.object(oslo_messaging.MessageHandlingServer,
                                'start', side_effect=real_start) as rpc_start:
             with mock.patch('socket.socket', return_value=udp_socket):
-                self.srv.start()
-                self.addCleanup(self.srv.stop)
+                self.srv.run()
+                self.addCleanup(self.srv.terminate)
                 self.srv.udp_thread.join(5)
                 self.assertFalse(self.srv.udp_thread.is_alive())
                 self.assertEqual(0, rpc_start.call_count)
@@ -202,8 +202,8 @@ class TestCollector(tests_base.BaseTestCase):
         self.data_sent = []
         with mock.patch('socket.socket',
                         return_value=self._make_fake_socket(self.utf8_msg)):
-            self.srv.start()
-            self.addCleanup(self.srv.stop)
+            self.srv.run()
+            self.addCleanup(self.srv.terminate)
             self.srv.udp_thread.join(5)
             self.assertFalse(self.srv.udp_thread.is_alive())
             self.assertTrue(utils.verify_signature(
@@ -218,8 +218,8 @@ class TestCollector(tests_base.BaseTestCase):
         mock_record.side_effect = Exception('boom')
         mock_dispatcher.record_events.side_effect = Exception('boom')
 
-        self.srv.start()
-        self.addCleanup(self.srv.stop)
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
         endp = getattr(self.srv, listener).dispatcher.endpoints[0]
         ret = endp.sample([{'ctxt': {}, 'publisher_id': 'pub_id',
                             'event_type': 'event', 'payload': {},
