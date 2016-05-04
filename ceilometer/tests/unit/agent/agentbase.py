@@ -42,7 +42,8 @@ from ceilometer import utils
 
 class TestSample(sample.Sample):
     def __init__(self, name, type, unit, volume, user_id, project_id,
-                 resource_id, timestamp, resource_metadata, source=None):
+                 resource_id, timestamp=None, resource_metadata=None,
+                 source=None):
         super(TestSample, self).__init__(name, type, unit, volume, user_id,
                                          project_id, resource_id, timestamp,
                                          resource_metadata, source)
@@ -717,3 +718,21 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         LOG.info.assert_called_with(
             'Skip pollster %(name)s, no %(p_context)sresources found this '
             'cycle', {'name': 'test', 'p_context': 'new '})
+
+    @mock.patch('oslo_utils.timeutils.utcnow')
+    def test_polling_samples_timestamp(self, mock_utc):
+        polled_samples = []
+        timestamp = '2222-11-22T00:11:22.333333'
+
+        def fake_send_notification(samples):
+            polled_samples.extend(samples)
+
+        mock_utc.return_value = datetime.datetime.strptime(
+            timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+
+        self.setup_polling()
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
+        polling_task._send_notification = mock.Mock(
+            side_effect=fake_send_notification)
+        polling_task.poll_and_notify()
+        self.assertEqual(timestamp, polled_samples[0]['timestamp'])
