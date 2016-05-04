@@ -1,0 +1,6 @@
+---
+fixes:
+  - >
+    [`bug 1578128 <https://bugs.launchpad.net/ceilometer/+bug/1578128>`_]
+    Add a tool that allow users to drop the legacy alarm and alarm_history
+    tables.
