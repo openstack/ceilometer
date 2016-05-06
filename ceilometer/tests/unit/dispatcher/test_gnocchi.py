@@ -52,6 +52,7 @@ class DispatcherTest(base.BaseTestCase):
         self.resource_id = str(uuid.uuid4())
         self.samples = [{
             'counter_name': 'disk.root.size',
+            'counter_unit': 'GB',
             'counter_type': 'gauge',
             'counter_volume': '2',
             'user_id': 'test_user',
@@ -64,9 +65,11 @@ class DispatcherTest(base.BaseTestCase):
                 'image_ref': 'imageref!',
                 'instance_flavor_id': 1234,
                 'display_name': 'myinstance',
-            }},
+                }
+            },
             {
                 'counter_name': 'disk.root.size',
+                'counter_unit': 'GB',
                 'counter_type': 'gauge',
                 'counter_volume': '2',
                 'user_id': 'test_user',
@@ -187,6 +190,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         ('disk.root.size', dict(
             sample={
                 'counter_name': 'disk.root.size',
+                'counter_unit': 'GB',
                 'counter_type': 'gauge',
                 'counter_volume': '2',
                 'user_id': 'test_user',
@@ -227,6 +231,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         ('hardware.ipmi.node.power', dict(
             sample={
                 'counter_name': 'hardware.ipmi.node.power',
+                'counter_unit': 'W',
                 'counter_type': 'gauge',
                 'counter_volume': '2',
                 'user_id': 'test_user',
@@ -356,6 +361,13 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             attributes['id'] = self.sample['resource_id']
             attributes['metrics'] = dict((metric_name, {})
                                          for metric_name in self.metric_names)
+            for k, v in six.iteritems(attributes['metrics']):
+                if k == 'disk.root.size':
+                    v['unit'] = 'GB'
+                    continue
+                if k == 'hardware.ipmi.node.power':
+                    v['unit'] = 'W'
+                    continue
             expected_calls.append(mock.call.resource.create(
                 self.resource_type, attributes))
 
@@ -367,6 +379,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
                 expected_calls.append(mock.call.metric.create({
                     'name': self.sample['counter_name'],
+                    'unit': self.sample['counter_unit'],
                     'resource_id': resource_id}))
                 if self.create_metric_fail:
                     fakeclient.metric.create.side_effect = [Exception('boom!')]

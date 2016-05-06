@@ -337,6 +337,9 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
                         metric_name, [])
                     m.append({'timestamp': sample['timestamp'],
                               'value': sample['counter_volume']})
+                    unit = sample['counter_unit']
+                    metric = sample['counter_name']
+                    res_info['resource']['metrics'][metric]['unit'] = unit
 
                 stats['measures'] += len(measures[gnocchi_id][metric_name])
                 res_info["resource"].update(res_info["resource_extra"])
