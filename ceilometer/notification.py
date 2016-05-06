@@ -65,9 +65,13 @@ OPTS = [
                     default=[],
                     secret=True,
                     help="Messaging URLs to listen for notifications. "
-                         "Example: transport://user:pass@host1:port"
-                         "[,hostN:portN]/virtual_host "
-                         "(DEFAULT/transport_url is used if empty)"),
+                         "Example: rabbit://user:pass@host1:port1"
+                         "[,user:pass@hostN:portN]/virtual_host "
+                         "(DEFAULT/transport_url is used if empty). This "
+                         "is useful when you have dedicate messaging nodes "
+                         "for each service, for example, all nova "
+                         "notifications go to rabbit-nova:5672, while all "
+                         "cinder notifications go to rabbit-cinder:5672."),
     cfg.IntOpt('batch_size',
                default=1,
                help='Number of notification messages to wait before '
