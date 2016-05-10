@@ -18,6 +18,7 @@ import shutil
 
 import mock
 from oslo_config import fixture as fixture_config
+import oslo_messaging
 import oslo_service.service
 from oslo_utils import fileutils
 from oslo_utils import timeutils
@@ -152,8 +153,8 @@ class TestNotification(tests_base.BaseTestCase):
                          self.srv.listeners[0].dispatcher.endpoints[0])
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
-    def test_unique_consumers(self, fake_event_endpoint_class):
+    @mock.patch('oslo_messaging.get_batch_notification_listener')
+    def test_unique_consumers(self, mock_listener):
 
         def fake_get_notifications_manager_dup_targets(pm):
             plugin = instance.Instance(pm)
@@ -166,7 +167,10 @@ class TestNotification(tests_base.BaseTestCase):
             get_nm.side_effect = fake_get_notifications_manager_dup_targets
             self.srv.start()
             self.addCleanup(self.srv.stop)
-            self.assertEqual(1, len(self.srv.listeners[0].dispatcher.targets))
+            self.assertEqual(1, len(mock_listener.call_args_list))
+            args, kwargs = mock_listener.call_args
+            self.assertEqual(1, len(args[1]))
+            self.assertIsInstance(args[1][0], oslo_messaging.Target)
 
 
 class BaseRealNotification(tests_base.BaseTestCase):
@@ -381,44 +385,59 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
-    def test_reset_listener_on_refresh(self):
+    @mock.patch('oslo_messaging.get_batch_notification_listener')
+    def test_reset_listener_on_refresh(self, mock_listener):
+        mock_listener.side_effect = [
+            mock.MagicMock(),  # main listener
+            mock.MagicMock(),  # pipeline listener
+            mock.MagicMock(),  # refresh pipeline listener
+        ]
+
         self.srv.start()
         self.addCleanup(self.srv.stop)
+
+        def _check_listener_targets():
+            args, kwargs = mock_listener.call_args
+            self.assertEqual(20, len(args[1]))
+            self.assertIsInstance(args[1][0], oslo_messaging.Target)
+
+        _check_listener_targets()
+
         listener = self.srv.pipeline_listener
-        self.assertEqual(20,
-                         len(self.srv.pipeline_listener.dispatcher.targets))
         self.srv._configure_pipeline_listener()
-        self.assertEqual(20,
-                         len(self.srv.pipeline_listener.dispatcher.targets))
         self.assertIsNot(listener, self.srv.pipeline_listener)
 
-    def test_retain_common_targets_on_refresh(self):
+        _check_listener_targets()
+
+    @mock.patch('oslo_messaging.get_batch_notification_listener')
+    def test_retain_common_targets_on_refresh(self, mock_listener):
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '.extract_my_subset', return_value=[1, 2]):
             self.srv.start()
             self.addCleanup(self.srv.stop)
         listened_before = [target.topic for target in
-                           self.srv.pipeline_listener.dispatcher.targets]
+                           mock_listener.call_args[0][1]]
         self.assertEqual(4, len(listened_before))
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '.extract_my_subset', return_value=[1, 3]):
             self.srv._refresh_agent(None)
         listened_after = [target.topic for target in
-                          self.srv.pipeline_listener.dispatcher.targets]
+                          mock_listener.call_args[0][1]]
         self.assertEqual(4, len(listened_after))
         common = set(listened_before) & set(listened_after)
         for topic in common:
             self.assertTrue(topic.endswith('1'))
 
-    def test_notify_to_relevant_endpoint(self):
+    @mock.patch('oslo_messaging.get_batch_notification_listener')
+    def test_notify_to_relevant_endpoint(self, mock_listener):
         self.srv.start()
         self.addCleanup(self.srv.stop)
-        dispatcher = self.srv.pipeline_listener.dispatcher
-        self.assertIsNotEmpty(dispatcher.targets)
+
+        targets = mock_listener.call_args[0][1]
+        self.assertIsNotEmpty(targets)
 
         endpoints = {}
-
-        for endpoint in dispatcher.endpoints:
+        for endpoint in mock_listener.call_args[0][2]:
             self.assertEqual(1, len(endpoint.publish_context.pipelines))
             pipe = list(endpoint.publish_context.pipelines)[0]
             endpoints[pipe.name] = endpoint
