@@ -21,7 +21,6 @@ import six
 from stevedore import named
 
 from ceilometer.i18n import _LW
-from ceilometer.publisher import utils
 
 
 LOG = log.getLogger(__name__)
@@ -87,36 +86,9 @@ class MeterDispatcherBase(Base):
     def record_metering_data(self, data):
         """Recording metering data interface."""
 
-    def verify_and_record_metering_data(self, datapoints):
-        """Verify metering data's signature and record valid ones."""
-        if not isinstance(datapoints, list):
-            datapoints = [datapoints]
-
-        valid_datapoints = []
-        for datapoint in datapoints:
-            if utils.verify_signature(datapoint,
-                                      self.conf.publisher.telemetry_secret):
-                valid_datapoints.append(datapoint)
-            else:
-                LOG.warning(_LW('Message signature is invalid, discarding '
-                                'it: <%r>.'), datapoint)
-        return self.record_metering_data(valid_datapoints)
-
 
 @six.add_metaclass(abc.ABCMeta)
 class EventDispatcherBase(Base):
     @abc.abstractmethod
     def record_events(self, events):
         """Record events."""
-
-    def verify_and_record_events(self, events):
-        """Verify event signature and record them."""
-        goods = []
-        for event in events:
-            if utils.verify_signature(
-                    event, self.conf.publisher.telemetry_secret):
-                goods.append(event)
-            else:
-                LOG.warning(_LW(
-                    'event signature invalid, discarding event: %s'), event)
-        return self.record_events(goods)

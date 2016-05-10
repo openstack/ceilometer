@@ -142,7 +142,7 @@ class DispatcherTest(base.BaseTestCase):
     def _do_test_activity_filter(self, expected_measures, fake_batch, __):
 
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        d.verify_and_record_metering_data(self.samples)
+        d.record_metering_data(self.samples)
         fake_batch.assert_called_with(
             mock.ANY, mock.ANY,
             {'metrics': 1, 'resources': 1, 'measures': expected_measures})
@@ -427,7 +427,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         batch = fakeclient.metric.batch_resources_metrics_measures
         batch.side_effect = batch_side_effect
 
-        self.dispatcher.verify_and_record_metering_data([self.sample])
+        self.dispatcher.record_metering_data([self.sample])
 
         # Check that the last log message is the expected one
         if (self.post_measure_fail or self.create_metric_fail
