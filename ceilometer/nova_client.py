@@ -168,8 +168,3 @@ class Client(object):
         return self.nova_client.servers.list(
             detailed=True,
             search_opts=search_opts)
-
-    @logged
-    def floating_ip_get_all(self):
-        """Returns all floating ips."""
-        return self.nova_client.floating_ips.list()

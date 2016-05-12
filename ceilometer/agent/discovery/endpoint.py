@@ -29,8 +29,7 @@ class EndpointDiscovery(plugin.DiscoveryBase):
 
     This discovery should be used when the relevant APIs are not well suited
     to dividing the pollster's work into smaller pieces than a whole service
-    at once. Example of this is the floating_ip pollster which calls
-    nova.floating_ips.list() and therefore gets all floating IPs at once.
+    at once.
     """
 
     @staticmethod
