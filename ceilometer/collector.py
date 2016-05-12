@@ -136,14 +136,6 @@ class CollectorService(service_base.ServiceBase):
             self.udp_thread.join()
         super(CollectorService, self).stop()
 
-    def record_metering_data(self, context, data):
-        """RPC endpoint for messages we send to ourselves.
-
-        When the notification messages are re-published through the
-        RPC publisher, this method receives them for processing.
-        """
-        self.meter_manager.map_method('record_metering_data', data=data)
-
 
 class CollectorEndpoint(object):
     def __init__(self, dispatcher_manager):

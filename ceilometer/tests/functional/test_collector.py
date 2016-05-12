@@ -112,14 +112,6 @@ class TestCollector(tests_base.BaseTestCase):
         udp_socket.bind.assert_called_once_with((conf.udp_address,
                                                  conf.udp_port))
 
-    def test_record_metering_data(self):
-        mock_dispatcher = self._setup_fake_dispatcher()
-        dps = dispatcher.load_dispatcher_manager()
-        (self.srv.meter_manager, self.srv.manager) = dps
-        self.srv.record_metering_data(None, self.counter)
-        mock_dispatcher.record_metering_data.assert_called_once_with(
-            data=self.counter)
-
     def test_udp_receive_base(self):
         self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
