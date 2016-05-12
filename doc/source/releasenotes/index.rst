@@ -29,8 +29,12 @@
 * `Kilo`_
 * `Liberty`_
 
+Since Mitaka development cycle, we start to host release notes on
+`Ceilometer Release Notes`_
+
 .. _Havana: https://wiki.openstack.org/wiki/ReleaseNotes/Havana#OpenStack_Metering_.28Ceilometer.29
 .. _IceHouse: https://wiki.openstack.org/wiki/ReleaseNotes/Icehouse#OpenStack_Telemetry_.28Ceilometer.29
 .. _Juno: https://wiki.openstack.org/wiki/ReleaseNotes/Juno#OpenStack_Telemetry_.28Ceilometer.29
 .. _Kilo: https://wiki.openstack.org/wiki/ReleaseNotes/Kilo#OpenStack_Telemetry_.28Ceilometer.29
 .. _Liberty: https://wiki.openstack.org/wiki/ReleaseNotes/Liberty#OpenStack_Telemetry_.28Ceilometer.29
+.. _Ceilometer Release Notes: http://docs.openstack.org/releasenotes/ceilometer/
