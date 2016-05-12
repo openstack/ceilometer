@@ -1,9 +1,6 @@
 #
 # Copyright Ericsson AB 2013. All rights reserved
 #
-# Authors: Ildiko Vancsa <ildiko.vancsa@ericsson.com>
-#          Balazs Gibizer <balazs.gibizer@ericsson.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at

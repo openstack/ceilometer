@@ -2,10 +2,6 @@
 # Copyright 2013 Julien Danjou
 # Copyright 2014 Red Hat, Inc
 #
-# Authors: Julien Danjou <julien@danjou.info>
-#          Eoghan Glynn <eglynn@redhat.com>
-#          Nejc Saje <nsaje@redhat.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
