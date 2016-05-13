@@ -59,7 +59,7 @@ sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
 if [ $EXIT_CODE -ne 0 ] ; then
     set +x
     echo "* Heat stack:"
-    heat stack-show integration_test
+    openstack stack show integration_test
     echo "* Alarm list:"
     ceilometer alarm-list
     echo "* Nova instance list:"
