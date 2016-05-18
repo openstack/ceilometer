@@ -1,0 +1,5 @@
+---
+features:
+  - >
+    Added support for magnum bay CRUD events, event_type
+    is 'magnum.bay.*'.
