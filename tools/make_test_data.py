@@ -26,9 +26,7 @@ source .tox/py27/bin/activate
 """
 import argparse
 import datetime
-import logging
 import random
-import sys
 import uuid
 
 from oslo_config import cfg
@@ -188,15 +186,6 @@ def main():
     cfg.CONF([], project='ceilometer')
 
     args = get_parser().parse_args()
-
-    # Set up logging to use the console
-    console = logging.StreamHandler(sys.stderr)
-    console.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(message)s')
-    console.setFormatter(formatter)
-    root_logger = logging.getLogger('')
-    root_logger.addHandler(console)
-    root_logger.setLevel(logging.DEBUG)
 
     # Connect to the metering database
     conn = storage.get_connection_from_config(cfg.CONF)
