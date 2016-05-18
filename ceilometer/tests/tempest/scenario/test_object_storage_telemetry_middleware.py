@@ -139,7 +139,7 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
         return obj_name
 
     @test.idempotent_id('6d6b88e5-3e38-41bc-b34a-79f713a6cb85')
-    @test.services('object_storage', 'telemetry')
+    @test.services('object_storage')
     def test_swift_middleware_notifies(self):
         container_name = self.create_container()
         obj_name = self.upload_object_to_container(container_name)
