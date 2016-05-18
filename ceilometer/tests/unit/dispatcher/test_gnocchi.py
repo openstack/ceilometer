@@ -30,6 +30,7 @@ import six
 import testscenarios
 
 from ceilometer.dispatcher import gnocchi
+from ceilometer.publisher import utils
 from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
 
@@ -80,6 +81,9 @@ class DispatcherTest(base.BaseTestCase):
                     'display_name': 'myinstance',
                 }
             }]
+        for sample in self.samples:
+            sample['message_signature'] = utils.compute_signature(
+                sample, self.conf.conf.publisher.telemetry_secret)
 
         ks_client = mock.Mock(auth_token='fake_token')
         ks_client.projects.find.return_value = mock.Mock(
@@ -137,7 +141,7 @@ class DispatcherTest(base.BaseTestCase):
     def _do_test_activity_filter(self, expected_measures, fake_batch, __):
 
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        d.record_metering_data(self.samples)
+        d.verify_and_record_metering_data(self.samples)
         fake_batch.assert_called_with(
             mock.ANY, mock.ANY,
             {'metrics': 1, 'resources': 1, 'measures': expected_measures})
@@ -309,6 +313,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         )
 
         self.sample['resource_id'] = str(uuid.uuid4()) + "/foobar"
+        self.sample['message_signature'] = utils.compute_signature(
+            self.sample, self.conf.conf.publisher.telemetry_secret)
 
     @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
     @mock.patch('gnocchiclient.v1.client.Client')
@@ -410,7 +416,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         batch = fakeclient.metric.batch_resources_metrics_measures
         batch.side_effect = batch_side_effect
 
-        self.dispatcher.record_metering_data([self.sample])
+        self.dispatcher.verify_and_record_metering_data([self.sample])
 
         # Check that the last log message is the expected one
         if (self.post_measure_fail or self.create_metric_fail

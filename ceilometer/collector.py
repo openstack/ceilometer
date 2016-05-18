@@ -121,8 +121,8 @@ class CollectorService(service_base.ServiceBase):
             else:
                 try:
                     LOG.debug("UDP: Storing %s", sample)
-                    self.meter_manager.map_method('record_metering_data',
-                                                  sample)
+                    self.meter_manager.map_method(
+                        'verify_and_record_metering_data', sample)
                 except Exception:
                     LOG.exception(_("UDP: Unable to store meter"))
 
@@ -157,7 +157,7 @@ class CollectorEndpoint(object):
 
 
 class SampleEndpoint(CollectorEndpoint):
-    method = 'record_metering_data'
+    method = 'verify_and_record_metering_data'
     ep_type = 'sample'
 
 

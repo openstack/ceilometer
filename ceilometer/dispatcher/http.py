@@ -19,8 +19,7 @@ from oslo_log import log
 import requests
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _, _LE
-from ceilometer.publisher import utils as publisher_utils
+from ceilometer.i18n import _LE
 
 LOG = log.getLogger(__name__)
 
@@ -73,9 +72,9 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
     def record_metering_data(self, data):
         if self.target == '':
             # if the target was not set, do not do anything
-            LOG.error(_('Dispatcher target was not set, no meter will '
-                        'be posted. Set the target in the ceilometer.conf '
-                        'file'))
+            LOG.error(_LE('Dispatcher target was not set, no meter will '
+                          'be posted. Set the target in the ceilometer.conf '
+                          'file.'))
             return
 
         # We may have receive only one counter on the wire
@@ -90,23 +89,16 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                  'resource_id': meter['resource_id'],
                  'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
                  'counter_volume': meter['counter_volume']})
-            if publisher_utils.verify_signature(
-                    meter, self.conf.publisher.telemetry_secret):
-                try:
-                    # Every meter should be posted to the target
-                    res = requests.post(self.target,
-                                        data=json.dumps(meter),
-                                        headers=self.headers,
-                                        timeout=self.timeout)
-                    LOG.debug('Message posting finished with status code '
-                              '%d.', res.status_code)
-                except Exception as err:
-                    LOG.exception(_('Failed to record metering data: %s'),
-                                  err)
-            else:
-                LOG.warning(_(
-                    'message signature invalid, discarding message: %r'),
-                    meter)
+            try:
+                # Every meter should be posted to the target
+                res = requests.post(self.target,
+                                    data=json.dumps(meter),
+                                    headers=self.headers,
+                                    timeout=self.timeout)
+                LOG.debug('Message posting finished with status code '
+                          '%d.', res.status_code)
+            except Exception as err:
+                LOG.exception(_LE('Failed to record metering data: %s.'), err)
 
     def record_events(self, events):
         if not isinstance(events, list):
