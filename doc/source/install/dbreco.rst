@@ -57,14 +57,14 @@ numerous reasons:
 
 The following is a table indicating the status of each database drivers:
 
-================== ============================= =================== ======
-Driver             API querying                  API statistics      Alarms
-================== ============================= =================== ======
-MongoDB            Yes                           Yes                 Yes
-MySQL              Yes                           Yes                 Yes
-PostgreSQL         Yes                           Yes                 Yes
-HBase              Yes                           Yes, except groupby Yes
-================== ============================= =================== ======
+================== ============================= ===========================================
+Driver             API querying                  API statistics
+================== ============================= ===========================================
+MongoDB            Yes                           Yes
+MySQL              Yes                           Yes
+PostgreSQL         Yes                           Yes
+HBase              Yes                           Yes, except groupby & selectable aggregates
+================== ============================= ===========================================
 
 
 Moving from Ceilometer to Gnocchi
