@@ -33,6 +33,7 @@ import pymongo
 import six
 
 import ceilometer
+from ceilometer.i18n import _
 from ceilometer import storage
 from ceilometer.storage import base
 from ceilometer.storage import models
@@ -521,6 +522,13 @@ class Connection(pymongo_base.Connection):
         Items are containing meter statistics described by the query
         parameters. The filter must have a meter value set.
         """
+        # NOTE(zqfan): We already have checked at API level, but
+        # still leave it here in case of directly storage calls.
+        if aggregate:
+            for a in aggregate:
+                if a.func not in self.AGGREGATES:
+                    msg = _('Invalid aggregation function: %s') % a.func
+                    raise storage.StorageBadAggregate(msg)
 
         if (groupby and set(groupby) -
             set(['user_id', 'project_id', 'resource_id', 'source',
