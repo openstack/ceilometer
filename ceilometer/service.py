@@ -15,6 +15,7 @@
 import socket
 import sys
 
+from keystoneauth1 import loading as ka_loading
 from oslo_config import cfg
 import oslo_i18n
 from oslo_log import log
@@ -82,7 +83,7 @@ def prepare_service(argv=None, config_files=None):
              version=version.version_info.version_string(),
              default_config_files=config_files)
 
-    keystone_client.setup_keystoneauth(cfg.CONF)
+    ka_loading.load_auth_from_conf_options(cfg.CONF, "service_credentials")
 
     log.setup(cfg.CONF, 'ceilometer')
     # NOTE(liusheng): guru cannot run with service under apache daemon, so when
