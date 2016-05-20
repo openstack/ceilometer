@@ -12,18 +12,16 @@
 # Yu Zhang, 2013
 # 颜海峰 <yanheven@gmail.com>, 2014
 # English translations for ceilometer.
-# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
-# Daisy <guoyingc@cn.ibm.com>, 2016. #zanata
 # Linda <duleish@cn.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev3\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-04-07 10:58+0000\n"
+"Project-Id-Version: ceilometer 6.0.1.dev11\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-05-19 11:00+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-19 05:12+0000\n"
+"PO-Revision-Date: 2016-04-29 04:40+0000\n"
 "Last-Translator: Linda <duleish@cn.ibm.com>\n"
 "Language: zh-CN\n"
 "Language-Team: Chinese (China)\n"
@@ -37,11 +35,11 @@ msgstr "无法找到 %(entity)s %(id)s "
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
-msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
+msgstr "算术变形器在表达式“%s”中必须至少使用一个指标"
 
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
-msgstr "表%(table_name)s已经存在，无法创建。忽略此错误继续执行。"
+msgstr "无法创建表 %(table_name)s，因为它已存在。忽略此错误"
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
@@ -53,32 +51,33 @@ msgstr "无法连接伺服主机：%s "
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
-msgstr "无法连接到XenAPI：%s"
+msgstr "无法连接到 XenAPI：%s"
 
 #, python-format
 msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr "无法为虚拟机%(id)s获取CPU使用率：%(e)s"
+msgstr "无法获取 %(id)s 的 CPU 使用率：%(e)s"
 
 #, python-format
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr "无法为%(id)s获取内存使用信息：%(e)s"
+msgstr "无法获取 %(id)s 的内存使用情况：%(e)s"
 
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
-msgstr "无法获取虚拟机%s的CPU使用率"
+msgstr "无法获取 VM %s CPU 使用率"
 
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
-msgstr "无法为实例%s获取IP地址"
+msgstr "无法获取实例 %s 的 IP 地址"
 
 msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in "
 "the ceilometer.conf file"
-msgstr "分发器目标未设置，没有指标将被发送。在ceilometer.conf文件中设置目标。"
+msgstr ""
+"未设置分发器目标，将不会发布测量数据。请在 ceilometer.conf 文件中设置目标。"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "正在丢弃通知%(type)s (uuid:%(msgid)s)"
+msgstr "正在删除通知 %(type)s (uuid:%(msgid)s)"
 
 #, python-format
 msgid ""
@@ -99,7 +98,7 @@ msgid "Event"
 msgstr "事件"
 
 msgid "Expression evaluated to a NaN value!"
-msgstr "表达式计算结果为NaN！"
+msgstr "表达式计算结果为 NaN 值！"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
@@ -109,15 +108,14 @@ msgstr "未能导入 %(name)s 的扩展：%(error)s"
 msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
-msgstr ""
-"为虚拟机<name=%(name)s, id=%(id)s>获取监控数据失败了，虚拟机状态为SHUTOFF"
+msgstr "未能检查到实例 <name=%(name)s, id=%(id)s> 的数据，域状态为 SHUTOFF。"
 
 #, python-format
 msgid ""
 "Failed to inspect memory usage of %(instance_uuid)s, can not get info from "
 "libvirt: %(error)s"
 msgstr ""
-"为虚拟机%(instance_uuid)s采集内存使用指标失败了，无法从libvirt获取信息："
+"未能检查到 %(instance_uuid)s 的内存使用情况，无法从 libvirt 获取信息："
 "%(error)s"
 
 #, python-format
@@ -125,8 +123,8 @@ msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
 "not get info from libvirt."
 msgstr ""
-"为虚拟机<name=%(name)s, id=%(id)s>采集内存使用指标失败了，无法从libvirt获取信"
-"息。"
+"未能检查到实例 <name=%(name)s, id=%(id)s> 的内存使用情况，无法从 libvirt 获取"
+"信息。"
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -134,31 +132,31 @@ msgstr "无法为 %s 加载任何通知处理器"
 
 #, python-format
 msgid "Failed to parse the timestamp value %s"
-msgstr "解析时间戳%s失败"
+msgstr "未能解析时间戳记值 %s"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
-msgstr "发布%d个数据点时失败，正在将其丢弃"
+msgstr "未能发布 %d 个数据点，正在将其删除"
 
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
-msgstr "发布%d个数据点时失败，将其入队"
+msgstr "未能发布 %d 个数据点，将其入队"
 
 #, python-format
 msgid "Failed to record metering data: %s"
-msgstr "无法保存监控数据：%s"
+msgstr "无法记录测量数据：%s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
-msgstr "过滤表达式不合法：%s"
+msgstr "过滤表达式无效：%s"
 
 #, python-format
 msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
-msgstr "忽略虚拟机%(name)s (%(instance_id)s) : %(error)s"
+msgstr "忽略实例 %(name)s (%(instance_id)s)：%(error)s"
 
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "忽略虚拟机%(name)s：%(error)s"
+msgstr "忽略实例 %(name)s：%(error)s"
 
 #, python-format
 msgid "Ignoring loadbalancer %(loadbalancer_id)s"
@@ -177,25 +175,25 @@ msgstr ""
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
-msgstr "非法的间隔%(period)s: %(err)s"
+msgstr "无效的时间段 %(period)s：%(err)s"
 
 #, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
-msgstr "特征%(trait)s包含了不合法的特征类型'%(type)s' "
+msgstr "特征 %(trait)s 包含了无效法的特征类型“%(type)s” "
 
 msgid "Limit must be positive"
-msgstr "limit必须是正数"
+msgstr "limit 必须是正数"
 
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
-msgstr "从数据库返回了多个id为%s的事件"
+msgstr "从存储库驱动程序返回了多个标识为 %s 的事件"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
-msgstr "多个虚拟机%s在XenServer中被找到"
+msgstr "在 XenServer 中找到多个 VM %s"
 
 msgid "Must specify connection_url, and connection_password to use"
-msgstr "使用时必须指定connection_url和connection_password"
+msgstr "使用时必须指定 connection_url 和 connection_password"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
@@ -210,11 +208,11 @@ msgstr "未授权访问 %(aspect)s %(id)s"
 
 #, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
-msgstr "OpenDaylight接口返回状态%(status)s，原因%(reason)s"
+msgstr "OpenDaylitght API 返回了状态 %(status)s %(reason)s"
 
 #, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
-msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
+msgstr "Opencontrail API 返回了 %(status)s %(reason)s"
 
 #, python-format
 msgid ""
@@ -230,7 +228,7 @@ msgstr "运算符 %(operator)s 不受支持。受支持的运算符为：%(suppo
 
 #, python-format
 msgid "Order-by expression not valid: %s"
-msgstr "orderby表达式不合法：%s"
+msgstr "排序依据表达式无效：%s"
 
 #, python-format
 msgid ""
@@ -238,7 +236,7 @@ msgid ""
 msgstr "%(name)s 的 JSONPath 规范“%(jsonpath)s”中存在解析错误：%(err)s"
 
 msgid "Period must be positive."
-msgstr "period 参数必须是正数"
+msgstr "时间段必须是正数。"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
@@ -261,11 +259,11 @@ msgstr "管道 %(pipeline)s：%(smp)s 的变形器%(trans)s 出错，退出"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
-msgstr "指定了插件，但未对 %s 提供插件名"
+msgstr "指定了插件，但没有为 %s 提供插件名"
 
 #, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
+msgstr "轮询 %(mtr)s 传感器已失败 %(cnt)s 次！"
 
 #, python-format
 msgid "Polling %(name)s failed for %(cnt)s times!"
@@ -273,7 +271,7 @@ msgstr "轮询 %(name)s 已失败 %(cnt)s 次！"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
-msgstr "%s的采集器被禁用"
+msgstr "已禁用 %s 的采集器！"
 
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
@@ -282,28 +280,28 @@ msgstr "请阻止轮询程序 %(name)s 再轮询源 %(source)s！"
 #, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr "发布的数据量超过本地队列最大长度，正在丢弃最老的%d个数据"
+msgstr "超过发布器的本地队列最大长度，正在删除最旧的 %d 个样本"
 
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
-msgstr "未知的发布策略(%s)，强制使用默认策略"
+msgstr "未知的发布策略 (%s)，强制使用缺省值"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
-msgstr "RGW AdminOps接口返回%(status)s %(reason)s"
+msgstr "RGW AdminOps API 返回了 %(status)s %(reason)s"
 
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
-msgstr "请求无法连接到OpenDaylight的北向REST接口"
+msgstr "请求无法连接到带有 NorthBound REST API 的 OpenDaylight"
 
 #, python-format
 msgid "Required field %s not specified"
-msgstr "必填项%s没有填写"
+msgstr "未指定所需字段 %s"
 
 msgid "Resource"
 msgstr "资源"
 
 msgid "Sample"
-msgstr "数据"
+msgstr "样本"
 
 msgid "Samples should be included in request body"
 msgstr "样本应包括在请求主体中"
@@ -314,12 +312,12 @@ msgstr "跳过 %s 的加载扩展"
 
 #, python-format
 msgid "String %s is not a valid isotime"
-msgstr "字符串%s不是个合法的标准时间格式"
+msgstr "字符串 %s 是无效的标准时间格式"
 
 msgid ""
 "The Yaml file that defines mapping between samples and gnocchi resources/"
 "metrics"
-msgstr "用于定义样本与 gnocchi 资源/度量值之间的映射的Yaml 文件"
+msgstr "定义样本与 gnocchi 资源/度量值之间的映射的 Yaml 文件"
 
 #, python-format
 msgid ""
@@ -332,7 +330,7 @@ msgid "The field 'fields' is required for %s"
 msgstr "%s 需要字段“fields”"
 
 msgid "The path for the file publisher is required"
-msgstr "文件发布器必须设置文件路径"
+msgstr "需要文件发布器的路径"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -356,7 +354,7 @@ msgstr "无法发现资源：%s"
 
 #, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
-msgstr "无法计算表达式%(expr)s：%(exc)s"
+msgstr "无法计算表达式 %(expr)s：%(exc)s"
 
 #, python-format
 msgid "Unable to load publisher %s"
@@ -370,17 +368,17 @@ msgstr "无法加载管理程序的探测器：%s"
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
 "up."
-msgstr "在%(retries)d次尝试后仍无法重连到MongoDB主节点。放弃重连。"
+msgstr "在 %(retries)d 次尝试后仍无法重连到主要 MongoDB。放弃重连。"
 
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
 "%(retry_interval)d seconds."
 msgstr ""
-"无法重连到MongoDB主节点：%(errmsg)s。在%(retry_interval)d秒后进行重试。"
+"无法重连到主要 MongoDB：%(errmsg)s。在 %(retry_interval)d 秒后进行重试。"
 
 msgid "Unable to send sample over UDP"
-msgstr "无法通过UDP发送采样"
+msgstr "无法通过 UDP 发送样本"
 
 #, python-format
 msgid ""
@@ -393,7 +391,7 @@ msgstr "未知的发现扩展：%s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr "未知的元数据类型。键(%s)将无法进行查询。"
+msgstr "未知的元数据类型。键 (%s) 将无法进行查询。"
 
 #, python-format
 msgid ""
@@ -402,7 +400,7 @@ msgstr "在负载均衡器 %(id)s 上接收到未知状态 %(stat)s，正在跳�
 
 #, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "从fw %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在 fw %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
@@ -414,11 +412,11 @@ msgstr "在成员 %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
-msgstr "从pool %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在池 %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
-msgstr "从vip %(id)s收到未知的状态%(stat)s，跳过该采样数据"
+msgstr "在 vip %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
@@ -426,17 +424,17 @@ msgstr "在 VPN %(id)s 上接收到未知状态 %(stat)s，正在跳过样本"
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
-msgstr "在 VMware vSphere 中，找不到 VM %s"
+msgstr "在 VMware vSphere 中未找到 VM %s"
 
 #, python-format
 msgid "VM %s not found in XenServer"
-msgstr "无法在XenServer中找到虚拟机%s"
+msgstr "在 XenServer 中未找到 VM %s"
 
 msgid "Wrong sensor type"
 msgstr "错误的传感器类型"
 
 msgid "XenAPI not installed"
-msgstr "XenAPI没有安装"
+msgstr "没有安装 XenAPI"
 
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
@@ -447,7 +445,7 @@ msgstr "Aodh 被禁用或不可用时，警报 URL 不可用。"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
+msgstr "无法获取 %(id)s 的 CPU 时间：%(e)s"
 
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "启用 Gnocchi 后，direct 选项不能为 true。"
@@ -458,23 +456,23 @@ msgstr "正在退出时间顺序样本：%s"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"
-msgstr "因为之前没有数据（用来计算差值）因而丢弃数据：%s"
+msgstr "正在删除没有先前数据的样本：%s"
 
 msgid "ipmitool output length mismatch"
-msgstr "ipmi输出长度不匹配"
+msgstr "ipmitool 输出长度不匹配"
 
 msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes和backup_count必须是整数。"
+msgstr "max_bytes 和 backup_count 应该是数字。"
 
 #, python-format
 msgid "message signature invalid, discarding message: %r"
-msgstr "消息签名不合法，丢弃消息：%r"
+msgstr "消息签名无效，丢弃消息：%r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
-msgstr "解析IPMI传感器数据失败，从给定的输入中无法检索到数据"
+msgstr "解析 IPMI 传感器数据失败，从给定的输入中无法检索到数据"
 
 msgid "parse IPMI sensor data failed,unknown sensor type"
-msgstr "解析IPMI传感器数据失败，未知的传感器类型"
+msgstr "解析 IPMI 传感器数据失败，未知的传感器类型"
 
 msgid "running ipmitool failure"
-msgstr "运行ipmitool时失败了"
+msgstr "运行 ipmitool 时失败"

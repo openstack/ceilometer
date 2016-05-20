@@ -21,21 +21,17 @@
 # EVEILLARD <stephane.eveillard@gmail.com>, 2013
 # Corinne Verheyde <cverheyd@hotmail.com>, 2013
 # Corinne Verheyde <cverheyd@hotmail.com>, 2013
-# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
-# Tom Cocozzello <tjcocozz@us.ibm.com>, 2015. #zanata
-# Angelique Pillal <pillal@fr.ibm.com>, 2016. #zanata
-# Corinne Verheyde <cverheyd@gmail.com>, 2016. #zanata
-# Tom Cocozzello <tjcocozz@us.ibm.com>, 2016. #zanata
+# leroy <dleroy@fr.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.0.0rc3.dev2\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-03-30 00:07+0000\n"
+"Project-Id-Version: ceilometer 6.0.1.dev11\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-05-19 11:00+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-29 08:24+0000\n"
-"Last-Translator: Angelique Pillal <pillal@fr.ibm.com>\n"
+"PO-Revision-Date: 2016-04-24 08:42+0000\n"
+"Last-Translator: leroy <dleroy@fr.ibm.com>\n"
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -44,12 +40,12 @@ msgstr ""
 
 #, python-format
 msgid "%(entity)s %(id)s Not Found"
-msgstr "%(entity)s %(id)s n'a pas été trouvé"
+msgstr "%(entity)s %(id)s non trouvé"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr ""
-"Le transformateur arithmétique doit utiliser au moins un mètre dans "
+"Le transformateur arithmétique doit utiliser au moins un compteur dans "
 "l'expression '%s'"
 
 #, python-format
@@ -60,28 +56,27 @@ msgstr ""
 
 #, python-format
 msgid "Continue after error from %(name)s: %(error)s"
-msgstr "Continue après l'erreur %(name)s: %(error)s "
+msgstr "Continuer après l'erreur de %(name)s : %(error)s "
 
 #, python-format
 msgid "Could not connect slave host: %s "
-msgstr "Impossible de se connecter à l'hôte slave: %s "
+msgstr "Impossible de se connecter à l'hôte esclave : %s "
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
-msgstr "Connexion impossible XenAPI: %s"
+msgstr "Impossible de se connecter à XenAPI : %s"
 
 #, python-format
 msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr "Ne peut pas recevoir l'utilisation CPU pour %(id)s: %(e)s"
+msgstr "Impossible d'obtenir l'utilisation UC pour %(id)s : %(e)s"
 
 #, python-format
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr ""
-"Impossible de récupérer l'utilisation de la mémoire pour %(id)s : %(e)s"
+msgstr "Impossible d'obtenir l'utilisation de la mémoire pour %(id)s : %(e)s"
 
 #, python-format
 msgid "Could not get VM %s CPU Utilization"
-msgstr "Impossible d'obtenir l'utilisation CPU de la VM %s"
+msgstr "Impossible d'obtenir l'utilisation UC de la machine virtuelle %s"
 
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
@@ -91,12 +86,12 @@ msgid ""
 "Dispatcher target was not set, no meter will be posted. Set the target in "
 "the ceilometer.conf file"
 msgstr ""
-"La cible du répartiteur n'était pas définie, aucun compteur ne sera envoyé. "
+"La cible du répartiteur n'était pas définie, aucun compteur ne sera publié. "
 "Définissez la cible dans le fichier ceilometer.conf"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "Suppression du %(type)s de notification (uuid:%(msgid)s)"
+msgstr "Suppression de la notification %(type)s (uuid : %(msgid)s)"
 
 #, python-format
 msgid ""
@@ -108,7 +103,7 @@ msgstr ""
 
 #, python-format
 msgid "Error parsing HTTP response: %s"
-msgstr "Erreur lors de l'analyse syntaxique de la réponse: %s"
+msgstr "Erreur lors de l'analyse syntaxique de la réponse HTTP : %s"
 
 msgid "Error stopping pollster."
 msgstr "Erreur lors de l'arrêt du sondeur."
@@ -117,18 +112,18 @@ msgid "Event"
 msgstr "Événement"
 
 msgid "Expression evaluated to a NaN value!"
-msgstr "Expression évaluée avec une valeur not-a-number !"
+msgstr "Expression évaluée avec une valeur NaN  !"
 
 #, python-format
 msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr "Echec de l'importation de l'extension pour %(name)s: %(error)s"
+msgstr "Échec de l'importation de l'extension pour %(name)s : %(error)s"
 
 #, python-format
 msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
 msgstr ""
-"Echec de l'inspection des données de l'instance <name=%(name)s, id=%(id)s>. "
+"Échec de l'inspection des données de l'instance <name=%(name)s, id=%(id)s>. "
 "Le domaine est à l'état SHUTOFF (INTERRUPTION)."
 
 #, python-format
@@ -136,7 +131,7 @@ msgid ""
 "Failed to inspect memory usage of %(instance_uuid)s, can not get info from "
 "libvirt: %(error)s"
 msgstr ""
-"Echec de l'inspection de l'utilisation de la mémoire de %(instance_uuid)s. "
+"Échec de l'inspection de l'utilisation de la mémoire de %(instance_uuid)s. "
 "Impossible d'obtenir des informations de libvirt : %(error)s"
 
 #, python-format
@@ -144,46 +139,45 @@ msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
 "not get info from libvirt."
 msgstr ""
-"Echec de l'inspection de l'utilisation de la mémoire de l'instance <name="
+"Échec de l'inspection de l'utilisation de la mémoire de l'instance <name="
 "%(name)s, id=%(id)s>. Impossible d'obtenir des informations de libvirt."
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
-msgstr "Échec du chargement de tous les gestionnaires de notification pour %s"
+msgstr "Échec du chargement des gestionnaires de notification pour %s"
 
 #, python-format
 msgid "Failed to parse the timestamp value %s"
-msgstr "Echec de l'analyse syntaxique de la valeur d'horodatage %s"
+msgstr "Échec de l'analyse syntaxique de la valeur d'horodatage %s"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
-msgstr "Echec de la publication des points de données %d. Suppression en cours"
+msgstr "Échec de la publication de %d points de données. Suppression en cours"
 
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr ""
-"Echec de la publication des points de données %d. Mettez-les en file "
-"d'attente"
+"Échec de la publication de %d  points de données. Mise en file d'attente"
 
 #, python-format
 msgid "Failed to record metering data: %s"
-msgstr "Impossible d'enregistrer les données de mesure: %s"
+msgstr "Impossible d'enregistrer les données de mesure : %s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
-msgstr "Filtre de l'expression n'est pas valide: %s"
+msgstr "Expression de filtre non valide : %s"
 
 #, python-format
 msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
-msgstr "L'instance %(name)s est ignorée (%(instance_id)s) : %(error)s"
+msgstr "Instance %(name)s ignorée (%(instance_id)s) : %(error)s"
 
 #, python-format
 msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "instance %(name)s: %(error)s ignoré"
+msgstr "Instance %(name)s : %(error)s ignorée"
 
 #, python-format
 msgid "Ignoring loadbalancer %(loadbalancer_id)s"
-msgstr "Loadbalancer %(loadbalancer_id)s ignoré"
+msgstr "Équilibreur de charge %(loadbalancer_id)s ignoré"
 
 #, python-format
 msgid "Ignoring pool %(pool_id)s"
@@ -210,27 +204,27 @@ msgstr "La limite doit être positive"
 
 #, python-format
 msgid "More than one event with id %s returned from storage driver"
-msgstr ""
-"Plus d'un événement avec l'identificateur %s a été renvoyé à partir du "
-"pilote de stockage"
+msgstr "Plusieurs événements avec l'ID %s retournés par le pilote de stockage"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
 msgstr "Plusieurs machines virtuelles %s trouvées dans XenServer"
 
 msgid "Must specify connection_url, and connection_password to use"
-msgstr "Il faut indiquer connection_url et connection_password pour utiliser"
+msgstr ""
+"connection_url et connection_password doivent être indiqués pour "
+"l'utilisation de"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
-msgstr "Aucun plugin nommé %(plugin)s n'est disponible pour %(name)s"
+msgstr "Aucun plug-in nommé %(plugin)s n'est disponible pour %(name)s"
 
 msgid "Node Manager init failed"
-msgstr "Echec de l'initialisation du gestionnaire de noeud"
+msgstr "Échec de l'initialisation du gestionnaire de nœud"
 
 #, python-format
 msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "Non autorisé à accéder %(aspect)s %(id)s "
+msgstr "Non autorisé à accéder à %(aspect)s %(id)s "
 
 #, python-format
 msgid "OpenDaylitght API returned %(status)s %(reason)s"
@@ -245,27 +239,27 @@ msgid ""
 "Operator %(operator)s is not supported. Only equality operator is available "
 "for field %(field)s"
 msgstr ""
-"Opérateur %(operator)s non supporté. Seul l'opérateur égalité est disponible "
-"pour le champ %(field)s"
+"Opérateur %(operator)s non pris en charge. Seul l'opérateur d'égalité est "
+"disponible pour la zone %(field)s"
 
 #, python-format
 msgid ""
 "Operator %(operator)s is not supported. The supported operators are: "
 "%(supported)s"
 msgstr ""
-"L'opérateur %(operator)s n'est pas supporté. Les opérateurs supportés sont: "
-"%(supported)s"
+"L'opérateur %(operator)s n'est pas pris en charge. Les opérateurs pris en "
+"charge sont les suivants : %(supported)s"
 
 #, python-format
 msgid "Order-by expression not valid: %s"
-msgstr "L'expression de tri n'est pas valide : %s"
+msgstr "Expression Order-by non valide : %s"
 
 #, python-format
 msgid ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
 msgstr ""
-"Erreur d'analyse dans la spécification JSONPath '%(jsonpath)s' pour "
-"%(name)s : %(err)s"
+"Erreur d'analyse syntaxique dans la spécification JSONPath '%(jsonpath)s' "
+"pour %(name)s : %(err)s"
 
 msgid "Period must be positive."
 msgstr "La période doit être positive."
@@ -273,27 +267,28 @@ msgstr "La période doit être positive."
 #, python-format
 msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
 msgstr ""
-"Pipeline %(pipeline)s : statut %(status)s après erreur du diffuseur %(pub)s"
+"Pipeline %(pipeline)s : Statut %(status)s après erreur de l'éditeur %(pub)s"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "Pipeline %(pipeline)s: Reprise après une erreur de l'éditeur %(pub)s"
+msgstr "Pipeline %(pipeline)s : Reprise après une erreur de l'éditeur %(pub)s"
 
 #, python-format
 msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr "Pipeline %(pipeline)s: Erreur à la purge du transformateur %(trans)s"
+msgstr ""
+"Pipeline %(pipeline)s : Erreur lors de la purge du transformateur %(trans)s"
 
 #, python-format
 msgid ""
 "Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
 "%(smp)s"
 msgstr ""
-"Pipeline %(pipeline)s: Sortie après erreur du transformateur %(trans)s pour "
+"Pipeline %(pipeline)s : Sortie après erreur du transformateur %(trans)s pour "
 "%(smp)s"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
-msgstr "Plugin spécifié, mais aucun nom de plugin n'est fourni pour %s"
+msgstr "Plug-in spécifié, mais aucun nom de plug-in fourni pour %s"
 
 #, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
@@ -301,26 +296,28 @@ msgstr "L'interrogation du capteur %(mtr)s a échoué %(cnt)s fois !"
 
 #, python-format
 msgid "Polling %(name)s failed for %(cnt)s times!"
-msgstr "Sondage de %(name)s %(cnt)s fois en échec!"
+msgstr "Échec du sondage de %(name)s pendant %(cnt)s fois !"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
-msgstr "Le pollster pour %s est désactivé !"
+msgstr "Le sondeur pour %s est désactivé !"
 
 #, python-format
 msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
-msgstr "Empêcher le pollster %(name)s d'interroger la source %(source)s !"
+msgstr "Empêcher le sondeur %(name)s d'interroger la source %(source)s !"
 
 #, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr ""
-"La longueur maximale de local_queue du diffuseur est dépassée, suppression "
+"La longueur maximale de local_queue de l'éditeur est dépassée, suppression "
 "des %d échantillons les plus anciens"
 
 #, python-format
 msgid "Publishing policy is unknown (%s) force to default"
-msgstr "La politique de publication est inconnue (%s) forcé le défaut"
+msgstr ""
+"La stratégie de publication est inconnue (%s), forcée sur stratégie par "
+"défaut"
 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
@@ -328,58 +325,57 @@ msgstr "L'API AdminOps RGW a renvoyé %(status)s %(reason)s"
 
 msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
 msgstr ""
-"La demande n'a pas réussi à se connecter à OpenDaylight avec l'API REST "
-"NorthBound"
+"La demande n'a pas pu se connecter à OpenDaylight avec l'API REST NorthBound"
 
 #, python-format
 msgid "Required field %s not specified"
-msgstr "Champ requis %s non spécifiée"
+msgstr "Zone obligatoire %s non spécifiée"
 
 msgid "Resource"
 msgstr "Ressource"
 
 msgid "Sample"
-msgstr "Echantillon"
+msgstr "Échantillon"
 
 msgid "Samples should be included in request body"
-msgstr "Des exemples doivent être inclus dans le corps de demande"
+msgstr "Des exemples doivent être inclus dans le corps de la demande"
 
 #, python-format
 msgid "Skip loading extension for %s"
-msgstr "Passer le chargement de l'extension pour %s"
+msgstr "Omettre le chargement de l'extension pour %s"
 
 #, python-format
 msgid "String %s is not a valid isotime"
-msgstr "La chaine de caractère %s n'est pas valide isotime"
+msgstr "La chaine %s n'est pas un isotime valide"
 
 msgid ""
 "The Yaml file that defines mapping between samples and gnocchi resources/"
 "metrics"
 msgstr ""
-"Fichier Yaml qui définit le mappage entre les exemples et les ressources "
-"gnocchi /les métriques"
+"Fichier Yaml qui définit le mappage entre les échantillons et les ressources/"
+"métriques gnocchi"
 
 #, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
 msgstr ""
-"Le type de données %(type)s n'est pas supporté. Les types de données "
-"supportés sont: %(supported)s"
+"Le type de données %(type)s n'est pas pris en charge. La liste de types de "
+"données pris en charge est la suivante : %(supported)s"
 
 #, python-format
 msgid "The field 'fields' is required for %s"
-msgstr "Le champ 'fields' est requis pour  %s"
+msgstr "La zone 'fields' est obligatoire pour  %s"
 
 msgid "The path for the file publisher is required"
-msgstr "Le chemin du éditeur de fichier est obligatoire "
+msgstr "Le chemin de l'éditeur de fichier est obligatoire "
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
-msgstr "UDP: Impossible de décoder les données envoyées par %s"
+msgstr "UDP : Impossible de décoder les données envoyées par %s"
 
 msgid "UDP: Unable to store meter"
-msgstr "UDP: Impossible de stocker les mesures"
+msgstr "UDP: Impossible de stocker le compteur"
 
 #, python-format
 msgid "Unable to connect to the database server: %(errmsg)s."
@@ -389,12 +385,12 @@ msgstr "Impossible de se connecter au serveur de base de données : %(errmsg)s."
 msgid ""
 "Unable to convert the value %(value)s to the expected data type %(type)s."
 msgstr ""
-"Impossible de convertir la valeur %(value)s vers le type de données attendu "
+"Impossible de convertir la valeur %(value)s dans le type de données attendu "
 "%(type)s."
 
 #, python-format
 msgid "Unable to discover resources: %s"
-msgstr "Impossible de découvrir les ressources: %s"
+msgstr "Impossible de découvrir les ressources : %s"
 
 #, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
@@ -406,15 +402,15 @@ msgstr "Impossible de charger l'éditeur %s "
 
 #, python-format
 msgid "Unable to load the hypervisor inspector: %s"
-msgstr "Impossible de télécharger  l'inspecteur hypervisor: %s"
+msgstr "Impossible de télécharger l'inspecteur d'hyperviseur : %s"
 
 #, python-format
 msgid ""
 "Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
 "up."
 msgstr ""
-"Impossible de se reconnecter au serveur mongodb principal après %(retries)d "
-"tentatives. Abandon."
+"Impossible de se reconnecter au serveur mongodb principal au bout de "
+"%(retries)d tentatives. Abandon."
 
 #, python-format
 msgid ""
@@ -425,67 +421,71 @@ msgstr ""
 "Nouvelle tentative dans %(retry_interval)d secondes."
 
 msgid "Unable to send sample over UDP"
-msgstr "Impossible d'envoyer l'échantillon en UDP"
+msgstr "Impossible d'envoyer l'échantillon sur UDP"
 
 #, python-format
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type %(type)s."
 msgstr ""
 "Exception inattendue lors de la conversion de %(value)s dans le type de "
-"donnée attendue %(type)s."
+"donnée attendu %(type)s."
 
 #, python-format
 msgid "Unknown discovery extension: %s"
-msgstr "Découverte d'une extension inconnue: %s"
+msgstr "Extension de découverte inconnue : %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr "Type de métadonnées inconnu, la clé (%s) n'est pas requêtable"
+msgstr "Type de métadonnées inconnu. La clé (%s) ne peut pas être interrogée."
 
 #, python-format
 msgid ""
 "Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
 msgstr ""
-"Statut %(stat)s inconnu reçu sur le Load Balancer %(id)s,  échantillon ignoré"
+"Statut %(stat)s inconnu reçu sur l'équilibreur de charge %(id)s,  "
+"échantillon ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "Etat %(stat)s inconnu reçu sur le pare-feu %(id)s, échantillon ignoré"
+msgstr ""
+"Statut %(stat)s inconnu reçu sur le pare-feu %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
-msgstr "Etat %(stat)s inconnu reçu sur le listener %(id)s, échantillon ignoré"
+msgstr ""
+"Statut %(stat)s inconnu reçu sur le programme d'écoute %(id)s, échantillon "
+"ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
-msgstr "Etat %(stat)s inconnu reçu sur le membre %(id)s, échantillon ignoré"
+msgstr "Statut %(stat)s inconnu reçu sur le membre %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
-msgstr "Etat %(stat)s inconnu reçu sur le pool %(id)s, échantillon ignoré"
+msgstr "Statut %(stat)s inconnu reçu sur le pool %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
 msgstr ""
-"Etat %(stat)s inconnu reçu sur l'IP virtuelle %(id)s, échantillon ignoré"
+"Statut %(stat)s inconnu reçu sur l'IP virtuelle %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
-msgstr "Etat %(stat)s inconnu reçu sur le vpn %(id)s, échantillon ignoré"
+msgstr "Statut %(stat)s inconnu reçu sur le VPN %(id)s, échantillon ignoré"
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
-msgstr "La machine virtuelle %s est introuvable dans VMware vSphere"
+msgstr "Machine virtuelle %s non trouvée dans VMware vSphere"
 
 #, python-format
 msgid "VM %s not found in XenServer"
 msgstr "VM %s non trouvé dans XenServer"
 
 msgid "Wrong sensor type"
-msgstr "Type de détecteur incorrect"
+msgstr "Type de détecteur erroné"
 
 msgid "XenAPI not installed"
-msgstr "XenAPI n'est pas installé"
+msgstr "XenAPI non installé"
 
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
@@ -498,37 +498,38 @@ msgstr ""
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "impossible d'obtenir le temps UC pour %(id)s : %(e)s"
+msgstr "ne peut pas obtenir le temps UC pour %(id)s : %(e)s"
 
 msgid "direct option cannot be true when Gnocchi is enabled."
-msgstr "L'option directe ne peut pas être à vrai si Gnocchi est activé."
+msgstr ""
+"L'option directe ne peut pas être définie sur vrai si Gnocchi est activé."
 
 #, python-format
 msgid "dropping out of time order sample: %s"
-msgstr "suppression de l'exemple de classement dans le temps : %s"
+msgstr "suppression de l'échantillon de classement temporel : %s"
 
 #, python-format
 msgid "dropping sample with no predecessor: %s"
-msgstr "abandon de l'échantillon sans prédécesseur: %s"
+msgstr "abandon de l'échantillon sans prédécesseur : %s"
 
 msgid "ipmitool output length mismatch"
-msgstr "Non-concordance de longueur de la sortie ipmitool"
+msgstr "Non concordance de longueur de la sortie ipmitool"
 
 msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes et backup_count doivent etre des chiffres."
+msgstr "max_bytes et backup_count doivent être des nombres."
 
 #, python-format
 msgid "message signature invalid, discarding message: %r"
-msgstr "signature du message invalide, message ignoré: %r"
+msgstr "signature de message non valide, message ignoré : %r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
-"Echec de l'analyse des données du détecteur IPMI, aucune donnée extraite à "
+"Échec de l'analyse des données du détecteur IPMI. Aucune donnée extraite à "
 "partir de l'entrée fournie"
 
 msgid "parse IPMI sensor data failed,unknown sensor type"
 msgstr ""
-"Echec de l'analyse des données du détecteur IPMI, type de détecteur inconnu"
+"Échec de l'analyse des données du détecteur IPMI, type de détecteur inconnu"
 
 msgid "running ipmitool failure"
-msgstr "Echec d'exécution d'ipmitool"
+msgstr "Échec d'exécution d'ipmitool"

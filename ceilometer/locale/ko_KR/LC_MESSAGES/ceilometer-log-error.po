@@ -1,13 +1,14 @@
+# SeYeon Lee <sy_lee@kr.ibm.com>, 2016. #zanata
 # Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev3\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-04-07 10:59+0000\n"
+"Project-Id-Version: ceilometer 6.0.1.dev11\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-05-19 11:00+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-07 03:38+0000\n"
+"PO-Revision-Date: 2016-04-25 02:00+0000\n"
 "Last-Translator: SeYeon Lee <sy_lee@kr.ibm.com>\n"
 "Language-Team: Korean (South Korea)\n"
 "Language: ko-KR\n"
@@ -35,7 +36,8 @@ msgstr "조정 백엔드에서 그룹 멤버십 정보를 가져오는 중에 �
 #, python-format
 msgid "Error joining partitioning group %s, re-trying"
 msgstr ""
-"파티션 지정 그룹 %s을(를) 결합하는 중에 오류가 발생하여, 다시 시도 중입니다."
+"파티션 지정 그룹 %s을(를) 결합하는 중에 오류가 발생하여 다시 시도하는 중입니"
+"다."
 
 #, python-format
 msgid "Error loading meter definition : %(err)s"
