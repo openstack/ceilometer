@@ -25,6 +25,7 @@ import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 
 from ceilometer.agent import plugin_base
+from ceilometer.i18n import _LI
 from ceilometer import keystone_client
 from ceilometer import sample
 
@@ -72,9 +73,10 @@ class _Base(plugin_base.PollsterBase):
                 _Base._ENDPOINT = keystone_client.get_service_catalog(
                     ksclient).url_for(
                         service_type=cfg.CONF.service_types.swift,
-                        interface=conf.interface)
-            except exceptions.EndpointNotFound:
-                LOG.debug("Swift endpoint not found")
+                        interface=conf.interface,
+                        region_name=conf.region_name)
+            except exceptions.EndpointNotFound as e:
+                LOG.info(_LI("Swift endpoint not found: %s"), e)
         return _Base._ENDPOINT
 
     def _iter_accounts(self, ksclient, cache, tenants):
