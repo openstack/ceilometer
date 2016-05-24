@@ -171,7 +171,7 @@ class ScalingTransformer(BaseConversionTransformer):
 class RateOfChangeTransformer(ScalingTransformer):
     """Transformer based on the rate of change of a sample volume.
 
-    For example taking the current and previous volumes of a cumulative sample
+    For example, taking the current and previous volumes of a cumulative sample
     and producing a gauge value based on the proportion of some maximum used.
     """
 

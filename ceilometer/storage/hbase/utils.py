@@ -315,7 +315,7 @@ def make_general_rowkey_scan(rts_start=None, rts_end=None, some_id=None):
     if not rts_start:
         # NOTE(idegtiarov): Here we could not use chr > 122 because chr >= 123
         # will be quoted and character will be turn in a composition that is
-        # started with '%' (chr(37)) that lexicographically is less then chr
+        # started with '%' (chr(37)) that lexicographically is less than chr
         # of number
         rts_start = chr(122)
     end_row = prepare_key(some_id, rts_start)

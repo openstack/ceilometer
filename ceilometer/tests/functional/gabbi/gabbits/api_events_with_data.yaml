@@ -215,7 +215,7 @@ tests:
       $.[0].name: ate
       $.[0].value: '0'
 
-# Get all traits of type ate for a invalid event type should return an empty
+# Get all traits of type ate for an invalid event type should return an empty
 # list
 - name: get all traits of type for event type bad event type
   url: /v2/event_types/bad_event_type/traits/ate

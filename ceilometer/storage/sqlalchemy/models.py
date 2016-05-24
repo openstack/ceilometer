@@ -169,7 +169,7 @@ class Resource(Base):
     __table_args__ = (
         # TODO(gordc): this should exist but the attribute values we set
         #              for user/project/source/resource id's are too large
-        #              for a uuid.
+        #              for an uuid.
         # UniqueConstraint('resource_id', 'user_id', 'project_id',
         #                  'source_id', 'metadata_hash',
         #                  name='res_def_unique'),

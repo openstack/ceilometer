@@ -329,12 +329,12 @@ class NotificationService(service_base.PipelineBasedService):
             self.event_pipe_manager = self._get_event_pipeline_manager(
                 self.transport)
 
-        # re-start the main queue listeners.
+        # restart the main queue listeners.
         utils.kill_listeners(self.listeners)
         self._configure_main_queue_listeners(
             self.pipe_manager, self.event_pipe_manager)
 
-        # re-start the pipeline listeners if workload partitioning
+        # restart the pipeline listeners if workload partitioning
         # is enabled.
         if cfg.CONF.notification.workload_partitioning:
             self._configure_pipeline_listener()

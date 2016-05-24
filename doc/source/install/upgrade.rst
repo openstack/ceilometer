@@ -89,7 +89,7 @@ version in time.
 4. Upgrade the polling agent(s)
 
    The new polling agent can be started alongside the old agent only if no new
-   pollsters were added. If not, new polling agents must start only in it's
+   pollsters were added. If not, new polling agents must start only in its
    own partitioning group and poll only the new pollsters. After all old agents
    are upgraded, the polling agents can be changed to poll both new pollsters
    AND the old ones.

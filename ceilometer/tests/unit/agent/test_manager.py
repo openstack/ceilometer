@@ -484,7 +484,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
         updated_pipeline_cfg_file = self.setup_pipeline_file(pipeline)
 
-        # Move/re-name the updated pipeline file to the original pipeline
+        # Move/rename the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
 
