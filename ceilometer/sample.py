@@ -57,8 +57,8 @@ cfg.CONF.register_opts(OPTS)
 class Sample(object):
 
     def __init__(self, name, type, unit, volume, user_id, project_id,
-                 resource_id, timestamp, resource_metadata, source=None,
-                 id=None):
+                 resource_id, timestamp=None, resource_metadata=None,
+                 source=None, id=None):
         self.name = name
         self.type = type
         self.unit = unit
@@ -67,7 +67,7 @@ class Sample(object):
         self.project_id = project_id
         self.resource_id = resource_id
         self.timestamp = timestamp
-        self.resource_metadata = resource_metadata
+        self.resource_metadata = resource_metadata or {}
         self.source = source or cfg.CONF.sample_source
         self.id = id or str(uuid.uuid1())
 
@@ -98,6 +98,9 @@ class Sample(object):
                    timestamp=ts,
                    resource_metadata=metadata,
                    source=source)
+
+    def set_timestamp(self, timestamp):
+        self.timestamp = timestamp
 
 TYPE_GAUGE = 'gauge'
 TYPE_DELTA = 'delta'

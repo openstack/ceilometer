@@ -28,6 +28,7 @@ from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
 from oslo_utils import fnmatch
+from oslo_utils import timeutils
 from six import moves
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
@@ -190,6 +191,7 @@ class PollingTask(object):
                              "%(src)s"),
                          dict(poll=pollster.name, src=source_name))
                 try:
+                    polling_timestamp = timeutils.utcnow().isoformat()
                     samples = pollster.obj.get_samples(
                         manager=self.manager,
                         cache=cache,
@@ -198,6 +200,8 @@ class PollingTask(object):
                     sample_batch = []
 
                     for sample in samples:
+                        # Note(yuywz): Unify the timestamp of polled samples
+                        sample.set_timestamp(polling_timestamp)
                         sample_dict = (
                             publisher_utils.meter_message_from_counter(
                                 sample, self._telemetry_secret

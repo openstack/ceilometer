@@ -143,7 +143,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         self.assertEqual(2, len(samples))
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
-        self._assert_sample(samples[1], 2, 'b', None, times[1])
+        self._assert_sample(samples[1], 2, 'b', {}, times[1])
 
     def test_get_samples_two_driver_one_resource(self):
         times = self._make_timestamps(4)
@@ -173,7 +173,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         self.assertEqual(2, len(samples))
         self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
-        self._assert_sample(samples[1], 2, 'b', None, times[1])
+        self._assert_sample(samples[1], 2, 'b', {}, times[1])
 
     def test_get_samples_return_none(self):
         fake_driver = self._make_fake_driver(None)
