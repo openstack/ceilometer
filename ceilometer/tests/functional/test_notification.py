@@ -296,7 +296,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         # Modify the collection targets
         updated_pipeline_cfg_file = self.setup_pipeline(['vcpus',
                                                          'disk.root.size'])
-        # Move/re-name the updated pipeline file to the original pipeline
+        # Move/rename the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
         self.srv.refresh_pipeline()
@@ -319,7 +319,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         updated_ev_pipeline_cfg_file = self.setup_event_pipeline(
             ['compute.instance.*'])
 
-        # Move/re-name the updated pipeline file to the original pipeline
+        # Move/rename the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_ev_pipeline_cfg_file, ev_pipeline_cfg_file)
         self.srv.refresh_pipeline()

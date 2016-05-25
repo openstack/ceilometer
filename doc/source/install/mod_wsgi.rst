@@ -40,7 +40,7 @@ work with a copy of ceilometer installed via devstack.
    ``/etc/httpd/conf.d``.
 
 2. Modify the ``WSGIDaemonProcess`` directive to set the ``user`` and
-   ``group`` values to a appropriate user on your server. In many
+   ``group`` values to an appropriate user on your server. In many
    installations ``ceilometer`` will be correct.
 
 3. Enable the ceilometer site. On deb-based systems::
