@@ -15,7 +15,6 @@ import itertools
 import pkg_resources
 import six
 
-from debtcollector import moves
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
@@ -41,13 +40,6 @@ cfg.CONF.import_opt('disable_non_metric_meters', 'ceilometer.notification',
 LOG = log.getLogger(__name__)
 
 
-MeterDefinitionException = moves.moved_class(declarative.DefinitionException,
-                                             'MeterDefinitionException',
-                                             __name__,
-                                             version=6.0,
-                                             removal_version="?")
-
-
 class MeterDefinition(object):
 
     SAMPLE_ATTRIBUTES = ["name", "type", "volume", "unit", "timestamp",
@@ -61,7 +53,7 @@ class MeterDefinition(object):
         missing = [field for field in self.REQUIRED_FIELDS
                    if not self.cfg.get(field)]
         if missing:
-            raise declarative.DefinitionException(
+            raise declarative.MeterDefinitionException(
                 _LE("Required fields %s not specified") % missing, self.cfg)
 
         self._event_type = self.cfg.get('event_type')
@@ -70,7 +62,7 @@ class MeterDefinition(object):
 
         if ('type' not in self.cfg.get('lookup', []) and
                 self.cfg['type'] not in sample.TYPES):
-            raise declarative.DefinitionException(
+            raise declarative.MeterDefinitionException(
                 _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
         self._fallback_user_id = declarative.Definition(
@@ -193,10 +185,9 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                     or not cfg.CONF.notification.disable_non_metric_meters):
                 try:
                     md = MeterDefinition(meter_cfg, plugin_manager)
-                except declarative.DefinitionException as me:
-                    errmsg = (_LE("Error loading meter definition : %(err)s")
-                              % dict(err=six.text_type(me)))
-                    LOG.error(errmsg)
+                except declarative.DefinitionException as e:
+                    errmsg = _LE("Error loading meter definition: %s")
+                    LOG.error(errmsg, six.text_type(e))
                 else:
                     definitions[meter_cfg['name']] = md
         return definitions.values()
