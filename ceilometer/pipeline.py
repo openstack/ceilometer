@@ -619,7 +619,60 @@ EVENT_TYPE = {'pipeline': EventPipeline,
               'sink': EventSink}
 
 
-class PipelineManager(object):
+class ConfigManagerBase(object):
+    """Base class for managing configuration file refresh"""
+
+    def __init__(self):
+        self.cfg_loc = None
+
+    def load_config(self, cfg_info):
+        """Load a configuration file and set its refresh values."""
+        if isinstance(cfg_info, dict):
+            conf = cfg_info
+        else:
+            if not os.path.exists(cfg_info):
+                cfg_info = cfg.CONF.find_file(cfg_info)
+            with open(cfg_info) as fap:
+                data = fap.read()
+
+            conf = yaml.safe_load(data)
+            self.cfg_loc = cfg_info
+            self.cfg_mtime = self.get_cfg_mtime()
+            self.cfg_hash = self.get_cfg_hash()
+        LOG.info("Config file: %s", conf)
+        return conf
+
+    def get_cfg_mtime(self):
+        """Return modification time of cfg file"""
+        return os.path.getmtime(self.cfg_loc) if self.cfg_loc else None
+
+    def get_cfg_hash(self):
+        """Return hash of configuration file"""
+        if not self.cfg_loc:
+            return None
+
+        with open(self.cfg_loc) as fap:
+            data = fap.read()
+        if six.PY3:
+            data = data.encode('utf-8')
+
+        file_hash = hashlib.md5(data).hexdigest()
+        return file_hash
+
+    def cfg_changed(self):
+        """Returns hash of changed cfg else False."""
+        mtime = self.get_cfg_mtime()
+        if mtime > self.cfg_mtime:
+            LOG.info(_LI('Configuration file has been updated.'))
+            self.cfg_mtime = mtime
+            _hash = self.get_cfg_hash()
+            if _hash != self.cfg_hash:
+                LOG.info(_LI("Detected change in configuration."))
+                return _hash
+        return False
+
+
+class PipelineManager(ConfigManagerBase):
     """Pipeline Manager
 
     Pipeline manager sets up pipelines according to config file
@@ -628,7 +681,7 @@ class PipelineManager(object):
 
     """
 
-    def __init__(self, cfg, transformer_manager, p_type=SAMPLE_TYPE):
+    def __init__(self, cfg_info, transformer_manager, p_type=SAMPLE_TYPE):
         """Setup the pipelines according to config.
 
         The configuration is supported as follows:
@@ -695,6 +748,8 @@ class PipelineManager(object):
         Publisher's name is plugin name in setup.cfg
 
         """
+        super(PipelineManager, self).__init__()
+        cfg = self.load_config(cfg_info)
         self.pipelines = []
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
@@ -746,17 +801,19 @@ class PipelineManager(object):
         return PublishContext(self.pipelines)
 
 
-class PollingManager(object):
+class PollingManager(ConfigManagerBase):
     """Polling Manager
 
     Polling manager sets up polling according to config file.
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg_info):
         """Setup the polling according to config.
 
         The configuration is the sources half of the Pipeline Config.
         """
+        super(PollingManager, self).__init__()
+        cfg = self.load_config(cfg_info)
         self.sources = []
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
@@ -775,85 +832,26 @@ class PollingManager(object):
         unique_names.clear()
 
 
-def _setup_pipeline_manager(cfg_file, transformer_manager, p_type=SAMPLE_TYPE):
-    if not os.path.exists(cfg_file):
-        cfg_file = cfg.CONF.find_file(cfg_file)
-
-    LOG.debug("Pipeline config file: %s", cfg_file)
-
-    with open(cfg_file) as fap:
-        data = fap.read()
-
-    pipeline_cfg = yaml.safe_load(data)
-    LOG.info(_LI("Pipeline config: %s"), pipeline_cfg)
-
-    return PipelineManager(pipeline_cfg,
-                           transformer_manager or
-                           extension.ExtensionManager(
-                               'ceilometer.transformer',
-                           ), p_type)
-
-
-def _setup_polling_manager(cfg_file):
-    if not os.path.exists(cfg_file):
-        cfg_file = cfg.CONF.find_file(cfg_file)
-
-    LOG.debug("Polling config file: %s", cfg_file)
-
-    with open(cfg_file) as fap:
-        data = fap.read()
-
-    pipeline_cfg = yaml.safe_load(data)
-    LOG.info(_LI("Pipeline config: %s"), pipeline_cfg)
-
-    return PollingManager(pipeline_cfg)
-
-
 def setup_event_pipeline(transformer_manager=None):
     """Setup event pipeline manager according to yaml config file."""
+    default = extension.ExtensionManager('ceilometer.transformer')
     cfg_file = cfg.CONF.event_pipeline_cfg_file
-    return _setup_pipeline_manager(cfg_file, transformer_manager, EVENT_TYPE)
+    return PipelineManager(cfg_file, transformer_manager or default,
+                           EVENT_TYPE)
 
 
 def setup_pipeline(transformer_manager=None):
     """Setup pipeline manager according to yaml config file."""
+    default = extension.ExtensionManager('ceilometer.transformer')
     cfg_file = cfg.CONF.pipeline_cfg_file
-    return _setup_pipeline_manager(cfg_file, transformer_manager)
-
-
-def _get_pipeline_cfg_file(p_type=SAMPLE_TYPE):
-    if p_type == EVENT_TYPE:
-        cfg_file = cfg.CONF.event_pipeline_cfg_file
-    else:
-        cfg_file = cfg.CONF.pipeline_cfg_file
-
-    if not os.path.exists(cfg_file):
-        cfg_file = cfg.CONF.find_file(cfg_file)
-
-    return cfg_file
-
-
-def get_pipeline_mtime(p_type=SAMPLE_TYPE):
-    cfg_file = _get_pipeline_cfg_file(p_type)
-    return os.path.getmtime(cfg_file)
-
-
-def get_pipeline_hash(p_type=SAMPLE_TYPE):
-
-    cfg_file = _get_pipeline_cfg_file(p_type)
-    with open(cfg_file) as fap:
-        data = fap.read()
-    if six.PY3:
-        data = data.encode('utf-8')
-
-    file_hash = hashlib.md5(data).hexdigest()
-    return file_hash
+    return PipelineManager(cfg_file, transformer_manager or default,
+                           SAMPLE_TYPE)
 
 
 def setup_polling():
     """Setup polling manager according to yaml config file."""
     cfg_file = cfg.CONF.pipeline_cfg_file
-    return _setup_polling_manager(cfg_file)
+    return PollingManager(cfg_file)
 
 
 def get_pipeline_grouping_key(pipe):

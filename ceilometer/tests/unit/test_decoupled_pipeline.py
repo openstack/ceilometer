@@ -136,9 +136,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'publishers': ['new'],
         })
         self.pipeline_cfg['sources'][0]['sinks'].append('second_sink')
-
-        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager)
+        pipeline_manager = pipeline.PipelineManager(
+            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         with pipeline_manager.publisher() as p:
             p([self.test_counter])
 
@@ -179,9 +178,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'resources': [],
             'sinks': ['test_sink']
         })
-
-        pipeline_manager = pipeline.PipelineManager(self.pipeline_cfg,
-                                                    self.transformer_manager)
+        pipeline_manager = pipeline.PipelineManager(
+            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         with pipeline_manager.publisher() as p:
             p([self.test_counter])
 
@@ -225,8 +223,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         pipeline_cfg = yaml.safe_load(data)
         for s in pipeline_cfg['sinks']:
             s['publishers'] = ['test://']
-        pipeline_manager = pipeline.PipelineManager(pipeline_cfg,
-                                                    self.transformer_manager)
+        pipeline_manager = pipeline.PipelineManager(
+            self.cfg2file(pipeline_cfg), self.transformer_manager)
         pipe = pipeline_manager.pipelines[index]
         self._do_test_rate_of_change_mapping(pipe, meters, units)
 
@@ -279,7 +277,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.assertRaises(pipeline.PipelineException,
                           pipeline.PipelineManager,
-                          self.pipeline_cfg,
+                          self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)
 
     def test_duplicated_source_names(self):
@@ -292,5 +290,5 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.assertRaises(pipeline.PipelineException,
                           pipeline.PipelineManager,
-                          self.pipeline_cfg,
+                          self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)

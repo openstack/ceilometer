@@ -287,7 +287,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.srv.run()
         self.addCleanup(self.srv.terminate)
 
-        pipeline = self.srv.pipeline_hash
+        pipeline = self.srv.pipeline_manager.cfg_hash
 
         # Modify the collection targets
         updated_pipeline_cfg_file = self.setup_pipeline(['vcpus',
@@ -297,7 +297,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
         start = time.time()
         while time.time() - start < 10:
-            if pipeline != self.srv.pipeline_hash:
+            if pipeline != self.srv.pipeline_manager.cfg_hash:
                 break
         else:
             self.fail("Pipeline failed to reload")
@@ -312,7 +312,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.srv.run()
         self.addCleanup(self.srv.terminate)
 
-        pipeline = self.srv.event_pipeline_hash
+        pipeline = self.srv.event_pipeline_manager.cfg_hash
 
         # Modify the collection targets
         updated_ev_pipeline_cfg_file = self.setup_event_pipeline(
@@ -323,7 +323,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         shutil.move(updated_ev_pipeline_cfg_file, ev_pipeline_cfg_file)
         start = time.time()
         while time.time() - start < 10:
-            if pipeline != self.srv.event_pipeline_hash:
+            if pipeline != self.srv.event_pipeline_manager.cfg_hash:
                 break
         else:
             self.fail("Pipeline failed to reload")
