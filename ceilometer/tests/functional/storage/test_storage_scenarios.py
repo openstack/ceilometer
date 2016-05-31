@@ -3198,3 +3198,39 @@ class TestRecordUnicodeSamples(DBTestBase):
         self.assertEqual(expected['counter_name'], actual['counter_name'])
         self.assertEqual(expected['resource_metadata'],
                          actual['resource_metadata'])
+
+
+@tests_db.run_with('mongodb')
+class TestBatchRecordingMetering(tests_db.TestBase):
+    def test_batch_recording_metering_data(self):
+        self.sample_dicts = []
+        for i in range(1, 10):
+            s = sample.Sample(name='sample-%s' % i,
+                              type=sample.TYPE_CUMULATIVE,
+                              unit='',
+                              volume=i * 0.1,
+                              user_id='user-id',
+                              project_id='project-id',
+                              resource_id='resource-%s' % str(i % 3),
+                              timestamp=datetime.datetime(2016, 6, 1, 15, i),
+                              resource_metadata={'fake_meta': i},
+                              source=None)
+            s_dict = utils.meter_message_from_counter(
+                s, self.CONF.publisher.telemetry_secret)
+            self.sample_dicts.append(s_dict)
+        self.conn.record_metering_data_batch(self.sample_dicts)
+        results = list(self.conn.query_samples())
+        self.assertEqual(len(self.sample_dicts), len(results))
+        for sample_item in results:
+            d = sample_item.as_dict()
+            del d['recorded_at']
+            self.assertIn(d, self.sample_dicts)
+
+        resources = list(self.conn.get_resources())
+        self.assertEqual(3, len(resources))
+        self.assertEqual('resource-0', resources[0].resource_id)
+        self.assertEqual({'fake_meta': 9}, resources[0].metadata)
+        self.assertEqual('resource-2', resources[1].resource_id)
+        self.assertEqual({'fake_meta': 8}, resources[1].metadata)
+        self.assertEqual('resource-1', resources[2].resource_id)
+        self.assertEqual({'fake_meta': 7}, resources[2].metadata)

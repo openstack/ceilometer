@@ -71,6 +71,8 @@ class DatabaseDispatcher(dispatcher.MeterDispatcherBase,
 
     def record_metering_data(self, data):
         # We may have receive only one counter on the wire
+        if not data:
+            return
         if not isinstance(data, list):
             data = [data]
 
@@ -82,18 +84,18 @@ class DatabaseDispatcher(dispatcher.MeterDispatcherBase,
                  'resource_id': meter['resource_id'],
                  'timestamp': meter.get('timestamp', 'NO TIMESTAMP'),
                  'counter_volume': meter['counter_volume']})
-            try:
-                # Convert the timestamp to a datetime instance.
-                # Storage engines are responsible for converting
-                # that value to something they can store.
-                if meter.get('timestamp'):
-                    ts = timeutils.parse_isotime(meter['timestamp'])
-                    meter['timestamp'] = timeutils.normalize_time(ts)
-                self.meter_conn.record_metering_data(meter)
-            except Exception as err:
-                LOG.error(_LE('Failed to record metering data: %s.'), err)
-                # raise the exception to propagate it up in the chain.
-                raise
+            # Convert the timestamp to a datetime instance.
+            # Storage engines are responsible for converting
+            # that value to something they can store.
+            if meter.get('timestamp'):
+                ts = timeutils.parse_isotime(meter['timestamp'])
+                meter['timestamp'] = timeutils.normalize_time(ts)
+        try:
+            self.meter_conn.record_metering_data_batch(data)
+        except Exception as err:
+            LOG.error(_LE('Failed to record %(len)s: %(err)s.'),
+                      {'len': len(data), 'err': err})
+            raise
 
     def record_events(self, events):
         if not isinstance(events, list):

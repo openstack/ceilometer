@@ -20,6 +20,9 @@
 # under the License.
 """MongoDB storage backend"""
 
+import itertools
+import operator
+
 import copy
 import datetime
 import uuid
@@ -243,69 +246,95 @@ class Connection(pymongo_base.Connection):
         self.conn.close()
 
     def record_metering_data(self, data):
-        """Write the data to the backend storage system.
+        # TODO(liusheng): this is a workaround that is because there are
+        # storage scenario tests which directly invoke this method and pass a
+        # sample dict with all the storage backends and
+        # call conn.record_metering_data. May all the Ceilometer
+        # native storage backends can support batch recording in future, and
+        # then we need to refactor the scenario tests.
+        self.record_metering_data_batch([data])
 
-        :param data: a dictionary such as returned by
-                     ceilometer.publisher.utils.meter_message_from_counter
+    def record_metering_data_batch(self, samples):
+        """Record the metering data in batch.
+
+        :param samples: a list of samples dict.
         """
         # Record the updated resource metadata - we use $setOnInsert to
         # unconditionally insert sample timestamps and resource metadata
         # (in the update case, this must be conditional on the sample not
         # being out-of-order)
-        data = copy.deepcopy(data)
-        data['resource_metadata'] = pymongo_utils.improve_keys(
-            data.pop('resource_metadata'))
-        resource = self.db.resource.find_one_and_update(
-            {'_id': data['resource_id']},
-            {'$set': {'project_id': data['project_id'],
-                      'user_id': data['user_id'],
-                      'source': data['source'],
-                      },
-             '$setOnInsert': {'metadata': data['resource_metadata'],
-                              'first_sample_timestamp': data['timestamp'],
-                              'last_sample_timestamp': data['timestamp'],
-                              },
-             '$addToSet': {'meter': {'counter_name': data['counter_name'],
-                                     'counter_type': data['counter_type'],
-                                     'counter_unit': data['counter_unit'],
-                                     },
-                           },
-             },
-            upsert=True,
-            return_document=pymongo.ReturnDocument.AFTER,
-        )
-
-        # only update last sample timestamp if actually later (the usual
-        # in-order case)
-        last_sample_timestamp = resource.get('last_sample_timestamp')
-        if (last_sample_timestamp is None or
-                last_sample_timestamp <= data['timestamp']):
-            self.db.resource.update_one(
-                {'_id': data['resource_id']},
-                {'$set': {'metadata': data['resource_metadata'],
-                          'last_sample_timestamp': data['timestamp']}}
+        sorted_samples = sorted(
+            copy.deepcopy(samples),
+            key=lambda s: (s['resource_id'], s['timestamp']))
+        res_grouped_samples = itertools.groupby(
+            sorted_samples, key=operator.itemgetter('resource_id'))
+        samples_to_update_resource = []
+        for resource_id, g_samples in res_grouped_samples:
+            g_samples = list(g_samples)
+            g_samples[-1]['meter'] = [{'counter_name': s['counter_name'],
+                                       'counter_type': s['counter_type'],
+                                       'counter_unit': s['counter_unit'],
+                                       } for s in g_samples]
+            g_samples[-1]['last_sample_timestamp'] = g_samples[-1]['timestamp']
+            g_samples[-1]['first_sample_timestamp'] = g_samples[0]['timestamp']
+            samples_to_update_resource.append(g_samples[-1])
+        for sample in samples_to_update_resource:
+            sample['resource_metadata'] = pymongo_utils.improve_keys(
+                sample.pop('resource_metadata'))
+            resource = self.db.resource.find_one_and_update(
+                {'_id': sample['resource_id']},
+                {'$set': {'project_id': sample['project_id'],
+                          'user_id': sample['user_id'],
+                          'source': sample['source'],
+                          },
+                 '$setOnInsert': {
+                     'metadata': sample['resource_metadata'],
+                     'first_sample_timestamp': sample['timestamp'],
+                     'last_sample_timestamp': sample['timestamp'],
+                    },
+                 '$addToSet': {
+                     'meter': {'$each': sample['meter']},
+                    },
+                 },
+                upsert=True,
+                return_document=pymongo.ReturnDocument.AFTER,
             )
 
-        # only update first sample timestamp if actually earlier (the unusual
-        # out-of-order case)
-        # NOTE: a null first sample timestamp is not updated as this indicates
-        # a pre-existing resource document dating from before we started
-        # recording these timestamps in the resource collection
-        first_sample_timestamp = resource.get('first_sample_timestamp')
-        if (first_sample_timestamp is not None and
-                first_sample_timestamp > data['timestamp']):
-            self.db.resource.update_one(
-                {'_id': data['resource_id']},
-                {'$set': {'first_sample_timestamp': data['timestamp']}}
-            )
+            # only update last sample timestamp if actually later (the usual
+            # in-order case)
+            last_sample_timestamp = resource.get('last_sample_timestamp')
+            if (last_sample_timestamp is None or
+                    last_sample_timestamp <= sample['last_sample_timestamp']):
+                self.db.resource.update_one(
+                    {'_id': sample['resource_id']},
+                    {'$set': {'metadata': sample['resource_metadata'],
+                              'last_sample_timestamp':
+                                  sample['last_sample_timestamp']}}
+                )
+
+            # only update first sample timestamp if actually earlier (
+            # the unusual out-of-order case)
+            # NOTE: a null first sample timestamp is not updated as this
+            # indicates a pre-existing resource document dating from before
+            # we started recording these timestamps in the resource collection
+            first_sample_timestamp = resource.get('first_sample_timestamp')
+            if (first_sample_timestamp is not None and
+                    first_sample_timestamp > sample['first_sample_timestamp']):
+                self.db.resource.update_one(
+                    {'_id': sample['resource_id']},
+                    {'$set': {'first_sample_timestamp':
+                              sample['first_sample_timestamp']}}
+                )
 
         # Record the raw data for the meter. Use a copy so we do not
         # modify a data structure owned by our caller (the driver adds
         # a new key '_id').
-        record = copy.copy(data)
-        record['recorded_at'] = timeutils.utcnow()
-
-        self.db.meter.insert_one(record)
+        record = copy.deepcopy(samples)
+        for s in record:
+            s['recorded_at'] = timeutils.utcnow()
+            s['resource_metadata'] = pymongo_utils.improve_keys(
+                s.pop('resource_metadata'))
+        self.db.meter.insert_many(record)
 
     def clear_expired_metering_data(self, ttl):
         """Clear expired data from the backend storage system.
