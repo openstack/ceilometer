@@ -363,8 +363,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             if retry:
                 self._gnocchi.metric.add_measures(metric_name, measures,
                                                   resource_id)
-                LOG.debug("Measure posted on metric %s of resource %s",
-                          metric_name, resource_id)
+            LOG.debug("Measure posted on metric %s of resource %s",
+                      metric_name, resource_id)
 
         if resource_extra:
             self._if_not_cached("update", resource_type, resource,
