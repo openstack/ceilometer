@@ -34,8 +34,9 @@ def get_transport(url=None, optional=False, cache=True):
     if not transport or not cache:
         try:
             transport = oslo_messaging.get_transport(cfg.CONF, url)
-        except oslo_messaging.InvalidTransportURL as e:
-            if not optional or e.url:
+        except (oslo_messaging.InvalidTransportURL,
+                oslo_messaging.DriverLoadFailure):
+            if not optional or url:
                 # NOTE(sileht): oslo_messaging is configured but unloadable
                 # so reraise the exception
                 raise
