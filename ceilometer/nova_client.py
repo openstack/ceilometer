@@ -14,6 +14,7 @@
 import functools
 
 import novaclient
+from novaclient import api_versions
 from novaclient import client as nova_client
 from oslo_config import cfg
 from oslo_log import log
@@ -69,7 +70,7 @@ class Client(object):
             logger.logger.setLevel(log.DEBUG)
 
         self.nova_client = nova_client.Client(
-            version=2,
+            version=api_versions.APIVersion('2.1'),
             session=keystone_client.get_session(),
 
             # nova adapter options
