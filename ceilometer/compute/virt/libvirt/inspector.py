@@ -117,6 +117,29 @@ class LibvirtInspector(virt_inspector.Inspector):
         dom_info = domain.info()
         return virt_inspector.CPUStats(number=dom_info[3], time=dom_info[4])
 
+    def inspect_cpu_l3_cache(self, instance):
+        domain = self._lookup_by_uuid(instance)
+        try:
+            stats = self.connection.domainListGetStats(
+                [domain], libvirt.VIR_DOMAIN_STATS_PERF)
+            perf = stats[0][1]
+            usage = perf["perf.cmt"]
+            return virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=usage)
+        except AttributeError as e:
+            msg = _('Perf is not supported by current version of libvirt, and '
+                    'failed to inspect l3 cache usage of %(instance_uuid)s, '
+                    'can not get info from libvirt: %(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)
+        # domainListGetStats might launch an exception if the method or
+        # cmt perf event is not supported by the underlying hypervisor
+        # being used by libvirt.
+        except libvirt.libvirtError as e:
+            msg = _('Failed to inspect l3 cache usage of %(instance_uuid)s, '
+                    'can not get info from libvirt: %(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)
+
     def _get_domain_not_shut_off_or_raise(self, instance):
         instance_name = util.instance_name(instance)
         domain = self._lookup_by_uuid(instance)
