@@ -14,7 +14,6 @@
 # under the License.
 
 from oslo_log import log
-from oslo_utils import timeutils
 
 from ceilometer.i18n import _
 from ceilometer.network.services import base
@@ -58,7 +57,6 @@ class FirewallPollster(base.BaseServicesPollster):
                 user_id=None,
                 project_id=fw['tenant_id'],
                 resource_id=fw['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(fw)
             )
 
@@ -92,6 +90,5 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
                 user_id=None,
                 project_id=fw['tenant_id'],
                 resource_id=fw['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(fw)
             )

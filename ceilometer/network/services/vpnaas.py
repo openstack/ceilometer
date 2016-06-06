@@ -14,7 +14,6 @@
 # under the License.
 
 from oslo_log import log
-from oslo_utils import timeutils
 
 from ceilometer.i18n import _
 from ceilometer.network.services import base
@@ -59,7 +58,6 @@ class VPNServicesPollster(base.BaseServicesPollster):
                 user_id=None,
                 project_id=vpn['tenant_id'],
                 resource_id=vpn['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(vpn)
             )
 
@@ -102,6 +100,5 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
                 user_id=None,
                 project_id=conn['tenant_id'],
                 resource_id=conn['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(conn)
             )

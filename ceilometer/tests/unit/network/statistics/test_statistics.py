@@ -105,75 +105,65 @@ class TestBaseGetSamples(base.BaseTestCase):
 
         return [v for v in self.pollster.get_samples(self, {}, resources)]
 
-    def _assert_sample(self, s, volume, resource_id, resource_metadata,
-                       timestamp):
-            self.assertEqual('foo', s.name)
-            self.assertEqual(sample.TYPE_CUMULATIVE, s.type)
-            self.assertEqual('bar', s.unit)
-            self.assertEqual(volume, s.volume)
-            self.assertIsNone(s.user_id)
-            self.assertIsNone(s.project_id)
-            self.assertEqual(resource_id, s.resource_id)
-            self.assertEqual(timestamp, s.timestamp)
-            self.assertEqual(resource_metadata, s.resource_metadata)
+    def _assert_sample(self, s, volume, resource_id, resource_metadata):
+        self.assertEqual('foo', s.name)
+        self.assertEqual(sample.TYPE_CUMULATIVE, s.type)
+        self.assertEqual('bar', s.unit)
+        self.assertEqual(volume, s.volume)
+        self.assertIsNone(s.user_id)
+        self.assertIsNone(s.project_id)
+        self.assertEqual(resource_id, s.resource_id)
+        self.assertEqual(resource_metadata, s.resource_metadata)
 
     def test_get_samples_one_driver_one_resource(self):
-        times = self._make_timestamps(2)
-        fake_driver = self._make_fake_driver((1, 'a', {'spam': 'egg'},
-                                              times[0]),
-                                             (2, 'b', None, times[1]))
+        fake_driver = self._make_fake_driver((1, 'a', {'spam': 'egg'},),
+                                             (2, 'b', None))
 
         self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo')
 
         self.assertEqual(1, len(samples))
-        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
+        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'})
 
     def test_get_samples_one_driver_two_resource(self):
-        times = self._make_timestamps(3)
-        fake_driver = self._make_fake_driver((1, 'a', {'spam': 'egg'},
-                                              times[0]),
-                                             (2, 'b', None, times[1]),
-                                             (3, 'c', None, times[2]))
+        fake_driver = self._make_fake_driver((1, 'a', {'spam': 'egg'},),
+                                             (2, 'b', None),
+                                             (3, 'c', None))
 
         self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo', 'http://bar')
 
         self.assertEqual(2, len(samples))
-        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
-        self._assert_sample(samples[1], 2, 'b', {}, times[1])
+        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'})
+        self._assert_sample(samples[1], 2, 'b', {})
 
     def test_get_samples_two_driver_one_resource(self):
-        times = self._make_timestamps(4)
-        fake_driver1 = self._make_fake_driver((1, 'a', {'spam': 'egg'},
-                                               times[0]),
-                                              (2, 'b', None), times[1])
+        fake_driver1 = self._make_fake_driver((1, 'a', {'spam': 'egg'},),
+                                              (2, 'b', None))
 
-        fake_driver2 = self._make_fake_driver((11, 'A', None, times[2]),
-                                              (12, 'B', None, times[3]))
+        fake_driver2 = self._make_fake_driver((11, 'A', None),
+                                              (12, 'B', None))
 
         self._setup_ext_mgr(http=fake_driver1(), https=fake_driver2())
 
         samples = self._get_samples('http://foo')
 
         self.assertEqual(1, len(samples))
-        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
+        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'})
 
     def test_get_samples_multi_samples(self):
-        times = self._make_timestamps(2)
-        fake_driver = self._make_fake_driver([(1, 'a', {'spam': 'egg'},
-                                               times[0]),
-                                              (2, 'b', None, times[1])])
+        fake_driver = self._make_fake_driver([(1, 'a', {'spam': 'egg'},),
+                                              (2, 'b', None)])
 
         self._setup_ext_mgr(http=fake_driver())
 
         samples = self._get_samples('http://foo')
 
         self.assertEqual(2, len(samples))
-        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'}, times[0])
-        self._assert_sample(samples[1], 2, 'b', {}, times[1])
+        self._assert_sample(samples[0], 1, 'a', {'spam': 'egg'})
+        self._assert_sample(samples[1], 2, 'b', {})
 
     def test_get_samples_return_none(self):
         fake_driver = self._make_fake_driver(None)

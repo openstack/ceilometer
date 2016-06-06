@@ -18,7 +18,6 @@
 
 from oslo_config import cfg
 from oslo_log import log
-from oslo_utils import timeutils
 
 from ceilometer.i18n import _LW
 from ceilometer.network.services import base
@@ -59,6 +58,5 @@ class FloatingIPPollster(base.BaseServicesPollster):
                 user_id=fip.get('user_id'),
                 project_id=fip['tenant_id'],
                 resource_id=fip['id'],
-                timestamp=timeutils.utcnow().isoformat(),
                 resource_metadata=self.extract_metadata(fip)
             )

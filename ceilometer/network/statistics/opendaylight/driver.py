@@ -14,7 +14,6 @@
 # under the License.
 
 from oslo_log import log
-from oslo_utils import timeutils
 import six
 from six import moves
 from six.moves.urllib import parse as urlparse
@@ -161,9 +160,6 @@ class OpenDayLightDriver(driver.Driver):
                     cs.host_tracker.get_active_hosts(container_name))
                 container_data['inactive_hosts'] = (
                     cs.host_tracker.get_inactive_hosts(container_name))
-
-                container_data['timestamp'] = timeutils.utcnow().isoformat()
-
                 data[container_name] = container_data
             except Exception:
                 LOG.exception(_('Request failed to connect to OpenDaylight'
@@ -199,7 +195,6 @@ class OpenDayLightDriver(driver.Driver):
 
         samples = []
         for name, value in six.iteritems(data):
-            timestamp = value['timestamp']
             for sample in iter(extractor, value):
                 if sample is not None:
                     # set controller name and container name
@@ -207,7 +202,7 @@ class OpenDayLightDriver(driver.Driver):
                     sample[2]['controller'] = 'OpenDaylight'
                     sample[2]['container'] = name
 
-                    samples.append(sample + (timestamp, ))
+                    samples.append(sample)
 
         return samples
 
