@@ -64,7 +64,7 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
             skip_msg = ("%s skipped as swift is not available" %
                         cls.__name__)
             raise cls.skipException(skip_msg)
-        if not CONF.service_available.ceilometer_plugin:
+        if not CONF.service_available.ceilometer:
             skip_msg = ("%s skipped as ceilometer is not available" %
                         cls.__name__)
             raise cls.skipException(skip_msg)

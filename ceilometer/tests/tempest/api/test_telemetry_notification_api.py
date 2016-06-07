@@ -78,7 +78,7 @@ class TelemetryNotificationAdminAPITest(base.BaseTelemetryAdminTest):
 
         body = self.create_server()
 
-        if CONF.telemetry_plugin.event_enabled:
+        if CONF.telemetry.event_enabled:
             query = ('instance_id', 'eq', body['id'])
             self.await_events(query)
 
