@@ -102,7 +102,6 @@ class Resources(object):
         self._resources = []
         self._discovery = []
         self.blacklist = []
-        self.last_dup = []
 
     def setup(self, source):
         self._resources = source.resources
