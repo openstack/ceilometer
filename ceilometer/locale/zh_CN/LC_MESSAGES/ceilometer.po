@@ -16,9 +16,9 @@
 # Linda <duleish@cn.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev57\n"
+"Project-Id-Version: ceilometer 6.0.1.dev170\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-04-18 02:09+0000\n"
+"POT-Creation-Date: 2016-06-07 17:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -69,11 +69,6 @@ msgstr "无法获取虚拟机%s的CPU使用率"
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "无法为实例%s获取IP地址"
-
-msgid ""
-"Dispatcher target was not set, no meter will be posted. Set the target in "
-"the ceilometer.conf file"
-msgstr "分发器目标未设置，没有指标将被发送。在ceilometer.conf文件中设置目标。"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -142,10 +137,6 @@ msgstr "发布%d个数据点时失败，正在将其丢弃"
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr "发布%d个数据点时失败，将其入队"
-
-#, python-format
-msgid "Failed to record metering data: %s"
-msgstr "无法保存监控数据：%s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
@@ -463,10 +454,6 @@ msgstr "ipmi输出长度不匹配"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes和backup_count必须是整数。"
-
-#, python-format
-msgid "message signature invalid, discarding message: %r"
-msgstr "消息签名不合法，丢弃消息：%r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr "解析IPMI传感器数据失败，从给定的输入中无法检索到数据"

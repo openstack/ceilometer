@@ -7,9 +7,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev57\n"
+"Project-Id-Version: ceilometer 6.0.1.dev170\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-04-18 02:09+0000\n"
+"POT-Creation-Date: 2016-06-07 17:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -63,13 +63,6 @@ msgstr "No se puede obtener la utilización de CPU de VM %s"
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "No se ha podido obtener la dirección IP de la instancia %s"
-
-msgid ""
-"Dispatcher target was not set, no meter will be posted. Set the target in "
-"the ceilometer.conf file"
-msgstr ""
-"No se ha establecido el destino de asignador, no se enviará ningún medidor. "
-"Establezca el destino en el archivo ceilometer.conf"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -139,10 +132,6 @@ msgstr "No se han podido publicar los puntos de datos %d, descartándolos"
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr "No se han podido publicar los puntos de datos %d, póngalos en cola"
-
-#, python-format
-msgid "Failed to record metering data: %s"
-msgstr "No se ha podido registrar los datos de medición: %s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
@@ -508,10 +497,6 @@ msgstr "la longitud de salida de ipmitool no coincide"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes y backup_count deben ser números."
-
-#, python-format
-msgid "message signature invalid, discarding message: %r"
-msgstr "firma de mensaje no válida, descartando mensaje: %r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""

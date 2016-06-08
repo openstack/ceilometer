@@ -8,9 +8,9 @@
 # 笹原 昌美 <ebb0de1@jp.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev57\n"
+"Project-Id-Version: ceilometer 6.0.1.dev170\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-04-18 02:09+0000\n"
+"POT-Creation-Date: 2016-06-07 17:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -65,13 +65,6 @@ msgstr "VM %s のCPU 使用率を取得できませんでした"
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "インスタンス %s の IP アドレスを取得できませんでした"
-
-msgid ""
-"Dispatcher target was not set, no meter will be posted. Set the target in "
-"the ceilometer.conf file"
-msgstr ""
-"ディスパッチャーターゲットが設定されておらず、メーターは通知されません。"
-"ceilometer.conf ファイルでターゲットを設定してください。"
 
 #, fuzzy, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -141,10 +134,6 @@ msgstr "%d データポイントの公開に失敗しました。これらは廃
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr "%d データポイントの公開に失敗しました。これらをキューに入れてください"
-
-#, python-format
-msgid "Failed to record metering data: %s"
-msgstr "計測データを記録できませんでした: %s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
@@ -504,10 +493,6 @@ msgstr "ipmitool 出力の長さが一致しません"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes と backup_count は数値でなければなりません。"
-
-#, python-format
-msgid "message signature invalid, discarding message: %r"
-msgstr "メッセージシグニチャーが無効です。メッセージを破棄します: %r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""

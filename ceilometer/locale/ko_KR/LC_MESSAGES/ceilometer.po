@@ -12,9 +12,9 @@
 # Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev57\n"
+"Project-Id-Version: ceilometer 6.0.1.dev170\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-04-18 02:09+0000\n"
+"POT-Creation-Date: 2016-06-07 17:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -65,13 +65,6 @@ msgstr "VM %s CPU 이용률을 가져올 수 없음"
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "%s 인스턴스의 IP 주소를 얻을 수 없음"
-
-msgid ""
-"Dispatcher target was not set, no meter will be posted. Set the target in "
-"the ceilometer.conf file"
-msgstr ""
-"디스패처 대상을 설정하지 않았으며 미터가 게시되지 않습니다. ceilometer.conf "
-"파일에 대상을 설정하십시오."
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -141,10 +134,6 @@ msgstr "%d 데이터포인트 공개 실패. 이를 삭제하는 중"
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr "%d 데이터포인트 공개 실패. 이를 큐에 대기시킴"
-
-#, python-format
-msgid "Failed to record metering data: %s"
-msgstr "측정 데이터 기록 실패: %s"
 
 #, python-format
 msgid "Filter expression not valid: %s"
@@ -483,10 +472,6 @@ msgstr "ipmitool 출력 길이 불일치"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes 및 backup_count는 숫자여야 합니다."
-
-#, python-format
-msgid "message signature invalid, discarding message: %r"
-msgstr "올바르지 않은 메시지 서명. 메시지 버리는 중: %r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""

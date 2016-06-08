@@ -10,14 +10,14 @@
 # Frank Kloeker <eumel@arcor.de>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev57\n"
+"Project-Id-Version: ceilometer 6.0.1.dev170\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-04-18 02:09+0000\n"
+"POT-Creation-Date: 2016-06-07 17:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-04 05:01+0000\n"
-"Last-Translator: Monika Wolf <vcomas3@de.ibm.com>\n"
+"PO-Revision-Date: 2016-06-06 06:19+0000\n"
+"Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -68,13 +68,6 @@ msgstr "CPU-Auslastung für VM %s konnte nicht abgerufen werden"
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "IP-Adresse von Instanz %s konnte nicht abgerufen werden"
-
-msgid ""
-"Dispatcher target was not set, no meter will be posted. Set the target in "
-"the ceilometer.conf file"
-msgstr ""
-"Dispatcher-Ziel nicht definiert, es werden keine Messgrößen übergeben. Das "
-"Ziel in der Datei 'ceilometer.conf' definieren."
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -148,10 +141,6 @@ msgstr ""
 "einreihen"
 
 #, python-format
-msgid "Failed to record metering data: %s"
-msgstr "Messdaten wurden nicht aufgezeichnet: %s"
-
-#, python-format
 msgid "Filter expression not valid: %s"
 msgstr "Filterausdruck nicht gültig: %s"
 
@@ -178,6 +167,10 @@ msgid ""
 msgstr ""
 "Ungültige YAML-Syntax in Definitionsdatei %(file)s in Zeile: %(line)s, "
 "Spalte: %(column)s."
+
+#, python-format
+msgid "Invalid aggregation function: %s"
+msgstr "Ungültige Aggreation Funktion: %s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -516,10 +509,6 @@ msgstr "Abweichung bei ipmitool-Ausgabelänge"
 
 msgid "max_bytes and backup_count should be numbers."
 msgstr "max_bytes und backup_count sollten Zahlen sein."
-
-#, python-format
-msgid "message signature invalid, discarding message: %r"
-msgstr "Nachrichtensignatur ungültig, Nachricht wird verworfen: %r"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
