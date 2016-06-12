@@ -24,9 +24,7 @@ from ceilometer.tests import base
 class BinTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinTestCase, self).setUp()
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "[database]\n"
+        content = ("[database]\n"
                    "connection=log://localhost\n")
         if six.PY3:
             content = content.encode('utf-8')
@@ -56,9 +54,7 @@ class BinTestCase(base.BaseTestCase):
                       b"time to live is disabled", err)
 
     def _test_run_expirer_ttl_enabled(self, ttl_name, data_name):
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "[database]\n"
+        content = ("[database]\n"
                    "%s=1\n"
                    "connection=log://localhost\n" % ttl_name)
         if six.PY3:
@@ -89,7 +85,6 @@ class BinSendSampleTestCase(base.BaseTestCase):
         super(BinSendSampleTestCase, self).setUp()
         pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
         content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
                    "pipeline_cfg_file={0}\n".format(pipeline_cfg_file))
         if six.PY3:
             content = content.encode('utf-8')
@@ -126,9 +121,7 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
         super(BinCeilometerPollingServiceTestCase, self).tearDown()
 
     def test_starting_with_duplication_namespaces(self):
-        content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
-                   "[database]\n"
+        content = ("[database]\n"
                    "connection=log://localhost\n")
         if six.PY3:
             content = content.encode('utf-8')
@@ -147,7 +140,6 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
 
     def test_polling_namespaces_invalid_value_in_config(self):
         content = ("[DEFAULT]\n"
-                   "rpc_backend=fake\n"
                    "polling_namespaces = ['central']\n"
                    "[database]\n"
                    "connection=log://localhost\n")
