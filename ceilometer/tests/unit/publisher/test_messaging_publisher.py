@@ -107,13 +107,13 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
     def test_publish_topic_override(self, notifier):
         msg_publisher.SampleNotifierPublisher(
             netutils.urlsplit('notifier://?topic=custom_topic'))
-        notifier.assert_called_with(mock.ANY, topic='custom_topic',
+        notifier.assert_called_with(mock.ANY, topics=['custom_topic'],
                                     driver=mock.ANY, retry=mock.ANY,
                                     publisher_id=mock.ANY)
 
         msg_publisher.EventNotifierPublisher(
             netutils.urlsplit('notifier://?topic=custom_event_topic'))
-        notifier.assert_called_with(mock.ANY, topic='custom_event_topic',
+        notifier.assert_called_with(mock.ANY, topics=['custom_event_topic'],
                                     driver=mock.ANY, retry=mock.ANY,
                                     publisher_id=mock.ANY)
 

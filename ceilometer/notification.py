@@ -116,7 +116,7 @@ class NotificationService(service_base.PipelineBasedService):
                 transport,
                 driver=cfg.CONF.publisher_notifier.telemetry_driver,
                 publisher_id=pipe.name,
-                topic='%s-%s-%s' % (self.NOTIFICATION_IPC, pipe.name, x)))
+                topics=['%s-%s-%s' % (self.NOTIFICATION_IPC, pipe.name, x)]))
         return notifiers
 
     def _get_pipe_manager(self, transport, pipeline_manager):

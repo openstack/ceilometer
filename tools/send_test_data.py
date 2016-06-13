@@ -48,7 +48,7 @@ def get_notifier(config_file):
         messaging.get_transport(),
         driver='messagingv2',
         publisher_id='telemetry.publisher.test',
-        topic='metering',
+        topics=['metering'],
     )
 
 

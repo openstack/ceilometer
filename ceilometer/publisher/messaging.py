@@ -192,12 +192,12 @@ class NotifierPublisher(MessagingPublisher):
     def __init__(self, parsed_url, default_topic):
         super(NotifierPublisher, self).__init__(parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
-        topic = options.get('topic', [default_topic])[-1]
+        topic = options.get('topic', [default_topic])
         self.notifier = oslo_messaging.Notifier(
             messaging.get_transport(),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='telemetry.publisher.%s' % cfg.CONF.host,
-            topic=topic,
+            topics=topic,
             retry=self.retry
         )
 
