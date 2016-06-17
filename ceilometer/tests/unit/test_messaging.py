@@ -60,6 +60,6 @@ class MessagingTests(base.BaseTestCase):
         self.assertNotEqual(t1, t2)
 
     def test_get_transport_optional(self):
-        self.CONF.set_override('rpc_backend', '')
+        self.CONF.set_override('transport_url', 'non-url')
         self.assertIsNone(messaging.get_transport(optional=True,
                                                   cache=False))
