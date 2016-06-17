@@ -122,7 +122,7 @@ class Evaluator(object):
         at the original point in time.
         """
         cron.get_prev()
-        diff = timeutils.total_seconds(ts - cron.get_next(datetime.datetime))
+        diff = (ts - cron.get_next(datetime.datetime)).total_seconds()
         return abs(diff) < 60  # minute precision
 
     @abc.abstractmethod
