@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import glanceclient
 import mock
 import novaclient
 from oslo_config import fixture as fixture_config
@@ -32,7 +33,7 @@ class TestNovaClient(base.BaseTestCase):
             self.nv.nova_client.flavors, 'get',
             side_effect=self.fake_flavors_get))
         self.useFixture(mockpatch.PatchObject(
-            self.nv.nova_client.images, 'get',
+            self.nv.glance_client.images, 'get',
             side_effect=self.fake_images_get))
         self.CONF = self.useFixture(fixture_config.Config()).conf
 
@@ -65,7 +66,7 @@ class TestNovaClient(base.BaseTestCase):
             a.name = image_details[a.id][0]
             a.metadata = image_details[a.id][1]
         else:
-            raise novaclient.exceptions.NotFound('foobar')
+            raise glanceclient.exc.HTTPNotFound('foobar')
 
         return a
 
