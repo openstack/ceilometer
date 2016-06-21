@@ -18,6 +18,7 @@ from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
 from ceilometer.compute import discovery
+from ceilometer import service
 import ceilometer.tests.base as base
 
 
@@ -59,6 +60,7 @@ class TestDiscovery(base.BaseTestCase):
         self.useFixture(patch_timeutils)
 
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [])
         self.CONF.set_override('host', 'test')
 
     def test_normal_discovery(self):
@@ -97,3 +99,28 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual(1, list(resources)[0].id)
         self.client.instance_get_all_by_host.assert_called_once_with(
             self.CONF.host, "2016-01-01T00:00:00+00:00")
+
+    def test_discovery_with_legacy_resource_cache_cleanup(self):
+        self.CONF.set_override("resource_update_interval", 600,
+                               group="compute")
+        self.CONF.set_override("resource_cache_expiry", 1800,
+                               group="compute")
+        dsc = discovery.InstanceDiscovery()
+        resources = dsc.discover(mock.MagicMock())
+        self.assertEqual(1, len(resources))
+
+        self.utc_now.return_value = datetime.datetime(
+            2016, 1, 1, minute=20, tzinfo=iso8601.iso8601.UTC)
+        resources = dsc.discover(mock.MagicMock())
+        self.assertEqual(1, len(resources))
+
+        self.utc_now.return_value = datetime.datetime(
+            2016, 1, 1, minute=31, tzinfo=iso8601.iso8601.UTC)
+        resources = dsc.discover(mock.MagicMock())
+        self.assertEqual(1, len(resources))
+
+        expected_calls = [mock.call('test', None),
+                          mock.call('test', '2016-01-01T00:00:00+00:00'),
+                          mock.call('test', None)]
+        self.assertEqual(expected_calls,
+                         self.client.instance_get_all_by_host.call_args_list)
