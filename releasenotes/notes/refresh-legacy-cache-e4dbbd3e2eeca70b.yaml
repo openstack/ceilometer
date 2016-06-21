@@ -1,0 +1,9 @@
+---
+fixes:
+  - |
+    A local cache is used when polling instance metrics to minimise calls Nova
+    API. A new option is added `resource_cache_expiry` to configure a time to
+    live for cache before it expires. This resolves issue where migrated
+    instances are not removed from cache. This is only relevant when
+    `instance_discovery_method` is set to `naive`. It is recommended to use
+    `libvirt_metadata` if possible.

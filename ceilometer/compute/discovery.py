@@ -62,6 +62,17 @@ OPTS = [
                     "on this option's interval. Measurements relating "
                     "to the instances will match intervals "
                     "defined in pipeline. "),
+    cfg.IntOpt('resource_cache_expiry',
+               default=3600,
+               min=0,
+               help="The expiry to totally refresh the instances resource "
+                    "cache, since the instance may be migrated to another "
+                    "host, we need to clean the legacy instances info in "
+                    "local cache by totally refreshing the local cache. "
+                    "The minimum should be the value of the config option "
+                    "of resource_update_interval. This option is only used "
+                    "for agent polling to Nova API, so it will works only "
+                    "when 'instance_discovery_method' was set to 'naive'.")
 ]
 
 LOG = log.getLogger(__name__)
@@ -90,6 +101,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
         self.nova_cli = nova_client.Client(conf)
         self.expiration_time = conf.compute.resource_update_interval
+        self.cache_expiry = conf.compute.resource_cache_expiry
         if self.method == "libvirt_metadata":
             self._connection = None
             # 4096 instances on a compute should be enough :)
@@ -97,6 +109,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
         else:
             self.instances = {}
             self.last_run = None
+            self.last_cache_expire = None
 
     @property
     def connection(self):
@@ -210,17 +223,26 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
     def discover_nova_polling(self, manager, param=None):
         secs_from_last_update = 0
+        utc_now = timeutils.utcnow(True)
+        secs_from_last_expire = 0
         if self.last_run:
             secs_from_last_update = timeutils.delta_seconds(
-                self.last_run, timeutils.utcnow(True))
+                self.last_run, utc_now)
+        if self.last_cache_expire:
+            secs_from_last_expire = timeutils.delta_seconds(
+                self.last_cache_expire, utc_now)
 
         instances = []
         # NOTE(ityaptin) we update make a nova request only if
         # it's a first discovery or resources expired
         if not self.last_run or secs_from_last_update >= self.expiration_time:
             try:
-                utc_now = timeutils.utcnow(True)
-                since = self.last_run.isoformat() if self.last_run else None
+                if secs_from_last_expire < self.cache_expiry and self.last_run:
+                    since = self.last_run.isoformat()
+                else:
+                    since = None
+                    self.instances.clear()
+                    self.last_cache_expire = utc_now
                 instances = self.nova_cli.instance_get_all_by_host(
                     self.conf.host, since)
                 self.last_run = utc_now
