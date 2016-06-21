@@ -43,6 +43,7 @@ def _get_metadata_from_object(instance):
         'flavor': instance.flavor,
         'status': instance.status.lower(),
         'state': getattr(instance, 'OS-EXT-STS:vm_state', u''),
+        'task_state': getattr(instance, 'OS-EXT-STS:task_state', u''),
     }
 
     # Image properties
