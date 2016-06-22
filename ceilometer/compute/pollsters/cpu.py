@@ -17,6 +17,7 @@
 from oslo_log import log
 
 import ceilometer
+from ceilometer.agent import plugin_base
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -90,4 +91,41 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
                           self.inspector.__class__.__name__)
             except Exception as err:
                 LOG.exception(_('Could not get CPU Util for %(id)s: %(e)s'),
+                              {'id': instance.id, 'e': err})
+
+
+class CPUL3CachePollster(pollsters.BaseComputePollster):
+
+    def get_samples(self, manager, cache, resources):
+        self._inspection_duration = self._record_poll_time()
+        for instance in resources:
+            LOG.debug(_('checking cache usage for instance %s'), instance.id)
+            try:
+                cpu_cache = self.inspector.inspect_cpu_l3_cache(
+                    instance, self._inspection_duration)
+                LOG.debug(_("CPU cache size: %(id)s %(cache_size)d"),
+                          ({'id': instance.id,
+                            'l3_cache_usage': cpu_cache.l3_cache_usage}))
+                yield util.make_sample_from_instance(
+                    instance,
+                    name='cpu_l3_cache',
+                    type=sample.TYPE_GAUGE,
+                    unit='B',
+                    volume=cpu_cache.l3_cache_usage,
+                )
+            except virt_inspector.InstanceNotFoundException as err:
+                # Instance was deleted while getting samples. Ignore it.
+                LOG.debug('Exception while getting samples %s', err)
+            except virt_inspector.NoDataException as e:
+                LOG.warning(('Cannot inspect data of %(pollster)s for '
+                             '%(instance_id)s, non-fatal reason: %(exc)s'),
+                            {'pollster': self.__class__.__name__,
+                             'instance_id': instance.id, 'exc': e})
+                raise plugin_base.PollsterPermanentError(resources)
+            except ceilometer.NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug('Obtaining cache usage is not implemented for %s',
+                          self.inspector.__class__.__name__)
+            except Exception as err:
+                LOG.exception(_('Could not get cache usage for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
