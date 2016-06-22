@@ -48,7 +48,14 @@
                     "threshold": 10,
                     "comparison_operator": "gt",
                     "alarm_actions": [
-                        { "get_attr": [ "web_server_scaledown_policy", "alarm_url" ] }
+                        {
+                            "str_replace": {
+                                "template": "trust+url",
+                                "params": {
+                                    "url": { "get_attr": [ "web_server_scaledown_policy", "signal_url" ] }
+                                }
+                            }
+                        }
                     ],
                     "resource_type": "instance",
                     "query": {
