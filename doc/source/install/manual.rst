@@ -471,6 +471,14 @@ Configure the driver in ``heat.conf``::
   [oslo_messaging_notifications]
   driver=messagingv2
 
+Neutron
+------
+
+Edit ``neutron.conf`` to include::
+
+  [oslo_messaging_notifications]
+  driver = messagingv2
+
 Nova
 ----
 
