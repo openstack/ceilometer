@@ -4,11 +4,6 @@
 # Copyright 2013 eNovance
 # Copyright 2014 Red Hat, Inc
 #
-# Authors: Yunhong Jiang <yunhong.jiang@intel.com>
-#          Julien Danjou <julien@danjou.info>
-#          Eoghan Glynn <eglynn@redhat.com>
-#          Nejc Saje <nsaje@redhat.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
