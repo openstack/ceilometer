@@ -78,10 +78,12 @@ class PreciseTimestamp(TypeDecorator):
         return value
 
 
+_COMMON_TABLE_ARGS = {'mysql_charset': "utf8", 'mysql_engine': "InnoDB"}
+
+
 class CeilometerBase(object):
     """Base class for Ceilometer Models."""
-    __table_args__ = {'mysql_charset': "utf8",
-                      'mysql_engine': "InnoDB"}
+    __table_args__ = _COMMON_TABLE_ARGS
     __table_initialized__ = False
 
     def __setitem__(self, key, value):
@@ -105,6 +107,7 @@ class MetaText(Base):
     __tablename__ = 'metadata_text'
     __table_args__ = (
         Index('ix_meta_text_key', 'meta_key'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
@@ -117,6 +120,7 @@ class MetaBool(Base):
     __tablename__ = 'metadata_bool'
     __table_args__ = (
         Index('ix_meta_bool_key', 'meta_key'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
@@ -129,6 +133,7 @@ class MetaBigInt(Base):
     __tablename__ = 'metadata_int'
     __table_args__ = (
         Index('ix_meta_int_key', 'meta_key'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
@@ -141,6 +146,7 @@ class MetaFloat(Base):
     __tablename__ = 'metadata_float'
     __table_args__ = (
         Index('ix_meta_float_key', 'meta_key'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, ForeignKey('resource.internal_id'), primary_key=True)
     meta_key = Column(String(255), primary_key=True)
@@ -154,6 +160,7 @@ class Meter(Base):
     __table_args__ = (
         UniqueConstraint('name', 'type', 'unit', name='def_unique'),
         Index('ix_meter_name', 'name'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, primary_key=True)
     name = Column(String(255), nullable=False)
@@ -175,6 +182,7 @@ class Resource(Base):
         #                  name='res_def_unique'),
         Index('ix_resource_resource_id', 'resource_id'),
         Index('ix_resource_metadata_hash', 'metadata_hash'),
+        _COMMON_TABLE_ARGS,
     )
 
     internal_id = Column(Integer, primary_key=True)
@@ -209,7 +217,8 @@ class Sample(Base):
         Index('ix_sample_timestamp', 'timestamp'),
         Index('ix_sample_resource_id', 'resource_id'),
         Index('ix_sample_meter_id', 'meter_id'),
-        Index('ix_sample_meter_id_resource_id', 'meter_id', 'resource_id')
+        Index('ix_sample_meter_id_resource_id', 'meter_id', 'resource_id'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, primary_key=True)
     meter_id = Column(Integer, ForeignKey('meter.id'))
@@ -260,7 +269,8 @@ class Event(Base):
     __table_args__ = (
         Index('ix_event_message_id', 'message_id'),
         Index('ix_event_type_id', 'event_type_id'),
-        Index('ix_event_generated', 'generated')
+        Index('ix_event_generated', 'generated'),
+        _COMMON_TABLE_ARGS,
     )
     id = Column(Integer, primary_key=True)
     message_id = Column(String(50), unique=True)
@@ -289,6 +299,7 @@ class TraitText(Base):
     __tablename__ = 'trait_text'
     __table_args__ = (
         Index('ix_trait_text_event_id_key', 'event_id', 'key'),
+        _COMMON_TABLE_ARGS,
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
     key = Column(String(255), primary_key=True)
@@ -301,6 +312,7 @@ class TraitInt(Base):
     __tablename__ = 'trait_int'
     __table_args__ = (
         Index('ix_trait_int_event_id_key', 'event_id', 'key'),
+        _COMMON_TABLE_ARGS,
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
     key = Column(String(255), primary_key=True)
@@ -313,6 +325,7 @@ class TraitFloat(Base):
     __tablename__ = 'trait_float'
     __table_args__ = (
         Index('ix_trait_float_event_id_key', 'event_id', 'key'),
+        _COMMON_TABLE_ARGS,
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
     key = Column(String(255), primary_key=True)
@@ -325,6 +338,7 @@ class TraitDatetime(Base):
     __tablename__ = 'trait_datetime'
     __table_args__ = (
         Index('ix_trait_datetime_event_id_key', 'event_id', 'key'),
+        _COMMON_TABLE_ARGS,
     )
     event_id = Column(Integer, ForeignKey('event.id'), primary_key=True)
     key = Column(String(255), primary_key=True)
