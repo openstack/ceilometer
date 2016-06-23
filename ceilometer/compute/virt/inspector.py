@@ -315,7 +315,7 @@ class Inspector(object):
         """Inspect the disk information for an instance.
 
         :param instance: the target instance
-        :return: for each disk , capacity , alloaction and usage
+        :return: for each disk , capacity , allocation and usage
         """
         raise ceilometer.NotImplementedError
 
