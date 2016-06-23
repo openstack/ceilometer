@@ -29,6 +29,7 @@ from ceilometer import version
 OPTS = [
     cfg.StrOpt('host',
                default=socket.gethostname(),
+               sample_default='<your_hostname>',
                help='Name of this node, which must be valid in an AMQP '
                'key. Can be an opaque identifier. For ZeroMQ only, must '
                'be a valid host name, FQDN, or IP address.'),
