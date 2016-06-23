@@ -137,6 +137,11 @@ class Connection(object):
     def upgrade():
         """Migrate the database to `version` or the most recent version."""
 
+    def record_metering_data_batch(self, samples):
+        """Record the metering data in batch"""
+        for s in samples:
+            self.record_metering_data(s)
+
     @staticmethod
     def record_metering_data(data):
         """Write the data to the backend storage system.

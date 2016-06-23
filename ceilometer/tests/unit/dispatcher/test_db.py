@@ -91,7 +91,7 @@ class TestDispatcherDB(base.BaseTestCase):
 
             called = False
 
-            def record_metering_data(self, data):
+            def record_metering_data_batch(self, data):
                 self.called = True
 
         self.dispatcher._meter_conn = ErrorConnection()
