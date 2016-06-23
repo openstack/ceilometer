@@ -13,6 +13,7 @@
 
 import functools
 
+import glanceclient
 import novaclient
 from novaclient import api_versions
 from novaclient import client as nova_client
@@ -39,6 +40,7 @@ SERVICE_OPTS = [
 cfg.CONF.register_opts(OPTS)
 cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
 cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
+cfg.CONF.import_opt('glance', 'ceilometer.image.glance', 'service_types')
 cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
 
 LOG = log.getLogger(__name__)
@@ -60,7 +62,7 @@ def logged(func):
 class Client(object):
     """A client which gets information via python-novaclient."""
 
-    def __init__(self, endpoint_override=None, auth=None):
+    def __init__(self):
         """Initialize a nova client object."""
         conf = cfg.CONF.service_credentials
 
@@ -68,20 +70,24 @@ class Client(object):
         if cfg.CONF.nova_http_log_debug:
             logger = log.getLogger("novaclient-debug")
             logger.logger.setLevel(log.DEBUG)
+        ks_session = keystone_client.get_session()
 
         self.nova_client = nova_client.Client(
             version=api_versions.APIVersion('2.1'),
-            session=keystone_client.get_session(),
+            session=ks_session,
 
             # nova adapter options
             region_name=conf.region_name,
             interface=conf.interface,
             service_type=cfg.CONF.service_types.nova,
-
-            # keystone adapter options
-            endpoint_override=endpoint_override,
-            auth=auth,
             logger=logger)
+
+        self.glance_client = glanceclient.Client(
+            version='2',
+            session=ks_session,
+            region_name=conf.region_name,
+            interface=conf.interface,
+            service_type=cfg.CONF.service_types.glance)
 
     def _with_flavor_and_image(self, instances):
         flavor_cache = {}
@@ -126,8 +132,8 @@ class Client(object):
             image = cache.get(iid)
         else:
             try:
-                image = self.nova_client.images.get(iid)
-            except novaclient.exceptions.NotFound:
+                image = self.glance_client.images.get(iid)
+            except glanceclient.exc.HTTPNotFound:
                 image = None
             cache[iid] = image
 
