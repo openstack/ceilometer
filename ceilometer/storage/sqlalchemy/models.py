@@ -34,7 +34,7 @@ from ceilometer import utils
 class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string."""
 
-    impl = String
+    impl = Text
 
     @staticmethod
     def process_bind_param(value, dialect):
