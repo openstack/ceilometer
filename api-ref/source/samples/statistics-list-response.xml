@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<values>
+  <value>
+    <avg>4.5</avg>
+    <count>10</count>
+    <duration>300.0</duration>
+    <duration_end>2013-01-04T16:47:00</duration_end>
+    <duration_start>2013-01-04T16:42:00</duration_start>
+    <max>9.0</max>
+    <min>1.0</min>
+    <period>7200</period>
+    <period_end>2013-01-04T18:00:00</period_end>
+    <period_start>2013-01-04T16:00:00</period_start>
+    <sum>45.0</sum>
+    <unit>GiB</unit>
+  </value>
+</values>
