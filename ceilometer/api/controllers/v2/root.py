@@ -36,15 +36,12 @@ from ceilometer import keystone_client
 
 API_OPTS = [
     cfg.BoolOpt('gnocchi_is_enabled',
-                default=None,
                 help=('Set True to disable resource/meter/sample URLs. '
                       'Default autodetection by querying keystone.')),
     cfg.BoolOpt('aodh_is_enabled',
-                default=None,
                 help=('Set True to redirect alarms URLs to aodh. '
                       'Default autodetection by querying keystone.')),
     cfg.StrOpt('aodh_url',
-               default=None,
                help=('The endpoint of Aodh to redirect alarms URLs '
                      'to Aodh API. Default autodetection by querying '
                      'keystone.')),

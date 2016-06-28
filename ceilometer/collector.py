@@ -42,7 +42,6 @@ OPTS = [
                help='Number of notification messages to wait before '
                'dispatching them'),
     cfg.IntOpt('batch_timeout',
-               default=None,
                help='Number of seconds to wait before dispatching samples'
                'when batch_size is not reached (None means indefinitely)'),
 ]
