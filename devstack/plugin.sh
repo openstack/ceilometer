@@ -425,14 +425,6 @@ function start_ceilometer {
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
         run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF"
     fi
-
-    # Only die on API if it was actually intended to be turned on
-    if is_service_enabled ceilometer-api; then
-        echo "Waiting for ceilometer-api to start..."
-        if ! wait_for_service $SERVICE_TIMEOUT $(ceilometer_service_url)/v2/; then
-            die $LINENO "ceilometer-api did not start"
-        fi
-    fi
 }
 
 # stop_ceilometer() - Stop running processes
