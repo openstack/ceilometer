@@ -383,7 +383,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                     fakeclient.metric.create.side_effect = [Exception('boom!')]
                 elif self.metric_exists:
                     fakeclient.metric.create.side_effect = [
-                        gnocchi_exc.NamedMetricAreadyExists(409)]
+                        gnocchi_exc.NamedMetricAlreadyExists(409)]
                 else:
                     fakeclient.metric.create.side_effect = [None]
 
