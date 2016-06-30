@@ -271,7 +271,10 @@ class AgentManager(service_base.PipelineBasedService):
         if self.extensions == []:
             raise EmptyPollstersList()
 
-        self.discovery_manager = self._extensions('discover')
+        discoveries = (self._extensions('discover', namespace).extensions
+                       for namespace in namespaces)
+        self.discoveries = list(itertools.chain(*list(discoveries)))
+
         self.partition_coordinator = coordination.PartitionCoordinator()
 
         # Compose coordination group prefix.
@@ -331,7 +334,7 @@ class AgentManager(service_base.PipelineBasedService):
 
     def join_partitioning_groups(self):
         self.groups = set([self.construct_group_id(d.obj.group_id)
-                          for d in self.discovery_manager])
+                          for d in self.discoveries])
         # let each set of statically-defined resources have its own group
         static_resource_groups = set([
             self.construct_group_id(utils.hash_of_set(p.resources))
@@ -435,7 +438,7 @@ class AgentManager(service_base.PipelineBasedService):
         return (s.scheme or s.path), (s.netloc + s.path if s.scheme else None)
 
     def _discoverer(self, name):
-        for d in self.discovery_manager:
+        for d in self.discoveries:
             if d.name == name:
                 return d.obj
         return None
