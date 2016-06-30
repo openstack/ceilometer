@@ -196,7 +196,7 @@ function _ceilometer_cleanup_apache_wsgi {
     fi
 }
 
-function _drop_database {
+function _ceilometer_drop_database {
     if is_service_enabled ceilometer-collector ceilometer-api ; then
         if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
             mongo ceilometer --eval "db.dropDatabase();"
@@ -210,7 +210,7 @@ function _drop_database {
 # from previous runs that a clean run would need to clean up
 function cleanup_ceilometer {
     _ceilometer_cleanup_apache_wsgi
-    _drop_database
+    _ceilometer_drop_database
     sudo rm -f "$CEILOMETER_CONF_DIR"/*
     sudo rmdir "$CEILOMETER_CONF_DIR"
 }
@@ -264,7 +264,7 @@ function _ceilometer_configure_storage_backend {
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
-    _drop_database
+    _ceilometer_drop_database
 }
 
 # Configure Ceilometer
