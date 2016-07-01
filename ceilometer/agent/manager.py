@@ -342,8 +342,29 @@ class AgentManager(service_base.PipelineBasedService):
             if p.resources
         ])
         self.groups.update(static_resource_groups)
+
+        if not self.groups and self.partition_coordinator.is_active():
+            self.partition_coordinator.stop()
+            self.kill_heartbeat_timer()
+
+        if self.groups and not self.partition_coordinator.is_active():
+            self.partition_coordinator.start()
+            self.heartbeat_timer = self.tg.add_timer(
+                cfg.CONF.coordination.heartbeat,
+                self.partition_coordinator.heartbeat)
+
         for group in self.groups:
             self.partition_coordinator.join_group(group)
+
+    def kill_heartbeat_timer(self):
+        if not getattr(self, 'heartbeat_timer', None):
+            return
+
+        try:
+            self.heartbeat_timer.stop()
+            self.tg.timer_done(self.heartbeat_timer)
+        except Exception as e:
+            LOG.error(_LE("Failed to stop heartbeat timer due to: %s"), e)
 
     def create_polling_task(self):
         """Create an initially empty polling task."""
@@ -384,24 +405,20 @@ class AgentManager(service_base.PipelineBasedService):
                                    self.interval_task,
                                    initial_delay=delay_time,
                                    task=polling_task))
-        self.tg.add_timer(cfg.CONF.coordination.heartbeat,
-                          self.partition_coordinator.heartbeat)
 
         return pollster_timers
 
     def start(self):
         super(AgentManager, self).start()
         self.polling_manager = pipeline.setup_polling()
-
-        self.partition_coordinator.start()
         self.join_partitioning_groups()
-
         self.pollster_timers = self.configure_polling_tasks()
-
         self.init_pipeline_refresh()
 
     def stop(self):
         if self.started:
+            self.stop_pollsters()
+            self.kill_heartbeat_timer()
             self.partition_coordinator.stop()
         super(AgentManager, self).stop()
 
