@@ -1,0 +1,141 @@
+# Translations template for ceilometer.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the ceilometer project.
+#
+# Translators:
+# aji.zqfan <aji.zqfan@gmail.com>, 2015
+# Lianhao Lu <lianhao.lu@intel.com>, 2014
+# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
+# chunhan <chunhan_ryan@163.com>, 2016. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: ceilometer 6.0.1.dev17\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-06-17 10:46+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-06-30 03:01+0000\n"
+"Last-Translator: chunhan <chunhan_ryan@163.com>\n"
+"Language: zh-CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
+"Language-Team: Chinese (China)\n"
+
+#, python-format
+msgid "%d events are removed from database"
+msgstr "%d个事件从数据库中被移除"
+
+#, python-format
+msgid "%d samples removed from database"
+msgstr "从数据库中移除%d个采样数据。"
+
+msgid "Configuration:"
+msgstr "配置"
+
+#, python-format
+msgid "Connecting to %(db)s on %(nodelist)s"
+msgstr "正在连接到%(nodelist)s节点的数据库%(db)s。"
+
+msgid "Coordination backend started successfully."
+msgstr "协调器后台启动成功"
+
+#, python-format
+msgid "Definitions: %s"
+msgstr "定义： %s"
+
+msgid "Detected change in pipeline configuration."
+msgstr "检测到管道配置发生改变"
+
+#, python-format
+msgid "Dropping event data with TTL %d"
+msgstr "正在根据TTL: %d丢弃事件数据"
+
+#, python-format
+msgid "Dropping metering data with TTL %d"
+msgstr "正在根据TTL %d丢弃监控数据"
+
+#, python-format
+msgid "Duplicate event detected, skipping it: %s"
+msgstr "检测到重复事件，正在跳过：%s"
+
+msgid "Expired residual resource and meter definition data"
+msgstr "剩余资源和计量表定义数据已过期"
+
+#, python-format
+msgid "Index %s will be recreate."
+msgstr "索引%s将被重新创建"
+
+#, python-format
+msgid "Joined partitioning group %s"
+msgstr "已加入分组%s"
+
+#, python-format
+msgid "Left partitioning group %s"
+msgstr "已离开分组%s"
+
+#, python-format
+msgid "No limit value provided, result set will be limited to %(limit)d."
+msgstr "限制值未被提供，结果集应被限制到%(limit)d."
+
+msgid "Nothing to clean, database event time to live is disabled"
+msgstr "事件数据库过期时间未激活，没有数据要清除"
+
+msgid "Nothing to clean, database metering time to live is disabled"
+msgstr "监控数据库过期时间未激活，没有数据要清除"
+
+#, python-format
+msgid ""
+"Pipeline %(pipeline)s: Setup transformer instance %(name)s with parameter "
+"%(param)s"
+msgstr "管道%(pipeline)s：使用参数%(param)s初始化变形器实例%(name)s"
+
+#, python-format
+msgid "Pipeline config: %s"
+msgstr "管道配置：%s"
+
+msgid "Pipeline configuration file has been updated."
+msgstr "管道配置文件已被更新"
+
+#, python-format
+msgid "Polling pollster %(poll)s in the context of %(src)s"
+msgstr "在上下文环境%(src)s执行采集器%(poll)s"
+
+#, python-format
+msgid "Publishing policy set to %s"
+msgstr "设置发布策略为%s"
+
+msgid "Reconfiguring polling tasks."
+msgstr "重新配置轮询任务"
+
+msgid "Reloading notification agent and listeners."
+msgstr "重新加载通知代理和jianting"
+
+#, python-format
+msgid "Skip pollster %(name)s, no %(p_context)sresources found this cycle"
+msgstr "跳过采集器%(name)s,本周期无法找到上下文为%(p_context)s的资源"
+
+#, python-format
+msgid "Starting server in PID %s"
+msgstr "正在启动服务进程PID %s"
+
+#, python-format
+msgid "Swift endpoint not found: %s"
+msgstr "对象存储的端点组：%s未被找到"
+
+msgid "detected decoupled pipeline config format"
+msgstr "检测到分离的管道配置格式"
+
+#, python-format
+msgid "metering data %(counter_name)s for %(resource_id)s: %(counter_volume)s"
+msgstr "%(resource_id)s的资源监控数据%(counter_name)s 值为：%(counter_volume)s"
+
+#, python-format
+msgid "serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s"
+msgstr ""
+"服务在0.0.0.0:%(sport)s上运行，可以通过http://127.0.0.1:%(vport)s来查看"
+
+#, python-format
+msgid "serving on http://%(host)s:%(port)s"
+msgstr "服务在http://%(host)s:%(port)s上运行"

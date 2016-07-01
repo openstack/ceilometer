@@ -1,0 +1,151 @@
+# Translations template for ceilometer.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the ceilometer project.
+#
+# Translators:
+# aji.zqfan <aji.zqfan@gmail.com>, 2015
+# Shuwen SUN <chris-void@outlook.com>, 2014
+# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
+# Gaoxiao Zhu <zhu.gaoxiao@h3c.com>, 2016. #zanata
+# chunhan <chunhan_ryan@163.com>, 2016. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: ceilometer 6.0.1.dev17\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2016-06-17 10:46+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-06-30 02:28+0000\n"
+"Last-Translator: chunhan <chunhan_ryan@163.com>\n"
+"Language: zh-CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.3\n"
+"Language-Team: Chinese (China)\n"
+
+#, python-format
+msgid "Cannot load inspector %(name)s: %(err)s"
+msgstr "无法加载检查器 %(name)s: %(err)s"
+
+#, python-format
+msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
+msgstr "无法为%(id)s获取常驻内存使用量：%(e)s"
+
+#, python-format
+msgid "Dispatcher failed to handle the %s, requeue it."
+msgstr "分发器处理%s失败，重新排队"
+
+msgid "Error connecting to coordination backend."
+msgstr "连接到协调器后端出错"
+
+msgid "Error getting group membership info from coordination backend."
+msgstr "从协调器后端获取组成员信息时出错"
+
+#, python-format
+msgid "Error joining partitioning group %s, re-trying"
+msgstr "加入分组 %s出错，正在重试"
+
+#, python-format
+msgid "Error loading meter definition : %(err)s"
+msgstr "加载计量的定义失败：%(err)s"
+
+#, python-format
+msgid "Error processing event and it will be dropped: %s"
+msgstr "处理事件%s时出错，将被丢弃"
+
+msgid "Error sending a heartbeat to coordination backend."
+msgstr "发送心跳信息至协调器后端出错"
+
+msgid "Fail to process a notification"
+msgstr "处理通知失败"
+
+msgid "Fail to process notification"
+msgstr "处理通知失败"
+
+msgid "Failed to connect to Gnocchi."
+msgstr "连接Gnocchi失败。"
+
+#, python-format
+msgid "Failed to connect to Kafka service: %s"
+msgstr "连接Kafka服务失败：%s"
+
+#, python-format
+msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
+msgstr "连接数据库失败，目的%(purpose)s 稍后重试：%(err)s"
+
+#, python-format
+msgid "Failed to connect to db, purpose %(purpose)s retry later: %(err)s"
+msgstr "连接数据库失败，目的%(purpose)s 稍后重试：%(err)s"
+
+#, python-format
+msgid "Failed to load resource due to error %s"
+msgstr "加载资源失败因为错误%s"
+
+#, python-format
+msgid "Failed to record event: %s"
+msgstr "无法记录事件：%s"
+
+#, python-format
+msgid "Failed to record metering data: %s"
+msgstr "无法保存监控数据：%s"
+
+msgid "Failed to retry to send sample data with max_retry times"
+msgstr "尝试发送采样数据达到最大重试次数后仍失败"
+
+msgid ""
+"Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: Current agent is "
+"not part of group and cannot take tasks"
+msgstr ""
+"组ID:%{group_id}s,成员：%{members}s，当前用户%{me}s：当前用户不在组中,无法执"
+"行任务"
+
+#, python-format
+msgid "Invalid type %s specified"
+msgstr "被指定的类型%s无效"
+
+#, python-format
+msgid "Missing field %s"
+msgstr "缺少字段%s"
+
+msgid "Passed resource dict must contain keys resource_id and resource_url."
+msgstr "传入的资源字典必须包含键resource_id和resource_url"
+
+#, python-format
+msgid "Required field %(field)s should be a %(type)s"
+msgstr "所需字段%(field)s应为%(type)s类型"
+
+#, python-format
+msgid "Required field %s not specified"
+msgstr "未指定所需字段 %s"
+
+#, python-format
+msgid "Required fields %s not specified"
+msgstr "必需字段%s未被指定"
+
+#, python-format
+msgid "Skip invalid resource %s"
+msgstr "跳过无效资源%s"
+
+#, python-format
+msgid "Skipping %(name)s, keystone issue: %(exc)s"
+msgstr "跳过%(name)s，由keystone引起：%(exc)s"
+
+msgid "Status Code: %{code}s. Failed todispatch event: %{event}s"
+msgstr "状态码：%{code}s。分发事件：%{event}s失败"
+
+#, python-format
+msgid "Unable to load changed event pipeline: %s"
+msgstr "无法加载更改的事件管道：%s"
+
+#, python-format
+msgid "Unable to load changed pipeline: %s"
+msgstr "无法加载更改的管道：%s"
+
+#, python-format
+msgid "Unrecognized type value %s"
+msgstr "无法识别的类型值 %s"
+
+#, python-format
+msgid "inspector call failed for %(ident)s host %(host)s: %(err)s"
+msgstr "标识为%(ident)s的主机%(host)s检查器调用失败: %(err)s"
