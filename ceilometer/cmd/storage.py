@@ -16,6 +16,7 @@
 
 from oslo_config import cfg
 from oslo_log import log
+from six import moves
 import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
 
@@ -55,9 +56,9 @@ def expirer():
 
 
 def db_clean_legacy():
-    confirm = raw_input("Do you really want to drop the legacy alarm tables? "
-                        "This will destroy data definitely if it exist. "
-                        "Please type 'YES' to confirm: ")
+    confirm = moves.input("Do you really want to drop the legacy alarm tables?"
+                          "This will destroy data definitely if it exist. "
+                          "Please type 'YES' to confirm: ")
     if confirm != 'YES':
         print("DB legacy cleanup aborted!")
         return
