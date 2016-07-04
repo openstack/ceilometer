@@ -20,12 +20,12 @@ service_available_group = cfg.OptGroup(name="service_available",
                                        title="Available OpenStack Services")
 
 ServiceAvailableGroup = [
-    cfg.BoolOpt('ceilometer_plugin',
+    cfg.BoolOpt('ceilometer',
                 default=True,
                 help="Whether or not Ceilometer is expected to be available"),
 ]
 
-telemetry_group = cfg.OptGroup(name='telemetry_plugin',
+telemetry_group = cfg.OptGroup(name='telemetry',
                                title='Telemetry Service Options')
 
 TelemetryGroup = [
