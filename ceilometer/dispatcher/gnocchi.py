@@ -122,7 +122,7 @@ class ResourcesDefinition(object):
 
 def get_gnocchiclient(conf):
     requests_session = requests.session()
-    for scheme in requests_session.adapters.keys():
+    for scheme in list(requests_session.adapters.keys()):
         requests_session.mount(scheme, ka_session.TCPKeepAliveAdapter(
             pool_block=True))
 
