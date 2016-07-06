@@ -187,6 +187,10 @@ class InstanceShutOffException(InspectorException):
     pass
 
 
+class InstanceNoDataException(InspectorException):
+    pass
+
+
 class NoDataException(InspectorException):
     pass
 
