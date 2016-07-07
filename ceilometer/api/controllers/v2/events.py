@@ -192,9 +192,21 @@ def _event_query_to_event_filter(q):
                      {'operator': i.op, 'supported': base.operation_kind})
             raise base.ClientSideError(error)
         if i.field in evt_model_filter:
-            if i.op != 'eq':
+            if i.op != 'eq' and i.field in ('event_type', 'message_id'):
                 error = (_('Operator %(operator)s is not supported. Only'
-                           ' equality operator is available for field'
+                           ' `eq\' operator is available for field'
+                           ' %(field)s') %
+                         {'operator': i.op, 'field': i.field})
+                raise base.ClientSideError(error)
+            if i.op != 'ge' and i.field == 'start_timestamp':
+                error = (_('Operator %(operator)s is not supported. Only'
+                           ' `ge\' operator is available for field'
+                           ' %(field)s') %
+                         {'operator': i.op, 'field': i.field})
+                raise base.ClientSideError(error)
+            if i.op != 'le' and i.field == 'end_timestamp':
+                error = (_('Operator %(operator)s is not supported. Only'
+                           ' `le\' operator is available for field'
                            ' %(field)s') %
                          {'operator': i.op, 'field': i.field})
                 raise base.ClientSideError(error)
