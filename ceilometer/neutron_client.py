@@ -392,19 +392,25 @@ class Client(object):
     @logged
     def list_listener(self):
         """This method is used to get the list of the listeners."""
-        resp = self.client.list_listeners()
-        resources = resp.get('listeners')
-        for listener in resources:
-            loadbalancer_id = listener.get('loadbalancers')[0].get('id')
-            status = self._get_listener_status(loadbalancer_id)
-            listener['operating_status'] = status[listener.get('id')]
+        resources = []
+        if self.lb_version == 'v2':
+            # list_listeners works only with lbaas v2 extension
+            resp = self.client.list_listeners()
+            resources = resp.get('listeners')
+            for listener in resources:
+                loadbalancer_id = listener.get('loadbalancers')[0].get('id')
+                status = self._get_listener_status(loadbalancer_id)
+                listener['operating_status'] = status[listener.get('id')]
         return resources
 
     @logged
     def list_loadbalancer(self):
         """This method is used to get the list of the loadbalancers."""
-        resp = self.client.list_loadbalancers()
-        resources = resp.get('loadbalancers')
+        resources = []
+        if self.lb_version == 'v2':
+            # list_loadbalancers works only with lbaas v2 extension
+            resp = self.client.list_loadbalancers()
+            resources = resp.get('loadbalancers')
         return resources
 
     @logged
