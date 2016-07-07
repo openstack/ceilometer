@@ -32,10 +32,26 @@ OPTS = [
                help='SNMPd user name of all nodes running in the cloud.'),
     cfg.StrOpt('readonly_user_password',
                default='password',
-               help='SNMPd password of all the nodes running in the cloud.',
+               help='SNMPd v3 authentication password of all the nodes '
+                    'running in the cloud.',
                secret=True),
+    cfg.StrOpt('readonly_user_auth_proto',
+               choices=['md5', 'sha'],
+               help='SNMPd v3 authentication algorithm of all the nodes '
+                    'running in the cloud'),
+    cfg.StrOpt('readonly_user_priv_proto',
+               choices=['des', 'aes128', '3des', 'aes192', 'aes256'],
+               help='SNMPd v3 encryption algorithm of all the nodes '
+                    'running in the cloud'),
+    cfg.StrOpt('readonly_user_priv_password',
+               help='SNMPd v3 encryption password of all the nodes '
+                    'running in the cloud.',
+               secret=True),
+
+
 ]
-cfg.CONF.register_opts(OPTS, group='hardware')
+CONF = cfg.CONF
+CONF.register_opts(OPTS, group='hardware')
 
 
 class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
@@ -48,6 +64,31 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
     @staticmethod
     def _address(instance, field):
         return instance.addresses['ctlplane'][0].get(field)
+
+    @staticmethod
+    def _make_resource_url(ip):
+        params = [('readonly_user_auth_proto', 'auth_proto'),
+                  ('readonly_user_priv_proto', 'priv_proto'),
+                  ('readonly_user_priv_password', 'priv_password')]
+        hwconf = CONF.hardware
+        url = hwconf.url_scheme
+        username = hwconf.readonly_user_name
+        password = hwconf.readonly_user_password
+        if username:
+            url += username
+        if password:
+            url += ':' + password
+        if username or password:
+            url += '@'
+        url += ip
+
+        query = "&".join(
+            param + "=" + hwconf.get(conf) for (conf, param) in params
+            if hwconf.get(conf))
+        if query:
+            url += '?' + query
+
+        return url
 
     def discover(self, manager, param=None):
         """Discover resources to monitor.
@@ -75,11 +116,7 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
         for instance in self.instances.values():
             try:
                 ip_address = self._address(instance, 'addr')
-                final_address = (
-                    cfg.CONF.hardware.url_scheme +
-                    cfg.CONF.hardware.readonly_user_name + ':' +
-                    cfg.CONF.hardware.readonly_user_password + '@' +
-                    ip_address)
+                final_address = self._make_resource_url(ip_address)
 
                 resource = {
                     'resource_id': instance.id,

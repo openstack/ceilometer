@@ -14,6 +14,7 @@
 # under the License.
 """Tests for ceilometer/hardware/inspector/snmp/inspector.py
 """
+import mock
 from oslo_utils import netutils
 from oslotest import mockpatch
 
@@ -202,3 +203,20 @@ class TestSNMPInspector(test_base.BaseTestCase):
             name = rfc1902.ObjectName(oid)
 
         self.assertEqual(oid, str(name))
+
+    @mock.patch.object(snmp.cmdgen, 'UsmUserData')
+    def test_auth_strategy(self, mock_method):
+        host = ''.join(['snmp://a:b@foo?auth_proto=sha',
+                       '&priv_password=pass&priv_proto=aes256'])
+        host = netutils.urlsplit(host)
+        self.inspector._get_auth_strategy(host)
+        mock_method.assert_called_with(
+            'a', authKey='b',
+            authProtocol=snmp.cmdgen.usmHMACSHAAuthProtocol,
+            privProtocol=snmp.cmdgen.usmAesCfb256Protocol,
+            privKey='pass')
+
+        host2 = 'snmp://a:b@foo?&priv_password=pass'
+        host2 = netutils.urlsplit(host2)
+        self.inspector._get_auth_strategy(host2)
+        mock_method.assert_called_with('a', authKey='b', privKey='pass')

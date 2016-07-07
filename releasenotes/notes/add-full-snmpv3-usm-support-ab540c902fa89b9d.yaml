@@ -1,0 +1,5 @@
+---
+fixes:
+  - >
+    [`bug 1597618 <https://bugs.launchpad.net/ceilometer/+bug/1597618>`_]
+    Add the full support of snmp v3 user security model.

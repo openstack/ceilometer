@@ -87,11 +87,22 @@ class TestHardwareDiscovery(base.BaseTestCase):
         'flavor_id': 'flavor_id',
     }
 
+    expected_usm = {
+        'resource_id': 'resource_id',
+        'resource_url': ''.join(['snmp://ro_snmp_user:password@0.0.0.0',
+                                 '?priv_proto=aes192',
+                                 '&priv_password=priv_pass']),
+        'mac_addr': '01-23-45-67-89-ab',
+        'image_id': 'image_id',
+        'flavor_id': 'flavor_id',
+    }
+
     def setUp(self):
         super(TestHardwareDiscovery, self).setUp()
         self.discovery = hardware.NodesDiscoveryTripleO()
         self.discovery.nova_cli = mock.MagicMock()
         self.manager = mock.MagicMock()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_hardware_discovery(self):
         self.discovery.nova_cli.instance_get_all.return_value = [
@@ -106,3 +117,13 @@ class TestHardwareDiscovery(base.BaseTestCase):
         self.discovery.nova_cli.instance_get_all.return_value = [instance]
         resources = self.discovery.discover(self.manager)
         self.assertEqual(0, len(resources))
+
+    def test_hardware_discovery_usm(self):
+        self.CONF.set_override('readonly_user_priv_proto', 'aes192',
+                               group='hardware')
+        self.CONF.set_override('readonly_user_priv_password', 'priv_pass',
+                               group='hardware')
+        self.discovery.nova_cli.instance_get_all.return_value = [
+            self.MockInstance()]
+        resources = self.discovery.discover(self.manager)
+        self.assertEqual(self.expected_usm, resources[0])

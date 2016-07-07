@@ -16,9 +16,10 @@
 """Inspector for collecting data over SNMP"""
 
 import copy
-from pysnmp.entity.rfc3413.oneliner import cmdgen
 
+from pysnmp.entity.rfc3413.oneliner import cmdgen
 import six
+import six.moves.urllib.parse as urlparse
 
 from ceilometer.hardware.inspector import base
 
@@ -55,6 +56,22 @@ def parse_snmp_return(ret, is_bulk=False):
 
 EXACT = 'type_exact'
 PREFIX = 'type_prefix'
+
+_auth_proto_mapping = {
+    'md5': cmdgen.usmHMACMD5AuthProtocol,
+    'sha': cmdgen.usmHMACSHAAuthProtocol,
+}
+_priv_proto_mapping = {
+    'des': cmdgen.usmDESPrivProtocol,
+    'aes128': cmdgen.usmAesCfb128Protocol,
+    '3des': cmdgen.usm3DESEDEPrivProtocol,
+    'aes192': cmdgen.usmAesCfb192Protocol,
+    'aes256': cmdgen.usmAesCfb256Protocol,
+}
+_usm_proto_mapping = {
+    'auth_proto': ('authProtocol', _auth_proto_mapping),
+    'priv_proto': ('privProtocol', _priv_proto_mapping),
+}
 
 
 class SNMPInspector(base.Inspector):
@@ -283,9 +300,24 @@ class SNMPInspector(base.Inspector):
 
     @staticmethod
     def _get_auth_strategy(host):
+        options = urlparse.parse_qs(host.query)
+        kwargs = {}
+
+        for key in _usm_proto_mapping:
+            opt = options.get(key, [None])[-1]
+            value = _usm_proto_mapping[key][1].get(opt)
+            if value:
+                kwargs[_usm_proto_mapping[key][0]] = value
+
+        priv_pass = options.get('priv_password', [None])[-1]
+        if priv_pass:
+            kwargs['privKey'] = priv_pass
         if host.password:
+            kwargs['authKey'] = host.password
+
+        if kwargs:
             auth_strategy = cmdgen.UsmUserData(host.username,
-                                               authKey=host.password)
+                                               **kwargs)
         else:
             auth_strategy = cmdgen.CommunityData(host.username or 'public')
         return auth_strategy
