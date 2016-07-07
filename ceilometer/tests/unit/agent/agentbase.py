@@ -19,6 +19,7 @@
 import abc
 import copy
 import datetime
+import time
 
 import mock
 from oslo_config import fixture as fixture_config
@@ -250,6 +251,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'pipeline_cfg_file',
             self.path_get('etc/ceilometer/pipeline.yaml')
         )
+        self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.CONF(args=[])
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
@@ -307,13 +309,22 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mpc = self.mgr.partition_coordinator
         mpc.is_active.return_value = False
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
+        self.mgr.partition_coordinator.heartbeat = mock.MagicMock()
         self.mgr.start()
         setup_polling.assert_called_once_with()
         mpc.start.assert_called_once_with()
         self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
-        timer_call = mock.call(1.0, mpc.heartbeat)
-        self.assertEqual([timer_call], self.mgr.tg.add_timer.call_args_list)
+
+        # Wait first heatbeat
+        runs = 0
+        for i in six.moves.range(10):
+            runs = list(self.mgr.heartbeat_timer.iter_watchers())[0].runs
+            if runs > 0:
+                break
+            time.sleep(0.5)
+        self.assertGreaterEqual(1, runs)
+
         self.mgr.stop()
         mpc.stop.assert_called_once_with()
 
@@ -323,6 +334,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mpc = self.mgr.partition_coordinator
         mpc.is_active.return_value = False
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
+        self.mgr.partition_coordinator.heartbeat = mock.MagicMock()
+
         self.CONF.set_override('refresh_pipeline_cfg', True)
         self.CONF.set_override('pipeline_polling_interval', 5)
         self.addCleanup(self.mgr.stop)
@@ -332,10 +345,17 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mpc.start.assert_called_once_with()
         self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
-        timer_call = mock.call(1.0, mpc.heartbeat)
-        pipeline_poller_call = mock.call(5, self.mgr.refresh_pipeline)
-        self.assertEqual([timer_call, pipeline_poller_call],
-                         self.mgr.tg.add_timer.call_args_list)
+
+        # Wait first heatbeat
+        runs = 0
+        for i in six.moves.range(10):
+            runs = list(self.mgr.heartbeat_timer.iter_watchers())[0].runs
+            if runs > 0:
+                break
+            time.sleep(0.5)
+        self.assertGreaterEqual(1, runs)
+
+        self.assertEqual([], list(self.mgr.polling_periodics.iter_watchers()))
 
     def test_join_partitioning_groups(self):
         self.mgr.discoveries = self.create_discoveries()
@@ -412,10 +432,9 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mgr = self.create_manager()
         mgr.extensions = self.mgr.extensions
         mgr.create_polling_task = mock.MagicMock()
-        mgr.tg = mock.MagicMock()
         mgr.start()
         self.addCleanup(mgr.stop)
-        self.assertTrue(mgr.tg.add_timer.called)
+        mgr.create_polling_task.assert_called_once_with()
 
     def test_manager_exception_persistency(self):
         self.pipeline_cfg['sources'].append({

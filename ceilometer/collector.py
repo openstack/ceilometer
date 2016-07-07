@@ -126,13 +126,14 @@ class CollectorService(service_base.ServiceBase):
                     LOG.exception(_("UDP: Unable to store meter"))
 
     def stop(self):
-        if self.sample_listener:
-            utils.kill_listeners([self.sample_listener])
-        if self.event_listener:
-            utils.kill_listeners([self.event_listener])
-        if self.udp_thread:
-            self.udp_run = False
-            self.udp_thread.join()
+        if self.started:
+            if self.sample_listener:
+                utils.kill_listeners([self.sample_listener])
+            if self.event_listener:
+                utils.kill_listeners([self.event_listener])
+            if self.udp_thread:
+                self.udp_run = False
+                self.udp_thread.join()
         super(CollectorService, self).stop()
 
 

@@ -22,6 +22,7 @@ import six
 
 from ceilometer.i18n import _LE, _LI
 from ceilometer import pipeline
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -56,10 +57,19 @@ class PipelineBasedService(ServiceBase):
             self.set_pipeline_hash(pipeline.get_pipeline_hash(
                 pipeline.EVENT_TYPE), pipeline.EVENT_TYPE)
 
+        self.refresh_pipeline_periodic = None
         if (cfg.CONF.refresh_pipeline_cfg or
                 cfg.CONF.refresh_event_pipeline_cfg):
-            self.tg.add_timer(cfg.CONF.pipeline_polling_interval,
-                              self.refresh_pipeline)
+            self.refresh_pipeline_periodic = utils.create_periodic(
+                target=self.refresh_pipeline,
+                spacing=cfg.CONF.pipeline_polling_interval)
+            utils.spawn_thread(self.refresh_pipeline_periodic.start)
+
+    def stop(self):
+        if self.started and self.refresh_pipeline_periodic:
+            self.refresh_pipeline_periodic.stop()
+            self.refresh_pipeline_periodic.wait()
+        super(PipelineBasedService, self).stop()
 
     def get_pipeline_mtime(self, p_type=pipeline.SAMPLE_TYPE):
         return (self.event_pipeline_mtime if p_type == pipeline.EVENT_TYPE else
