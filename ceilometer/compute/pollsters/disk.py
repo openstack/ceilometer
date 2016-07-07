@@ -21,6 +21,7 @@ from oslo_log import log
 import six
 
 import ceilometer
+from ceilometer.agent import plugin_base
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -170,6 +171,7 @@ class _Base(pollsters.BaseComputePollster):
                           ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
                               {'name': instance_name, 'error': err})
@@ -307,6 +309,7 @@ class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
                           ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
@@ -442,6 +445,7 @@ class _DiskLatencyPollsterBase(pollsters.BaseComputePollster):
                           ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
@@ -512,6 +516,7 @@ class _DiskIOPSPollsterBase(pollsters.BaseComputePollster):
                           '%(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
                 LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
@@ -640,6 +645,7 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
                           ' %(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
                 LOG.exception(_('Ignoring instance %(name)s '

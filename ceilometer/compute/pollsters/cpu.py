@@ -58,6 +58,7 @@ class CPUPollster(pollsters.BaseComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug('Obtaining CPU time is not implemented for %s',
                           self.inspector.__class__.__name__)
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.exception(_('could not get CPU time for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
@@ -89,6 +90,7 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug('Obtaining CPU Util is not implemented for %s',
                           self.inspector.__class__.__name__)
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.exception(_('Could not get CPU Util for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
@@ -126,6 +128,7 @@ class CPUL3CachePollster(pollsters.BaseComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug('Obtaining cache usage is not implemented for %s',
                           self.inspector.__class__.__name__)
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.exception(_('Could not get cache usage for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
