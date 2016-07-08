@@ -16,6 +16,7 @@
 from oslo_log import log
 
 import ceilometer
+from ceilometer.agent import plugin_base
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -61,6 +62,7 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug('Obtaining Memory Usage is not implemented for %s',
                           self.inspector.__class__.__name__)
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.exception(_('Could not get Memory Usage for '
                                 '%(id)s: %(e)s'), {'id': instance.id,
@@ -104,6 +106,7 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
                 # Selected inspector does not implement this pollster.
                 LOG.debug('Obtaining Resident Memory is not implemented'
                           ' for %s', self.inspector.__class__.__name__)
+                raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.exception(_LE('Could not get Resident Memory Usage for '
                                   '%(id)s: %(e)s'), {'id': instance.id,
