@@ -220,7 +220,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                         '<name=%(name)s, id=%(id)s>, '
                         'can not get info from libvirt.') % {
                     'name': instance_name, 'id': instance.id}
-                raise virt_inspector.NoDataException(msg)
+                raise virt_inspector.InstanceNoDataException(msg)
         # memoryStats might launch an exception if the method is not supported
         # by the underlying hypervisor being used by libvirt.
         except libvirt.libvirtError as e:

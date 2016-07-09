@@ -16,6 +16,7 @@
 import mock
 
 from ceilometer.agent import manager
+from ceilometer.agent import plugin_base
 from ceilometer.compute.pollsters import memory
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests.unit.compute.pollsters import base
@@ -31,7 +32,7 @@ class TestMemoryPollster(base.TestPollsterBase):
         next_value = iter((
             virt_inspector.MemoryUsageStats(usage=1.0),
             virt_inspector.MemoryUsageStats(usage=2.0),
-            virt_inspector.NoDataException(),
+            virt_inspector.InstanceNoDataException(),
             virt_inspector.InstanceShutOffException(),
         ))
 
@@ -65,6 +66,24 @@ class TestMemoryPollster(base.TestPollsterBase):
         _verify_memory_metering(1, 2.0, 0)
         _verify_memory_metering(0, 0, 1)
         _verify_memory_metering(0, 0, 0)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples_with_empty_stats(self):
+
+        def inspect_memory_usage(instance, duration):
+            raise virt_inspector.NoDataException()
+
+        self.inspector.inspect_memory_usage = mock.Mock(
+            side_effect=inspect_memory_usage)
+
+        mgr = manager.AgentManager()
+        pollster = memory.MemoryUsagePollster()
+
+        def all_samples():
+            return list(pollster.get_samples(mgr, {}, [self.instance]))
+
+        self.assertRaises(plugin_base.PollsterPermanentError,
+                          all_samples)
 
 
 class TestResidentMemoryPollster(base.TestPollsterBase):

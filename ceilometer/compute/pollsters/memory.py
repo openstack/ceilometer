@@ -53,11 +53,17 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                           'getting samples of %(pollster)s: %(exc)s',
                           {'instance_id': instance.id,
                            'pollster': self.__class__.__name__, 'exc': e})
-            except virt_inspector.NoDataException as e:
+            except virt_inspector.InstanceNoDataException as e:
                 LOG.warning(_LW('Cannot inspect data of %(pollster)s for '
                                 '%(instance_id)s, non-fatal reason: %(exc)s'),
                             {'pollster': self.__class__.__name__,
                              'instance_id': instance.id, 'exc': e})
+            except virt_inspector.NoDataException as e:
+                LOG.warning(_LW('Cannot inspect data of %(pollster)s for '
+                                '%(instance_id)s: %(exc)s'),
+                            {'pollster': self.__class__.__name__,
+                             'instance_id': instance.id, 'exc': e})
+                raise plugin_base.PollsterPermanentError(resources)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug('Obtaining Memory Usage is not implemented for %s',

@@ -336,7 +336,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                                                  2, 999999)):
                 with mock.patch.object(self.domain, 'memoryStats',
                                        return_value={}):
-                    self.assertRaises(virt_inspector.NoDataException,
+                    self.assertRaises(virt_inspector.InstanceNoDataException,
                                       self.inspector.inspect_memory_usage,
                                       self.instance)
 
