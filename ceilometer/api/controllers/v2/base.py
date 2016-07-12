@@ -60,31 +60,6 @@ class ProjectNotAuthorized(ClientSideError):
             status_code=401)
 
 
-class AdvEnum(wtypes.wsproperty):
-    """Handle default and mandatory for wtypes.Enum."""
-    def __init__(self, name, *args, **kwargs):
-        self._name = '_advenum_%s' % name
-        self._default = kwargs.pop('default', None)
-        mandatory = kwargs.pop('mandatory', False)
-        enum = wtypes.Enum(*args, **kwargs)
-        super(AdvEnum, self).__init__(datatype=enum, fget=self._get,
-                                      fset=self._set, mandatory=mandatory)
-
-    def _get(self, parent):
-        if hasattr(parent, self._name):
-            value = getattr(parent, self._name)
-            return value or self._default
-        return self._default
-
-    def _set(self, parent, value):
-        try:
-            if self.datatype.validate(value):
-                setattr(parent, self._name, value)
-        except ValueError as e:
-            raise wsme.exc.InvalidInput(self._name.replace('_advenum_', '', 1),
-                                        value, e)
-
-
 class Base(wtypes.DynamicBase):
 
     @classmethod
