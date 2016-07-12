@@ -48,17 +48,18 @@ class TestCollector(tests_base.BaseTestCase):
                                group='publisher')
         self._setup_messaging()
 
-        self.counter = sample.Sample(
-            name='foobar',
-            type='bad',
-            unit='F',
-            volume=1,
-            user_id='jd',
-            project_id='ceilometer',
-            resource_id='cat',
-            timestamp=timeutils.utcnow().isoformat(),
-            resource_metadata={},
-        ).as_dict()
+        self.sample = utils.meter_message_from_counter(
+            sample.Sample(
+                name='foobar',
+                type='bad',
+                unit='F',
+                volume=1,
+                user_id='jd',
+                project_id='ceilometer',
+                resource_id='cat',
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={},
+            ), self.CONF.publisher.telemetry_secret)
 
         self.utf8_msg = utils.meter_message_from_counter(
             sample.Sample(
@@ -115,13 +116,8 @@ class TestCollector(tests_base.BaseTestCase):
     def test_udp_receive_base(self):
         self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
-        self.counter['source'] = 'mysource'
-        self.counter['counter_name'] = self.counter['name']
-        self.counter['counter_volume'] = self.counter['volume']
-        self.counter['counter_type'] = self.counter['type']
-        self.counter['counter_unit'] = self.counter['unit']
 
-        udp_socket = self._make_fake_socket(self.counter)
+        udp_socket = self._make_fake_socket(self.sample)
 
         with mock.patch('socket.socket') as mock_socket:
             mock_socket.return_value = udp_socket
@@ -132,14 +128,14 @@ class TestCollector(tests_base.BaseTestCase):
             mock_socket.assert_called_with(socket.AF_INET, socket.SOCK_DGRAM)
 
         self._verify_udp_socket(udp_socket)
-        mock_record = mock_dispatcher.verify_and_record_metering_data
-        mock_record.assert_called_once_with(self.counter)
+        mock_record = mock_dispatcher.record_metering_data
+        mock_record.assert_called_once_with(self.sample)
 
     def test_udp_socket_ipv6(self):
         self._setup_messaging(False)
         self.CONF.set_override('udp_address', '::1', group='collector')
         self._setup_fake_dispatcher()
-        sock = self._make_fake_socket('data')
+        sock = self._make_fake_socket(self.sample)
 
         with mock.patch.object(socket, 'socket') as mock_socket:
             mock_socket.return_value = sock
@@ -152,16 +148,10 @@ class TestCollector(tests_base.BaseTestCase):
     def test_udp_receive_storage_error(self):
         self._setup_messaging(False)
         mock_dispatcher = self._setup_fake_dispatcher()
-        mock_record = mock_dispatcher.verify_and_record_metering_data
+        mock_record = mock_dispatcher.record_metering_data
         mock_record.side_effect = self._raise_error
 
-        self.counter['source'] = 'mysource'
-        self.counter['counter_name'] = self.counter['name']
-        self.counter['counter_volume'] = self.counter['volume']
-        self.counter['counter_type'] = self.counter['type']
-        self.counter['counter_unit'] = self.counter['unit']
-
-        udp_socket = self._make_fake_socket(self.counter)
+        udp_socket = self._make_fake_socket(self.sample)
         with mock.patch('socket.socket', return_value=udp_socket):
             self.srv.start()
             self.addCleanup(self.srv.stop)
@@ -170,7 +160,7 @@ class TestCollector(tests_base.BaseTestCase):
 
         self._verify_udp_socket(udp_socket)
 
-        mock_record.assert_called_once_with(self.counter)
+        mock_record.assert_called_once_with(self.sample)
 
     @staticmethod
     def _raise_error(*args, **kwargs):
@@ -179,7 +169,7 @@ class TestCollector(tests_base.BaseTestCase):
     def test_udp_receive_bad_decoding(self):
         self._setup_messaging(False)
         self._setup_fake_dispatcher()
-        udp_socket = self._make_fake_socket(self.counter)
+        udp_socket = self._make_fake_socket(self.sample)
         with mock.patch('socket.socket', return_value=udp_socket):
             with mock.patch('msgpack.loads', self._raise_error):
                 self.srv.start()
@@ -194,7 +184,7 @@ class TestCollector(tests_base.BaseTestCase):
         """Check that only UDP is started if messaging transport is unset."""
         self._setup_messaging(False)
         self._setup_fake_dispatcher()
-        udp_socket = self._make_fake_socket(self.counter)
+        udp_socket = self._make_fake_socket(self.sample)
         real_start = oslo_messaging.MessageHandlingServer.start
         with mock.patch.object(oslo_messaging.MessageHandlingServer,
                                'start', side_effect=real_start) as rpc_start:
@@ -224,10 +214,9 @@ class TestCollector(tests_base.BaseTestCase):
 
         mock_dispatcher = self._setup_fake_dispatcher()
         self.srv.dispatcher_manager = dispatcher.load_dispatcher_manager()
-        mock_record = mock_dispatcher.verify_and_record_metering_data
+        mock_record = mock_dispatcher.record_metering_data
         mock_record.side_effect = Exception('boom')
-        mock_dispatcher.verify_and_record_events.side_effect = Exception(
-            'boom')
+        mock_dispatcher.record_events.side_effect = Exception('boom')
 
         self.srv.start()
         self.addCleanup(self.srv.stop)

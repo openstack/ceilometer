@@ -55,7 +55,7 @@ class TestDispatcherHttp(base.BaseTestCase):
         self.assertEqual('', dispatcher.target)
 
         with mock.patch.object(requests, 'post') as post:
-            dispatcher.verify_and_record_metering_data(self.msg)
+            dispatcher.record_metering_data(self.msg)
 
         # Since the target is not set, no http post should occur, thus the
         # call_count should be zero.
@@ -66,7 +66,7 @@ class TestDispatcherHttp(base.BaseTestCase):
         dispatcher = http.HttpDispatcher(self.CONF)
 
         with mock.patch.object(requests, 'post') as post:
-            dispatcher.verify_and_record_metering_data(self.msg)
+            dispatcher.record_metering_data(self.msg)
 
         self.assertEqual(1, post.call_count)
 

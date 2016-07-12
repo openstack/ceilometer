@@ -24,8 +24,9 @@ from oslo_utils import netutils
 from oslo_utils import units
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _, _LE, _LW
 from ceilometer import messaging
+from ceilometer.publisher import utils as publisher_utils
 from ceilometer import service_base
 from ceilometer import utils
 
@@ -81,7 +82,8 @@ class CollectorService(service_base.ServiceBase):
                 self.sample_listener = (
                     messaging.get_batch_notification_listener(
                         transport, [sample_target],
-                        [SampleEndpoint(self.meter_manager)],
+                        [SampleEndpoint(cfg.CONF.publisher.telemetry_secret,
+                                        self.meter_manager)],
                         allow_requeue=True,
                         batch_size=cfg.CONF.collector.batch_size,
                         batch_timeout=cfg.CONF.collector.batch_timeout))
@@ -93,7 +95,8 @@ class CollectorService(service_base.ServiceBase):
                 self.event_listener = (
                     messaging.get_batch_notification_listener(
                         transport, [event_target],
-                        [EventEndpoint(self.event_manager)],
+                        [EventEndpoint(cfg.CONF.publisher.telemetry_secret,
+                                       self.event_manager)],
                         allow_requeue=True,
                         batch_size=cfg.CONF.collector.batch_size,
                         batch_timeout=cfg.CONF.collector.batch_timeout))
@@ -118,12 +121,17 @@ class CollectorService(service_base.ServiceBase):
             except Exception:
                 LOG.warning(_("UDP: Cannot decode data sent by %s"), source)
             else:
-                try:
-                    LOG.debug("UDP: Storing %s", sample)
-                    self.meter_manager.map_method(
-                        'verify_and_record_metering_data', sample)
-                except Exception:
-                    LOG.exception(_("UDP: Unable to store meter"))
+                if publisher_utils.verify_signature(
+                        sample, cfg.CONF.publisher.telemetry_secret):
+                    try:
+                        LOG.debug("UDP: Storing %s", sample)
+                        self.meter_manager.map_method(
+                            'record_metering_data', sample)
+                    except Exception:
+                        LOG.exception(_("UDP: Unable to store meter"))
+                else:
+                    LOG.warning(_LW('sample signature invalid, '
+                                    'discarding: %s'), sample)
 
     def stop(self):
         if self.started:
@@ -138,7 +146,8 @@ class CollectorService(service_base.ServiceBase):
 
 
 class CollectorEndpoint(object):
-    def __init__(self, dispatcher_manager):
+    def __init__(self, secret, dispatcher_manager):
+        self.secret = secret
         self.dispatcher_manager = dispatcher_manager
 
     def sample(self, messages):
@@ -147,20 +156,24 @@ class CollectorEndpoint(object):
         When another service sends a notification over the message
         bus, this method receives it.
         """
-        samples = list(chain.from_iterable(m["payload"] for m in messages))
+        goods = []
+        for sample in chain.from_iterable(m["payload"] for m in messages):
+            if publisher_utils.verify_signature(sample, self.secret):
+                goods.append(sample)
+            else:
+                LOG.warning(_LW('notification signature invalid, '
+                                'discarding: %s'), sample)
         try:
-            self.dispatcher_manager.map_method(self.method, samples)
+            self.dispatcher_manager.map_method(self.method, goods)
         except Exception:
-            LOG.exception(_LE("Dispatcher failed to handle the %s, "
-                              "requeue it."), self.ep_type)
+            LOG.exception(_LE("Dispatcher failed to handle the notification, "
+                              "re-queuing it."))
             return oslo_messaging.NotificationResult.REQUEUE
 
 
 class SampleEndpoint(CollectorEndpoint):
-    method = 'verify_and_record_metering_data'
-    ep_type = 'sample'
+    method = 'record_metering_data'
 
 
 class EventEndpoint(CollectorEndpoint):
-    method = 'verify_and_record_events'
-    ep_type = 'event'
+    method = 'record_events'
