@@ -99,12 +99,10 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
 class CPUL3CachePollster(pollsters.BaseComputePollster):
 
     def get_samples(self, manager, cache, resources):
-        self._inspection_duration = self._record_poll_time()
         for instance in resources:
             LOG.debug(_('checking cache usage for instance %s'), instance.id)
             try:
-                cpu_cache = self.inspector.inspect_cpu_l3_cache(
-                    instance, self._inspection_duration)
+                cpu_cache = self.inspector.inspect_cpu_l3_cache(instance)
                 LOG.debug(_("CPU cache size: %(id)s %(cache_size)d"),
                           ({'id': instance.id,
                             'l3_cache_usage': cpu_cache.l3_cache_usage}))

@@ -120,7 +120,7 @@ class TestCPUL3CachePollster(base.TestPollsterBase):
             virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=180224),
         ))
 
-        def inspect_cpu_l3_cache(name, duration):
+        def inspect_cpu_l3_cache(name):
             return next(next_value)
 
         self.inspector.inspect_cpu_l3_cache = (mock.Mock(

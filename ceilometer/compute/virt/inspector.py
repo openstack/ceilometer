@@ -229,12 +229,10 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_cpu_l3_cache(self, instance, duration=None):
+    def inspect_cpu_l3_cache(self, instance):
         """Inspect the CPU L3 cache usage for an instance.
 
         :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
         :return: the amount of cpu l3 cache used
         """
         raise ceilometer.NotImplementedError
