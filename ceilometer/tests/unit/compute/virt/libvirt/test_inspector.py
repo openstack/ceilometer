@@ -303,6 +303,38 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, info0.allocation)
             self.assertEqual(3, info0.physical)
 
+    def test_inspect_disk_info_network_type(self):
+        dom_xml = """
+             <domain type='kvm'>
+                 <devices>
+                     <disk type='network' device='disk'>
+                         <driver name='qemu' type='qcow2' cache='none'/>
+                         <source file='/path/instance-00000001/disk'/>
+                         <target dev='vda' bus='virtio'/>
+                         <alias name='virtio-disk0'/>
+                         <address type='pci' domain='0x0000' bus='0x00'
+                                  slot='0x04' function='0x0'/>
+                     </disk>
+                 </devices>
+             </domain>
+        """
+
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(self.inspector.connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'XMLDesc',
+                                                  return_value=dom_xml))
+            stack.enter_context(mock.patch.object(self.domain, 'blockInfo',
+                                                  return_value=(1, 2, 3,
+                                                                -1)))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(0, 0, 0,
+                                                                2, 999999)))
+            disks = list(self.inspector.inspect_disk_info(self.instance))
+
+            self.assertEqual(0, len(disks))
+
     def test_inspect_memory_usage_with_domain_shutoff(self):
         connection = self.inspector.connection
         with mock.patch.object(connection, 'lookupByUUIDString',

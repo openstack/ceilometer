@@ -22,7 +22,7 @@ import six
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _
+from ceilometer.i18n import _LW, _
 
 libvirt = None
 
@@ -205,19 +205,25 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     def inspect_disk_info(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
-
         tree = etree.fromstring(domain.XMLDesc(0))
-        for device in filter(
-                bool,
-                [target.get("dev")
-                 for target in tree.findall('devices/disk/target')]):
-            disk = virt_inspector.Disk(device=device)
-            block_info = domain.blockInfo(device)
-            info = virt_inspector.DiskInfo(capacity=block_info[0],
-                                           allocation=block_info[1],
-                                           physical=block_info[2])
-
-            yield (disk, info)
+        for disk in tree.findall('devices/disk'):
+            disk_type = disk.get('type')
+            if disk_type:
+                if disk_type == 'network':
+                    LOG.warning(
+                        _LW('Inspection disk usage of network disk '
+                            '%(instance_uuid)s unsupported by libvirt') % {
+                            'instance_uuid': instance.id})
+                    continue
+                target = disk.find('target')
+                device = target.get('dev')
+                if device:
+                    dsk = virt_inspector.Disk(device=device)
+                    block_info = domain.blockInfo(device)
+                    info = virt_inspector.DiskInfo(capacity=block_info[0],
+                                                   allocation=block_info[1],
+                                                   physical=block_info[2])
+                    yield (dsk, info)
 
     def inspect_memory_resident(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
