@@ -93,6 +93,9 @@ class Model(object):
     def __eq__(self, other):
         return self.as_dict() == other.as_dict()
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @classmethod
     def get_field_names(cls):
         fields = inspect.getargspec(cls.__init__)[0]
