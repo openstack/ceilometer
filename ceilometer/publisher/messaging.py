@@ -192,9 +192,16 @@ class NotifierPublisher(MessagingPublisher):
     def __init__(self, parsed_url, default_topic):
         super(NotifierPublisher, self).__init__(parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
-        topic = options.get('topic', [default_topic])
+        topic = options.pop('topic', [default_topic])
+        driver = options.pop('driver', ['rabbit'])[0]
+        url = None
+        if parsed_url.netloc != '':
+            url = urlparse.urlunsplit([driver, parsed_url.netloc,
+                                       parsed_url.path,
+                                       urlparse.urlencode(options, True),
+                                       parsed_url.fragment])
         self.notifier = oslo_messaging.Notifier(
-            messaging.get_transport(),
+            messaging.get_transport(url),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='telemetry.publisher.%s' % cfg.CONF.host,
             topics=topic,

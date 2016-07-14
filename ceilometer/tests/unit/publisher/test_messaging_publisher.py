@@ -117,6 +117,30 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
                                     driver=mock.ANY, retry=mock.ANY,
                                     publisher_id=mock.ANY)
 
+    @mock.patch('ceilometer.messaging.get_transport')
+    def test_publish_other_host(self, cgt):
+        msg_publisher.SampleNotifierPublisher(
+            netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234'))
+        cgt.assert_called_with('rabbit://foo:foo@127.0.0.1:1234')
+
+        msg_publisher.EventNotifierPublisher(
+            netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234'))
+        cgt.assert_called_with('rabbit://foo:foo@127.0.0.1:1234')
+
+    @mock.patch('ceilometer.messaging.get_transport')
+    def test_publish_other_host_vhost_and_query(self, cgt):
+        msg_publisher.SampleNotifierPublisher(
+            netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234/foo'
+                              '?driver=amqp&amqp_auto_delete=true'))
+        cgt.assert_called_with('amqp://foo:foo@127.0.0.1:1234/foo'
+                               '?amqp_auto_delete=true')
+
+        msg_publisher.EventNotifierPublisher(
+            netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234/foo'
+                              '?driver=amqp&amqp_auto_delete=true'))
+        cgt.assert_called_with('amqp://foo:foo@127.0.0.1:1234/foo'
+                               '?amqp_auto_delete=true')
+
 
 class TestPublisher(testscenarios.testcase.WithScenarios,
                     BasePublisherTestCase):
