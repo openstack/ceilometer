@@ -372,6 +372,20 @@ class TestLibvirtInspection(base.BaseTestCase):
                                       self.inspector.inspect_memory_usage,
                                       self.instance)
 
+    def test_inspect_memory_bandwidth(self):
+        fake_stats = [({}, {'perf.mbmt': 1892352, 'perf.mbml': 1802240})]
+        connection = self.inspector.connection
+        with mock.patch.object(connection, 'lookupByUUIDString',
+                               return_value=self.domain):
+            with mock.patch.object(self.domain, 'info',
+                                   return_value=(0, 0, 51200,
+                                                 2, 999999)):
+                with mock.patch.object(connection, 'domainListGetStats',
+                                       return_value=fake_stats):
+                    mb = self.inspector.inspect_memory_bandwidth(self.instance)
+                    self.assertEqual(1892352, mb.total)
+                    self.assertEqual(1802240, mb.local)
+
 
 class TestLibvirtInspectionWithError(base.BaseTestCase):
 

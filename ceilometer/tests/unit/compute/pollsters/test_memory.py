@@ -132,3 +132,62 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
         _verify_resident_memory_metering(1, 2.0, 0)
         _verify_resident_memory_metering(0, 0, 1)
         _verify_resident_memory_metering(0, 0, 0)
+
+
+class TestMemoryBandwidthPollster(base.TestPollsterBase):
+
+    def setUp(self):
+        super(TestMemoryBandwidthPollster, self).setUp()
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        next_value = iter((
+            virt_inspector.MemoryBandwidthStats(total=1892352, local=1802240),
+            virt_inspector.MemoryBandwidthStats(total=1081344, local=90112),
+        ))
+
+        def inspect_memory_bandwidth(instance, duration):
+            return next(next_value)
+
+        self.inspector.inspect_memory_bandwidth = mock.Mock(
+            side_effect=inspect_memory_bandwidth)
+        mgr = manager.AgentManager()
+
+        def _check_memory_bandwidth_total(expected_usage):
+            pollster = memory.MemoryBandwidthTotalPollster()
+
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual(set(['memory.bandwidth.total']),
+                             set([s.name for s in samples]))
+            self.assertEqual(expected_usage, samples[0].volume)
+
+        def _check_memory_bandwidth_local(expected_usage):
+            pollster = memory.MemoryBandwidthLocalPollster()
+
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual(set(['memory.bandwidth.local']),
+                             set([s.name for s in samples]))
+            self.assertEqual(expected_usage, samples[0].volume)
+
+        _check_memory_bandwidth_total(1892352)
+        _check_memory_bandwidth_local(90112)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples_with_empty_stats(self):
+
+        def inspect_memory_bandwidth(instance, duration):
+            raise virt_inspector.NoDataException()
+
+        self.inspector.inspect_memory_bandwidth = mock.Mock(
+            side_effect=inspect_memory_bandwidth)
+
+        mgr = manager.AgentManager()
+        pollster = memory.MemoryBandwidthTotalPollster()
+
+        def all_samples():
+            return list(pollster.get_samples(mgr, {}, [self.instance]))
+
+        self.assertRaises(plugin_base.PollsterPermanentError,
+                          all_samples)

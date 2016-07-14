@@ -1,0 +1,5 @@
+---
+features:
+  - Add two new meters, including memory.bandwidth.total and
+    memory.bandwidth.local, to get memory bandwidth statistics
+    based on Intel CMT feature.

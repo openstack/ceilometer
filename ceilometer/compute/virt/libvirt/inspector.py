@@ -255,3 +255,27 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         memory = domain.memoryStats()['rss'] / units.Ki
         return virt_inspector.MemoryResidentStats(resident=memory)
+
+    def inspect_memory_bandwidth(self, instance, duration=None):
+        domain = self._get_domain_not_shut_off_or_raise(instance)
+
+        try:
+            stats = self.connection.domainListGetStats(
+                [domain], libvirt.VIR_DOMAIN_STATS_PERF)
+            perf = stats[0][1]
+            return virt_inspector.MemoryBandwidthStats(total=perf["perf.mbmt"],
+                                                       local=perf["perf.mbml"])
+        except AttributeError as e:
+            msg = _('Perf is not supported by current version of libvirt, and '
+                    'failed to inspect memory bandwidth of %(instance_uuid)s, '
+                    'can not get info from libvirt: %(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)
+        # domainListGetStats might launch an exception if the method or
+        # mbmt/mbml perf event is not supported by the underlying hypervisor
+        # being used by libvirt.
+        except libvirt.libvirtError as e:
+            msg = _('Failed to inspect memory bandwidth of %(instance_uuid)s, '
+                    'can not get info from libvirt: %(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)
