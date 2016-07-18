@@ -45,6 +45,13 @@ API_OPTS = [
                help=('The endpoint of Aodh to redirect alarms URLs '
                      'to Aodh API. Default autodetection by querying '
                      'keystone.')),
+    cfg.BoolOpt('panko_is_enabled',
+                help=('Set True to redirect events URLs to Panko. '
+                      'Default autodetection by querying keystone.')),
+    cfg.StrOpt('panko_url',
+               help=('The endpoint of Panko to redirect events URLs '
+                     'to Panko API. Default autodetection by querying '
+                     'keystone.')),
 ]
 
 cfg.CONF.register_opts(API_OPTS, group='api')
@@ -64,7 +71,7 @@ def aodh_abort():
                        "disabled or unavailable."))
 
 
-def aodh_redirect(url):
+def _redirect(url):
     # NOTE(sileht): we use 307 and not 301 or 302 to allow
     # client to redirect POST/PUT/DELETE/...
     # FIXME(sileht): it would be better to use 308, but webob
@@ -75,14 +82,15 @@ def aodh_redirect(url):
 
 
 class QueryController(object):
-    def __init__(self, gnocchi_is_enabled=False, aodh_url=None):
+    def __init__(self, gnocchi_is_enabled=False,
+                 aodh_url=None):
         self.gnocchi_is_enabled = gnocchi_is_enabled
         self.aodh_url = aodh_url
 
     @pecan.expose()
     def _lookup(self, kind, *remainder):
         if kind == 'alarms' and self.aodh_url:
-            aodh_redirect(self.aodh_url)
+            _redirect(self.aodh_url)
         elif kind == 'alarms':
             aodh_abort()
         elif kind == 'samples' and self.gnocchi_is_enabled:
@@ -96,14 +104,14 @@ class QueryController(object):
 class V2Controller(object):
     """Version 2 API controller root."""
 
-    event_types = events.EventTypesController()
-    events = events.EventsController()
     capabilities = capabilities.CapabilitiesController()
 
     def __init__(self):
         self._gnocchi_is_enabled = None
         self._aodh_is_enabled = None
         self._aodh_url = None
+        self._panko_is_enabled = None
+        self._panko_url = None
 
     @property
     def gnocchi_is_enabled(self):
@@ -137,13 +145,13 @@ class V2Controller(object):
             if cfg.CONF.api.aodh_is_enabled is False:
                 self._aodh_url = ""
             elif cfg.CONF.api.aodh_url is not None:
-                self._aodh_url = self._normalize_aodh_url(
+                self._aodh_url = self._normalize_url(
                     cfg.CONF.api.aodh_url)
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(
                         keystone_client.get_client())
-                    self._aodh_url = self._normalize_aodh_url(
+                    self._aodh_url = self._normalize_url(
                         catalog.url_for(service_type='alarming'))
                 except exceptions.EndpointNotFound:
                     self._aodh_url = ""
@@ -155,6 +163,32 @@ class V2Controller(object):
                                     "enabled. Alarms URLs will be redirected "
                                     "to aodh endpoint."))
         return self._aodh_url
+
+    @property
+    def panko_url(self):
+        if self._panko_url is None:
+            if cfg.CONF.api.panko_is_enabled is False:
+                self._panko_url = ""
+            elif cfg.CONF.api.panko_url is not None:
+                self._panko_url = self._normalize_url(
+                    cfg.CONF.api.panko_url)
+            else:
+                try:
+                    catalog = keystone_client.get_service_catalog(
+                        keystone_client.get_client())
+                    self._panko_url = self._normalize_url(
+                        catalog.url_for(service_type='event'))
+                except exceptions.EndpointNotFound:
+                    self._panko_url = ""
+                except exceptions.ClientException:
+                    LOG.warning(
+                        _LW("Can't connect to keystone, assuming Panko "
+                            "is disabled and retry later."))
+                else:
+                    LOG.warning(_LW("ceilometer-api started with Panko "
+                                    "enabled. Events URLs will be redirected "
+                                    "to Panko endpoint."))
+        return self._panko_url
 
     @pecan.expose()
     def _lookup(self, kind, *remainder):
@@ -181,12 +215,20 @@ class V2Controller(object):
         elif kind == 'alarms' and (not self.aodh_url):
             aodh_abort()
         elif kind == 'alarms' and self.aodh_url:
-            aodh_redirect(self.aodh_url)
+            _redirect(self.aodh_url)
+        elif kind == 'events':
+            if self.panko_url:
+                return _redirect(self.panko_url)
+            return events.EventsController(), remainder
+        elif kind == 'event_types':
+            if self.panko_url:
+                return _redirect(self.panko_url)
+            return events.EventTypesController(), remainder
         else:
             pecan.abort(404)
 
     @staticmethod
-    def _normalize_aodh_url(url):
+    def _normalize_url(url):
         if url.endswith("/"):
             return url[:-1]
         return url
