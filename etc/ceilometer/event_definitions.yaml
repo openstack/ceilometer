@@ -1,5 +1,5 @@
 ---
-- event_type: compute.instance.*
+- event_type: 'compute.instance.*'
   traits: &instance_traits
     tenant_id:
       fields: payload.tenant_id
@@ -96,7 +96,7 @@
       fields: payload.image_id
     host:
       fields: payload.host
-- event_type: ['image.update', 'image.upload', 'image.delete']
+- event_type: ['image.create', 'image.update', 'image.upload', 'image.delete']
   traits: &glance_crud
     project_id:
       fields: payload.owner
