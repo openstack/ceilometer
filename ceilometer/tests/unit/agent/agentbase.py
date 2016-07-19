@@ -310,7 +310,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mpc.is_active.return_value = False
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.mgr.partition_coordinator.heartbeat = mock.MagicMock()
-        self.mgr.start()
+        self.mgr.run()
         setup_polling.assert_called_once_with()
         mpc.start.assert_called_once_with()
         self.assertEqual(2, mpc.join_group.call_count)
@@ -325,7 +325,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             time.sleep(0.5)
         self.assertGreaterEqual(1, runs)
 
-        self.mgr.stop()
+        self.mgr.terminate()
         mpc.stop.assert_called_once_with()
 
     @mock.patch('ceilometer.pipeline.setup_polling')
@@ -338,9 +338,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
         self.CONF.set_override('refresh_pipeline_cfg', True)
         self.CONF.set_override('pipeline_polling_interval', 5)
-        self.addCleanup(self.mgr.stop)
-        self.mgr.start()
-        self.addCleanup(self.mgr.stop)
+        self.mgr.run()
+        self.addCleanup(self.mgr.terminate)
         setup_polling.assert_called_once_with()
         mpc.start.assert_called_once_with()
         self.assertEqual(2, mpc.join_group.call_count)
@@ -432,8 +431,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mgr = self.create_manager()
         mgr.extensions = self.mgr.extensions
         mgr.create_polling_task = mock.MagicMock()
-        mgr.start()
-        self.addCleanup(mgr.stop)
+        mgr.run()
+        self.addCleanup(mgr.terminate)
         mgr.create_polling_task.assert_called_once_with()
 
     def test_manager_exception_persistency(self):

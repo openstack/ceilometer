@@ -16,6 +16,7 @@
 from itertools import chain
 import socket
 
+import cotyledon
 import msgpack
 from oslo_config import cfg
 from oslo_log import log
@@ -27,7 +28,6 @@ from ceilometer import dispatcher
 from ceilometer.i18n import _, _LE, _LW
 from ceilometer import messaging
 from ceilometer.publisher import utils as publisher_utils
-from ceilometer import service_base
 from ceilometer import utils
 
 OPTS = [
@@ -59,17 +59,17 @@ cfg.CONF.import_opt('store_events', 'ceilometer.notification',
 LOG = log.getLogger(__name__)
 
 
-class CollectorService(service_base.ServiceBase):
+class CollectorService(cotyledon.Service):
     """Listener for the collector service."""
-    def start(self):
+    def run(self):
         """Bind the UDP socket and handle incoming data."""
+        super(CollectorService, self).run()
         # ensure dispatcher is configured before starting other services
         dispatcher_managers = dispatcher.load_dispatcher_manager()
         (self.meter_manager, self.event_manager) = dispatcher_managers
         self.sample_listener = None
         self.event_listener = None
         self.udp_thread = None
-        super(CollectorService, self).start()
 
         if cfg.CONF.collector.udp_address:
             self.udp_thread = utils.spawn_thread(self.start_udp)
@@ -133,16 +133,15 @@ class CollectorService(service_base.ServiceBase):
                     LOG.warning(_LW('sample signature invalid, '
                                     'discarding: %s'), sample)
 
-    def stop(self):
-        if self.started:
-            if self.sample_listener:
-                utils.kill_listeners([self.sample_listener])
-            if self.event_listener:
-                utils.kill_listeners([self.event_listener])
-            if self.udp_thread:
-                self.udp_run = False
-                self.udp_thread.join()
-        super(CollectorService, self).stop()
+    def terminate(self):
+        if self.sample_listener:
+            utils.kill_listeners([self.sample_listener])
+        if self.event_listener:
+            utils.kill_listeners([self.event_listener])
+        if self.udp_thread:
+            self.udp_run = False
+            self.udp_thread.join()
+        super(CollectorService, self).terminate()
 
 
 class CollectorEndpoint(object):
