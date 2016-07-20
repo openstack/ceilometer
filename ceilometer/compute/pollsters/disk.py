@@ -130,21 +130,11 @@ class _Base(pollsters.BaseComputePollster):
                 'device': c_data.per_disk_requests[_metadata].keys()},
         )]
 
-    @staticmethod
-    def _get_samples_per_device(c_data, _attr, instance, _name, _unit):
+    def _get_samples_per_device(self, c_data, _attr, instance, _name, _unit):
         """Return one or more Samples for meter 'disk.device.*'"""
-        samples = []
-        for disk, value in six.iteritems(c_data.per_disk_requests[_attr]):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name=_name,
-                type=sample.TYPE_CUMULATIVE,
-                unit=_unit,
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_devices(c_data.per_disk_requests[_attr],
+                                             instance, _name,
+                                             sample.TYPE_CUMULATIVE, _unit)
 
     def get_samples(self, manager, cache, resources):
         for instance in resources:
@@ -318,19 +308,9 @@ class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
     def _get_samples_per_device(self, disk_rates_info, _attr, instance,
                                 _name, _unit):
         """Return one or more Samples for meter 'disk.device.*'."""
-        samples = []
-        for disk, value in six.iteritems(disk_rates_info.per_disk_rate[
-                _attr]):
-            samples.append(util.make_sample_from_instance(
-                instance,
-                name=_name,
-                type=sample.TYPE_GAUGE,
-                unit=_unit,
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
+        return self._get_samples_per_devices(
+            disk_rates_info.per_disk_rate[_attr],
+            instance, _name, sample.TYPE_GAUGE, _unit)
 
     def _get_sample_read_and_write(self, instance, _name, _unit, _element,
                                    _attr1, _attr2):

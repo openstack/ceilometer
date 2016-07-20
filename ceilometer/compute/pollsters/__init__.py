@@ -18,6 +18,7 @@ from oslo_utils import timeutils
 import six
 
 from ceilometer.agent import plugin_base
+from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 
 
@@ -75,3 +76,18 @@ class BaseComputePollster(plugin_base.PollsterBase):
                                                current_time)
         self._last_poll_time = current_time
         return duration
+
+    @staticmethod
+    def _get_samples_per_devices(attribute, instance, _name, _type, _unit):
+        samples = []
+        for disk, value in six.iteritems(attribute):
+            samples.append(util.make_sample_from_instance(
+                instance,
+                name=_name,
+                type=_type,
+                unit=_unit,
+                volume=value,
+                resource_id="%s-%s" % (instance.id, disk),
+                additional_metadata={'disk_name': disk},
+            ))
+        return samples
