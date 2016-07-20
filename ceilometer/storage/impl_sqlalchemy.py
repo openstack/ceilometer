@@ -237,7 +237,20 @@ class Connection(base.Connection):
         from oslo_db.sqlalchemy import migration
         path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                             'sqlalchemy', 'migrate_repo')
-        migration.db_sync(self._engine_facade.get_engine(), path)
+        engine = self._engine_facade.get_engine()
+
+        from migrate import exceptions as migrate_exc
+        from migrate.versioning import api
+        from migrate.versioning import repository
+
+        repo = repository.Repository(path)
+        try:
+            api.db_version(engine, repo)
+        except migrate_exc.DatabaseNotControlledError:
+            models.Base.metadata.create_all(engine)
+            api.version_control(engine, repo, repo.latest)
+        else:
+            migration.db_sync(engine, path)
 
     def clear(self):
         engine = self._engine_facade.get_engine()
