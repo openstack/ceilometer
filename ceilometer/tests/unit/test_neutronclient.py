@@ -184,3 +184,9 @@ class TestNeutronClient(base.BaseTestCase):
         self.assertEqual(2, stats[0]['total_connections'])
         self.assertEqual(3, stats[0]['bytes_in'])
         self.assertEqual(4, stats[0]['bytes_out'])
+
+    def test_v1_list_loadbalancer_returns_empty_list(self):
+        self.assertEqual([], self.nc.list_loadbalancer())
+
+    def test_v1_list_listener_returns_empty_list(self):
+        self.assertEqual([], self.nc.list_listener())
