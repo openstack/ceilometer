@@ -77,6 +77,20 @@ class NotificationBase(PluginBase):
         :param message: Message to process.
         """
 
+    @staticmethod
+    def _consume_and_drop(self, ctxt, publisher_id, event_type, payload,
+                          metadata):
+        """RPC endpoint for useless notification level"""
+        # NOTE(sileht): nothing special todo here, but because we listen
+        # for the generic notification exchange we have to consume all its
+        # queues
+
+    audit = _consume_and_drop
+    debug = _consume_and_drop
+    warn = _consume_and_drop
+    error = _consume_and_drop
+    critical = _consume_and_drop
+
     def info(self, ctxt, publisher_id, event_type, payload, metadata):
         """RPC endpoint for notification messages at info level
 
