@@ -543,3 +543,35 @@
       fields: payload.info.db.statement
     db.params:
       fields: payload.info.db.params
+- event_type: 'magnum.bay.*'
+  traits: &magnum_bay_crud
+    id:
+      fields: payload.id
+    typeURI:
+      fields: payload.typeURI
+    eventType:
+      fields: payload.eventType
+    eventTime:
+      fields: payload.eventTime
+    action:
+      fields: payload.action
+    outcome:
+      fields: payload.outcome
+    initiator_id:
+      fields: payload.initiator.id
+    initiator_typeURI:
+      fields: payload.initiator.typeURI
+    initiator_name:
+      fields: payload.initiator.name
+    initiator_host_agent:
+      fields: payload.initiator.host.agent
+    initiator_host_address:
+      fields: payload.initiator.host.address
+    target_id:
+      fields: payload.target.id
+    target_typeURI:
+      fields: payload.target.typeURI
+    observer_id:
+      fields: payload.observer.id
+    observer_typeURI:
+      fields: payload.observer.typeURI
