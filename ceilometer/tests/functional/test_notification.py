@@ -25,7 +25,7 @@ import six
 from stevedore import extension
 import yaml
 
-from ceilometer.compute.notifications import instance
+from ceilometer.agent import plugin_base
 from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.publisher import test as test_publisher
@@ -83,6 +83,18 @@ TEST_NOTICE_PAYLOAD = {
 }
 
 
+class _FakeNotificationPlugin(plugin_base.NotificationBase):
+    event_types = ['fake.event']
+
+    def get_targets(self, conf):
+        return [oslo_messaging.Target(
+            topic=topic, exchange=conf.nova_control_exchange)
+            for topic in self.get_notification_topics(conf)]
+
+    def process_notification(self, message):
+        return []
+
+
 class TestNotification(tests_base.BaseTestCase):
 
     def setUp(self):
@@ -96,7 +108,7 @@ class TestNotification(tests_base.BaseTestCase):
         self.srv = notification.NotificationService(0)
 
     def fake_get_notifications_manager(self, pm):
-        self.plugin = instance.Instance(pm)
+        self.plugin = _FakeNotificationPlugin(pm)
         return extension.ExtensionManager.make_test_instance(
             [
                 extension.Extension('test',
@@ -148,7 +160,7 @@ class TestNotification(tests_base.BaseTestCase):
     def test_unique_consumers(self, mock_listener):
 
         def fake_get_notifications_manager_dup_targets(pm):
-            plugin = instance.Instance(pm)
+            plugin = _FakeNotificationPlugin(pm)
             return extension.ExtensionManager.make_test_instance(
                 [extension.Extension('test', None, None, plugin),
                  extension.Extension('test', None, None, plugin)])
@@ -213,14 +225,12 @@ class BaseRealNotification(tests_base.BaseTestCase):
         self.CONF([], project='ceilometer', validate_default_values=True)
         self.setup_messaging(self.CONF, 'nova')
 
-        pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])
+        pipeline_cfg_file = self.setup_pipeline(['vcpus', 'memory'])
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
 
         self.expected_samples = 2
 
         self.CONF.set_override("backend_url", None, group="coordination")
-        self.CONF.set_override("disable_non_metric_meters", False,
-                               group="notification")
 
         ev_pipeline_cfg_file = self.setup_event_pipeline(
             ['compute.instance.*'])
@@ -342,16 +352,6 @@ class TestRealNotification(BaseRealNotification):
             if len(self.publisher.events) >= self.expected_events:
                 break
         self.assertEqual(self.expected_events, len(self.publisher.events))
-
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_notification_disable_non_metrics(self, fake_publisher_cls):
-        self.CONF.set_override("disable_non_metric_meters", True,
-                               group="notification")
-        # instance is a not a metric. we should only get back memory
-        self.expected_samples = 1
-        fake_publisher_cls.return_value = self.publisher
-        self._check_notification_service()
-        self.assertEqual('memory', self.publisher.samples[0].name)
 
 
 class TestRealNotificationHA(BaseRealNotification):
@@ -488,7 +488,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
             'sources': [{
                 'name': 'test_pipeline',
                 'interval': 5,
-                'meters': ['instance', 'memory'],
+                'meters': ['vcpus', 'memory'],
                 'sinks': ['test_sink']
             }],
             'sinks': [{

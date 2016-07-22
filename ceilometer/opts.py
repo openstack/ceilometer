@@ -20,7 +20,6 @@ import ceilometer.api.app
 import ceilometer.cmd.polling
 import ceilometer.collector
 import ceilometer.compute.discovery
-import ceilometer.compute.notifications
 import ceilometer.compute.util
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.inspector
@@ -40,7 +39,6 @@ import ceilometer.ipmi.pollsters
 import ceilometer.keystone_client
 import ceilometer.meter.notifications
 import ceilometer.middleware
-import ceilometer.network.notifications
 import ceilometer.neutron_client
 import ceilometer.notification
 import ceilometer.nova_client
@@ -61,14 +59,12 @@ def list_opts():
          itertools.chain(ceilometer.agent.manager.OPTS,
                          ceilometer.api.app.OPTS,
                          ceilometer.cmd.polling.CLI_OPTS,
-                         ceilometer.compute.notifications.OPTS,
                          ceilometer.compute.util.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.inspector.OPTS,
                          ceilometer.dispatcher.OPTS,
                          ceilometer.ipmi.notifications.ironic.OPTS,
                          ceilometer.middleware.OPTS,
-                         ceilometer.network.notifications.OPTS,
                          ceilometer.nova_client.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.OPTS,
