@@ -119,7 +119,7 @@ class ServerUnreachable(TempestException):
 # of get_network_from_name and preprov_creds to tempest.lib, and it should
 # be migrated along with them
 class InvalidTestResource(TempestException):
-    message = "%(name) is not a valid %(type), or the name is ambiguous"
+    message = "%(name)s is not a valid %(type)s, or the name is ambiguous"
 
 
 class RFCViolation(RestClientException):
