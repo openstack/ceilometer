@@ -402,11 +402,11 @@ class AgentManager(service_base.PipelineBasedService):
                           else delay_polling_time)
 
             @periodics.periodic(spacing=interval, run_immediately=False)
-            def task():
-                self.interval_task(polling_task)
+            def task(running_task):
+                self.interval_task(running_task)
 
             utils.spawn_thread(utils.delayed, delay_time,
-                               self.polling_periodics.add, task)
+                               self.polling_periodics.add, task, polling_task)
 
         if data:
             # Don't start useless threads if no task will run
