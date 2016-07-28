@@ -1,0 +1,4 @@
+---
+deprecations:
+  - The event database dispatcher is now deprecated. It has been moved to a new
+    project, alongside the Ceilometer API for /v2/events, called Panko.

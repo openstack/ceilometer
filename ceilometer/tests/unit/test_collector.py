@@ -36,6 +36,7 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
         self.conf.import_opt('telemetry_secret',
                              'ceilometer.publisher.utils',
                              'publisher')
+        self.conf.set_override("event_dispatchers", ['database'])
         self.useFixture(mockpatch.Patch(
             'ceilometer.dispatcher.database.EventDatabaseDispatcher',
             new=FakeDispatcher))
