@@ -24,7 +24,7 @@ from ceilometer import storage
 LOG = log.getLogger(__name__)
 
 
-class DatabaseDispatcher(object):
+class DatabaseDispatcher(dispatcher.Base):
     """Dispatcher class for recording metering data into database.
 
     The dispatcher class which records each meter into a database configured
@@ -37,34 +37,18 @@ class DatabaseDispatcher(object):
     meter_dispatchers = database
     event_dispatchers = database
     """
-    def __init__(self, conf):
-        self.conf = conf
-        self._conn = self._get_db_conn(conf, self.CONNECTION_TYPE, True)
-
-    def _get_db_conn(self, conf, purpose, ignore_exception=False):
-        try:
-            return storage.get_connection_from_config(conf, purpose)
-        except Exception as err:
-            params = {"purpose": purpose, "err": err}
-            LOG.exception(_LE("Failed to connect to db, purpose %(purpose)s "
-                              "re-try later: %(err)s") % params)
-            if not ignore_exception:
-                raise
 
     @property
     def conn(self):
-        if not self._conn:
-            self._conn = self._get_db_conn(self.conf, self.CONNECTION_TYPE)
+        if not hasattr(self, "_conn"):
+            self._conn = storage.get_connection_from_config(
+                self.conf, self.CONNECTION_TYPE)
         return self._conn
 
 
 class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase,
                               DatabaseDispatcher):
     CONNECTION_TYPE = 'metering'
-
-    def __init__(self, conf):
-        DatabaseDispatcher.__init__(self, conf)
-        dispatcher.MeterDispatcherBase.__init__(self, conf)
 
     def record_metering_data(self, data):
         # We may have receive only one counter on the wire
@@ -98,10 +82,6 @@ class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase,
 class EventDatabaseDispatcher(dispatcher.EventDispatcherBase,
                               DatabaseDispatcher):
     CONNECTION_TYPE = 'event'
-
-    def __init__(self, conf):
-        DatabaseDispatcher.__init__(self, conf)
-        dispatcher.EventDispatcherBase.__init__(self, conf)
 
     def record_events(self, events):
         if not isinstance(events, list):
