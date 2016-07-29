@@ -413,7 +413,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def _batching_samples(self, expected_samples, call_count):
         self.useFixture(mockpatch.PatchObject(manager.utils, 'delayed',
                                               side_effect=fakedelayed))
-        pipeline = yaml.dump({
+        pipeline_cfg = {
             'sources': [{
                 'name': 'test_pipeline',
                 'interval': 1,
@@ -424,18 +424,12 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'name': 'test_sink',
                 'transformers': [],
                 'publishers': ["test"]}]
-        })
+        }
 
-        pipeline_cfg_file = self.setup_pipeline_file(pipeline)
+        self.mgr.polling_manager = pipeline.PollingManager(pipeline_cfg)
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
 
-        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
-
-        self.mgr.run()
-        self.addCleanup(self.mgr.terminate)
-        # Manually executes callbacks
-        for cb, __, args, kwargs in self.mgr.polling_periodics._callables:
-            cb(*args, **kwargs)
-
+        self.mgr.interval_task(polling_task)
         samples = self.notified_samples
         self.assertEqual(expected_samples, len(samples))
         self.assertEqual(call_count, self.notifier.sample.call_count)
