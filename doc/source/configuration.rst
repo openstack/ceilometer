@@ -56,7 +56,7 @@ In effect, a sink describes a chain of handlers. The chain starts with
 zero or more transformers and ends with one or more publishers. The first
 transformer in the chain is passed samples from the corresponding source,
 takes some action such as deriving rate of change, performing unit conversion,
-or aggregating, before passing the modified sample to next step.
+or aggregating, before passing the modified sample to the next step.
 
 The chains end with one or more publishers. This component makes it possible
 to persist the data into storage through the message bus or to send it to one
