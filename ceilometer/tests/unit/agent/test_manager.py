@@ -16,7 +16,7 @@
 
 import shutil
 
-from keystoneclient import exceptions as ks_exceptions
+from keystoneauth1 import exceptions as ka_exceptions
 import mock
 from novaclient import client as novaclient
 from oslo_config import fixture as fixture_config
@@ -303,7 +303,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         """Test for bug 1316532."""
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
-            side_effect=ks_exceptions.ClientException))
+            side_effect=ka_exceptions.ClientException))
         self.pipeline_cfg = {
             'sources': [{
                 'name': "test_keystone",

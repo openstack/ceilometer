@@ -21,7 +21,6 @@ import random
 from concurrent import futures
 from futurist import periodics
 from keystoneauth1 import exceptions as ka_exceptions
-from keystoneclient import exceptions as ks_exceptions
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
@@ -453,8 +452,7 @@ class AgentManager(service_base.PipelineBasedService):
             try:
                 self._keystone = keystone_client.get_client()
                 self._keystone_last_exception = None
-            except (ka_exceptions.ClientException,
-                    ks_exceptions.ClientException) as e:
+            except ka_exceptions.ClientException as e:
                 self._keystone = None
                 self._keystone_last_exception = e
         if self._keystone is not None:
@@ -504,8 +502,7 @@ class AgentManager(service_base.PipelineBasedService):
                     resources.extend(partitioned)
                     if discovery_cache is not None:
                         discovery_cache[url] = partitioned
-                except (ka_exceptions.ClientException,
-                        ks_exceptions.ClientException) as e:
+                except ka_exceptions.ClientException as e:
                     LOG.error(_LE('Skipping %(name)s, keystone issue: '
                                   '%(exc)s'), {'name': name, 'exc': e})
                 except Exception as err:
