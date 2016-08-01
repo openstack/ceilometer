@@ -34,7 +34,7 @@ import ceilometer.dispatcher.gnocchi
 import ceilometer.energy.kwapi
 import ceilometer.event.converter
 import ceilometer.hardware.discovery
-import ceilometer.image.glance
+import ceilometer.image.discovery
 import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
@@ -67,7 +67,6 @@ def list_opts():
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.inspector.OPTS,
                          ceilometer.dispatcher.OPTS,
-                         ceilometer.image.glance.OPTS,
                          ceilometer.ipmi.notifications.ironic.OPTS,
                          ceilometer.middleware.OPTS,
                          ceilometer.network.notifications.OPTS,
@@ -113,7 +112,7 @@ def list_opts():
             loading.get_auth_plugin_conf_options('password'))),
         ('service_types',
          itertools.chain(ceilometer.energy.kwapi.SERVICE_OPTS,
-                         ceilometer.image.glance.SERVICE_OPTS,
+                         ceilometer.image.discovery.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,

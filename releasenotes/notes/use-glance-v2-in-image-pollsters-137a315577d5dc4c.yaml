@@ -1,0 +1,8 @@
+---
+features:
+  - Since the Glance v1 APIs won't be maintained any more, this change
+    add the support of glance v2 in images pollsters.
+
+upgrade:
+  - >
+    The option `glance_page_size' has been removed because it's not actually needed.
