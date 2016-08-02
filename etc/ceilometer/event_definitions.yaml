@@ -127,6 +127,7 @@
     destination_ip:
       fields: payload.destination_ip
     bytes_sent:
+      type: int
       fields: payload.bytes_sent
 - event_type: orchestration.stack.*
   traits: &orchestration_crud
