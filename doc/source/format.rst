@@ -303,10 +303,9 @@ The ``dns.zone.delete`` event is sent when a zone is deleted::
 Sample quantity events
 ----------------------
 Quantity events have the same overall format, but additionally have a section
-called metrics which is a section called metrics which is an array of
-information about the meters that the event is reporting on. Each metric entry
-has a type, unit, name and volume.  Multiple values can be reported in one
-event.
+called metrics which is an array of information about the meters that the
+event is reporting on. Each metric entry has a type, unit, name and 
+volume.  Multiple values can be reported in one event.
 
 ``dns.zone.usage`` is hourly event sent with usage for each zone instance::
 
