@@ -20,17 +20,23 @@ from six import moves
 import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
 
-from ceilometer.i18n import _LE, _LI
+from ceilometer.i18n import _LE, _LI, _LW
 from ceilometer import service
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 
 
-def dbsync():
+def upgrade():
     service.prepare_service()
     storage.get_connection_from_config(cfg.CONF, 'metering').upgrade()
     storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
+
+
+def dbsync():
+    LOG.warning(_LW('ceilometer-dbsync is deprecated in favor of '
+                    'ceilometer-upgrade'))
+    upgrade()
 
 
 def expirer():

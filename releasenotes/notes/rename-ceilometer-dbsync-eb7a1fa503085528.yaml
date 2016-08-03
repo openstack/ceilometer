@@ -1,0 +1,13 @@
+---
+prelude: >
+    Ceilometer backends are no more only databases but
+    also REST API like Gnocchi. So ceilometer-dbsync binary
+    name doesn't make a lot of sense and have been renamed
+    ceilometer-upgrade. The new binary handles database
+    schema upgrade like ceilometer-dbsync does, but it
+    also handle any changes needed in configured ceilometer
+    backends like Gnocchi.
+deprecations:
+  - For backward compatibility reason we temporary
+    keep ceilometer-dbsync, at least for one major version to
+    ensure deployer have time update their tooling.

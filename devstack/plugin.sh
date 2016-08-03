@@ -362,7 +362,7 @@ function init_ceilometer {
     if is_service_enabled ceilometer-collector ceilometer-api && is_service_enabled mysql postgresql ; then
         if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
             recreate_database ceilometer
-            $CEILOMETER_BIN_DIR/ceilometer-dbsync
+            $CEILOMETER_BIN_DIR/ceilometer-upgrade
         fi
     fi
 }
