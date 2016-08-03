@@ -359,10 +359,17 @@ function init_ceilometer {
     sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
     rm -f $CEILOMETER_AUTH_CACHE_DIR/*
 
-    if is_service_enabled ceilometer-collector ceilometer-api && is_service_enabled mysql postgresql ; then
-        if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-            recreate_database ceilometer
-            $CEILOMETER_BIN_DIR/ceilometer-upgrade
+    if is_service_enabled ceilometer-collector ceilometer-api; then
+        if is_service_enabled mysql postgresql ; then
+            if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
+                recreate_database ceilometer
+                $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-gnocchi-resource-types
+            fi
+        fi
+        if is_service_enabled gnocchi ; then
+            if [ "$CEILOMETER_BACKEND" = 'gnocchi' ]; then
+                $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database --skip-event-database
+            fi
         fi
     fi
 }

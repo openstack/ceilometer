@@ -21,13 +21,14 @@ import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
 
 from ceilometer.i18n import _LE, _LI, _LW
+from ceilometer import gnocchi_client
 from ceilometer import service
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 
 
-def upgrade():
+def upgrade(default_skip_gnocchi_resource_types=False):
     cfg.CONF.register_cli_opts([
         cfg.BoolOpt('skip-metering-database',
                     help='Skip metering database upgrade.',
@@ -35,6 +36,9 @@ def upgrade():
         cfg.BoolOpt('skip-event-database',
                     help='Skip event database upgrade.',
                     default=False),
+        cfg.BoolOpt('skip-gnocchi-resource-types',
+                    help='Skip gnocchi resource-types upgrade.',
+                    default=default_skip_gnocchi_resource_types),
     ])
 
     service.prepare_service()
@@ -50,11 +54,17 @@ def upgrade():
         LOG.debug("Upgrading event database")
         storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
 
+    if cfg.CONF.skip_gnocchi_resource_types:
+        LOG.info("Skipping Gnocchi resource types upgrade")
+    else:
+        LOG.debug("Upgrading Gnocchi resource types")
+        gnocchi_client.upgrade_resource_types(cfg.CONF)
+
 
 def dbsync():
     LOG.warning(_LW('ceilometer-dbsync is deprecated in favor of '
                     'ceilometer-upgrade'))
-    upgrade()
+    upgrade(default_skip_gnocchi_resource_types=True)
 
 
 def expirer():
