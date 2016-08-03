@@ -33,12 +33,6 @@ class BaseServicesPollster(plugin_base.PollsterBase):
 
     FIELDS = []
 
-    @staticmethod
-    def _iter_cache(cache, meter_name, method):
-        if meter_name not in cache:
-            cache[meter_name] = list(method())
-        return iter(cache[meter_name])
-
     def extract_metadata(self, metric):
         return dict((k, metric[k]) for k in self.FIELDS)
 
