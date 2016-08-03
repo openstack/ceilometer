@@ -28,9 +28,27 @@ LOG = log.getLogger(__name__)
 
 
 def upgrade():
+    cfg.CONF.register_cli_opts([
+        cfg.BoolOpt('skip-metering-database',
+                    help='Skip metering database upgrade.',
+                    default=False),
+        cfg.BoolOpt('skip-event-database',
+                    help='Skip event database upgrade.',
+                    default=False),
+    ])
+
     service.prepare_service()
-    storage.get_connection_from_config(cfg.CONF, 'metering').upgrade()
-    storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
+    if cfg.CONF.skip_metering_database:
+        LOG.info("Skipping metering database upgrade")
+    else:
+        LOG.debug("Upgrading metering database")
+        storage.get_connection_from_config(cfg.CONF, 'metering').upgrade()
+
+    if cfg.CONF.skip_event_database:
+        LOG.info("Skipping event database upgrade")
+    else:
+        LOG.debug("Upgrading event database")
+        storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
 
 
 def dbsync():
