@@ -39,7 +39,7 @@ clouds. This means that if you are looking at this project to solve your
 billing needs, this is the right way to go, but certainly not the end of the
 road for you. Once Ceilometer is in place on your OpenStack deployment, you
 will still have several things to do before you can produce a bill for your
-customers. One of you first task could be: finding the right queries within the
+customers. One of your first task could be: finding the right queries within the
 Ceilometer API to extract the information you need for your very own rating
 engine.
 
