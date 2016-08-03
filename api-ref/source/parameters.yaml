@@ -1,0 +1,734 @@
+# variables in header
+{}
+
+# variables in path
+alarm_id_1:
+  description: |
+    The UUID of the alarm.
+  in: path
+  required: false
+  type: string
+message_id_1:
+  description: |
+    The UUID of the message.
+  in: path
+  required: false
+  type: string
+meter_name:
+  description: |
+    The name of the meter.
+  in: path
+  required: false
+  type: string
+resource_id_2:
+  description: |
+    The UUID of the resource.
+  in: path
+  required: false
+  type: string
+sample_id:
+  description: |
+    The UUID of the sample.
+  in: path
+  required: false
+  type: string
+
+# variables in query
+aggregate:
+  description: |
+    A list of selectable aggregation functions to apply.
+
+    For example:
+
+    ::
+
+       GET /v2/meters/METER_NAME/statistics?aggregate.func=cardinality
+       &
+       aggregate.param=resource_id
+       &
+       aggregate.func=cardinality
+       &
+       aggregate.param=project_id
+  in: query
+  required: false
+  type: object
+data:
+  description: |
+    An alarm within the request body.
+  in: query
+  required: false
+  type: string
+direct:
+  description: |
+    Indicates whether the samples are POST ed
+    directly to storage. Set ``?direct=True`` to POST the samples
+    directly to storage.
+  in: query
+  required: false
+  type: string
+groupby:
+  description: |
+    Fields for group by aggregation.
+  in: query
+  required: false
+  type: object
+limit:
+  description: |
+    Limits the maximum number of samples that the response returns.
+
+    For example:
+
+    ::
+
+       GET /v2/events?limit=1000
+  in: query
+  required: false
+  type: integer
+limit_1:
+  description: |
+    Requests a page size of items. Returns a number
+    of items up to a limit value. Use the ``limit`` parameter to make
+    an initial limited request and use the ID of the last-seen item
+    from the response as the ``marker`` parameter value in a
+    subsequent limited request.
+  in: query
+  required: false
+  type: integer
+meter_links:
+  description: |
+    Set ``?meter_links=1`` to return a self link and
+    related meter links.
+  in: query
+  required: false
+  type: integer
+period:
+  description: |
+    The period, in seconds, for which you want
+    statistics.
+  in: query
+  required: false
+  type: integer
+q:
+  description: |
+    Filters the response by one or more arguments.
+    For example: ``?q.field=Foo & q.value=my_text``.
+  in: query
+  required: false
+  type: array
+q_1:
+  description: |
+    Filters the response by one or more event arguments.
+
+    For example:
+
+    ::
+
+       GET /v2/events?q.field=Foo
+       &
+       q.value=my_text
+  in: query
+  required: false
+  type: array
+samples:
+  description: |
+    A list of samples.
+  in: query
+  required: false
+  type: array
+state_1:
+  description: |
+    The alarm state. A valid value is ``ok``,
+    ``alarm``, or ``insufficient data``.
+  in: query
+  required: true
+  type: string
+
+# variables in body
+alarm_actions:
+  description: |
+    The list of actions that the alarm performs.
+  in: body
+  required: true
+  type: array
+alarm_id:
+  description: |
+    The UUID of the alarm.
+  in: body
+  required: true
+  type: string
+alarm_storage:
+  description: |
+    Defines the capabilities for the storage that
+    stores persisting alarm definitions. A value of ``true`` indicates
+    that the capability is available.
+  in: body
+  required: true
+  type: object
+alarms:history:query:complex:
+  description: |
+    If ``true``, the complex query capability for
+    alarm history is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+alarms:history:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    alarm history is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+alarms:query:complex:
+  description: |
+    If ``true``, the complex query capability for
+    alarm definitions is available for the configured database back
+    end.
+  in: body
+  required: true
+  type: boolean
+alarms:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    alarm definitions is available for the configured database back
+    end.
+  in: body
+  required: true
+  type: boolean
+api:
+  description: |
+    A set of key and value pairs that contain the API
+    capabilities for the configured storage driver.
+  in: body
+  required: true
+  type: object
+avg:
+  description: |
+    The average of all volume values in the data.
+  in: body
+  required: true
+  type: number
+combination_rule:
+  description: |
+    The rules for the combination alarm type.
+  in: body
+  required: true
+  type: string
+count:
+  description: |
+    The number of samples seen.
+  in: body
+  required: true
+  type: integer
+description:
+  description: |
+    Describes the alarm.
+  in: body
+  required: true
+  type: string
+duration:
+  description: |
+    The number of seconds between the oldest and
+    newest date and time stamp.
+  in: body
+  required: true
+  type: number
+duration_end:
+  description: |
+    The date and time in UTC format of the query end
+    time.
+  in: body
+  required: true
+  type: string
+duration_start:
+  description: |
+    The date and time in UTC format of the query
+    start time.
+  in: body
+  required: true
+  type: string
+enabled:
+  description: |
+    If ``true``, evaluation and actioning is enabled
+    for the alarm.
+  in: body
+  required: true
+  type: boolean
+event_storage:
+  description: |
+    If ``true``, the capabilities for the storage
+    that stores persisting events is available.
+  in: body
+  required: true
+  type: object
+event_type:
+  description: |
+    The dotted string that represents the event.
+  in: body
+  required: true
+  type: string
+events:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    events is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+generated:
+  description: |
+    The date and time when the event occurred.
+  in: body
+  required: true
+  type: string
+id:
+  description: |
+    The UUID of the sample.
+  in: body
+  required: true
+  type: string
+insufficient_data_actions:
+  description: |
+    The list of actions that the alarm performs when
+    the alarm state is ``insufficient_data``.
+  in: body
+  required: true
+  type: array
+links:
+  description: |
+    A list that contains a self link and associated
+    meter links.
+  in: body
+  required: true
+  type: array
+max:
+  description: |
+    The maximum volume seen in the data.
+  in: body
+  required: true
+  type: number
+message_id:
+  description: |
+    The UUID of the message.
+  in: body
+  required: true
+  type: string
+metadata:
+  description: |
+    An arbitrary set of one or more metadata key and
+    value pairs that are associated with the sample.
+  in: body
+  required: true
+  type: object
+metadata_1:
+  description: |
+    A set of one or more arbitrary metadata key and
+    value pairs that are associated with the resource.
+  in: body
+  required: true
+  type: object
+meter:
+  description: |
+    The meter name.
+  in: body
+  required: true
+  type: string
+meter_id:
+  description: |
+    The UUID of the meter.
+  in: body
+  required: true
+  type: string
+meters:query:complex:
+  description: |
+    If ``true``, the complex query capability for
+    meters is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+meters:query:metadata:
+  description: |
+    If ``true``, the simple query capability for the
+    metadata of meters is available for the configured database back
+    end.
+  in: body
+  required: true
+  type: boolean
+meters:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    meters is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+min:
+  description: |
+    The minimum volume seen in the data.
+  in: body
+  required: true
+  type: number
+name:
+  description: |
+    The name of the alarm.
+  in: body
+  required: true
+  type: string
+name_1:
+  description: |
+    The meter name.
+  in: body
+  required: true
+  type: string
+ok_actions:
+  description: |
+    The list of actions that the alarm performs when
+    the alarm state is ``ok``.
+  in: body
+  required: true
+  type: array
+period_end:
+  description: |
+    The period end date and time in UTC format.
+  in: body
+  required: true
+  type: string
+period_start:
+  description: |
+    The period start date and time in UTC format.
+  in: body
+  required: true
+  type: string
+project_id:
+  description: |
+    The UUID of the project or tenant that owns the
+    resource.
+  in: body
+  required: true
+  type: string
+project_id_1:
+  description: |
+    The UUID of the project.
+  in: body
+  required: true
+  type: string
+project_id_2:
+  description: |
+    The UUID of the owning project or tenant.
+  in: body
+  required: true
+  type: string
+raw:
+  description: |
+    A dictionary object that stores event messages
+    for future evaluation.
+  in: body
+  required: true
+  type: object
+recorded_at:
+  description: |
+    The date and time when the sample was recorded.
+  in: body
+  required: true
+  type: string
+repeat_actions:
+  description: |
+    If set to ``true``, the alarm notifications are
+    repeated. Otherwise, this value is ``false``.
+  in: body
+  required: true
+  type: boolean
+resource_id:
+  description: |
+    The UUID of the resource for which the
+    measurements are taken.
+  in: body
+  required: true
+  type: string
+resource_id_1:
+  description: |
+    The UUID of the resource.
+  in: body
+  required: true
+  type: string
+resources:query:complex:
+  description: |
+    If ``true``, the complex query capability for
+    resources is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+resources:query:metadata:
+  description: |
+    If ``true``, the simple query capability for the
+    metadata of resources is available for the configured database
+    back end.
+  in: body
+  required: true
+  type: boolean
+resources:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    resources is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+samples:query:complex:
+  description: |
+    If ``true``, the complex query capability for
+    samples is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+samples:query:metadata:
+  description: |
+    If ``true``, the simple query capability for the
+    metadata of samples is available for the configured database back
+    end.
+  in: body
+  required: true
+  type: boolean
+samples:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    samples is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+source:
+  description: |
+    The name of the source that identifies where the
+    sample comes from.
+  in: body
+  required: true
+  type: string
+source_1:
+  description: |
+    The name of the source from which the meter came.
+  in: body
+  required: true
+  type: string
+source_2:
+  description: |
+    The name of the source from which the resource
+    came.
+  in: body
+  required: true
+  type: string
+state:
+  description: |
+    The state of the alarm.
+  in: body
+  required: true
+  type: string
+state_timestamp:
+  description: |
+    The date and time of the alarm state.
+  in: body
+  required: true
+  type: string
+statistics:aggregation:selectable:avg:
+  description: |
+    If ``true``, the ``avg`` capability is available
+    for the configured database back end. Use the ``avg`` capability
+    to get average values for samples.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:cardinality:
+  description: |
+    If ``true``, the ``cardinality`` capability is
+    available for the configured database back end. Use the
+    ``cardinality`` capability to get cardinality for samples.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:count:
+  description: |
+    If ``true``, the ``count`` capability is
+    available for the configured database back end. Use the ``count``
+    capability to calculate the number of samples for a query.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:max:
+  description: |
+    If ``true``, the ``max`` capability is available
+    for the configured database back end. . Use the ``max`` capability
+    to calculate the maximum value for a query.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:min:
+  description: |
+    If ``true``, the ``min`` capability is available
+    for the configured database back end. Use the ``min`` capability
+    to calculate the minimum value for a query.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:quartile:
+  description: |
+    If ``true``, the ``quartile`` capability is
+    available for the configured database back end. Use the
+    ``quartile`` capability to calculate the quartile of sample
+    volumes for a query.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:stddev:
+  description: |
+    If ``true``, the ``stddev`` capability is
+    available for the configured database back end. Use the ``stddev``
+    capability to calculate the standard deviation of sample volumes
+    for a query.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:selectable:sum:
+  description: |
+    If ``true``, the ``sum`` capability is available
+    for the configured database back end. Use the ``sum`` capability
+    to calculate the sum of sample volumes for a query.
+  in: body
+  required: true
+  type: boolean
+statistics:aggregation:standard:
+  description: |
+    If ``true``, the ``standard`` set of aggregation
+    capability is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+statistics:groupby:
+  description: |
+    If ``true``, the ``groupby`` capability is
+    available for calculating statistics for the configured database
+    back end.
+  in: body
+  required: true
+  type: boolean
+statistics:query:complex:
+  description: |
+    If ``true``, the complex query capability for
+    statistics is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+statistics:query:metadata:
+  description: |
+    If ``true``, the simple query capability for the
+    sample metadata that is used to calculate statistics is available
+    for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+statistics:query:simple:
+  description: |
+    If ``true``, the simple query capability for
+    statistics is available for the configured database back end.
+  in: body
+  required: true
+  type: boolean
+storage:
+  description: |
+    If ``true``, the capabilities for the storage
+    that stores persisting samples is available.
+  in: body
+  required: true
+  type: object
+storage:production_ready:
+  description: |
+    If ``true``, the database back end is ready to
+    use in a production environment.
+  in: body
+  required: true
+  type: boolean
+sum:
+  description: |
+    The total of all of the volume values seen in the
+    data.
+  in: body
+  required: true
+  type: number
+threshold_rule:
+  description: |
+    The rules for the threshold alarm type.
+  in: body
+  required: true
+  type: string
+timestamp:
+  description: |
+    The date and time in UTC format when the
+    measurement was made.
+  in: body
+  required: true
+  type: string
+timestamp_1:
+  description: |
+    The date and time of the alarm.
+  in: body
+  required: true
+  type: string
+traits:
+  description: |
+    A list of objects. Each object contains key and
+    value pairs that describe the event.
+  in: body
+  required: true
+  type: array
+type:
+  description: |
+    The meter type.
+  in: body
+  required: true
+  type: string
+type_1:
+  description: |
+    The type of the alarm, which is either
+    ``threshold`` or ``combination``.
+  in: body
+  required: true
+  type: string
+type_2:
+  description: |
+    The meter type.  The type value is gauge, delta,
+    or cumulative.
+  in: body
+  required: true
+  type: string
+unit:
+  description: |
+    The unit of measure for the ``volume`` value.
+  in: body
+  required: true
+  type: string
+unit_1:
+  description: |
+    The unit of measure.
+  in: body
+  required: true
+  type: string
+unit_2:
+  description: |
+    The unit type of the data set.
+  in: body
+  required: true
+  type: string
+user_id:
+  description: |
+    The UUID of the user who either created or last
+    updated the resource.
+  in: body
+  required: true
+  type: string
+user_id_1:
+  description: |
+    The UUID of the user.
+  in: body
+  required: true
+  type: string
+volume:
+  description: |
+    The actual measured value.
+  in: body
+  required: true
+  type: number
+

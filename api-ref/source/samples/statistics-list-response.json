@@ -1,0 +1,16 @@
+[
+    {
+        "avg": 4.5,
+        "count": 10,
+        "duration": 300,
+        "duration_end": "2013-01-04T16:47:00",
+        "duration_start": "2013-01-04T16:42:00",
+        "max": 9,
+        "min": 1,
+        "period": 7200,
+        "period_end": "2013-01-04T18:00:00",
+        "period_start": "2013-01-04T16:00:00",
+        "sum": 45,
+        "unit": "GiB"
+    }
+]
