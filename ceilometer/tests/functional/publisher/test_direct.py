@@ -89,7 +89,7 @@ class TestEventDirectPublisher(tests_db.TestBase):
                  for i in range(0, 5)]
 
     def test_direct_publisher(self):
-        parsed_url = netutils.urlsplit('direct://')
+        parsed_url = netutils.urlsplit('direct://dispatcher=database')
         publisher = direct.DirectPublisher(parsed_url)
         publisher.publish_events(self.test_data)
 
