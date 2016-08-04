@@ -128,5 +128,5 @@
      An OpenStack user.
 
 .. [#] http://en.wikipedia.org/wiki/Ceilometer
-.. [#] https://git.openstack.org/cgit/openstack/ceilometer/tree/ceilometer/openstack/common/notifier
+.. [#] https://git.openstack.org/cgit/openstack/oslo.messaging/tree/oslo_messaging/notify/notifier.py
 .. [#] http://en.wikipedia.org/wiki/Non-repudiation
