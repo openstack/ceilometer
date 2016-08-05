@@ -216,7 +216,9 @@ the notification and polling agents. It validates the incoming data and (if
 the signature is valid) then writes the messages to a declared target:
 database, file, gnocchi or http.
 
-More details on database and Gnocchi targets can be found in the install guide.
+More details on database and Gnocchi targets can be found in the 
+:ref:`choosing_db_backend` guide.
+
 
 
 Accessing the data
