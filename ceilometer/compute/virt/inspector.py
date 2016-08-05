@@ -80,6 +80,14 @@ MemoryResidentStats = collections.namedtuple('MemoryResidentStats',
                                              ['resident'])
 
 
+# Named tuple representing memory bandwidth statistics.
+#
+# total: total system bandwidth from one level of cache
+# local: bandwidth of memory traffic for a memory controller
+#
+MemoryBandwidthStats = collections.namedtuple('MemoryBandwidthStats',
+                                              ['total', 'local'])
+
 # Named tuple representing vNICs.
 #
 # name: the name of the vNIC
@@ -283,6 +291,16 @@ class Inspector(object):
         :param duration: the last 'n' seconds, over which the value should be
                inspected
         :return: the amount of resident memory
+        """
+        raise ceilometer.NotImplementedError
+
+    def inspect_memory_bandwidth(self, instance, duration=None):
+        """Inspect the memory bandwidth statistics for an instance.
+
+        :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
+        :return:
         """
         raise ceilometer.NotImplementedError
 
