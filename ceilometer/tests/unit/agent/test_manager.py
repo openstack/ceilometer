@@ -269,7 +269,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.notifier.sample.side_effect = self.fake_notifier_sample
         self.useFixture(mockpatch.Patch('oslo_messaging.Notifier',
                                         return_value=self.notifier))
-        self.source_resources = True
         super(TestRunTasks, self).setUp()
         self.useFixture(mockpatch.Patch(
             'keystoneclient.v2_0.client.Client',
@@ -309,7 +308,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'name': "test_keystone",
                 'interval': 10,
                 'meters': ['testkeystone'],
-                'resources': ['test://'] if self.source_resources else [],
+                'resources': ['test://'],
                 'sinks': ['test_sink']}],
             'sinks': [{
                 'name': 'test_sink',
@@ -378,7 +377,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'name': source_name,
                 'interval': 10,
                 'meters': ['testpollingexception'],
-                'resources': ['test://'] if self.source_resources else [],
+                'resources': ['test://'],
                 'sinks': ['test_sink']}],
             'sinks': [{
                 'name': 'test_sink',
@@ -445,7 +444,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'name': 'test_pipeline',
                 'interval': 1,
                 'meters': ['test'],
-                'resources': ['test://'] if self.source_resources else [],
+                'resources': ['test://'],
                 'sinks': ['test_sink']}],
             'sinks': [{
                 'name': 'test_sink',
@@ -471,7 +470,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'name': 'test_pipeline',
                 'interval': 1,
                 'meters': ['testanother'],
-                'resources': ['test://'] if self.source_resources else [],
+                'resources': ['test://'],
                 'sinks': ['test_sink']}],
             'sinks': [{
                 'name': 'test_sink',

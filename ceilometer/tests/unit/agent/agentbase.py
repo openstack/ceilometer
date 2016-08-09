@@ -265,7 +265,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                 'name': 'test_pipeline',
                 'interval': 60,
                 'meters': ['test'],
-                'resources': ['test://'] if self.source_resources else [],
+                'resources': ['test://'],
                 'sinks': ['test_sink']}],
             'sinks': [{
                 'name': 'test_sink',
@@ -383,7 +383,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'name': 'test_pipeline_1',
             'interval': 10,
             'meters': ['test'],
-            'resources': ['test://'] if self.source_resources else [],
+            'resources': ['test://'],
             'sinks': ['test_sink']
         })
         self.setup_polling()
@@ -410,7 +410,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'name': 'test_pipeline_1',
             'interval': 60,
             'meters': ['testanother'],
-            'resources': ['testanother://'] if self.source_resources else [],
+            'resources': ['testanother://'],
             'sinks': ['test_sink']
         })
         self.setup_polling()
