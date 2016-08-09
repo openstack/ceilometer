@@ -17,11 +17,16 @@
 
 import copy
 
+from oslo_log import log
 from pysnmp.entity.rfc3413.oneliner import cmdgen
+from pysnmp.proto import rfc1905
 import six
 import six.moves.urllib.parse as urlparse
 
 from ceilometer.hardware.inspector import base
+
+
+LOG = log.getLogger(__name__)
 
 
 class SNMPException(Exception):
@@ -187,18 +192,24 @@ class SNMPInspector(base.Inspector):
         return matched
 
     @staticmethod
-    def get_oid_value(oid_cache, oid_def, suffix=''):
+    def get_oid_value(oid_cache, oid_def, suffix='', host=None):
         oid, converter = oid_def
         value = oid_cache[oid + suffix]
         if converter:
-            value = converter(value)
+            try:
+                value = converter(value)
+            except ValueError:
+                if isinstance(value, rfc1905.NoSuchObject):
+                    LOG.debug("OID %s%s has no value" % (
+                        oid, " on %s" % host.hostname if host else ""))
+                    return None
         return value
 
     @classmethod
-    def construct_metadata(cls, oid_cache, meta_defs, suffix=''):
+    def construct_metadata(cls, oid_cache, meta_defs, suffix='', host=None):
         metadata = {}
         for key, oid_def in six.iteritems(meta_defs):
-            metadata[key] = cls.get_oid_value(oid_cache, oid_def, suffix)
+            metadata[key] = cls.get_oid_value(oid_cache, oid_def, suffix, host)
         return metadata
 
     @classmethod
@@ -243,11 +254,11 @@ class SNMPInspector(base.Inspector):
             suffix = oid[len(meter_def['metric_oid'][0]):]
             value = self.get_oid_value(oid_cache,
                                        meter_def['metric_oid'],
-                                       suffix)
+                                       suffix, host)
             # get the metadata for this sample value
             metadata = self.construct_metadata(oid_cache,
                                                meter_def['metadata'],
-                                               suffix)
+                                               suffix, host)
             extra_metadata = copy.deepcopy(input_extra_metadata) or {}
             # call post_op for special cases
             if meter_def['post_op']:

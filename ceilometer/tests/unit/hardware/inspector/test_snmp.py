@@ -17,6 +17,7 @@
 import mock
 from oslo_utils import netutils
 from oslotest import mockpatch
+from pysnmp.proto.rfc1905 import noSuchObject
 
 from ceilometer.hardware.inspector import snmp
 from ceilometer.tests import base as test_base
@@ -34,8 +35,14 @@ class FakeObjectName(object):
 
 class FakeCommandGenerator(object):
     def getCmd(self, authData, transportTarget, *oids, **kwargs):
-        varBinds = [(FakeObjectName(oid),
-                    int(oid.split('.')[-1])) for oid in oids]
+        emptyOID = '1.3.6.1.4.1.2021.4.14.0'
+        varBinds = [
+            (FakeObjectName(oid), int(oid.split('.')[-1]))
+            for oid in oids
+            if oid != emptyOID
+        ]
+        if emptyOID in oids:
+            varBinds += [(FakeObjectName(emptyOID), noSuchObject)]
         return (None, None, 0, varBinds)
 
     def bulkCmd(authData, transportTarget, nonRepeaters, maxRepetitions,
@@ -63,6 +70,12 @@ class TestSNMPInspector(test_base.BaseTestCase):
             'metadata': {
                 'meta': ('1.3.6.1.4.1.2021.9.1.3', int)
             },
+            'post_op': None,
+        },
+        'test_nosuch': {
+            'matching_type': snmp.EXACT,
+            'metric_oid': ('1.3.6.1.4.1.2021.4.14.0', int),
+            'metadata': {},
             'post_op': None,
         },
     }
@@ -98,6 +111,18 @@ class TestSNMPInspector(test_base.BaseTestCase):
         metadata.update(post_op_meta=4)
         extra.update(project_id=2)
         return value
+
+    def test_inspect_no_such_object(self):
+        cache = {}
+        try:
+            # inspect_generic() is a generator, so we explicitly need to
+            # iterate through it in order to trigger the exception.
+            list(self.inspector.inspect_generic(self.host,
+                                                cache,
+                                                {},
+                                                self.mapping['test_nosuch']))
+        except ValueError:
+            self.fail("got ValueError when interpreting NoSuchObject return")
 
     def test_inspect_generic_exact(self):
         self.inspector._fake_post_op = self._fake_post_op
