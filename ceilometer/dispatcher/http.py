@@ -101,8 +101,8 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                           '%d.', res.status_code)
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                LOG.exception(_LE('Status Code: %{code}s. Failed to'
-                                  'dispatch meter: %{meter}s'),
+                LOG.exception(_LE('Status Code: %(code)s. Failed to '
+                                  'dispatch meter: %(meter)s'),
                               {'code': res.status_code, 'meter': meter})
 
     def record_events(self, events):
@@ -128,6 +128,6 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                           '%d.', res.status_code)
                 res.raise_for_status()
             except requests.exceptions.HTTPError:
-                LOG.exception(_LE('Status Code: %{code}s. Failed to'
-                                  'dispatch event: %{event}s'),
+                LOG.exception(_LE('Status Code: %(code)s. Failed to '
+                                  'dispatch event: %(event)s'),
                               {'code': res.status_code, 'event': event})
