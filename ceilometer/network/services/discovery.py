@@ -109,3 +109,10 @@ class FirewallPolicyDiscovery(_BaseServicesDiscovery):
         """Discover resources to monitor."""
 
         return self.neutron_cli.fw_policy_get_all()
+
+
+class FloatingIPDiscovery(_BaseServicesDiscovery):
+    def discover(self, manager, param=None):
+        """Discover floating IP resources to monitor."""
+
+        return self.neutron_cli.fip_get_all()
