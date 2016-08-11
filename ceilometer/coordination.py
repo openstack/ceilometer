@@ -61,7 +61,7 @@ class ErrorJoiningPartitioningGroup(Exception):
 class MemberNotInGroupError(Exception):
     def __init__(self, group_id, members, my_id):
         super(MemberNotInGroupError, self).__init__(_LE(
-            'Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: '
+            'Group ID: %(group_id)s, Members: %(members)s, Me: %(me)s: '
             'Current agent is not part of group and cannot take tasks') %
             {'group_id': group_id, 'members': members, 'me': my_id})
 
