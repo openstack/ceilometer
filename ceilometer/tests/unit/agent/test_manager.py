@@ -116,11 +116,12 @@ class TestManager(base.BaseTestCase):
             manager.AgentManager(namespaces='ipmi',
                                  pollster_list=['hardware.ipmi.node.*'])
         except manager.EmptyPollstersList:
-            err_msg = 'Skip loading extension for hardware.ipmi.node.%s'
+            err_msg = 'Skip loading extension for %s'
             pollster_names = [
                 'power', 'temperature', 'outlet_temperature',
                 'airflow', 'cups', 'cpu_util', 'mem_util', 'io_util']
-            calls = [mock.call(err_msg % n) for n in pollster_names]
+            calls = [mock.call(err_msg, 'hardware.ipmi.node.%s' % n)
+                     for n in pollster_names]
             LOG.exception.assert_has_calls(calls=calls, any_order=True)
 
     # Skip loading pollster upon ImportError

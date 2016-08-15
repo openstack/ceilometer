@@ -105,7 +105,7 @@ def build_server():
     # Create the WSGI server and start it
     host, port = cfg.CONF.api.host, cfg.CONF.api.port
 
-    LOG.info(_LI('Starting server in PID %s') % os.getpid())
+    LOG.info(_LI('Starting server in PID %s'), os.getpid())
     LOG.info(_LI("Configuration:"))
     cfg.CONF.log_opt_values(LOG, log.INFO)
 

@@ -303,7 +303,7 @@ class AgentManager(service_base.PipelineBasedService):
             # Extension raising ExtensionLoadError can be ignored,
             # and ignore anything we can't import as a safety measure.
             if isinstance(exc, plugin_base.ExtensionLoadError):
-                LOG.exception(_("Skip loading extension for %s") % ep.name)
+                LOG.exception(_LE("Skip loading extension for %s"), ep.name)
                 return
             if isinstance(exc, ImportError):
                 LOG.error(_("Failed to import extension for %(name)s: "
@@ -506,9 +506,9 @@ class AgentManager(service_base.PipelineBasedService):
                     LOG.error(_LE('Skipping %(name)s, keystone issue: '
                                   '%(exc)s'), {'name': name, 'exc': e})
                 except Exception as err:
-                    LOG.exception(_('Unable to discover resources: %s') % err)
+                    LOG.exception(_LE('Unable to discover resources: %s'), err)
             else:
-                LOG.warning(_('Unknown discovery extension: %s') % name)
+                LOG.warning(_LW('Unknown discovery extension: %s'), name)
         return resources
 
     def stop_pollsters_tasks(self):

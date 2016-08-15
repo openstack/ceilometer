@@ -90,10 +90,10 @@ class MessagingPublisher(publisher.PublisherBase):
         self.local_queue = []
 
         if self.policy in ['default', 'queue', 'drop']:
-            LOG.info(_LI('Publishing policy set to %s') % self.policy)
+            LOG.info(_LI('Publishing policy set to %s'), self.policy)
         else:
             LOG.warning(_('Publishing policy is unknown (%s) force to '
-                          'default') % self.policy)
+                          'default'), self.policy)
             self.policy = 'default'
 
         self.retry = 1 if self.policy in ['queue', 'drop'] else None
