@@ -40,5 +40,8 @@ class CeilometerTempestPlugin(plugins.TempestPlugin):
                                   tempest_config.TelemetryGroup)
 
     def get_opt_lists(self):
-        return [(tempest_config.telemetry_group.name,
-                 tempest_config.TelemetryGroup)]
+        return [
+            (tempest_config.telemetry_group.name,
+             tempest_config.TelemetryGroup),
+            ('service_available', tempest_config.ServiceAvailableGroup)
+        ]
