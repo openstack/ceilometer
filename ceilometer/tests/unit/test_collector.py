@@ -37,7 +37,7 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
                              'ceilometer.publisher.utils',
                              'publisher')
         self.useFixture(mockpatch.Patch(
-            'ceilometer.dispatcher.database.DatabaseDispatcher',
+            'ceilometer.dispatcher.database.EventDatabaseDispatcher',
             new=FakeDispatcher))
 
     @mock.patch('ceilometer.publisher.utils.verify_signature')
@@ -46,7 +46,7 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
             return ev.get('message_signature') != 'bad_signature'
         mocked_verify.side_effect = _fake_verify
         sample = {"payload": [{"message_signature": "bad_signature"}]}
-        manager = dispatcher.load_dispatcher_manager()[0]
+        manager = dispatcher.load_dispatcher_manager()[1]
         v = collector.EventEndpoint("secret", manager)
         v.sample([sample])
         self.assertEqual([], manager['database'].obj.events)

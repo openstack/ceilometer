@@ -19,16 +19,12 @@ from ceilometer import dispatcher
 from ceilometer.tests import base
 
 
-class FakeDispatcherSample(dispatcher.MeterDispatcherBase):
+class FakeMeterDispatcher(dispatcher.MeterDispatcherBase):
     def record_metering_data(self, data):
         pass
 
 
-class FakeDispatcher(dispatcher.MeterDispatcherBase,
-                     dispatcher.EventDispatcherBase):
-    def record_metering_data(self, data):
-        pass
-
+class FakeEventDispatcher(dispatcher.EventDispatcherBase):
     def record_events(self, events):
         pass
 
@@ -41,10 +37,13 @@ class TestDispatchManager(base.BaseTestCase):
                          event_dispatchers=['database'])
         self.useFixture(mockpatch.Patch(
             'ceilometer.dispatcher.gnocchi.GnocchiDispatcher',
-            new=FakeDispatcherSample))
+            new=FakeMeterDispatcher))
         self.useFixture(mockpatch.Patch(
-            'ceilometer.dispatcher.database.DatabaseDispatcher',
-            new=FakeDispatcher))
+            'ceilometer.dispatcher.database.MeterDatabaseDispatcher',
+            new=FakeMeterDispatcher))
+        self.useFixture(mockpatch.Patch(
+            'ceilometer.dispatcher.database.EventDatabaseDispatcher',
+            new=FakeEventDispatcher))
 
     def test_load(self):
         sample_mg, event_mg = dispatcher.load_dispatcher_manager()
