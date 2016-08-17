@@ -40,14 +40,6 @@ OPTS = [
 ]
 cfg.CONF.register_opts(OPTS)
 
-API_OPT = cfg.IntOpt('workers',
-                     default=1,
-                     min=1,
-                     deprecated_group='DEFAULT',
-                     deprecated_name='api_workers',
-                     help='Number of workers for api, default value is 1.')
-cfg.CONF.register_opt(API_OPT, 'api')
-
 NOTI_OPT = cfg.IntOpt('workers',
                       default=1,
                       min=1,
