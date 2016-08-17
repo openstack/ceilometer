@@ -134,6 +134,21 @@ class _RateBase(_Base):
         return info.tx_bytes_rate
 
 
+class _PacketsBase(_Base):
+
+    NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:",
+                                  "read-packets=%d",
+                                  "write-packets=%d"])
+
+    @staticmethod
+    def _get_rx_info(info):
+        return info.rx_packets
+
+    @staticmethod
+    def _get_tx_info(info):
+        return info.tx_packets
+
+
 class IncomingBytesPollster(_Base):
 
     def _get_sample(self, instance, vnic, info):
@@ -147,7 +162,7 @@ class IncomingBytesPollster(_Base):
         )
 
 
-class IncomingPacketsPollster(_Base):
+class IncomingPacketsPollster(_PacketsBase):
 
     def _get_sample(self, instance, vnic, info):
         return self.make_vnic_sample(
@@ -173,7 +188,7 @@ class OutgoingBytesPollster(_Base):
         )
 
 
-class OutgoingPacketsPollster(_Base):
+class OutgoingPacketsPollster(_PacketsBase):
 
     def _get_sample(self, instance, vnic, info):
         return self.make_vnic_sample(
