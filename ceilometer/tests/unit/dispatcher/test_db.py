@@ -40,7 +40,7 @@ class TestDispatcherDB(base.BaseTestCase):
                                    [], {})
         event = utils.message_from_event(event,
                                          self.CONF.publisher.telemetry_secret)
-        with mock.patch.object(self.event_dispatcher._conn,
+        with mock.patch.object(self.event_dispatcher.conn,
                                'record_events') as record_events:
             self.event_dispatcher.record_events(event)
         self.assertEqual(1, len(record_events.call_args_list[0][0][0]))
@@ -54,7 +54,7 @@ class TestDispatcherDB(base.BaseTestCase):
             msg, self.CONF.publisher.telemetry_secret,
         )
 
-        with mock.patch.object(self.meter_dispatcher._conn,
+        with mock.patch.object(self.meter_dispatcher.conn,
                                'record_metering_data') as record_metering_data:
             self.meter_dispatcher.record_metering_data(msg)
 
@@ -73,7 +73,7 @@ class TestDispatcherDB(base.BaseTestCase):
         expected = msg.copy()
         expected['timestamp'] = datetime.datetime(2012, 7, 2, 13, 53, 40)
 
-        with mock.patch.object(self.meter_dispatcher._conn,
+        with mock.patch.object(self.meter_dispatcher.conn,
                                'record_metering_data') as record_metering_data:
             self.meter_dispatcher.record_metering_data(msg)
 
@@ -93,7 +93,7 @@ class TestDispatcherDB(base.BaseTestCase):
         expected['timestamp'] = datetime.datetime(2012, 9, 30, 23,
                                                   31, 50, 262000)
 
-        with mock.patch.object(self.meter_dispatcher._conn,
+        with mock.patch.object(self.meter_dispatcher.conn,
                                'record_metering_data') as record_metering_data:
             self.meter_dispatcher.record_metering_data(msg)
 
