@@ -40,10 +40,8 @@ class BaseConversionTransformer(transformer.TransformerBase):
                        unit and scaling factor (a missing value
                        connotes no change)
         """
-        source = source or {}
-        target = target or {}
-        self.source = source
-        self.target = target
+        self.source = source or {}
+        self.target = target or {}
         super(BaseConversionTransformer, self).__init__(**kwargs)
 
     def _map(self, s, attr):
