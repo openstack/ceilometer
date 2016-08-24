@@ -16,3 +16,6 @@ subunit.log
 
 # Files created by releasenotes build
 releasenotes/build
+
+# Files created by api-ref build
+api-ref/build
