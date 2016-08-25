@@ -18,18 +18,18 @@ from six.moves.urllib import parse as urllib
 
 from tempest import config
 from tempest.lib.common import rest_client
-from tempest.lib.services.compute.flavors_client import FlavorsClient
-from tempest.lib.services.compute.floating_ips_client import FloatingIPsClient
-from tempest.lib.services.compute.networks_client import NetworksClient
-from tempest.lib.services.compute.servers_client import ServersClient
+from tempest.lib.services.compute import flavors_client as flavor_cli
+from tempest.lib.services.compute import floating_ips_client as floatingip_cli
+from tempest.lib.services.compute import networks_client as network_cli
+from tempest.lib.services.compute import servers_client as server_cli
 from tempest import manager
-from tempest.services.object_storage.container_client import ContainerClient
-from tempest.services.object_storage.object_client import ObjectClient
+from tempest.services.object_storage import container_client as container_cli
+from tempest.services.object_storage import object_client as obj_cli
 
-from ceilometer.tests.tempest.service.images.v1.images_client import \
-    ImagesClient
-from ceilometer.tests.tempest.service.images.v2.images_client import \
-    ImagesClient as ImagesClientV2
+from ceilometer.tests.tempest.service.images.v1 import images_client as \
+    img_cli_v1
+from ceilometer.tests.tempest.service.images.v2 import images_client as \
+    img_cli_v2
 
 
 CONF = config.CONF
@@ -156,38 +156,45 @@ class Manager(manager.Manager):
             getattr(self, 'set_%s' % client)()
 
     def set_servers_client(self):
-        self.servers_client = ServersClient(self.auth_provider,
-                                            **self.compute_params)
+        self.servers_client = server_cli.ServersClient(
+            self.auth_provider,
+            **self.compute_params)
 
     def set_compute_networks_client(self):
-        self.compute_networks_client = NetworksClient(self.auth_provider,
-                                                      **self.compute_params)
+        self.compute_networks_client = network_cli.NetworksClient(
+            self.auth_provider,
+            **self.compute_params)
 
     def set_compute_floating_ips_client(self):
-        self.compute_floating_ips_client = FloatingIPsClient(
+        self.compute_floating_ips_client = floatingip_cli.FloatingIPsClient(
             self.auth_provider,
             **self.compute_params)
 
     def set_flavors_client(self):
-        self.flavors_client = FlavorsClient(self.auth_provider,
-                                            **self.compute_params)
+        self.flavors_client = flavor_cli.FlavorsClient(
+            self.auth_provider,
+            **self.compute_params)
 
     def set_image_client(self):
-        self.image_client = ImagesClient(self.auth_provider,
-                                         **self.image_params)
+        self.image_client = img_cli_v1.ImagesClient(
+            self.auth_provider,
+            **self.image_params)
 
     def set_image_client_v2(self):
-        self.image_client_v2 = ImagesClientV2(self.auth_provider,
-                                              **self.image_params)
+        self.image_client_v2 = img_cli_v2.ImagesClient(
+            self.auth_provider,
+            **self.image_params)
 
     def set_telemetry_client(self):
         self.telemetry_client = TelemetryClient(self.auth_provider,
                                                 **self.telemetry_params)
 
     def set_container_client(self):
-        self.container_client = ContainerClient(self.auth_provider,
-                                                **self.object_storage_params)
+        self.container_client = container_cli.ContainerClient(
+            self.auth_provider,
+            **self.object_storage_params)
 
     def set_object_client(self):
-        self.object_client = ObjectClient(self.auth_provider,
-                                          **self.object_storage_params)
+        self.object_client = obj_cli.ObjectClient(
+            self.auth_provider,
+            **self.object_storage_params)
