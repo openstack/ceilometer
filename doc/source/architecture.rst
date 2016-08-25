@@ -197,12 +197,14 @@ Publishing the data
 
    This figure shows how a sample can be published to multiple destinations.
 
-Currently, processed data can be published using 5 different transports:
-notifier, a notification based publisher which pushes samples to a message
-queue which can be consumed by the collector or an external system; udp, which
-publishes samples using UDP packets; http, which targets a REST interface;
-and kafka, which publishes data to a Kafka message queue to be consumed by any
-system that supports Kafka.
+Currently, processed data can be published using 5 different transports: 
+1. direct, which publishes samples to a configured database dispatcher directly; 
+2. notifier, a notification based publisher which pushes samples to a message queue 
+   which can be consumed by the collector or an external system; 
+3. udp, which publishes samples using UDP packets; 
+4. http, which targets a REST interface; 
+5. kafka, which publishes data to a Kafka message queue to be consumed by any system 
+   that supports Kafka.
 
 
 Storing the data
