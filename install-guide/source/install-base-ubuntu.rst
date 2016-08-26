@@ -60,7 +60,7 @@ Install and configure components
    .. code-block:: console
 
       # apt-get install ceilometer-api ceilometer-collector \
-        ceilometer-agent-central ceilometer-agent-notification
+        ceilometer-agent-central ceilometer-agent-notification \
         python-ceilometerclient
 
 .. include:: install-base-config-common.rst
