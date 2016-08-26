@@ -63,18 +63,12 @@ class TestXenapiInspection(base.BaseTestCase):
         fake_stat = virt_inspector.CPUUtilStats(util=40)
 
         def fake_xenapi_request(method, args):
-            metrics_rec = {
-                'memory_actual': '536870912',
-                'VCPUs_number': '1',
-                'VCPUs_utilisation': {'0': 0.4, }
-            }
-
             if method == 'VM.get_by_name_label':
                 return ['vm_ref']
-            elif method == 'VM.get_metrics':
-                return 'metrics_ref'
-            elif method == 'VM_metrics.get_record':
-                return metrics_rec
+            elif method == 'VM.get_VCPUs_max':
+                return '1'
+            elif method == 'VM.query_data_source':
+                return 0.4
             else:
                 return None
 

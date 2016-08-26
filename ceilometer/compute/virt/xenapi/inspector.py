@@ -120,18 +120,15 @@ class XenapiInspector(virt_inspector.Inspector):
     def inspect_cpu_util(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
-        metrics_ref = self._call_xenapi("VM.get_metrics", vm_ref)
-        metrics_rec = self._call_xenapi("VM_metrics.get_record",
-                                        metrics_ref)
-        vcpus_number = metrics_rec['VCPUs_number']
-        vcpus_utils = metrics_rec['VCPUs_utilisation']
-        if len(vcpus_utils) == 0:
-            msg = _("Could not get VM %s CPU Utilization") % instance_name
+        vcpus_number = int(self._call_xenapi("VM.get_VCPUs_max", vm_ref))
+        if vcpus_number <= 0:
+            msg = _("Could not get VM %s CPU number") % instance_name
             raise XenapiException(msg)
-
         utils = 0.0
-        for num in range(int(vcpus_number)):
-            utils += vcpus_utils.get(str(num))
+        for index in range(vcpus_number):
+            utils += float(self._call_xenapi("VM.query_data_source",
+                                             vm_ref,
+                                             "cpu%d" % index))
         utils = utils / int(vcpus_number) * 100
         return virt_inspector.CPUUtilStats(util=utils)
 
