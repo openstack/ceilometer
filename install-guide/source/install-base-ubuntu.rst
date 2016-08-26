@@ -48,7 +48,7 @@ MongoDB before proceeding further.
       If the command fails saying you are not authorized to insert a user,
       you may need to temporarily comment out the ``auth`` option in
       the ``/etc/mongodb.conf`` file, restart the MongoDB service using
-      ``systemctl restart mongodb``, and try calling the command again.
+      ``service mongodb restart``, and try calling the command again.
 
 .. include:: install-base-prereq-common.rst
 
