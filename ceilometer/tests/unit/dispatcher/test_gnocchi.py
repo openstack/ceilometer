@@ -168,6 +168,25 @@ class DispatcherTest(base.BaseTestCase):
     def test_activity_filter_nomatch(self):
         self._do_test_activity_filter(2)
 
+    @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
+                '.batch_measures')
+    def test_unhandled_meter(self, fake_batch):
+        samples = [{
+            'counter_name': 'unknown.meter',
+            'counter_unit': 'GB',
+            'counter_type': 'gauge',
+            'counter_volume': '2',
+            'user_id': 'test_user',
+            'project_id': 'test_project',
+            'source': 'openstack',
+            'timestamp': '2014-05-08 20:23:48.028195',
+            'resource_id': 'randomid',
+            'resource_metadata': {}
+        }]
+        d = gnocchi.GnocchiDispatcher(self.conf.conf)
+        d.record_metering_data(samples)
+        self.assertEqual(0, len(fake_batch.call_args[0][1]))
+
 
 class MockResponse(mock.NonCallableMock):
     def __init__(self, code):

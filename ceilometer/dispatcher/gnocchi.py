@@ -352,7 +352,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
             # because batch_resources_metrics_measures exception
             # returns this id and not the ceilometer one
             gnocchi_id = gnocchi_utils.encode_resource_id(resource_id)
-            res_info = gnocchi_data[gnocchi_id] = {}
+            res_info = {}
             for metric_name, samples in metric_grouped_samples:
                 stats['metrics'] += 1
 
@@ -386,6 +386,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase):
 
                 stats['measures'] += len(measures[gnocchi_id][metric_name])
                 res_info["resource"].update(res_info["resource_extra"])
+                if res_info:
+                    gnocchi_data[gnocchi_id] = res_info
 
         try:
             self.batch_measures(measures, gnocchi_data, stats)
