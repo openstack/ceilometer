@@ -36,11 +36,16 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.CONF.set_override('aodh_is_enabled', True, group='api')
         self.CONF.set_override('aodh_url', 'http://alarm-endpoint:8008/',
                                group='api')
+        self.CONF.set_override('panko_is_enabled', True, group='api')
+        self.CONF.set_override('panko_url', 'http://event-endpoint:8009/',
+                               group='api')
 
     def _setup_keystone_mock(self):
         self.CONF.set_override('gnocchi_is_enabled', None, group='api')
         self.CONF.set_override('aodh_is_enabled', None, group='api')
         self.CONF.set_override('aodh_url', None, group='api')
+        self.CONF.set_override('panko_is_enabled', None, group='api')
+        self.CONF.set_override('panko_url', None, group='api')
         self.CONF.set_override('meter_dispatchers', ['database'])
         self.ks = mock.Mock()
         self.catalog = (self.ks.session.auth.get_access.
@@ -55,6 +60,8 @@ class TestAPIUpgradePath(v2.FunctionalTest):
             return 'http://gnocchi/'
         elif service_type == 'alarming':
             return 'http://alarm-endpoint:8008/'
+        elif service_type == 'event':
+            return 'http://event-endpoint:8009/'
 
     def _do_test_gnocchi_enabled_without_database_backend(self):
         self.CONF.set_override('meter_dispatchers', 'gnocchi')
@@ -62,14 +69,6 @@ class TestAPIUpgradePath(v2.FunctionalTest):
             response = self.app.get(self.PATH_PREFIX + '/' + endpoint,
                                     status=410)
             self.assertIn(b'Gnocchi API', response.body)
-
-        headers_events = {"X-Roles": "admin",
-                          "X-User-Id": "user1",
-                          "X-Project-Id": "project1"}
-        for endpoint in ['events', 'event_types']:
-            self.app.get(self.PATH_PREFIX + '/' + endpoint,
-                         headers=headers_events,
-                         status=200)
 
         response = self.post_json('/query/samples',
                                   params={
@@ -125,6 +124,35 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.assertEqual("http://alarm-endpoint:8008/v2/query/alarms",
                          response.headers['Location'])
 
+    def _do_test_event_redirect(self):
+        response = self.app.get(self.PATH_PREFIX + '/events',
+                                expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://event-endpoint:8009/v2/events",
+                         response.headers['Location'])
+
+        response = self.app.get(self.PATH_PREFIX + '/events/uuid',
+                                expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://event-endpoint:8009/v2/events/uuid",
+                         response.headers['Location'])
+
+        response = self.app.delete(self.PATH_PREFIX + '/events/uuid',
+                                   expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://event-endpoint:8009/v2/events/uuid",
+                         response.headers['Location'])
+
+        response = self.app.get(self.PATH_PREFIX + '/event_types',
+                                expect_errors=True)
+
+        self.assertEqual(307, response.status_code)
+        self.assertEqual("http://event-endpoint:8009/v2/event_types",
+                         response.headers['Location'])
+
     def test_gnocchi_enabled_without_database_backend_keystone(self):
         self._setup_keystone_mock()
         self._do_test_gnocchi_enabled_without_database_backend()
@@ -143,6 +171,16 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.assertEqual([mock.call(service_type="alarming")],
                          self.catalog.url_for.mock_calls)
 
+    def test_event_redirect_keystone(self):
+        self._setup_keystone_mock()
+        self._do_test_event_redirect()
+        self.assertEqual([mock.call(service_type="event")],
+                         self.catalog.url_for.mock_calls)
+
     def test_alarm_redirect_configoptions(self):
         self._setup_osloconfig_options()
         self._do_test_alarm_redirect()
+
+    def test_event_redirect_configoptions(self):
+        self._setup_osloconfig_options()
+        self._do_test_event_redirect()
