@@ -210,7 +210,8 @@ class PartitionCoordinator(object):
             self.join_group(group_id)
         try:
             members = self._get_members(group_id)
-            LOG.debug('Members of group: %s, Me: %s', members, self._my_id)
+            LOG.debug('Members of group %s are: %s, Me: %s',
+                      group_id, members, self._my_id)
             if self._my_id not in members:
                 LOG.warning(_LW('Cannot extract tasks because agent failed to '
                                 'join group properly. Rejoining group.'))
@@ -218,10 +219,14 @@ class PartitionCoordinator(object):
                 members = self._get_members(group_id)
                 if self._my_id not in members:
                     raise MemberNotInGroupError(group_id, members, self._my_id)
+                LOG.debug('Members of group %s are: %s, Me: %s',
+                          group_id, members, self._my_id)
             hr = utils.HashRing(members)
+            iterable = list(iterable)
             filtered = [v for v in iterable
                         if hr.get_node(str(v)) == self._my_id]
-            LOG.debug('My subset: %s', [str(f) for f in filtered])
+            LOG.debug('The universal set: %s, my subset: %s',
+                      [str(f) for f in iterable], [str(f) for f in filtered])
             return filtered
         except tooz.coordination.ToozError:
             LOG.exception(_LE('Error getting group membership info from '
