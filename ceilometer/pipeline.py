@@ -703,7 +703,7 @@ class PipelineManager(object):
 
         unique_names = set()
         sources = []
-        for s in cfg.get('sources', []):
+        for s in cfg.get('sources'):
             name = s.get('name')
             if name in unique_names:
                 raise PipelineException("Duplicated source names: %s" %
@@ -714,7 +714,7 @@ class PipelineManager(object):
         unique_names.clear()
 
         sinks = {}
-        for s in cfg.get('sinks', []):
+        for s in cfg.get('sinks'):
             name = s.get('name')
             if name in unique_names:
                 raise PipelineException("Duplicated sink names: %s" %
@@ -764,7 +764,7 @@ class PollingManager(object):
         LOG.info(_LI('detected decoupled pipeline config format'))
 
         unique_names = set()
-        for s in cfg.get('sources', []):
+        for s in cfg.get('sources'):
             name = s.get('name')
             if name in unique_names:
                 raise PipelineException("Duplicated source names: %s" %
