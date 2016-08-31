@@ -76,7 +76,7 @@ Pollster
 Compute plugins are defined as subclasses of the
 :class:`ceilometer.compute.pollsters.BaseComputePollster` class as defined in
 the ``ceilometer/compute/pollsters/__init__.py`` file. Pollsters must implement
-one method: ``get_samples(self, manager, context)``, which returns a
+one method: ``get_samples(self, manager, cache, resources)``, which returns a
 sequence of ``Sample`` objects as defined in the
 ``ceilometer/sample.py`` file.
 
