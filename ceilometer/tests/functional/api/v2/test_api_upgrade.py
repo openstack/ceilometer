@@ -156,10 +156,8 @@ class TestAPIUpgradePath(v2.FunctionalTest):
     def test_gnocchi_enabled_without_database_backend_keystone(self):
         self._setup_keystone_mock()
         self._do_test_gnocchi_enabled_without_database_backend()
-        self.catalog.url_for.assert_has_calls([
-            mock.call(service_type="alarming"),
-            mock.call(service_type="metric")],
-            any_order=True)
+        self.catalog.url_for.assert_has_calls(
+            [mock.call(service_type="metric")])
 
     def test_gnocchi_enabled_without_database_backend_configoptions(self):
         self._setup_osloconfig_options()
@@ -168,14 +166,14 @@ class TestAPIUpgradePath(v2.FunctionalTest):
     def test_alarm_redirect_keystone(self):
         self._setup_keystone_mock()
         self._do_test_alarm_redirect()
-        self.assertEqual([mock.call(service_type="alarming")],
-                         self.catalog.url_for.mock_calls)
+        self.catalog.url_for.assert_has_calls(
+            [mock.call(service_type="alarming")])
 
     def test_event_redirect_keystone(self):
         self._setup_keystone_mock()
         self._do_test_event_redirect()
-        self.assertEqual([mock.call(service_type="event")],
-                         self.catalog.url_for.mock_calls)
+        self.catalog.url_for.assert_has_calls(
+            [mock.call(service_type="event")])
 
     def test_alarm_redirect_configoptions(self):
         self._setup_osloconfig_options()
