@@ -42,7 +42,8 @@ OPTS = [
                min=1,
                help='Number of queues to parallelize workload across. This '
                     'value should be larger than the number of active '
-                    'notification agents for optimal results.'),
+                    'notification agents for optimal results. WARNING: '
+                    'Once set, lowering this value may result in lost data.'),
     cfg.BoolOpt('ack_on_event_error',
                 default=True,
                 deprecated_group='collector',

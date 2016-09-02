@@ -176,6 +176,31 @@ The default configuration can be found in `pipeline.yaml`_.
 
 .. _pipeline.yaml: https://git.openstack.org/cgit/openstack/ceilometer/tree/etc/ceilometer/pipeline.yaml
 
+Pipeline Processing
+-------------------
+
+On large workloads, multiple notification agents can be deployed to handle the
+flood of incoming messages from monitored services. If transformations are
+enabled in the pipeline, the notification agents must be coordinated to ensure
+related messages are routed to the same agent. To enable coordination, set the
+``workload_partitioning`` value in ``notification`` section.
+
+To distribute messages across agents, ``pipeline_processing_queues`` option
+should be set. This value defines how many pipeline queues to create which will
+then be distributed to the active notification agents. It is recommended that
+the number of processing queues, at the very least, match the number of agents.
+
+.. note::
+
+   Increasing the number of processing queues will improve the distribution
+   of messages across the agents.
+
+.. warning::
+
+   Decreasing the number of processing queues may result in lost data as any
+   previously created queues may no longer be assigned to active agents. It
+   is only recommended that you **increase** processing queues.
+
 Publishers
 ++++++++++
 
