@@ -1,0 +1,4 @@
+---
+deprecations:
+  - The Kwapi pollsters are deprecated and will be removed in the next major
+    version of Ceilometer.
