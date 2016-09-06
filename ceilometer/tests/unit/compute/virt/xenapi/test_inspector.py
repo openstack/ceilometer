@@ -19,6 +19,7 @@ from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector
+from ceilometer.tests.unit.compute.virt.xenapi import fake_XenAPI
 
 
 class TestSwapXapiHost(base.BaseTestCase):
@@ -81,25 +82,59 @@ class TestXenapiInspection(base.BaseTestCase):
     def test_inspect_memory_usage(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
                          'id': 'fake_instance_id'}
-        fake_stat = virt_inspector.MemoryUsageStats(usage=128)
+        fake_stat = virt_inspector.MemoryUsageStats(usage=64)
 
-        def fake_xenapi_request(method, args):
-            metrics_rec = {
-                'memory_actual': '134217728',
-            }
+        def _fake_xenapi_request(method, args):
+            fake_total_mem = 134217728.0
+            fake_free_mem = 65536.0
 
             if method == 'VM.get_by_name_label':
                 return ['vm_ref']
-            elif method == 'VM.get_metrics':
-                return 'metrics_ref'
-            elif method == 'VM_metrics.get_record':
-                return metrics_rec
+            elif method == 'VM.query_data_source':
+                if 'memory' in args:
+                    return fake_total_mem
+                elif 'memory_internal_free' in args:
+                    return fake_free_mem
+                else:
+                    return None
             else:
                 return None
 
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
-                               side_effect=fake_xenapi_request):
+                               side_effect=_fake_xenapi_request):
+            memory_stat = self.inspector.inspect_memory_usage(fake_instance)
+            self.assertEqual(fake_stat, memory_stat)
+
+    def test_inspect_memory_usage_without_freeMem(self):
+        fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
+                         'id': 'fake_instance_id'}
+        fake_stat = virt_inspector.MemoryUsageStats(usage=128)
+
+        def _fake_xenapi_request(method, args):
+            if xenapi_inspector.api is None:
+                # the XenAPI may not exist in the test environment.
+                # In that case, we use the fake XenAPI for testing.
+                xenapi_inspector.api = fake_XenAPI
+            fake_total_mem = 134217728.0
+            fake_details = ['INTERNAL_ERROR',
+                            'Rrd.Invalid_data_source("memory_internal_free")']
+
+            if method == 'VM.get_by_name_label':
+                return ['vm_ref']
+            elif method == 'VM.query_data_source':
+                if 'memory' in args:
+                    return fake_total_mem
+                elif 'memory_internal_free' in args:
+                    raise xenapi_inspector.api.Failure(fake_details)
+                else:
+                    return None
+            else:
+                return None
+
+        session = self.inspector.session
+        with mock.patch.object(session, 'xenapi_request',
+                               side_effect=_fake_xenapi_request):
             memory_stat = self.inspector.inspect_memory_usage(fake_instance)
             self.assertEqual(fake_stat, memory_stat)
 

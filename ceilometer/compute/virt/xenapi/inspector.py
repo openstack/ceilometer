@@ -135,12 +135,23 @@ class XenapiInspector(virt_inspector.Inspector):
     def inspect_memory_usage(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
-        metrics_ref = self._call_xenapi("VM.get_metrics", vm_ref)
-        metrics_rec = self._call_xenapi("VM_metrics.get_record",
-                                        metrics_ref)
-        # Stat provided from XenServer is in B, converting it to MB.
-        memory = int(metrics_rec['memory_actual']) / units.Mi
-        return virt_inspector.MemoryUsageStats(usage=memory)
+        total_mem = float(self._call_xenapi("VM.query_data_source",
+                                            vm_ref,
+                                            "memory"))
+        try:
+            free_mem = float(self._call_xenapi("VM.query_data_source",
+                                               vm_ref,
+                                               "memory_internal_free"))
+        except api.Failure:
+            # If PV tools is not installed in the guest instance, it's
+            # impossible to get free memory. So give it a default value
+            # as 0.
+            free_mem = 0
+        # memory provided from XenServer is in Bytes;
+        # memory_internal_free provided from XenServer is in KB,
+        # converting it to MB.
+        memory_usage = (total_mem - free_mem * units.Ki) / units.Mi
+        return virt_inspector.MemoryUsageStats(usage=memory_usage)
 
     def inspect_vnic_rates(self, instance, duration=None):
         instance_name = util.instance_name(instance)
