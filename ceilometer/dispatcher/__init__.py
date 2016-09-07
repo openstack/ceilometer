@@ -31,7 +31,7 @@ OPTS = [
                     default=['database'],
                     help='Dispatchers to process metering data.'),
     cfg.MultiStrOpt('event_dispatchers',
-                    default=['database'],
+                    default=[],
                     deprecated_name='dispatcher',
                     help='Dispatchers to process event data.'),
 ]

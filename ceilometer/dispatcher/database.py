@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from debtcollector import removals
 from oslo_log import log
 from oslo_utils import timeutils
 
@@ -79,6 +80,9 @@ class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase,
             raise
 
 
+@removals.removed_class("EventDatabaseDispatcher",
+                        message="Use panko instead",
+                        removal_version="8.0.0")
 class EventDatabaseDispatcher(dispatcher.EventDispatcherBase,
                               DatabaseDispatcher):
     CONNECTION_TYPE = 'event'
