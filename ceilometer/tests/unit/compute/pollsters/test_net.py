@@ -49,7 +49,9 @@ class TestNetPollster(base.TestPollsterBase):
                             projnet='proj1',
                             dhcp_server='10.0.0.1'))
         stats0 = virt_inspector.InterfaceStats(rx_bytes=1, rx_packets=2,
-                                               tx_bytes=3, tx_packets=4)
+                                               rx_drop=20, rx_errors=21,
+                                               tx_bytes=3, tx_packets=4,
+                                               tx_drop=22, tx_errors=23)
         self.vnic1 = virt_inspector.Interface(
             name='vnet1',
             fref='fa163e71ec6f',
@@ -59,7 +61,9 @@ class TestNetPollster(base.TestPollsterBase):
                             projnet='proj2',
                             dhcp_server='10.0.0.2'))
         stats1 = virt_inspector.InterfaceStats(rx_bytes=5, rx_packets=6,
-                                               tx_bytes=7, tx_packets=8)
+                                               rx_drop=24, rx_errors=25,
+                                               tx_bytes=7, tx_packets=8,
+                                               tx_drop=26, tx_errors=27)
         self.vnic2 = virt_inspector.Interface(
             name='vnet2',
             fref=None,
@@ -69,7 +73,9 @@ class TestNetPollster(base.TestPollsterBase):
                             projnet='proj3',
                             dhcp_server='10.0.0.3'))
         stats2 = virt_inspector.InterfaceStats(rx_bytes=9, rx_packets=10,
-                                               tx_bytes=11, tx_packets=12)
+                                               rx_drop=28, rx_errors=29,
+                                               tx_bytes=11, tx_packets=12,
+                                               tx_drop=30, tx_errors=31)
 
         vnics = [
             (self.vnic0, stats0),
@@ -175,6 +181,50 @@ class TestNetPollster(base.TestPollsterBase):
              ],
         )
 
+    def test_incoming_drops(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.IncomingDropPollster,
+            [('10.0.0.2', 20, self.vnic0.fref),
+             ('192.168.0.3', 24, self.vnic1.fref),
+             ('192.168.0.4', 28,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+        )
+
+    def test_outgoing_drops(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.OutgoingDropPollster,
+            [('10.0.0.2', 22, self.vnic0.fref),
+             ('192.168.0.3', 26, self.vnic1.fref),
+             ('192.168.0.4', 30,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+        )
+
+    def test_incoming_errors(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.IncomingErrorsPollster,
+            [('10.0.0.2', 21, self.vnic0.fref),
+             ('192.168.0.3', 25, self.vnic1.fref),
+             ('192.168.0.4', 29,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+        )
+
+    def test_outgoing_errors(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.OutgoingErrorsPollster,
+            [('10.0.0.2', 23, self.vnic0.fref),
+             ('192.168.0.3', 27, self.vnic1.fref),
+             ('192.168.0.4', 31,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+        )
+
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_metadata(self):
         factory = net.OutgoingBytesPollster
@@ -206,7 +256,9 @@ class TestNetPollsterCache(base.TestPollsterBase):
                             projnet='proj1',
                             dhcp_server='10.0.0.1'))
         stats0 = virt_inspector.InterfaceStats(rx_bytes=1, rx_packets=2,
-                                               tx_bytes=3, tx_packets=4)
+                                               rx_drop=20, rx_errors=21,
+                                               tx_bytes=3, tx_packets=4,
+                                               tx_drop=22, tx_errors=23)
         vnics = [(vnic0, stats0)]
 
         mgr = manager.AgentManager()
@@ -230,6 +282,18 @@ class TestNetPollsterCache(base.TestPollsterBase):
 
     def test_outgoing_packets(self):
         self._check_get_samples_cache(net.OutgoingPacketsPollster)
+
+    def test_incoming_drops(self):
+        self._check_get_samples_cache(net.IncomingDropPollster)
+
+    def test_outgoing_drops(self):
+        self._check_get_samples_cache(net.OutgoingDropPollster)
+
+    def test_incoming_errors(self):
+        self._check_get_samples_cache(net.IncomingErrorsPollster)
+
+    def test_outgoing_errors(self):
+        self._check_get_samples_cache(net.OutgoingErrorsPollster)
 
 
 class TestNetRatesPollster(base.TestPollsterBase):
