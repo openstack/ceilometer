@@ -15,12 +15,12 @@
 """Tests for Ceilometer notify daemon."""
 
 import shutil
+import time
 
 import mock
 from oslo_config import fixture as fixture_config
 import oslo_messaging
 from oslo_utils import fileutils
-from oslo_utils import timeutils
 import six
 from stevedore import extension
 import yaml
@@ -252,8 +252,8 @@ class BaseRealNotification(tests_base.BaseTestCase):
                                           "compute.vagrant-precise")
         notifier.info({}, 'compute.instance.create.end',
                       TEST_NOTICE_PAYLOAD)
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+        start = time.time()
+        while time.time() - start < 60:
             if (len(self.publisher.samples) >= self.expected_samples and
                     len(self.publisher.events) >= self.expected_events):
                 break
@@ -287,7 +287,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.srv.run()
         self.addCleanup(self.srv.terminate)
 
-        pipeline = self.srv.pipe_manager
+        pipeline = self.srv.pipeline_hash
 
         # Modify the collection targets
         updated_pipeline_cfg_file = self.setup_pipeline(['vcpus',
@@ -295,9 +295,12 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         # Move/rename the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
-        self.srv.refresh_pipeline()
-
-        self.assertNotEqual(pipeline, self.srv.pipe_manager)
+        start = time.time()
+        while time.time() - start < 10:
+            if pipeline != self.srv.pipeline_hash:
+                break
+        else:
+            self.fail("Pipeline failed to reload")
 
     def test_notification_reloaded_event_pipeline(self):
         ev_pipeline_cfg_file = self.setup_event_pipeline(
@@ -309,7 +312,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.srv.run()
         self.addCleanup(self.srv.terminate)
 
-        pipeline = self.srv.event_pipe_manager
+        pipeline = self.srv.event_pipeline_hash
 
         # Modify the collection targets
         updated_ev_pipeline_cfg_file = self.setup_event_pipeline(
@@ -318,9 +321,12 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         # Move/rename the updated pipeline file to the original pipeline
         # file path as recorded in oslo config
         shutil.move(updated_ev_pipeline_cfg_file, ev_pipeline_cfg_file)
-        self.srv.refresh_pipeline()
-
-        self.assertNotEqual(pipeline, self.srv.pipe_manager)
+        start = time.time()
+        while time.time() - start < 10:
+            if pipeline != self.srv.event_pipeline_hash:
+                break
+        else:
+            self.fail("Pipeline failed to reload")
 
 
 class TestRealNotification(BaseRealNotification):
@@ -343,8 +349,8 @@ class TestRealNotification(BaseRealNotification):
                                           'compute.vagrant-precise')
         notifier.error({}, 'compute.instance.error',
                        TEST_NOTICE_PAYLOAD)
-        start = timeutils.utcnow()
-        while timeutils.delta_seconds(start, timeutils.utcnow()) < 600:
+        start = time.time()
+        while time.time() - start < 60:
             if len(self.publisher.events) >= self.expected_events:
                 break
         self.assertEqual(self.expected_events, len(self.publisher.events))
@@ -543,9 +549,9 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         payload2['instance_id'] = '1'
         notifier.info({}, 'compute.instance.create.end', payload2)
         self.expected_samples = 4
-        start = timeutils.utcnow()
         with mock.patch('six.moves.builtins.hash', lambda x: int(x)):
-            while timeutils.delta_seconds(start, timeutils.utcnow()) < 60:
+            start = time.time()
+            while time.time() - start < 60:
                 if (len(self.publisher.samples + self.publisher2.samples) >=
                         self.expected_samples):
                     break
