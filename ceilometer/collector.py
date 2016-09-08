@@ -61,9 +61,8 @@ LOG = log.getLogger(__name__)
 
 class CollectorService(cotyledon.Service):
     """Listener for the collector service."""
-    def run(self):
-        """Bind the UDP socket and handle incoming data."""
-        super(CollectorService, self).run()
+    def __init__(self, worker_id):
+        super(CollectorService, self).__init__(worker_id)
         # ensure dispatcher is configured before starting other services
         dispatcher_managers = dispatcher.load_dispatcher_manager()
         (self.meter_manager, self.event_manager) = dispatcher_managers
@@ -71,6 +70,7 @@ class CollectorService(cotyledon.Service):
         self.event_listener = None
         self.udp_thread = None
 
+    def run(self):
         if cfg.CONF.collector.udp_address:
             self.udp_thread = utils.spawn_thread(self.start_udp)
 
