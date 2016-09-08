@@ -21,6 +21,11 @@ try:
 except ImportError:
     api = None
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.i18n import _
@@ -97,13 +102,28 @@ class XenapiInspector(virt_inspector.Inspector):
     def __init__(self, conf):
         super(XenapiInspector, self).__init__(conf)
         self.session = get_api_session(self.conf)
+        self.host_ref = self._get_host_ref()
+        self.host_uuid = self._get_host_uuid()
 
     def _get_host_ref(self):
         """Return the xenapi host on which nova-compute runs on."""
         return self.session.xenapi.session.get_this_host(self.session.handle)
 
+    def _get_host_uuid(self):
+        return self.session.xenapi.host.get_uuid(self.host_ref)
+
     def _call_xenapi(self, method, *args):
         return self.session.xenapi_request(method, args)
+
+    def _call_plugin(self, plugin, fn, args):
+        args['host_uuid'] = self.host_uuid
+        return self.session.xenapi.host.call_plugin(
+            self.host_ref, plugin, fn, args)
+
+    def _call_plugin_serialized(self, plugin, fn, *args, **kwargs):
+        params = {'params': pickle.dumps(dict(args=args, kwargs=kwargs))}
+        rv = self._call_plugin(plugin, fn, params)
+        return pickle.loads(rv)
 
     def _lookup_by_name(self, instance_name):
         vm_refs = self._call_xenapi("VM.get_by_name_label", instance_name)
@@ -152,6 +172,31 @@ class XenapiInspector(virt_inspector.Inspector):
         # converting it to MB.
         memory_usage = (total_mem - free_mem * units.Ki) / units.Mi
         return virt_inspector.MemoryUsageStats(usage=memory_usage)
+
+    def inspect_vnics(self, instance):
+        instance_name = util.instance_name(instance)
+        vm_ref = self._lookup_by_name(instance_name)
+        dom_id = self._call_xenapi("VM.get_domid", vm_ref)
+        vif_refs = self._call_xenapi("VM.get_VIFs", vm_ref)
+        bw_all = self._call_plugin_serialized('bandwidth',
+                                              'fetch_all_bandwidth')
+        for vif_ref in vif_refs or []:
+            vif_rec = self._call_xenapi("VIF.get_record", vif_ref)
+
+            interface = virt_inspector.Interface(
+                name=vif_rec['uuid'],
+                mac=vif_rec['MAC'],
+                fref=None,
+                parameters=None)
+            bw_vif = bw_all[dom_id][vif_rec['device']]
+
+            # TODO(jianghuaw): Currently the plugin can only support
+            # rx_bytes and tx_bytes, so temporarily set others as -1.
+            stats = virt_inspector.InterfaceStats(
+                rx_bytes=bw_vif['bw_in'], rx_packets=-1, rx_drop=-1,
+                rx_errors=-1, tx_bytes=bw_vif['bw_out'], tx_packets=-1,
+                tx_drop=-1, tx_errors=-1)
+            yield (interface, stats)
 
     def inspect_vnic_rates(self, instance, duration=None):
         instance_name = util.instance_name(instance)
