@@ -119,7 +119,7 @@ Delete alarm
 
 Deletes an alarm, by alarm ID.
 
-Error response codes:204
+Normal response codes:204
 
 
 Request
