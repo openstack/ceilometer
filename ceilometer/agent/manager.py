@@ -383,11 +383,6 @@ class AgentManager(service_base.PipelineBasedService):
                 if discovery_group_id else None)
 
     def start_polling_tasks(self):
-        # NOTE(sileht): 1000 is just the same as previous oslo_service code
-        self.polling_periodics = periodics.PeriodicWorker.create(
-            [], executor_factory=lambda:
-            futures.ThreadPoolExecutor(max_workers=1000))
-
         # allow time for coordination if necessary
         delay_start = self.partition_coordinator.is_active()
 
@@ -396,6 +391,12 @@ class AgentManager(service_base.PipelineBasedService):
             0, cfg.CONF.shuffle_time_before_polling_task)
 
         data = self.setup_polling_tasks()
+
+        # One thread per polling tasks is enough
+        self.polling_periodics = periodics.PeriodicWorker.create(
+            [], executor_factory=lambda:
+            futures.ThreadPoolExecutor(max_workers=len(data)))
+
         for interval, polling_task in data.items():
             delay_time = (interval + delay_polling_time if delay_start
                           else delay_polling_time)
