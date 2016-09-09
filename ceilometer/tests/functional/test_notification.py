@@ -90,7 +90,6 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("backend_url", None, group="coordination")
-        self.CONF.set_override("store_events", False, group="notification")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
         self.setup_messaging(self.CONF)
@@ -111,6 +110,7 @@ class TestNotification(tests_base.BaseTestCase):
     @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
     def _do_process_notification_manager_start(self,
                                                fake_event_endpoint_class):
+        self.CONF([], project='ceilometer', validate_default_values=True)
         with mock.patch.object(self.srv,
                                '_get_notifications_manager') as get_nm:
             get_nm.side_effect = self.fake_get_notifications_manager
@@ -134,18 +134,10 @@ class TestNotification(tests_base.BaseTestCase):
                            'payload': TEST_NOTICE_PAYLOAD,
                            'metadata': TEST_NOTICE_METADATA}])
 
-        self.assertEqual(1, len(self.srv.listeners[0].dispatcher.endpoints))
-        self.assertTrue(self.srv.pipeline_manager.publisher.called)
-
-    def test_process_notification_no_events(self):
-        self._do_process_notification_manager_start()
-        self.assertEqual(1, len(self.srv.listeners[0].dispatcher.endpoints))
-        self.assertNotEqual(self.fake_event_endpoint,
-                            self.srv.listeners[0].dispatcher.endpoints[0])
+        self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
 
     @mock.patch('ceilometer.pipeline.setup_event_pipeline', mock.MagicMock())
     def test_process_notification_with_events(self):
-        self.CONF.set_override("store_events", True, group="notification")
         self._do_process_notification_manager_start()
         self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
         self.assertEqual(self.fake_event_endpoint,
@@ -161,15 +153,14 @@ class TestNotification(tests_base.BaseTestCase):
                 [extension.Extension('test', None, None, plugin),
                  extension.Extension('test', None, None, plugin)])
 
+        self.CONF([], project='ceilometer', validate_default_values=True)
         with mock.patch.object(self.srv,
                                '_get_notifications_manager') as get_nm:
             get_nm.side_effect = fake_get_notifications_manager_dup_targets
             self.srv.run()
             self.addCleanup(self.srv.terminate)
-            self.assertEqual(1, len(mock_listener.call_args_list))
+            self.assertEqual(2, len(mock_listener.call_args_list))
             args, kwargs = mock_listener.call_args
-            self.assertEqual(1, len(args[1]))
-            self.assertIsInstance(args[1][0], oslo_messaging.Target)
             self.assertEqual(1, len(self.srv.listeners))
 
 
@@ -228,7 +219,6 @@ class BaseRealNotification(tests_base.BaseTestCase):
         self.expected_samples = 2
 
         self.CONF.set_override("backend_url", None, group="coordination")
-        self.CONF.set_override("store_events", True, group="notification")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
 
@@ -306,8 +296,6 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         ev_pipeline_cfg_file = self.setup_event_pipeline(
             ['compute.instance.create.start'])
         self.CONF.set_override("event_pipeline_cfg_file", ev_pipeline_cfg_file)
-
-        self.CONF.set_override("store_events", True, group="notification")
 
         self.srv.run()
         self.addCleanup(self.srv.terminate)
@@ -516,7 +504,6 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
         self.CONF.set_override("backend_url", None, group="coordination")
-        self.CONF.set_override("store_events", False, group="notification")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
         self.CONF.set_override('workload_partitioning', True,

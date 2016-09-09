@@ -233,5 +233,4 @@ class TestCollector(tests_base.BaseTestCase):
 
     @mock.patch.object(collector.CollectorService, 'start_udp', mock.Mock())
     def test_collector_event_requeue(self):
-        self.CONF.set_override('store_events', True, group='notification')
         self._test_collector_requeue('event_listener')

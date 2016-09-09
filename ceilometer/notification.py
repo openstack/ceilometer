@@ -47,10 +47,6 @@ OPTS = [
                 default=True,
                 deprecated_group='collector',
                 help='Acknowledge message when event persistence fails.'),
-    cfg.BoolOpt('store_events',
-                deprecated_group='collector',
-                default=False,
-                help='Save event details.'),
     cfg.BoolOpt('disable_non_metric_meters',
                 default=True,
                 help='WARNING: Ceilometer historically offered the ability to '
@@ -133,18 +129,16 @@ class NotificationService(service_base.PipelineBasedService):
         return pipe_manager
 
     def _get_event_pipeline_manager(self, transport):
+        if cfg.CONF.notification.workload_partitioning:
+            event_pipe_manager = pipeline.EventPipelineTransportManager()
+            for pipe in self.event_pipeline_manager.pipelines:
+                event_pipe_manager.add_transporter(
+                    (pipe.source.support_event, ['event_type'],
+                     self._get_notifiers(transport, pipe)))
+        else:
+            event_pipe_manager = self.event_pipeline_manager
 
-        if cfg.CONF.notification.store_events:
-            if cfg.CONF.notification.workload_partitioning:
-                event_pipe_manager = pipeline.EventPipelineTransportManager()
-                for pipe in self.event_pipeline_manager.pipelines:
-                    event_pipe_manager.add_transporter(
-                        (pipe.source.support_event, ['event_type'],
-                         self._get_notifiers(transport, pipe)))
-            else:
-                event_pipe_manager = self.event_pipeline_manager
-
-            return event_pipe_manager
+        return event_pipe_manager
 
     def run(self):
         super(NotificationService, self).run()
@@ -161,8 +155,7 @@ class NotificationService(service_base.PipelineBasedService):
 
         self.pipeline_manager = pipeline.setup_pipeline()
 
-        if cfg.CONF.notification.store_events:
-            self.event_pipeline_manager = pipeline.setup_event_pipeline()
+        self.event_pipeline_manager = pipeline.setup_event_pipeline()
 
         self.transport = messaging.get_transport()
 
@@ -232,9 +225,8 @@ class NotificationService(service_base.PipelineBasedService):
         ack_on_error = cfg.CONF.notification.ack_on_event_error
 
         endpoints = []
-        if cfg.CONF.notification.store_events:
-            endpoints.append(
-                event_endpoint.EventsNotificationEndpoint(event_pipe_manager))
+        endpoints.append(
+            event_endpoint.EventsNotificationEndpoint(event_pipe_manager))
 
         targets = []
         for ext in notification_manager:
@@ -274,9 +266,7 @@ class NotificationService(service_base.PipelineBasedService):
             self._configure_pipeline_listener()
 
     def _configure_pipeline_listener(self):
-        ev_pipes = []
-        if cfg.CONF.notification.store_events:
-            ev_pipes = self.event_pipeline_manager.pipelines
+        ev_pipes = self.event_pipeline_manager.pipelines
         pipelines = self.pipeline_manager.pipelines + ev_pipes
         transport = messaging.get_transport()
         partitioned = self.partition_coordinator.extract_my_subset(

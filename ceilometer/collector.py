@@ -52,8 +52,6 @@ cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')
 cfg.CONF.import_opt('event_topic', 'ceilometer.publisher.messaging',
                     group='publisher_notifier')
-cfg.CONF.import_opt('store_events', 'ceilometer.notification',
-                    group='notification')
 
 
 LOG = log.getLogger(__name__)
@@ -89,7 +87,7 @@ class CollectorService(cotyledon.Service):
                         batch_timeout=cfg.CONF.collector.batch_timeout))
                 self.sample_listener.start()
 
-            if cfg.CONF.notification.store_events and list(self.event_manager):
+            if list(self.event_manager):
                 event_target = oslo_messaging.Target(
                     topic=cfg.CONF.publisher_notifier.event_topic)
                 self.event_listener = (

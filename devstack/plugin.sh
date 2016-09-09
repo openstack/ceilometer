@@ -36,7 +36,6 @@
 #   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 600.
 #   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'es')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
-#   CEILOMETER_EVENTS:             Set to True to enable event collection
 #   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
 
 # Save trace setting
@@ -251,9 +250,7 @@ function _ceilometer_configure_storage_backend {
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         gnocchi_url=$(gnocchi_service_url)
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
-        # FIXME(sileht): We shouldn't load event_dispatchers if store_event is False
         iniset $CEILOMETER_CONF DEFAULT event_dispatchers ""
-        iniset $CEILOMETER_CONF notification store_events False
         # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
         iniset $CEILOMETER_CONF storage max_retries 20
         # NOTE(gordc): set batching to better handle recording on a slow machine
@@ -326,8 +323,6 @@ function configure_ceilometer {
     iniset $CEILOMETER_CONF service_credentials auth_url $KEYSTONE_SERVICE_URI
 
     configure_auth_token_middleware $CEILOMETER_CONF ceilometer $CEILOMETER_AUTH_CACHE_DIR
-
-    iniset $CEILOMETER_CONF notification store_events $CEILOMETER_EVENTS
 
     # Configure storage
     if is_service_enabled ceilometer-collector ceilometer-api; then
