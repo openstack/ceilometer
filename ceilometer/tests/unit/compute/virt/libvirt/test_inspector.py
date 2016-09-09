@@ -386,6 +386,25 @@ class TestLibvirtInspection(base.BaseTestCase):
                     self.assertEqual(1892352, mb.total)
                     self.assertEqual(1802240, mb.local)
 
+    def test_inspect_perf_events(self):
+        fake_stats = [({}, {'perf.cpu_cycles': 7259361,
+                            'perf.instructions': 8815623,
+                            'perf.cache_references': 74184,
+                            'perf.cache_misses': 16737})]
+        connection = self.inspector.connection
+        with mock.patch.object(connection, 'lookupByUUIDString',
+                               return_value=self.domain):
+            with mock.patch.object(self.domain, 'info',
+                                   return_value=(0, 0, 51200,
+                                                 2, 999999)):
+                with mock.patch.object(connection, 'domainListGetStats',
+                                       return_value=fake_stats):
+                    pe = self.inspector.inspect_perf_events(self.instance)
+                    self.assertEqual(7259361, pe.cpu_cycles)
+                    self.assertEqual(8815623, pe.instructions)
+                    self.assertEqual(74184, pe.cache_references)
+                    self.assertEqual(16737, pe.cache_misses)
+
 
 class TestLibvirtInspectionWithError(base.BaseTestCase):
 

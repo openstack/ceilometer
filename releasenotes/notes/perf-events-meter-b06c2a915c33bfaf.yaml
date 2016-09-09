@@ -1,0 +1,6 @@
+---
+features:
+  - Add four new meters, including perf.cpu.cycles for the number
+    of cpu cycles one instruction needs, perf.instructions for the
+    count of instructions, perf.cache_references for the count of
+    cache hits and cache_misses for the count of caches misses.

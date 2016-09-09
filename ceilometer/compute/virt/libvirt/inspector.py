@@ -22,7 +22,7 @@ import six
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _LW, _
+from ceilometer.i18n import _LW, _LE, _
 
 libvirt = None
 
@@ -277,5 +277,33 @@ class LibvirtInspector(virt_inspector.Inspector):
         except libvirt.libvirtError as e:
             msg = _('Failed to inspect memory bandwidth of %(instance_uuid)s, '
                     'can not get info from libvirt: %(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)
+
+    def inspect_perf_events(self, instance, duration=None):
+        domain = self._get_domain_not_shut_off_or_raise(instance)
+
+        try:
+            stats = self.connection.domainListGetStats(
+                [domain], libvirt.VIR_DOMAIN_STATS_PERF)
+            perf = stats[0][1]
+            return virt_inspector.PerfEventsStats(
+                cpu_cycles=perf["perf.cpu_cycles"],
+                instructions=perf["perf.instructions"],
+                cache_references=perf["perf.cache_references"],
+                cache_misses=perf["perf.cache_misses"])
+        except AttributeError as e:
+            msg = _LE('Perf is not supported by current version of libvirt, '
+                      'and failed to inspect perf events of '
+                      '%(instance_uuid)s, can not get info from libvirt: '
+                      '%(error)s') % {
+                'instance_uuid': instance.id, 'error': e}
+            raise virt_inspector.NoDataException(msg)
+        # domainListGetStats might launch an exception if the method or
+        # mbmt/mbml perf event is not supported by the underlying hypervisor
+        # being used by libvirt.
+        except libvirt.libvirtError as e:
+            msg = _LE('Failed to inspect perf events of %(instance_uuid)s, '
+                      'can not get info from libvirt: %(error)s') % {
                 'instance_uuid': instance.id, 'error': e}
             raise virt_inspector.NoDataException(msg)
