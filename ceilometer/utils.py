@@ -76,7 +76,7 @@ def decode_unicode(input):
         # the tuple would become list. So we have to generate the value as
         # list here.
         return [decode_unicode(element) for element in input]
-    elif six.PY2 and isinstance(input, six.text_type):
+    elif isinstance(input, six.text_type):
         return input.encode('utf-8')
     elif six.PY3 and isinstance(input, six.binary_type):
         return input.decode('utf-8')
@@ -237,7 +237,8 @@ class HashRing(object):
     @staticmethod
     def _hash(key):
         return struct.unpack_from('>I',
-                                  hashlib.md5(str(key).encode()).digest())[0]
+                                  hashlib.md5(decode_unicode(six
+                                              .text_type(key))).digest())[0]
 
     def _get_position_on_ring(self, key):
         hashed_key = self._hash(key)
