@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import six
 import uuid
 
 from oslo_config import cfg
@@ -224,9 +225,10 @@ class PartitionCoordinator(object):
             hr = utils.HashRing(members)
             iterable = list(iterable)
             filtered = [v for v in iterable
-                        if hr.get_node(str(v)) == self._my_id]
+                        if hr.get_node(six.text_type(v)) == self._my_id]
             LOG.debug('The universal set: %s, my subset: %s',
-                      [str(f) for f in iterable], [str(f) for f in filtered])
+                      [six.text_type(f) for f in iterable],
+                      [six.text_type(f) for f in filtered])
             return filtered
         except tooz.coordination.ToozError:
             LOG.exception(_LE('Error getting group membership info from '
