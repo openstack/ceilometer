@@ -111,12 +111,12 @@ class HttpPublisher(publisher.PublisherBase):
         content = ','.join([jsonutils.dumps(item) for item in data])
         content = '[' + content + ']'
 
-        LOG.debug('Data to be posted by HttpPublisher: %s' % content)
+        LOG.debug('Data to be posted by HttpPublisher: %s', content)
 
         res = session.post(self.target, data=content, headers=self.headers,
                            timeout=self.timeout)
         if res.status_code >= 300:
-            LOG.error(_LE('Data post failed with status code %s') %
+            LOG.error(_LE('Data post failed with status code %s'),
                       res.status_code)
 
     def publish_samples(self, samples):
