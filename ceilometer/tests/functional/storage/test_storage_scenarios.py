@@ -605,7 +605,7 @@ class RawSampleTest(DBTestBase):
     @tests_db.run_with('sqlite', 'mysql', 'pgsql')
     def test_clear_metering_data_expire_samples_only(self):
 
-        cfg.CONF.set_override('sql_expire_samples_only', True)
+        cfg.CONF.set_override('sql_expire_samples_only', True, 'database')
         self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(4 * 60)
         f = storage.SampleFilter(meter='instance')

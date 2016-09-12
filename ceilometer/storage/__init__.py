@@ -47,20 +47,15 @@ OPTS = [
                secret=True,
                help='The connection string used to connect to the event '
                'database. (if unset, connection is used)'),
+    cfg.BoolOpt('sql-expire-samples-only',
+                default=False,
+                help="Indicates if expirer expires only samples. If set true,"
+                " expired samples will be deleted, but residual"
+                " resource and meter definition data will remain."),
 ]
 
 cfg.CONF.register_opts(OPTS, group='database')
 
-CLI_OPTS = [
-    cfg.BoolOpt('sql-expire-samples-only',
-                default=False,
-                help="Indicates if expirer expires only samples. If set true,"
-                     " expired samples will be deleted, but residual"
-                     " resource and meter definition data will remain.",
-                ),
-]
-
-cfg.CONF.register_cli_opts(CLI_OPTS)
 
 db_options.set_defaults(cfg.CONF)
 
