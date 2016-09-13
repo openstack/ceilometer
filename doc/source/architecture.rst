@@ -37,20 +37,17 @@ collection, but also designed to work together as a complete solution:
 4. (optional) api - service to query and view data recorded by collector
    in internal full-fidelity database (if enabled).
 
-As Ceilometer has grown to capture more data, it became apparent that data
-storage would need to be optimised. To address this, Gnocchi_ (resource metering
-as a service) was developed to capture the data in a time series database to
+Data normalised and collected by Ceilometer can be sent to various targets.
+Gnocchi_ was developed to capture measurement data in a time series database to
 optimise storage and querying. Gnocchi is intended to replace the existing
-metering database interface.
+metering database interface. Additionally, Aodh_ is the alarming service which
+can be send notifications when user defined rules are broken. Lastly, Panko_ is
+the event storage project designed to capture document-oriented data such as
+logs and system event actions.
 
 .. _Gnocchi: http://docs.openstack.org/developer/gnocchi/
-
-.. figure:: ./ceilo-gnocchi-arch.png
-   :width: 100%
-   :align: center
-   :alt: Ceilometer+Gnocchi Architecture summary
-
-   An overall summary of Ceilometer+Gnocchi's logical architecture.
+.. _Aodh: http://docs.openstack.org/developer/aodh
+.. _Panko: http://docs.openstack.org/developer/panko
 
 
 Gathering the data
