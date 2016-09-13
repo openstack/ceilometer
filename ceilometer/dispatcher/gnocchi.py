@@ -125,13 +125,13 @@ class ResourcesDefinition(object):
 
     def event_match(self, event_type):
         for e in self._ensure_list(self.cfg.get('event_create', [])):
-            if fnmatch.match(event_type, e):
+            if fnmatch.fnmatch(event_type, e):
                 return EVENT_CREATE
         for e in self._ensure_list(self.cfg.get('event_delete', [])):
-            if fnmatch.match(event_type, e):
+            if fnmatch.fnmatch(event_type, e):
                 return EVENT_DELETE
         for e in self._ensure_list(self.cfg.get('event_update', [])):
-            if fnmatch.match(event_type, e):
+            if fnmatch.fnmatch(event_type, e):
                 return EVENT_UPDATE
 
     def sample_attributes(self, sample):

@@ -25,6 +25,7 @@ from oslo_utils import fileutils
 from oslotest import mockpatch
 import requests
 import six
+from stevedore import extension
 import testscenarios
 
 from ceilometer.dispatcher import gnocchi
@@ -102,6 +103,26 @@ class DispatcherTest(base.BaseTestCase):
         names = [rd.cfg['resource_type'] for rd in d.resources_definition]
         self.assertIn('instance', names)
         self.assertIn('volume', names)
+
+    def test_match(self):
+        resource = {
+            'metrics':
+                ['image', 'image.size', 'image.download', 'image.serve'],
+            'attributes':
+                {'container_format': 'resource_metadata.container_format',
+                 'disk_format': 'resource_metadata.disk_format',
+                 'name': 'resource_metadata.name'},
+            'event_delete': 'image.delete',
+            'event_attributes': {'id': 'resource_id'},
+            'resource_type': 'image'}
+        plugin_manager = extension.ExtensionManager(
+            namespace='ceilometer.event.trait.trait_plugin')
+        rd = gnocchi.ResourcesDefinition(
+            resource, self.conf.conf.dispatcher_gnocchi.archive_policy,
+            plugin_manager)
+        operation = rd.event_match("image.delete")
+        self.assertEqual('delete', operation)
+        self.assertEqual(True, rd.metric_match('image'))
 
     @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
     def test_broken_config_load(self, mylog):
