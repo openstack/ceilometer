@@ -90,12 +90,18 @@ def expirer():
 
 
 def db_clean_legacy():
-    confirm = moves.input("Do you really want to drop the legacy alarm tables?"
-                          "This will destroy data definitely if it exist. "
-                          "Please type 'YES' to confirm: ")
-    if confirm != 'YES':
-        print("DB legacy cleanup aborted!")
-        return
+    cfg.CONF.register_cli_opts([
+        cfg.strOpt('confirm-drop-alarm-table',
+                   short='n',
+                   help='confirm to drop the legacy alarm tables')])
+    if not cfg.CONF.confirm_drop_alarm_table:
+        confirm = moves.input("Do you really want to drop the legacy alarm "
+                              "tables? This will destroy data definitely "
+                              "if it exist. Please type 'YES' to confirm: ")
+        if confirm != 'YES':
+            print("DB legacy cleanup aborted!")
+            return
+
     service.prepare_service()
     for purpose in ['metering', 'event']:
         url = (getattr(cfg.CONF.database, '%s_connection' % purpose) or
