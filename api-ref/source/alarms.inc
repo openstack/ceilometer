@@ -24,7 +24,7 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - alarm_id: alarm_id
+   - alarm_id: alarm_id_path
 
 
 Response Parameters
@@ -32,21 +32,22 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
+   - alarm: alarm_response
    - alarm_actions: alarm_actions
    - alarm_id: alarm_id
-   - combination_rule: combination_rule
-   - description: description
-   - enabled: enabled
-   - insufficient_data_actions: insufficient_data_actions
-   - timestamp: timestamp
-   - name: name
-   - ok_actions: ok_actions
-   - project_id: project_id
-   - state_timestamp: state_timestamp
-   - threshold_rule: threshold_rule
-   - repeat_actions: repeat_actions
-   - state: state
-   - type: type
+   - combination_rule: alarm_combination_rule
+   - description: alarm_description
+   - enabled: alarm_enabled
+   - insufficient_data_actions: alarm_insufficient_data_actions
+   - timestamp: alarm_timestamp
+   - name: alarm_name
+   - ok_actions: alarm_ok_actions
+   - project_id: alarm_project_id
+   - state_timestamp: alarm_state_timestamp
+   - threshold_rule: alarm_threshold_rule
+   - repeat_actions: alarm_repeat_actions
+   - state: alarm_state
+   - type: alarm_type
    - user_id: user_id
 
 Response Example
@@ -75,8 +76,8 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - alarm_id: alarm_id
-   - data: data
+   - alarm_id: alarm_id_path
+   - alarm: alarm_request
 
 
 Response Parameters
@@ -84,22 +85,23 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
+   - alarm: alarm_response
    - alarm_actions: alarm_actions
-   - ok_actions: ok_actions
-   - description: description
-   - timestamp: timestamp
-   - enabled: enabled
-   - combination_rule: combination_rule
-   - state_timestamp: state_timestamp
-   - threshold_rule: threshold_rule
    - alarm_id: alarm_id
-   - state: state
-   - insufficient_data_actions: insufficient_data_actions
-   - repeat_actions: repeat_actions
+   - combination_rule: alarm_combination_rule
+   - description: alarm_description
+   - enabled: alarm_enabled
+   - insufficient_data_actions: alarm_insufficient_data_actions
+   - timestamp: alarm_timestamp
+   - name: alarm_name
+   - ok_actions: alarm_ok_actions
+   - project_id: alarm_project_id
+   - state_timestamp: alarm_state_timestamp
+   - threshold_rule: alarm_threshold_rule
+   - repeat_actions: alarm_repeat_actions
+   - state: alarm_state
+   - type: alarm_type
    - user_id: user_id
-   - project_id: project_id
-   - type: type
-   - name: name
 
 
 
@@ -127,7 +129,7 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - alarm_id: alarm_id
+   - alarm_id: alarm_id_path
 
 
 
@@ -151,8 +153,8 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - alarm_id: alarm_id
-   - state: state
+   - alarm_id: alarm_id_path
+   - state: alarm_state
 
 
 
@@ -183,7 +185,7 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - alarm_id: alarm_id
+   - alarm_id: alarm_id_path
 
 
 
@@ -232,7 +234,7 @@ Response Parameters
    - threshold_rule: threshold_rule
    - alarm_id: alarm_id
    - state: state
-   - insufficient_data_actions: insufficient_data_actions
+   - insufficient_data_actions: alarm_insufficient_data_actions
    - repeat_actions: repeat_actions
    - user_id: user_id
    - project_id: project_id
@@ -275,22 +277,23 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
+   - alarm: alarm_response
    - alarm_actions: alarm_actions
-   - ok_actions: ok_actions
-   - description: description
-   - timestamp: timestamp
-   - enabled: enabled
-   - combination_rule: combination_rule
-   - state_timestamp: state_timestamp
-   - threshold_rule: threshold_rule
    - alarm_id: alarm_id
-   - state: state
-   - insufficient_data_actions: insufficient_data_actions
-   - repeat_actions: repeat_actions
+   - combination_rule: alarm_combination_rule
+   - description: alarm_description
+   - enabled: alarm_enabled
+   - insufficient_data_actions: alarm_insufficient_data_actions
+   - timestamp: alarm_timestamp
+   - name: alarm_name
+   - ok_actions: alarm_ok_actions
+   - project_id: alarm_project_id
+   - state_timestamp: alarm_state_timestamp
+   - threshold_rule: alarm_threshold_rule
+   - repeat_actions: alarm_repeat_actions
+   - state: alarm_state
+   - type: alarm_type
    - user_id: user_id
-   - project_id: project_id
-   - type: type
-   - name: name
 
 
 
@@ -320,7 +323,7 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - alarm_id: alarm_id
+   - alarm_id: alarm_id_path
    - q: q
 
 
