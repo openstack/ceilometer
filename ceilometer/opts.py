@@ -16,7 +16,6 @@ import itertools
 from keystoneauth1 import loading
 
 import ceilometer.agent.manager
-import ceilometer.api
 import ceilometer.api.app
 import ceilometer.cmd.polling
 import ceilometer.collector
@@ -76,10 +75,7 @@ def list_opts():
                          ceilometer.sample.OPTS,
                          ceilometer.service.OPTS,
                          ceilometer.utils.OPTS,)),
-        ('api',
-         itertools.chain(ceilometer.api.OPTS,
-                         ceilometer.api.app.API_OPTS,
-                         [ceilometer.service.API_OPT])),
+        ('api', ceilometer.api.app.API_OPTS),
         ('collector',
          itertools.chain(ceilometer.collector.OPTS,
                          [ceilometer.service.COLL_OPT])),

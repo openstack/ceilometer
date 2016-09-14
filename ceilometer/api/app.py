@@ -1,5 +1,6 @@
 #
 # Copyright 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2015-2016 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,11 +20,9 @@ from oslo_config import cfg
 from oslo_log import log
 from paste import deploy
 import pecan
-from werkzeug import serving
 
 from ceilometer.api import hooks
 from ceilometer.api import middleware
-from ceilometer.i18n import _LI, _LW
 
 LOG = log.getLogger(__name__)
 
@@ -67,16 +66,9 @@ def setup_app(pecan_config=None):
 
     pecan.configuration.set_config(dict(pecan_config), overwrite=True)
 
-    # NOTE(sileht): pecan debug won't work in multi-process environment
-    pecan_debug = CONF.api.pecan_debug
-    if CONF.api.workers and CONF.api.workers != 1 and pecan_debug:
-        pecan_debug = False
-        LOG.warning(_LW('pecan_debug cannot be enabled, if workers is > 1, '
-                        'the value is overrided with False'))
-
     app = pecan.make_app(
         pecan_config['app']['root'],
-        debug=pecan_debug,
+        debug=CONF.api.pecan_debug,
         hooks=app_hooks,
         wrap_app=middleware.ParsableErrorMiddleware,
         guess_content_type_from_ext=False
@@ -98,27 +90,6 @@ def load_app():
         raise cfg.ConfigFilesNotFoundError([cfg.CONF.api_paste_config])
     LOG.info("Full WSGI config used: %s" % cfg_file)
     return deploy.loadapp("config:" + cfg_file)
-
-
-def build_server():
-    app = load_app()
-    # Create the WSGI server and start it
-    host, port = cfg.CONF.api.host, cfg.CONF.api.port
-
-    LOG.info(_LI('Starting server in PID %s'), os.getpid())
-    LOG.info(_LI("Configuration:"))
-    cfg.CONF.log_opt_values(LOG, log.INFO)
-
-    if host == '0.0.0.0':
-        LOG.info(_LI(
-            'serving on 0.0.0.0:%(sport)s, view at http://127.0.0.1:%(vport)s')
-            % ({'sport': port, 'vport': port}))
-    else:
-        LOG.info(_LI("serving on http://%(host)s:%(port)s") % (
-                 {'host': host, 'port': port}))
-
-    serving.run_simple(cfg.CONF.api.host, cfg.CONF.api.port,
-                       app, processes=CONF.api.workers)
 
 
 def app_factory(global_config, **local_conf):
