@@ -133,6 +133,7 @@ For Gnocchi dispatcher, the following configuration settings should be added::
 
     [DEFAULT]
     meter_dispatchers = gnocchi
+    event_dispatchers = gnocchi
 
     [dispatcher_gnocchi]
     archive_policy = low

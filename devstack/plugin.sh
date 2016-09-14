@@ -250,7 +250,7 @@ function _ceilometer_configure_storage_backend {
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         gnocchi_url=$(gnocchi_service_url)
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
-        iniset $CEILOMETER_CONF DEFAULT event_dispatchers ""
+        iniset $CEILOMETER_CONF DEFAULT event_dispatchers gnocchi
         # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
         iniset $CEILOMETER_CONF storage max_retries 20
         # NOTE(gordc): set batching to better handle recording on a slow machine
