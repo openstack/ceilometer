@@ -384,7 +384,7 @@ class Connection(base.Connection):
             rows = sample_q.delete()
             LOG.info(_LI("%d samples removed from database"), rows)
 
-        if not cfg.CONF.sql_expire_samples_only:
+        if not cfg.CONF.database.sql_expire_samples_only:
             with session.begin():
                 # remove Meter definitions with no matching samples
                 (session.query(models.Meter)
@@ -456,7 +456,7 @@ class Connection(base.Connection):
         # NOTE: When sql_expire_samples_only is enabled, there will be some
         #       resources without any sample, in such case we should use inner
         #       join on sample table to avoid wrong result.
-        if cfg.CONF.sql_expire_samples_only or has_timestamp:
+        if cfg.CONF.database.sql_expire_samples_only or has_timestamp:
             res_q = session.query(distinct(models.Resource.resource_id)).join(
                 models.Sample,
                 models.Sample.resource_id == models.Resource.internal_id)
