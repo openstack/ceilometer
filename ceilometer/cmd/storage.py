@@ -21,7 +21,6 @@ import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
 
 from ceilometer.i18n import _LE, _LI, _LW
-from ceilometer import gnocchi_client
 from ceilometer import service
 from ceilometer import storage
 
@@ -58,6 +57,7 @@ def upgrade(default_skip_gnocchi_resource_types=False):
         LOG.info("Skipping Gnocchi resource types upgrade")
     else:
         LOG.debug("Upgrading Gnocchi resource types")
+        from ceilometer import gnocchi_client
         gnocchi_client.upgrade_resource_types(cfg.CONF)
 
 
