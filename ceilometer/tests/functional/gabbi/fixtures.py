@@ -63,8 +63,6 @@ class ConfigFixture(fixture.GabbiFixture):
         self.conf([], project='ceilometer', validate_default_values=True)
         opts.set_defaults(self.conf)
         conf.import_group('api', 'ceilometer.api.controllers.v2.root')
-        conf.import_opt('store_events', 'ceilometer.notification',
-                        group='notification')
 
         content = ('{"default": ""}')
         if six.PY3:
@@ -93,8 +91,6 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('pecan_debug', True, group='api')
         conf.set_override('gnocchi_is_enabled', False, group='api')
         conf.set_override('aodh_is_enabled', False, group='api')
-
-        conf.set_override('store_events', True, group='notification')
 
     def stop_fixture(self):
         """Reset the config and remove data."""

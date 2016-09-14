@@ -341,7 +341,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.run()
         self.addCleanup(self.mgr.terminate)
         setup_polling.assert_called_once_with()
-        mpc.start.assert_called_once_with()
+        mpc.start.assert_called_with()
         self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
 

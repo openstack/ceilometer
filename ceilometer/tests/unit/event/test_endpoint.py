@@ -15,7 +15,6 @@
 """Tests for Ceilometer notify daemon."""
 
 import mock
-from oslo_config import cfg
 from oslo_config import fixture as fixture_config
 import oslo_messaging
 from oslo_utils import fileutils
@@ -82,10 +81,6 @@ TEST_NOTICE_PAYLOAD = {
 }
 
 
-cfg.CONF.import_opt('store_events', 'ceilometer.notification',
-                    group='notification')
-
-
 class TestEventEndpoint(tests_base.BaseTestCase):
 
     def get_publisher(self, url, namespace=''):
@@ -130,7 +125,6 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF([])
         self.CONF.set_override("connection", "log://", group='database')
-        self.CONF.set_override("store_events", True, group="notification")
         self.setup_messaging(self.CONF)
 
         self.useFixture(mockpatch.PatchObject(publisher, 'get_publisher',

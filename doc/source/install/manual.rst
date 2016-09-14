@@ -47,9 +47,6 @@ Gnocchi
      meter_dispatchers = gnocchi
      event_dispatchers =
 
-     [notification]
-     store_events = False
-
      [dispatcher_gnocchi]
      filter_service_activity = False # Enable if using swift backend
      filter_project = <project name associated with gnocchi user> # if using swift backend
