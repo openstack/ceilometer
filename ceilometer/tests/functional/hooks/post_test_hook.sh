@@ -16,7 +16,7 @@
 
 function generate_testr_results {
     if [ -f .testrepository/0 ]; then
-        sudo .tox/functional/bin/testr last --subunit > $WORKSPACE/testrepository.subunit
+        sudo .tox/py-functional/bin/testr last --subunit > $WORKSPACE/testrepository.subunit
         sudo mv $WORKSPACE/testrepository.subunit $BASE/logs/testrepository.subunit
         sudo /usr/os-testr-env/bin/subunit2html $BASE/logs/testrepository.subunit $BASE/logs/testr_results.html
         sudo gzip -9 $BASE/logs/testrepository.subunit
@@ -42,7 +42,7 @@ echo "Running ceilometer functional test suite"
 set +e
 
 # NOTE(ityaptin) Expected a script param which contains a backend name
-CEILOMETER_TEST_BACKEND="$1" sudo -E -H -u ${STACK_USER:-${USER}} tox -efunctional
+CEILOMETER_TEST_BACKEND="$1" sudo -E -H -u ${STACK_USER:-${USER}} tox -epy-functional
 EXIT_CODE=$?
 set -e
 
