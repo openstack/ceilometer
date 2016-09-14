@@ -45,7 +45,7 @@ Gnocchi
 
      [DEFAULT]
      meter_dispatchers = gnocchi
-     event_dispatchers =
+     event_dispatchers = gnocchi
 
      [dispatcher_gnocchi]
      filter_service_activity = False # Enable if using swift backend

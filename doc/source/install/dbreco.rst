@@ -84,6 +84,7 @@ backend::
   [DEFAULT]
   meter_dispatchers=database
   meter_dispatchers=gnocchi
+  event_dispatchers=gnocchi
 
 .. _Gnocchi: http://gnocchi.xyz
 .. _here: https://docs.google.com/presentation/d/1PefouoeMVd27p2OGDfNQpx18mY-Wk5l0P1Ke2Vt5LwA/edit?usp=sharing
