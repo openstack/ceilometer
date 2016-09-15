@@ -88,6 +88,19 @@ MemoryResidentStats = collections.namedtuple('MemoryResidentStats',
 MemoryBandwidthStats = collections.namedtuple('MemoryBandwidthStats',
                                               ['total', 'local'])
 
+
+# Named tuple representing perf events statistics.
+#
+# cpu_cycles: the number of cpu cycles one instruction needs
+# instructions: the count of instructions
+# cache_references: the count of cache hits
+# cache_misses: the count of caches misses
+#
+PerfEventsStats = collections.namedtuple('PerfEventsStats',
+                                         ['cpu_cycles', 'instructions',
+                                          'cache_references', 'cache_misses'])
+
+
 # Named tuple representing vNICs.
 #
 # name: the name of the vNIC
@@ -336,6 +349,16 @@ class Inspector(object):
 
         :param instance: the target instance
         :return: for each disk , capacity , allocation and usage
+        """
+        raise ceilometer.NotImplementedError
+
+    def inspect_perf_events(self, instance, duration=None):
+        """Inspect the perf events statistics for an instance.
+
+        :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
+        :return:
         """
         raise ceilometer.NotImplementedError
 
