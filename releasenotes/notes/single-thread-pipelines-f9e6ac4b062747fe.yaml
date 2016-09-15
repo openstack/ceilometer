@@ -1,0 +1,11 @@
+---
+upgrade:
+  - Batching is enabled by default now when coordinated workers are enabled.
+    Depending on load, it is recommended to scale out the number of
+    `pipeline_processing_queues` to improve distribution. `batch_size` should
+    also be configured accordingly.
+fixes:
+  - Fix to improve handling messages in environments heavily backed up.
+    Previously, notification handlers greedily grabbed messages from queues
+    which could cause ordering issues. A fix was applied to sequentially
+    process messages in a single thread to prevent ordering issues.

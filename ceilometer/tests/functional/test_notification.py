@@ -367,6 +367,16 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')
+    def test_notification_threads(self, m_listener):
+        self.CONF.set_override('batch_size', 1, group='notification')
+        self.srv.run()
+        m_listener.assert_called_with(override_pool_size=None)
+        m_listener.reset_mock()
+        self.CONF.set_override('batch_size', 2, group='notification')
+        self.srv.run()
+        m_listener.assert_called_with(override_pool_size=1)
+
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_reset_listener_on_refresh(self, mock_listener):
         mock_listener.side_effect = [

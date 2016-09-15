@@ -17,6 +17,7 @@
 import abc
 import hashlib
 from itertools import chain
+from operator import methodcaller
 import os
 
 from oslo_config import cfg
@@ -105,7 +106,7 @@ class SamplePipelineEndpoint(PipelineEndpoint):
                 s, cfg.CONF.publisher.telemetry_secret)
         ]
         with self.publish_context as p:
-            p(samples)
+            p(sorted(samples, key=methodcaller('get_iso_timestamp')))
 
 
 class EventPipelineEndpoint(PipelineEndpoint):
