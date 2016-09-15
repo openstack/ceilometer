@@ -328,34 +328,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.terminate()
         mpc.stop.assert_called_once_with()
 
-    @mock.patch('ceilometer.pipeline.setup_polling')
-    def test_start_with_pipeline_poller(self, setup_polling):
-        self.mgr.setup_polling_tasks = mock.MagicMock()
-        mpc = self.mgr.partition_coordinator
-        mpc.is_active.return_value = False
-        self.CONF.set_override('heartbeat', 1.0, group='coordination')
-        self.mgr.partition_coordinator.heartbeat = mock.MagicMock()
-
-        self.CONF.set_override('refresh_pipeline_cfg', True)
-        self.CONF.set_override('pipeline_polling_interval', 5)
-        self.mgr.run()
-        self.addCleanup(self.mgr.terminate)
-        setup_polling.assert_called_once_with()
-        mpc.start.assert_called_with()
-        self.assertEqual(2, mpc.join_group.call_count)
-        self.mgr.setup_polling_tasks.assert_called_once_with()
-
-        # Wait first heatbeat
-        runs = 0
-        for i in six.moves.range(10):
-            runs = list(self.mgr.heartbeat_timer.iter_watchers())[0].runs
-            if runs > 0:
-                break
-            time.sleep(0.5)
-        self.assertGreaterEqual(1, runs)
-
-        self.assertEqual([], list(self.mgr.polling_periodics.iter_watchers()))
-
     def test_join_partitioning_groups(self):
         self.mgr.discoveries = self.create_discoveries()
         self.mgr.join_partitioning_groups()
