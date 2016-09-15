@@ -54,18 +54,49 @@
    .. code-block:: console
 
       $ openstack endpoint create --region RegionOne \
-        --publicurl http://controller:8777 \
-        --internalurl http://controller:8777 \
-        --adminurl http://controller:8777 metering
+        metering public http://controller:8777
       +--------------+----------------------------------+
       | Field        | Value                            |
       +--------------+----------------------------------+
-      | adminurl     | http://controller:8777           |
+      | enabled      | True                             |
       | id           | b808b67b848d443e9eaaa5e5d796970c |
-      | internalurl  | http://controller:8777           |
-      | publicurl    | http://controller:8777           |
+      | interface    | public                           |
       | region       | RegionOne                        |
+      | region_id    | RegionOne                        |
       | service_id   | 5fb7fd1bb2954fddb378d4031c28c0e4 |
       | service_name | ceilometer                       |
       | service_type | metering                         |
+      | url          | http://controller:8777           |
+      +--------------+----------------------------------+
+
+      $ openstack endpoint create --region RegionOne \
+        metering internal http://controller:8777
+      +--------------+----------------------------------+
+      | Field        | Value                            |
+      +--------------+----------------------------------+
+      | enabled      | True                             |
+      | id           | c7009b1c2ee54b71b771fa3d0ae4f948 |
+      | interface    | internal                         |
+      | region       | RegionOne                        |
+      | region_id    | RegionOne                        |
+      | service_id   | 5fb7fd1bb2954fddb378d4031c28c0e4 |
+      | service_name | ceilometer                       |
+      | service_type | metering                         |
+      | url          | http://controller:8777           |
+      +--------------+----------------------------------+
+
+      $ openstack endpoint create --region RegionOne \
+        metering admin http://controller:8777
+      +--------------+----------------------------------+
+      | Field        | Value                            |
+      +--------------+----------------------------------+
+      | enabled      | True                             |
+      | id           | b2c00566d0604551b5fe1540c699db3d |
+      | interface    | admin                            |
+      | region       | RegionOne                        |
+      | region_id    | RegionOne                        |
+      | service_id   | 5fb7fd1bb2954fddb378d4031c28c0e4 |
+      | service_name | ceilometer                       |
+      | service_type | metering                         |
+      | url          | http://controller:8777           |
       +--------------+----------------------------------+
