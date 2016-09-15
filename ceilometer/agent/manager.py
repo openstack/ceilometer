@@ -392,6 +392,10 @@ class AgentManager(service_base.PipelineBasedService):
 
         data = self.setup_polling_tasks()
 
+        # Don't start useless threads if no task will run
+        if not data:
+            return
+
         # One thread per polling tasks is enough
         self.polling_periodics = periodics.PeriodicWorker.create(
             [], executor_factory=lambda:
@@ -408,9 +412,7 @@ class AgentManager(service_base.PipelineBasedService):
             utils.spawn_thread(utils.delayed, delay_time,
                                self.polling_periodics.add, task, polling_task)
 
-        if data:
-            # Don't start useless threads if no task will run
-            utils.spawn_thread(self.polling_periodics.start, allow_empty=True)
+        utils.spawn_thread(self.polling_periodics.start, allow_empty=True)
 
     def run(self):
         super(AgentManager, self).run()
