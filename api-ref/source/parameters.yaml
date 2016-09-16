@@ -2,7 +2,7 @@
 {}
 
 # variables in path
-alarm_id_1:
+alarm_id_path:
   description: |
     The UUID of the alarm.
   in: path
@@ -52,12 +52,6 @@ aggregate:
   in: query
   required: false
   type: object
-data:
-  description: |
-    An alarm within the request body.
-  in: query
-  required: false
-  type: string
 direct:
   description: |
     Indicates whether the samples are POST ed
@@ -135,13 +129,6 @@ samples:
   in: query
   required: false
   type: array
-state_1:
-  description: |
-    The alarm state. A valid value is ``ok``,
-    ``alarm``, or ``insufficient data``.
-  in: query
-  required: true
-  type: string
 
 # variables in body
 alarm_actions:
@@ -150,9 +137,73 @@ alarm_actions:
   in: body
   required: true
   type: array
+alarm_combination_rule:
+  description: |
+    The rules for the combination alarm type.
+  in: body
+  required: true
+  type: string
+alarm_description:
+  description: |
+    Describes the alarm.
+  in: body
+  required: true
+  type: string
+alarm_enabled:
+  description: |
+    If ``true``, evaluation and actioning is enabled
+    for the alarm.
+  in: body
+  required: true
+  type: boolean
 alarm_id:
   description: |
     The UUID of the alarm.
+  in: body
+  required: true
+  type: string
+alarm_insufficient_data_actions:
+  description: |
+    The list of actions that the alarm performs when
+    the alarm state is ``insufficient_data``.
+  in: body
+  required: true
+  type: array
+alarm_name:
+  description: |
+    The name of the alarm.
+  in: body
+  required: true
+  type: string
+alarm_ok_actions:
+  description: |
+    The list of actions that the alarm performs when
+    the alarm state is ``ok``.
+  in: body
+  required: true
+  type: array
+alarm_repeat_actions:
+  description: |
+    If set to ``true``, the alarm notifications are
+    repeated. Otherwise, this value is ``false``.
+  in: body
+  required: true
+  type: boolean
+alarm_request:
+  description: |
+    An alarm within the request body.
+  in: body
+  required: false
+  type: string
+alarm_state:
+  description: |
+    The state of the alarm.
+  in: body
+  required: true
+  type: string
+alarm_state_timestamp:
+  description: |
+    The date and time of the alarm state.
   in: body
   required: true
   type: string
@@ -164,6 +215,25 @@ alarm_storage:
   in: body
   required: true
   type: object
+alarm_threshold_rule:
+  description: |
+    The rules for the threshold alarm type.
+  in: body
+  required: true
+  type: string
+alarm_timestamp:
+  description: |
+    The date and time of the alarm.
+  in: body
+  required: true
+  type: string
+alarm_type:
+  description: |
+    The type of the alarm, which is either
+    ``threshold`` or ``combination``.
+  in: body
+  required: true
+  type: string
 alarms:history:query:complex:
   description: |
     If ``true``, the complex query capability for
@@ -246,13 +316,6 @@ duration_start:
   in: body
   required: true
   type: string
-enabled:
-  description: |
-    If ``true``, evaluation and actioning is enabled
-    for the alarm.
-  in: body
-  required: true
-  type: boolean
 event_storage:
   description: |
     If ``true``, the capabilities for the storage
@@ -285,13 +348,6 @@ id:
   in: body
   required: true
   type: string
-insufficient_data_actions:
-  description: |
-    The list of actions that the alarm performs when
-    the alarm state is ``insufficient_data``.
-  in: body
-  required: true
-  type: array
 links:
   description: |
     A list that contains a self link and associated
@@ -377,13 +433,6 @@ name_1:
   in: body
   required: true
   type: string
-ok_actions:
-  description: |
-    The list of actions that the alarm performs when
-    the alarm state is ``ok``.
-  in: body
-  required: true
-  type: array
 period_end:
   description: |
     The period end date and time in UTC format.
@@ -428,13 +477,6 @@ recorded_at:
   in: body
   required: true
   type: string
-repeat_actions:
-  description: |
-    If set to ``true``, the alarm notifications are
-    repeated. Otherwise, this value is ``false``.
-  in: body
-  required: true
-  type: boolean
 resource_id:
   description: |
     The UUID of the resource for which the
@@ -515,12 +557,6 @@ source_2:
 state:
   description: |
     The state of the alarm.
-  in: body
-  required: true
-  type: string
-state_timestamp:
-  description: |
-    The date and time of the alarm state.
   in: body
   required: true
   type: string
@@ -648,12 +684,6 @@ sum:
   in: body
   required: true
   type: number
-threshold_rule:
-  description: |
-    The rules for the threshold alarm type.
-  in: body
-  required: true
-  type: string
 timestamp:
   description: |
     The date and time in UTC format when the
@@ -677,13 +707,6 @@ traits:
 type:
   description: |
     The meter type.
-  in: body
-  required: true
-  type: string
-type_1:
-  description: |
-    The type of the alarm, which is either
-    ``threshold`` or ``combination``.
   in: body
   required: true
   type: string
