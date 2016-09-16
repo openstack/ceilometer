@@ -80,6 +80,7 @@ class ConfigFixture(fixture.GabbiFixture):
         )
 
         # A special pipeline is required to use the direct publisher.
+        conf.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
         conf.set_override('pipeline_cfg_file',
                           'ceilometer/tests/functional/gabbi_pipeline.yaml')
 
