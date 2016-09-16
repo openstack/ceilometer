@@ -8,7 +8,7 @@ alarm_id_path:
   in: path
   required: false
   type: string
-message_id_1:
+message_id_path:
   description: |
     The UUID of the message.
   in: path
@@ -316,6 +316,19 @@ duration_start:
   in: body
   required: true
   type: string
+event_generated:
+  description: |
+    The date and time when the event occurred.
+  in: body
+  required: true
+  type: string
+event_raw:
+  description: |
+    A dictionary object that stores event messages
+    for future evaluation.
+  in: body
+  required: true
+  type: object
 event_storage:
   description: |
     If ``true``, the capabilities for the storage
@@ -329,6 +342,13 @@ event_type:
   in: body
   required: true
   type: string
+events:
+  description: |
+    A list of objects. Each object contains key and
+    value pairs that describe the event.
+  in: body
+  required: true
+  type: array
 events:query:simple:
   description: |
     If ``true``, the simple query capability for
@@ -336,12 +356,6 @@ events:query:simple:
   in: body
   required: true
   type: boolean
-generated:
-  description: |
-    The date and time when the event occurred.
-  in: body
-  required: true
-  type: string
 id:
   description: |
     The UUID of the sample.
@@ -464,13 +478,6 @@ project_id_2:
   in: body
   required: true
   type: string
-raw:
-  description: |
-    A dictionary object that stores event messages
-    for future evaluation.
-  in: body
-  required: true
-  type: object
 recorded_at:
   description: |
     The date and time when the sample was recorded.
@@ -697,13 +704,6 @@ timestamp_1:
   in: body
   required: true
   type: string
-traits:
-  description: |
-    A list of objects. Each object contains key and
-    value pairs that describe the event.
-  in: body
-  required: true
-  type: array
 type:
   description: |
     The meter type.

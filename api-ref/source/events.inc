@@ -24,7 +24,7 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - message_id: message_id
+   - message_id: message_id_path
 
 
 Response Parameters
@@ -32,9 +32,9 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
-   - traits: traits
-   - raw: raw
-   - generated: generated
+   - events: events
+   - raw: event_raw
+   - generated: event_generated
    - event_type: event_type
    - message_id: message_id
 
@@ -75,8 +75,8 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
-   - traits: traits
-   - raw: raw
+   - events: events
+   - raw: event_raw
    - generated: generated
    - event_type: event_type
    - message_id: message_id
