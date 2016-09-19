@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 from collections import defaultdict
-from hashlib import md5
+import hashlib
 import itertools
 import operator
 import re
@@ -38,7 +38,7 @@ from ceilometer import gnocchi_client
 from ceilometer import keystone_client
 
 NAME_ENCODED = __name__.encode('utf-8')
-CACHE_NAMESPACE = uuid.UUID(bytes=md5(NAME_ENCODED).digest())
+CACHE_NAMESPACE = uuid.UUID(bytes=hashlib.md5(NAME_ENCODED).digest())
 LOG = log.getLogger(__name__)
 
 dispatcher_opts = [
