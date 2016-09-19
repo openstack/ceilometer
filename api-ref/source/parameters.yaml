@@ -20,7 +20,7 @@ meter_name:
   in: path
   required: false
   type: string
-resource_id_2:
+resource_id_path:
   description: |
     The UUID of the resource.
   in: path
@@ -484,19 +484,30 @@ recorded_at:
   in: body
   required: true
   type: string
-resource_id:
+measurement_resource_id:
   description: |
     The UUID of the resource for which the
     measurements are taken.
   in: body
   required: true
   type: string
-resource_id_1:
+resource:
+  description: |
+  in: body
+  required: true
+  type: object
+resource_id:
   description: |
     The UUID of the resource.
   in: body
   required: true
   type: string
+resouces:
+  description: |
+    List of the resources.
+  in: body
+  required: true
+  type: array
 resources:query:complex:
   description: |
     If ``true``, the complex query capability for
