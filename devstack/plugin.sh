@@ -237,6 +237,7 @@ function _ceilometer_configure_cache_backend {
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
+        iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
     elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
@@ -245,6 +246,7 @@ function _ceilometer_configure_storage_backend {
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
         ${TOP_DIR}/pkg/elasticsearch.sh start
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
+        iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then

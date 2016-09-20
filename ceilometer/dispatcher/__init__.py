@@ -28,7 +28,7 @@ LOG = log.getLogger(__name__)
 OPTS = [
     cfg.MultiStrOpt('meter_dispatchers',
                     deprecated_name='dispatcher',
-                    default=['database'],
+                    default=[],
                     help='Dispatchers to process metering data.'),
     cfg.MultiStrOpt('event_dispatchers',
                     default=[],
