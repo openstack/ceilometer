@@ -91,6 +91,7 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('pecan_debug', True, group='api')
         conf.set_override('gnocchi_is_enabled', False, group='api')
         conf.set_override('aodh_is_enabled', False, group='api')
+        conf.set_override('panko_is_enabled', False, group='api')
 
     def stop_fixture(self):
         """Reset the config and remove data."""
