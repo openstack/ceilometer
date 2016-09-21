@@ -24,6 +24,8 @@ import pecan
 from ceilometer.api import hooks
 from ceilometer.api import middleware
 
+from ceilometer import service
+
 LOG = log.getLogger(__name__)
 
 CONF = cfg.CONF
@@ -94,3 +96,8 @@ def load_app():
 
 def app_factory(global_config, **local_conf):
     return setup_app()
+
+
+def build_wsgi_app():
+    service.prepare_service()
+    return load_app()
