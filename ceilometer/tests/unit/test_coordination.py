@@ -281,3 +281,23 @@ class TestPartitioning(base.BaseTestCase):
         coord.stop()
         self.assertIsEmpty(coord._groups)
         self.assertIsNone(coord._coordinator)
+
+    def test_partitioning_with_unicode(self):
+        all_resources = [u'\u0634\u0628\u06a9\u0647',
+                         u'\u0627\u0647\u0644',
+                         u'\u0645\u062d\u0628\u0627\u0646']
+        agents = ['agent_%s' % i for i in range(2)]
+
+        expected_resources = [list() for _ in range(len(agents))]
+        hr = utils.HashRing(agents)
+        for r in all_resources:
+            key = agents.index(hr.get_node(r))
+            expected_resources[key].append(r)
+
+        agents_kwargs = []
+        for i, agent in enumerate(agents):
+            agents_kwargs.append(dict(agent_id=agent,
+                                 group_id='group',
+                                 all_resources=all_resources,
+                                 expected_resources=expected_resources[i]))
+        self._usage_simulation(*agents_kwargs)
