@@ -410,7 +410,7 @@ function start_ceilometer {
     run_process ceilometer-aipmi "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces ipmi --config-file $CEILOMETER_CONF"
 
     if [[ "$CEILOMETER_USE_MOD_WSGI" == "False" ]]; then
-        run_process ceilometer-api "$CEILOMETER_BIN_DIR/ceilometer-api -d -v --config-file $CEILOMETER_CONF"
+        run_process ceilometer-api "$CEILOMETER_BIN_DIR/ceilometer-api --port $CEILOMETER_SERVICE_PORT"
     elif is_service_enabled ceilometer-api; then
         enable_apache_site ceilometer
         restart_apache_server
