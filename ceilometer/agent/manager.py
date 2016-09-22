@@ -443,7 +443,7 @@ class AgentManager(service_base.PipelineBasedService):
         # tasks. During this short time bad thing can occur.
         #
         # I think we must not reset keystone client before
-        # running a polling task, but refresh it periodicaly instead.
+        # running a polling task, but refresh it periodically instead.
 
         # NOTE(sileht): we do lazy loading of the keystone client
         # for multiple reasons:
