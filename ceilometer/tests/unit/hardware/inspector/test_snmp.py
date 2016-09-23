@@ -209,10 +209,11 @@ class TestSNMPInspector(test_base.BaseTestCase):
 
     def test_pysnmp_ver43(self):
         # Test pysnmp version >=4.3 compatibility of ObjectIdentifier
-        from distutils.version import StrictVersion
+        from distutils import version
         import pysnmp
 
-        has43 = StrictVersion(pysnmp.__version__) >= StrictVersion('4.3.0')
+        has43 = (version.StrictVersion(pysnmp.__version__) >=
+                 version.StrictVersion('4.3.0'))
         oid = '1.3.6.4.1.2021.11.57.0'
 
         if has43:

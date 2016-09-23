@@ -17,8 +17,7 @@ import json
 import mock
 from oslotest import base
 
-from ceilometer.objectstore.rgw_client import RGWAdminAPIFailed
-from ceilometer.objectstore.rgw_client import RGWAdminClient
+from ceilometer.objectstore import rgw_client
 
 
 RGW_ADMIN_BUCKETS = '''
@@ -152,15 +151,16 @@ class TestRGWAdminClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestRGWAdminClient, self).setUp()
-        self.client = RGWAdminClient('http://127.0.0.1:8080/admin',
-                                     'abcde', 'secret')
+        self.client = rgw_client.RGWAdminClient('http://127.0.0.1:8080/admin',
+                                                'abcde', 'secret')
         self.get_resp = mock.MagicMock()
         self.get = mock.patch('requests.get',
                               return_value=self.get_resp).start()
 
     def test_make_request_exception(self):
         self.get_resp.status_code = 403
-        self.assertRaises(RGWAdminAPIFailed, self.client._make_request,
+        self.assertRaises(rgw_client.RGWAdminAPIFailed,
+                          self.client._make_request,
                           *('foo', {}))
 
     def test_make_request(self):
@@ -173,8 +173,8 @@ class TestRGWAdminClient(base.BaseTestCase):
         self.get_resp.status_code = 200
         self.get_resp.json.return_value = buckets_json
         actual = self.client.get_bucket('foo')
-        bucket_list = [RGWAdminClient.Bucket('somefoo', 1000, 1000),
-                       RGWAdminClient.Bucket('somefoo31', 1, 42),
+        bucket_list = [rgw_client.RGWAdminClient.Bucket('somefoo', 1000, 1000),
+                       rgw_client.RGWAdminClient.Bucket('somefoo31', 1, 42),
                        ]
         expected = {'num_buckets': 2, 'size': 1042, 'num_objects': 1001,
                     'buckets': bucket_list}

@@ -91,8 +91,10 @@ class _Base(plugin_base.PollsterBase):
             raise StopIteration()
 
         try:
-            from ceilometer.objectstore.rgw_client import RGWAdminClient
-            rgw_client = RGWAdminClient(endpoint, self.access_key, self.secret)
+            from ceilometer.objectstore import rgw_client as c_rgw_client
+            rgw_client = c_rgw_client.RGWAdminClient(endpoint,
+                                                     self.access_key,
+                                                     self.secret)
         except ImportError:
             raise plugin_base.PollsterPermanentError(tenants)
 
