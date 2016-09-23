@@ -165,7 +165,7 @@ class TestTraitDefinition(ConverterBase):
         tdef = converter.TraitDefinition('test_trait', cfg,
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
-        self.assertIs(None, t)
+        self.assertIsNone(t)
         self.nothing_plugin_class.assert_called_once_with()
         self.nothing_plugin.trait_values.assert_called_once_with([
             ('payload.instance_id', 'id-for-instance-0001'),
@@ -264,21 +264,21 @@ class TestTraitDefinition(ConverterBase):
         tdef = converter.TraitDefinition('test_trait', cfg,
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
-        self.assertIs(None, t)
+        self.assertIsNone(t)
 
     def test_to_trait_null(self):
         cfg = dict(type='text', fields='payload.instance_id2')
         tdef = converter.TraitDefinition('test_trait', cfg,
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
-        self.assertIs(None, t)
+        self.assertIsNone(t)
 
     def test_to_trait_empty_nontext(self):
         cfg = dict(type='datetime', fields='payload.bogus_date')
         tdef = converter.TraitDefinition('test_trait', cfg,
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
-        self.assertIs(None, t)
+        self.assertIsNone(t)
 
     def test_to_trait_multiple_null_missing(self):
         cfg = dict(type='text', fields=['payload.not_here_boss',
@@ -286,7 +286,7 @@ class TestTraitDefinition(ConverterBase):
         tdef = converter.TraitDefinition('test_trait', cfg,
                                          self.fake_plugin_mgr)
         t = tdef.to_trait(self.n1)
-        self.assertIs(None, t)
+        self.assertIsNone(t)
 
     def test_missing_fields_config(self):
         self.assertRaises(declarative.DefinitionException,
