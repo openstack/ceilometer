@@ -54,7 +54,7 @@ class TestSplitterPlugin(base.BaseTestCase):
         plugin = self.pclass(**param)
         match_list = [('test.thing', 'test-foobar-baz')]
         value = plugin.trait_values(match_list)[0]
-        self.assertIs(None, value)
+        self.assertIsNone(value)
 
     def test_no_match(self):
         param = dict(separator='-', segment=0)
