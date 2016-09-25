@@ -95,7 +95,7 @@ dispatcher posts the meters onto Gnocchi_ backend. Each dispatcher can have
 its own configuration parameters. Please see available configuration
 parameters at the beginning of each dispatcher file.
 
-.. _Gnocchi: http://gnocchi.readthedocs.org/en/latest/basic.html
+.. _Gnocchi: http://gnocchi.xyz
 
 To check if any of the dispatchers is available in your system, you can
 inspect the Ceilometer egg entry_points.txt file, you should normally see text
