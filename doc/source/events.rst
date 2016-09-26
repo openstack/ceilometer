@@ -20,7 +20,7 @@
 =============================
 
 Events vs. Samples
-==================
+~~~~~~~~~~~~~~~~~~
 
 In addition to Meters, and related Sample data, Ceilometer can also process
 Events.  While a Sample represents a single numeric datapoint, driving a Meter
@@ -34,21 +34,21 @@ In general, Events let you know when something has changed about an
 object in an OpenStack system, such as the resize of an instance, or creation
 of an image.
 
-While Samples can be relatively cheap (small),
-disposable (losing an individual sample datapoint won't matter much),
-and fast, Events are larger, more informative, and should be handled more
-consistently (you do not want to lose one).
+While Samples can be relatively cheap (small), disposable (losing an individual
+sample datapoint won't matter much), and fast, Events are larger, more
+informative, and should be handled more consistently (you do not want to lose
+one).
 
 Event Structure
-===============
+~~~~~~~~~~~~~~~
 
 To facilitate downstream processing (billing and/or aggregation), a
 :doc:`minimum required data set and format <format>` has been defined for
 services, however events generally contain the following information:
 
-
 event_type
-    A dotted string defining what event occurred, such as "compute.instance.resize.start"
+    A dotted string defining what event occurred, such as
+    ``compute.instance.resize.start``
 
 message_id
     A UUID for this event.
@@ -66,7 +66,7 @@ raw
     can be stored (unindexed) for future evaluation.
 
 Events from Notifications
-=========================
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Events are primarily created via the notifications system in OpenStack.
 OpenStack systems, such as Nova, Glance, Neutron, etc. will emit
@@ -94,7 +94,7 @@ Converting Notifications to Events
 In order to make it easier to allow users to extract what they need,
 the conversion from Notifications to Events is driven by a
 configuration file (specified by the flag definitions_cfg_file_ in
-ceilometer.conf).
+:file:`ceilometer.conf`).
 
 This includes descriptions of how to map fields in the notification body
 to Traits, and optional plugins for doing any programmatic translations
@@ -111,7 +111,7 @@ set of definitions will be assumed. By default, any notifications that
 do not have a corresponding event definition in the definitions file will be
 converted to events with a set of minimal, default traits.  This can be
 changed by setting the flag drop_unmatched_notifications_ in the
-ceilometer.conf file. If this is set to True, then any notifications
+:file:`ceilometer.conf` file. If this is set to True, then any notifications
 that don't have events defined for them in the file will be dropped.
 This can be what you want, the notification system is quite chatty by design
 (notifications philosophy is "tell us everything, we'll ignore what we don't
@@ -123,7 +123,7 @@ need"), so you may want to ignore the noisier ones if you don't use them.
 There is a set of default traits (all are TEXT type) that will be added to
 all events if the notification has the relevant data:
 
-* service:  (All notifications should have this) notification's publisher
+* service: (All notifications should have this) notification's publisher
 * tenant_id
 * request_id
 * project_id
@@ -131,7 +131,7 @@ all events if the notification has the relevant data:
 
 These do not have to be specified in the event definition, they are
 automatically added, but their definitions can be overridden for a given
-event_type.
+``event_type``.
 
 Definitions file format
 -----------------------
@@ -139,12 +139,12 @@ Definitions file format
 The event definitions file is in YAML format. It consists of a list of event
 definitions, which are mappings. Order is significant, the list of definitions
 is scanned in *reverse* order (last definition in the file to the first),
-to find a definition which matches the notification's event_type.  That
+to find a definition which matches the notification's event_type. That
 definition will be used to generate the Event. The reverse ordering is done
 because it is common to want to have a more general wildcarded definition
-(such as "compute.instance.*" ) with a set of traits common to all of those
+(such as ``compute.instance.*``) with a set of traits common to all of those
 events, with a few more specific event definitions (like
-"compute.instance.exists") afterward that have all of the above traits, plus
+``compute.instance.exists``) afterward that have all of the above traits, plus
 a few more. This lets you put the general definition first, followed by the
 specific ones, and use YAML mapping include syntax to avoid copying all of the
 trait definitions.
@@ -182,12 +182,12 @@ fields
     the notification. By default the value will be the first such field.
     (plugins can alter that, if they wish). This is normally a string,
     but, for convenience, it can be specified as a list of
-    specifications, which will match the fields for all of them. (See
-    `Field Path Specifications`_ for more info on this syntax.)
+    specifications, which will match the fields for all of them.
+    (See `Field Path Specifications`_ for more info on this syntax.)
 plugin
     (optional) This is a mapping (For convenience, this value can also
     be specified as a string, which is interpreted as the name of a
-    plugin to be loaded with no parameters) with the following keys
+    plugin to be loaded with no parameters) with the following keys:
 
     name
         (string) name of a plugin to load
@@ -202,16 +202,19 @@ Field Path Specifications
 
 The path specifications define which fields in the JSON notification
 body are extracted to provide the value for a given trait.  The paths
-can be specified with a dot syntax (e.g. "payload.host"). Square
-bracket syntax (e.g. "payload[host]") is also supported. In either
+can be specified with a dot syntax (e.g. ``payload.host``). Square
+bracket syntax (e.g. ``payload[host]``) is also supported. In either
 case, if the key for the field you are looking for contains special
 characters, like '.', it will need to be quoted (with double or single
 quotes) like so:
 
+::
+
           payload.image_meta.'org.openstack__1__architecture'
 
 The syntax used for the field specification is a variant of JSONPath,
-and is fairly flexible. (see: https://github.com/kennknowles/python-jsonpath-rw for more info)
+and is fairly flexible. 
+(see: https://github.com/kennknowles/python-jsonpath-rw for more info)
 
 Example Definitions file
 ------------------------
@@ -275,7 +278,7 @@ will be set to whatever the plugin returned (coerced to the appropriate type
 for the trait).
 
 Building Notifications
-======================
+~~~~~~~~~~~~~~~~~~~~~~
 
 In general, the payload format OpenStack services emit could be described as
 the Wild West. The payloads are often arbitrary data dumps at the time of
