@@ -119,6 +119,24 @@ class TestDispatcherHttp(base.BaseTestCase):
 
         self.assertEqual('/path/to/cert.crt', post.call_args[1]['verify'])
 
+    def test_http_dispatcher_non_batch(self):
+        self.CONF.dispatcher_http.target = 'fake'
+        self.CONF.dispatcher_http.batch_mode = False
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        with mock.patch('requests.post') as post:
+            dispatcher.record_metering_data([self.msg, self.msg])
+            self.assertEqual(2, post.call_count)
+
+    def test_http_dispatcher_batch(self):
+        self.CONF.dispatcher_http.target = 'fake'
+        self.CONF.dispatcher_http.batch_mode = True
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        with mock.patch('requests.post') as post:
+            dispatcher.record_metering_data([self.msg, self.msg, self.msg])
+            self.assertEqual(1, post.call_count)
+
 
 class TestEventDispatcherHttp(base.BaseTestCase):
     """Test sending events with the http dispatcher"""
@@ -191,3 +209,21 @@ class TestEventDispatcherHttp(base.BaseTestCase):
             dispatcher.record_events(self.event)
 
         self.assertEqual('/path/to/cert.crt', post.call_args[1]['verify'])
+
+    def test_http_dispatcher_nonbatch_event(self):
+        self.CONF.dispatcher_http.event_target = 'fake'
+        self.CONF.dispatcher_http.batch_mode = False
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        with mock.patch('requests.post') as post:
+            dispatcher.record_events([self.event, self.event])
+            self.assertEqual(2, post.call_count)
+
+    def test_http_dispatcher_batch_event(self):
+        self.CONF.dispatcher_http.event_target = 'fake'
+        self.CONF.dispatcher_http.batch_mode = True
+        dispatcher = http.HttpDispatcher(self.CONF)
+
+        with mock.patch('requests.post') as post:
+            dispatcher.record_events([self.event, self.event])
+            self.assertEqual(1, post.call_count)
