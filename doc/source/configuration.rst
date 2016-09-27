@@ -17,24 +17,24 @@
  Configuration Options
 =======================
 
-For the list and description of configuration options that can be set for Ceilometer in
-order to set up the services please see the
+For the list and description of configuration options that can be set for
+Ceilometer in order to set up the services please see the
 `Telemetry section <http://docs.openstack.org/trunk/config-reference/content/ch_configuring-openstack-telemetry.html>`_
 in the OpenStack Manuals Configuration Reference.
 
 Sample Configuration file
-=========================
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The sample configuration file for Ceilometer, named
-etc/ceilometer/ceilometer.conf.sample, was removed from version control after
-the Icehouse release. For more details, please read the file
-etc/ceilometer/README-ceilometer.conf.txt. You can generate this sample
+:file:`etc/ceilometer/ceilometer.conf.sample`, was removed from version
+control after the Icehouse release. For more details, please read the file
+:file:`etc/ceilometer/README-ceilometer.conf.txt`. You can generate this sample
 configuration file by running ``tox -e genconfig``.
 
 .. _Pipeline-Configuration:
 
 Pipelines
-=========
+~~~~~~~~~
 
 Pipelines describe a coupling between sources of samples and the
 corresponding sinks for transformation and publication of the samples.
@@ -68,9 +68,10 @@ Pipeline configuration
 ----------------------
 
 Pipeline configuration by default, is stored in a separate configuration file,
-called pipeline.yaml, next to the ceilometer.conf file. The pipeline
-configuration file can be set in the *pipeline_cfg_file* parameter in
-ceilometer.conf. Multiple chains can be defined in one configuration file.
+called :file:`pipeline.yaml`, next to the :file:`ceilometer.conf` file. The
+pipeline configuration file can be set in the *pipeline_cfg_file* parameter in
+:file:`ceilometer.conf`. Multiple chains can be defined in one configuration
+file.
 
 The chain definition looks like the following::
 
@@ -96,23 +97,23 @@ The *name* parameter of a source is unrelated to anything else;
 nothing references a source by name, and a source's name does not have
 to match anything.
 
-The *interval* parameter in the sources section should be defined in seconds. It
-determines the cadence of sample injection into the pipeline, where samples are
-produced under the direct control of an agent, i.e. via a polling cycle as opposed
-to incoming notifications.
+The *interval* parameter in the sources section should be defined in seconds.
+It determines the cadence of sample injection into the pipeline, where samples
+are produced under the direct control of an agent, i.e. via a polling cycle as
+opposed to incoming notifications.
 
 There are several ways to define the list of meters for a pipeline source. The
 list of valid meters can be found in the :ref:`measurements` section. There is
 a possibility to define all the meters, or just included or excluded meters,
 with which a source should operate:
 
-* To include all meters, use the '*' wildcard symbol.
+* To include all meters, use the ``*`` wildcard symbol.
 * To define the list of meters, use either of the following:
 
-  * To define the list of included meters, use the 'meter_name' syntax
-  * To define the list of excluded meters, use the '!meter_name' syntax
+  * To define the list of included meters, use the ``meter_name`` syntax
+  * To define the list of excluded meters, use the ``!meter_name`` syntax
   * For meters, which identify a complex Sample field, use the wildcard
-    symbol to select all, e.g. for "disk.read.bytes", use "disk.\*"
+    symbol to select all, e.g. for ``disk.read.bytes``, use ``disk.*``
 
 The above definition methods can be used in the following combinations:
 
@@ -141,7 +142,7 @@ The optional *discovery* section of a pipeline source contains the list of
 discoverers. These discoverers can be used to dynamically discover the
 resources to be polled by the pollsters defined in this pipeline. The name
 of the discoverers should be the same as the related names of plugins in
-setup.cfg.
+:file:`setup.cfg`.
 
 If *resources* or *discovery* section is not set, the default value would
 be an empty list. If both *resources* and *discovery* are set, the final
@@ -160,17 +161,17 @@ following in descending order of precedence:
     3. From the per-agent default discovery.
 
 The *transformers* section of a pipeline sink provides the possibility to add a
-list of transformer definitions. The names of the transformers should be the same
-as the names of the related extensions in setup.cfg. For a more detailed
-description, please see the `transformers`_ section of the Administrator Guide
-of Ceilometer.
+list of transformer definitions. The names of the transformers should be the
+same as the names of the related extensions in :file:`setup.cfg`. For a more
+detailed description, please see the `transformers`_ section of the
+Administrator Guide of Ceilometer.
 
 .. _transformers: http://docs.openstack.org/admin-guide/telemetry-data-collection.html#transformers
 
 The *publishers* section contains the list of publishers, where the samples
 data should be sent after the possible transformations. The names of the
 publishers should be the same as the related names of the plugins in
-setup.cfg.
+:file:`setup.cfg`.
 
 The default configuration can be found in `pipeline.yaml`_.
 
@@ -202,7 +203,7 @@ the number of processing queues, at the very least, match the number of agents.
    is only recommended that you **increase** processing queues.
 
 Publishers
-++++++++++
+~~~~~~~~~~
 
 For more information about publishers see the `publishers`_ section of the
 Administrator Guide of Ceilometer.
