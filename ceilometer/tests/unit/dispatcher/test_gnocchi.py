@@ -22,6 +22,8 @@ from keystoneauth1 import exceptions as ka_exceptions
 import mock
 from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
+from oslo_utils import fixture as utils_fixture
+from oslo_utils import timeutils
 from oslotest import mockpatch
 import requests
 import six
@@ -34,6 +36,50 @@ from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
 
 load_tests = testscenarios.load_tests_apply_scenarios
+
+INSTANCE_DELETE_START = {
+    u'_context_auth_token': u'3d8b13de1b7d499587dfc69b77dc09c2',
+    u'_context_is_admin': True,
+    u'_context_project_id': u'7c150a59fe714e6f9263774af9688f0e',
+    u'_context_quota_class': None,
+    u'_context_read_deleted': u'no',
+    u'_context_remote_address': u'10.0.2.15',
+    u'_context_request_id': u'req-fb3c4546-a2e5-49b7-9fd2-a63bd658bc39',
+    u'_context_roles': [u'admin'],
+    u'_context_timestamp': u'2012-05-08T20:24:14.547374',
+    u'_context_user_id': u'1e3ce043029547f1a61c1996d1a531a2',
+    u'event_type': u'compute.instance.delete.start',
+    u'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4',
+    u'payload': {u'created_at': u'2012-05-08 20:23:41',
+                 u'deleted_at': u'',
+                 u'disk_gb': 0,
+                 u'display_name': u'testme',
+                 u'image_ref_url': u'http://10.0.2.15:9292/images/UUID',
+                 u'instance_id': u'9f9d01b9-4a58-4271-9e27-398b21ab20d1',
+                 u'instance_type': u'm1.tiny',
+                 u'instance_type_id': 2,
+                 u'launched_at': u'2012-05-08 20:23:47',
+                 u'memory_mb': 512,
+                 u'state': u'active',
+                 u'state_description': u'deleting',
+                 u'tenant_id': u'7c150a59fe714e6f9263774af9688f0e',
+                 u'user_id': u'1e3ce043029547f1a61c1996d1a531a2',
+                 u'reservation_id': u'1e3ce043029547f1a61c1996d1a531a3',
+                 u'vcpus': 1,
+                 u'root_gb': 0,
+                 u'ephemeral_gb': 0,
+                 u'host': u'compute-host-name',
+                 u'availability_zone': u'1e3ce043029547f1a61c1996d1a531a4',
+                 u'os_type': u'linux?',
+                 u'architecture': u'x86',
+                 u'image_ref': u'UUID',
+                 u'kernel_id': u'1e3ce043029547f1a61c1996d1a531a5',
+                 u'ramdisk_id': u'1e3ce043029547f1a61c1996d1a531a6',
+                 },
+    u'priority': u'INFO',
+    u'publisher_id': u'compute.vagrant-precise',
+    u'timestamp': u'2012-05-08 20:24:14.824743',
+}
 
 
 @mock.patch('gnocchiclient.v1.client.Client', mock.Mock())
@@ -358,6 +404,51 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.sample['resource_id'] = str(uuid.uuid4()) + "/foobar"
         self.sample['message_signature'] = utils.compute_signature(
             self.sample, self.conf.conf.publisher.telemetry_secret)
+
+    @mock.patch('gnocchiclient.v1.client.Client')
+    def test_event_workflow(self, fakeclient_cls):
+        self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
+
+        fakeclient = fakeclient_cls.return_value
+
+        fakeclient.resource.search.side_effect = [
+            [{"id": "b26268d6-8bb5-11e6-baff-00224d8226cd",
+              "type": "instance_disk",
+              "instance_id": "9f9d01b9-4a58-4271-9e27-398b21ab20d1"}],
+            [{"id": "b1c7544a-8bb5-11e6-850e-00224d8226cd",
+              "type": "instance_network_interface",
+              "instance_id": "9f9d01b9-4a58-4271-9e27-398b21ab20d1"}],
+        ]
+
+        search_params = {
+            '=': {'instance_id': '9f9d01b9-4a58-4271-9e27-398b21ab20d1'}
+        }
+
+        now = timeutils.utcnow()
+        self.useFixture(utils_fixture.TimeFixture(now))
+
+        expected_calls = [
+            mock.call.capabilities.list(),
+            mock.call.resource.search('instance_disk', search_params),
+            mock.call.resource.search('instance_network_interface',
+                                      search_params),
+            mock.call.resource.update(
+                'instance', '9f9d01b9-4a58-4271-9e27-398b21ab20d1',
+                {'ended_at': now.isoformat()}),
+            mock.call.resource.update(
+                'instance_disk',
+                'b26268d6-8bb5-11e6-baff-00224d8226cd',
+                {'ended_at': now.isoformat()}),
+            mock.call.resource.update(
+                'instance_network_interface',
+                'b1c7544a-8bb5-11e6-850e-00224d8226cd',
+                {'ended_at': now.isoformat()})
+        ]
+
+        self.dispatcher.record_events([INSTANCE_DELETE_START])
+        self.assertEqual(6, len(fakeclient.mock_calls))
+        for call in expected_calls:
+            self.assertIn(call, fakeclient.mock_calls)
 
     @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
     @mock.patch('gnocchiclient.v1.client.Client')
