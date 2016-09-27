@@ -14,6 +14,7 @@
 # under the License.
 
 from itertools import chain
+import select
 import socket
 
 import cotyledon
@@ -111,6 +112,10 @@ class CollectorService(cotyledon.Service):
 
         self.udp_run = True
         while self.udp_run:
+            # NOTE(sileht): return every 10 seconds to allow
+            # clear shutdown
+            if not select.select([udp], [], [], 10.0)[0]:
+                continue
             # NOTE(jd) Arbitrary limit of 64K because that ought to be
             # enough for anybody.
             data, source = udp.recvfrom(64 * units.Ki)
