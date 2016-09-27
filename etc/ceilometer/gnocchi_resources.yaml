@@ -66,14 +66,10 @@ resources:
       server_group: resource_metadata.user_metadata.server_group
     event_delete: compute.instance.delete.start
     event_attributes:
-      id: instance_id
+      id: payload.instance_id
     event_associated_resources:
-      instance_network_interface:
-        query: '{"=": {"instance_id": "%s"}}'
-        fields: [id]
-      instance_disk:
-        query: '{"=": {"instance_id": "%s"}}'
-        fields: [id]
+      instance_network_interface: '{"=": {"instance_id": "%s"}}'
+      instance_disk: '{"=": {"instance_id": "%s"}}'
 
   - resource_type: instance_network_interface
     metrics:
@@ -120,7 +116,7 @@ resources:
       disk_format: resource_metadata.disk_format
     event_delete: image.delete
     event_attributes:
-      id: resource_id
+      id: payload.resource_id
 
   - resource_type: ipmi
     metrics:
