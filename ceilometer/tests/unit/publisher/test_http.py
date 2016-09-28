@@ -18,7 +18,7 @@
 import datetime
 import mock
 from oslotest import base
-from requests import Session
+import requests
 from six.moves.urllib import parse as urlparse
 import uuid
 
@@ -122,14 +122,16 @@ class TestHttpPublisher(base.BaseTestCase):
 
         res = mock.Mock()
         res.status_code = 200
-        with mock.patch.object(Session, 'post', return_value=res) as m_req:
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertFalse(thelog.error.called)
 
         res.status_code = 401
-        with mock.patch.object(Session, 'post', return_value=res) as m_req:
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
         self.assertEqual(1, m_req.call_count)
@@ -143,14 +145,16 @@ class TestHttpPublisher(base.BaseTestCase):
 
         res = mock.Mock()
         res.status_code = 200
-        with mock.patch.object(Session, 'post', return_value=res) as m_req:
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
             publisher.publish_events(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertFalse(thelog.error.called)
 
         res.status_code = 401
-        with mock.patch.object(Session, 'post', return_value=res) as m_req:
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
             publisher.publish_samples(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
@@ -163,7 +167,8 @@ class TestHttpPublisher(base.BaseTestCase):
 
         res = mock.Mock()
         res.status_code = 200
-        with mock.patch.object(Session, 'post', return_value=res) as m_req:
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
             publisher.publish_events(self.empty_event_data)
 
         self.assertEqual(0, m_req.call_count)

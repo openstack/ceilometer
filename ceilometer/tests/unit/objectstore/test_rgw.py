@@ -22,11 +22,11 @@ import testscenarios.testcase
 
 from ceilometer.agent import manager
 from ceilometer.objectstore import rgw
-from ceilometer.objectstore.rgw_client import RGWAdminClient as rgw_client
+from ceilometer.objectstore import rgw_client
 
-bucket_list1 = [rgw_client.Bucket('somefoo1', 10, 7)]
-bucket_list2 = [rgw_client.Bucket('somefoo2', 2, 9)]
-bucket_list3 = [rgw_client.Bucket('unlisted', 100, 100)]
+bucket_list1 = [rgw_client.RGWAdminClient.Bucket('somefoo1', 10, 7)]
+bucket_list2 = [rgw_client.RGWAdminClient.Bucket('somefoo2', 2, 9)]
+bucket_list3 = [rgw_client.RGWAdminClient.Bucket('unlisted', 100, 100)]
 
 GET_BUCKETS = [('tenant-000', {'num_buckets': 2, 'size': 1042,
                                'num_objects': 1001, 'buckets': bucket_list1}),
@@ -119,7 +119,8 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
 
         api_method = 'get_%s' % self.pollster.METHOD
 
-        with mockpatch.PatchObject(rgw_client, api_method, new=mock_method):
+        with mockpatch.PatchObject(rgw_client.RGWAdminClient,
+                                   api_method, new=mock_method):
             cache = {self.pollster.CACHE_KEY_METHOD: [self.ACCOUNTS[0]]}
             data = list(self.pollster._iter_accounts(mock.Mock(), cache,
                                                      ASSIGNED_TENANTS))
@@ -146,7 +147,8 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         mock_method = mock.MagicMock()
         endpoint = 'http://127.0.0.1:8000/admin'
         api_method = 'get_%s' % self.pollster.METHOD
-        with mockpatch.PatchObject(rgw_client, api_method, new=mock_method):
+        with mockpatch.PatchObject(rgw_client.RGWAdminClient,
+                                   api_method, new=mock_method):
             with mockpatch.PatchObject(
                     self.manager._catalog, 'url_for',
                     return_value=endpoint):
@@ -160,7 +162,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         mock_url_for = mock.MagicMock()
         mock_url_for.return_value = '/endpoint'
         api_method = 'get_%s' % self.pollster.METHOD
-        with mockpatch.PatchObject(rgw_client, api_method,
+        with mockpatch.PatchObject(rgw_client.RGWAdminClient, api_method,
                                    new=mock.MagicMock()):
             with mockpatch.PatchObject(
                     self.manager._catalog, 'url_for',
