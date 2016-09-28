@@ -121,7 +121,9 @@ HBase
 
    The implementation uses `HappyBase`_, which is a wrapper library used to
    interact with HBase via Thrift protocol. You can verify the Thrift
-   connection by running a quick test from a client::
+   connection by running a quick test from a client:
+
+   .. code-block:: python
 
     import happybase
 
