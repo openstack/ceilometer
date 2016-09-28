@@ -17,7 +17,7 @@
 
 You can get API version list via request to endpoint root path. For example::
 
-  curl -H "X-AUTH-TOKEN: fa2ec18631f94039a5b9a8b4fe8f56ad" http://127.0.0.1:8777
+    $ curl -H "X-AUTH-TOKEN: fa2ec18631f94039a5b9a8b4fe8f56ad" http://127.0.0.1:8777
 
 Sample response::
 
