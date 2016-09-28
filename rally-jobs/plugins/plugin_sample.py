@@ -10,7 +10,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-""" Sample of plugin for Ceilometer.
+"""Sample of plugin for Ceilometer.
 
 For more Ceilometer related benchmarks take a look here:
 github.com/openstack/rally/blob/master/rally/benchmark/scenarios/ceilometer/
