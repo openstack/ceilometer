@@ -34,7 +34,7 @@ Gnocchi
 
 2. Initialize Gnocchi for Ceilometer::
 
-     gnocchi-upgrade --create-legacy-resource-types
+    $ gnocchi-upgrade --create-legacy-resource-types
 
    .. note::
 

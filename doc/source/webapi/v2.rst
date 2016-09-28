@@ -235,37 +235,37 @@ Ceilometer API calls:
 
 A simple query to return a list of available meters::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters"
 
 A query to return the list of resources::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/resources"
 
 A query to return the list of samples, limited to a specific meter type::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/disk.root.size"
 
 A query using filters (see: `query filter section <http://docs.openstack.org/developer/ceilometer/webapi/v2.html#filtering-queries>`_)::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.delete.start"
 
 Additional examples::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/disk.root.size?q.field=resource_id&q.op=eq&q.value=<resource_id_here>"
 
 or::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.exists"
 
 You can specify multiple filters by using an array of queries (order matters)::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/instance"\
        "?q.field=metadata.event_type&q.value=compute.instance.exists"\
        "&q.field=timestamp&q.op=gt&q.value=2013-07-03T13:34:17"
@@ -273,7 +273,7 @@ You can specify multiple filters by using an array of queries (order matters)::
 A query to find the maximum value and standard deviation (*max*, *stddev*) of
 the CPU utilization for a given instance (identified by *resource_id*)::
 
-     curl -H 'X-Auth-Token: <inserttokenhere>' \
+     $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/cpu_util/statistics?aggregate.func=max&aggregate.func=stddev"\
        "&q.field=resource_id&q.op=eq&q.value=64da755c-9120-4236-bee1-54acafe24980"
 
@@ -285,13 +285,13 @@ the CPU utilization for a given instance (identified by *resource_id*)::
 
 JSON based example::
 
-     curl -X GET -H "X-Auth-Token: <inserttokenhere>" -H "Content-Type: application/json"
+     $ curl -X GET -H "X-Auth-Token: <inserttokenhere>" -H "Content-Type: application/json"
      -d '{"q": [{"field": "timestamp", "op": "ge", "value": "2014-04-01T13:34:17"}]}'
        http://localhost:8777/v2/meters/instance
 
 JSON based example with multiple filters::
 
-     curl -X GET -H "X-Auth-Token: <inserttokenhere>" -H "Content-Type: application/json"
+     $ curl -X GET -H "X-Auth-Token: <inserttokenhere>" -H "Content-Type: application/json"
       -d '{"q": [{"field": "timestamp", "op": "ge", "value": "2014-04-01T13:34:17"},
         {"field": "resource_id", "op": "eq", "value": "4da2b992-0dc3-4a7c-a19a-d54bf918de41"}]}'
         http://localhost:8777/v2/meters/instance
@@ -618,7 +618,7 @@ to four, the query looks like the following::
 
 A query request looks like the following with curl::
 
-    curl -X POST -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
+    $ curl -X POST -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
       -d '<insertyourqueryexpressionhere>' \
        http://localhost:8777/v2/query/samples
 
@@ -634,7 +634,7 @@ By adding a *Sample* to a *Resource*, you create automatically the corresponding
 *Meter* if it does not exist already. To achieve this, you have to POST a list
 of one to many samples in JSON format::
 
-    curl -X POST -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
+    $ curl -X POST -H 'X-Auth-Token: <inserttokenhere>' -H 'Content-Type: application/json' \
       -d '<insertyoursampleslisthere>' \
       http://localhost:8777/v2/meters/<insertyourmeternamehere>
 
