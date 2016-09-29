@@ -1,5 +1,5 @@
-Enable Image service meters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enable Image service meters for Ubuntu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Telemetry uses notifications to collect Image service meters. Perform
 these steps on the controller node.
