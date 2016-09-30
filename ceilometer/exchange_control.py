@@ -14,6 +14,12 @@
 from oslo_config import cfg
 
 EXCHANGE_OPTS = [
+    cfg.StrOpt('nova_control_exchange',
+               default='nova',
+               help="Exchange name for Nova notifications."),
+    cfg.StrOpt('neutron_control_exchange',
+               default='neutron',
+               help="Exchange name for Neutron notifications."),
     cfg.StrOpt('heat_control_exchange',
                default='heat',
                help="Exchange name for Heat notifications"),
