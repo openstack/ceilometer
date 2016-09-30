@@ -16,14 +16,10 @@
 from oslo_config import cfg
 
 
-service_available_group = cfg.OptGroup(name="service_available",
-                                       title="Available OpenStack Services")
-
-ServiceAvailableGroup = [
-    cfg.BoolOpt('ceilometer',
-                default=True,
-                help="Whether or not Ceilometer is expected to be available"),
-]
+service_option = cfg.BoolOpt('ceilometer',
+                             default=True,
+                             help="Whether or not Ceilometer is expected to be"
+                                  "available")
 
 telemetry_group = cfg.OptGroup(name='telemetry',
                                title='Telemetry Service Options')
