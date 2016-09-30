@@ -15,7 +15,6 @@
 
 import os
 
-from tempest import config
 from tempest.test_discover import plugins
 
 import ceilometer
@@ -32,16 +31,13 @@ class CeilometerTempestPlugin(plugins.TempestPlugin):
         return full_test_dir, base_path
 
     def register_opts(self, conf):
-        config.register_opt_group(conf,
-                                  tempest_config.service_available_group,
-                                  tempest_config.ServiceAvailableGroup)
-        config.register_opt_group(conf,
-                                  tempest_config.telemetry_group,
-                                  tempest_config.TelemetryGroup)
+        conf.register_group(tempest_config.telemetry_group)
+        conf.register_opts(tempest_config.TelemetryGroup, group='telemetry')
+        conf.register_opt(tempest_config.service_option,
+                          group='service_available')
 
     def get_opt_lists(self):
         return [
             (tempest_config.telemetry_group.name,
              tempest_config.TelemetryGroup),
-            ('service_available', tempest_config.ServiceAvailableGroup)
-        ]
+            ('service_available', [tempest_config.service_option])]
