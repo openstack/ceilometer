@@ -10,8 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-""" Various HBase helpers
-"""
+"""Various HBase helpers"""
 import copy
 import datetime
 import json

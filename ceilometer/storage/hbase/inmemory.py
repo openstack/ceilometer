@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-""" This is a very crude version of "in-memory HBase", which implements just
+"""This is a very crude version of "in-memory HBase", which implements just
  enough functionality of HappyBase API to support testing of our driver.
 """
 
