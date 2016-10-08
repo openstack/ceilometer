@@ -149,6 +149,34 @@ class _PacketsBase(_Base):
         return info.tx_packets
 
 
+class _DropBase(_Base):
+
+    NET_USAGE_MESSAGE = ' '.join(["NETWORK PACKET DROPS:", "%s %s:",
+                                  "rx-drop=%d", "tx-drop=%d"])
+
+    @staticmethod
+    def _get_rx_info(info):
+        return info.rx_drop
+
+    @staticmethod
+    def _get_tx_info(info):
+        return info.tx_drop
+
+
+class _ErrorsBase(_Base):
+
+    NET_USAGE_MESSAGE = ' '.join(["NETWORK PACKET ERRORS:", "%s %s:",
+                                  "rx-errors=%d", "tx-errors=%d"])
+
+    @staticmethod
+    def _get_rx_info(info):
+        return info.rx_errors
+
+    @staticmethod
+    def _get_tx_info(info):
+        return info.tx_errors
+
+
 class IncomingBytesPollster(_Base):
 
     def _get_sample(self, instance, vnic, info):
@@ -223,5 +251,57 @@ class OutgoingBytesRatePollster(_RateBase):
             type=sample.TYPE_GAUGE,
             unit='B/s',
             volume=info.tx_bytes_rate,
+            vnic_data=vnic,
+        )
+
+
+class IncomingDropPollster(_DropBase):
+
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
+            instance,
+            name='network.incoming.packets.drop',
+            type=sample.TYPE_CUMULATIVE,
+            unit='packet',
+            volume=info.rx_drop,
+            vnic_data=vnic,
+        )
+
+
+class OutgoingDropPollster(_DropBase):
+
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
+            instance,
+            name='network.outgoing.packets.drop',
+            type=sample.TYPE_CUMULATIVE,
+            unit='packet',
+            volume=info.tx_drop,
+            vnic_data=vnic,
+        )
+
+
+class IncomingErrorsPollster(_ErrorsBase):
+
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
+            instance,
+            name='network.incoming.packets.error',
+            type=sample.TYPE_CUMULATIVE,
+            unit='packet',
+            volume=info.rx_errors,
+            vnic_data=vnic,
+        )
+
+
+class OutgoingErrorsPollster(_ErrorsBase):
+
+    def _get_sample(self, instance, vnic, info):
+        return self.make_vnic_sample(
+            instance,
+            name='network.outgoing.packets.error',
+            type=sample.TYPE_CUMULATIVE,
+            unit='packet',
+            volume=info.tx_errors,
             vnic_data=vnic,
         )

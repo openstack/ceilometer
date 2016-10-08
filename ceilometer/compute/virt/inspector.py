@@ -120,8 +120,10 @@ Interface = collections.namedtuple('Interface', ['name', 'mac',
 # tx_packets: number of transmitted packets
 #
 InterfaceStats = collections.namedtuple('InterfaceStats',
-                                        ['rx_bytes', 'rx_packets',
-                                         'tx_bytes', 'tx_packets'])
+                                        ['rx_bytes', 'tx_bytes',
+                                         'rx_packets', 'tx_packets',
+                                         'rx_drop', 'tx_drop',
+                                         'rx_errors', 'tx_errors'])
 
 
 # Named tuple representing vNIC rate statistics.

@@ -120,8 +120,12 @@ class HyperVInspector(virt_inspector.Inspector):
             stats = virt_inspector.InterfaceStats(
                 rx_bytes=vnic_metrics['rx_mb'] * units.Mi,
                 rx_packets=0,
+                rx_drop=0,
+                rx_errors=0,
                 tx_bytes=vnic_metrics['tx_mb'] * units.Mi,
-                tx_packets=0)
+                tx_packets=0,
+                tx_drop=0,
+                tx_errors=0)
 
             yield (interface, stats)
 
