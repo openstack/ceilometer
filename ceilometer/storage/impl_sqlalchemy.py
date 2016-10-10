@@ -338,8 +338,11 @@ class Connection(base.Connection):
 
         return internal_id
 
-    @api.wrap_db_retry(retry_interval=cfg.CONF.database.retry_interval,
-                       max_retries=cfg.CONF.database.max_retries,
+    # FIXME(sileht): use set_defaults to pass cfg.CONF.database.retry_interval
+    # and cfg.CONF.database.max_retries to this method when global config
+    # have been removed (puting directly cfg.CONF don't work because and copy
+    # the default instead of the configured value)
+    @api.wrap_db_retry(retry_interval=10, max_retries=10,
                        retry_on_deadlock=True)
     def record_metering_data(self, data):
         """Write the data to the backend storage system.
