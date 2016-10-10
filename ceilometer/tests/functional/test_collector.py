@@ -169,17 +169,21 @@ class TestCollector(tests_base.BaseTestCase):
     def _raise_error(*args, **kwargs):
         raise Exception
 
-    def test_udp_receive_bad_decoding(self):
+    @mock.patch.object(collector, 'LOG')
+    def test_udp_receive_bad_decoding(self, log):
         self._setup_messaging(False)
         udp_socket = self._make_fake_socket(self.sample)
-        with mock.patch('socket.socket', return_value=udp_socket):
-            with mock.patch('msgpack.loads', self._raise_error):
-                self.srv.run()
-                self.addCleanup(self.srv.terminate)
-                self.srv.udp_thread.join(5)
-                self.assertFalse(self.srv.udp_thread.is_alive())
+        with mock.patch('select.select', return_value=([udp_socket], [], [])):
+            with mock.patch('socket.socket', return_value=udp_socket):
+                with mock.patch('msgpack.loads', self._raise_error):
+                    self.srv.run()
+                    self.addCleanup(self.srv.terminate)
+                    self.srv.udp_thread.join(5)
+                    self.assertFalse(self.srv.udp_thread.is_alive())
 
         self._verify_udp_socket(udp_socket)
+        log.warning.assert_called_once_with(
+            "UDP: Cannot decode data sent by %s", mock.ANY)
 
     @mock.patch.object(collector.CollectorService, 'start_udp')
     def test_only_udp(self, udp_start):
