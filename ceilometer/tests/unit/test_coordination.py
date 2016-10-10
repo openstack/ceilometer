@@ -160,7 +160,7 @@ class TestPartitioning(base.BaseTestCase):
                         coordinator_cls(member_id, shared_storage,
                                         retry_count) if retry_count else
                         coordinator_cls(member_id, shared_storage)):
-            pc = coordination.PartitionCoordinator(agent_id)
+            pc = coordination.PartitionCoordinator(self.CONF, agent_id)
             pc.start()
             if cleanup_stop:
                 self.addCleanup(pc.stop)

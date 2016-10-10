@@ -89,13 +89,14 @@ class PartitionCoordinator(object):
     empty iterable in this case.
     """
 
-    def __init__(self, my_id=None):
+    def __init__(self, conf, my_id=None):
+        self.conf = conf
         self._coordinator = None
         self._groups = set()
         self._my_id = my_id or str(uuid.uuid4())
 
     def start(self):
-        backend_url = cfg.CONF.coordination.backend_url
+        backend_url = self.conf.coordination.backend_url
         if backend_url:
             try:
                 self._coordinator = tooz.coordination.get_coordinator(
@@ -147,8 +148,8 @@ class PartitionCoordinator(object):
                 or not group_id):
             return
 
-        retry_backoff = cfg.CONF.coordination.retry_backoff * 1000
-        max_retry_interval = cfg.CONF.coordination.max_retry_interval * 1000
+        retry_backoff = self.conf.coordination.retry_backoff * 1000
+        max_retry_interval = self.conf.coordination.max_retry_interval * 1000
 
         @retrying.retry(
             wait_exponential_multiplier=retry_backoff,

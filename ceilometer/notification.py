@@ -164,7 +164,8 @@ class NotificationService(service_base.PipelineBasedService):
 
         if self.conf.notification.workload_partitioning:
             self.group_id = self.NOTIFICATION_NAMESPACE
-            self.partition_coordinator = coordination.PartitionCoordinator()
+            self.partition_coordinator = coordination.PartitionCoordinator(
+                self.conf)
             self.partition_coordinator.start()
         else:
             # FIXME(sileht): endpoint uses the notification_topics option

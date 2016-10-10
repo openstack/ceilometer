@@ -278,7 +278,8 @@ class AgentManager(service_base.PipelineBasedService):
         self.discoveries = list(itertools.chain(*list(discoveries)))
         self.polling_periodics = None
 
-        self.partition_coordinator = coordination.PartitionCoordinator()
+        self.partition_coordinator = coordination.PartitionCoordinator(
+            self.conf)
         self.heartbeat_timer = utils.create_periodic(
             target=self.partition_coordinator.heartbeat,
             spacing=self.conf.coordination.heartbeat,
