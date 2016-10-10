@@ -80,7 +80,7 @@ class NotifierHook(hooks.PecanHook):
     """
 
     def __init__(self, conf):
-        transport = messaging.get_transport()
+        transport = messaging.get_transport(conf)
         self.notifier = oslo_messaging.Notifier(
             transport, driver=conf.publisher_notifier.telemetry_driver,
             publisher_id="ceilometer.api")

@@ -74,7 +74,7 @@ class CollectorService(cotyledon.Service):
         if self.conf.collector.udp_address:
             self.udp_thread = utils.spawn_thread(self.start_udp)
 
-        transport = messaging.get_transport(optional=True)
+        transport = messaging.get_transport(self.conf, optional=True)
         if transport:
             if list(self.meter_manager):
                 sample_target = oslo_messaging.Target(

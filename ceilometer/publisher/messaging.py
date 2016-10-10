@@ -201,7 +201,7 @@ class NotifierPublisher(MessagingPublisher):
                                        urlparse.urlencode(options, True),
                                        parsed_url.fragment])
         self.notifier = oslo_messaging.Notifier(
-            messaging.get_transport(url),
+            messaging.get_transport(cfg.CONF, url),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id='telemetry.publisher.%s' % cfg.CONF.host,
             topics=topic,
