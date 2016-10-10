@@ -21,5 +21,5 @@ from ceilometer import service
 from ceilometer.api import app
 
 # Initialize the oslo configuration library and logging
-service.prepare_service([])
-application = app.load_app()
+conf = service.prepare_service([])
+application = app.load_app(conf)

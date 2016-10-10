@@ -21,7 +21,6 @@ from oslo_policy import opts
 import pecan
 import pecan.testing
 
-from ceilometer.api import rbac
 from ceilometer.tests import db as db_test_base
 
 cfg.CONF.import_group('api', 'ceilometer.api.controllers.v2.root')
@@ -64,11 +63,10 @@ class FunctionalTest(db_test_base.TestBase):
             },
         }
 
-        return pecan.testing.load_test_app(self.config)
+        return pecan.testing.load_test_app(self.config, conf=self.CONF)
 
     def tearDown(self):
         super(FunctionalTest, self).tearDown()
-        rbac.reset()
         pecan.set_config({}, overwrite=True)
 
     def put_json(self, path, params, expect_errors=False, headers=None,

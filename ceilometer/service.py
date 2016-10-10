@@ -19,6 +19,7 @@ from keystoneauth1 import loading as ka_loading
 from oslo_config import cfg
 import oslo_i18n
 from oslo_log import log
+from oslo_policy import opts as policy_opts
 from oslo_reports import guru_meditation_report as gmr
 
 from ceilometer.conf import defaults
@@ -62,26 +63,32 @@ keystone_client.register_keystoneauth_opts(cfg.CONF)
 
 
 def prepare_service(argv=None, config_files=None):
+    if argv is None:
+        argv = sys.argv
+
+    # FIXME(sileht): Use ConfigOpts() instead
+    conf = cfg.CONF
+
     oslo_i18n.enable_lazy()
-    log.register_options(cfg.CONF)
-    log_levels = (cfg.CONF.default_log_levels +
+    log.register_options(conf)
+    log_levels = (conf.default_log_levels +
                   ['futurist=INFO', 'neutronclient=INFO',
                    'keystoneclient=INFO'])
     log.set_defaults(default_log_levels=log_levels)
     defaults.set_cors_middleware_defaults()
+    policy_opts.set_defaults(conf)
 
-    if argv is None:
-        argv = sys.argv
-    cfg.CONF(argv[1:], project='ceilometer', validate_default_values=True,
-             version=version.version_info.version_string(),
-             default_config_files=config_files)
+    conf(argv[1:], project='ceilometer', validate_default_values=True,
+         version=version.version_info.version_string(),
+         default_config_files=config_files)
 
-    ka_loading.load_auth_from_conf_options(cfg.CONF, "service_credentials")
+    ka_loading.load_auth_from_conf_options(conf, "service_credentials")
 
-    log.setup(cfg.CONF, 'ceilometer')
+    log.setup(conf, 'ceilometer')
     # NOTE(liusheng): guru cannot run with service under apache daemon, so when
     # ceilometer-api running with mod_wsgi, the argv is [], we don't start
     # guru.
     if argv:
         gmr.TextGuruMeditation.setup_autorun(version)
     messaging.setup()
+    return conf

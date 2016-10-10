@@ -97,7 +97,7 @@ class TestAPIACL(v2.FunctionalTest):
     def _make_app(self):
         file_name = self.path_get('etc/ceilometer/api_paste.ini')
         self.CONF.set_override("api_paste_config", file_name)
-        return webtest.TestApp(app.load_app())
+        return webtest.TestApp(app.load_app(self.CONF))
 
     def test_non_authenticated(self):
         response = self.get_json('/meters', expect_errors=True)

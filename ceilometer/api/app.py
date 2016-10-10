@@ -15,6 +15,7 @@
 # under the License.
 
 import os
+import uuid
 
 from oslo_config import cfg
 from oslo_log import log
@@ -52,11 +53,14 @@ CONF.register_opts(OPTS)
 CONF.register_opts(API_OPTS, group='api')
 
 
-def setup_app(pecan_config=None):
+def setup_app(pecan_config=None, conf=None):
+    if conf is None:
+        raise RuntimeError("No configuration passed")
+
     # FIXME: Replace DBHook with a hooks.TransactionHook
-    app_hooks = [hooks.ConfigHook(),
-                 hooks.DBHook(),
-                 hooks.NotifierHook(),
+    app_hooks = [hooks.ConfigHook(conf),
+                 hooks.DBHook(conf),
+                 hooks.NotifierHook(conf),
                  hooks.TranslationHook()]
 
     pecan_config = pecan_config or {
@@ -70,7 +74,7 @@ def setup_app(pecan_config=None):
 
     app = pecan.make_app(
         pecan_config['app']['root'],
-        debug=CONF.api.pecan_debug,
+        debug=conf.api.pecan_debug,
         hooks=app_hooks,
         wrap_app=middleware.ParsableErrorMiddleware,
         guess_content_type_from_ext=False
@@ -79,25 +83,43 @@ def setup_app(pecan_config=None):
     return app
 
 
-def load_app():
+# NOTE(sileht): pastedeploy uses ConfigParser to handle
+# global_conf, since python 3 ConfigParser doesn't
+# allow to store object as config value, only strings are
+# permit, so to be able to pass an object created before paste load
+# the app, we store them into a global var. But the each loaded app
+# store it's configuration in unique key to be concurrency safe.
+global APPCONFIGS
+APPCONFIGS = {}
+
+
+def load_app(conf):
+    global APPCONFIGS
+
     # Build the WSGI app
     cfg_file = None
-    cfg_path = cfg.CONF.api_paste_config
+    cfg_path = conf.api_paste_config
     if not os.path.isabs(cfg_path):
-        cfg_file = CONF.find_file(cfg_path)
+        cfg_file = conf.find_file(cfg_path)
     elif os.path.exists(cfg_path):
         cfg_file = cfg_path
 
     if not cfg_file:
-        raise cfg.ConfigFilesNotFoundError([cfg.CONF.api_paste_config])
+        raise cfg.ConfigFilesNotFoundError([conf.api_paste_config])
+
+    configkey = str(uuid.uuid4())
+    APPCONFIGS[configkey] = conf
+
     LOG.info("Full WSGI config used: %s" % cfg_file)
-    return deploy.loadapp("config:" + cfg_file)
+    return deploy.loadapp("config:" + cfg_file,
+                          global_conf={'configkey': configkey})
 
 
 def app_factory(global_config, **local_conf):
-    return setup_app()
+    global APPCONFIGS
+    conf = APPCONFIGS.get(global_config.get('configkey'))
+    return setup_app(conf=conf)
 
 
-def build_wsgi_app():
-    service.prepare_service()
-    return load_app()
+def build_wsgi_app(argv=None):
+    return load_app(service.prepare_service(argv=argv))

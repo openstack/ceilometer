@@ -21,7 +21,6 @@
 import base64
 import datetime
 
-from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import strutils
 from oslo_utils import timeutils
@@ -360,7 +359,8 @@ class MeterController(rest.RestController):
             s.message_id = published_sample.id
 
             sample_dict = publisher_utils.meter_message_from_counter(
-                published_sample, cfg.CONF.publisher.telemetry_secret)
+                published_sample,
+                pecan.request.cfg.publisher.telemetry_secret)
             if direct:
                 ts = timeutils.parse_isotime(sample_dict['timestamp'])
                 sample_dict['timestamp'] = timeutils.normalize_time(ts)

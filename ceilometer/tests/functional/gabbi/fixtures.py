@@ -29,6 +29,7 @@ from oslo_utils import fileutils
 import six
 from six.moves.urllib import parse as urlparse
 
+from ceilometer.api import app
 from ceilometer.event.storage import models
 from ceilometer.publisher import utils
 from ceilometer import sample
@@ -39,12 +40,25 @@ from ceilometer import storage
 # data store.
 ENGINES = ['mongodb']
 
+# NOTE(chdent): Hack to restore semblance of global configuration to
+# pass to the WSGI app used per test suite. LOAD_APP_KWARGS are the olso
+# configuration, and the pecan application configuration of
+# which the critical part is a reference to the current indexer.
+LOAD_APP_KWARGS = None
+
+
+def setup_app():
+    global LOAD_APP_KWARGS
+    return app.load_app(**LOAD_APP_KWARGS)
+
 
 class ConfigFixture(fixture.GabbiFixture):
     """Establish the relevant configuration for a test run."""
 
     def start_fixture(self):
         """Set up config."""
+
+        global LOAD_APP_KWARGS
 
         self.conf = None
 
@@ -93,6 +107,10 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('gnocchi_is_enabled', False, group='api')
         conf.set_override('aodh_is_enabled', False, group='api')
         conf.set_override('panko_is_enabled', False, group='api')
+
+        LOAD_APP_KWARGS = {
+            'conf': conf,
+        }
 
     def stop_fixture(self):
         """Reset the config and remove data."""
