@@ -166,12 +166,11 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
         super(ProcessMeterNotifications, self).__init__(manager)
         self.definitions = self._load_definitions()
 
-    @staticmethod
-    def _load_definitions():
+    def _load_definitions(self):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
         meters_cfg = declarative.load_definitions(
-            {}, cfg.CONF.meter.meter_definitions_cfg_file,
+            cfg.CONF, {}, cfg.CONF.meter.meter_definitions_cfg_file,
             pkg_resources.resource_filename(__name__, "data/meters.yaml"))
 
         definitions = {}

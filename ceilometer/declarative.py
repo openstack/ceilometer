@@ -14,7 +14,6 @@
 import os
 
 from jsonpath_rw_ext import parser
-from oslo_config import cfg
 from oslo_log import log
 import six
 import yaml
@@ -146,11 +145,11 @@ class Definition(object):
             return getter
 
 
-def load_definitions(defaults, config_file, fallback_file=None):
+def load_definitions(conf, defaults, config_file, fallback_file=None):
     """Setup a definitions from yaml config file."""
 
     if not os.path.exists(config_file):
-        config_file = cfg.CONF.find_file(config_file)
+        config_file = conf.find_file(config_file)
     if not config_file and fallback_file is not None:
         LOG.debug("No Definitions configuration file found!"
                   "Using default config.")

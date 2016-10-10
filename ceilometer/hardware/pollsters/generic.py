@@ -194,7 +194,7 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
     def build_pollsters(cls):
         if not cls.mapping:
             definition_cfg = declarative.load_definitions(
-                {}, cfg.CONF.hardware.meter_definitions_file,
+                cfg.CONF, {}, cfg.CONF.hardware.meter_definitions_file,
                 pkg_resources.resource_filename(__name__, "data/snmp.yaml"))
             cls.mapping = load_definition(definition_cfg)
 

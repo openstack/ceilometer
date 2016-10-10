@@ -264,7 +264,8 @@ class TestMeterProcessing(test.BaseTestCase):
         super(TestMeterProcessing, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         ceilometer_service.prepare_service(argv=[], config_files=[])
-        self.handler = notifications.ProcessMeterNotifications(mock.Mock())
+        self.handler = notifications.ProcessMeterNotifications(
+            mock.Mock(conf=self.CONF))
 
     def test_fallback_meter_path(self):
         self.CONF.set_override('meter_definitions_cfg_file',

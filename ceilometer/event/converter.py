@@ -289,6 +289,7 @@ class NotificationEventsConverter(object):
 def setup_events(trait_plugin_mgr):
     """Setup the event definitions from yaml config file."""
     return NotificationEventsConverter(
-        declarative.load_definitions([], cfg.CONF.event.definitions_cfg_file),
+        declarative.load_definitions(cfg.CONF, [],
+                                     cfg.CONF.event.definitions_cfg_file),
         trait_plugin_mgr,
         add_catchall=not cfg.CONF.event.drop_unmatched_notifications)

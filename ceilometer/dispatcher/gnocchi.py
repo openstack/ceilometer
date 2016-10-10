@@ -252,7 +252,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
         data = declarative.load_definitions(
-            {}, conf.dispatcher_gnocchi.resources_definition_file)
+            conf, {}, conf.dispatcher_gnocchi.resources_definition_file)
         resource_defs = []
         for resource in data.get('resources', []):
             try:

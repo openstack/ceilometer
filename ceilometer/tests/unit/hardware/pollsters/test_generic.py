@@ -127,7 +127,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
             'meter_definitions_file',
             meter_cfg_file, group='hardware')
         cfg = declarative.load_definitions(
-            {}, self.conf.hardware.meter_definitions_file)
+            self.conf, {}, self.conf.hardware.meter_definitions_file)
         return cfg
 
     def _check_get_samples(self, name, definition,
