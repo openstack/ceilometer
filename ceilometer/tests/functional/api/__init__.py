@@ -48,6 +48,7 @@ class FunctionalTest(db_test_base.TestBase):
 
         self.CONF.set_override('gnocchi_is_enabled', False, group='api')
         self.CONF.set_override('aodh_is_enabled', False, group='api')
+        self.CONF.set_override('panko_is_enabled', False, group='api')
 
         self.app = self._make_app()
 
