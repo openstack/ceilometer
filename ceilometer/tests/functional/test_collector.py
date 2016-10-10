@@ -77,7 +77,7 @@ class TestCollector(tests_base.BaseTestCase):
             'not-so-secret')
 
         self.mock_dispatcher = self._setup_fake_dispatcher()
-        self.srv = collector.CollectorService(0)
+        self.srv = collector.CollectorService(0, self.CONF)
 
     def _setup_messaging(self, enabled=True):
         if enabled:

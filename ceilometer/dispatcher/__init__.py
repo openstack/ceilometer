@@ -51,7 +51,7 @@ STORAGE_OPTS = [
 cfg.CONF.register_opts(STORAGE_OPTS, group='storage')
 
 
-def _load_dispatcher_manager(dispatcher_type):
+def _load_dispatcher_manager(conf, dispatcher_type):
     namespace = 'ceilometer.dispatcher.%s' % dispatcher_type
     conf_name = '%s_dispatchers' % dispatcher_type
 
@@ -60,9 +60,9 @@ def _load_dispatcher_manager(dispatcher_type):
     # to propagate exceptions.
     dispatcher_manager = named.NamedExtensionManager(
         namespace=namespace,
-        names=getattr(cfg.CONF, conf_name),
+        names=getattr(conf, conf_name),
         invoke_on_load=True,
-        invoke_args=[cfg.CONF],
+        invoke_args=[conf],
         propagate_map_exceptions=True)
     if not list(dispatcher_manager):
         LOG.warning(_LW('Failed to load any dispatchers for %s'),
@@ -70,9 +70,9 @@ def _load_dispatcher_manager(dispatcher_type):
     return dispatcher_manager
 
 
-def load_dispatcher_manager():
-    return (_load_dispatcher_manager('meter'),
-            _load_dispatcher_manager('event'))
+def load_dispatcher_manager(conf):
+    return (_load_dispatcher_manager(conf, 'meter'),
+            _load_dispatcher_manager(conf, 'event'))
 
 
 class Base(object):
