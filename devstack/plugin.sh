@@ -340,7 +340,6 @@ function configure_ceilometer {
     fi
 
     if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-        iniset $CEILOMETER_CONF api pecan_debug "False"
         _ceilometer_config_apache_wsgi
     fi
 
