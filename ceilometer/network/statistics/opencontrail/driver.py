@@ -14,6 +14,7 @@
 
 import re
 
+from oslo_config import cfg
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
@@ -65,7 +66,7 @@ class OpencontrailDriver(driver.Driver):
 
         data = {
             'o_client': client.Client(endpoint),
-            'n_client': neutron_client.Client()
+            'n_client': neutron_client.Client(cfg.CONF)
         }
 
         cache['network.statistics.opencontrail'] = data

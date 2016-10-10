@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_config import cfg
+
 from ceilometer.agent import plugin_base
 from ceilometer import neutron_client
 
@@ -22,7 +24,7 @@ class _BaseServicesDiscovery(plugin_base.DiscoveryBase):
 
     def __init__(self):
         super(_BaseServicesDiscovery, self).__init__()
-        self.neutron_cli = neutron_client.Client()
+        self.neutron_cli = neutron_client.Client(cfg.CONF)
 
 
 class LBPoolsDiscovery(_BaseServicesDiscovery):

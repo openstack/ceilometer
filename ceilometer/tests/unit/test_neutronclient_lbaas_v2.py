@@ -13,6 +13,7 @@
 
 import mock
 from neutronclient.v2_0 import client
+from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer import neutron_client
@@ -22,7 +23,8 @@ class TestNeutronClientLBaaSV2(base.BaseTestCase):
 
     def setUp(self):
         super(TestNeutronClientLBaaSV2, self).setUp()
-        self.nc = neutron_client.Client()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.nc = neutron_client.Client(self.CONF)
 
     @staticmethod
     def fake_list_lbaas_pools():

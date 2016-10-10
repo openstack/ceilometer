@@ -59,16 +59,16 @@ def logged(func):
 class Client(object):
     """A client which gets information via python-neutronclient."""
 
-    def __init__(self):
-        conf = cfg.CONF.service_credentials
+    def __init__(self, conf):
+        creds = conf.service_credentials
         params = {
             'session': keystone_client.get_session(),
-            'endpoint_type': conf.interface,
-            'region_name': conf.region_name,
-            'service_type': cfg.CONF.service_types.neutron,
+            'endpoint_type': creds.interface,
+            'region_name': creds.region_name,
+            'service_type': conf.service_types.neutron,
         }
         self.client = clientv20.Client(**params)
-        self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
+        self.lb_version = conf.service_types.neutron_lbaas_version
 
     @logged
     def port_get_all(self):
