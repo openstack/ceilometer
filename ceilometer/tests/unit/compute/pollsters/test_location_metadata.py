@@ -17,6 +17,7 @@
 """
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 import six
 
@@ -44,7 +45,8 @@ class TestLocationMetadata(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
-        self.manager = manager.AgentManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
         super(TestLocationMetadata, self).setUp()
 
         # Mimics an instance returned from nova api call

@@ -118,7 +118,7 @@ class TestNetPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, expected):
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = factory()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(3, len(samples))  # one for each nic
@@ -261,7 +261,7 @@ class TestNetPollsterCache(base.TestPollsterBase):
                                                tx_drop=22, tx_errors=23)
         vnics = [(vnic0, stats0)]
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = factory()
         cache = {
             pollster.CACHE_KEY_VNIC: {
@@ -340,7 +340,7 @@ class TestNetRatesPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, expected):
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = factory()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(3, len(samples))  # one for each nic

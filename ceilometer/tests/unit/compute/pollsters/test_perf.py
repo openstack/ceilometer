@@ -38,7 +38,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
 
         self.inspector.inspect_perf_events = mock.Mock(
             side_effect=inspect_perf_events)
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
 
         def _check_perf_events_cpu_cycles(expected_usage):
             pollster = perf.PerfEventsCPUCyclesPollster()
@@ -90,7 +90,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
         self.inspector.inspect_perf_events = mock.Mock(
             side_effect=inspect_perf_events)
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = perf.PerfEventsCPUCyclesPollster()
 
         def all_samples():

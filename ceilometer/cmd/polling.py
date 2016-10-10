@@ -78,14 +78,15 @@ CLI_OPTS = [
 CONF.register_cli_opts(CLI_OPTS)
 
 
-def create_polling_service(worker_id):
-    return manager.AgentManager(CONF.polling_namespaces,
-                                CONF.pollster_list,
-                                worker_id)
+def create_polling_service(worker_id, conf):
+    return manager.AgentManager(worker_id,
+                                conf,
+                                conf.polling_namespaces,
+                                conf.pollster_list)
 
 
 def main():
-    service.prepare_service()
+    conf = service.prepare_service()
     sm = cotyledon.ServiceManager()
-    sm.add(create_polling_service)
+    sm.add(create_polling_service, args=(conf,))
     sm.run()

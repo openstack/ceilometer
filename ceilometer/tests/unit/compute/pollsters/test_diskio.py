@@ -15,6 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
 from ceilometer.agent import manager
@@ -29,7 +30,7 @@ class TestBaseDiskIO(base.BaseTestCase):
 
     def setUp(self):
         super(TestBaseDiskIO, self).setUp()
-
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.inspector = mock.Mock()
         self.instance = self._get_fake_instances()
         patch_virt = mockpatch.Patch(
@@ -65,7 +66,7 @@ class TestBaseDiskIO(base.BaseTestCase):
     def _check_get_samples(self, factory, name, expected_count=2):
         pollster = factory()
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         cache = {}
         samples = list(pollster.get_samples(mgr, cache, self.instance))
         self.assertIsNotEmpty(samples)

@@ -14,6 +14,7 @@
 # under the License.
 
 import mock
+from oslo_config import fixture as fixture_config
 
 from ceilometer.agent import manager
 from ceilometer.image import glance
@@ -86,7 +87,8 @@ class TestImagePollsterPageSize(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollsterPageSize, self).setUp()
-        self.manager = manager.AgentManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
         self.pollster = glance.ImageSizePollster()
 
     def test_image_pollster(self):
@@ -105,7 +107,8 @@ class TestImagePageSize(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePageSize, self).setUp()
-        self.manager = manager.AgentManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
         self.pollster = glance.ImagePollster()
 
     def test_image_pollster(self):

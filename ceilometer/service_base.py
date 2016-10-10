@@ -16,7 +16,6 @@
 import abc
 
 import cotyledon
-from oslo_config import cfg
 from oslo_log import log
 import six
 
@@ -29,6 +28,10 @@ LOG = log.getLogger(__name__)
 
 @six.add_metaclass(abc.ABCMeta)
 class PipelineBasedService(cotyledon.Service):
+    def __init__(self, worker_id, conf):
+        super(PipelineBasedService, self).__init__(worker_id)
+        self.conf = conf
+
     def clear_pipeline_validation_status(self):
         """Clears pipeline validation status flags."""
         self.pipeline_validated = False
@@ -39,11 +42,11 @@ class PipelineBasedService(cotyledon.Service):
         self.clear_pipeline_validation_status()
 
         self.refresh_pipeline_periodic = None
-        if (cfg.CONF.refresh_pipeline_cfg or
-                cfg.CONF.refresh_event_pipeline_cfg):
+        if (self.conf.refresh_pipeline_cfg or
+                self.conf.refresh_event_pipeline_cfg):
             self.refresh_pipeline_periodic = utils.create_periodic(
                 target=self.refresh_pipeline,
-                spacing=cfg.CONF.pipeline_polling_interval)
+                spacing=self.conf.pipeline_polling_interval)
             utils.spawn_thread(self.refresh_pipeline_periodic.start)
 
     def terminate(self):
@@ -58,7 +61,7 @@ class PipelineBasedService(cotyledon.Service):
     def refresh_pipeline(self):
         """Refreshes appropriate pipeline, then delegates to agent."""
 
-        if cfg.CONF.refresh_pipeline_cfg:
+        if self.conf.refresh_pipeline_cfg:
             manager = None
             if hasattr(self, 'pipeline_manager'):
                 manager = self.pipeline_manager
@@ -82,7 +85,7 @@ class PipelineBasedService(cotyledon.Service):
                     LOG.exception(_LE('Unable to load changed pipeline: %s')
                                   % err)
 
-        if cfg.CONF.refresh_event_pipeline_cfg:
+        if self.conf.refresh_event_pipeline_cfg:
             # Pipeline in the notification agent.
             manager = (self.event_pipeline_manager
                        if hasattr(self, 'event_pipeline_manager') else None)

@@ -15,6 +15,7 @@
 import abc
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 import six
 
@@ -24,6 +25,10 @@ from ceilometer.tests import base
 
 @six.add_metaclass(abc.ABCMeta)
 class TestPollsterBase(base.BaseTestCase):
+
+    def setUp(self):
+        super(TestPollsterBase, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def fake_data(self):
         """Fake data used for test."""
@@ -56,7 +61,7 @@ class TestPollsterBase(base.BaseTestCase):
             'ceilometer.ipmi.platform.ipmi_sensor.IPMISensor',
             return_value=nm))
 
-        self.mgr = manager.AgentManager(['ipmi'])
+        self.mgr = manager.AgentManager(0, self.CONF, ['ipmi'])
 
         self.pollster = self.make_pollster()
 

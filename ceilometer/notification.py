@@ -109,17 +109,17 @@ class NotificationService(service_base.PipelineBasedService):
 
     def _get_notifiers(self, transport, pipe):
         notifiers = []
-        for x in range(cfg.CONF.notification.pipeline_processing_queues):
+        for x in range(self.conf.notification.pipeline_processing_queues):
             notifiers.append(oslo_messaging.Notifier(
                 transport,
-                driver=cfg.CONF.publisher_notifier.telemetry_driver,
+                driver=self.conf.publisher_notifier.telemetry_driver,
                 publisher_id=pipe.name,
                 topics=['%s-%s-%s' % (self.NOTIFICATION_IPC, pipe.name, x)]))
         return notifiers
 
     def _get_pipe_manager(self, transport, pipeline_manager):
 
-        if cfg.CONF.notification.workload_partitioning:
+        if self.conf.notification.workload_partitioning:
             pipe_manager = pipeline.SamplePipelineTransportManager()
             for pipe in pipeline_manager.pipelines:
                 key = pipeline.get_pipeline_grouping_key(pipe)
@@ -132,7 +132,7 @@ class NotificationService(service_base.PipelineBasedService):
         return pipe_manager
 
     def _get_event_pipeline_manager(self, transport):
-        if cfg.CONF.notification.workload_partitioning:
+        if self.conf.notification.workload_partitioning:
             event_pipe_manager = pipeline.EventPipelineTransportManager()
             for pipe in self.event_pipeline_manager.pipelines:
                 event_pipe_manager.add_transporter(
@@ -160,9 +160,9 @@ class NotificationService(service_base.PipelineBasedService):
 
         self.event_pipeline_manager = pipeline.setup_event_pipeline()
 
-        self.transport = messaging.get_transport(cfg.CONF)
+        self.transport = messaging.get_transport(self.conf)
 
-        if cfg.CONF.notification.workload_partitioning:
+        if self.conf.notification.workload_partitioning:
             self.group_id = self.NOTIFICATION_NAMESPACE
             self.partition_coordinator = coordination.PartitionCoordinator()
             self.partition_coordinator.start()
@@ -183,18 +183,18 @@ class NotificationService(service_base.PipelineBasedService):
         self._configure_main_queue_listeners(self.pipe_manager,
                                              self.event_pipe_manager)
 
-        if cfg.CONF.notification.workload_partitioning:
+        if self.conf.notification.workload_partitioning:
             # join group after all manager set up is configured
             self.partition_coordinator.join_group(self.group_id)
             self.partition_coordinator.watch_group(self.group_id,
                                                    self._refresh_agent)
 
-            @periodics.periodic(spacing=cfg.CONF.coordination.heartbeat,
+            @periodics.periodic(spacing=self.conf.coordination.heartbeat,
                                 run_immediately=True)
             def heartbeat():
                 self.partition_coordinator.heartbeat()
 
-            @periodics.periodic(spacing=cfg.CONF.coordination.check_watchers,
+            @periodics.periodic(spacing=self.conf.coordination.check_watchers,
                                 run_immediately=True)
             def run_watchers():
                 self.partition_coordinator.run_watchers()
@@ -211,7 +211,7 @@ class NotificationService(service_base.PipelineBasedService):
             with self.coord_lock:
                 self._configure_pipeline_listener()
 
-        if not cfg.CONF.notification.disable_non_metric_meters:
+        if not self.conf.notification.disable_non_metric_meters:
             LOG.warning(_LW('Non-metric meters may be collected. It is highly '
                             'advisable to disable these meters using '
                             'ceilometer.conf or the pipeline.yaml'))
@@ -225,7 +225,7 @@ class NotificationService(service_base.PipelineBasedService):
             LOG.warning(_('Failed to load any notification handlers for %s'),
                         self.NOTIFICATION_NAMESPACE)
 
-        ack_on_error = cfg.CONF.notification.ack_on_event_error
+        ack_on_error = self.conf.notification.ack_on_event_error
 
         endpoints = []
         endpoints.append(
@@ -234,7 +234,7 @@ class NotificationService(service_base.PipelineBasedService):
         targets = []
         for ext in notification_manager:
             handler = ext.obj
-            if (cfg.CONF.notification.disable_non_metric_meters and
+            if (self.conf.notification.disable_non_metric_meters and
                     isinstance(handler, base.NonMetricNotificationBase)):
                 continue
             LOG.debug('Event types from %(name)s: %(type)s'
@@ -245,14 +245,14 @@ class NotificationService(service_base.PipelineBasedService):
             # NOTE(gordc): this could be a set check but oslo_messaging issue
             # https://bugs.launchpad.net/oslo.messaging/+bug/1398511
             # This ensures we don't create multiple duplicate consumers.
-            for new_tar in handler.get_targets(cfg.CONF):
+            for new_tar in handler.get_targets(self.conf):
                 if new_tar not in targets:
                     targets.append(new_tar)
             endpoints.append(handler)
 
-        urls = cfg.CONF.notification.messaging_urls or [None]
+        urls = self.conf.notification.messaging_urls or [None]
         for url in urls:
-            transport = messaging.get_transport(cfg.CONF, url)
+            transport = messaging.get_transport(self.conf, url)
             # NOTE(gordc): ignore batching as we want pull
             # to maintain sequencing as much as possible.
             listener = messaging.get_batch_notification_listener(
@@ -271,10 +271,10 @@ class NotificationService(service_base.PipelineBasedService):
     def _configure_pipeline_listener(self):
         ev_pipes = self.event_pipeline_manager.pipelines
         pipelines = self.pipeline_manager.pipelines + ev_pipes
-        transport = messaging.get_transport(cfg.CONF)
+        transport = messaging.get_transport(self.conf)
         partitioned = self.partition_coordinator.extract_my_subset(
             self.group_id,
-            range(cfg.CONF.notification.pipeline_processing_queues))
+            range(self.conf.notification.pipeline_processing_queues))
 
         endpoints = []
         targets = []
@@ -300,11 +300,11 @@ class NotificationService(service_base.PipelineBasedService):
             transport,
             targets,
             endpoints,
-            batch_size=cfg.CONF.notification.batch_size,
-            batch_timeout=cfg.CONF.notification.batch_timeout)
+            batch_size=self.conf.notification.batch_size,
+            batch_timeout=self.conf.notification.batch_timeout)
         # NOTE(gordc): set single thread to process data sequentially
         # if batching enabled.
-        batch = (1 if cfg.CONF.notification.batch_size > 1 else None)
+        batch = (1 if self.conf.notification.batch_size > 1 else None)
         self.pipeline_listener.start(override_pool_size=batch)
 
     def terminate(self):
@@ -344,5 +344,5 @@ class NotificationService(service_base.PipelineBasedService):
 
             # restart the pipeline listeners if workload partitioning
             # is enabled.
-            if cfg.CONF.notification.workload_partitioning:
+            if self.conf.notification.workload_partitioning:
                 self._configure_pipeline_listener()

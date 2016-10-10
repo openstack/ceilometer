@@ -29,7 +29,7 @@ class TestInstancePollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_instance(self):
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(1, len(samples))
@@ -48,7 +48,7 @@ class TestInstancePollster(base.TestPollsterBase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override('reserved_metadata_keys', ['fqdn'])
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual({'fqdn': 'vm_fqdn',
@@ -57,7 +57,7 @@ class TestInstancePollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_namespace(self):
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual({'stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128'},
@@ -65,14 +65,14 @@ class TestInstancePollster(base.TestPollsterBase):
 
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override('reserved_metadata_namespace', [])
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertNotIn('user_metadata', samples[0].resource_metadata)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_flavor_name_as_metadata_instance_type(self):
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = pollsters_instance.InstancePollster()
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(1, len(samples))

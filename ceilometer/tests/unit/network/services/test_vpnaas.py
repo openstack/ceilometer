@@ -14,6 +14,7 @@
 # under the License.
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
@@ -29,7 +30,8 @@ class _BaseTestVPNPollster(base.BaseTestCase):
     def setUp(self):
         super(_BaseTestVPNPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        self.manager = manager.AgentManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
         plugin_base._get_keystone = mock.Mock()
         catalog = (plugin_base._get_keystone.session.auth.get_access.
                    return_value.service_catalog)

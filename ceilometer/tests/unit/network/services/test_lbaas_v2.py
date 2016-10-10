@@ -14,7 +14,7 @@
 
 import mock
 
-from oslo_config import cfg
+from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
@@ -30,7 +30,8 @@ class _BaseTestLBPollster(base.BaseTestCase):
     def setUp(self):
         super(_BaseTestLBPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        self.manager = manager.AgentManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
         plugin_base._get_keystone = mock.Mock()
         catalog = (plugin_base._get_keystone.session.auth.get_access.
                    return_value.service_catalog)
@@ -239,9 +240,9 @@ class TestLBStatsPollster(_BaseTestLBPollster):
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'list_loadbalancer',
                                         return_value=fake_loadbalancers))
-        cfg.CONF.set_override('neutron_lbaas_version',
-                              'v2',
-                              group='service_types')
+        self.CONF.set_override('neutron_lbaas_version',
+                               'v2',
+                               group='service_types')
 
     @staticmethod
     def fake_list_loadbalancers():

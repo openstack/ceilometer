@@ -107,7 +107,7 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF.set_override("workload_partitioning", True,
                                group='notification')
         self.setup_messaging(self.CONF)
-        self.srv = notification.NotificationService(0)
+        self.srv = notification.NotificationService(0, self.CONF)
 
     def fake_get_notifications_manager(self, pm):
         self.plugin = _FakeNotificationPlugin(pm)
@@ -275,7 +275,7 @@ class TestRealNotificationReloadablePipeline(BaseRealNotification):
         self.CONF.set_override('refresh_pipeline_cfg', True)
         self.CONF.set_override('refresh_event_pipeline_cfg', True)
         self.CONF.set_override('pipeline_polling_interval', 1)
-        self.srv = notification.NotificationService(0)
+        self.srv = notification.NotificationService(0, self.CONF)
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_pipeline_poller(self, fake_publisher_cls):
@@ -335,7 +335,7 @@ class TestRealNotification(BaseRealNotification):
 
     def setUp(self):
         super(TestRealNotification, self).setUp()
-        self.srv = notification.NotificationService(0)
+        self.srv = notification.NotificationService(0, self.CONF)
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_service(self, fake_publisher_cls):
@@ -364,7 +364,7 @@ class TestRealNotificationHA(BaseRealNotification):
         super(TestRealNotificationHA, self).setUp()
         self.CONF.set_override('workload_partitioning', True,
                                group='notification')
-        self.srv = notification.NotificationService(0)
+        self.srv = notification.NotificationService(0, self.CONF)
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
     def test_notification_service(self, fake_publisher_cls):
@@ -545,8 +545,8 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
     def _check_notifications(self, fake_publisher_cls):
         fake_publisher_cls.side_effect = [self.publisher, self.publisher2]
 
-        self.srv = notification.NotificationService(0)
-        self.srv2 = notification.NotificationService(0)
+        self.srv = notification.NotificationService(0, self.CONF)
+        self.srv2 = notification.NotificationService(0, self.CONF)
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '._get_members', return_value=['harry', 'lloyd']):
             with mock.patch('uuid.uuid4', return_value='harry'):

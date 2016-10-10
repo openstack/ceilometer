@@ -140,8 +140,8 @@ class PollingTask(object):
         resource_factory = lambda: Resources(agent_manager)
         self.resources = collections.defaultdict(resource_factory)
 
-        self._batch = cfg.CONF.batch_polled_samples
-        self._telemetry_secret = cfg.CONF.publisher.telemetry_secret
+        self._batch = self.manager.conf.batch_polled_samples
+        self._telemetry_secret = self.manager.conf.publisher.telemetry_secret
 
     def add(self, pollster, source):
         self.pollster_matches[source.name].add(pollster)
@@ -232,18 +232,19 @@ class PollingTask(object):
 
 class AgentManager(service_base.PipelineBasedService):
 
-    def __init__(self, namespaces=None, pollster_list=None, worker_id=0):
+    def __init__(self, worker_id, conf, namespaces=None, pollster_list=None, ):
+
         namespaces = namespaces or ['compute', 'central']
         pollster_list = pollster_list or []
-        group_prefix = cfg.CONF.polling.partitioning_group_prefix
+        group_prefix = conf.polling.partitioning_group_prefix
 
         # features of using coordination and pollster-list are exclusive, and
         # cannot be used at one moment to avoid both samples duplication and
         # samples being lost
-        if pollster_list and cfg.CONF.coordination.backend_url:
+        if pollster_list and conf.coordination.backend_url:
             raise PollsterListForbidden()
 
-        super(AgentManager, self).__init__(worker_id)
+        super(AgentManager, self).__init__(worker_id, conf)
 
         def _match(pollster):
             """Find out if pollster name matches to one of the list."""
@@ -280,7 +281,7 @@ class AgentManager(service_base.PipelineBasedService):
         self.partition_coordinator = coordination.PartitionCoordinator()
         self.heartbeat_timer = utils.create_periodic(
             target=self.partition_coordinator.heartbeat,
-            spacing=cfg.CONF.coordination.heartbeat,
+            spacing=self.conf.coordination.heartbeat,
             run_immediately=True)
 
         # Compose coordination group prefix.
@@ -290,8 +291,8 @@ class AgentManager(service_base.PipelineBasedService):
                              if group_prefix else namespace_prefix)
 
         self.notifier = oslo_messaging.Notifier(
-            messaging.get_transport(cfg.CONF),
-            driver=cfg.CONF.publisher_notifier.telemetry_driver,
+            messaging.get_transport(self.conf),
+            driver=self.conf.publisher_notifier.telemetry_driver,
             publisher_id="ceilometer.polling")
 
         self._keystone = None
@@ -388,7 +389,7 @@ class AgentManager(service_base.PipelineBasedService):
 
         # set shuffle time before polling task if necessary
         delay_polling_time = random.randint(
-            0, cfg.CONF.shuffle_time_before_polling_task)
+            0, self.conf.shuffle_time_before_polling_task)
 
         data = self.setup_polling_tasks()
 
@@ -485,7 +486,7 @@ class AgentManager(service_base.PipelineBasedService):
                 try:
                     if discoverer.KEYSTONE_REQUIRED_FOR_SERVICE:
                         service_type = getattr(
-                            cfg.CONF.service_types,
+                            self.conf.service_types,
                             discoverer.KEYSTONE_REQUIRED_FOR_SERVICE)
                         if not keystone_client.get_service_catalog(
                                 self.keystone).get_endpoints(

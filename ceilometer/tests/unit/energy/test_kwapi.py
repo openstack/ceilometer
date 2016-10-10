@@ -14,6 +14,7 @@
 
 from keystoneauth1 import exceptions
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 import six
@@ -47,8 +48,8 @@ ENDPOINT = 'end://point'
 
 class TestManager(manager.AgentManager):
 
-    def __init__(self):
-        super(TestManager, self).__init__()
+    def __init__(self, worker_id, conf):
+        super(TestManager, self).__init__(worker_id, conf)
         self._keystone = mock.Mock()
 
 
@@ -57,7 +58,8 @@ class _BaseTestCase(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestCase, self).setUp()
-        self.manager = TestManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = TestManager(0, self.CONF)
 
 
 class TestKwapi(_BaseTestCase):

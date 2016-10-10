@@ -16,6 +16,7 @@ import collections
 
 from keystoneauth1 import exceptions
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 import testscenarios.testcase
@@ -46,8 +47,8 @@ ASSIGNED_TENANTS = [Tenant('tenant-000'), Tenant('tenant-001')]
 
 class TestManager(manager.AgentManager):
 
-    def __init__(self):
-        super(TestManager, self).__init__()
+    def __init__(self, worker_id, conf):
+        super(TestManager, self).__init__(worker_id, conf)
         self._keystone = mock.Mock()
         self._catalog = (self._keystone.session.auth.get_access.
                          return_value.service_catalog)
@@ -87,8 +88,9 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestRgwPollster, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.pollster = self.factory()
-        self.manager = TestManager()
+        self.manager = TestManager(0, self.CONF)
 
         if self.pollster.CACHE_KEY_METHOD == 'rgw.get_bucket':
             self.ACCOUNTS = GET_BUCKETS

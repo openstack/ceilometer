@@ -46,7 +46,7 @@ class TestMemoryPollster(base.TestPollsterBase):
         self.inspector.inspect_memory_usage = mock.Mock(
             side_effect=inspect_memory_usage)
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = memory.MemoryUsagePollster()
 
         @mock.patch('ceilometer.compute.pollsters.memory.LOG')
@@ -76,7 +76,7 @@ class TestMemoryPollster(base.TestPollsterBase):
         self.inspector.inspect_memory_usage = mock.Mock(
             side_effect=inspect_memory_usage)
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = memory.MemoryUsagePollster()
 
         def all_samples():
@@ -110,7 +110,7 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
         self.inspector.inspect_memory_resident = mock.Mock(
             side_effect=inspect_memory_resident)
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = memory.MemoryResidentPollster()
 
         @mock.patch('ceilometer.compute.pollsters.memory.LOG')
@@ -151,7 +151,7 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
 
         self.inspector.inspect_memory_bandwidth = mock.Mock(
             side_effect=inspect_memory_bandwidth)
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
 
         def _check_memory_bandwidth_total(expected_usage):
             pollster = memory.MemoryBandwidthTotalPollster()
@@ -183,7 +183,7 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
         self.inspector.inspect_memory_bandwidth = mock.Mock(
             side_effect=inspect_memory_bandwidth)
 
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.CONF)
         pollster = memory.MemoryBandwidthTotalPollster()
 
         def all_samples():

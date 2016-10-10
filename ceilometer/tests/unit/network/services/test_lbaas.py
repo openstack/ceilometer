@@ -15,7 +15,7 @@
 
 import mock
 
-from oslo_config import cfg
+from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
@@ -31,10 +31,11 @@ class _BaseTestLBPollster(base.BaseTestCase):
     def setUp(self):
         super(_BaseTestLBPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        self.manager = manager.AgentManager()
-        cfg.CONF.set_override('neutron_lbaas_version',
-                              'v1',
-                              group='service_types')
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
+        self.CONF.set_override('neutron_lbaas_version',
+                               'v1',
+                               group='service_types')
         plugin_base._get_keystone = mock.Mock()
         catalog = (plugin_base._get_keystone.session.auth.get_access.
                    return_value.service_catalog)

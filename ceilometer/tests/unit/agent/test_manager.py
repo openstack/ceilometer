@@ -60,11 +60,11 @@ class TestManager(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def test_load_plugins(self):
-        mgr = manager.AgentManager()
+        mgr = manager.AgentManager(0, self.conf)
         self.assertIsNotNone(list(mgr.extensions))
 
     def test_load_plugins_pollster_list(self):
-        mgr = manager.AgentManager(pollster_list=['disk.*'])
+        mgr = manager.AgentManager(0, self.conf, pollster_list=['disk.*'])
         # currently we do have 26 disk-related pollsters
         self.assertEqual(26, len(list(mgr.extensions)))
 
@@ -75,7 +75,7 @@ class TestManager(base.BaseTestCase):
             manager.EmptyPollstersList,
             'No valid pollsters can be loaded with the startup parameters'
             ' polling-namespaces and pollster-list.',
-            manager.AgentManager,
+            manager.AgentManager, 0, self.conf,
             pollster_list=['aaa'])
 
     def test_load_plugins_no_intersection(self):
@@ -87,8 +87,7 @@ class TestManager(base.BaseTestCase):
             manager.EmptyPollstersList,
             'No valid pollsters can be loaded with the startup parameters'
             ' polling-namespaces and pollster-list.',
-            manager.AgentManager,
-            parameters)
+            manager.AgentManager, 0, self.conf, parameters)
 
     # Test plugin load behavior based on Node Manager pollsters.
     # pollster_list is just a filter, so sensor pollsters under 'ipmi'
@@ -98,7 +97,8 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
     def test_load_normal_plugins(self):
-        mgr = manager.AgentManager(namespaces=['ipmi'],
+        mgr = manager.AgentManager(0, self.conf,
+                                   namespaces=['ipmi'],
                                    pollster_list=['hardware.ipmi.node.*'])
         # 8 pollsters for Node Manager
         self.assertEqual(8, len(mgr.extensions))
@@ -113,7 +113,8 @@ class TestManager(base.BaseTestCase):
         # Here we additionally check that namespaces will be converted to the
         # list if param was not set as a list.
         try:
-            manager.AgentManager(namespaces='ipmi',
+            manager.AgentManager(0, self.conf,
+                                 namespaces='ipmi',
                                  pollster_list=['hardware.ipmi.node.*'])
         except manager.EmptyPollstersList:
             err_msg = 'Skip loading extension for %s'
@@ -136,8 +137,7 @@ class TestManager(base.BaseTestCase):
             manager.EmptyPollstersList,
             'No valid pollsters can be loaded with the startup parameters'
             ' polling-namespaces and pollster-list.',
-            manager.AgentManager,
-            parameters)
+            manager.AgentManager, 0, self.conf, parameters)
 
     # Exceptions other than ExtensionLoadError are propagated
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
@@ -147,16 +147,17 @@ class TestManager(base.BaseTestCase):
     def test_load_exceptional_plugins(self):
         self.assertRaises(PollingException,
                           manager.AgentManager,
+                          0, self.conf,
                           ['ipmi'],
                           ['hardware.ipmi.node.*'])
 
     def test_load_plugins_pollster_list_forbidden(self):
-        manager.cfg.CONF.set_override('backend_url', 'http://',
-                                      group='coordination')
+        self.conf.set_override('backend_url', 'http://',
+                               group='coordination')
         self.assertRaises(manager.PollsterListForbidden,
                           manager.AgentManager,
+                          0, self.conf,
                           pollster_list=['disk.*'])
-        manager.cfg.CONF.reset()
 
     def test_builder(self):
         @staticmethod
@@ -182,7 +183,7 @@ class TestManager(base.BaseTestCase):
 
         with mock.patch.object(manager.AgentManager, '_get_ext_mgr',
                                new=fake_get_ext_mgr):
-            mgr = manager.AgentManager(namespaces=['central'])
+            mgr = manager.AgentManager(0, self.conf, namespaces=['central'])
             self.assertEqual(3, len(mgr.extensions))
             for ext in mgr.extensions:
                 self.assertIn(ext.name, ['builder1', 'builder2', 'test'])
@@ -242,12 +243,11 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             timestamp=agentbase.default_test_data.timestamp,
             resource_metadata=agentbase.default_test_data.resource_metadata)
 
-    @staticmethod
     @mock.patch('ceilometer.compute.pollsters.'
                 'BaseComputePollster.setup_environment',
                 mock.Mock(return_value=None))
-    def create_manager():
-        return manager.AgentManager()
+    def create_manager(self):
+        return manager.AgentManager(0, self.CONF)
 
     @staticmethod
     def setup_pipeline_file(pipeline):

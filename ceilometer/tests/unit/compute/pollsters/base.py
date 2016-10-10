@@ -15,6 +15,7 @@
 # under the License.
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
 import ceilometer.tests.base as base
@@ -24,6 +25,7 @@ class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
         self.inspector = mock.Mock()
         self.instance = mock.MagicMock()

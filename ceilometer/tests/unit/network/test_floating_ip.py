@@ -15,6 +15,7 @@
 # under the License.
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
@@ -29,7 +30,8 @@ class _BaseTestFloatingIPPollster(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestFloatingIPPollster, self).setUp()
-        self.manager = manager.AgentManager()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.manager = manager.AgentManager(0, self.CONF)
         plugin_base._get_keystone = mock.Mock()
 
 
