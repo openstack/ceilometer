@@ -57,7 +57,7 @@ CONF.register_opts(OPTS, group='hardware')
 class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
     def __init__(self):
         super(NodesDiscoveryTripleO, self).__init__()
-        self.nova_cli = nova_client.Client()
+        self.nova_cli = nova_client.Client(cfg.CONF)
         self.last_run = None
         self.instances = {}
 
