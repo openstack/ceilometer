@@ -120,7 +120,7 @@ class NotificationService(service_base.PipelineBasedService):
     def _get_pipe_manager(self, transport, pipeline_manager):
 
         if self.conf.notification.workload_partitioning:
-            pipe_manager = pipeline.SamplePipelineTransportManager()
+            pipe_manager = pipeline.SamplePipelineTransportManager(self.conf)
             for pipe in pipeline_manager.pipelines:
                 key = pipeline.get_pipeline_grouping_key(pipe)
                 pipe_manager.add_transporter(
@@ -133,7 +133,8 @@ class NotificationService(service_base.PipelineBasedService):
 
     def _get_event_pipeline_manager(self, transport):
         if self.conf.notification.workload_partitioning:
-            event_pipe_manager = pipeline.EventPipelineTransportManager()
+            event_pipe_manager = pipeline.EventPipelineTransportManager(
+                self.conf)
             for pipe in self.event_pipeline_manager.pipelines:
                 event_pipe_manager.add_transporter(
                     (pipe.source.support_event, ['event_type'],
@@ -156,9 +157,9 @@ class NotificationService(service_base.PipelineBasedService):
         # hence only one listener is required
         self.pipeline_listener = None
 
-        self.pipeline_manager = pipeline.setup_pipeline()
+        self.pipeline_manager = pipeline.setup_pipeline(self.conf)
 
-        self.event_pipeline_manager = pipeline.setup_event_pipeline()
+        self.event_pipeline_manager = pipeline.setup_event_pipeline(self.conf)
 
         self.transport = messaging.get_transport(self.conf)
 

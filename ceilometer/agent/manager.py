@@ -416,7 +416,7 @@ class AgentManager(service_base.PipelineBasedService):
 
     def run(self):
         super(AgentManager, self).run()
-        self.polling_manager = pipeline.setup_polling()
+        self.polling_manager = pipeline.setup_polling(self.conf)
         self.join_partitioning_groups()
         self.start_polling_tasks()
         self.init_pipeline_refresh()

@@ -137,6 +137,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.pipeline_cfg['sources'][0]['sinks'].append('second_sink')
         pipeline_manager = pipeline.PipelineManager(
+            self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         with pipeline_manager.publisher() as p:
             p([self.test_counter])
@@ -179,6 +180,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'sinks': ['test_sink']
         })
         pipeline_manager = pipeline.PipelineManager(
+            self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         with pipeline_manager.publisher() as p:
             p([self.test_counter])
@@ -224,6 +226,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         for s in pipeline_cfg['sinks']:
             s['publishers'] = ['test://']
         pipeline_manager = pipeline.PipelineManager(
+            self.CONF,
             self.cfg2file(pipeline_cfg), self.transformer_manager)
         pipe = pipeline_manager.pipelines[index]
         self._do_test_rate_of_change_mapping(pipe, meters, units)
@@ -277,6 +280,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.assertRaises(pipeline.PipelineException,
                           pipeline.PipelineManager,
+                          self.CONF,
                           self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)
 
@@ -290,5 +294,6 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.assertRaises(pipeline.PipelineException,
                           pipeline.PipelineManager,
+                          self.CONF,
                           self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)

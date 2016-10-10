@@ -62,12 +62,13 @@ cfg.CONF.register_opt(COLL_OPT, 'collector')
 keystone_client.register_keystoneauth_opts(cfg.CONF)
 
 
-def prepare_service(argv=None, config_files=None):
+def prepare_service(argv=None, config_files=None, conf=None):
     if argv is None:
         argv = sys.argv
 
     # FIXME(sileht): Use ConfigOpts() instead
-    conf = cfg.CONF
+    if conf is None:
+        conf = cfg.CONF
 
     oslo_i18n.enable_lazy()
     log.register_options(conf)

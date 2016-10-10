@@ -76,10 +76,12 @@ class PipelineBasedService(cotyledon.Service):
                                'new': pipeline_hash})
                     # Pipeline in the notification agent.
                     if hasattr(self, 'pipeline_manager'):
-                        self.pipeline_manager = pipeline.setup_pipeline()
+                        self.pipeline_manager = pipeline.setup_pipeline(
+                            self.conf)
                     # Polling in the polling agent.
                     elif hasattr(self, 'polling_manager'):
-                        self.polling_manager = pipeline.setup_polling()
+                        self.polling_manager = pipeline.setup_polling(
+                            self.conf)
                     self.pipeline_validated = True
                 except Exception as err:
                     LOG.exception(_LE('Unable to load changed pipeline: %s')
@@ -96,8 +98,8 @@ class PipelineBasedService(cotyledon.Service):
                               "old hash: %(old)s, new hash: %(new)s",
                               {'old': manager.cfg_hash,
                                'new': ev_pipeline_hash})
-                    self.event_pipeline_manager = (pipeline.
-                                                   setup_event_pipeline())
+                    self.event_pipeline_manager = (
+                        pipeline. setup_event_pipeline(self.conf))
                     self.event_pipeline_validated = True
                 except Exception as err:
                     LOG.exception(_LE('Unable to load changed event pipeline:'

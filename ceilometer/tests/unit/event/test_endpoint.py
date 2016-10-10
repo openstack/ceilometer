@@ -108,7 +108,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF.set_override('event_pipeline_cfg_file',
                                ev_pipeline_cfg_file)
 
-        ev_pipeline_mgr = pipeline.setup_event_pipeline()
+        ev_pipeline_mgr = pipeline.setup_event_pipeline(self.CONF)
         return ev_pipeline_mgr
 
     def _setup_endpoint(self, publishers):

@@ -65,7 +65,7 @@ def send_sample():
                    help='Meter metadata.'),
     ])
 
-    service.prepare_service()
+    conf = service.prepare_service()
 
     # Set up logging to use the console
     console = logging.StreamHandler(sys.stderr)
@@ -77,17 +77,17 @@ def send_sample():
     root_logger.setLevel(logging.DEBUG)
 
     pipeline_manager = pipeline.setup_pipeline(
-        extension.ExtensionManager('ceilometer.transformer'))
+        conf, extension.ExtensionManager('ceilometer.transformer'))
 
     with pipeline_manager.publisher() as p:
         p([sample.Sample(
-            name=cfg.CONF.sample_name,
-            type=cfg.CONF.sample_type,
-            unit=cfg.CONF.sample_unit,
-            volume=cfg.CONF.sample_volume,
-            user_id=cfg.CONF.sample_user,
-            project_id=cfg.CONF.sample_project,
-            resource_id=cfg.CONF.sample_resource,
-            timestamp=cfg.CONF.sample_timestamp,
-            resource_metadata=cfg.CONF.sample_metadata and eval(
-                cfg.CONF.sample_metadata))])
+            name=conf.sample_name,
+            type=conf.sample_type,
+            unit=conf.sample_unit,
+            volume=conf.sample_volume,
+            user_id=conf.sample_user,
+            project_id=conf.sample_project,
+            resource_id=conf.sample_resource,
+            timestamp=conf.sample_timestamp,
+            resource_metadata=conf.sample_metadata and eval(
+                conf.sample_metadata))])

@@ -265,6 +265,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             self.notified_samples.append(m)
 
     def setUp(self):
+        self.conf = self.useFixture(fixture_config.Config()).conf
+        self.conf([])
         self.notified_samples = []
         self.notifier = mock.Mock()
         self.notifier.sample.side_effect = self.fake_notifier_sample
@@ -316,7 +318,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
+                                                           self.pipeline_cfg)
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
@@ -364,7 +367,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
+                                                           self.pipeline_cfg)
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertEqual(1, novalog.exception.call_count)
@@ -385,7 +389,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
+                                                           self.pipeline_cfg)
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches[source_name])[0]
 
@@ -426,7 +431,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         }
 
-        self.mgr.polling_manager = pipeline.PollingManager(pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
+                                                           pipeline_cfg)
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
 
         self.mgr.interval_task(polling_task)

@@ -82,6 +82,7 @@ class PipelineEndpoint(object):
         self.filter_rule = oslo_messaging.NotificationFilter(
             publisher_id=pipeline.name)
         self.publish_context = PublishContext([pipeline])
+        self.conf = pipeline.conf
 
     @abc.abstractmethod
     def sample(self, messages):
@@ -103,7 +104,7 @@ class SamplePipelineEndpoint(PipelineEndpoint):
                                resource_metadata=s['resource_metadata'],
                                source=s.get('source'))
             for s in samples if publisher_utils.verify_signature(
-                s, cfg.CONF.publisher.telemetry_secret)
+                s, self.conf.publisher.telemetry_secret)
         ]
         with self.publish_context as p:
             p(sorted(samples, key=methodcaller('get_iso_timestamp')))
@@ -123,20 +124,21 @@ class EventPipelineEndpoint(PipelineEndpoint):
                         for name, dtype, value in ev['traits']],
                 raw=ev.get('raw', {}))
             for ev in events if publisher_utils.verify_signature(
-                ev, cfg.CONF.publisher.telemetry_secret)
+                ev, self.conf.publisher.telemetry_secret)
         ]
         try:
             with self.publish_context as p:
                 p(events)
         except Exception:
-            if not cfg.CONF.notification.ack_on_event_error:
+            if not self.conf.notification.ack_on_event_error:
                 return oslo_messaging.NotificationResult.REQUEUE
             raise
         return oslo_messaging.NotificationResult.HANDLED
 
 
 class _PipelineTransportManager(object):
-    def __init__(self):
+    def __init__(self, conf):
+        self.conf = conf
         self.transporters = []
 
     @staticmethod
@@ -186,20 +188,18 @@ class SamplePipelineTransportManager(_PipelineTransportManager):
     filter_attr = 'counter_name'
     event_type = 'ceilometer.pipeline'
 
-    @staticmethod
-    def serializer(data):
+    def serializer(self, data):
         return publisher_utils.meter_message_from_counter(
-            data, cfg.CONF.publisher.telemetry_secret)
+            data, self.conf.publisher.telemetry_secret)
 
 
 class EventPipelineTransportManager(_PipelineTransportManager):
     filter_attr = 'event_type'
     event_type = 'pipeline.event'
 
-    @staticmethod
-    def serializer(data):
+    def serializer(self, data):
         return publisher_utils.message_from_event(
-            data, cfg.CONF.publisher.telemetry_secret)
+            data, self.conf.publisher.telemetry_secret)
 
 
 class PublishContext(object):
@@ -517,7 +517,8 @@ class SampleSink(Sink):
 class Pipeline(object):
     """Represents a coupling between a sink and a corresponding source."""
 
-    def __init__(self, source, sink):
+    def __init__(self, conf, source, sink):
+        self.conf = conf
         self.source = source
         self.sink = sink
         self.name = str(self)
@@ -623,7 +624,8 @@ EVENT_TYPE = {'pipeline': EventPipeline,
 class ConfigManagerBase(object):
     """Base class for managing configuration file refresh"""
 
-    def __init__(self):
+    def __init__(self, conf):
+        self.conf = conf
         self.cfg_loc = None
 
     def load_config(self, cfg_info):
@@ -632,7 +634,7 @@ class ConfigManagerBase(object):
             conf = cfg_info
         else:
             if not os.path.exists(cfg_info):
-                cfg_info = cfg.CONF.find_file(cfg_info)
+                cfg_info = self.conf.find_file(cfg_info)
             with open(cfg_info) as fap:
                 data = fap.read()
 
@@ -682,7 +684,8 @@ class PipelineManager(ConfigManagerBase):
 
     """
 
-    def __init__(self, cfg_info, transformer_manager, p_type=SAMPLE_TYPE):
+    def __init__(self, conf, cfg_info, transformer_manager,
+                 p_type=SAMPLE_TYPE):
         """Setup the pipelines according to config.
 
         The configuration is supported as follows:
@@ -749,7 +752,7 @@ class PipelineManager(ConfigManagerBase):
         Publisher's name is plugin name in setup.cfg
 
         """
-        super(PipelineManager, self).__init__()
+        super(PipelineManager, self).__init__(conf)
         cfg = self.load_config(cfg_info)
         self.pipelines = []
         if not ('sources' in cfg and 'sinks' in cfg):
@@ -783,7 +786,7 @@ class PipelineManager(ConfigManagerBase):
         for source in sources:
             source.check_sinks(sinks)
             for target in source.sinks:
-                pipe = p_type['pipeline'](source, sinks[target])
+                pipe = p_type['pipeline'](self.conf, source, sinks[target])
                 if pipe.name in unique_names:
                     raise PipelineException(
                         "Duplicate pipeline name: %s. Ensure pipeline"
@@ -808,12 +811,12 @@ class PollingManager(ConfigManagerBase):
     Polling manager sets up polling according to config file.
     """
 
-    def __init__(self, cfg_info):
+    def __init__(self, conf, cfg_info):
         """Setup the polling according to config.
 
         The configuration is the sources half of the Pipeline Config.
         """
-        super(PollingManager, self).__init__()
+        super(PollingManager, self).__init__(conf)
         cfg = self.load_config(cfg_info)
         self.sources = []
         if not ('sources' in cfg and 'sinks' in cfg):
@@ -833,26 +836,26 @@ class PollingManager(ConfigManagerBase):
         unique_names.clear()
 
 
-def setup_event_pipeline(transformer_manager=None):
+def setup_event_pipeline(conf, transformer_manager=None):
     """Setup event pipeline manager according to yaml config file."""
     default = extension.ExtensionManager('ceilometer.transformer')
-    cfg_file = cfg.CONF.event_pipeline_cfg_file
-    return PipelineManager(cfg_file, transformer_manager or default,
+    cfg_file = conf.event_pipeline_cfg_file
+    return PipelineManager(conf, cfg_file, transformer_manager or default,
                            EVENT_TYPE)
 
 
-def setup_pipeline(transformer_manager=None):
+def setup_pipeline(conf, transformer_manager=None):
     """Setup pipeline manager according to yaml config file."""
     default = extension.ExtensionManager('ceilometer.transformer')
-    cfg_file = cfg.CONF.pipeline_cfg_file
-    return PipelineManager(cfg_file, transformer_manager or default,
+    cfg_file = conf.pipeline_cfg_file
+    return PipelineManager(conf, cfg_file, transformer_manager or default,
                            SAMPLE_TYPE)
 
 
-def setup_polling():
+def setup_polling(conf):
     """Setup polling manager according to yaml config file."""
-    cfg_file = cfg.CONF.pipeline_cfg_file
-    return PollingManager(cfg_file)
+    cfg_file = conf.pipeline_cfg_file
+    return PollingManager(conf, cfg_file)
 
 
 def get_pipeline_grouping_key(pipe):

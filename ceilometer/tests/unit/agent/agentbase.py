@@ -194,7 +194,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         params = []
 
     def setup_polling(self):
-        self.mgr.polling_manager = pipeline.PollingManager(self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
+                                                           self.pipeline_cfg)
 
     def create_extension_list(self):
         return [extension.Extension('test',
@@ -311,7 +312,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.mgr.partition_coordinator.heartbeat = mock.MagicMock()
         self.mgr.run()
-        setup_polling.assert_called_once_with()
+        setup_polling.assert_called_once_with(self.CONF)
         mpc.start.assert_called_once_with()
         self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
