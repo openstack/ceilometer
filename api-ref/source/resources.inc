@@ -33,6 +33,7 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
+   - resources: resources
    - user_id: user_id
    - links: links
    - resource_id: resource_id
@@ -68,7 +69,7 @@ Request
 
 .. rest_parameters:: parameters.yaml
 
-   - resource_id: resource_id
+   - resource_id: resource_id_path
 
 
 Response Parameters
@@ -76,6 +77,7 @@ Response Parameters
 
 .. rest_parameters:: parameters.yaml
 
+   - resource: resource
    - user_id: user_id
    - links: links
    - resource_id: resource_id
@@ -90,6 +92,4 @@ Response Example
 
 .. literalinclude:: ../samples/resource-show-response.json
    :language: javascript
-
-
 
