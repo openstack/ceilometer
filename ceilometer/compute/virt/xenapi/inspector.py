@@ -160,18 +160,19 @@ class XenapiInspector(virt_inspector.Inspector):
         if vif_refs:
             for vif_ref in vif_refs:
                 vif_rec = self._call_xenapi("VIF.get_record", vif_ref)
-                vif_metrics_ref = self._call_xenapi(
-                    "VIF.get_metrics", vif_ref)
-                vif_metrics_rec = self._call_xenapi(
-                    "VIF_metrics.get_record", vif_metrics_ref)
+
+                rx_rate = float(self._call_xenapi(
+                    "VM.query_data_source", vm_ref,
+                    "vif_%s_rx" % vif_rec['device']))
+                tx_rate = float(self._call_xenapi(
+                    "VM.query_data_source", vm_ref,
+                    "vif_%s_tx" % vif_rec['device']))
 
                 interface = virt_inspector.Interface(
                     name=vif_rec['uuid'],
                     mac=vif_rec['MAC'],
                     fref=None,
                     parameters=None)
-                rx_rate = float(vif_metrics_rec['io_read_kbs']) * units.Ki
-                tx_rate = float(vif_metrics_rec['io_write_kbs']) * units.Ki
                 stats = virt_inspector.InterfaceRateStats(rx_rate, tx_rate)
                 yield (interface, stats)
 
@@ -182,16 +183,14 @@ class XenapiInspector(virt_inspector.Inspector):
         if vbd_refs:
             for vbd_ref in vbd_refs:
                 vbd_rec = self._call_xenapi("VBD.get_record", vbd_ref)
-                vbd_metrics_ref = self._call_xenapi("VBD.get_metrics",
-                                                    vbd_ref)
-                vbd_metrics_rec = self._call_xenapi("VBD_metrics.get_record",
-                                                    vbd_metrics_ref)
 
                 disk = virt_inspector.Disk(device=vbd_rec['device'])
-                # Stats provided from XenServer are in KB/s,
-                # converting it to B/s.
-                read_rate = float(vbd_metrics_rec['io_read_kbs']) * units.Ki
-                write_rate = float(vbd_metrics_rec['io_write_kbs']) * units.Ki
+                read_rate = float(self._call_xenapi(
+                    "VM.query_data_source", vm_ref,
+                    "vbd_%s_read" % vbd_rec['device']))
+                write_rate = float(self._call_xenapi(
+                    "VM.query_data_source", vm_ref,
+                    "vbd_%s_write" % vbd_rec['device']))
                 disk_rate_info = virt_inspector.DiskRateStats(
                     read_bytes_rate=read_rate,
                     read_requests_rate=0,
