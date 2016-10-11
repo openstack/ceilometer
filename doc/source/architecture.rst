@@ -202,7 +202,7 @@ Currently, processed data can be published using 5 different transports:
    which can be consumed by the collector or an external system;
 3. udp, which publishes samples using UDP packets;
 4. http, which targets a REST interface;
-5. kafka, which publishes data to a Kafka message queue to be consumed by any system 
+5. kafka, which publishes data to a Kafka message queue to be consumed by any system
    that supports Kafka.
 
 
@@ -217,7 +217,7 @@ the notification and polling agents. It validates the incoming data and (if
 the signature is valid) then writes the messages to a declared target:
 database, file, gnocchi or http.
 
-More details on database and Gnocchi targets can be found in the 
+More details on database and Gnocchi targets can be found in the
 :ref:`choosing_db_backend` guide.
 
 
