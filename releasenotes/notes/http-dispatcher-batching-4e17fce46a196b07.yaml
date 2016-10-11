@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    In the [dispatcher_http] section of ceilometer.conf, batch_mode can be
+    set to True to activate sending meters and events in batches, or
+    False (default value) to send each meter and event with a fresh HTTP call.
+
