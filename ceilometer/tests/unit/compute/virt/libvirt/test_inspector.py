@@ -404,6 +404,20 @@ class TestLibvirtInspection(base.BaseTestCase):
                     self.assertEqual(74184, pe.cache_references)
                     self.assertEqual(16737, pe.cache_misses)
 
+    def test_inspect_perf_events_libvirt_less_than_2_3_0(self):
+        fake_stats = [({}, {})]
+        connection = self.inspector.connection
+        with mock.patch.object(connection, 'lookupByUUIDString',
+                               return_value=self.domain):
+            with mock.patch.object(self.domain, 'info',
+                                   return_value=(0, 0, 51200,
+                                                 2, 999999)):
+                with mock.patch.object(connection, 'domainListGetStats',
+                                       return_value=fake_stats):
+                    self.assertRaises(virt_inspector.NoDataException,
+                                      self.inspector.inspect_perf_events,
+                                      self.instance)
+
 
 class TestLibvirtInspectionWithError(base.BaseTestCase):
 
