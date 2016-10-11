@@ -70,7 +70,7 @@ class Client(object):
         if conf.nova_http_log_debug:
             logger = log.getLogger("novaclient-debug")
             logger.logger.setLevel(log.DEBUG)
-        ks_session = keystone_client.get_session()
+        ks_session = keystone_client.get_session(conf)
 
         self.nova_client = nova_client.Client(
             version=api_versions.APIVersion('2.1'),

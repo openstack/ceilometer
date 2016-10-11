@@ -37,7 +37,8 @@ def get_gnocchiclient(conf, endpoint_override=None):
         requests_session.mount(scheme, ka_session.TCPKeepAliveAdapter(
             pool_block=True))
 
-    session = keystone_client.get_session(requests_session=requests_session)
+    session = keystone_client.get_session(conf,
+                                          requests_session=requests_session)
     return client.Client('1', session,
                          interface=conf.service_credentials.interface,
                          region_name=conf.service_credentials.region_name,

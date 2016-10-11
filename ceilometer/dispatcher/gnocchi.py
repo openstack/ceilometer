@@ -205,7 +205,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         self.conf = conf
         self.filter_service_activity = (
             conf.dispatcher_gnocchi.filter_service_activity)
-        self._ks_client = keystone_client.get_client()
+        self._ks_client = keystone_client.get_client(conf)
         self.resources_definition = self._load_resources_definitions(conf)
 
         self.cache = None

@@ -33,7 +33,7 @@ class ImagesDiscovery(plugin_base.DiscoveryBase):
         conf = cfg.CONF.service_credentials
         self.glance_client = glanceclient.Client(
             version='2',
-            session=keystone_client.get_session(),
+            session=keystone_client.get_session(cfg.CONF),
             region_name=conf.region_name,
             interface=conf.interface,
             service_type=cfg.CONF.service_types.glance)
