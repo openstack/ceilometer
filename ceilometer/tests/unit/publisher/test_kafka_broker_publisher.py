@@ -18,6 +18,7 @@ import datetime
 import uuid
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslo_utils import netutils
 
 from ceilometer.event.storage import models as event
@@ -97,8 +98,12 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
         ),
     ]
 
+    def setUp(self):
+        super(TestKafkaPublisher, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
     def test_publish(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
@@ -108,7 +113,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
     def test_publish_without_options(self):
         publisher = kafka.KafkaBrokerPublisher(
-            netutils.urlsplit('kafka://127.0.0.1:9092'))
+            self.CONF, netutils.urlsplit('kafka://127.0.0.1:9092'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_samples(self.test_data)
@@ -116,16 +121,16 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_without_policy(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer'))
         self.assertEqual('default', publisher.policy)
 
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=test'))
         self.assertEqual('default', publisher.policy)
 
     def test_publish_to_host_with_default_policy(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=default'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
@@ -137,7 +142,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_with_drop_policy(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=drop'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
@@ -147,7 +152,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_with_queue_policy(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
@@ -157,7 +162,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             self.assertEqual(1, len(publisher.local_queue))
 
     def test_publish_to_down_host_with_default_queue_size(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
@@ -175,7 +180,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
                              publisher.local_queue[1023][1][0]['counter_name'])
 
     def test_publish_to_host_from_down_to_up_with_queue(self):
-        publisher = kafka.KafkaBrokerPublisher(netutils.urlsplit(
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
@@ -194,8 +199,8 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_event_with_default_policy(self):
-        publisher = kafka.KafkaBrokerPublisher(
-            netutils.urlsplit('kafka://127.0.0.1:9092?topic=ceilometer'))
+        publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(
+            'kafka://127.0.0.1:9092?topic=ceilometer'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_events(self.test_event_data)

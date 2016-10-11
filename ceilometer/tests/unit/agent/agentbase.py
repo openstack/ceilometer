@@ -277,12 +277,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.useFixture(mockpatch.PatchObject(
             publisher, 'get_publisher', side_effect=self.get_publisher))
 
-    @staticmethod
-    def get_publisher(url, namespace=''):
+    def get_publisher(self, url, namespace=''):
         fake_drivers = {'test://': test_publisher.TestPublisher,
                         'new://': test_publisher.TestPublisher,
                         'rpc://': test_publisher.TestPublisher}
-        return fake_drivers[url](url)
+        return fake_drivers[url](self.CONF, url)
 
     def tearDown(self):
         self.Pollster.samples = []

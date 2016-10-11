@@ -25,7 +25,7 @@ from ceilometer import publisher
 LOG = log.getLogger(__name__)
 
 
-class HttpPublisher(publisher.PublisherBase):
+class HttpPublisher(publisher.ConfigPublisherBase):
     """Publisher metering data to a http endpoint
 
     The publisher which records metering data into a http endpoint. The
@@ -63,8 +63,8 @@ class HttpPublisher(publisher.PublisherBase):
     Http end point is required for this publisher to work properly.
     """
 
-    def __init__(self, parsed_url):
-        super(HttpPublisher, self).__init__(parsed_url)
+    def __init__(self, conf, parsed_url):
+        super(HttpPublisher, self).__init__(conf, parsed_url)
         self.target = parsed_url.geturl()
 
         if not parsed_url.hostname:

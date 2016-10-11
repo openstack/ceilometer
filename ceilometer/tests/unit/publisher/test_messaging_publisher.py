@@ -106,12 +106,14 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
     @mock.patch('oslo_messaging.Notifier')
     def test_publish_topic_override(self, notifier):
         msg_publisher.SampleNotifierPublisher(
+            self.CONF,
             netutils.urlsplit('notifier://?topic=custom_topic'))
         notifier.assert_called_with(mock.ANY, topics=['custom_topic'],
                                     driver=mock.ANY, retry=mock.ANY,
                                     publisher_id=mock.ANY)
 
         msg_publisher.EventNotifierPublisher(
+            self.CONF,
             netutils.urlsplit('notifier://?topic=custom_event_topic'))
         notifier.assert_called_with(mock.ANY, topics=['custom_event_topic'],
                                     driver=mock.ANY, retry=mock.ANY,
@@ -120,22 +122,26 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
     @mock.patch('ceilometer.messaging.get_transport')
     def test_publish_other_host(self, cgt):
         msg_publisher.SampleNotifierPublisher(
+            self.CONF,
             netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234'))
         cgt.assert_called_with(self.CONF, 'rabbit://foo:foo@127.0.0.1:1234')
 
         msg_publisher.EventNotifierPublisher(
+            self.CONF,
             netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234'))
         cgt.assert_called_with(self.CONF, 'rabbit://foo:foo@127.0.0.1:1234')
 
     @mock.patch('ceilometer.messaging.get_transport')
     def test_publish_other_host_vhost_and_query(self, cgt):
         msg_publisher.SampleNotifierPublisher(
+            self.CONF,
             netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234/foo'
                               '?driver=amqp&amqp_auto_delete=true'))
         cgt.assert_called_with(self.CONF, 'amqp://foo:foo@127.0.0.1:1234/foo'
                                '?amqp_auto_delete=true')
 
         msg_publisher.EventNotifierPublisher(
+            self.CONF,
             netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234/foo'
                               '?driver=amqp&amqp_auto_delete=true'))
         cgt.assert_called_with(self.CONF, 'amqp://foo:foo@127.0.0.1:1234/foo'
@@ -168,6 +174,7 @@ class TestPublisherPolicy(TestPublisher):
     @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_no_policy(self, mylog):
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://' % self.protocol))
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
@@ -185,6 +192,7 @@ class TestPublisherPolicy(TestPublisher):
     @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_policy_block(self, mylog):
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://?policy=default' % self.protocol))
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
@@ -201,6 +209,7 @@ class TestPublisherPolicy(TestPublisher):
     @mock.patch('ceilometer.publisher.messaging.LOG')
     def test_published_with_policy_incorrect(self, mylog):
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://?policy=notexist' % self.protocol))
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
@@ -221,6 +230,7 @@ class TestPublisherPolicyReactions(TestPublisher):
 
     def test_published_with_policy_drop_and_rpc_down(self):
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://?policy=drop' % self.protocol))
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
@@ -232,6 +242,7 @@ class TestPublisherPolicyReactions(TestPublisher):
 
     def test_published_with_policy_queue_and_rpc_down(self):
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://?policy=queue' % self.protocol))
         side_effect = msg_publisher.DeliveryFailure()
         with mock.patch.object(publisher, '_send') as fake_send:
@@ -245,6 +256,7 @@ class TestPublisherPolicyReactions(TestPublisher):
     def test_published_with_policy_queue_and_rpc_down_up(self):
         self.rpc_unreachable = True
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://?policy=queue' % self.protocol))
 
         side_effect = msg_publisher.DeliveryFailure()
@@ -266,7 +278,7 @@ class TestPublisherPolicyReactions(TestPublisher):
             self.assertEqual(expected, fake_send.mock_calls)
 
     def test_published_with_policy_sized_queue_and_rpc_down(self):
-        publisher = self.publisher_cls(netutils.urlsplit(
+        publisher = self.publisher_cls(self.CONF, netutils.urlsplit(
             '%s://?policy=queue&max_queue_length=3' % self.protocol))
 
         side_effect = msg_publisher.DeliveryFailure()
@@ -293,6 +305,7 @@ class TestPublisherPolicyReactions(TestPublisher):
 
     def test_published_with_policy_default_sized_queue_and_rpc_down(self):
         publisher = self.publisher_cls(
+            self.CONF,
             netutils.urlsplit('%s://?policy=queue' % self.protocol))
 
         side_effect = msg_publisher.DeliveryFailure()

@@ -62,8 +62,8 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
     field. If max_retry is not specified, default the number of retry is 100.
     """
 
-    def __init__(self, parsed_url):
-        super(KafkaBrokerPublisher, self).__init__(parsed_url)
+    def __init__(self, conf, parsed_url):
+        super(KafkaBrokerPublisher, self).__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
 
         self._producer = None

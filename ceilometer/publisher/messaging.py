@@ -72,9 +72,10 @@ def raise_delivery_failure(exc):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class MessagingPublisher(publisher.PublisherBase):
+class MessagingPublisher(publisher.ConfigPublisherBase):
 
-    def __init__(self, parsed_url):
+    def __init__(self, conf, parsed_url):
+        super(MessagingPublisher, self).__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         # the value of options is a list of url param values
         # only take care of the latest one if the option
@@ -107,10 +108,10 @@ class MessagingPublisher(publisher.PublisherBase):
 
         meters = [
             utils.meter_message_from_counter(
-                sample, cfg.CONF.publisher.telemetry_secret)
+                sample, self.conf.publisher.telemetry_secret)
             for sample in samples
         ]
-        topic = cfg.CONF.publisher_notifier.metering_topic
+        topic = self.conf.publisher_notifier.metering_topic
         self.local_queue.append((topic, meters))
 
         if self.per_meter_topic:
@@ -177,9 +178,9 @@ class MessagingPublisher(publisher.PublisherBase):
         :param events: events from pipeline after transformation
         """
         ev_list = [utils.message_from_event(
-            event, cfg.CONF.publisher.telemetry_secret) for event in events]
+            event, self.conf.publisher.telemetry_secret) for event in events]
 
-        topic = cfg.CONF.publisher_notifier.event_topic
+        topic = self.conf.publisher_notifier.event_topic
         self.local_queue.append((topic, ev_list))
         self.flush()
 
@@ -189,8 +190,8 @@ class MessagingPublisher(publisher.PublisherBase):
 
 
 class NotifierPublisher(MessagingPublisher):
-    def __init__(self, parsed_url, default_topic):
-        super(NotifierPublisher, self).__init__(parsed_url)
+    def __init__(self, conf, parsed_url, default_topic):
+        super(NotifierPublisher, self).__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         topic = options.pop('topic', [default_topic])
         driver = options.pop('driver', ['rabbit'])[0]
@@ -201,9 +202,9 @@ class NotifierPublisher(MessagingPublisher):
                                        urlparse.urlencode(options, True),
                                        parsed_url.fragment])
         self.notifier = oslo_messaging.Notifier(
-            messaging.get_transport(cfg.CONF, url),
-            driver=cfg.CONF.publisher_notifier.telemetry_driver,
-            publisher_id='telemetry.publisher.%s' % cfg.CONF.host,
+            messaging.get_transport(self.conf, url),
+            driver=self.conf.publisher_notifier.telemetry_driver,
+            publisher_id='telemetry.publisher.%s' % self.conf.host,
             topics=topic,
             retry=self.retry
         )
@@ -217,12 +218,12 @@ class NotifierPublisher(MessagingPublisher):
 
 
 class SampleNotifierPublisher(NotifierPublisher):
-    def __init__(self, parsed_url):
+    def __init__(self, conf, parsed_url):
         super(SampleNotifierPublisher, self).__init__(
-            parsed_url, cfg.CONF.publisher_notifier.metering_topic)
+            conf, parsed_url, conf.publisher_notifier.metering_topic)
 
 
 class EventNotifierPublisher(NotifierPublisher):
-    def __init__(self, parsed_url):
+    def __init__(self, conf, parsed_url):
         super(EventNotifierPublisher, self).__init__(
-            parsed_url, cfg.CONF.publisher_notifier.event_topic)
+            conf, parsed_url, conf.publisher_notifier.event_topic)

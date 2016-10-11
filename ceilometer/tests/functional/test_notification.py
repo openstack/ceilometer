@@ -246,7 +246,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
             "definitions_cfg_file",
             self.path_get('etc/ceilometer/event_definitions.yaml'),
             group='event')
-        self.publisher = test_publisher.TestPublisher("")
+        self.publisher = test_publisher.TestPublisher(self.CONF, "")
 
     def _check_notification_service(self):
         self.srv.run()
@@ -539,8 +539,8 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
                                group='notification')
         self.CONF.set_override('pipeline_processing_queues', 2,
                                group='notification')
-        self.publisher = test_publisher.TestPublisher("")
-        self.publisher2 = test_publisher.TestPublisher("")
+        self.publisher = test_publisher.TestPublisher(self.CONF, "")
+        self.publisher2 = test_publisher.TestPublisher(self.CONF, "")
 
     def _check_notifications(self, fake_publisher_cls):
         fake_publisher_cls.side_effect = [self.publisher, self.publisher2]

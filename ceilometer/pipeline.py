@@ -363,7 +363,8 @@ class Sink(object):
     passed data directly from the sink which are published unchanged.
     """
 
-    def __init__(self, cfg, transformer_manager):
+    def __init__(self, conf, cfg, transformer_manager):
+        self.conf = conf
         self.cfg = cfg
 
         try:
@@ -383,8 +384,8 @@ class Sink(object):
                 # Support old format without URL
                 p = p + "://"
             try:
-                self.publishers.append(publisher.get_publisher(p,
-                                                               self.NAMESPACE))
+                self.publishers.append(publisher.get_publisher(
+                    self.conf, p, self.NAMESPACE))
             except Exception:
                 LOG.exception(_("Unable to load publisher %s"), p)
 
@@ -780,7 +781,8 @@ class PipelineManager(ConfigManagerBase):
                                         name, self)
             else:
                 unique_names.add(name)
-                sinks[s['name']] = p_type['sink'](s, transformer_manager)
+                sinks[s['name']] = p_type['sink'](self.conf, s,
+                                                  transformer_manager)
         unique_names.clear()
 
         for source in sources:

@@ -30,13 +30,13 @@ from ceilometer.publisher import utils
 
 class EventPipelineTestCase(base.BaseTestCase):
 
-    def get_publisher(self, url, namespace=''):
+    def get_publisher(self, conf, url, namespace=''):
         fake_drivers = {'test://': test_publisher.TestPublisher,
                         'new://': test_publisher.TestPublisher,
                         'except://': self.PublisherClassException}
-        return fake_drivers[url](url)
+        return fake_drivers[url](conf, url)
 
-    class PublisherClassException(publisher.PublisherBase):
+    class PublisherClassException(publisher.ConfigPublisherBase):
         def publish_samples(self, samples):
             pass
 
@@ -87,7 +87,7 @@ class EventPipelineTestCase(base.BaseTestCase):
             'ceilometer.pipeline.LOG.exception',
             side_effect=self._handle_reraise_exception))
 
-    def _handle_reraise_exception(self, msg):
+    def _handle_reraise_exception(self, *args, **kwargs):
         if self._reraise_exception:
             raise Exception(traceback.format_exc())
 

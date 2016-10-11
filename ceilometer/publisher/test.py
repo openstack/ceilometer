@@ -18,10 +18,11 @@
 from ceilometer import publisher
 
 
-class TestPublisher(publisher.PublisherBase):
+class TestPublisher(publisher.ConfigPublisherBase):
     """Publisher used in unit testing."""
 
-    def __init__(self, parsed_url):
+    def __init__(self, conf, parsed_url):
+        super(TestPublisher, self).__init__(conf, parsed_url)
         self.samples = []
         self.events = []
         self.calls = 0

@@ -115,7 +115,7 @@ class TestUDPPublisher(base.BaseTestCase):
 
     def _check_udp_socket(self, url, expected_addr_family):
         with mock.patch.object(socket, 'socket') as mock_socket:
-            udp.UDPPublisher(netutils.urlsplit(url))
+            udp.UDPPublisher(self.CONF, netutils.urlsplit(url))
             mock_socket.assert_called_with(expected_addr_family,
                                            socket.SOCK_DGRAM)
 
@@ -154,6 +154,7 @@ class TestUDPPublisher(base.BaseTestCase):
         with mock.patch('socket.socket',
                         self._make_fake_socket(self.data_sent)):
             publisher = udp.UDPPublisher(
+                self.CONF,
                 netutils.urlsplit('udp://somehost'))
         publisher.publish_samples(self.test_data)
 
@@ -192,5 +193,6 @@ class TestUDPPublisher(base.BaseTestCase):
         with mock.patch('socket.socket',
                         self._make_broken_socket):
             publisher = udp.UDPPublisher(
+                self.CONF,
                 netutils.urlsplit('udp://localhost'))
         publisher.publish_samples(self.test_data)

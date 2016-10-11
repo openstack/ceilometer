@@ -33,11 +33,12 @@ cfg.CONF.import_opt('udp_port', 'ceilometer.collector',
 LOG = log.getLogger(__name__)
 
 
-class UDPPublisher(publisher.PublisherBase):
-    def __init__(self, parsed_url):
+class UDPPublisher(publisher.ConfigPublisherBase):
+    def __init__(self, conf, parsed_url):
+        super(UDPPublisher, self).__init__(conf, parsed_url)
         self.host, self.port = netutils.parse_host_port(
             parsed_url.netloc,
-            default_port=cfg.CONF.collector.udp_port)
+            default_port=self.conf.collector.udp_port)
         addrinfo = None
         try:
             addrinfo = socket.getaddrinfo(self.host, None, socket.AF_INET6,
@@ -66,7 +67,7 @@ class UDPPublisher(publisher.PublisherBase):
 
         for sample in samples:
             msg = utils.meter_message_from_counter(
-                sample, cfg.CONF.publisher.telemetry_secret)
+                sample, self.conf.publisher.telemetry_secret)
             host = self.host
             port = self.port
             LOG.debug("Publishing sample %(msg)s over UDP to "

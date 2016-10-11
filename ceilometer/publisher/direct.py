@@ -12,7 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from oslo_config import cfg
 from oslo_log import log
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
@@ -25,7 +24,7 @@ from ceilometer.publisher import utils
 LOG = log.getLogger(__name__)
 
 
-class DirectPublisher(publisher.PublisherBase):
+class DirectPublisher(publisher.ConfigPublisherBase):
     """A publisher that allows saving directly from the pipeline.
 
     Samples are saved to a configured dispatcher. This is useful
@@ -36,8 +35,8 @@ class DirectPublisher(publisher.PublisherBase):
     can use direct://?dispatcher=gnocchi, direct://?dispatcher=http,
     direct://?dispatcher=log, ...
     """
-    def __init__(self, parsed_url):
-        super(DirectPublisher, self).__init__(parsed_url)
+    def __init__(self, conf, parsed_url):
+        super(DirectPublisher, self).__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         self.dispatcher_name = options.get('dispatcher', ['database'])[-1]
         self._sample_dispatcher = None
@@ -57,13 +56,13 @@ class DirectPublisher(publisher.PublisherBase):
 
     def get_sample_dispatcher(self):
         if not self._sample_dispatcher:
-            self._sample_dispatcher = self.sample_driver(cfg.CONF)
+            self._sample_dispatcher = self.sample_driver(self.conf)
         return self._sample_dispatcher
 
     def get_event_dispatcher(self):
         if not self._event_dispatcher:
             if self.event_driver != self.sample_driver:
-                self._event_dispatcher = self.event_driver(cfg.CONF)
+                self._event_dispatcher = self.event_driver(self.conf)
             else:
                 self._event_dispatcher = self.get_sample_dispatcher()
         return self._event_dispatcher
@@ -78,7 +77,7 @@ class DirectPublisher(publisher.PublisherBase):
             samples = [samples]
         self.get_sample_dispatcher().record_metering_data([
             utils.meter_message_from_counter(
-                sample, cfg.CONF.publisher.telemetry_secret)
+                sample, self.conf.publisher.telemetry_secret)
             for sample in samples
         ])
 
@@ -92,5 +91,5 @@ class DirectPublisher(publisher.PublisherBase):
             events = [events]
         self.get_event_dispatcher().record_events([
             utils.message_from_event(
-                event, cfg.CONF.publisher.telemetry_secret)
+                event, self.conf.publisher.telemetry_secret)
             for event in events])
