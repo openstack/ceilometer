@@ -60,55 +60,56 @@ LOG = log.getLogger(__name__)
 
 class CollectorService(cotyledon.Service):
     """Listener for the collector service."""
-    def __init__(self, worker_id):
+    def __init__(self, worker_id, conf):
         super(CollectorService, self).__init__(worker_id)
+        self.conf = conf
         # ensure dispatcher is configured before starting other services
-        dispatcher_managers = dispatcher.load_dispatcher_manager()
+        dispatcher_managers = dispatcher.load_dispatcher_manager(conf)
         (self.meter_manager, self.event_manager) = dispatcher_managers
         self.sample_listener = None
         self.event_listener = None
         self.udp_thread = None
 
     def run(self):
-        if cfg.CONF.collector.udp_address:
+        if self.conf.collector.udp_address:
             self.udp_thread = utils.spawn_thread(self.start_udp)
 
         transport = messaging.get_transport(optional=True)
         if transport:
             if list(self.meter_manager):
                 sample_target = oslo_messaging.Target(
-                    topic=cfg.CONF.publisher_notifier.metering_topic)
+                    topic=self.conf.publisher_notifier.metering_topic)
                 self.sample_listener = (
                     messaging.get_batch_notification_listener(
                         transport, [sample_target],
-                        [SampleEndpoint(cfg.CONF.publisher.telemetry_secret,
+                        [SampleEndpoint(self.conf.publisher.telemetry_secret,
                                         self.meter_manager)],
                         allow_requeue=True,
-                        batch_size=cfg.CONF.collector.batch_size,
-                        batch_timeout=cfg.CONF.collector.batch_timeout))
+                        batch_size=self.conf.collector.batch_size,
+                        batch_timeout=self.conf.collector.batch_timeout))
                 self.sample_listener.start()
 
             if list(self.event_manager):
                 event_target = oslo_messaging.Target(
-                    topic=cfg.CONF.publisher_notifier.event_topic)
+                    topic=self.conf.publisher_notifier.event_topic)
                 self.event_listener = (
                     messaging.get_batch_notification_listener(
                         transport, [event_target],
-                        [EventEndpoint(cfg.CONF.publisher.telemetry_secret,
+                        [EventEndpoint(self.conf.publisher.telemetry_secret,
                                        self.event_manager)],
                         allow_requeue=True,
-                        batch_size=cfg.CONF.collector.batch_size,
-                        batch_timeout=cfg.CONF.collector.batch_timeout))
+                        batch_size=self.conf.collector.batch_size,
+                        batch_timeout=self.conf.collector.batch_timeout))
                 self.event_listener.start()
 
     def start_udp(self):
         address_family = socket.AF_INET
-        if netutils.is_valid_ipv6(cfg.CONF.collector.udp_address):
+        if netutils.is_valid_ipv6(self.conf.collector.udp_address):
             address_family = socket.AF_INET6
         udp = socket.socket(address_family, socket.SOCK_DGRAM)
         udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        udp.bind((cfg.CONF.collector.udp_address,
-                  cfg.CONF.collector.udp_port))
+        udp.bind((self.conf.collector.udp_address,
+                  self.conf.collector.udp_port))
 
         self.udp_run = True
         while self.udp_run:
@@ -125,7 +126,7 @@ class CollectorService(cotyledon.Service):
                 LOG.warning(_("UDP: Cannot decode data sent by %s"), source)
             else:
                 if publisher_utils.verify_signature(
-                        sample, cfg.CONF.publisher.telemetry_secret):
+                        sample, self.conf.publisher.telemetry_secret):
                     try:
                         LOG.debug("UDP: Storing %s", sample)
                         self.meter_manager.map_method(

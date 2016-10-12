@@ -15,16 +15,14 @@
 # under the License.
 
 import cotyledon
-from oslo_config import cfg
 
 from ceilometer import collector
 from ceilometer import service
 
-CONF = cfg.CONF
-
 
 def main():
-    service.prepare_service()
+    conf = service.prepare_service()
     sm = cotyledon.ServiceManager()
-    sm.add(collector.CollectorService, workers=CONF.collector.workers)
+    sm.add(collector.CollectorService, workers=conf.collector.workers,
+           args=(conf,))
     sm.run()

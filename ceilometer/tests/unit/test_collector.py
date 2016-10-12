@@ -47,7 +47,7 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
             return ev.get('message_signature') != 'bad_signature'
         mocked_verify.side_effect = _fake_verify
         sample = {"payload": [{"message_signature": "bad_signature"}]}
-        manager = dispatcher.load_dispatcher_manager()[1]
+        manager = dispatcher.load_dispatcher_manager(self.conf)[1]
         v = collector.EventEndpoint("secret", manager)
         v.sample([sample])
         self.assertEqual([], manager['database'].obj.events)
