@@ -52,6 +52,7 @@ cfg.CONF.register_opts(OPTS)
 # Resource metadata: various metadata
 # id: an uuid of a sample, can be taken from API  when post sample via API
 class Sample(object):
+    SOURCE_DEFAULT = "openstack"
 
     def __init__(self, name, type, unit, volume, user_id, project_id,
                  resource_id, timestamp=None, resource_metadata=None,
@@ -65,7 +66,7 @@ class Sample(object):
         self.resource_id = resource_id
         self.timestamp = timestamp
         self.resource_metadata = resource_metadata or {}
-        self.source = source or cfg.CONF.sample_source
+        self.source = source or self.SOURCE_DEFAULT
         self.id = id or str(uuid.uuid1())
 
     def as_dict(self):
@@ -101,6 +102,12 @@ class Sample(object):
 
     def get_iso_timestamp(self):
         return timeutils.parse_isotime(self.timestamp)
+
+
+def setup(conf):
+    # NOTE(sileht): Instead of passing the cfg.CONF everywhere in ceilometer
+    # prepare_service will override this default
+    Sample.SOURCE_DEFAULT = conf.sample_source
 
 
 TYPE_GAUGE = 'gauge'
