@@ -104,6 +104,8 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
+        self.CONF.set_override("workload_partitioning", True,
+                               group='notification')
         self.setup_messaging(self.CONF)
         self.srv = notification.NotificationService(0)
 
@@ -119,6 +121,7 @@ class TestNotification(tests_base.BaseTestCase):
         )
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @mock.patch('ceilometer.pipeline.setup_event_pipeline', mock.MagicMock())
     @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
     def _do_process_notification_manager_start(self,
                                                fake_event_endpoint_class):
@@ -156,6 +159,7 @@ class TestNotification(tests_base.BaseTestCase):
                          self.srv.listeners[0].dispatcher.endpoints[0])
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    @mock.patch('ceilometer.pipeline.setup_event_pipeline', mock.MagicMock())
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_unique_consumers(self, mock_listener):
 
@@ -505,6 +509,18 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
                                                         suffix="yaml")
         return pipeline_cfg_file
 
+    def setup_event_pipeline(self):
+        pipeline = yaml.dump({
+            'sources': [],
+            'sinks': []
+        })
+        if six.PY3:
+            pipeline = pipeline.encode('utf-8')
+
+        pipeline_cfg_file = fileutils.write_to_tempfile(
+            content=pipeline, prefix="event_pipeline", suffix="yaml")
+        return pipeline_cfg_file
+
     def setUp(self):
         super(TestRealNotificationMultipleAgents, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
@@ -512,7 +528,10 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])
+        event_pipeline_cfg_file = self.setup_event_pipeline()
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
+        self.CONF.set_override("event_pipeline_cfg_file",
+                               event_pipeline_cfg_file)
         self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("disable_non_metric_meters", False,
                                group="notification")
