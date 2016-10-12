@@ -127,8 +127,8 @@ class TestLBListenerPollster(_BaseTestLBPollster):
                          set([s.name for s in samples]))
 
     def test_listener_discovery(self):
-        discovered_listeners = discovery.LBListenersDiscovery().discover(
-            self.manager)
+        discovered_listeners = discovery.LBListenersDiscovery(
+            self.CONF).discover(self.manager)
         self.assertEqual(4, len(discovered_listeners))
         for listener in self.fake_list_listeners():
             if listener['operating_status'] == 'pending_create':
@@ -217,8 +217,8 @@ class TestLBLoadBalancerPollster(_BaseTestLBPollster):
                          set([s.name for s in samples]))
 
     def test_loadbalancer_discovery(self):
-        discovered_loadbalancers = \
-            discovery.LBLoadBalancersDiscovery().discover(self.manager)
+        discovered_loadbalancers = discovery.LBLoadBalancersDiscovery(
+            self.CONF).discover(self.manager)
         self.assertEqual(4, len(discovered_loadbalancers))
         for loadbalancer in self.fake_list_loadbalancers():
             if loadbalancer['operating_status'] == 'pending_create':

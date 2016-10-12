@@ -40,12 +40,12 @@ cfg.CONF.register_opts(OPTS, group='compute')
 
 
 class InstanceDiscovery(plugin_base.DiscoveryBase):
-    def __init__(self):
-        super(InstanceDiscovery, self).__init__()
-        self.nova_cli = nova_client.Client(cfg.CONF)
+    def __init__(self, conf):
+        super(InstanceDiscovery, self).__init__(conf)
+        self.nova_cli = nova_client.Client(conf)
         self.last_run = None
         self.instances = {}
-        self.expiration_time = cfg.CONF.compute.resource_update_interval
+        self.expiration_time = conf.compute.resource_update_interval
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
@@ -62,7 +62,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 utc_now = timeutils.utcnow(True)
                 since = self.last_run.isoformat() if self.last_run else None
                 instances = self.nova_cli.instance_get_all_by_host(
-                    cfg.CONF.host, since)
+                    self.conf.host, since)
                 self.last_run = utc_now
             except Exception:
                 # NOTE(zqfan): instance_get_all_by_host is wrapped and will log
@@ -81,7 +81,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
     @property
     def group_id(self):
-        if cfg.CONF.compute.workload_partitioning:
-            return cfg.CONF.host
+        if self.conf.compute.workload_partitioning:
+            return self.conf.host
         else:
             return None

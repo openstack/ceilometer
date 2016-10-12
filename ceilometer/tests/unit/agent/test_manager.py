@@ -161,7 +161,7 @@ class TestManager(base.BaseTestCase):
 
     def test_builder(self):
         @staticmethod
-        def fake_get_ext_mgr(namespace):
+        def fake_get_ext_mgr(namespace, *args, **kwargs):
             if 'builder' in namespace:
                 return extension.ExtensionManager.make_test_instance(
                     [
@@ -352,7 +352,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         ext = extension.Extension('tripleo_overcloud_nodes',
                                   None,
                                   None,
-                                  discovery.NodesDiscoveryTripleO())
+                                  discovery.NodesDiscoveryTripleO(self.CONF))
         self.mgr.discoveries = (extension.ExtensionManager
                                 .make_test_instance([ext]))
 

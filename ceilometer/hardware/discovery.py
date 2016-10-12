@@ -55,9 +55,9 @@ CONF.register_opts(OPTS, group='hardware')
 
 
 class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
-    def __init__(self):
-        super(NodesDiscoveryTripleO, self).__init__()
-        self.nova_cli = nova_client.Client(cfg.CONF)
+    def __init__(self, conf):
+        super(NodesDiscoveryTripleO, self).__init__(conf)
+        self.nova_cli = nova_client.Client(conf)
         self.last_run = None
         self.instances = {}
 
@@ -65,12 +65,8 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
     def _address(instance, field):
         return instance.addresses['ctlplane'][0].get(field)
 
-    @staticmethod
-    def _make_resource_url(ip):
-        params = [('readonly_user_auth_proto', 'auth_proto'),
-                  ('readonly_user_priv_proto', 'priv_proto'),
-                  ('readonly_user_priv_password', 'priv_password')]
-        hwconf = CONF.hardware
+    def _make_resource_url(self, ip):
+        hwconf = self.conf.hardware
         url = hwconf.url_scheme
         username = hwconf.readonly_user_name
         password = hwconf.readonly_user_password
@@ -82,9 +78,10 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
             url += '@'
         url += ip
 
-        query = "&".join(
-            param + "=" + hwconf.get(conf) for (conf, param) in params
-            if hwconf.get(conf))
+        opts = ['auth_proto', 'priv_proto', 'priv_password']
+        query = "&".join(opt + "=" + hwconf['readonly_user_%s' % opt]
+                         for opt in opts
+                         if hwconf['readonly_user_%s' % opt])
         if query:
             url += '?' + query
 
