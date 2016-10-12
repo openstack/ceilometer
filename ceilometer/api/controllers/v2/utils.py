@@ -43,7 +43,7 @@ cfg.CONF.import_opt('default_api_return_limit', 'ceilometer.api.app',
 def enforce_limit(limit):
     """Ensure limit is defined and is valid. if not, set a default."""
     if limit is None:
-        limit = cfg.CONF.api.default_api_return_limit
+        limit = pecan.request.cfg.api.default_api_return_limit
         LOG.info(_LI('No limit value provided, result set will be'
                      ' limited to %(limit)d.'), {'limit': limit})
     if not limit or limit <= 0:

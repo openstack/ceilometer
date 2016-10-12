@@ -116,11 +116,12 @@ class V2Controller(object):
     @property
     def gnocchi_is_enabled(self):
         if self._gnocchi_is_enabled is None:
-            if cfg.CONF.api.gnocchi_is_enabled is not None:
-                self._gnocchi_is_enabled = cfg.CONF.api.gnocchi_is_enabled
+            if pecan.request.cfg.api.gnocchi_is_enabled is not None:
+                self._gnocchi_is_enabled = (
+                    pecan.request.cfg.api.gnocchi_is_enabled)
 
-            elif ("gnocchi" not in cfg.CONF.meter_dispatchers
-                  or "database" in cfg.CONF.meter_dispatchers):
+            elif ("gnocchi" not in pecan.request.cfg.meter_dispatchers
+                  or "database" in pecan.request.cfg.meter_dispatchers):
                 self._gnocchi_is_enabled = False
             else:
                 try:
@@ -142,11 +143,11 @@ class V2Controller(object):
     @property
     def aodh_url(self):
         if self._aodh_url is None:
-            if cfg.CONF.api.aodh_is_enabled is False:
+            if pecan.request.cfg.api.aodh_is_enabled is False:
                 self._aodh_url = ""
-            elif cfg.CONF.api.aodh_url is not None:
+            elif pecan.request.cfg.api.aodh_url is not None:
                 self._aodh_url = self._normalize_url(
-                    cfg.CONF.api.aodh_url)
+                    pecan.request.cfg.api.aodh_url)
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(
@@ -167,11 +168,11 @@ class V2Controller(object):
     @property
     def panko_url(self):
         if self._panko_url is None:
-            if cfg.CONF.api.panko_is_enabled is False:
+            if pecan.request.cfg.api.panko_is_enabled is False:
                 self._panko_url = ""
-            elif cfg.CONF.api.panko_url is not None:
+            elif pecan.request.cfg.api.panko_url is not None:
                 self._panko_url = self._normalize_url(
-                    cfg.CONF.api.panko_url)
+                    pecan.request.cfg.api.panko_url)
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(

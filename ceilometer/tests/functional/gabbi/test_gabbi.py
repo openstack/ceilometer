@@ -22,7 +22,6 @@ import os
 
 from gabbi import driver
 
-from ceilometer.api import app
 from ceilometer.tests.functional.gabbi import fixtures as fixture_module
 
 TESTS_DIR = 'gabbits'
@@ -32,5 +31,5 @@ def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
-                              intercept=app.load_app,
+                              intercept=fixture_module.setup_app,
                               fixture_module=fixture_module)

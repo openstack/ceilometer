@@ -16,6 +16,7 @@
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
+from oslo_policy import policy
 
 from pecan import hooks
 
@@ -34,17 +35,22 @@ class ConfigHook(hooks.PecanHook):
 
     That allows controllers to get it.
     """
+    def __init__(self, conf):
+        super(ConfigHook, self).__init__()
+        self.conf = conf
+        self.enforcer = policy.Enforcer(conf)
+        self.enforcer.load_rules()
 
-    @staticmethod
-    def before(state):
-        state.request.cfg = cfg.CONF
+    def on_route(self, state):
+        state.request.cfg = self.conf
+        state.request.enforcer = self.enforcer
 
 
 class DBHook(hooks.PecanHook):
 
-    def __init__(self):
-        self.storage_connection = DBHook.get_connection('metering')
-        self.event_storage_connection = DBHook.get_connection('event')
+    def __init__(self, conf):
+        self.storage_connection = self.get_connection(conf, 'metering')
+        self.event_storage_connection = self.get_connection(conf, 'event')
 
         if (not self.storage_connection
            and not self.event_storage_connection):
@@ -57,9 +63,9 @@ class DBHook(hooks.PecanHook):
         state.request.event_storage_conn = self.event_storage_connection
 
     @staticmethod
-    def get_connection(purpose):
+    def get_connection(conf, purpose):
         try:
-            return storage.get_connection_from_config(cfg.CONF, purpose)
+            return storage.get_connection_from_config(conf, purpose)
         except Exception as err:
             params = {"purpose": purpose, "err": err}
             LOG.exception(_LE("Failed to connect to db, purpose %(purpose)s "
@@ -73,10 +79,10 @@ class NotifierHook(hooks.PecanHook):
     are posted via /v2/meters/ API.
     """
 
-    def __init__(self):
+    def __init__(self, conf):
         transport = messaging.get_transport()
         self.notifier = oslo_messaging.Notifier(
-            transport, driver=cfg.CONF.publisher_notifier.telemetry_driver,
+            transport, driver=conf.publisher_notifier.telemetry_driver,
             publisher_id="ceilometer.api")
 
     def before(self, state):
