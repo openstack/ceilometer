@@ -108,8 +108,15 @@ class CollectorService(cotyledon.Service):
             address_family = socket.AF_INET6
         udp = socket.socket(address_family, socket.SOCK_DGRAM)
         udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        udp.bind((self.conf.collector.udp_address,
-                  self.conf.collector.udp_port))
+        try:
+            # NOTE(zhengwei): linux kernel >= 3.9
+            udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        except Exception:
+            LOG.warning(_LW("System does not support socket.SO_REUSEPORT "
+                            "option. Only one worker will be able to process "
+                            "incoming data."))
+        udp.bind((cfg.CONF.collector.udp_address,
+                  cfg.CONF.collector.udp_port))
 
         self.udp_run = True
         while self.udp_run:
