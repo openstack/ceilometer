@@ -42,7 +42,7 @@ cfg.CONF.register_opts(OPTS, group='compute')
 class InstanceDiscovery(plugin_base.DiscoveryBase):
     def __init__(self):
         super(InstanceDiscovery, self).__init__()
-        self.nova_cli = nova_client.Client()
+        self.nova_cli = nova_client.Client(cfg.CONF)
         self.last_run = None
         self.instances = {}
         self.expiration_time = cfg.CONF.compute.resource_update_interval
