@@ -43,9 +43,9 @@ def send_batch_notifier(notifier, topic, batch):
 
 
 def get_notifier(config_file):
-    service.prepare_service(argv=['/', '--config-file', config_file])
+    conf = service.prepare_service(argv=['/', '--config-file', config_file])
     return oslo_messaging.Notifier(
-        messaging.get_transport(),
+        messaging.get_transport(conf),
         driver='messagingv2',
         publisher_id='telemetry.publisher.test',
         topics=['metering'],

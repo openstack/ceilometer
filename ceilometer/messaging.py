@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 import oslo_messaging
 from oslo_messaging import serializer as oslo_serializer
 
@@ -25,14 +24,14 @@ def setup():
     oslo_messaging.set_transport_defaults('ceilometer')
 
 
-def get_transport(url=None, optional=False, cache=True):
+def get_transport(conf, url=None, optional=False, cache=True):
     """Initialise the oslo_messaging layer."""
     global TRANSPORTS, DEFAULT_URL
     cache_key = url or DEFAULT_URL
     transport = TRANSPORTS.get(cache_key)
     if not transport or not cache:
         try:
-            transport = oslo_messaging.get_transport(cfg.CONF, url)
+            transport = oslo_messaging.get_transport(conf, url)
         except (oslo_messaging.InvalidTransportURL,
                 oslo_messaging.DriverLoadFailure):
             if not optional or url:

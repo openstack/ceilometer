@@ -160,7 +160,7 @@ class NotificationService(service_base.PipelineBasedService):
 
         self.event_pipeline_manager = pipeline.setup_event_pipeline()
 
-        self.transport = messaging.get_transport()
+        self.transport = messaging.get_transport(cfg.CONF)
 
         if cfg.CONF.notification.workload_partitioning:
             self.group_id = self.NOTIFICATION_NAMESPACE
@@ -252,7 +252,7 @@ class NotificationService(service_base.PipelineBasedService):
 
         urls = cfg.CONF.notification.messaging_urls or [None]
         for url in urls:
-            transport = messaging.get_transport(url)
+            transport = messaging.get_transport(cfg.CONF, url)
             # NOTE(gordc): ignore batching as we want pull
             # to maintain sequencing as much as possible.
             listener = messaging.get_batch_notification_listener(
@@ -271,7 +271,7 @@ class NotificationService(service_base.PipelineBasedService):
     def _configure_pipeline_listener(self):
         ev_pipes = self.event_pipeline_manager.pipelines
         pipelines = self.pipeline_manager.pipelines + ev_pipes
-        transport = messaging.get_transport()
+        transport = messaging.get_transport(cfg.CONF)
         partitioned = self.partition_coordinator.extract_my_subset(
             self.group_id,
             range(cfg.CONF.notification.pipeline_processing_queues))

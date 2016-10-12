@@ -290,7 +290,7 @@ class AgentManager(service_base.PipelineBasedService):
                              if group_prefix else namespace_prefix)
 
         self.notifier = oslo_messaging.Notifier(
-            messaging.get_transport(),
+            messaging.get_transport(cfg.CONF),
             driver=cfg.CONF.publisher_notifier.telemetry_driver,
             publisher_id="ceilometer.polling")
 
