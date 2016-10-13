@@ -63,17 +63,17 @@ class _Base(plugin_base.PollsterBase):
         return 'swift.%s_account' % self.METHOD
 
     @staticmethod
-    def _get_endpoint(ksclient):
+    def _get_endpoint(conf, ksclient):
         # we store the endpoint as a base class attribute, so keystone is
         # only ever called once
         if _Base._ENDPOINT is None:
             try:
-                conf = cfg.CONF.service_credentials
+                creds = conf.service_credentials
                 _Base._ENDPOINT = keystone_client.get_service_catalog(
                     ksclient).url_for(
-                        service_type=cfg.CONF.service_types.swift,
-                        interface=conf.interface,
-                        region_name=conf.region_name)
+                        service_type=conf.service_types.swift,
+                        interface=creds.interface,
+                        region_name=creds.region_name)
             except exceptions.EndpointNotFound as e:
                 LOG.info(_LI("Swift endpoint not found: %s"), e)
         return _Base._ENDPOINT
@@ -85,21 +85,22 @@ class _Base(plugin_base.PollsterBase):
         return iter(cache[self.CACHE_KEY_METHOD])
 
     def _get_account_info(self, ksclient, tenants):
-        endpoint = self._get_endpoint(ksclient)
+        endpoint = self._get_endpoint(self.conf, ksclient)
         if not endpoint:
             raise StopIteration()
 
         for t in tenants:
             api_method = '%s_account' % self.METHOD
             yield (t.id, getattr(swift, api_method)
-                                (self._neaten_url(endpoint, t.id),
+                                (self._neaten_url(endpoint, t.id,
+                                                  self.conf.reseller_prefix),
                                  keystone_client.get_auth_token(ksclient)))
 
     @staticmethod
-    def _neaten_url(endpoint, tenant_id):
+    def _neaten_url(endpoint, tenant_id, reseller_prefix):
         """Transform the registered url to standard and valid format."""
         return urlparse.urljoin(endpoint.split('/v1')[0].rstrip('/') + '/',
-                                'v1/' + cfg.CONF.reseller_prefix + tenant_id)
+                                'v1/' + reseller_prefix + tenant_id)
 
 
 class ObjectsPollster(_Base):

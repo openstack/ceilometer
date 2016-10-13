@@ -43,7 +43,7 @@ class TestLBListenerPollster(_BaseTestLBPollster):
 
     def setUp(self):
         super(TestLBListenerPollster, self).setUp()
-        self.pollster = lbaas.LBListenerPollster()
+        self.pollster = lbaas.LBListenerPollster(self.CONF)
         self.pollster.lb_version = 'v2'
         fake_listeners = self.fake_list_listeners()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
@@ -141,7 +141,7 @@ class TestLBLoadBalancerPollster(_BaseTestLBPollster):
 
     def setUp(self):
         super(TestLBLoadBalancerPollster, self).setUp()
-        self.pollster = lbaas.LBLoadBalancerPollster()
+        self.pollster = lbaas.LBLoadBalancerPollster(self.CONF)
         self.pollster.lb_version = 'v2'
         fake_loadbalancers = self.fake_list_loadbalancers()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
@@ -268,7 +268,7 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, sample_name, expected_volume,
                            expected_type):
-        pollster = factory()
+        pollster = factory(self.CONF)
 
         cache = {}
         samples = list(pollster.get_samples(self.manager, cache,

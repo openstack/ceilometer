@@ -14,7 +14,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 from oslo_log import log
 
 import ceilometer
@@ -40,7 +39,7 @@ class CPUPollster(pollsters.BaseComputePollster):
                            'time': cpu_info.time})
                 cpu_num = {'cpu_number': cpu_info.number}
                 yield util.make_sample_from_instance(
-                    cfg.CONF,
+                    self.conf,
                     instance,
                     name='cpu',
                     type=sample.TYPE_CUMULATIVE,
@@ -79,7 +78,7 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
                           {'instance': instance,
                            'util': cpu_info.util})
                 yield util.make_sample_from_instance(
-                    cfg.CONF,
+                    self.conf,
                     instance,
                     name='cpu_util',
                     type=sample.TYPE_GAUGE,
@@ -110,7 +109,7 @@ class CPUL3CachePollster(pollsters.BaseComputePollster):
                           ({'id': instance.id,
                             'l3_cache_usage': cpu_cache.l3_cache_usage}))
                 yield util.make_sample_from_instance(
-                    cfg.CONF,
+                    self.conf,
                     instance,
                     name='cpu_l3_cache',
                     type=sample.TYPE_GAUGE,

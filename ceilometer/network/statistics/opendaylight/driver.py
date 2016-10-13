@@ -81,8 +81,7 @@ class OpenDayLightDriver(driver.Driver):
       http://127.0.0.1:8080/controller/nb/v2/statistics/default/flow
       http://127.0.0.1:8080/controller/nb/v2/statistics/egg/flow
     """
-    @staticmethod
-    def _prepare_cache(endpoint, params, cache):
+    def _prepare_cache(self, endpoint, params, cache):
 
         if 'network.statistics.opendaylight' in cache:
             return cache['network.statistics.opendaylight']
@@ -98,7 +97,7 @@ class OpenDayLightDriver(driver.Driver):
             odl_params['user'] = params['user'][0]
         if 'password' in params:
             odl_params['password'] = params['password'][0]
-        cs = client.Client(endpoint, odl_params)
+        cs = client.Client(self.conf, endpoint, odl_params)
 
         for container_name in container_names:
             try:

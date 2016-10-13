@@ -23,9 +23,6 @@ from ceilometer.tests.unit.compute.pollsters import base
 
 class TestPerfEventsPollster(base.TestPollsterBase):
 
-    def setUp(self):
-        super(TestPerfEventsPollster, self).setUp()
-
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         fake_value = virt_inspector.PerfEventsStats(cpu_cycles=7259361,
@@ -41,7 +38,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
         mgr = manager.AgentManager(0, self.CONF)
 
         def _check_perf_events_cpu_cycles(expected_usage):
-            pollster = perf.PerfEventsCPUCyclesPollster()
+            pollster = perf.PerfEventsCPUCyclesPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -50,7 +47,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_instructions(expected_usage):
-            pollster = perf.PerfEventsInstructionsPollster()
+            pollster = perf.PerfEventsInstructionsPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -59,7 +56,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_cache_references(expected_usage):
-            pollster = perf.PerfEventsCacheReferencesPollster()
+            pollster = perf.PerfEventsCacheReferencesPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -68,7 +65,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_cache_misses(expected_usage):
-            pollster = perf.PerfEventsCacheMissesPollster()
+            pollster = perf.PerfEventsCacheMissesPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -91,7 +88,7 @@ class TestPerfEventsPollster(base.TestPollsterBase):
             side_effect=inspect_perf_events)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = perf.PerfEventsCPUCyclesPollster()
+        pollster = perf.PerfEventsCPUCyclesPollster(self.CONF)
 
         def all_samples():
             return list(pollster.get_samples(mgr, {}, [self.instance]))

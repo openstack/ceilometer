@@ -65,8 +65,8 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
     CACHE_KEY = 'hardware.generic'
     mapping = None
 
-    def __init__(self):
-        super(GenericHardwareDeclarativePollster, self).__init__()
+    def __init__(self, conf):
+        super(GenericHardwareDeclarativePollster, self).__init__(conf)
         self.inspectors = {}
 
     def _update_meter_definition(self, definition):
@@ -191,16 +191,16 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
         return samples
 
     @classmethod
-    def build_pollsters(cls):
+    def build_pollsters(cls, conf):
         if not cls.mapping:
             definition_cfg = declarative.load_definitions(
-                cfg.CONF, {}, cfg.CONF.hardware.meter_definitions_file,
+                conf, {}, conf.hardware.meter_definitions_file,
                 pkg_resources.resource_filename(__name__, "data/snmp.yaml"))
             cls.mapping = load_definition(definition_cfg)
 
         pollsters = []
         for name in cls.mapping:
-            pollster = cls()
+            pollster = cls(conf)
             pollster._update_meter_definition(cls.mapping[name])
             pollsters.append((name, pollster))
         return pollsters

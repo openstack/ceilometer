@@ -39,7 +39,7 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
 
     def setUp(self):
         super(TestFloatingIPPollster, self).setUp()
-        self.pollster = floatingip.FloatingIPPollster()
+        self.pollster = floatingip.FloatingIPPollster(self.CONF)
         fake_fip = self.fake_get_fip_service()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'fip_get_all',

@@ -16,7 +16,6 @@
 import abc
 import collections
 
-from oslo_config import cfg
 from oslo_log import log
 import six
 
@@ -44,9 +43,9 @@ LOAD_BALANCER_STATUS_V2 = {
 class BaseLBPollster(base.BaseServicesPollster):
     """Base Class for Load Balancer pollster"""
 
-    def __init__(self):
-        super(BaseLBPollster, self).__init__()
-        self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
+    def __init__(self, conf):
+        super(BaseLBPollster, self).__init__(conf)
+        self.lb_version = self.conf.service_types.neutron_lbaas_version
 
     def get_load_balancer_status_id(self, value):
         if self.lb_version == 'v1':
@@ -225,10 +224,10 @@ class _LBStatsPollster(base.BaseServicesPollster):
      and bandwidth.
     """
 
-    def __init__(self):
-        super(_LBStatsPollster, self).__init__()
-        self.client = neutron_client.Client(cfg.CONF)
-        self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
+    def __init__(self, conf):
+        super(_LBStatsPollster, self).__init__(conf)
+        self.client = neutron_client.Client(self.conf)
+        self.lb_version = self.conf.service_types.neutron_lbaas_version
 
     @staticmethod
     def make_sample_from_pool(pool, name, type, unit, volume,

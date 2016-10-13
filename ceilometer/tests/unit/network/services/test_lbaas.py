@@ -47,7 +47,7 @@ class TestLBPoolPollster(_BaseTestLBPollster):
 
     def setUp(self):
         super(TestLBPoolPollster, self).setUp()
-        self.pollster = lbaas.LBPoolPollster()
+        self.pollster = lbaas.LBPoolPollster(self.CONF)
         fake_pools = self.fake_get_pools()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'pool_get_all',
@@ -171,7 +171,7 @@ class TestLBVipPollster(_BaseTestLBPollster):
 
     def setUp(self):
         super(TestLBVipPollster, self).setUp()
-        self.pollster = lbaas.LBVipPollster()
+        self.pollster = lbaas.LBVipPollster(self.CONF)
         fake_vips = self.fake_get_vips()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'vip_get_all',
@@ -295,7 +295,7 @@ class TestLBMemberPollster(_BaseTestLBPollster):
 
     def setUp(self):
         super(TestLBMemberPollster, self).setUp()
-        self.pollster = lbaas.LBMemberPollster()
+        self.pollster = lbaas.LBMemberPollster(self.CONF)
         fake_members = self.fake_get_members()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'member_get_all',
@@ -389,7 +389,7 @@ class TestLBHealthProbePollster(_BaseTestLBPollster):
 
     def setUp(self):
         super(TestLBHealthProbePollster, self).setUp()
-        self.pollster = lbaas.LBHealthMonitorPollster()
+        self.pollster = lbaas.LBHealthMonitorPollster(self.CONF)
         fake_health_monitor = self.fake_get_health_monitor()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'health_monitor_get_all',
@@ -474,7 +474,7 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, sample_name, expected_volume,
                            expected_type):
-        pollster = factory()
+        pollster = factory(self.CONF)
         cache = {}
         samples = list(pollster.get_samples(self.manager, cache,
                                             self.fake_get_pools()))

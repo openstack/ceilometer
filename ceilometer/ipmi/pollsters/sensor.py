@@ -22,10 +22,9 @@ from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.ipmi.platform import ipmi_sensor
 from ceilometer import sample
 
-CONF = cfg.CONF
-CONF.import_opt('host', 'ceilometer.service')
-CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
-                group='ipmi')
+cfg.CONF.import_opt('host', 'ceilometer.service')
+cfg.CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
+                    group='ipmi')
 
 LOG = log.getLogger(__name__)
 
@@ -68,7 +67,7 @@ class SensorPollster(plugin_base.PollsterBase):
                 'Polling %(mtr)s sensor failed for %(cnt)s times!')
                 % ({'mtr': self.METRIC,
                     'cnt': self.polling_failures}))
-            if 0 <= CONF.ipmi.polling_retry < self.polling_failures:
+            if 0 <= self.conf.ipmi.polling_retry < self.polling_failures:
                 LOG.warning(_('Pollster for %s is disabled!') % self.METRIC)
                 raise plugin_base.PollsterPermanentError(resources)
             else:
@@ -95,12 +94,12 @@ class SensorPollster(plugin_base.PollsterBase):
                 continue
 
             resource_id = '%(host)s-%(sensor-id)s' % {
-                'host': CONF.host,
+                'host': self.conf.host,
                 'sensor-id': parser.transform_id(sensor_id)
             }
 
             metadata = {
-                'node': CONF.host
+                'node': self.conf.host
             }
 
             yield sample.Sample(

@@ -106,7 +106,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.pollster = self.factory()
+        self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
 
         if self.pollster.CACHE_KEY_METHOD == 'swift.head_account':
@@ -145,20 +145,25 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         self.assertEqual([self.ACCOUNTS[0]], data)
 
     def test_neaten_url(self):
+        reseller_prefix = self.CONF.reseller_prefix
         test_endpoints = ['http://127.0.0.1:8080',
                           'http://127.0.0.1:8080/swift']
         test_tenant_id = 'a7fd1695fa154486a647e44aa99a1b9b'
         for test_endpoint in test_endpoints:
             standard_url = test_endpoint + '/v1/AUTH_' + test_tenant_id
 
-            url = swift._Base._neaten_url(test_endpoint, test_tenant_id)
+            url = swift._Base._neaten_url(test_endpoint, test_tenant_id,
+                                          reseller_prefix)
             self.assertEqual(standard_url, url)
-            url = swift._Base._neaten_url(test_endpoint + '/', test_tenant_id)
+            url = swift._Base._neaten_url(test_endpoint + '/', test_tenant_id,
+                                          reseller_prefix)
             self.assertEqual(standard_url, url)
             url = swift._Base._neaten_url(test_endpoint + '/v1',
-                                          test_tenant_id)
+                                          test_tenant_id,
+                                          reseller_prefix)
             self.assertEqual(standard_url, url)
-            url = swift._Base._neaten_url(standard_url, test_tenant_id)
+            url = swift._Base._neaten_url(standard_url, test_tenant_id,
+                                          reseller_prefix)
             self.assertEqual(standard_url, url)
 
     def test_metering(self):
@@ -188,9 +193,10 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
                     return_value=endpoint):
                 list(self.pollster.get_samples(self.manager, {},
                                                ASSIGNED_TENANTS))
-        expected = [mock.call(self.pollster._neaten_url(endpoint, t.id),
-                              self.manager._auth_token)
-                    for t in ASSIGNED_TENANTS]
+        expected = [mock.call(self.pollster._neaten_url(
+            endpoint, t.id, self.CONF.reseller_prefix),
+            self.manager._auth_token)
+            for t in ASSIGNED_TENANTS]
         self.assertEqual(expected, mock_method.call_args_list)
 
     def test_get_endpoint_only_once(self):

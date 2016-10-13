@@ -44,7 +44,7 @@ class TestCPUPollster(base.TestPollsterBase):
         self.inspector.inspect_cpus = mock.Mock(side_effect=inspect_cpus)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster()
+        pollster = cpu.CPUPollster(self.CONF)
 
         def _verify_cpu_metering(expected_time):
             cache = {}
@@ -66,7 +66,7 @@ class TestCPUPollster(base.TestPollsterBase):
         self.inspector.inspect_cpus = mock.Mock(return_value=cpu_stats)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster()
+        pollster = cpu.CPUPollster(self.CONF)
 
         cache = {}
         samples = list(pollster.get_samples(mgr, cache, [self.instance]))
@@ -94,7 +94,7 @@ class TestCPUUtilPollster(base.TestPollsterBase):
                                            Mock(side_effect=inspect_cpu_util))
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUUtilPollster()
+        pollster = cpu.CPUUtilPollster(self.CONF)
 
         def _verify_cpu_util_metering(expected_util):
             cache = {}
@@ -127,7 +127,7 @@ class TestCPUL3CachePollster(base.TestPollsterBase):
             side_effect=inspect_cpu_l3_cache))
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUL3CachePollster()
+        pollster = cpu.CPUL3CachePollster(self.CONF)
 
         def _verify_cpu_l3_cache_metering(expected_usage):
             cache = {}

@@ -201,23 +201,24 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         return [extension.Extension('test',
                                     None,
                                     None,
-                                    self.Pollster(), ),
+                                    self.Pollster(self.CONF), ),
                 extension.Extension('testbatch',
                                     None,
                                     None,
-                                    self.BatchPollster(), ),
+                                    self.BatchPollster(self.CONF), ),
                 extension.Extension('testanother',
                                     None,
                                     None,
-                                    self.PollsterAnother(), ),
+                                    self.PollsterAnother(self.CONF), ),
                 extension.Extension('testexception',
                                     None,
                                     None,
-                                    self.PollsterException(), ),
+                                    self.PollsterException(self.CONF), ),
                 extension.Extension('testexceptionanother',
                                     None,
                                     None,
-                                    self.PollsterExceptionAnother(), )]
+                                    self.PollsterExceptionAnother(self.CONF), )
+                ]
 
     def create_discoveries(self):
         return extension.ExtensionManager.make_test_instance(

@@ -115,7 +115,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
             'ceilometer.hardware.inspector.get_inspector',
             self.faux_get_inspector))
         self.conf(args=[])
-        self.pollster = generic.GenericHardwareDeclarativePollster()
+        self.pollster = generic.GenericHardwareDeclarativePollster(self.conf)
 
     def _setup_meter_def_file(self, cfg):
         if six.PY3:
@@ -179,7 +179,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
         pollster = generic.GenericHardwareDeclarativePollster
         # Clear cached mapping
         pollster.mapping = None
-        exts = pollster.get_pollsters_extensions()
+        exts = pollster.get_pollsters_extensions(self.conf)
         self.assertEqual(2, len(exts))
         self.assertIn(exts[0].name, ['hardware.test1', 'hardware.test2.abc'])
         self.assertIn(exts[1].name, ['hardware.test1', 'hardware.test2.abc'])

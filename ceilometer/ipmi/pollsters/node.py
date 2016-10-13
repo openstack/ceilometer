@@ -24,10 +24,9 @@ from ceilometer.ipmi.platform import exception as nmexcept
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
 from ceilometer import sample
 
-CONF = cfg.CONF
-CONF.import_opt('host', 'ceilometer.service')
-CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
-                group='ipmi')
+cfg.CONF.import_opt('host', 'ceilometer.service')
+cfg.CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
+                    group='ipmi')
 
 LOG = log.getLogger(__name__)
 
@@ -65,7 +64,7 @@ class _Base(plugin_base.PollsterBase):
             LOG.warning(_('Polling %(name)s failed for %(cnt)s times!')
                         % ({'name': self.NAME,
                             'cnt': self.polling_failures}))
-            if 0 <= CONF.ipmi.polling_retry < self.polling_failures:
+            if 0 <= self.conf.ipmi.polling_retry < self.polling_failures:
                 LOG.warning(_('Pollster for %s is disabled!') % self.NAME)
                 raise plugin_base.PollsterPermanentError(resources)
             else:
@@ -74,7 +73,7 @@ class _Base(plugin_base.PollsterBase):
         self.polling_failures = 0
 
         metadata = {
-            'node': CONF.host
+            'node': self.conf.host
         }
 
         if stats:
@@ -87,7 +86,7 @@ class _Base(plugin_base.PollsterBase):
                 volume=data,
                 user_id=None,
                 project_id=None,
-                resource_id=CONF.host,
+                resource_id=self.conf.host,
                 resource_metadata=metadata)
 
 

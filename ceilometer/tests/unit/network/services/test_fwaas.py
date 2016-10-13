@@ -43,7 +43,7 @@ class TestFirewallPollster(_BaseTestFWPollster):
 
     def setUp(self):
         super(TestFirewallPollster, self).setUp()
-        self.pollster = fwaas.FirewallPollster()
+        self.pollster = fwaas.FirewallPollster(self.CONF)
         fake_fw = self.fake_get_fw_service()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'firewall_get_all',
@@ -121,7 +121,7 @@ class TestIPSecConnectionsPollster(_BaseTestFWPollster):
 
     def setUp(self):
         super(TestIPSecConnectionsPollster, self).setUp()
-        self.pollster = fwaas.FirewallPolicyPollster()
+        self.pollster = fwaas.FirewallPolicyPollster(self.CONF)
         fake_fw_policy = self.fake_get_fw_policy()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'fw_policy_get_all',

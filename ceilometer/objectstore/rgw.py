@@ -50,9 +50,10 @@ class _Base(plugin_base.PollsterBase):
     METHOD = 'bucket'
     _ENDPOINT = None
 
-    def __init__(self):
-        self.access_key = cfg.CONF.rgw_admin_credentials.access_key
-        self.secret = cfg.CONF.rgw_admin_credentials.secret_key
+    def __init__(self, conf):
+        super(_Base, self).__init__(conf)
+        self.access_key = self.conf.rgw_admin_credentials.access_key
+        self.secret = self.conf.rgw_admin_credentials.secret_key
 
     @property
     def default_discovery(self):
@@ -63,17 +64,17 @@ class _Base(plugin_base.PollsterBase):
         return 'rgw.get_%s' % self.METHOD
 
     @staticmethod
-    def _get_endpoint(ksclient):
+    def _get_endpoint(conf, ksclient):
         # we store the endpoint as a base class attribute, so keystone is
         # only ever called once, also we assume that in a single deployment
         # we may be only deploying `radosgw` or `swift` as the object-store
         if _Base._ENDPOINT is None:
             try:
-                conf = cfg.CONF.service_credentials
+                creds = conf.service_credentials
                 rgw_url = keystone_client.get_service_catalog(
                     ksclient).url_for(
-                        service_type=cfg.CONF.service_types.radosgw,
-                        interface=conf.interface)
+                        service_type=conf.service_types.radosgw,
+                        interface=creds.interface)
                 _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
             except exceptions.EndpointNotFound:
                 LOG.debug("Radosgw endpoint not found")
@@ -86,7 +87,7 @@ class _Base(plugin_base.PollsterBase):
         return iter(cache[self.CACHE_KEY_METHOD])
 
     def _get_account_info(self, ksclient, tenants):
-        endpoint = self._get_endpoint(ksclient)
+        endpoint = self._get_endpoint(self.conf, ksclient)
         if not endpoint:
             raise StopIteration()
 

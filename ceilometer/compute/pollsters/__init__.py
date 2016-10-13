@@ -14,7 +14,6 @@
 
 import abc
 
-from oslo_config import cfg
 from oslo_utils import timeutils
 import six
 
@@ -78,12 +77,12 @@ class BaseComputePollster(plugin_base.PollsterBase):
         self._last_poll_time = current_time
         return duration
 
-    @staticmethod
-    def _get_samples_per_devices(attribute, instance, _name, _type, _unit):
+    def _get_samples_per_devices(self, attribute, instance, _name, _type,
+                                 _unit):
         samples = []
         for disk, value in six.iteritems(attribute):
             samples.append(util.make_sample_from_instance(
-                cfg.CONF,
+                self.conf,
                 instance,
                 name=_name,
                 type=_type,

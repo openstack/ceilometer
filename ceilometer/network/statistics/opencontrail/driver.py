@@ -14,7 +14,6 @@
 
 import re
 
-from oslo_config import cfg
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
@@ -58,15 +57,14 @@ class OpencontrailDriver(driver.Driver):
       opencontrail://localhost:8081/?resource=fip_stats_list&
       virtual_network=default-domain:openstack:public
     """
-    @staticmethod
-    def _prepare_cache(endpoint, params, cache):
+    def _prepare_cache(self, endpoint, params, cache):
 
         if 'network.statistics.opencontrail' in cache:
             return cache['network.statistics.opencontrail']
 
         data = {
-            'o_client': client.Client(endpoint),
-            'n_client': neutron_client.Client(cfg.CONF)
+            'o_client': client.Client(self.conf, endpoint),
+            'n_client': neutron_client.Client(self.conf)
         }
 
         cache['network.statistics.opencontrail'] = data

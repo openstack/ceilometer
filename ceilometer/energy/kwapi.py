@@ -37,8 +37,9 @@ cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
 class KwapiClient(object):
     """Kwapi API client."""
 
-    def __init__(self, url, token=None):
+    def __init__(self, conf, url, token=None):
         """Initializes client."""
+        self.conf = conf
         self.url = url
         self.token = token
 
@@ -48,7 +49,7 @@ class KwapiClient(object):
         headers = {}
         if self.token is not None:
             headers = {'X-Auth-Token': self.token}
-        timeout = cfg.CONF.http_timeout
+        timeout = self.conf.http_timeout
         request = requests.get(probes_url, headers=headers, timeout=timeout)
         message = request.json()
         probes = message['probes']
@@ -63,12 +64,12 @@ class _Base(plugin_base.PollsterBase):
 
     @property
     def default_discovery(self):
-        return 'endpoint:%s' % cfg.CONF.service_types.kwapi
+        return 'endpoint:%s' % self.conf.service_types.kwapi
 
-    @staticmethod
-    def get_kwapi_client(ksclient, endpoint):
+    def get_kwapi_client(self, ksclient, endpoint):
         """Returns a KwapiClient configured with the proper url and token."""
-        return KwapiClient(endpoint, keystone_client.get_auth_token(ksclient))
+        return KwapiClient(self.conf, endpoint,
+                           keystone_client.get_auth_token(ksclient))
 
     CACHE_KEY_PROBE = 'kwapi.probes'
 

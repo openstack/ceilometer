@@ -15,6 +15,7 @@
 
 import datetime
 
+from oslo_config import fixture as fixture_config
 from oslo_utils import timeutils
 from oslotest import base
 
@@ -25,8 +26,11 @@ from ceilometer import sample
 
 class TestBase(base.BaseTestCase):
 
-    @staticmethod
-    def test_subclass_ok():
+    def setUp(self):
+        super(TestBase, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
+    def test_subclass_ok(self):
 
         class OkSubclass(statistics._Base):
 
@@ -34,7 +38,7 @@ class TestBase(base.BaseTestCase):
             meter_type = sample.TYPE_GAUGE
             meter_unit = 'B'
 
-        OkSubclass()
+        OkSubclass(self.CONF)
 
     def test_subclass_ng(self):
 
@@ -56,22 +60,23 @@ class TestBase(base.BaseTestCase):
             meter_name = 'foo'
             meter_type = sample.TYPE_GAUGE
 
-        self.assertRaises(TypeError, NgSubclass1)
-        self.assertRaises(TypeError, NgSubclass2)
-        self.assertRaises(TypeError, NgSubclass3)
+        self.assertRaises(TypeError, NgSubclass1, self.CONF)
+        self.assertRaises(TypeError, NgSubclass2, self.CONF)
+        self.assertRaises(TypeError, NgSubclass3, self.CONF)
 
 
 class TestBaseGetSamples(base.BaseTestCase):
 
     def setUp(self):
         super(TestBaseGetSamples, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
         class FakePollster(statistics._Base):
             meter_name = 'foo'
             meter_type = sample.TYPE_CUMULATIVE
             meter_unit = 'bar'
 
-        self.pollster = FakePollster()
+        self.pollster = FakePollster(self.CONF)
 
     def tearDown(self):
         statistics._Base.drivers = {}
@@ -84,7 +89,8 @@ class TestBaseGetSamples(base.BaseTestCase):
     def _make_fake_driver(self, *return_values):
         class FakeDriver(driver.Driver):
 
-            def __init__(self):
+            def __init__(self, conf):
+                super(FakeDriver, self).__init__(conf)
                 self.index = 0
 
             def get_sample_data(self, meter_name, parse_url, params, cache):
@@ -119,7 +125,7 @@ class TestBaseGetSamples(base.BaseTestCase):
         fake_driver = self._make_fake_driver((1, 'a', {'spam': 'egg'},),
                                              (2, 'b', None))
 
-        self._setup_ext_mgr(http=fake_driver())
+        self._setup_ext_mgr(http=fake_driver(self.CONF))
 
         samples = self._get_samples('http://foo')
 
@@ -131,7 +137,7 @@ class TestBaseGetSamples(base.BaseTestCase):
                                              (2, 'b', None),
                                              (3, 'c', None))
 
-        self._setup_ext_mgr(http=fake_driver())
+        self._setup_ext_mgr(http=fake_driver(self.CONF))
 
         samples = self._get_samples('http://foo', 'http://bar')
 
@@ -146,7 +152,8 @@ class TestBaseGetSamples(base.BaseTestCase):
         fake_driver2 = self._make_fake_driver((11, 'A', None),
                                               (12, 'B', None))
 
-        self._setup_ext_mgr(http=fake_driver1(), https=fake_driver2())
+        self._setup_ext_mgr(http=fake_driver1(self.CONF),
+                            https=fake_driver2(self.CONF))
 
         samples = self._get_samples('http://foo')
 
@@ -157,7 +164,7 @@ class TestBaseGetSamples(base.BaseTestCase):
         fake_driver = self._make_fake_driver([(1, 'a', {'spam': 'egg'},),
                                               (2, 'b', None)])
 
-        self._setup_ext_mgr(http=fake_driver())
+        self._setup_ext_mgr(http=fake_driver(self.CONF))
 
         samples = self._get_samples('http://foo')
 
@@ -168,7 +175,7 @@ class TestBaseGetSamples(base.BaseTestCase):
     def test_get_samples_return_none(self):
         fake_driver = self._make_fake_driver(None)
 
-        self._setup_ext_mgr(http=fake_driver())
+        self._setup_ext_mgr(http=fake_driver(self.CONF))
 
         samples = self._get_samples('http://foo')
 
@@ -180,6 +187,6 @@ class TestBaseGetSamples(base.BaseTestCase):
             def get_sample_data(self, meter_name, parse_url, params, cache):
                 return None
 
-        self._setup_ext_mgr(http=NoneFakeDriver())
+        self._setup_ext_mgr(http=NoneFakeDriver(self.CONF))
         samples = self._get_samples('http://foo')
         self.assertFalse(samples)

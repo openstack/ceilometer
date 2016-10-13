@@ -13,15 +13,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_config import fixture as fixture_config
 from oslotest import base
 
 
 class _PollsterTestBase(base.BaseTestCase):
+    def setUp(self):
+        super(_PollsterTestBase, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def _test_pollster(self, pollster_class, meter_name,
                        meter_type, meter_unit):
 
-        pollster = pollster_class()
+        pollster = pollster_class(self.CONF)
 
         self.assertEqual(pollster.meter_name, meter_name)
         self.assertEqual(pollster.meter_type, meter_type)

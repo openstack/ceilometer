@@ -31,8 +31,8 @@ class TestClientHTTPBasicAuth(base.BaseTestCase):
 
     def setUp(self):
         super(TestClientHTTPBasicAuth, self).setUp()
-        self.conf = self.useFixture(config_fixture.Config())
-        ceilometer_service.prepare_service(argv=[], config_files=[])
+        conf = ceilometer_service.prepare_service(argv=[], config_files=[])
+        self.CONF = self.useFixture(config_fixture.Config(conf)).conf
         self.parsed_url = urlparse.urlparse(
             'http://127.0.0.1:8080/controller/nb/v2?container_name=default&'
             'container_name=egg&auth=%s&user=admin&password=admin_pass&'
@@ -46,7 +46,7 @@ class TestClientHTTPBasicAuth(base.BaseTestCase):
         odl_params = {'auth': self.params.get('auth')[0],
                       'user': self.params.get('user')[0],
                       'password': self.params.get('password')[0]}
-        self.client = client.Client(self.endpoint, odl_params)
+        self.client = client.Client(self.CONF, self.endpoint, odl_params)
 
         self.resp = mock.MagicMock()
         self.get = mock.patch('requests.get',
