@@ -36,7 +36,7 @@ class _Base(plugin_base.PollsterBase):
 
     def setup_environment(self):
         super(_Base, self).setup_environment()
-        self.nodemanager = node_manager.NodeManager()
+        self.nodemanager = node_manager.NodeManager(self.conf)
         self.polling_failures = 0
 
         # Do not load this extension if no NM support
