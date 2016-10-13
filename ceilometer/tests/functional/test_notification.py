@@ -29,6 +29,7 @@ from ceilometer.agent import plugin_base
 from ceilometer import messaging
 from ceilometer import notification
 from ceilometer.publisher import test as test_publisher
+from ceilometer import service
 from ceilometer.tests import base as tests_base
 
 TEST_NOTICE_CTXT = {
@@ -100,6 +101,7 @@ class TestNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(TestNotification, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [], self.CONF)
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("disable_non_metric_meters", False,
@@ -225,8 +227,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(BaseRealNotification, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        # Dummy config file to avoid looking for system config
-        self.CONF([], project='ceilometer', validate_default_values=True)
+        service.prepare_service([], [], self.CONF)
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['vcpus', 'memory'])
@@ -524,7 +525,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
     def setUp(self):
         super(TestRealNotificationMultipleAgents, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF([], project='ceilometer', validate_default_values=True)
+        service.prepare_service([], [], self.CONF)
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])

@@ -26,6 +26,7 @@ from ceilometer import collector
 from ceilometer import dispatcher
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer import service
 from ceilometer.tests import base as tests_base
 
 
@@ -42,6 +43,7 @@ class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [], self.CONF)
         self.CONF.import_opt("connection", "oslo_db.options", group="database")
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('telemetry_secret', 'not-so-secret',

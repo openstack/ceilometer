@@ -16,7 +16,6 @@
 """
 
 from oslo_config import cfg
-from oslo_db import options as db_options
 from oslo_log import log
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
@@ -55,9 +54,6 @@ OPTS = [
 ]
 
 cfg.CONF.register_opts(OPTS, group='database')
-
-
-db_options.set_defaults(cfg.CONF)
 
 
 class StorageUnknownWriteError(Exception):
