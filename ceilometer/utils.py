@@ -36,10 +36,11 @@ from oslo_utils import timeutils
 from oslo_utils import units
 import six
 
+ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
 
 OPTS = [
     cfg.StrOpt('rootwrap_config',
-               default="/etc/ceilometer/rootwrap.conf",
+               default=ROOTWRAP_CONF,
                help='Path to the rootwrap configuration file to'
                     'use for running commands as root'),
 ]
@@ -50,7 +51,13 @@ EPOCH_TIME = datetime.datetime(1970, 1, 1)
 
 
 def _get_root_helper():
-    return 'sudo ceilometer-rootwrap %s' % CONF.rootwrap_config
+    global ROOTWRAP_CONF
+    return 'sudo ceilometer-rootwrap %s' % ROOTWRAP_CONF
+
+
+def setup_root_helper(conf):
+    global ROOTWRAP_CONF
+    ROOTWRAP_CONF = conf.rootwrap_config
 
 
 def execute(*cmd, **kwargs):

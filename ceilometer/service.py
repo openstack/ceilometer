@@ -27,6 +27,7 @@ from ceilometer.conf import defaults
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import sample
+from ceilometer import utils
 from ceilometer import version
 
 OPTS = [
@@ -88,6 +89,7 @@ def prepare_service(argv=None, config_files=None, conf=None):
     ka_loading.load_auth_from_conf_options(conf, "service_credentials")
 
     log.setup(conf, 'ceilometer')
+    utils.setup_root_helper(conf)
     sample.setup(conf)
 
     # NOTE(liusheng): guru cannot run with service under apache daemon, so when
