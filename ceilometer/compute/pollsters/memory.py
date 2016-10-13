@@ -16,6 +16,7 @@
 import abc
 import collections
 
+from oslo_config import cfg
 from oslo_log import log
 
 import ceilometer
@@ -46,6 +47,7 @@ class MemoryUsagePollster(pollsters.BaseComputePollster):
                           {'instance': instance,
                            'usage': memory_info.usage})
                 yield util.make_sample_from_instance(
+                    cfg.CONF,
                     instance,
                     name='memory.usage',
                     type=sample.TYPE_GAUGE,
@@ -96,6 +98,7 @@ class MemoryResidentPollster(pollsters.BaseComputePollster):
                           {'instance': instance,
                            'resident': memory_info.resident})
                 yield util.make_sample_from_instance(
+                    cfg.CONF,
                     instance,
                     name='memory.resident',
                     type=sample.TYPE_GAUGE,
@@ -149,6 +152,7 @@ class _MemoryBandwidthPollster(pollsters.BaseComputePollster):
                                     c_data, _element):
         """Total / local Pollster and return one Sample"""
         return [util.make_sample_from_instance(
+            cfg.CONF,
             instance,
             name=_name,
             type=sample.TYPE_GAUGE,

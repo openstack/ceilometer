@@ -30,7 +30,7 @@ INSTANCE_PROPERTIES = [
 ]
 
 
-def _get_metadata_from_object(instance):
+def _get_metadata_from_object(conf, instance):
     """Return a metadata dictionary for the instance."""
     instance_type = instance.flavor['name'] if instance.flavor else None
     metadata = {
@@ -72,13 +72,14 @@ def _get_metadata_from_object(instance):
     metadata['root_gb'] = (int(metadata['disk_gb']) -
                            int(metadata['ephemeral_gb']))
 
-    return compute_util.add_reserved_user_metadata(instance.metadata, metadata)
+    return compute_util.add_reserved_user_metadata(conf, instance.metadata,
+                                                   metadata)
 
 
-def make_sample_from_instance(instance, name, type, unit, volume,
+def make_sample_from_instance(conf, instance, name, type, unit, volume,
                               resource_id=None, additional_metadata=None):
     additional_metadata = additional_metadata or {}
-    resource_metadata = _get_metadata_from_object(instance)
+    resource_metadata = _get_metadata_from_object(conf, instance)
     resource_metadata.update(additional_metadata)
     return sample.Sample(
         name=name,
