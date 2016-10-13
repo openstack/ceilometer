@@ -31,9 +31,6 @@ SERVICE_OPTS = [
                help='Neutron load balancer version.')
 ]
 
-cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
-
 LOG = log.getLogger(__name__)
 
 

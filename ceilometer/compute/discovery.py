@@ -36,7 +36,6 @@ OPTS = [
                     "to the instances will match intervals "
                     "defined in pipeline.")
 ]
-cfg.CONF.register_opts(OPTS, group='compute')
 
 
 class InstanceDiscovery(plugin_base.DiscoveryBase):

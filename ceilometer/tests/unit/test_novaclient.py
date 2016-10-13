@@ -20,13 +20,15 @@ from oslotest import base
 from oslotest import mockpatch
 
 from ceilometer import nova_client
+from ceilometer import service
 
 
 class TestNovaClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestNovaClient, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self._flavors_count = 0
         self._images_count = 0
         self.nv = nova_client.Client(self.CONF)

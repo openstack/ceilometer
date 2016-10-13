@@ -24,8 +24,6 @@ from ceilometer import service
 
 LOG = log.getLogger(__name__)
 
-CONF = cfg.CONF
-
 
 class MultiChoicesOpt(cfg.Opt):
     def __init__(self, name, choices=None, **kwargs):
@@ -75,8 +73,6 @@ CLI_OPTS = [
                          'used while polling'),
 ]
 
-CONF.register_cli_opts(CLI_OPTS)
-
 
 def create_polling_service(worker_id, conf):
     return manager.AgentManager(worker_id,
@@ -86,7 +82,9 @@ def create_polling_service(worker_id, conf):
 
 
 def main():
-    conf = service.prepare_service()
+    conf = cfg.ConfigOpts()
+    conf.register_cli_opts(CLI_OPTS)
+    service.prepare_service(conf=conf)
     sm = cotyledon.ServiceManager()
     sm.add(create_polling_service, args=(conf,))
     sm.run()

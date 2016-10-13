@@ -11,20 +11,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 import oslo_messaging
 
 from ceilometer.agent import plugin_base
 from ceilometer import sample
-
-OPTS = [
-    cfg.StrOpt('ceilometer_control_exchange',
-               default='ceilometer',
-               help="Exchange name for ceilometer notifications."),
-]
-
-
-cfg.CONF.register_opts(OPTS)
 
 
 class TelemetryBase(plugin_base.NotificationBase):

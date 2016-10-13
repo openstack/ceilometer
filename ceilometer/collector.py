@@ -46,14 +46,14 @@ OPTS = [
     cfg.IntOpt('batch_timeout',
                help='Number of seconds to wait before dispatching samples'
                'when batch_size is not reached (None means indefinitely)'),
+    cfg.IntOpt('workers',
+               default=1,
+               min=1,
+               deprecated_group='DEFAULT',
+               deprecated_name='collector_workers',
+               help='Number of workers for collector service. '
+               'default value is 1.')
 ]
-
-cfg.CONF.register_opts(OPTS, group="collector")
-cfg.CONF.import_opt('metering_topic', 'ceilometer.publisher.messaging',
-                    group='publisher_notifier')
-cfg.CONF.import_opt('event_topic', 'ceilometer.publisher.messaging',
-                    group='publisher_notifier')
-
 
 LOG = log.getLogger(__name__)
 

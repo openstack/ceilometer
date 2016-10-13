@@ -18,7 +18,6 @@ import datetime
 import operator
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslo_db import api
 from oslo_db import exception as dbexc
 from oslo_utils import timeutils
@@ -66,7 +65,6 @@ class DBTestBase(tests_db.TestBase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
         patcher = mock.patch.object(timeutils, 'utcnow')
         self.addCleanup(patcher.stop)
         self.mock_utcnow = patcher.start()

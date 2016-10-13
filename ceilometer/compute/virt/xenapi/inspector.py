@@ -40,10 +40,6 @@ OPTS = [
                secret=True),
 ]
 
-CONF = cfg.CONF
-CONF.register_group(opt_group)
-CONF.register_opts(OPTS, group=opt_group)
-
 
 class XenapiException(virt_inspector.InspectorException):
     pass

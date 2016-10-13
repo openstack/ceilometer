@@ -44,10 +44,6 @@ SERVICE_OPTS = [
                help='Swift service type.'),
 ]
 
-cfg.CONF.register_opts(OPTS)
-cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
-
 
 class _Base(plugin_base.PollsterBase):
 

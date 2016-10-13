@@ -65,9 +65,6 @@ OPTS = [
                     'work-arounds.'),
 ]
 
-cfg.CONF.register_group(opt_group)
-cfg.CONF.register_opts(OPTS, group=opt_group)
-
 VC_AVERAGE_MEMORY_CONSUMED_CNTR = 'mem:consumed:average'
 VC_AVERAGE_CPU_CONSUMED_CNTR = 'cpu:usage:average'
 VC_NETWORK_RX_COUNTER = 'net:received:average'

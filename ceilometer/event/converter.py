@@ -39,8 +39,6 @@ OPTS = [
                     'not captured.')
 ]
 
-cfg.CONF.register_opts(OPTS, group='event')
-
 LOG = log.getLogger(__name__)
 
 

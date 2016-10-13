@@ -54,10 +54,6 @@ NOTIFIER_OPTS = [
                )
 ]
 
-cfg.CONF.register_opts(NOTIFIER_OPTS,
-                       group="publisher_notifier")
-cfg.CONF.import_opt('host', 'ceilometer.service')
-
 
 class DeliveryFailure(Exception):
     def __init__(self, message=None, cause=None):

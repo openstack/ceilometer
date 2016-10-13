@@ -37,12 +37,6 @@ SERVICE_OPTS = [
                help='Nova service type.'),
 ]
 
-cfg.CONF.register_opts(OPTS)
-cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.import_opt('http_timeout', 'ceilometer.service')
-cfg.CONF.import_opt('glance', 'ceilometer.image.discovery', 'service_types')
-cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
-
 LOG = log.getLogger(__name__)
 
 

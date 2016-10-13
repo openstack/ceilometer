@@ -50,8 +50,6 @@ OPTS = [
 
 
 ]
-CONF = cfg.CONF
-CONF.register_opts(OPTS, group='hardware')
 
 
 class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):

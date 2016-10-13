@@ -50,4 +50,7 @@ EXCHANGE_OPTS = [
     cfg.StrOpt('dns_control_exchange',
                default='central',
                help="Exchange name for DNS service notifications."),
+    cfg.StrOpt('ceilometer_control_exchange',
+               default='ceilometer',
+               help="Exchange name for ceilometer notifications."),
 ]

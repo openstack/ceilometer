@@ -42,8 +42,8 @@ class FakeConnection(object):
 class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.import_opt("connection", "oslo_db.options", group="database")
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('telemetry_secret', 'not-so-secret',

@@ -26,8 +26,6 @@ OPTS = [
                help='URL to Gnocchi. default: autodetection'),
 ]
 
-cfg.CONF.register_opts(OPTS, group="dispatcher_gnocchi")
-
 
 def get_gnocchiclient(conf, endpoint_override=None):
     session = keystone_client.get_session(conf)

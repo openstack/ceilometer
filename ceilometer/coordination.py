@@ -50,7 +50,6 @@ OPTS = [
                help='Maximum number of seconds between retry to join '
                     'partitioning group')
 ]
-cfg.CONF.register_opts(OPTS, group='coordination')
 
 
 class ErrorJoiningPartitioningGroup(Exception):

@@ -38,7 +38,6 @@ OPTS = [
                                                   "publisher")]
                ),
 ]
-cfg.CONF.register_opts(OPTS, group="publisher")
 
 
 def compute_signature(message, secret):

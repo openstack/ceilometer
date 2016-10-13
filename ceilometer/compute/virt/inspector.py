@@ -32,8 +32,6 @@ OPTS = [
                     'and powervm.'),
 ]
 
-cfg.CONF.register_opts(OPTS)
-
 
 LOG = log.getLogger(__name__)
 

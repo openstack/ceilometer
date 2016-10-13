@@ -25,11 +25,7 @@ import pecan
 from ceilometer.api import hooks
 from ceilometer.api import middleware
 
-from ceilometer import service
-
 LOG = log.getLogger(__name__)
-
-CONF = cfg.CONF
 
 OPTS = [
     cfg.StrOpt('api_paste_config',
@@ -45,9 +41,6 @@ API_OPTS = [
                help='Default maximum number of items returned by API request.'
                ),
 ]
-
-CONF.register_opts(OPTS)
-CONF.register_opts(API_OPTS, group='api')
 
 
 def setup_app(pecan_config=None, conf=None):
@@ -117,7 +110,3 @@ def app_factory(global_config, **local_conf):
     global APPCONFIGS
     conf = APPCONFIGS.get(global_config.get('configkey'))
     return setup_app(conf=conf)
-
-
-def build_wsgi_app(argv=None):
-    return load_app(service.prepare_service(argv=argv))

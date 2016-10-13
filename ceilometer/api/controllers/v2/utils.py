@@ -23,7 +23,6 @@ import datetime
 import functools
 import inspect
 
-from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 import pecan
@@ -36,8 +35,6 @@ from ceilometer.i18n import _, _LI
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
-cfg.CONF.import_opt('default_api_return_limit', 'ceilometer.api.app',
-                    group='api')
 
 
 def enforce_limit(limit):

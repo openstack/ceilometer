@@ -25,6 +25,7 @@ from ceilometer import declarative
 from ceilometer.hardware.inspector import base as inspector_base
 from ceilometer.hardware.pollsters import generic
 from ceilometer import sample
+from ceilometer import service
 from ceilometer.tests import base as test_base
 
 
@@ -109,12 +110,12 @@ class TestGenericPollsters(test_base.BaseTestCase):
 
     def setUp(self):
         super(TestGenericPollsters, self).setUp()
-        self.conf = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.conf = self.useFixture(fixture_config.Config(conf)).conf
         self.resources = ["snmp://test", "snmp://test2"]
         self.useFixture(mockpatch.Patch(
             'ceilometer.hardware.inspector.get_inspector',
             self.faux_get_inspector))
-        self.conf(args=[])
         self.pollster = generic.GenericHardwareDeclarativePollster(self.conf)
 
     def _setup_meter_def_file(self, cfg):

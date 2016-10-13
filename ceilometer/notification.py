@@ -25,7 +25,6 @@ from stevedore import extension
 from ceilometer.agent import plugin_base as base
 from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer import exchange_control
 from ceilometer.i18n import _, _LI, _LW
 from ceilometer import messaging
 from ceilometer import pipeline
@@ -78,12 +77,14 @@ OPTS = [
                default=5,
                help='Number of seconds to wait before publishing samples'
                'when batch_size is not reached (None means indefinitely)'),
+    cfg.IntOpt('workers',
+               default=1,
+               min=1,
+               deprecated_group='DEFAULT',
+               deprecated_name='notification_workers',
+               help='Number of workers for notification service, '
+               'default value is 1.')
 ]
-
-cfg.CONF.register_opts(exchange_control.EXCHANGE_OPTS)
-cfg.CONF.register_opts(OPTS, group="notification")
-cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
-                    group='publisher_notifier')
 
 
 class NotificationService(service_base.PipelineBasedService):

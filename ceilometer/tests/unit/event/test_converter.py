@@ -599,8 +599,8 @@ class TestNotificationConverter(ConverterBase):
 
     def setUp(self):
         super(TestNotificationConverter, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        ceilometer_service.prepare_service(argv=[], config_files=[])
+        conf = ceilometer_service.prepare_service(argv=[], config_files=[])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.valid_event_def1 = [{
             'event_type': 'compute.instance.create.*',
             'traits': {

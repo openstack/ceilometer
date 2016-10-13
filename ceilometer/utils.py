@@ -44,8 +44,6 @@ OPTS = [
                help='Path to the rootwrap configuration file to'
                     'use for running commands as root'),
 ]
-CONF = cfg.CONF
-CONF.register_opts(OPTS)
 
 EPOCH_TIME = datetime.datetime(1970, 1, 1)
 

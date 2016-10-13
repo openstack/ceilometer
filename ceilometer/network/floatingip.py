@@ -16,7 +16,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 from oslo_log import log
 
 from ceilometer.i18n import _LW
@@ -24,8 +23,6 @@ from ceilometer.network.services import base
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
-
-cfg.CONF.import_group('service_types', 'ceilometer.neutron_client')
 
 
 class FloatingIPPollster(base.BaseServicesPollster):

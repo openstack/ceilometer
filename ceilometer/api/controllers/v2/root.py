@@ -54,9 +54,6 @@ API_OPTS = [
                      'keystone.')),
 ]
 
-cfg.CONF.register_opts(API_OPTS, group='api')
-cfg.CONF.import_opt('meter_dispatchers', 'ceilometer.dispatcher')
-
 LOG = log.getLogger(__name__)
 
 

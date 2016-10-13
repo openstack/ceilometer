@@ -34,8 +34,6 @@ OPTS = [
                      'namespace.'),
 ]
 
-cfg.CONF.register_opts(OPTS)
-
 
 def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
     limit = conf.reserved_metadata_length

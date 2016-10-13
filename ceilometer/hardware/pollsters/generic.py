@@ -35,8 +35,6 @@ OPTS = [
                ),
 ]
 
-cfg.CONF.register_opts(OPTS, group='hardware')
-
 LOG = log.getLogger(__name__)
 
 
