@@ -84,12 +84,12 @@ class EventDefinition(object):
                                             '_context_tenant']),
     )
 
-    def __init__(self, definition_cfg, trait_plugin_mgr):
+    def __init__(self, definition_cfg, trait_plugin_mgr, raw_levels):
         self._included_types = []
         self._excluded_types = []
         self.traits = dict()
         self.cfg = definition_cfg
-        self.raw_levels = [level.lower() for level in cfg.CONF.event.store_raw]
+        self.raw_levels = raw_levels
 
         try:
             event_type = definition_cfg['event_type']
@@ -254,14 +254,20 @@ class NotificationEventsConverter(object):
 
     """
 
-    def __init__(self, events_config, trait_plugin_mgr, add_catchall=True):
+    def __init__(self, conf, events_config, trait_plugin_mgr):
+        self.conf = conf
+
+        raw_levels = [level.lower() for level in self.conf.event.store_raw]
         self.definitions = [
-            EventDefinition(event_def, trait_plugin_mgr)
+            EventDefinition(event_def, trait_plugin_mgr, raw_levels)
             for event_def in reversed(events_config)]
+
+        add_catchall = not self.conf.event.drop_unmatched_notifications
         if add_catchall and not any(d.is_catchall for d in self.definitions):
             event_def = dict(event_type='*', traits={})
             self.definitions.append(EventDefinition(event_def,
-                                                    trait_plugin_mgr))
+                                                    trait_plugin_mgr,
+                                                    raw_levels))
 
     def to_event(self, notification_body):
         event_type = notification_body['event_type']
@@ -275,7 +281,7 @@ class NotificationEventsConverter(object):
         if edef is None:
             msg = (_('Dropping Notification %(type)s (uuid:%(msgid)s)')
                    % dict(type=event_type, msgid=message_id))
-            if cfg.CONF.event.drop_unmatched_notifications:
+            if self.conf.event.drop_unmatched_notifications:
                 LOG.debug(msg)
             else:
                 # If drop_unmatched_notifications is False, this should
@@ -289,7 +295,7 @@ class NotificationEventsConverter(object):
 def setup_events(conf, trait_plugin_mgr):
     """Setup the event definitions from yaml config file."""
     return NotificationEventsConverter(
+        conf,
         declarative.load_definitions(conf, [],
                                      conf.event.definitions_cfg_file),
-        trait_plugin_mgr,
-        add_catchall=not conf.event.drop_unmatched_notifications)
+        trait_plugin_mgr)
