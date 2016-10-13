@@ -170,18 +170,20 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
         meters_cfg = declarative.load_definitions(
-            cfg.CONF, {}, cfg.CONF.meter.meter_definitions_cfg_file,
+            self.manager.conf, {},
+            self.manager.conf.meter.meter_definitions_cfg_file,
             pkg_resources.resource_filename(__name__, "data/meters.yaml"))
 
         definitions = {}
+        disable_non_metric_meters = (self.manager.conf.notification.
+                                     disable_non_metric_meters)
         for meter_cfg in reversed(meters_cfg['metric']):
             if meter_cfg.get('name') in definitions:
                 # skip duplicate meters
                 LOG.warning(_LW("Skipping duplicate meter definition %s")
                             % meter_cfg)
                 continue
-            if (meter_cfg.get('volume') != 1
-                    or not cfg.CONF.notification.disable_non_metric_meters):
+            if (meter_cfg.get('volume') != 1 or not disable_non_metric_meters):
                 try:
                     md = MeterDefinition(meter_cfg, plugin_manager)
                 except declarative.DefinitionException as e:
