@@ -85,12 +85,12 @@ def get_connection_from_config(conf, purpose='metering'):
         namespace = 'ceilometer.%s.storage' % purpose
         url = (getattr(conf.database, '%s_connection' % purpose) or
                conf.database.connection)
-        return get_connection(url, namespace)
+        return get_connection(conf, url, namespace)
 
     return _inner()
 
 
-def get_connection(url, namespace):
+def get_connection(conf, url, namespace):
     """Return an open connection to the database."""
     connection_scheme = urlparse.urlparse(url).scheme
     # SqlAlchemy connections specify may specify a 'dialect' or
@@ -100,7 +100,7 @@ def get_connection(url, namespace):
     LOG.debug('looking for %(name)r driver in %(namespace)r',
               {'name': engine_name, 'namespace': namespace})
     mgr = driver.DriverManager(namespace, engine_name)
-    return mgr.driver(url)
+    return mgr.driver(conf, url)
 
 
 class SampleFilter(object):

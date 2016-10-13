@@ -36,10 +36,13 @@ except ImportError:
     mocks = None   # happybase module is not Python 3 compatible yet
 
 
-class MongoDbManager(fixtures.Fixture):
-
-    def __init__(self, url):
+class DBManager(fixtures.Fixture):
+    def __init__(self, conf, url):
         self._url = url
+        self._conf = conf
+
+
+class MongoDbManager(DBManager):
 
     def setUp(self):
         super(MongoDbManager, self).setUp()
@@ -49,9 +52,9 @@ class MongoDbManager(fixtures.Fixture):
                 message='.*you must provide a username and password.*')
             try:
                 self.connection = storage.get_connection(
-                    self.url, 'ceilometer.metering.storage')
+                    self._conf, self.url, 'ceilometer.metering.storage')
                 self.event_connection = storage.get_connection(
-                    self.url, 'ceilometer.event.storage')
+                    self._conf, self.url, 'ceilometer.event.storage')
             except storage.StorageBadVersion as e:
                 raise testcase.TestSkipped(six.text_type(e))
 
@@ -63,8 +66,9 @@ class MongoDbManager(fixtures.Fixture):
         }
 
 
-class SQLManager(fixtures.Fixture):
-    def __init__(self, url):
+class SQLManager(DBManager):
+    def __init__(self, conf, url):
+        super(SQLManager, self).__init__(conf, url)
         db_name = 'ceilometer_%s' % uuid.uuid4().hex
         engine = sqlalchemy.create_engine(url)
         conn = engine.connect()
@@ -78,9 +82,9 @@ class SQLManager(fixtures.Fixture):
     def setUp(self):
         super(SQLManager, self).setUp()
         self.connection = storage.get_connection(
-            self.url, 'ceilometer.metering.storage')
+            self._conf, self.url, 'ceilometer.metering.storage')
         self.event_connection = storage.get_connection(
-            self.url, 'ceilometer.event.storage')
+            self._conf, self.url, 'ceilometer.event.storage')
 
 
 class PgSQLManager(SQLManager):
@@ -97,32 +101,26 @@ class MySQLManager(SQLManager):
         conn.execute('CREATE DATABASE %s;' % db_name)
 
 
-class ElasticSearchManager(fixtures.Fixture):
-    def __init__(self, url):
-        self.url = url
-
+class ElasticSearchManager(DBManager):
     def setUp(self):
         super(ElasticSearchManager, self).setUp()
         self.connection = storage.get_connection(
-            'sqlite://', 'ceilometer.metering.storage')
+            self._conf, 'sqlite://', 'ceilometer.metering.storage')
         self.event_connection = storage.get_connection(
-            self.url, 'ceilometer.event.storage')
+            self._conf, self.url, 'ceilometer.event.storage')
         # prefix each test with unique index name
         self.event_connection.index_name = 'events_%s' % uuid.uuid4().hex
         # force index on write so data is queryable right away
         self.event_connection._refresh_on_write = True
 
 
-class HBaseManager(fixtures.Fixture):
-    def __init__(self, url):
-        self._url = url
-
+class HBaseManager(DBManager):
     def setUp(self):
         super(HBaseManager, self).setUp()
         self.connection = storage.get_connection(
-            self.url, 'ceilometer.metering.storage')
+            self._conf, self.url, 'ceilometer.metering.storage')
         self.event_connection = storage.get_connection(
-            self.url, 'ceilometer.event.storage')
+            self._conn, self.url, 'ceilometer.event.storage')
         # Unique prefix for each test to keep data is distinguished because
         # all test data is stored in one table
         data_prefix = str(uuid.uuid4().hex)
@@ -152,17 +150,14 @@ class HBaseManager(fixtures.Fixture):
         )
 
 
-class SQLiteManager(fixtures.Fixture):
-
-    def __init__(self, url):
-        self.url = url
-
+class SQLiteManager(DBManager):
     def setUp(self):
         super(SQLiteManager, self).setUp()
+        self.url = self._url
         self.connection = storage.get_connection(
-            self.url, 'ceilometer.metering.storage')
+            self._conf, self._url, 'ceilometer.metering.storage')
         self.event_connection = storage.get_connection(
-            self.url, 'ceilometer.event.storage')
+            self._conf, self._url, 'ceilometer.event.storage')
 
 
 @six.add_metaclass(test_base.SkipNotImplementedMeta)
@@ -202,7 +197,7 @@ class TestBase(test_base.BaseTestCase):
         if not manager:
             self.skipTest("missing driver manager: %s" % engine)
 
-        self.db_manager = manager(db_url)
+        self.db_manager = manager(self.CONF, db_url)
 
         self.useFixture(self.db_manager)
 
@@ -231,7 +226,7 @@ class TestBase(test_base.BaseTestCase):
         self.conn = None
         super(TestBase, self).tearDown()
 
-    def _get_connection(self, url, namespace):
+    def _get_connection(self, conf, url, namespace):
         if namespace == "ceilometer.event.storage":
             return self.event_conn
         return self.conn

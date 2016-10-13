@@ -18,7 +18,6 @@ import datetime
 import hashlib
 import os
 
-from oslo_config import cfg
 from oslo_db import api
 from oslo_db import exception as dbexc
 from oslo_db.sqlalchemy import session as db_session
@@ -220,12 +219,13 @@ class Connection(base.Connection):
         AVAILABLE_STORAGE_CAPABILITIES,
     )
 
-    def __init__(self, url):
+    def __init__(self, conf, url):
+        super(Connection, self).__init__(conf, url)
         # Set max_retries to 0, since oslo.db in certain cases may attempt
         # to retry making the db connection retried max_retries ^ 2 times
         # in failure case and db reconnection has already been implemented
         # in storage.__init__.get_connection_from_config function
-        options = dict(cfg.CONF.database.items())
+        options = dict(self.conf.database.items())
         options['max_retries'] = 0
         # oslo.db doesn't support options defined by Ceilometer
         for opt in storage.OPTS:
@@ -387,7 +387,7 @@ class Connection(base.Connection):
             rows = sample_q.delete()
             LOG.info(_LI("%d samples removed from database"), rows)
 
-        if not cfg.CONF.database.sql_expire_samples_only:
+        if not self.conf.database.sql_expire_samples_only:
             with session.begin():
                 # remove Meter definitions with no matching samples
                 (session.query(models.Meter)
@@ -459,7 +459,7 @@ class Connection(base.Connection):
         # NOTE: When sql_expire_samples_only is enabled, there will be some
         #       resources without any sample, in such case we should use inner
         #       join on sample table to avoid wrong result.
-        if cfg.CONF.database.sql_expire_samples_only or has_timestamp:
+        if self.conf.database.sql_expire_samples_only or has_timestamp:
             res_q = session.query(distinct(models.Resource.resource_id)).join(
                 models.Sample,
                 models.Sample.resource_id == models.Resource.internal_id)

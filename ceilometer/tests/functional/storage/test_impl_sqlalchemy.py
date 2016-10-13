@@ -52,8 +52,8 @@ class EngineFacadeTest(tests_db.TestBase):
 
     @mock.patch.object(warnings, 'warn')
     def test_no_not_supported_warning(self, mocked):
-        impl_sqlalchemy.Connection('sqlite://')
-        impl_sqla_event.Connection('sqlite://')
+        impl_sqlalchemy.Connection(self.CONF, 'sqlite://')
+        impl_sqla_event.Connection(self.CONF, 'sqlite://')
         self.assertNotIn(mock.call(mock.ANY, exception.NotSupportedWarning),
                          mocked.call_args_list)
 
