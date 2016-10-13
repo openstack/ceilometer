@@ -109,8 +109,11 @@ class TestCollector(tests_base.BaseTestCase):
 
     def _verify_udp_socket(self, udp_socket):
         conf = self.CONF.collector
-        udp_socket.setsockopt.assert_called_once_with(socket.SOL_SOCKET,
-                                                      socket.SO_REUSEADDR, 1)
+        setsocketopt_calls = [mock.call.setsockopt(socket.SOL_SOCKET,
+                                                   socket.SO_REUSEADDR, 1),
+                              mock.call.setsockopt(socket.SOL_SOCKET,
+                                                   socket.SO_REUSEPORT, 1)]
+        udp_socket.setsockopt.assert_has_calls(setsocketopt_calls)
         udp_socket.bind.assert_called_once_with((conf.udp_address,
                                                  conf.udp_port))
 
