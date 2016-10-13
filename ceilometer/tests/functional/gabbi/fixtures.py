@@ -103,7 +103,6 @@ class ConfigFixture(fixture.GabbiFixture):
         conf.set_override('metering_connection', '', group='database')
         conf.set_override('event_connection', '', group='database')
 
-        conf.set_override('pecan_debug', True, group='api')
         conf.set_override('gnocchi_is_enabled', False, group='api')
         conf.set_override('aodh_is_enabled', False, group='api')
         conf.set_override('panko_is_enabled', False, group='api')
