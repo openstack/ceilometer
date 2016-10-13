@@ -227,7 +227,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
 
     def __init__(self):
         super(_LBStatsPollster, self).__init__()
-        self.client = neutron_client.Client()
+        self.client = neutron_client.Client(cfg.CONF)
         self.lb_version = cfg.CONF.service_types.neutron_lbaas_version
 
     @staticmethod
