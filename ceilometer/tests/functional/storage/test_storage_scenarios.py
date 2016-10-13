@@ -18,7 +18,7 @@ import datetime
 import operator
 
 import mock
-from oslo_config import cfg
+from oslo_config import fixture as fixture_config
 from oslo_db import api
 from oslo_db import exception as dbexc
 from oslo_utils import timeutils
@@ -66,6 +66,7 @@ class DBTestBase(tests_db.TestBase):
 
     def setUp(self):
         super(DBTestBase, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         patcher = mock.patch.object(timeutils, 'utcnow')
         self.addCleanup(patcher.stop)
         self.mock_utcnow = patcher.start()
@@ -604,7 +605,7 @@ class RawSampleTest(DBTestBase):
     @tests_db.run_with('sqlite', 'mysql', 'pgsql')
     def test_clear_metering_data_expire_samples_only(self):
 
-        cfg.CONF.set_override('sql_expire_samples_only', True, 'database')
+        self.CONF.set_override('sql_expire_samples_only', True, 'database')
         self.mock_utcnow.return_value = datetime.datetime(2012, 7, 2, 10, 45)
         self.conn.clear_expired_metering_data(4 * 60)
         f = storage.SampleFilter(meter='instance')
@@ -3161,7 +3162,7 @@ class MongoAutoReconnectTest(DBTestBase):
 class MongoTimeToLiveTest(DBTestBase):
 
     def test_ensure_index(self):
-        cfg.CONF.set_override('metering_time_to_live', 5, group='database')
+        self.CONF.set_override('metering_time_to_live', 5, group='database')
         self.conn.upgrade()
         self.assertEqual(5, self.conn.db.resource.index_information()
                          ['resource_ttl']['expireAfterSeconds'])
@@ -3169,9 +3170,9 @@ class MongoTimeToLiveTest(DBTestBase):
                          ['meter_ttl']['expireAfterSeconds'])
 
     def test_modification_of_index(self):
-        cfg.CONF.set_override('metering_time_to_live', 5, group='database')
+        self.CONF.set_override('metering_time_to_live', 5, group='database')
         self.conn.upgrade()
-        cfg.CONF.set_override('metering_time_to_live', 15, group='database')
+        self.CONF.set_override('metering_time_to_live', 15, group='database')
         self.conn.upgrade()
         self.assertEqual(15, self.conn.db.resource.index_information()
                          ['resource_ttl']['expireAfterSeconds'])
