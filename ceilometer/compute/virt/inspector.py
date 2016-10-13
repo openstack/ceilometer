@@ -226,6 +226,9 @@ class NoSanityException(InspectorException):
 #
 class Inspector(object):
 
+    def __init__(self, conf):
+        self.conf = conf
+
     def check_sanity(self):
         """Check the sanity of hypervisor inspector.
 
@@ -365,13 +368,14 @@ class Inspector(object):
         raise ceilometer.NotImplementedError
 
 
-def get_hypervisor_inspector():
+def get_hypervisor_inspector(conf):
     try:
         namespace = 'ceilometer.compute.virt'
         mgr = driver.DriverManager(namespace,
-                                   cfg.CONF.hypervisor_inspector,
-                                   invoke_on_load=True)
+                                   conf.hypervisor_inspector,
+                                   invoke_on_load=True,
+                                   invoke_args=(conf, ))
         return mgr.driver
     except ImportError as e:
         LOG.error(_("Unable to load the hypervisor inspector: %s") % e)
-        return Inspector()
+        return Inspector(conf)

@@ -35,7 +35,7 @@ class BaseComputePollster(plugin_base.PollsterBase):
         try:
             inspector = self._inspector
         except AttributeError:
-            inspector = virt_inspector.get_hypervisor_inspector()
+            inspector = virt_inspector.get_hypervisor_inspector(self.conf)
             BaseComputePollster._inspector = inspector
         return inspector
 

@@ -15,6 +15,7 @@
 """
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -52,11 +53,11 @@ class TestSwapXapiHost(base.BaseTestCase):
 class TestXenapiInspection(base.BaseTestCase):
 
     def setUp(self):
+        super(TestXenapiInspection, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
         api_session = mock.Mock()
         xenapi_inspector.get_api_session = mock.Mock(return_value=api_session)
-        self.inspector = xenapi_inspector.XenapiInspector()
-
-        super(TestXenapiInspection, self).setUp()
+        self.inspector = xenapi_inspector.XenapiInspector(self.CONF)
 
     def test_inspect_cpu_util(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
