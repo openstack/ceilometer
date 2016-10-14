@@ -28,7 +28,7 @@ OPTS = [
     cfg.StrOpt('hypervisor_inspector',
                default='libvirt',
                help='Inspector to use for inspecting the hypervisor layer. '
-                    'Known inspectors are libvirt, hyperv, vmware, xenapi '
+                    'Known inspectors are libvirt, hyperv, vsphere, xenapi '
                     'and powervm.'),
 ]
 
