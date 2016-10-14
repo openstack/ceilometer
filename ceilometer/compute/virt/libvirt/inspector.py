@@ -291,7 +291,10 @@ class LibvirtInspector(virt_inspector.Inspector):
                 instructions=perf["perf.instructions"],
                 cache_references=perf["perf.cache_references"],
                 cache_misses=perf["perf.cache_misses"])
-        except AttributeError as e:
+            # NOTE(sileht): KeyError if for libvirt >=2.0.0,<2.3.0, the perf
+            # subsystem ws existing but not  these attributes
+            # https://github.com/libvirt/libvirt/commit/bae660869de0612bee2a740083fb494c27e3f80c
+        except (AttributeError, KeyError) as e:
             msg = _LE('Perf is not supported by current version of libvirt, '
                       'and failed to inspect perf events of '
                       '%(instance_uuid)s, can not get info from libvirt: '
