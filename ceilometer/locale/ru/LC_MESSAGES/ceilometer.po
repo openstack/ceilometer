@@ -6,9 +6,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -61,11 +61,6 @@ msgstr ""
 "Не удалось получить информацию об использовании памяти для %(id)s: %(e)s"
 
 #, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr ""
-"Не удалось получить информацию об использовании CPU для виртуальной машины %s"
-
-#, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "Не удалось получить IP-адрес экземпляра %s"
 
@@ -84,9 +79,6 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "Ошибка анализа ответа HTTP: %s"
-
-msgid "Error stopping pollster."
-msgstr "Ошибка остановки опрашивающего объекта."
 
 msgid "Event"
 msgstr "Событие"
@@ -209,14 +201,6 @@ msgstr "API Opencontrail возвратил %(status)s %(reason)s"
 
 #, python-format
 msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr ""
-"Оператор %(operator)s не поддерживается. Для поля %(field)s возможен только "
-"оператор равенства"
-
-#, python-format
-msgid ""
 "Operator %(operator)s is not supported. The supported operators are: "
 "%(supported)s"
 msgstr ""
@@ -310,10 +294,6 @@ msgid "Samples should be included in request body"
 msgstr "Образцы должны включаться в тело запроса"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "Пропустить загрузку расширения для %s"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "Строка %s не является допустимым значением isotime"
 
@@ -357,10 +337,6 @@ msgstr ""
 "Преобразовать значение %(value)s в ожидаемый тип данных %(type)s невозможно."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "Не удалось найти ресурсы: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Вычислить выражение %(expr)s невозможно: %(exc)s"
 
@@ -397,10 +373,6 @@ msgid ""
 msgstr ""
 "Возникла непредвиденная исключительная ситуация при преобразовании %(value)s "
 "в ожидаемый тип данных %(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "Неизвестное расширение поиска: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."

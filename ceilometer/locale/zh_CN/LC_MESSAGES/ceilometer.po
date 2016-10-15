@@ -16,9 +16,9 @@
 # Linda <duleish@cn.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -63,10 +63,6 @@ msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "无法为%(id)s获取内存使用信息：%(e)s"
 
 #, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "无法获取虚拟机%s的CPU使用率"
-
-#, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "无法为实例%s获取IP地址"
 
@@ -85,9 +81,6 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "解析HTTP响应失败: %s"
-
-msgid "Error stopping pollster."
-msgstr "停止轮询程序时出错。"
 
 msgid "Event"
 msgstr "事件"
@@ -207,12 +200,6 @@ msgstr "Opencontrail接口返回状态%(status)s，原因%(reason)s"
 
 #, python-format
 msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr "运算符 %(operator)s 不受支持。对于字段 %(field)s，只能使用等号运算符"
-
-#, python-format
-msgid ""
 "Operator %(operator)s is not supported. The supported operators are: "
 "%(supported)s"
 msgstr "运算符 %(operator)s 不受支持。受支持的运算符为：%(supported)s"
@@ -298,10 +285,6 @@ msgid "Samples should be included in request body"
 msgstr "样本应包括在请求主体中"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "跳过为%s加载扩展"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "字符串%s不是个合法的标准时间格式"
 
@@ -340,10 +323,6 @@ msgid ""
 msgstr "无法转换%(value)s到预期的数据类型%(type)s。"
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "无法发现资源：%s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "无法计算表达式%(expr)s：%(exc)s"
 
@@ -375,10 +354,6 @@ msgstr "无法通过UDP发送采样"
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type %(type)s."
 msgstr "在转换%(value)s到预期的数据类型%(type)s时发生了未预料的异常。"
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "未知的发现器插件：%s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."

@@ -12,9 +12,9 @@
 # Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -59,10 +59,6 @@ msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "%(id)s에 대한 메모리 사용을 가져올 수 없음: %(e)s"
 
 #, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "VM %s CPU 이용률을 가져올 수 없음"
-
-#, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "%s 인스턴스의 IP 주소를 얻을 수 없음"
 
@@ -81,9 +77,6 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "HTTP 응답 구문 분석 중 오류 발생: %s"
-
-msgid "Error stopping pollster."
-msgstr "의견조사자를 중지하는 중에 오류가 발생했습니다. "
 
 msgid "Event"
 msgstr "이벤트"
@@ -206,14 +199,6 @@ msgstr "Opencontrail API가 %(status)s 리턴: %(reason)s"
 
 #, python-format
 msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr ""
-"연산자 %(operator)s이(가) 지원되지 않습니다. 필드 %(field)s에는 등호 연산자"
-"만 사용할 수 있습니다."
-
-#, python-format
-msgid ""
 "Operator %(operator)s is not supported. The supported operators are: "
 "%(supported)s"
 msgstr ""
@@ -302,10 +287,6 @@ msgid "Samples should be included in request body"
 msgstr "샘플이 요청 본문에 포함되어야 함"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "%s 확장자 로드 건너뛰기"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "문자열 %s이(가) 올바른 등시간이 아님"
 
@@ -346,10 +327,6 @@ msgid ""
 msgstr "%(value)s 값을 예상 데이터 유형 %(type)s(으)로 변환할 수 없습니다."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "자원을 검색할 수 없음: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "%(expr)s 표현식을 평가할 수 없음: %(exc)s"
 
@@ -386,10 +363,6 @@ msgid ""
 msgstr ""
 "%(value)s을(를) 예상된 데이터 유형으로 변환하는 중에 예상치 않은 예외 발생 "
 "%(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "알 수 없는 검색 확장자: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."

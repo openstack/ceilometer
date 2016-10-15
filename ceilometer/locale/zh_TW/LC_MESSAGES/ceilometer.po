@@ -8,9 +8,9 @@
 # Jennifer <cristxu@tw.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -55,10 +55,6 @@ msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "無法取得 %(id)s 的記憶體用量：%(e)s"
 
 #, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "無法取得 VM %s CPU 使用率"
-
-#, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "無法取得實例 %s 的 IP 位址"
 
@@ -77,9 +73,6 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "剖析 HTTP 回應時發生錯誤：%s"
-
-msgid "Error stopping pollster."
-msgstr "停止 pollster 時發生錯誤。"
 
 msgid "Event"
 msgstr "事件"
@@ -197,12 +190,6 @@ msgstr "Opencontrail API 傳回了 %(status)s %(reason)s"
 
 #, python-format
 msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr "運算子 %(operator)s 不受支援。只有等式運算子才可供欄位 %(field)s 使用"
-
-#, python-format
-msgid ""
 "Operator %(operator)s is not supported. The supported operators are: "
 "%(supported)s"
 msgstr "運算子 %(operator)s 不受支援。受支援的運算子為：%(supported)s"
@@ -287,10 +274,6 @@ msgid "Samples should be included in request body"
 msgstr "要求內文中應該包括範例"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "跳過載入 %s 的延伸"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "字串 %s 不是有效的 ISO 時間"
 
@@ -329,10 +312,6 @@ msgid ""
 msgstr "無法將值 %(value)s 轉換成預期的資料類型 %(type)s。"
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "無法探索資源：%s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "無法對表示式 %(expr)s 進行求值：%(exc)s"
 
@@ -365,10 +344,6 @@ msgstr "無法透過 UDP 來傳送樣本"
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type %(type)s."
 msgstr "將 %(value)s 轉換為預期的資料類型%(type)s 時發生非預期的異常狀況。"
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "不明的探索延伸：%s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."

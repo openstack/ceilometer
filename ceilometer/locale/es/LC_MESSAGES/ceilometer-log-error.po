@@ -2,9 +2,9 @@
 # Eugènia Torrella <tester03@es.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,10 +22,6 @@ msgstr "No se ha podido cargar el inspector %(name)s: %(err)s"
 #, python-format
 msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
 msgstr "No se ha podido obtener el uso de memoria residente para %(id)s: %(e)s"
-
-#, python-format
-msgid "Dispatcher failed to handle the %s, requeue it."
-msgstr "El asignador no ha podido manejar el  %s, vuelva a ponerlo en la cola."
 
 msgid "Error connecting to coordination backend."
 msgstr "Error de conexión con el servidor coordinador."
@@ -60,12 +56,6 @@ msgid "Failed to connect to Kafka service: %s"
 msgstr "No se ha podido conectar con el servicio Kafka: %s"
 
 #, python-format
-msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
-msgstr ""
-"No se ha podido establecer conexión con la base de datos con el propósito "
-"%(purpose)s. Vuelva a intentarlo más tarde: %(err)s"
-
-#, python-format
 msgid "Failed to connect to db, purpose %(purpose)s retry later: %(err)s"
 msgstr ""
 "No se ha podido establecer conexión con la base de datos con el propósito "
@@ -82,13 +72,6 @@ msgstr "No se ha podido registrar el suceso: %s"
 msgid "Failed to retry to send sample data with max_retry times"
 msgstr ""
 "No se ha podido volver a intentar enviar datos de ejemplo max_retry veces"
-
-msgid ""
-"Group ID: %{group_id}s, Members: %{members}s, Me: %{me}s: Current agent is "
-"not part of group and cannot take tasks"
-msgstr ""
-"ID de grupo: %{group_id}s, Miembros: %{members}s, Yo: %{me}s: El agente "
-"actual no forma parte del grupo y no puede coger tareas"
 
 #, python-format
 msgid "Invalid type %s specified"
@@ -118,10 +101,6 @@ msgstr "No se han especificado los campos obligatorios %s"
 #, python-format
 msgid "Skip invalid resource %s"
 msgstr "Omitir el recurso no válido %s"
-
-msgid "Status Code: %{code}s. Failed todispatch event: %{event}s"
-msgstr ""
-"Código de estado: %{code}s. No se ha podido asignar el suceso: %{event}s"
 
 #, python-format
 msgid "Unrecognized type value %s"
