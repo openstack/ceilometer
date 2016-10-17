@@ -29,7 +29,6 @@ import random
 import uuid
 
 import make_test_data
-from oslo_config import cfg
 import oslo_messaging
 from six import moves
 
@@ -42,8 +41,7 @@ def send_batch_notifier(notifier, topic, batch):
     notifier.sample({}, event_type=topic, payload=batch)
 
 
-def get_notifier(config_file):
-    conf = service.prepare_service(argv=['/', '--config-file', config_file])
+def get_notifier(conf):
     return oslo_messaging.Notifier(
         messaging.get_transport(conf),
         driver='messagingv2',
@@ -52,7 +50,7 @@ def get_notifier(config_file):
     )
 
 
-def generate_data(send_batch, make_data_args, samples_count,
+def generate_data(conf, send_batch, make_data_args, samples_count,
                   batch_size, resources_count, topic):
     make_data_args.interval = 1
     make_data_args.start = (datetime.datetime.utcnow() -
@@ -65,7 +63,8 @@ def generate_data(send_batch, make_data_args, samples_count,
     resource_samples = {resource: 0 for resource in resources_list}
     batch = []
     count = 0
-    for sample in make_test_data.make_test_data(**make_data_args.__dict__):
+    for sample in make_test_data.make_test_data(conf,
+                                                **make_data_args.__dict__):
         count += 1
         resource = resources_list[random.randint(0, len(resources_list) - 1)]
         resource_samples[resource] += 1
@@ -76,7 +75,7 @@ def generate_data(send_batch, make_data_args, samples_count,
         sample['timestamp'] = sample['timestamp'].isoformat()
         # need to recalculate signature because of the resource_id change
         sig = utils.compute_signature(sample,
-                                      cfg.CONF.publisher.telemetry_secret)
+                                      conf.publisher.telemetry_secret)
         sample['message_signature'] = sig
         batch.append(sample)
         if len(batch) == batch_size:
@@ -129,14 +128,15 @@ def get_parser():
 def main():
     args = get_parser().parse_known_args()[0]
     make_data_args = make_test_data.get_parser().parse_known_args()[0]
-    notifier = get_notifier(args.config_file)
+    conf = service.prepare_service(argv=['/', '--config-file',
+                                         args.config_file])
+    notifier = get_notifier(conf)
     send_batch = functools.partial(send_batch_notifier, notifier)
     result_dir = args.result_dir
-    del args.notify
     del args.config_file
     del args.result_dir
 
-    resource_writes = generate_data(send_batch, make_data_args,
+    resource_writes = generate_data(conf, send_batch, make_data_args,
                                     **args.__dict__)
     result_file = "%s/sample-by-resource-%s" % (result_dir,
                                                 random.getrandbits(32))
