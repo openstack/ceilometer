@@ -19,21 +19,27 @@ from keystoneauth1 import loading as ka_loading
 from keystoneclient.v3 import client as ks_client_v3
 from oslo_config import cfg
 
-CFG_GROUP = "service_credentials"
+DEFAULT_GROUP = "service_credentials"
+
+# List of group that can set auth_section to use a different
+# credentials section
+OVERRIDABLE_GROUPS = ['dispatcher_gnocchi']
 
 
-def get_session(conf, requests_session=None):
+def get_session(conf, requests_session=None, group=None):
+
     """Get a ceilometer service credentials auth session."""
-    auth_plugin = ka_loading.load_auth_from_conf_options(conf, CFG_GROUP)
+    group = group or DEFAULT_GROUP
+    auth_plugin = ka_loading.load_auth_from_conf_options(conf, group)
     session = ka_loading.load_session_from_conf_options(
-        conf, CFG_GROUP, auth=auth_plugin, session=requests_session
+        conf, group, auth=auth_plugin, session=requests_session
     )
     return session
 
 
-def get_client(conf, trust_id=None, requests_session=None):
+def get_client(conf, trust_id=None, requests_session=None, group=None):
     """Return a client for keystone v3 endpoint, optionally using a trust."""
-    session = get_session(conf, requests_session=requests_session)
+    session = get_session(conf, requests_session=requests_session, group=group)
     return ks_client_v3.Client(session=session, trust_id=trust_id)
 
 
@@ -64,10 +70,26 @@ CLI_OPTS = [
 
 
 def register_keystoneauth_opts(conf):
-    ka_loading.register_auth_conf_options(conf, CFG_GROUP)
+    _register_keystoneauth_group(conf, DEFAULT_GROUP)
+    for group in OVERRIDABLE_GROUPS:
+        _register_keystoneauth_group(conf, group)
+        conf.set_default('auth_section', DEFAULT_GROUP, group=group)
+
+
+def _register_keystoneauth_group(conf, group):
+    ka_loading.register_auth_conf_options(conf, group)
     ka_loading.register_session_conf_options(
-        conf, CFG_GROUP,
+        conf, group,
         deprecated_opts={'cacert': [
-            cfg.DeprecatedOpt('os-cacert', group=CFG_GROUP),
+            cfg.DeprecatedOpt('os-cacert', group=group),
             cfg.DeprecatedOpt('os-cacert', group="DEFAULT")]
         })
+    conf.register_opts(CLI_OPTS, group=group)
+
+
+def post_register_keystoneauth_opts(conf):
+    for group in OVERRIDABLE_GROUPS:
+        if conf[group].auth_section != DEFAULT_GROUP:
+            # NOTE(sileht): We register this again after the auth_section have
+            # been read from the configuration file
+            _register_keystoneauth_group(conf, conf[group].auth_section)

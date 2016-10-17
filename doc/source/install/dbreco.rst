@@ -86,5 +86,26 @@ backend::
   meter_dispatchers=gnocchi
   event_dispatchers=gnocchi
 
+Disable Keystone Authentification for Gnocchi
+=============================================
+
+In somes cases, it is possible to disable keystone authentication for
+Gnocchi to remove the overhead of token creation/verification when request
+authentication doesn't matter. This will increase the performance of Gnocchi.
+
+Example of configuration::
+
+    [dispatcher_gnocchi]
+    auth_section=service_credentials_gnocchi
+
+    [service_credentials_gnocchi]
+    auth_type=gnocchi-noauth
+    roles = admin
+    user_id = <ceilometer_user_id>
+    project_id = <ceilometer_project_id>
+    endpoint = <gnocchi_endpoint>
+
+
+
 .. _Gnocchi: http://gnocchi.xyz
 .. _here: https://docs.google.com/presentation/d/1PefouoeMVd27p2OGDfNQpx18mY-Wk5l0P1Ke2Vt5LwA/edit?usp=sharing
