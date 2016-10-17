@@ -158,7 +158,7 @@ makes it easy to add new monitors in the agents.  In particular,
 Ceilometer now uses Stevedore_, and you should put your entry point
 definitions in the :file:`entry_points.txt` file of your Ceilometer egg.
 
-.. _setuptools entry points: http://pythonhosted.org/setuptools/setuptools.html#dynamic-discovery-of-services-and-plugins
+.. _setuptools entry points: http://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
 
 .. _Stevedore: http://docs.openstack.org/developer/stevedore/
 
