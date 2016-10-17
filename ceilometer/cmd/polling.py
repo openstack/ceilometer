@@ -15,6 +15,7 @@
 # under the License.
 
 import cotyledon
+from cotyledon import oslo_config_glue
 from oslo_config import cfg
 from oslo_log import log
 
@@ -87,4 +88,5 @@ def main():
     service.prepare_service(conf=conf)
     sm = cotyledon.ServiceManager()
     sm.add(create_polling_service, args=(conf,))
+    oslo_config_glue.setup(sm, conf)
     sm.run()

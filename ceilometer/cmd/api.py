@@ -14,10 +14,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
+
+from cotyledon import oslo_config_glue
+from oslo_log import log
 
 from ceilometer.api import app
 from ceilometer import service
 
+LOG = log.getLogger(__name__)
+
 
 def build_wsgi_app(argv=None):
-    return app.load_app(service.prepare_service(argv=argv))
+    conf = service.prepare_service(argv=argv)
+    conf.register_opts(oslo_config_glue.service_opts)
+    if conf.log_options:
+        LOG.debug('Full set of CONF:')
+        conf.log_opt_values(LOG, logging.DEBUG)
+    return app.load_app(conf)
