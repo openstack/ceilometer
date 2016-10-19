@@ -150,10 +150,11 @@ class ResourcesDefinition(object):
 
     def event_attributes(self, event):
         attrs = {'type': self.cfg['resource_type']}
-        for name, definition in self._event_attributes.items():
-            value = definition.parse(event)
+        traits = dict([(trait[0], trait[2]) for trait in event['traits']])
+        for attr, field in self.cfg.get('event_attributes', {}).items():
+            value = traits.get(field)
             if value is not None:
-                attrs[name] = value
+                attrs[attr] = value
         return attrs
 
 
@@ -520,12 +521,15 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         ended_at = timeutils.utcnow().isoformat()
 
         resource = rd.event_attributes(event)
-        associated_resources = rd.cfg['event_associated_resources']
+        associated_resources = rd.cfg.get('event_associated_resources', {})
 
-        to_end = itertools.chain([resource], *[
-            self._search_resource(resource_type, query % resource['id'])
-            for resource_type, query in associated_resources.items()
-        ])
+        if associated_resources:
+            to_end = itertools.chain([resource], *[
+                self._search_resource(resource_type, query % resource['id'])
+                for resource_type, query in associated_resources.items()
+            ])
+        else:
+            to_end = [resource]
 
         for resource in to_end:
             self._set_ended_at(resource, ended_at)

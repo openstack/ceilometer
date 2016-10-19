@@ -38,47 +38,150 @@ from ceilometer.tests import base
 load_tests = testscenarios.load_tests_apply_scenarios
 
 INSTANCE_DELETE_START = {
-    u'_context_auth_token': u'3d8b13de1b7d499587dfc69b77dc09c2',
-    u'_context_is_admin': True,
-    u'_context_project_id': u'7c150a59fe714e6f9263774af9688f0e',
-    u'_context_quota_class': None,
-    u'_context_read_deleted': u'no',
-    u'_context_remote_address': u'10.0.2.15',
-    u'_context_request_id': u'req-fb3c4546-a2e5-49b7-9fd2-a63bd658bc39',
-    u'_context_roles': [u'admin'],
-    u'_context_timestamp': u'2012-05-08T20:24:14.547374',
-    u'_context_user_id': u'1e3ce043029547f1a61c1996d1a531a2',
-    u'event_type': u'compute.instance.delete.start',
-    u'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4',
-    u'payload': {u'created_at': u'2012-05-08 20:23:41',
-                 u'deleted_at': u'',
-                 u'disk_gb': 0,
-                 u'display_name': u'testme',
-                 u'image_ref_url': u'http://10.0.2.15:9292/images/UUID',
-                 u'instance_id': u'9f9d01b9-4a58-4271-9e27-398b21ab20d1',
-                 u'instance_type': u'm1.tiny',
-                 u'instance_type_id': 2,
-                 u'launched_at': u'2012-05-08 20:23:47',
-                 u'memory_mb': 512,
-                 u'state': u'active',
-                 u'state_description': u'deleting',
-                 u'tenant_id': u'7c150a59fe714e6f9263774af9688f0e',
-                 u'user_id': u'1e3ce043029547f1a61c1996d1a531a2',
-                 u'reservation_id': u'1e3ce043029547f1a61c1996d1a531a3',
-                 u'vcpus': 1,
-                 u'root_gb': 0,
-                 u'ephemeral_gb': 0,
-                 u'host': u'compute-host-name',
-                 u'availability_zone': u'1e3ce043029547f1a61c1996d1a531a4',
-                 u'os_type': u'linux?',
-                 u'architecture': u'x86',
-                 u'image_ref': u'UUID',
-                 u'kernel_id': u'1e3ce043029547f1a61c1996d1a531a5',
-                 u'ramdisk_id': u'1e3ce043029547f1a61c1996d1a531a6',
-                 },
-    u'priority': u'INFO',
-    u'publisher_id': u'compute.vagrant-precise',
-    u'timestamp': u'2012-05-08 20:24:14.824743',
+    'event_type': u'compute.instance.delete.start',
+    'traits': [
+        [
+            'state',
+            1,
+            u'active'
+        ],
+        [
+            'user_id',
+            1,
+            u'1e3ce043029547f1a61c1996d1a531a2'
+        ],
+        [
+            'service',
+            1,
+            u'compute'
+        ],
+        [
+            'disk_gb',
+            2,
+            0
+        ],
+        [
+            'instance_type',
+            1,
+            u'm1.tiny'
+        ],
+        [
+            'tenant_id',
+            1,
+            u'7c150a59fe714e6f9263774af9688f0e'
+        ],
+        [
+            'root_gb',
+            2,
+            0
+        ],
+        [
+            'ephemeral_gb',
+            2,
+            0
+        ],
+        [
+            'instance_type_id',
+            2,
+            2
+        ],
+        [
+            'vcpus',
+            2,
+            1
+        ],
+        [
+            'memory_mb',
+            2,
+            512
+        ],
+        [
+            'instance_id',
+            1,
+            u'9f9d01b9-4a58-4271-9e27-398b21ab20d1'
+        ],
+        [
+            'host',
+            1,
+            u'vagrant-precise'
+        ],
+        [
+            'request_id',
+            1,
+            u'req-fb3c4546-a2e5-49b7-9fd2-a63bd658bc39'
+        ],
+        [
+            'project_id',
+            1,
+            u'7c150a59fe714e6f9263774af9688f0e'
+        ],
+        [
+            'launched_at',
+            4,
+            '2012-05-08T20:23:47'
+        ]
+    ],
+    'message_signature':
+        '831719d54059734f82e7d6498c6d7a8fd637568732e79c1fd375e128f142373a',
+    'raw': {},
+    'generated': '2012-05-08T20:24:14.824743',
+    'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
+}
+
+IMAGE_DELETE_START = {
+    u'event_type': u'image.delete',
+    u'traits': [
+        [
+            u'status',
+            1,
+            u'deleted'
+        ],
+        [
+            u'deleted_at',
+            1,
+            u'2016-11-04T04:25:56Z'
+        ],
+        [
+            u'user_id',
+            1,
+            u'e97ef33a20ed4843b520d223f3cc33d4'
+        ],
+        [
+            u'name',
+            1,
+            u'cirros'
+        ],
+        [
+            u'service',
+            1,
+            u'image.localhost'
+        ],
+        [
+            u'resource_id',
+            1,
+            u'dc337359-de70-4044-8e2c-80573ba6e577'
+        ],
+        [
+            u'created_at',
+            1,
+            u'2016-11-04T04:24:36Z'
+        ],
+        [
+            u'project_id',
+            1,
+            u'e97ef33a20ed4843b520d223f3cc33d4'
+        ],
+        [
+            u'size',
+            1,
+            u'13287936'
+        ]
+    ],
+    u'message_signature':
+        u'46fb4958e911f45007a3bb5934c5de7610892a6d742a4900695fd5929cd4c9b3',
+    u'raw': {},
+    u'generated': u'2016-11-04T04:25:56.493820',
+    u'message_id': u'7f5280f7-1d10-46a5-ba58-4d5508e49f99'
 }
 
 
@@ -442,11 +545,15 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             mock.call.resource.update(
                 'instance_network_interface',
                 'b1c7544a-8bb5-11e6-850e-00224d8226cd',
+                {'ended_at': now.isoformat()}),
+            mock.call.resource.update(
+                'image', 'dc337359-de70-4044-8e2c-80573ba6e577',
                 {'ended_at': now.isoformat()})
         ]
 
-        self.dispatcher.record_events([INSTANCE_DELETE_START])
-        self.assertEqual(6, len(fakeclient.mock_calls))
+        self.dispatcher.record_events([INSTANCE_DELETE_START,
+                                      IMAGE_DELETE_START])
+        self.assertEqual(7, len(fakeclient.mock_calls))
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 
