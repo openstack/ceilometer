@@ -199,8 +199,7 @@ class Client(object):
             else:
                 curl_command.append('--digest ')
 
-            curl_command.append('--user "%s":"%s" ' % (auth_class.username,
-                                                       auth_class.password))
+            curl_command.append('--user "%s":"***" ' % auth_class.username)
 
         for name, value in six.iteritems(self._req_params['headers']):
             curl_command.append('-H "%s: %s" ' % (name, value))
