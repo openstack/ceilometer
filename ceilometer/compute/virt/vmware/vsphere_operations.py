@@ -40,38 +40,38 @@ class VsphereOperations(object):
     def __init__(self, api_session, max_objects):
         self._api_session = api_session
         self._max_objects = max_objects
-        # Mapping between "VM's Nova instance Id" -> "VM's MOID"
+        # Mapping between "VM's Nova instance Id" -> "VM's managed object"
         # In case a VM is deployed by Nova, then its name is instance ID.
         # So this map essentially has VM names as keys.
-        self._vm_moid_lookup_map = {}
+        self._vm_mobj_lookup_map = {}
 
         # Mapping from full name -> ID, for VC Performance counters
         self._perf_counter_id_lookup_map = None
 
-    def _init_vm_moid_lookup_map(self):
+    def _init_vm_mobj_lookup_map(self):
         session = self._api_session
         result = session.invoke_api(vim_util, "get_objects", session.vim,
                                     "VirtualMachine", self._max_objects,
                                     [VM_INSTANCE_ID_PROPERTY],
                                     False)
         while result:
-            for vm_object in result.objects:
-                vm_moid = vm_object.obj.value
+            for object in result.objects:
+                vm_mobj = object.obj
                 # propSet will be set only if the server provides value
-                if hasattr(vm_object, 'propSet') and vm_object.propSet:
-                    vm_instance_id = vm_object.propSet[0].val
+                if hasattr(object, 'propSet') and object.propSet:
+                    vm_instance_id = object.propSet[0].val
                     if vm_instance_id:
-                        self._vm_moid_lookup_map[vm_instance_id] = vm_moid
+                        self._vm_mobj_lookup_map[vm_instance_id] = vm_mobj
 
             result = session.invoke_api(vim_util, "continue_retrieval",
                                         session.vim, result)
 
-    def get_vm_moid(self, vm_instance_id):
-        """Method returns VC MOID of the VM by its NOVA instance ID."""
-        if vm_instance_id not in self._vm_moid_lookup_map:
-            self._init_vm_moid_lookup_map()
+    def get_vm_mobj(self, vm_instance_id):
+        """Method returns VC mobj of the VM by its NOVA instance ID."""
+        if vm_instance_id not in self._vm_mobj_lookup_map:
+            self._init_vm_mobj_lookup_map()
 
-        return self._vm_moid_lookup_map.get(vm_instance_id, None)
+        return self._vm_mobj_lookup_map.get(vm_instance_id, None)
 
     def _init_perf_counter_id_lookup_map(self):
 
@@ -128,41 +128,41 @@ class VsphereOperations(object):
 
     # TODO(akhils@vmware.com) Move this method to common library
     # when it gets checked-in
-    def query_vm_property(self, vm_moid, property_name):
+    def query_vm_property(self, vm_mobj, property_name):
         """Method returns the value of specified property for a VM.
 
-        :param vm_moid: moid of the VM whose property is to be queried
+        :param vm_mobj: managed object of the VM whose property is to be
+            queried
         :param property_name: path of the property
         """
-        vm_mobj = vim_util.get_moref(vm_moid, "VirtualMachine")
         session = self._api_session
         return session.invoke_api(vim_util, "get_object_property",
                                   session.vim, vm_mobj, property_name)
 
-    def query_vm_aggregate_stats(self, vm_moid, counter_id, duration):
+    def query_vm_aggregate_stats(self, vm_mobj, counter_id, duration):
         """Method queries the aggregated real-time stat value for a VM.
 
         This method should be used for aggregate counters.
 
-        :param vm_moid: moid of the VM
+        :param vm_mobj: managed object of the VM
         :param counter_id: id of the perf counter in VC
         :param duration: in seconds from current time,
             over which the stat value was applicable
         :return: the aggregated stats value for the counter
         """
         # For aggregate counters, device_name should be ""
-        stats = self._query_vm_perf_stats(vm_moid, counter_id, "", duration)
+        stats = self._query_vm_perf_stats(vm_mobj, counter_id, "", duration)
 
         # Performance manager provides the aggregated stats value
         # with device name -> None
         return stats.get(None, 0)
 
-    def query_vm_device_stats(self, vm_moid, counter_id, duration):
+    def query_vm_device_stats(self, vm_mobj, counter_id, duration):
         """Method queries the real-time stat values for a VM, for all devices.
 
         This method should be used for device(non-aggregate) counters.
 
-        :param vm_moid: moid of the VM
+        :param vm_mobj: managed object of the VM
         :param counter_id: id of the perf counter in VC
         :param duration: in seconds from current time,
             over which the stat value was applicable
@@ -170,7 +170,7 @@ class VsphereOperations(object):
         """
         # For device counters, device_name should be "*" to get stat values
         # for all devices.
-        stats = self._query_vm_perf_stats(vm_moid, counter_id, "*", duration)
+        stats = self._query_vm_perf_stats(vm_mobj, counter_id, "*", duration)
 
         # For some device counters, in addition to the per device value
         # the Performance manager also returns the aggregated value.
@@ -178,10 +178,10 @@ class VsphereOperations(object):
         stats.pop(None, None)
         return stats
 
-    def _query_vm_perf_stats(self, vm_moid, counter_id, device_name, duration):
+    def _query_vm_perf_stats(self, vm_mobj, counter_id, device_name, duration):
         """Method queries the real-time stat values for a VM.
 
-        :param vm_moid: moid of the VM for which stats are needed
+        :param vm_mobj: managed object of the VM for which stats are needed
         :param counter_id: id of the perf counter in VC
         :param device_name: name of the device for which stats are to be
             queried. For aggregate counters pass empty string ("").
@@ -201,7 +201,7 @@ class VsphereOperations(object):
         metric_id.instance = device_name
 
         query_spec = client_factory.create('ns0:PerfQuerySpec')
-        query_spec.entity = vim_util.get_moref(vm_moid, "VirtualMachine")
+        query_spec.entity = vm_mobj
         query_spec.metricId = [metric_id]
         query_spec.intervalId = VC_REAL_TIME_SAMPLING_INTERVAL
         # We query all samples which are applicable over the specified duration
