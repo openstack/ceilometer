@@ -14,6 +14,7 @@
 
 import os
 import subprocess
+import time
 
 from oslo_utils import fileutils
 import six
@@ -45,13 +46,13 @@ class BinTestCase(base.BaseTestCase):
         subp = subprocess.Popen(['ceilometer-expirer',
                                  '-d',
                                  "--config-file=%s" % self.tempfile],
-                                stderr=subprocess.PIPE)
-        __, err = subp.communicate()
+                                stdout=subprocess.PIPE)
+        stdout, __ = subp.communicate()
         self.assertEqual(0, subp.poll())
         self.assertIn(b"Nothing to clean, database metering "
-                      b"time to live is disabled", err)
+                      b"time to live is disabled", stdout)
         self.assertIn(b"Nothing to clean, database event "
-                      b"time to live is disabled", err)
+                      b"time to live is disabled", stdout)
 
     def _test_run_expirer_ttl_enabled(self, ttl_name, data_name):
         content = ("[database]\n"
@@ -65,13 +66,13 @@ class BinTestCase(base.BaseTestCase):
         subp = subprocess.Popen(['ceilometer-expirer',
                                  '-d',
                                  "--config-file=%s" % self.tempfile],
-                                stderr=subprocess.PIPE)
-        __, err = subp.communicate()
+                                stdout=subprocess.PIPE)
+        stdout, __ = subp.communicate()
         self.assertEqual(0, subp.poll())
         msg = "Dropping %s data with TTL 1" % data_name
         if six.PY3:
             msg = msg.encode('utf-8')
-        self.assertIn(msg, err)
+        self.assertIn(msg, stdout)
 
     def test_run_expirer_ttl_enabled(self):
         self._test_run_expirer_ttl_enabled('metering_time_to_live',
@@ -134,9 +135,16 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
                                       "compute",
                                       "compute"],
                                      stderr=subprocess.PIPE)
-        out = self.subp.stderr.read(1024)
-        self.assertIn(b'Duplicated values: [\'compute\', \'compute\'] '
-                      b'found in CLI options, auto de-duplicated', out)
+        expected = (b'Duplicated values: [\'compute\', \'compute\'] '
+                    b'found in CLI options, auto de-duplicated')
+        # NOTE(gordc): polling process won't quit so wait for a bit and check
+        start = time.time()
+        while time.time() - start < 5:
+            output = self.subp.stderr.readline()
+            if expected in output:
+                break
+        else:
+            self.fail('Did not detect expected warning: %s' % expected)
 
     def test_polling_namespaces_invalid_value_in_config(self):
         content = ("[DEFAULT]\n"

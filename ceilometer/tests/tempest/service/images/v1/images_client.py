@@ -109,8 +109,7 @@ class ImagesClient(rest_client.RestClient):
     def _create_with_data(self, headers, data):
         resp, body_iter = self.http.raw_request('POST', '/v1/images',
                                                 headers=headers, body=data)
-        self._error_checker('POST', '/v1/images', headers, data, resp,
-                            body_iter)
+        self._error_checker(resp, body_iter)
         body = json.loads(''.join([c for c in body_iter]))
         return rest_client.ResponseBody(resp, body)
 
@@ -118,8 +117,7 @@ class ImagesClient(rest_client.RestClient):
         url = '/v1/images/%s' % image_id
         resp, body_iter = self.http.raw_request('PUT', url, headers=headers,
                                                 body=data)
-        self._error_checker('PUT', url, headers, data,
-                            resp, body_iter)
+        self._error_checker(resp, body_iter)
         body = json.loads(''.join([c for c in body_iter]))
         return rest_client.ResponseBody(resp, body)
 
