@@ -72,13 +72,8 @@ def aodh_abort():
 
 
 def _redirect(url):
-    # NOTE(sileht): we use 307 and not 301 or 302 to allow
-    # client to redirect POST/PUT/DELETE/...
-    # FIXME(sileht): it would be better to use 308, but webob
-    # doesn't handle it :(
-    # https://github.com/Pylons/webob/pull/207
     pecan.redirect(location=url + pecan.request.path_qs,
-                   code=307)
+                   code=308)
 
 
 class QueryController(object):
