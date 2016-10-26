@@ -216,7 +216,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             # noop backend. We don't want to use that here because
             # we want to avoid the cache pathways entirely if the
             # cache has not been configured explicitly.
-            if 'null' not in self.conf.cache.backend:
+            if self.conf.cache.enabled:
                 cache_region = oslo_cache.create_region()
                 self.cache = oslo_cache.configure_cache_region(
                     self.conf, cache_region)
