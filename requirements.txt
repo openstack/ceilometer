@@ -42,7 +42,7 @@ SQLAlchemy<1.1.0,>=1.0.10 # MIT
 sqlalchemy-migrate>=0.9.6 # Apache-2.0
 stevedore>=1.9.0 # Apache-2.0
 tooz>=1.28.0 # Apache-2.0
-WebOb>=1.2.3 # MIT
+WebOb>=1.5.0 # MIT
 WSME>=0.8 # MIT
 # NOTE(jd) We do not import it directly, but WSME datetime string parsing
 # behaviour changes when this library is installed

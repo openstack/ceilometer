@@ -97,21 +97,21 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         response = self.app.get(self.PATH_PREFIX + '/alarms',
                                 expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://alarm-endpoint:8008/v2/alarms",
                          response.headers['Location'])
 
         response = self.app.get(self.PATH_PREFIX + '/alarms/uuid',
                                 expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://alarm-endpoint:8008/v2/alarms/uuid",
                          response.headers['Location'])
 
         response = self.app.delete(self.PATH_PREFIX + '/alarms/uuid',
                                    expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://alarm-endpoint:8008/v2/alarms/uuid",
                          response.headers['Location'])
 
@@ -120,7 +120,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
                                       "filter": '{"=": {"type": "creation"}}',
                                       "orderby": '[{"timestamp": "DESC"}]',
                                       "limit": 3
-                                  }, status=307)
+                                  }, status=308)
         self.assertEqual("http://alarm-endpoint:8008/v2/query/alarms",
                          response.headers['Location'])
 
@@ -128,28 +128,28 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         response = self.app.get(self.PATH_PREFIX + '/events',
                                 expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://event-endpoint:8009/v2/events",
                          response.headers['Location'])
 
         response = self.app.get(self.PATH_PREFIX + '/events/uuid',
                                 expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://event-endpoint:8009/v2/events/uuid",
                          response.headers['Location'])
 
         response = self.app.delete(self.PATH_PREFIX + '/events/uuid',
                                    expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://event-endpoint:8009/v2/events/uuid",
                          response.headers['Location'])
 
         response = self.app.get(self.PATH_PREFIX + '/event_types',
                                 expect_errors=True)
 
-        self.assertEqual(307, response.status_code)
+        self.assertEqual(308, response.status_code)
         self.assertEqual("http://event-endpoint:8009/v2/event_types",
                          response.headers['Location'])
 
