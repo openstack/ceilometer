@@ -1,0 +1,4 @@
+---
+features:
+  - The tenant (project) discovery code in the polling agent now scans for
+    tenants in all available domains.
