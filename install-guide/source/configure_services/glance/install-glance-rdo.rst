@@ -11,25 +11,19 @@ Configure the Image service to use Telemetry
   ``/etc/glance/glance-registry.conf`` files and
   complete the following actions:
 
-  * In the ``[DEFAULT]``, ``[oslo_messaging_notifications]``, and
-    ``[oslo_messaging_rabbit]`` sections, configure notifications and RabbitMQ
+  * In the ``[DEFAULT]``, ``[oslo_messaging_notifications]`` sections,
+    configure notifications and RabbitMQ
     message broker access:
 
     .. code-block:: ini
 
        [DEFAULT]
        ...
-       rpc_backend = rabbit
+       transport_url = rabbit://openstack:RABBIT_PASS@controller
 
        [oslo_messaging_notifications]
        ...
        driver = messagingv2
-
-       [oslo_messaging_rabbit]
-       ...
-       rabbit_host = controller
-       rabbit_userid = openstack
-       rabbit_password = RABBIT_PASS
 
     Replace ``RABBIT_PASS`` with the password you chose for
     the ``openstack`` account in ``RabbitMQ``.
