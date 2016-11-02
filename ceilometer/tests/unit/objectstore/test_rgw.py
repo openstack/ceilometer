@@ -89,6 +89,8 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
     def setUp(self):
         super(TestRgwPollster, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.CONF.set_override('radosgw', 'object-store',
+                               group='service_types')
         self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
 

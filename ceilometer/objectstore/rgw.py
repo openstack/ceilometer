@@ -28,7 +28,6 @@ LOG = log.getLogger(__name__)
 
 SERVICE_OPTS = [
     cfg.StrOpt('radosgw',
-               default='object-store',
                help='Radosgw service type.'),
 ]
 
@@ -64,7 +63,7 @@ class _Base(plugin_base.PollsterBase):
         # we store the endpoint as a base class attribute, so keystone is
         # only ever called once, also we assume that in a single deployment
         # we may be only deploying `radosgw` or `swift` as the object-store
-        if _Base._ENDPOINT is None:
+        if _Base._ENDPOINT is None and conf.service_types.radosgw:
             try:
                 creds = conf.service_credentials
                 rgw_url = keystone_client.get_service_catalog(
