@@ -25,6 +25,7 @@ from oslo_reports import guru_meditation_report as gmr
 from ceilometer.conf import defaults
 from ceilometer import keystone_client
 from ceilometer import messaging
+from ceilometer import sample
 from ceilometer import version
 
 OPTS = [
@@ -86,6 +87,8 @@ def prepare_service(argv=None, config_files=None, conf=None):
     ka_loading.load_auth_from_conf_options(conf, "service_credentials")
 
     log.setup(conf, 'ceilometer')
+    sample.setup(conf)
+
     # NOTE(liusheng): guru cannot run with service under apache daemon, so when
     # ceilometer-api running with mod_wsgi, the argv is [], we don't start
     # guru.
