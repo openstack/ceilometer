@@ -768,7 +768,7 @@ class TestNotificationConverter(ConverterBase):
         self.CONF.set_override('drop_unmatched_notifications',
                                False, group='event')
 
-        c = converter.setup_events(self.fake_plugin_mgr)
+        c = converter.setup_events(self.CONF, self.fake_plugin_mgr)
         self.assertIsInstance(c, converter.NotificationEventsConverter)
         self.assertEqual(1, len(c.definitions))
         self.assertTrue(c.definitions[0].is_catchall)
@@ -776,6 +776,6 @@ class TestNotificationConverter(ConverterBase):
         self.CONF.set_override('drop_unmatched_notifications',
                                True, group='event')
 
-        c = converter.setup_events(self.fake_plugin_mgr)
+        c = converter.setup_events(self.CONF, self.fake_plugin_mgr)
         self.assertIsInstance(c, converter.NotificationEventsConverter)
         self.assertEqual(0, len(c.definitions))

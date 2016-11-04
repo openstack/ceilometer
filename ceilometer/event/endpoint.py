@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
 from stevedore import extension
@@ -29,6 +28,7 @@ class EventsNotificationEndpoint(object):
         super(EventsNotificationEndpoint, self).__init__()
         LOG.debug('Loading event definitions')
         self.event_converter = event_converter.setup_events(
+            manager.conf,
             extension.ExtensionManager(
                 namespace='ceilometer.event.trait_plugin'))
         self.manager = manager
@@ -61,7 +61,7 @@ class EventsNotificationEndpoint(object):
                     with self.manager.publisher() as p:
                         p(event)
             except Exception:
-                if not cfg.CONF.notification.ack_on_event_error:
+                if not self.manager.conf.notification.ack_on_event_error:
                     return oslo_messaging.NotificationResult.REQUEUE
                 LOG.error(_LE('Fail to process a notification'), exc_info=True)
         return oslo_messaging.NotificationResult.HANDLED
