@@ -121,7 +121,7 @@ class V2Controller(object):
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(
-                        keystone_client.get_client())
+                        keystone_client.get_client(pecan.request.cfg))
                     catalog.url_for(service_type='metric')
                 except exceptions.EndpointNotFound:
                     self._gnocchi_is_enabled = False
@@ -146,7 +146,7 @@ class V2Controller(object):
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(
-                        keystone_client.get_client())
+                        keystone_client.get_client(pecan.request.cfg))
                     self._aodh_url = self._normalize_url(
                         catalog.url_for(service_type='alarming'))
                 except exceptions.EndpointNotFound:
@@ -171,7 +171,7 @@ class V2Controller(object):
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(
-                        keystone_client.get_client())
+                        keystone_client.get_client(pecan.request.cfg))
                     self._panko_url = self._normalize_url(
                         catalog.url_for(service_type='event'))
                 except exceptions.EndpointNotFound:

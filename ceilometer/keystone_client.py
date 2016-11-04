@@ -22,18 +22,18 @@ from oslo_config import cfg
 CFG_GROUP = "service_credentials"
 
 
-def get_session(requests_session=None):
+def get_session(conf, requests_session=None):
     """Get a ceilometer service credentials auth session."""
-    auth_plugin = ka_loading.load_auth_from_conf_options(cfg.CONF, CFG_GROUP)
+    auth_plugin = ka_loading.load_auth_from_conf_options(conf, CFG_GROUP)
     session = ka_loading.load_session_from_conf_options(
-        cfg.CONF, CFG_GROUP, auth=auth_plugin, session=requests_session
+        conf, CFG_GROUP, auth=auth_plugin, session=requests_session
     )
     return session
 
 
-def get_client(trust_id=None, requests_session=None):
+def get_client(conf, trust_id=None, requests_session=None):
     """Return a client for keystone v3 endpoint, optionally using a trust."""
-    session = get_session(requests_session=requests_session)
+    session = get_session(conf, requests_session=requests_session)
     return ks_client_v3.Client(session=session, trust_id=trust_id)
 
 

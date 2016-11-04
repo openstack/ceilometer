@@ -455,7 +455,7 @@ class AgentManager(service_base.PipelineBasedService):
         # * use only one client for all plugins per polling cycle
         if self._keystone is None and self._keystone_last_exception is None:
             try:
-                self._keystone = keystone_client.get_client()
+                self._keystone = keystone_client.get_client(self.conf)
                 self._keystone_last_exception = None
             except ka_exceptions.ClientException as e:
                 self._keystone = None
