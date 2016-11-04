@@ -98,6 +98,6 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
                          set([s.name for s in samples]))
 
     def test_fip_discovery(self):
-        discovered_fips = discovery.FloatingIPDiscovery().discover(
-            self.manager)
+        discovered_fips = discovery.FloatingIPDiscovery(
+            self.CONF).discover(self.manager)
         self.assertEqual(3, len(discovered_fips))

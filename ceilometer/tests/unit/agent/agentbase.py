@@ -226,17 +226,17 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                     'testdiscovery',
                     None,
                     None,
-                    self.Discovery(), ),
+                    self.Discovery(self.CONF), ),
                 extension.Extension(
                     'testdiscoveryanother',
                     None,
                     None,
-                    self.DiscoveryAnother(), ),
+                    self.DiscoveryAnother(self.CONF), ),
                 extension.Extension(
                     'testdiscoveryexception',
                     None,
                     None,
-                    self.DiscoveryException(), ),
+                    self.DiscoveryException(self.CONF), ),
             ],
         )
 

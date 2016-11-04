@@ -273,7 +273,8 @@ class AgentManager(service_base.PipelineBasedService):
         if self.extensions == []:
             raise EmptyPollstersList()
 
-        discoveries = (self._extensions('discover', namespace).extensions
+        discoveries = (self._extensions('discover', namespace,
+                                        self.conf).extensions
                        for namespace in namespaces)
         self.discoveries = list(itertools.chain(*list(discoveries)))
         self.polling_periodics = None
@@ -300,7 +301,7 @@ class AgentManager(service_base.PipelineBasedService):
         self._keystone_last_exception = None
 
     @staticmethod
-    def _get_ext_mgr(namespace):
+    def _get_ext_mgr(namespace, *args, **kwargs):
         def _catch_extension_load_error(mgr, ep, exc):
             # Extension raising ExtensionLoadError can be ignored,
             # and ignore anything we can't import as a safety measure.
@@ -317,13 +318,15 @@ class AgentManager(service_base.PipelineBasedService):
         return extension.ExtensionManager(
             namespace=namespace,
             invoke_on_load=True,
+            invoke_args=args,
+            invoke_kwds=kwargs,
             on_load_failure_callback=_catch_extension_load_error,
         )
 
-    def _extensions(self, category, agent_ns=None):
+    def _extensions(self, category, agent_ns=None, *args, **kwargs):
         namespace = ('ceilometer.%s.%s' % (category, agent_ns) if agent_ns
                      else 'ceilometer.%s' % category)
-        return self._get_ext_mgr(namespace)
+        return self._get_ext_mgr(namespace, *args, **kwargs)
 
     def _extensions_from_builder(self, category, agent_ns=None):
         ns = ('ceilometer.builder.%s.%s' % (category, agent_ns) if agent_ns

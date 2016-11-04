@@ -28,15 +28,15 @@ cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
 
 
 class ImagesDiscovery(plugin_base.DiscoveryBase):
-    def __init__(self):
-        super(ImagesDiscovery, self).__init__()
-        conf = cfg.CONF.service_credentials
+    def __init__(self, conf):
+        super(ImagesDiscovery, self).__init__(conf)
+        creds = conf.service_credentials
         self.glance_client = glanceclient.Client(
             version='2',
-            session=keystone_client.get_session(cfg.CONF),
-            region_name=conf.region_name,
-            interface=conf.interface,
-            service_type=cfg.CONF.service_types.glance)
+            session=keystone_client.get_session(conf),
+            region_name=creds.region_name,
+            interface=creds.interface,
+            service_type=conf.service_types.glance)
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""

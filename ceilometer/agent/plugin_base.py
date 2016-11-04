@@ -246,6 +246,9 @@ class DiscoveryBase(object):
     KEYSTONE_REQUIRED_FOR_SERVICE = None
     """Service type required in keystone catalog to works"""
 
+    def __init__(self, conf):
+        self.conf = conf
+
     @abc.abstractmethod
     def discover(self, manager, param=None):
         """Discover resources to monitor.

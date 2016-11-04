@@ -62,7 +62,7 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override('host', 'test')
 
     def test_normal_discovery(self):
-        dsc = discovery.InstanceDiscovery()
+        dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
 
         self.assertEqual(1, len(resources))
@@ -80,7 +80,7 @@ class TestDiscovery(base.BaseTestCase):
     def test_discovery_with_resource_update_interval(self):
         self.CONF.set_override("resource_update_interval", 600,
                                group="compute")
-        dsc = discovery.InstanceDiscovery()
+        dsc = discovery.InstanceDiscovery(self.CONF)
         dsc.last_run = datetime.datetime(2016, 1, 1,
                                          tzinfo=iso8601.iso8601.UTC)
 
