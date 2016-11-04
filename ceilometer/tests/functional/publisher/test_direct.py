@@ -71,7 +71,7 @@ class TestDirectPublisher(tests_db.TestBase):
         self.CONF.set_override('connection', self.db_manager.url,
                                group='database')
         parsed_url = netutils.urlsplit('direct://')
-        publisher = direct.DirectPublisher(parsed_url)
+        publisher = direct.DirectPublisher(self.CONF, parsed_url)
         publisher.publish_samples(self.test_data)
 
         meters = list(self.conn.get_meters(resource=self.resource_id))
@@ -90,7 +90,7 @@ class TestEventDirectPublisher(tests_db.TestBase):
 
     def test_direct_publisher(self):
         parsed_url = netutils.urlsplit('direct://dispatcher=database')
-        publisher = direct.DirectPublisher(parsed_url)
+        publisher = direct.DirectPublisher(self.CONF, parsed_url)
         publisher.publish_events(self.test_data)
 
         e_types = list(self.event_conn.get_event_types())

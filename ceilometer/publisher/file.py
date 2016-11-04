@@ -26,7 +26,7 @@ from ceilometer import publisher
 LOG = log.getLogger(__name__)
 
 
-class FilePublisher(publisher.PublisherBase):
+class FilePublisher(publisher.ConfigPublisherBase):
     """Publisher metering data to file.
 
     The publisher which records metering data into a file. The file name and
@@ -53,8 +53,8 @@ class FilePublisher(publisher.PublisherBase):
     be used to save the metering data.
     """
 
-    def __init__(self, parsed_url):
-        super(FilePublisher, self).__init__(parsed_url)
+    def __init__(self, conf, parsed_url):
+        super(FilePublisher, self).__init__(conf, parsed_url)
 
         self.publisher_logger = None
         path = parsed_url.path

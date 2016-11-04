@@ -17,6 +17,7 @@
 
 import datetime
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 import requests
 from six.moves.urllib import parse as urlparse
@@ -77,20 +78,24 @@ class TestHttpPublisher(base.BaseTestCase):
         generated=datetime.datetime.utcnow().isoformat(),
         traits=[], raw={'payload': {}}) for i in range(0, 2)]
 
+    def setUp(self):
+        super(TestHttpPublisher, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
     def test_http_publisher_config(self):
         """Test publisher config parameters."""
         # invalid hostname, the given url, results in an empty hostname
         parsed_url = urlparse.urlparse('http:/aaa.bb/path')
         self.assertRaises(ValueError, http.HttpPublisher,
-                          parsed_url)
+                          self.CONF, parsed_url)
 
         # invalid port
         parsed_url = urlparse.urlparse('http://aaa:bb/path')
         self.assertRaises(ValueError, http.HttpPublisher,
-                          parsed_url)
+                          self.CONF, parsed_url)
 
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
         # By default, timeout and retry_count should be set to 1000 and 2
         # respectively
         self.assertEqual(1, publisher.timeout)
@@ -98,19 +103,19 @@ class TestHttpPublisher(base.BaseTestCase):
 
         parsed_url = urlparse.urlparse('http://localhost:90/path1?'
                                        'timeout=19&max_retries=4')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
         self.assertEqual(19, publisher.timeout)
         self.assertEqual(4, publisher.max_retries)
 
         parsed_url = urlparse.urlparse('http://localhost:90/path1?'
                                        'timeout=19')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
         self.assertEqual(19, publisher.timeout)
         self.assertEqual(2, publisher.max_retries)
 
         parsed_url = urlparse.urlparse('http://localhost:90/path1?'
                                        'max_retries=6')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
         self.assertEqual(1, publisher.timeout)
         self.assertEqual(6, publisher.max_retries)
 
@@ -118,7 +123,7 @@ class TestHttpPublisher(base.BaseTestCase):
     def test_http_post_samples(self, thelog):
         """Test publisher post."""
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
 
         res = mock.Mock()
         res.status_code = 200
@@ -141,7 +146,7 @@ class TestHttpPublisher(base.BaseTestCase):
     def test_http_post_events(self, thelog):
         """Test publisher post."""
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
 
         res = mock.Mock()
         res.status_code = 200
@@ -163,7 +168,7 @@ class TestHttpPublisher(base.BaseTestCase):
     @mock.patch('ceilometer.publisher.http.LOG')
     def test_http_post_empty_data(self, thelog):
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
-        publisher = http.HttpPublisher(parsed_url)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
 
         res = mock.Mock()
         res.status_code = 200

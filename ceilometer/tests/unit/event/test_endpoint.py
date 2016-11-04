@@ -83,10 +83,11 @@ TEST_NOTICE_PAYLOAD = {
 
 class TestEventEndpoint(tests_base.BaseTestCase):
 
-    def get_publisher(self, url, namespace=''):
+    @staticmethod
+    def get_publisher(conf, url, namespace=''):
         fake_drivers = {'test://': test.TestPublisher,
                         'except://': test.TestPublisher}
-        return fake_drivers[url](url)
+        return fake_drivers[url](conf, url)
 
     def _setup_pipeline(self, publishers):
         ev_pipeline = yaml.dump({

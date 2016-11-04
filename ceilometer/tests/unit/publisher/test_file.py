@@ -20,6 +20,7 @@ import logging.handlers
 import os
 import tempfile
 
+from oslo_config import fixture as fixture_config
 from oslo_utils import netutils
 from oslotest import base
 
@@ -65,13 +66,17 @@ class TestFilePublisher(base.BaseTestCase):
         ),
     ]
 
+    def setUp(self):
+        super(TestFilePublisher, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
     def test_file_publisher_maxbytes(self):
         # Test valid configurations
         tempdir = tempfile.mkdtemp()
         name = '%s/log_file' % tempdir
         parsed_url = netutils.urlsplit('file://%s?max_bytes=50&backup_count=3'
                                        % name)
-        publisher = file.FilePublisher(parsed_url)
+        publisher = file.FilePublisher(self.CONF, parsed_url)
         publisher.publish_samples(self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
@@ -88,7 +93,7 @@ class TestFilePublisher(base.BaseTestCase):
         tempdir = tempfile.mkdtemp()
         name = '%s/log_file_plain' % tempdir
         parsed_url = netutils.urlsplit('file://%s' % name)
-        publisher = file.FilePublisher(parsed_url)
+        publisher = file.FilePublisher(self.CONF, parsed_url)
         publisher.publish_samples(self.test_data)
 
         handler = publisher.publisher_logger.handlers[0]
@@ -111,7 +116,7 @@ class TestFilePublisher(base.BaseTestCase):
         parsed_url = netutils.urlsplit(
             'file://%s/log_file_bad'
             '?max_bytes=yus&backup_count=5y' % tempdir)
-        publisher = file.FilePublisher(parsed_url)
+        publisher = file.FilePublisher(self.CONF, parsed_url)
         publisher.publish_samples(self.test_data)
 
         self.assertIsNone(publisher.publisher_logger)
