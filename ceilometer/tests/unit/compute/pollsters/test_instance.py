@@ -24,9 +24,6 @@ from ceilometer.tests.unit.compute.pollsters import base
 
 class TestInstancePollster(base.TestPollsterBase):
 
-    def setUp(self):
-        super(TestInstancePollster, self).setUp()
-
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_instance(self):
         mgr = manager.AgentManager(0, self.CONF)

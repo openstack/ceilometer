@@ -37,10 +37,10 @@ OPTS = [
 cfg.CONF.register_opts(OPTS)
 
 
-def add_reserved_user_metadata(src_metadata, dest_metadata):
-    limit = cfg.CONF.reserved_metadata_length
+def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
+    limit = conf.reserved_metadata_length
     user_metadata = {}
-    for prefix in cfg.CONF.reserved_metadata_namespace:
+    for prefix in conf.reserved_metadata_namespace:
         md = dict(
             (k[len(prefix):].replace('.', '_'),
              v[:limit] if isinstance(v, six.string_types) else v)
@@ -50,7 +50,7 @@ def add_reserved_user_metadata(src_metadata, dest_metadata):
         )
         user_metadata.update(md)
 
-    for metadata_key in cfg.CONF.reserved_metadata_keys:
+    for metadata_key in conf.reserved_metadata_keys:
         md = dict(
             (k.replace('.', '_'),
              v[:limit] if isinstance(v, six.string_types) else v)

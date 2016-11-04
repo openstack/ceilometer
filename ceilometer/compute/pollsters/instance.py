@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_config import cfg
+
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer import sample
@@ -25,6 +27,7 @@ class InstancePollster(pollsters.BaseComputePollster):
     def get_samples(manager, cache, resources):
         for instance in resources:
             yield util.make_sample_from_instance(
+                cfg.CONF,
                 instance,
                 name='instance',
                 type=sample.TYPE_GAUGE,

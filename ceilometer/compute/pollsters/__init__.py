@@ -14,6 +14,7 @@
 
 import abc
 
+from oslo_config import cfg
 from oslo_utils import timeutils
 import six
 
@@ -82,6 +83,7 @@ class BaseComputePollster(plugin_base.PollsterBase):
         samples = []
         for disk, value in six.iteritems(attribute):
             samples.append(util.make_sample_from_instance(
+                cfg.CONF,
                 instance,
                 name=_name,
                 type=_type,

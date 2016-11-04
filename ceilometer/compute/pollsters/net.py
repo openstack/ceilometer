@@ -16,6 +16,7 @@
 
 import copy
 
+from oslo_config import cfg
 from oslo_log import log
 
 import ceilometer
@@ -47,6 +48,7 @@ class _Base(pollsters.BaseComputePollster):
             additional_metadata['vnic_name'] = vnic_data.name
 
         return util.make_sample_from_instance(
+            conf=cfg.CONF,
             instance=instance,
             name=name,
             type=type,
