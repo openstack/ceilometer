@@ -104,10 +104,10 @@ class Connection(base.Connection):
             if not ok:
                 __, result = result.popitem()
                 if result['status'] == 409:
-                    LOG.info(_LI('Duplicate event detected, skipping it: %s')
-                             % result)
+                    LOG.info(_LI('Duplicate event detected, skipping it: %s'),
+                             result)
                 else:
-                    LOG.exception(_LE('Failed to record event: %s') % result)
+                    LOG.exception(_LE('Failed to record event: %s'), result)
                     error = storage.StorageUnknownWriteError(result)
 
         if self._refresh_on_write:

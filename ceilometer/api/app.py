@@ -106,7 +106,7 @@ def load_app(conf):
     configkey = str(uuid.uuid4())
     APPCONFIGS[configkey] = conf
 
-    LOG.info("Full WSGI config used: %s" % cfg_file)
+    LOG.info("Full WSGI config used: %s", cfg_file)
     return deploy.loadapp("config:" + cfg_file,
                           global_conf={'configkey': configkey})
 
