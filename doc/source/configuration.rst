@@ -27,9 +27,8 @@ Sample Configuration file
 
 The sample configuration file for Ceilometer, named
 :file:`etc/ceilometer/ceilometer.conf.sample`, was removed from version
-control after the Icehouse release. For more details, please read the file
-:file:`etc/ceilometer/README-ceilometer.conf.txt`. You can generate this sample
-configuration file by running ``tox -e genconfig``.
+control after the Icehouse release. You can generate this sample configuration
+file by running ``tox -e genconfig``.
 
 .. _Pipeline-Configuration:
 
