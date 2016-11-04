@@ -117,19 +117,6 @@ class TestSignature(base.BaseTestCase):
         jsondata = jsonutils.loads(jsonutils.dumps(data))
         self.assertTrue(utils.verify_signature(jsondata, 'not-so-secret'))
 
-    def test_besteffort_compare_digest(self):
-        hash1 = "f5ac3fe42b80b80f979825d177191bc5"
-        hash2 = "f5ac3fe42b80b80f979825d177191bc5"
-        hash3 = "1dece7821bf3fd70fe1309eaa37d52a2"
-        hash4 = b"f5ac3fe42b80b80f979825d177191bc5"
-        hash5 = b"f5ac3fe42b80b80f979825d177191bc5"
-        hash6 = b"1dece7821bf3fd70fe1309eaa37d52a2"
-
-        self.assertTrue(utils.besteffort_compare_digest(hash1, hash2))
-        self.assertFalse(utils.besteffort_compare_digest(hash1, hash3))
-        self.assertTrue(utils.besteffort_compare_digest(hash4, hash5))
-        self.assertFalse(utils.besteffort_compare_digest(hash4, hash6))
-
     def test_verify_no_secret(self):
         data = {'a': 'A', 'b': 'B'}
         self.assertTrue(utils.verify_signature(data, ''))
