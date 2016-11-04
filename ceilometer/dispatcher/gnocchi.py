@@ -381,7 +381,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
 
         try:
             self.batch_measures(measures, gnocchi_data, stats)
-        except gnocchi_exc.ClientException as e:
+        except (gnocchi_exc.ClientException,
+                ka_exceptions.ConnectFailure) as e:
             LOG.error(six.text_type(e))
         except Exception as e:
             LOG.error(six.text_type(e), exc_info=True)
