@@ -24,7 +24,7 @@ def _has_rule(name):
 
 
 def enforce(policy_name, request):
-    """Return the user and project the request should be limited to.
+    """Checks authorization of a rule against the request.
 
     :param request: HTTP request
     :param policy_name: the policy name to validate authz against.
