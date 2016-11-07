@@ -115,8 +115,8 @@ class CollectorService(cotyledon.Service):
             LOG.warning(_LW("System does not support socket.SO_REUSEPORT "
                             "option. Only one worker will be able to process "
                             "incoming data."))
-        udp.bind((cfg.CONF.collector.udp_address,
-                  cfg.CONF.collector.udp_port))
+        udp.bind((self.conf.collector.udp_address,
+                  self.conf.collector.udp_port))
 
         self.udp_run = True
         while self.udp_run:
