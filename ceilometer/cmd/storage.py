@@ -20,14 +20,14 @@ from six import moves
 import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
 
-from ceilometer.i18n import _LE, _LI, _LW
+from ceilometer.i18n import _LE, _LI
 from ceilometer import service
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 
 
-def upgrade(default_skip_gnocchi_resource_types=False):
+def upgrade():
     cfg.CONF.register_cli_opts([
         cfg.BoolOpt('skip-metering-database',
                     help='Skip metering database upgrade.',
@@ -37,7 +37,7 @@ def upgrade(default_skip_gnocchi_resource_types=False):
                     default=False),
         cfg.BoolOpt('skip-gnocchi-resource-types',
                     help='Skip gnocchi resource-types upgrade.',
-                    default=default_skip_gnocchi_resource_types),
+                    default=False),
     ])
 
     service.prepare_service()
@@ -59,12 +59,6 @@ def upgrade(default_skip_gnocchi_resource_types=False):
         LOG.debug("Upgrading Gnocchi resource types")
         from ceilometer import gnocchi_client
         gnocchi_client.upgrade_resource_types(cfg.CONF)
-
-
-def dbsync():
-    LOG.warning(_LW('ceilometer-dbsync is deprecated in favor of '
-                    'ceilometer-upgrade'))
-    upgrade(default_skip_gnocchi_resource_types=True)
 
 
 def expirer():

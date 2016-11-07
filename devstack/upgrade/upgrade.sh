@@ -67,8 +67,8 @@ upgrade_project ceilometer $RUN_DIR $BASE_DEVSTACK_BRANCH $TARGET_DEVSTACK_BRANC
 # Migrate the database
 # NOTE(chdent): As we evolve BIN_DIR is likely to be defined, but
 # currently it is not.
-CEILOMETER_BIN_DIR=$(dirname $(which ceilometer-dbsync))
-$CEILOMETER_BIN_DIR/ceilometer-dbsync || die $LINENO "DB sync error"
+CEILOMETER_BIN_DIR=$(dirname $(which ceilometer-upgrade))
+$CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-gnocchi-resource-types || die $LINENO "ceilometer-upgrade error"
 
 # Start Ceilometer
 start_ceilometer

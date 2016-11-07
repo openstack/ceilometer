@@ -39,8 +39,9 @@ class BinTestCase(base.BaseTestCase):
         super(BinTestCase, self).tearDown()
         os.remove(self.tempfile)
 
-    def test_dbsync_run(self):
-        subp = subprocess.Popen(['ceilometer-dbsync',
+    def test_upgrade_run(self):
+        subp = subprocess.Popen(['ceilometer-upgrade',
+                                 '--skip-gnocchi-resource-types',
                                  "--config-file=%s" % self.tempfile])
         self.assertEqual(0, subp.wait())
 

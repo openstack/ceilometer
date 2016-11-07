@@ -1,0 +1,4 @@
+---
+other:
+  - The deprecated ceilometer-dbsync has been removed.
+    Use ceilometer-upgrade instead.

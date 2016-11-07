@@ -31,12 +31,12 @@ one pass.
 
 1. Upgrade the database (if applicable)
 
-   Run ceilometer-dbsync to upgrade the database if using one of Ceilometer's
-   databases (see :ref:`choosing_db_backend`). The database does not need to be
-   taken offline as no data is modified or deleted. Ideally this should be done
-   during a period of low activity. Best practices should still be followed
-   (ie. back up your data). If not using a Ceilometer database, you should
-   consult the documentation of that storage beforehand.
+   Run ceilometer-upgrade to upgrade the storage backend if using one of
+   Ceilometer's databases (see :ref:`choosing_db_backend`). The database does
+   not need to be taken offline. Ideally this should be done during a period of
+   low activity. Best practices should still be followed (ie. back up your
+   data). If not using a Ceilometer database, you should consult the
+   documentation of that storage beforehand.
 
 2. Upgrade the collector service(s)
 
