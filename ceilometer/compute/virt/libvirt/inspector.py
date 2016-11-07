@@ -244,6 +244,11 @@ class LibvirtInspector(virt_inspector.Inspector):
                             '%(instance_uuid)s unsupported by libvirt') % {
                             'instance_uuid': instance.id})
                     continue
+                # NOTE(lhx): "cdrom" device associated to the configdrive
+                # no longer has a "source" element. Releated bug:
+                # https://bugs.launchpad.net/ceilometer/+bug/1622718
+                if disk.find('source') is None:
+                    continue
                 target = disk.find('target')
                 device = target.get('dev')
                 if device:
