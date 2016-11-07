@@ -13,14 +13,10 @@
 # under the License.
 
 import mock
-from oslo_config import cfg
 
 from ceilometer.ipmi.pollsters import sensor
 from ceilometer.tests.unit.ipmi.notifications import ipmi_test_data
 from ceilometer.tests.unit.ipmi.pollsters import base
-
-CONF = cfg.CONF
-CONF.import_opt('host', 'ceilometer.service')
 
 TEMPERATURE_SENSOR_DATA = {
     'Temperature': ipmi_test_data.TEMPERATURE_DATA
@@ -49,13 +45,13 @@ class TestTemperatureSensorPollster(base.TestPollsterBase):
         return TEMPERATURE_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.TemperatureSensorPollster()
+        return sensor.TemperatureSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(10, float(32), CONF.host)
+        self._verify_metering(10, float(32), self.CONF.host)
 
 
 class TestMissingSensorData(base.TestPollsterBase):
@@ -64,7 +60,7 @@ class TestMissingSensorData(base.TestPollsterBase):
         return MISSING_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.TemperatureSensorPollster()
+        return sensor.TemperatureSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
@@ -78,7 +74,7 @@ class TestMalformedSensorData(base.TestPollsterBase):
         return MALFORMED_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.TemperatureSensorPollster()
+        return sensor.TemperatureSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
@@ -92,7 +88,7 @@ class TestMissingSensorId(base.TestPollsterBase):
         return MISSING_ID_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.TemperatureSensorPollster()
+        return sensor.TemperatureSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
@@ -106,13 +102,13 @@ class TestFanSensorPollster(base.TestPollsterBase):
         return FAN_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.FanSensorPollster()
+        return sensor.FanSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(12, float(7140), CONF.host)
+        self._verify_metering(12, float(7140), self.CONF.host)
 
 
 class TestCurrentSensorPollster(base.TestPollsterBase):
@@ -121,13 +117,13 @@ class TestCurrentSensorPollster(base.TestPollsterBase):
         return CURRENT_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.CurrentSensorPollster()
+        return sensor.CurrentSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(1, float(130), CONF.host)
+        self._verify_metering(1, float(130), self.CONF.host)
 
 
 class TestVoltageSensorPollster(base.TestPollsterBase):
@@ -136,10 +132,10 @@ class TestVoltageSensorPollster(base.TestPollsterBase):
         return VOLTAGE_SENSOR_DATA
 
     def make_pollster(self):
-        return sensor.VoltageSensorPollster()
+        return sensor.VoltageSensorPollster(self.CONF)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(4, float(3.309), CONF.host)
+        self._verify_metering(4, float(3.309), self.CONF.host)

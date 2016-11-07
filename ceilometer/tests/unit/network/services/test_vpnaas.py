@@ -43,7 +43,7 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
 
     def setUp(self):
         super(TestVPNServicesPollster, self).setUp()
-        self.pollster = vpnaas.VPNServicesPollster()
+        self.pollster = vpnaas.VPNServicesPollster(self.CONF)
         fake_vpn = self.fake_get_vpn_service()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'vpn_get_all',
@@ -125,7 +125,7 @@ class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
 
     def setUp(self):
         super(TestIPSecConnectionsPollster, self).setUp()
-        self.pollster = vpnaas.IPSecConnectionsPollster()
+        self.pollster = vpnaas.IPSecConnectionsPollster(self.CONF)
         fake_conns = self.fake_get_ipsec_connections()
         self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
                                         'ipsec_site_connections_get_all',

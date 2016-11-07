@@ -15,7 +15,6 @@
 # under the License.
 
 import mock
-from oslo_config import fixture as fixture_config
 
 from ceilometer.agent import manager
 from ceilometer.compute.pollsters import instance as pollsters_instance
@@ -27,7 +26,7 @@ class TestInstancePollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_instance(self):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = pollsters_instance.InstancePollster()
+        pollster = pollsters_instance.InstancePollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(1, len(samples))
         self.assertEqual('instance', samples[0].name)
@@ -42,11 +41,10 @@ class TestInstancePollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_keys(self):
-        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override('reserved_metadata_keys', ['fqdn'])
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = pollsters_instance.InstancePollster()
+        pollster = pollsters_instance.InstancePollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual({'fqdn': 'vm_fqdn',
                           'stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128'},
@@ -55,22 +53,21 @@ class TestInstancePollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_namespace(self):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = pollsters_instance.InstancePollster()
+        pollster = pollsters_instance.InstancePollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual({'stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128'},
                          samples[0].resource_metadata['user_metadata'])
 
-        self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override('reserved_metadata_namespace', [])
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = pollsters_instance.InstancePollster()
+        pollster = pollsters_instance.InstancePollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertNotIn('user_metadata', samples[0].resource_metadata)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_flavor_name_as_metadata_instance_type(self):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = pollsters_instance.InstancePollster()
+        pollster = pollsters_instance.InstancePollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(1, len(samples))
         self.assertEqual('m1.small',

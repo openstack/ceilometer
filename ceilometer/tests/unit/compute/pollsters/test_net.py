@@ -119,7 +119,7 @@ class TestNetPollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, expected):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = factory()
+        pollster = factory(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(3, len(samples))  # one for each nic
         self.assertEqual(set([samples[0].name]),
@@ -228,7 +228,7 @@ class TestNetPollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_metadata(self):
         factory = net.OutgoingBytesPollster
-        pollster = factory()
+        pollster = factory(self.CONF)
         sm = pollster.make_vnic_sample(self.faux_instance,
                                        name='network.outgoing.bytes',
                                        type=sample.TYPE_CUMULATIVE,
@@ -262,7 +262,7 @@ class TestNetPollsterCache(base.TestPollsterBase):
         vnics = [(vnic0, stats0)]
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = factory()
+        pollster = factory(self.CONF)
         cache = {
             pollster.CACHE_KEY_VNIC: {
                 self.instance.id: vnics,
@@ -341,7 +341,7 @@ class TestNetRatesPollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, expected):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = factory()
+        pollster = factory(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(3, len(samples))  # one for each nic
         self.assertEqual(set([samples[0].name]),

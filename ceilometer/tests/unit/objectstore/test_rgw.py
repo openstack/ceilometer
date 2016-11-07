@@ -89,7 +89,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
     def setUp(self):
         super(TestRgwPollster, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.pollster = self.factory()
+        self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
 
         if self.pollster.CACHE_KEY_METHOD == 'rgw.get_bucket':

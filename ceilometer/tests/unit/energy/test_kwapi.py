@@ -71,7 +71,7 @@ class TestKwapi(_BaseTestCase):
     def test_endpoint_not_exist(self):
         with mockpatch.PatchObject(kwapi._Base, 'get_kwapi_client',
                                    side_effect=self.fake_get_kwapi_client):
-            pollster = kwapi.EnergyPollster()
+            pollster = kwapi.EnergyPollster(self.CONF)
             samples = list(pollster.get_samples(self.manager, {},
                                                 [ENDPOINT]))
 
@@ -96,13 +96,13 @@ class TestEnergyPollster(_BaseTestCase):
             yield probe_dict
 
     def test_default_discovery(self):
-        pollster = kwapi.EnergyPollster()
+        pollster = kwapi.EnergyPollster(self.CONF)
         self.assertEqual('endpoint:energy', pollster.default_discovery)
 
     def test_sample(self):
         cache = {}
-        samples = list(self.pollster_cls().get_samples(self.manager, cache,
-                                                       [ENDPOINT]))
+        samples = list(self.pollster_cls(self.CONF).get_samples(
+            self.manager, cache, [ENDPOINT]))
         self.assertEqual(len(PROBE_DICT['probes']), len(samples))
         samples_by_name = dict((s.resource_id, s) for s in samples)
         for name, probe in PROBE_DICT['probes'].items():
@@ -125,7 +125,7 @@ class TestEnergyPollsterCache(_BaseTestCase):
             '%s-%s' % (ENDPOINT, self.pollster_cls.CACHE_KEY_PROBE): [probe],
         }
         self.manager._keystone = mock.Mock()
-        pollster = self.pollster_cls()
+        pollster = self.pollster_cls(self.CONF)
         with mock.patch.object(pollster, '_get_probes') as do_not_call:
             do_not_call.side_effect = AssertionError('should not be called')
             samples = list(pollster.get_samples(self.manager, cache,

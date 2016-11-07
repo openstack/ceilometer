@@ -47,7 +47,7 @@ class TestMemoryPollster(base.TestPollsterBase):
             side_effect=inspect_memory_usage)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryUsagePollster()
+        pollster = memory.MemoryUsagePollster(self.CONF)
 
         @mock.patch('ceilometer.compute.pollsters.memory.LOG')
         def _verify_memory_metering(expected_count, expected_memory_mb,
@@ -77,7 +77,7 @@ class TestMemoryPollster(base.TestPollsterBase):
             side_effect=inspect_memory_usage)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryUsagePollster()
+        pollster = memory.MemoryUsagePollster(self.CONF)
 
         def all_samples():
             return list(pollster.get_samples(mgr, {}, [self.instance]))
@@ -111,7 +111,7 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
             side_effect=inspect_memory_resident)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryResidentPollster()
+        pollster = memory.MemoryResidentPollster(self.CONF)
 
         @mock.patch('ceilometer.compute.pollsters.memory.LOG')
         def _verify_resident_memory_metering(expected_count,
@@ -154,7 +154,7 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
         mgr = manager.AgentManager(0, self.CONF)
 
         def _check_memory_bandwidth_total(expected_usage):
-            pollster = memory.MemoryBandwidthTotalPollster()
+            pollster = memory.MemoryBandwidthTotalPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -163,7 +163,7 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_memory_bandwidth_local(expected_usage):
-            pollster = memory.MemoryBandwidthLocalPollster()
+            pollster = memory.MemoryBandwidthLocalPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -184,7 +184,7 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
             side_effect=inspect_memory_bandwidth)
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryBandwidthTotalPollster()
+        pollster = memory.MemoryBandwidthTotalPollster(self.CONF)
 
         def all_samples():
             return list(pollster.get_samples(mgr, {}, [self.instance]))

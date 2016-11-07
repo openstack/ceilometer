@@ -89,7 +89,7 @@ class TestImagePollsterPageSize(base.BaseTestCase):
         super(TestImagePollsterPageSize, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.manager = manager.AgentManager(0, self.CONF)
-        self.pollster = glance.ImageSizePollster()
+        self.pollster = glance.ImageSizePollster(self.CONF)
 
     def test_image_pollster(self):
         image_samples = list(
@@ -109,7 +109,7 @@ class TestImagePageSize(base.BaseTestCase):
         super(TestImagePageSize, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.manager = manager.AgentManager(0, self.CONF)
-        self.pollster = glance.ImagePollster()
+        self.pollster = glance.ImagePollster(self.CONF)
 
     def test_image_pollster(self):
         image_samples = list(

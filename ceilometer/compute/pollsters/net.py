@@ -16,7 +16,6 @@
 
 import copy
 
-from oslo_config import cfg
 from oslo_log import log
 
 import ceilometer
@@ -35,8 +34,7 @@ class _Base(pollsters.BaseComputePollster):
     NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:", "read-bytes=%d",
                                   "write-bytes=%d"])
 
-    @staticmethod
-    def make_vnic_sample(instance, name, type, unit, volume, vnic_data):
+    def make_vnic_sample(self, instance, name, type, unit, volume, vnic_data):
         metadata = copy.copy(vnic_data)
         additional_metadata = dict(zip(metadata._fields, metadata))
         if vnic_data.fref is not None:
@@ -48,7 +46,7 @@ class _Base(pollsters.BaseComputePollster):
             additional_metadata['vnic_name'] = vnic_data.name
 
         return util.make_sample_from_instance(
-            conf=cfg.CONF,
+            conf=self.conf,
             instance=instance,
             name=name,
             type=type,

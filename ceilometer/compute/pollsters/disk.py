@@ -17,7 +17,6 @@
 import abc
 import collections
 
-from oslo_config import cfg
 from oslo_log import log
 import six
 
@@ -117,12 +116,11 @@ class _Base(pollsters.BaseComputePollster):
     def _get_samples(instance, c_data):
         """Return one or more Sample."""
 
-    @staticmethod
-    def _get_sample_read_and_write(instance, _name, _unit, c_data,
+    def _get_sample_read_and_write(self, instance, _name, _unit, c_data,
                                    _volume, _metadata):
         """Read / write Pollster and return one Sample"""
         return [util.make_sample_from_instance(
-            cfg.CONF,
+            self.conf,
             instance,
             name=_name,
             type=sample.TYPE_CUMULATIVE,
@@ -318,7 +316,7 @@ class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
                                    _attr1, _attr2):
         """Read / write Pollster and return one Sample"""
         return [util.make_sample_from_instance(
-            cfg.CONF,
+            self.conf,
             instance,
             name=_name,
             type=sample.TYPE_GAUGE,
@@ -439,7 +437,7 @@ class DiskLatencyPollster(_DiskLatencyPollsterBase):
 
     def _get_samples(self, instance, disk_latency_info):
         return [util.make_sample_from_instance(
-            cfg.CONF,
+            self.conf,
             instance,
             name='disk.latency',
             type=sample.TYPE_GAUGE,
@@ -455,7 +453,7 @@ class PerDeviceDiskLatencyPollster(_DiskLatencyPollsterBase):
         for disk, value in six.iteritems(disk_latency_info.per_disk_latency[
                 'disk_latency']):
             samples.append(util.make_sample_from_instance(
-                cfg.CONF,
+                self.conf,
                 instance,
                 name='disk.device.latency',
                 type=sample.TYPE_GAUGE,
@@ -512,7 +510,7 @@ class DiskIOPSPollster(_DiskIOPSPollsterBase):
 
     def _get_samples(self, instance, disk_iops_info):
         return [util.make_sample_from_instance(
-            cfg.CONF,
+            self.conf,
             instance,
             name='disk.iops',
             type=sample.TYPE_GAUGE,
@@ -528,7 +526,7 @@ class PerDeviceDiskIOPSPollster(_DiskIOPSPollsterBase):
         for disk, value in six.iteritems(disk_iops_info.per_disk_iops[
                 'iops_count']):
             samples.append(util.make_sample_from_instance(
-                cfg.CONF,
+                self.conf,
                 instance,
                 name='disk.device.iops',
                 type=sample.TYPE_GAUGE,
@@ -586,7 +584,7 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
         samples = []
         for disk, value in six.iteritems(disk_info.per_disk_info[_attr]):
             samples.append(util.make_sample_from_instance(
-                cfg.CONF,
+                self.conf,
                 instance,
                 name=_name,
                 type=sample.TYPE_GAUGE,
@@ -600,7 +598,7 @@ class _DiskInfoPollsterBase(pollsters.BaseComputePollster):
     def _get_samples_task(self, instance, _name, disk_info, _attr1, _attr2):
         """Return one or more Samples for meter 'disk.task.*'."""
         return [util.make_sample_from_instance(
-            cfg.CONF,
+            self.conf,
             instance,
             name=_name,
             type=sample.TYPE_GAUGE,

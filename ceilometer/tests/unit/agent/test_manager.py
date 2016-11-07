@@ -45,8 +45,8 @@ class PollingException(Exception):
 
 class TestPollsterBuilder(agentbase.TestPollster):
     @classmethod
-    def build_pollsters(cls):
-        return [('builder1', cls()), ('builder2', cls())]
+    def build_pollsters(cls, conf):
+        return [('builder1', cls(conf)), ('builder2', cls(conf))]
 
 
 @mock.patch('ceilometer.compute.pollsters.'
@@ -177,7 +177,8 @@ class TestManager(base.BaseTestCase):
                         extension.Extension('test',
                                             None,
                                             None,
-                                            agentbase.TestPollster()),
+                                            agentbase.TestPollster(
+                                                self.conf)),
                     ]
                 )
 
@@ -289,11 +290,12 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         exts.extend([extension.Extension('testkeystone',
                                          None,
                                          None,
-                                         self.PollsterKeystone(), ),
+                                         self.PollsterKeystone(self.CONF), ),
                      extension.Extension('testpollingexception',
                                          None,
                                          None,
-                                         self.PollsterPollingException(), )])
+                                         self.PollsterPollingException(
+                                             self.CONF), )])
         return exts
 
     def test_get_sample_resources(self):
@@ -343,11 +345,11 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             extension.Extension('testhardware',
                                 None,
                                 None,
-                                PollsterHardware(), ),
+                                PollsterHardware(self.CONF), ),
             extension.Extension('testhardware2',
                                 None,
                                 None,
-                                PollsterHardwareAnother(), )
+                                PollsterHardwareAnother(self.CONF), )
         ])
         ext = extension.Extension('tripleo_overcloud_nodes',
                                   None,

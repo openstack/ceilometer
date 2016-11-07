@@ -64,17 +64,17 @@ class _Base(plugin_base.PollsterBase):
         return parts, params
 
     @staticmethod
-    def get_driver(scheme):
+    def get_driver(conf, scheme):
         if scheme not in _Base.drivers:
             _Base.drivers[scheme] = _driver.DriverManager(_Base.NAMESPACE,
-                                                          scheme).driver()
+                                                          scheme).driver(conf)
         return _Base.drivers[scheme]
 
     def get_samples(self, manager, cache, resources):
         resources = resources or []
         for resource in resources:
             parse_url, params = self._parse_my_resource(resource)
-            ext = self.get_driver(parse_url.scheme)
+            ext = self.get_driver(self.conf, parse_url.scheme)
             sample_data = ext.get_sample_data(self.meter_name,
                                               parse_url,
                                               params,

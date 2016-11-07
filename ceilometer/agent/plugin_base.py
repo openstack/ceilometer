@@ -175,8 +175,9 @@ class PollsterBase(PluginBase):
         """
         pass
 
-    def __init__(self):
+    def __init__(self, conf):
         super(PollsterBase, self).__init__()
+        self.conf = conf
         try:
             self.setup_environment()
         except Exception as err:
@@ -214,7 +215,7 @@ class PollsterBase(PluginBase):
         """
 
     @classmethod
-    def build_pollsters(cls):
+    def build_pollsters(cls, conf):
         """Return a list of tuple (name, pollster).
 
         The name is the meter name which the pollster would return, the
@@ -225,7 +226,7 @@ class PollsterBase(PluginBase):
         return []
 
     @classmethod
-    def get_pollsters_extensions(cls):
+    def get_pollsters_extensions(cls, conf):
         """Return a list of stevedore extensions.
 
         The returned stevedore extensions wrap the pollster object instances
@@ -233,7 +234,7 @@ class PollsterBase(PluginBase):
         """
         extensions = []
         try:
-            for name, pollster in cls.build_pollsters():
+            for name, pollster in cls.build_pollsters(conf):
                 ext = extension.Extension(name, None, cls, pollster)
                 extensions.append(ext)
         except Exception as err:

@@ -15,7 +15,6 @@
 import abc
 import collections
 
-from oslo_config import cfg
 from oslo_log import log
 
 import ceilometer
@@ -59,7 +58,7 @@ class _PerfEventsPollster(pollsters.BaseComputePollster):
                                     c_data, _element):
         """Total / local Pollster and return one Sample"""
         return [util.make_sample_from_instance(
-            cfg.CONF,
+            self.conf,
             instance,
             name=_name,
             type=sample.TYPE_GAUGE,

@@ -256,7 +256,7 @@ class AgentManager(service_base.PipelineBasedService):
 
         # we'll have default ['compute', 'central'] here if no namespaces will
         # be passed
-        extensions = (self._extensions('poll', namespace).extensions
+        extensions = (self._extensions('poll', namespace, self.conf).extensions
                       for namespace in namespaces)
         # get the extensions from pollster builder
         extensions_fb = (self._extensions_from_builder('poll', namespace)
@@ -331,10 +331,10 @@ class AgentManager(service_base.PipelineBasedService):
     def _extensions_from_builder(self, category, agent_ns=None):
         ns = ('ceilometer.builder.%s.%s' % (category, agent_ns) if agent_ns
               else 'ceilometer.builder.%s' % category)
-        mgr = self._get_ext_mgr(ns)
+        mgr = self._get_ext_mgr(ns, self.conf)
 
         def _build(ext):
-            return ext.plugin.get_pollsters_extensions()
+            return ext.plugin.get_pollsters_extensions(self.conf)
 
         # NOTE: this seems a stevedore bug. if no extensions are found,
         # map will raise runtimeError which is not documented.
