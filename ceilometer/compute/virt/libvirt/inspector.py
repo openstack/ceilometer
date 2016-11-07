@@ -67,7 +67,8 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     per_type_uris = dict(uml='uml:///system', xen='xen:///', lxc='lxc:///')
 
-    def __init__(self):
+    def __init__(self, conf):
+        super(LibvirtInspector, self).__init__(conf)
         self._connection = None
 
     @property
@@ -77,8 +78,9 @@ class LibvirtInspector(virt_inspector.Inspector):
             if libvirt is None:
                 libvirt = __import__('libvirt')
 
-            uri = (CONF.libvirt_uri or
-                   self.per_type_uris.get(CONF.libvirt_type, 'qemu:///system'))
+            uri = (self.conf.libvirt_uri or
+                   self.per_type_uris.get(self.conf.libvirt_type,
+                                          'qemu:///system'))
             LOG.debug('Connecting to libvirt: %s', uri)
             self._connection = libvirt.openReadOnly(uri)
 

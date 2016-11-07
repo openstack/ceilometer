@@ -19,6 +19,7 @@ import sys
 
 import mock
 from os_win import exceptions as os_win_exc
+from oslo_config import fixture as fixture_config
 from oslo_utils import units
 from oslotest import base
 
@@ -32,7 +33,8 @@ class TestHyperVInspection(base.BaseTestCase):
     @mock.patch.object(hyperv_inspector.HyperVInspector,
                        '_compute_host_max_cpu_clock')
     def setUp(self, mock_compute_host_cpu_clock):
-        self._inspector = hyperv_inspector.HyperVInspector()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self._inspector = hyperv_inspector.HyperVInspector(self.CONF)
         self._inspector._utils = mock.MagicMock()
 
         super(TestHyperVInspection, self).setUp()

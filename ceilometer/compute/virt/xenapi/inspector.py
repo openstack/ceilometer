@@ -61,13 +61,13 @@ def swap_xapi_host(url, host_addr):
     return urlparse.urlunparse(replaced)
 
 
-def get_api_session():
+def get_api_session(conf):
     if not api:
         raise ImportError(_('XenAPI not installed'))
 
-    url = CONF.xenapi.connection_url
-    username = CONF.xenapi.connection_username
-    password = CONF.xenapi.connection_password
+    url = conf.xenapi.connection_url
+    username = conf.xenapi.connection_username
+    password = conf.xenapi.connection_password
     if not url or password is None:
         raise XenapiException(_('Must specify connection_url, and '
                                 'connection_password to use'))
@@ -94,9 +94,9 @@ def get_api_session():
 
 class XenapiInspector(virt_inspector.Inspector):
 
-    def __init__(self):
-        super(XenapiInspector, self).__init__()
-        self.session = get_api_session()
+    def __init__(self, conf):
+        super(XenapiInspector, self).__init__(conf)
+        self.session = get_api_session(self.conf)
 
     def _get_host_ref(self):
         """Return the xenapi host on which nova-compute runs on."""

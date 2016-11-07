@@ -77,8 +77,8 @@ exception_conversion_map = collections.OrderedDict([
 @decorate_all_methods(convert_exceptions, exception_conversion_map)
 class HyperVInspector(virt_inspector.Inspector):
 
-    def __init__(self):
-        super(HyperVInspector, self).__init__()
+    def __init__(self, conf):
+        super(HyperVInspector, self).__init__(conf)
         self._utils = utilsfactory.get_metricsutils()
         self._host_max_cpu_clock = self._compute_host_max_cpu_clock()
 

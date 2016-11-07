@@ -78,26 +78,26 @@ VC_DISK_WRITE_RATE_CNTR = "disk:write:average"
 VC_DISK_WRITE_REQUESTS_RATE_CNTR = "disk:numberWriteAveraged:average"
 
 
-def get_api_session():
+def get_api_session(conf):
     api_session = api.VMwareAPISession(
-        cfg.CONF.vmware.host_ip,
-        cfg.CONF.vmware.host_username,
-        cfg.CONF.vmware.host_password,
-        cfg.CONF.vmware.api_retry_count,
-        cfg.CONF.vmware.task_poll_interval,
-        wsdl_loc=cfg.CONF.vmware.wsdl_location,
-        port=cfg.CONF.vmware.host_port,
-        cacert=cfg.CONF.vmware.ca_file,
-        insecure=cfg.CONF.vmware.insecure)
+        conf.vmware.host_ip,
+        conf.vmware.host_username,
+        conf.vmware.host_password,
+        conf.vmware.api_retry_count,
+        conf.vmware.task_poll_interval,
+        wsdl_loc=conf.vmware.wsdl_location,
+        port=conf.vmware.host_port,
+        cacert=conf.vmware.ca_file,
+        insecure=conf.vmware.insecure)
     return api_session
 
 
 class VsphereInspector(virt_inspector.Inspector):
 
-    def __init__(self):
-        super(VsphereInspector, self).__init__()
+    def __init__(self, conf):
+        super(VsphereInspector, self).__init__(conf)
         self._ops = vsphere_operations.VsphereOperations(
-            get_api_session(), 1000)
+            get_api_session(self.conf), 1000)
 
     def inspect_cpu_util(self, instance, duration=None):
         vm_moid = self._ops.get_vm_moid(instance.id)

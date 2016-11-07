@@ -21,6 +21,7 @@ except ImportError:
 
 import fixtures
 import mock
+from oslo_config import fixture as fixture_config
 from oslo_utils import units
 from oslotest import base
 
@@ -35,12 +36,13 @@ class TestLibvirtInspection(base.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
 
         class VMInstance(object):
             id = 'ff58e738-12f4-4c58-acde-77617b68da56'
             name = 'instance-00000001'
         self.instance = VMInstance
-        self.inspector = libvirt_inspector.LibvirtInspector()
+        self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.VIR_DOMAIN_SHUTOFF = 5
         libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
@@ -426,7 +428,8 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspectionWithError, self).setUp()
-        self.inspector = libvirt_inspector.LibvirtInspector()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
         self.useFixture(fixtures.MonkeyPatch(
             'ceilometer.compute.virt.libvirt.inspector.'
             'LibvirtInspector.connection',
@@ -443,7 +446,8 @@ class TestLibvirtInitWithError(base.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInitWithError, self).setUp()
-        self.inspector = libvirt_inspector.LibvirtInspector()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
         libvirt_inspector.libvirt = mock.Mock()
 
     def test_init_error(self):
