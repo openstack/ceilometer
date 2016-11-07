@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import copy
+import datetime
 
 from oslo_utils import timeutils
 from oslotest import base
@@ -109,6 +110,6 @@ class AggregatorTransformerTestCase(base.BaseTestCase):
         for _ in range(100):
             sample = copy.copy(self.SAMPLE)
             sample.resource_id = sample.resource_id + str(self._sample_offset)
-            sample.timestamp = timeutils.isotime()
+            sample.timestamp = datetime.datetime.isoformat(timeutils.utcnow())
             aggregator.handle_sample(sample)
             self._sample_offset += 1
