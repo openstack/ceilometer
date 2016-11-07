@@ -47,6 +47,9 @@ OPTS = [
                help='SNMPd v3 encryption password of all the nodes '
                     'running in the cloud.',
                secret=True),
+    cfg.StrOpt('tripleo_network_name',
+               default='ctlplane',
+               help='Name of the control plane Tripleo network')
 
 
 ]
@@ -59,9 +62,9 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
         self.last_run = None
         self.instances = {}
 
-    @staticmethod
-    def _address(instance, field):
-        return instance.addresses['ctlplane'][0].get(field)
+    def _address(self, instance, field):
+        addresses = instance.addresses[self.conf.hardware.tripleo_network_name]
+        return addresses[0].get(field)
 
     def _make_resource_url(self, ip):
         hwconf = self.conf.hardware
