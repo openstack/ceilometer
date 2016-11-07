@@ -215,11 +215,11 @@ class Connection(base.Connection):
                             session.execute(model.__table__.insert(),
                                             trait_map[dtype])
             except dbexc.DBDuplicateEntry as e:
-                LOG.info(_LI("Duplicate event detected, skipping it: %s") % e)
+                LOG.info(_LI("Duplicate event detected, skipping it: %s"), e)
             except KeyError as e:
-                LOG.exception(_LE('Failed to record event: %s') % e)
+                LOG.exception(_LE('Failed to record event: %s'), e)
             except Exception as e:
-                LOG.exception(_LE('Failed to record event: %s') % e)
+                LOG.exception(_LE('Failed to record event: %s'), e)
                 error = e
         if error:
             raise error
