@@ -1717,7 +1717,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
         for offset in range(2):
             counter = copy.copy(self.test_counter)
-            counter.timestamp = timeutils.isotime(counter_time)
+            counter.timestamp = datetime.datetime.isoformat(counter_time)
             counter.resource_id = resource_id[0]
             counter.volume = offset
             counter.type = sample.TYPE_CUMULATIVE
@@ -1732,13 +1732,13 @@ class BasePipelineTestCase(base.BaseTestCase):
         aggregated_counters = aggregator.flush()
         self.assertEqual(len(aggregated_counters), 1)
         self.assertEqual(aggregated_counters[0].timestamp,
-                         timeutils.isotime(test_time))
+                         datetime.datetime.isoformat(test_time))
 
         rate_of_change_transformer.handle_sample(aggregated_counters[0])
 
         for offset in range(2):
             counter = copy.copy(self.test_counter)
-            counter.timestamp = timeutils.isotime(counter_time)
+            counter.timestamp = datetime.datetime.isoformat(counter_time)
             counter.resource_id = resource_id[offset]
             counter.volume = 2
             counter.type = sample.TYPE_CUMULATIVE
@@ -1758,7 +1758,7 @@ class BasePipelineTestCase(base.BaseTestCase):
                 rateOfChange = rate_of_change_transformer.handle_sample(
                     counter)
                 self.assertEqual(counter.timestamp,
-                                 timeutils.isotime(test_time))
+                                 datetime.datetime.isoformat(test_time))
 
         self.assertEqual(rateOfChange.volume, 1)
 
