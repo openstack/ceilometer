@@ -199,7 +199,7 @@ class PartitionCoordinator(object):
 
     @retrying.retry(stop_max_attempt_number=5, wait_random_max=2000,
                     retry_on_exception=retry_on_member_not_in_group)
-    def extract_my_subset(self, group_id, iterable, attempt=0):
+    def extract_my_subset(self, group_id, iterable):
         """Filters an iterable, returning only objects assigned to this agent.
 
         We have a list of objects and get a list of active group members from
