@@ -124,7 +124,10 @@ class LibvirtInspector(virt_inspector.Inspector):
             perf = stats[0][1]
             usage = perf["perf.cmt"]
             return virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=usage)
-        except AttributeError as e:
+        except (KeyError, AttributeError) as e:
+            # NOTE(sileht): KeyError if for libvirt >=2.0.0,<2.3.0, the perf
+            # subsystem ws existing but not  these attributes
+            # https://github.com/libvirt/libvirt/commit/bae660869de0612bee2a740083fb494c27e3f80c
             msg = _('Perf is not supported by current version of libvirt, and '
                     'failed to inspect l3 cache usage of %(instance_uuid)s, '
                     'can not get info from libvirt: %(error)s') % {
@@ -264,7 +267,10 @@ class LibvirtInspector(virt_inspector.Inspector):
             perf = stats[0][1]
             return virt_inspector.MemoryBandwidthStats(total=perf["perf.mbmt"],
                                                        local=perf["perf.mbml"])
-        except AttributeError as e:
+        except (KeyError, AttributeError) as e:
+            # NOTE(sileht): KeyError if for libvirt >=2.0.0,<2.3.0, the perf
+            # subsystem ws existing but not  these attributes
+            # https://github.com/libvirt/libvirt/commit/bae660869de0612bee2a740083fb494c27e3f80c
             msg = _('Perf is not supported by current version of libvirt, and '
                     'failed to inspect memory bandwidth of %(instance_uuid)s, '
                     'can not get info from libvirt: %(error)s') % {
