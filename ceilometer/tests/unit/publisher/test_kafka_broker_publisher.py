@@ -108,7 +108,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_samples(self.test_data)
-            self.assertEqual(5, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(5, len(fake_producer.send.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_without_options(self):
@@ -117,7 +117,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_samples(self.test_data)
-            self.assertEqual(5, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(5, len(fake_producer.send.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_without_policy(self):
@@ -134,11 +134,11 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=default'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
-            fake_producer.send_messages.side_effect = TypeError
+            fake_producer.send.side_effect = TypeError
             self.assertRaises(msg_publisher.DeliveryFailure,
                               publisher.publish_samples,
                               self.test_data)
-            self.assertEqual(100, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(100, len(fake_producer.send.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_with_drop_policy(self):
@@ -146,9 +146,9 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=drop'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
-            fake_producer.send_messages.side_effect = Exception("test")
+            fake_producer.send.side_effect = Exception("test")
             publisher.publish_samples(self.test_data)
-            self.assertEqual(1, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(1, len(fake_producer.send.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))
 
     def test_publish_to_host_with_queue_policy(self):
@@ -156,9 +156,9 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
-            fake_producer.send_messages.side_effect = Exception("test")
+            fake_producer.send.side_effect = Exception("test")
             publisher.publish_samples(self.test_data)
-            self.assertEqual(1, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(1, len(fake_producer.send.mock_calls))
             self.assertEqual(1, len(publisher.local_queue))
 
     def test_publish_to_down_host_with_default_queue_size(self):
@@ -166,7 +166,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
-            fake_producer.send_messages.side_effect = Exception("test")
+            fake_producer.send.side_effect = Exception("test")
 
             for i in range(0, 2000):
                 for s in self.test_data:
@@ -184,7 +184,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
             'kafka://127.0.0.1:9092?topic=ceilometer&policy=queue'))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
-            fake_producer.send_messages.side_effect = Exception("test")
+            fake_producer.send.side_effect = Exception("test")
             for i in range(0, 16):
                 for s in self.test_data:
                     s.name = 'test-%d' % i
@@ -192,7 +192,7 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
             self.assertEqual(16, len(publisher.local_queue))
 
-            fake_producer.send_messages.side_effect = None
+            fake_producer.send.side_effect = None
             for s in self.test_data:
                 s.name = 'test-%d' % 16
             publisher.publish_samples(self.test_data)
@@ -204,12 +204,12 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
             publisher.publish_events(self.test_event_data)
-            self.assertEqual(5, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(5, len(fake_producer.send.mock_calls))
 
         with mock.patch.object(publisher, '_producer') as fake_producer:
-            fake_producer.send_messages.side_effect = Exception("test")
+            fake_producer.send.side_effect = Exception("test")
             self.assertRaises(msg_publisher.DeliveryFailure,
                               publisher.publish_events,
                               self.test_event_data)
-            self.assertEqual(100, len(fake_producer.send_messages.mock_calls))
+            self.assertEqual(100, len(fake_producer.send.mock_calls))
             self.assertEqual(0, len(publisher.local_queue))

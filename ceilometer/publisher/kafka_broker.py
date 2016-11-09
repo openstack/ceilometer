@@ -77,8 +77,12 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
             return
 
         try:
-            client = kafka.KafkaClient("%s:%s" % (self._host, self._port))
-            self._producer = kafka.SimpleProducer(client)
+            self._producer = kafka.KafkaProducer(
+                bootstrap_servers=["%s:%s" % (self._host, self._port)])
+        except kafka.errors.KafkaError as e:
+            LOG.exception(_LE("Failed to connect to Kafka service: %s"), e)
+            raise messaging.DeliveryFailure('Kafka Client is not available, '
+                                            'please restart Kafka client')
         except Exception as e:
             LOG.exception(_LE("Failed to connect to Kafka service: %s"), e)
             raise messaging.DeliveryFailure('Kafka Client is not available, '
@@ -91,6 +95,6 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
         # application...
         try:
             for d in data:
-                self._producer.send_messages(self._topic, jsonutils.dumps(d))
+                self._producer.send(self._topic, jsonutils.dumps(d))
         except Exception as e:
             messaging.raise_delivery_failure(e)
