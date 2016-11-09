@@ -7,9 +7,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -58,10 +58,6 @@ msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "Impossibile ricevere l'Uso della Memoria per %(id)s: %(e)s"
 
 #, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "Impossibile conoscere l'utilizzo CPU della VM %s"
-
-#, python-format
 msgid "Couldn't obtain IP address of instance %s"
 msgstr "Impossibile ottenere l'indirizzo IP dell'istanza %s"
 
@@ -80,9 +76,6 @@ msgstr ""
 #, python-format
 msgid "Error parsing HTTP response: %s"
 msgstr "Errore durante l'analisi della risposta HTTP: %s"
-
-msgid "Error stopping pollster."
-msgstr "Errore durante l'arresto del sondaggio. "
 
 msgid "Event"
 msgstr "Evento"
@@ -207,14 +200,6 @@ msgstr "L'API Opencontrail ha restituito %(status)s %(reason)s"
 
 #, python-format
 msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr ""
-"Operatore %(operator)s non è supportato. Solo gli operatori di uguaglianza "
-"sono disponibili per il campo %(field)s"
-
-#, python-format
-msgid ""
 "Operator %(operator)s is not supported. The supported operators are: "
 "%(supported)s"
 msgstr ""
@@ -313,10 +298,6 @@ msgid "Samples should be included in request body"
 msgstr "I campioni devono essere inclusi nel corpo della richiesta "
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "Ignora caricamento dell'estensione per %s"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "La stringa %s non è un orario standard (isotime) valido"
 
@@ -361,10 +342,6 @@ msgstr ""
 "%(type)s."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "Impossibile rilevare le risorse: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Impossibile valutare l'espressione %(expr)s: %(exc)s"
 
@@ -401,10 +378,6 @@ msgid ""
 msgstr ""
 "Eccezione non prevista durante la conversione di %(value)s per il tipo di "
 "dati previsto %(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "Estensione di rilevamento sconosciuta: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."

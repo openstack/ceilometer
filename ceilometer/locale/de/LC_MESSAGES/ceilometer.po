@@ -8,16 +8,17 @@
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Frank Kloeker <eumel@arcor.de>, 2016. #zanata
+# Robert Simai <robert.simai@suse.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-06-06 06:19+0000\n"
-"Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
+"PO-Revision-Date: 2016-10-14 03:53+0000\n"
+"Last-Translator: Robert Simai <robert.simai@suse.com>\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -33,6 +34,10 @@ msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr ""
 "Arithmetiktransformer muss mindestens eine Messgröße im Ausdruck '%s' "
 "verwenden"
+
+#, python-format
+msgid "CPU cache size: %(id)s %(cache_size)d"
+msgstr "CPU Cache-Größe: %(id)s %(cache_size)d"
 
 #, python-format
 msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
@@ -62,8 +67,12 @@ msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "Abruf von Speicherbelegung nicht möglich für %(id)s: %(e)s"
 
 #, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "CPU-Auslastung für VM %s konnte nicht abgerufen werden"
+msgid "Could not get VM %s CPU number"
+msgstr "VM %s CPU Nummer kann nicht abgerufen werden"
+
+#, python-format
+msgid "Could not get cache usage for %(id)s: %(e)s"
+msgstr "Cache-Verwendung für %(id)s kann nicht abgerufen werden: %(e)s"
 
 #, python-format
 msgid "Couldn't obtain IP address of instance %s"
@@ -85,9 +94,6 @@ msgstr ""
 msgid "Error parsing HTTP response: %s"
 msgstr "Fehler bei Auswertung der HTTP-Antwort %s"
 
-msgid "Error stopping pollster."
-msgstr "Fehler beim Stoppen des Pollster."
-
 msgid "Event"
 msgstr "Ereignis"
 
@@ -105,6 +111,22 @@ msgid ""
 msgstr ""
 "Fehler beim Überprüfen von Daten der Instanz <name=%(name)s, id=%(id)s>, "
 "Domänenstatus ist ABGESCHALTET."
+
+#, python-format
+msgid ""
+"Failed to inspect l3 cache usage of %(instance_uuid)s, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"Fehler beim untersuchen der l3-Cache-Verwendung von %(instance_uuid)s, "
+"Information können nicht von libvirt abgerufen werden: %(error)s"
+
+#, python-format
+msgid ""
+"Failed to inspect memory bandwidth of %(instance_uuid)s, can not get info "
+"from libvirt: %(error)s"
+msgstr ""
+"Fehler beim untersuchen der Speicherbandbreite von %(instance_uuid)s, "
+"Informationen können nicht von libvirt abgerufen werden: %(error)s"
 
 #, python-format
 msgid ""
@@ -217,11 +239,27 @@ msgstr "Opencontrail-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
 
 #, python-format
 msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
+"Operator %(operator)s is not supported. Only `eq' operator is available for "
+"field %(field)s"
+msgstr ""
+"Operator %(operator)s wird nicht unterstützt. Für das Feld %(field)s ist nur "
+"der `eq' Operator verfügbar"
+
+#, python-format
+msgid ""
+"Operator %(operator)s is not supported. Only `ge' operator is available for "
+"field %(field)s"
 msgstr ""
 "Operator %(operator)s wird nicht unterstützt.  Für das Feld %(field)s ist "
-"nur der Gleichheitsoperator verfügbar."
+"nur der `ge' Operator verfügbar"
+
+#, python-format
+msgid ""
+"Operator %(operator)s is not supported. Only `le' operator is available for "
+"field %(field)s"
+msgstr ""
+"Operator %(operator)s wird nicht unterstützt.  Für das Feld %(field)s ist "
+"nur der `le' Operator verfügbar."
 
 #, python-format
 msgid ""
@@ -240,6 +278,25 @@ msgid ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
 msgstr ""
 "Analysefehler in JSONPath-Spezifikation '%(jsonpath)s' für %(name)s: %(err)s"
+
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"l3 cache usage of %(instance_uuid)s, can not get info from libvirt: %(error)s"
+msgstr ""
+"Perf wird von der aktuellen libvirt-Version nicht unterstützt, somit schlägt "
+"die Untersuchung des l3-Cache-Verwendung von %(instance_uuid)s fehl, "
+"Informationen können nicht von libvirt abgerufen werden: %(error)s"
+
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"memory bandwidth of %(instance_uuid)s, can not get info from libvirt: "
+"%(error)s"
+msgstr ""
+"Perf wird von der aktuellen libvirt-Version nicht unterstützt, somit schlägt "
+"die Untersuchung der Speicherbandbreite von %(instance_uuid)s fehl, "
+"Informationen können nicht von libvirt abgerufen werden: %(error)s"
 
 msgid "Period must be positive."
 msgstr "Zeitraum muss positiv sein."
@@ -322,10 +379,6 @@ msgid "Samples should be included in request body"
 msgstr "Beispiele sollten in Anforderungshauptteil enthalten sein"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "Laden der Ausnahme für %s überspringen"
-
-#, python-format
 msgid "String %s is not a valid isotime"
 msgstr "Zeichenfolge %s ist kein gültiger Wert für 'isotime'"
 
@@ -371,10 +424,6 @@ msgstr ""
 "werden."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "Ressourcen können nicht gefunden werden: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Auswertung nicht möglich für Ausdruck %(expr)s: %(exc)s"
 
@@ -411,10 +460,6 @@ msgid ""
 msgstr ""
 "Unerwartete Ausnahme beim Konvertieren von %(value)s in den erwarteten "
 "Datentyp %(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "Unbekannte Erkennungserweiterung: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
@@ -485,6 +530,10 @@ msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
 msgstr ""
 "Alarm-URLs sind nicht verfügbar, wenn Aodh inaktiviert oder nicht verfügbar "
 "ist."
+
+#, python-format
+msgid "checking cache usage for instance %s"
+msgstr "Prüfe Cache-Verwendung für die Instanz %s"
 
 #, python-format
 msgid "could not get CPU time for %(id)s: %(e)s"

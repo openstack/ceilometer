@@ -1,23 +1,40 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Monika Wolf <vcomas3@de.ibm.com>, 2016. #zanata
+# Robert Simai <robert.simai@suse.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 7.0.1.dev8\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2016-10-14 15:49+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-03 03:36+0000\n"
-"Last-Translator: Monika Wolf <vcomas3@de.ibm.com>\n"
+"PO-Revision-Date: 2016-10-14 04:02+0000\n"
+"Last-Translator: Robert Simai <robert.simai@suse.com>\n"
 "Language-Team: German\n"
 "Language: de\n"
 "X-Generator: Zanata 3.7.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #, python-format
+msgid "Can't publish events to a non-existing dispatcher'%s'"
+msgstr ""
+"Es können keine Ereignisse an einen nicht-vorhandenen Disponenten '%s' "
+"geschickt werden"
+
+#, python-format
+msgid "Can't publish samples to a non-existing dispatcher '%s'"
+msgstr ""
+"Es können keine Messwerte an einen nicht-vorhandenen Disponenten '%s' "
+"geschickt werden"
+
+#, python-format
 msgid "Cannot load inspector %(name)s: %(err)s"
 msgstr "Inspector %(name)s kann nicht geladen werden: %(err)s"
+
+msgid "Coordination join_group Error joining partitioning group"
+msgstr ""
+"Koordinierungs-join_group Fehler beim Beitreten zur Partitionierungsgruppe"
 
 #, python-format
 msgid "Could not get Resident Memory Usage for %(id)s: %(e)s"
@@ -26,9 +43,35 @@ msgstr ""
 "werden: %(e)s"
 
 #, python-format
-msgid "Dispatcher failed to handle the %s, requeue it."
+msgid "Could not get memory bandwidth for %(id)s: %(e)s"
+msgstr "Speicherbandbreite für %(id)s kann nicht abgerufen werden: %(e)s"
+
+#, python-format
+msgid "Could not get perf events for %(id)s: %(e)s"
+msgstr "Perf-Ereignisse für %(id)s können nicht abgerufen werden: %(e)s"
+
+#, python-format
+msgid "Data post failed with status code %s"
+msgstr "Fehler beim Aufgeben der Daten mit Status-Code: %s"
+
+msgid ""
+"Dispatcher event target was not set, no event will be posted. Set "
+"event_target in the ceilometer.conf file."
 msgstr ""
-"Dispatcher konnte %s nicht verarbeiten. Erneut in Warteschlange stellen."
+"Disponent-Ereignisziel wurde nicht gesetzt, es wird kein Ereignis "
+"abgeschickt. Setzen Sie event_target in der Datei ceilometer.conf."
+
+msgid "Dispatcher failed to handle the notification, re-queuing it."
+msgstr ""
+"Disponent konnte die Benachrichtigung nicht bearbeiten, sie wird in die "
+"Warteschleife gestellt."
+
+msgid ""
+"Dispatcher target was not set, no meter will be posted. Set the target in "
+"the ceilometer.conf file."
+msgstr ""
+"Disponenten-Ziel wurde nicht definiert, es werden keine Messgeräte "
+"eingesetzt. Setzen Sie das Ziel in der Datei 'ceilometer.conf'."
 
 msgid "Error connecting to coordination backend."
 msgstr "Fehler beim Herstellen einer Verbindung zum Koordinierungs-Back-End."
@@ -45,6 +88,14 @@ msgstr ""
 "wiederholt."
 
 #, python-format
+msgid "Error loading meter definition: %s"
+msgstr "Fehler beim Laden der Messgerätedefinition: %s"
+
+#, python-format
+msgid "Error occurred while dropping alarm tables of Hbase, %s"
+msgstr "Fehler beim Streichen der Alarmtabellen von Hbase, %s"
+
+#, python-format
 msgid "Error processing event and it will be dropped: %s"
 msgstr "Fehler beim Verarbeiten des Ereignisses und es wird gelöscht: %s"
 
@@ -58,6 +109,14 @@ msgstr "Eine Benachrichtigung konnte nicht verarbeitet werden."
 msgid "Fail to process notification"
 msgstr "Benachrichtigung konnte nicht verarbeitet werden."
 
+msgid "Fail to search resource type %{resource_type}s with '%{query}s'"
+msgstr ""
+"Fehler beim Suchen des Ressourcentyps %{resource_type}s mit '%{query}s'"
+
+#, python-format
+msgid "Fail to update the resource %s"
+msgstr "Fehler beim Aktualisieren der Ressource: %s"
+
 msgid "Failed to connect to Gnocchi."
 msgstr "Fehler beim Herstellen einer Verbindung zu Gnocchi."
 
@@ -66,24 +125,44 @@ msgid "Failed to connect to Kafka service: %s"
 msgstr "Fehler beim Herstellen einer Verbindung zum Kafka-Service: %s"
 
 #, python-format
-msgid "Failed to connect to db, purpose %(purpose)s re-try later: %(err)s"
-msgstr ""
-"Fehler beim Herstellen einer Verbindung zur Datenbank. Zweck: %(purpose)s "
-"Später erneut versuchen: %(err)s"
-
-#, python-format
 msgid "Failed to connect to db, purpose %(purpose)s retry later: %(err)s"
 msgstr ""
 "Fehler beim Herstellen einer Verbindung zur Datenbank. Zweck: %(purpose)s "
 "Später erneut versuchen: %(err)s"
 
 #, python-format
+msgid ""
+"Failed to inspect perf events of %(instance_uuid)s, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"Fehler beim untersuchen der perf-Ereignisse von %(instance_uuid)s, "
+"Informationen können nicht von libvirt abgerufen werden: %(error)s"
+
+#, python-format
 msgid "Failed to load resource due to error %s"
 msgstr "Fehler beim Laden der Ressource aufgrund des folgenden Fehlers %s"
 
 #, python-format
+msgid "Failed to record %(len)s: %(err)s."
+msgstr "Fehler bei der Aufzeichnung von %(len)s: %(err)s."
+
+#, python-format
 msgid "Failed to record event: %s"
 msgstr "Das Ereignis konnte nicht aufgezeichnet werden:  %s"
+
+msgid "Failed to retry to send sample data with max_retry times"
+msgstr ""
+"Fehler bei der Wiederholung, Sample-Daten mit der Anzahl von max_retry zu "
+"senden"
+
+#, python-format
+msgid ""
+"Group ID: %(group_id)s, Members: %(members)s, Me: %(me)s: Current agent is "
+"not part of group and cannot take tasks"
+msgstr ""
+"Gruppen ID: %(group_id)s, Mitglieder: %(members)s, Ich: %(me)s: Der aktuelle "
+"Agent ist nicht Teil der Gruppe und kann daher keine Aufgaben "
+"übernehmenCurrent agent is not part of group and cannot take tasks"
 
 #, python-format
 msgid "Invalid type %s specified"
@@ -97,6 +176,15 @@ msgid "Passed resource dict must contain keys resource_id and resource_url."
 msgstr ""
 "Das übergebene Ressourcenwörterverzeichnis muss die Schlüssel für "
 "resource_id und resource_url enthalten."
+
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"perf events of %(instance_uuid)s, can not get info from libvirt: %(error)s"
+msgstr ""
+"Perf wird von der aktuellen libvirt-Version nicht unterstützt, somit schlägt "
+"die Untersuchung der perf-Ereignisse von %(instance_uuid)s fehl, "
+"Informationen können nicht von libvirt abgerufen werden: %(error)s"
 
 #, python-format
 msgid "Required field %(field)s should be a %(type)s"
@@ -115,11 +203,26 @@ msgid "Skip invalid resource %s"
 msgstr "Ungültige Ressource %s überspringen"
 
 #, python-format
+msgid "Skip loading extension for %s"
+msgstr "Laden der Erweiterungen für %s überspringen"
+
+#, python-format
 msgid "Skipping %(name)s, keystone issue: %(exc)s"
 msgstr "%(name)s wird übersprungen, Keystone-Problem: %(exc)s"
 
-msgid "Status Code: %{code}s. Failed todispatch event: %{event}s"
-msgstr "Statuscode: %{code}s. Fehler beim Versenden des Ereignisses: %{event}s"
+#, python-format
+msgid "Status Code: %(code)s. Failed to dispatch event: %(event)s"
+msgstr ""
+"Statuscode: %(code)s. Fehler beim abfertigen des Ereignisses: %(event)s"
+
+#, python-format
+msgid "Status Code: %(code)s. Failed to dispatch meter: %(meter)s"
+msgstr ""
+"Statuscode: %(code)s. Fehler beim abfertigen des Messgerätes: %(meter)s"
+
+#, python-format
+msgid "Unable to discover resources: %s"
+msgstr "Ressourcen können nicht gefunden werden: %s"
 
 #, python-format
 msgid "Unable to load changed event pipeline: %s"
