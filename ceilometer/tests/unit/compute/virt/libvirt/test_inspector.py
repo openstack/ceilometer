@@ -349,6 +349,39 @@ class TestLibvirtInspection(base.BaseTestCase):
 
             self.assertEqual(0, len(disks))
 
+    def test_inspect_disk_info_without_source_element(self):
+        dom_xml = """
+             <domain type='kvm'>
+                 <devices>
+                    <disk type='file' device='cdrom'>
+                        <driver name='qemu' type='raw' cache='none'/>
+                        <backingStore/>
+                        <target dev='hdd' bus='ide' tray='open'/>
+                        <readonly/>
+                        <alias name='ide0-1-1'/>
+                        <address type='drive' controller='0' bus='1'
+                                 target='0' unit='1'/>
+                     </disk>
+                 </devices>
+             </domain>
+        """
+
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(mock.patch.object(self.inspector.connection,
+                                                  'lookupByUUIDString',
+                                                  return_value=self.domain))
+            stack.enter_context(mock.patch.object(self.domain, 'XMLDesc',
+                                                  return_value=dom_xml))
+            stack.enter_context(mock.patch.object(self.domain, 'blockInfo',
+                                                  return_value=(1, 2, 3,
+                                                                -1)))
+            stack.enter_context(mock.patch.object(self.domain, 'info',
+                                                  return_value=(0, 0, 0,
+                                                                2, 999999)))
+            disks = list(self.inspector.inspect_disk_info(self.instance))
+
+            self.assertEqual(0, len(disks))
+
     def test_inspect_memory_usage_with_domain_shutoff(self):
         connection = self.inspector.connection
         with mock.patch.object(connection, 'lookupByUUIDString',
