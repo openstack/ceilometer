@@ -35,9 +35,20 @@ class HttpPublisher(publisher.ConfigPublisherBase):
     `timeout` and `max_retries` will be set to 5 and 2 respectively. Additional
     parameters are:
 
-        - ssl can be enabled by setting `verify_ssl`
+        - ssl certificate verification can be disabled by setting `verify_ssl`
+          to False
         - batching can be configured by `batch`
         - connection pool size configured using `poolsize`
+        - Basic authentication can be configured using the URL authentication
+          scheme: http://username:password@example.com
+        - For certificate authentication, `clientcert` and `clientkey` are the
+          paths to the certificate and key files respectively. `clientkey` is
+          only required if the clientcert file doesn't already contain the key.
+
+    All of the parameters mentioned above get removed during processing,
+    with the remaining portion of the URL being used as the actual endpoint.
+    e.g. https://username:password@example.com/path?verify_ssl=False&q=foo
+    will result in a call to https://example.com/path?q=foo
 
     To use this publisher for samples, add the following section to the
     /etc/ceilometer/pipeline.yaml file or simply add it to an existing
@@ -63,7 +74,6 @@ class HttpPublisher(publisher.ConfigPublisherBase):
 
     def __init__(self, conf, parsed_url):
         super(HttpPublisher, self).__init__(conf, parsed_url)
-        self.target = parsed_url.geturl()
 
         if not parsed_url.hostname:
             raise ValueError('The hostname of an endpoint for '
@@ -83,12 +93,32 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         self.poster = (
             self._do_post if strutils.bool_from_string(self._get_param(
                 params, 'batch', True)) else self._individual_post)
+        verify_ssl = self._get_param(params, 'verify_ssl', True)
         try:
-            self.verify_ssl = strutils.bool_from_string(
-                self._get_param(params, 'verify_ssl', None), strict=True)
+            self.verify_ssl = strutils.bool_from_string(verify_ssl,
+                                                        strict=True)
         except ValueError:
-            self.verify_ssl = (self._get_param(params, 'verify_ssl', None)
-                               or True)
+            self.verify_ssl = (verify_ssl or True)
+
+        username = parsed_url.username
+        password = parsed_url.password
+        if username:
+            self.client_auth = (username, password)
+            netloc = parsed_url.netloc.replace(username+':'+password+'@', '')
+        else:
+            self.client_auth = None
+            netloc = parsed_url.netloc
+
+        clientcert = self._get_param(params, 'clientcert', None)
+        clientkey = self._get_param(params, 'clientkey', None)
+        if clientcert:
+            if clientkey:
+                self.client_cert = (clientcert, clientkey)
+            else:
+                self.client_cert = clientcert
+        else:
+            self.client_cert = None
+
         self.raw_only = strutils.bool_from_string(
             self._get_param(params, 'raw_only', False))
 
@@ -96,7 +126,16 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         kwargs = {'max_retries': self.max_retries,
                   'pool_connections': pool_size, 'pool_maxsize': pool_size}
         self.session = requests.Session()
-        # FIXME(gordc): support https in addition to http
+
+        # authentication & config params have been removed, so use URL with
+        # updated query string
+        self.target = urlparse.urlunsplit([
+            parsed_url.scheme,
+            netloc,
+            parsed_url.path,
+            urlparse.urlencode(params),
+            parsed_url.fragment])
+
         self.session.mount(self.target, adapters.HTTPAdapter(**kwargs))
 
         LOG.debug('HttpPublisher for endpoint %s is initialized!' %
@@ -105,8 +144,8 @@ class HttpPublisher(publisher.ConfigPublisherBase):
     @staticmethod
     def _get_param(params, name, default_value, cast=None):
         try:
-            return cast(params.get(name)[-1]) if cast else params.get(name)[-1]
-        except (ValueError, TypeError):
+            return cast(params.pop(name)[-1]) if cast else params.pop(name)[-1]
+        except (ValueError, TypeError, KeyError):
             LOG.debug('Default value %(value)s is used for %(name)s' %
                       {'value': default_value, 'name': name})
             return default_value
@@ -124,6 +163,8 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         try:
             res = self.session.post(self.target, data=data,
                                     headers=self.headers, timeout=self.timeout,
+                                    auth=self.client_auth,
+                                    cert=self.client_cert,
                                     verify=self.verify_ssl)
             res.raise_for_status()
             LOG.debug('Message posting to %s: status code %d.',
