@@ -91,7 +91,7 @@ def expirer():
 
 def db_clean_legacy():
     cfg.CONF.register_cli_opts([
-        cfg.strOpt('confirm-drop-alarm-table',
+        cfg.StrOpt('confirm-drop-alarm-table',
                    short='n',
                    help='confirm to drop the legacy alarm tables')])
     if not cfg.CONF.confirm_drop_alarm_table:
