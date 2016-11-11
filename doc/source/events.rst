@@ -213,7 +213,7 @@ quotes) like so:
           payload.image_meta.'org.openstack__1__architecture'
 
 The syntax used for the field specification is a variant of JSONPath,
-and is fairly flexible. 
+and is fairly flexible.
 (see: https://github.com/kennknowles/python-jsonpath-rw for more info)
 
 Example Definitions file
