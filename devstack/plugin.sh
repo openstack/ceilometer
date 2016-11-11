@@ -224,6 +224,7 @@ function cleanup_ceilometer {
 # NOTE(cdent): This currently only works for redis. Still working
 # out how to express the other backends.
 function _ceilometer_configure_cache_backend {
+    iniset $CEILOMETER_CONF cache enabled True
     iniset $CEILOMETER_CONF cache backend $CEILOMETER_CACHE_BACKEND
     iniset $CEILOMETER_CONF cache backend_argument url:$CEILOMETER_CACHE_URL
     iniadd_literal $CEILOMETER_CONF cache backend_argument distributed_lock:True
