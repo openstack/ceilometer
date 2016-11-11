@@ -71,12 +71,7 @@ class TestHttpPublisher(base.BaseTestCase):
     event_data = [event.Event(
         message_id=str(uuid.uuid4()), event_type='event_%d' % i,
         generated=datetime.datetime.utcnow().isoformat(),
-        traits=[], raw={'payload': {'some': 'aa'}}) for i in range(0, 2)]
-
-    empty_event_data = [event.Event(
-        message_id=str(uuid.uuid4()), event_type='event_%d' % i,
-        generated=datetime.datetime.utcnow().isoformat(),
-        traits=[], raw={'payload': {}}) for i in range(0, 2)]
+        traits=[], raw={'payload': {'some': 'aa'}}) for i in range(3)]
 
     def setUp(self):
         super(TestHttpPublisher, self).setUp()
@@ -96,9 +91,9 @@ class TestHttpPublisher(base.BaseTestCase):
 
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
         publisher = http.HttpPublisher(self.CONF, parsed_url)
-        # By default, timeout and retry_count should be set to 1000 and 2
+        # By default, timeout and retry_count should be set to 5 and 2
         # respectively
-        self.assertEqual(1, publisher.timeout)
+        self.assertEqual(5, publisher.timeout)
         self.assertEqual(2, publisher.max_retries)
 
         parsed_url = urlparse.urlparse('http://localhost:90/path1?'
@@ -116,7 +111,7 @@ class TestHttpPublisher(base.BaseTestCase):
         parsed_url = urlparse.urlparse('http://localhost:90/path1?'
                                        'max_retries=6')
         publisher = http.HttpPublisher(self.CONF, parsed_url)
-        self.assertEqual(1, publisher.timeout)
+        self.assertEqual(5, publisher.timeout)
         self.assertEqual(6, publisher.max_retries)
 
     @mock.patch('ceilometer.publisher.http.LOG')
@@ -125,22 +120,23 @@ class TestHttpPublisher(base.BaseTestCase):
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
         publisher = http.HttpPublisher(self.CONF, parsed_url)
 
-        res = mock.Mock()
+        res = requests.Response()
         res.status_code = 200
         with mock.patch.object(requests.Session, 'post',
                                return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
         self.assertEqual(1, m_req.call_count)
-        self.assertFalse(thelog.error.called)
+        self.assertFalse(thelog.exception.called)
 
+        res = requests.Response()
         res.status_code = 401
         with mock.patch.object(requests.Session, 'post',
                                return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
         self.assertEqual(1, m_req.call_count)
-        self.assertTrue(thelog.error.called)
+        self.assertTrue(thelog.exception.called)
 
     @mock.patch('ceilometer.publisher.http.LOG')
     def test_http_post_events(self, thelog):
@@ -148,33 +144,100 @@ class TestHttpPublisher(base.BaseTestCase):
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
         publisher = http.HttpPublisher(self.CONF, parsed_url)
 
-        res = mock.Mock()
+        res = requests.Response()
         res.status_code = 200
         with mock.patch.object(requests.Session, 'post',
                                return_value=res) as m_req:
             publisher.publish_events(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
-        self.assertFalse(thelog.error.called)
+        self.assertFalse(thelog.exception.called)
 
+        res = requests.Response()
         res.status_code = 401
         with mock.patch.object(requests.Session, 'post',
                                return_value=res) as m_req:
             publisher.publish_events(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
-        self.assertTrue(thelog.error.called)
+        self.assertTrue(thelog.exception.called)
 
     @mock.patch('ceilometer.publisher.http.LOG')
     def test_http_post_empty_data(self, thelog):
         parsed_url = urlparse.urlparse('http://localhost:90/path1')
         publisher = http.HttpPublisher(self.CONF, parsed_url)
 
-        res = mock.Mock()
+        res = requests.Response()
         res.status_code = 200
         with mock.patch.object(requests.Session, 'post',
                                return_value=res) as m_req:
-            publisher.publish_events(self.empty_event_data)
+            publisher.publish_events([])
 
         self.assertEqual(0, m_req.call_count)
         self.assertTrue(thelog.debug.called)
+
+    def _post_batch_control_test(self, method, data, batch):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1?'
+                                       'batch=%s' % batch)
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            getattr(publisher, method)(data)
+            self.assertEqual(1 if batch else 3, post.call_count)
+
+    def test_post_batch_sample(self):
+        self._post_batch_control_test('publish_samples', self.sample_data, 1)
+
+    def test_post_no_batch_sample(self):
+        self._post_batch_control_test('publish_samples', self.sample_data, 0)
+
+    def test_post_batch_event(self):
+        self._post_batch_control_test('publish_events', self.event_data, 1)
+
+    def test_post_no_batch_event(self):
+        self._post_batch_control_test('publish_events', self.event_data, 0)
+
+    def test_post_verify_ssl_default(self):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_samples(self.sample_data)
+            self.assertTrue(post.call_args[1]['verify'])
+
+    def test_post_verify_ssl_True(self):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1?'
+                                       'verify_ssl=True')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_samples(self.sample_data)
+            self.assertTrue(post.call_args[1]['verify'])
+
+    def test_post_verify_ssl_False(self):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1?'
+                                       'verify_ssl=False')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_samples(self.sample_data)
+            self.assertFalse(post.call_args[1]['verify'])
+
+    def test_post_verify_ssl_path(self):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1?'
+                                       'verify_ssl=/path/to/cert.crt')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_samples(self.sample_data)
+            self.assertEqual('/path/to/cert.crt', post.call_args[1]['verify'])
+
+    def test_post_raw_only(self):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1?raw_only=1')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_events(self.event_data)
+            self.assertEqual(
+                '[{"some": "aa"}, {"some": "aa"}, {"some": "aa"}]',
+                post.call_args[1]['data'])

@@ -14,6 +14,7 @@
 
 import json
 
+from debtcollector import removals
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import strutils
@@ -48,6 +49,8 @@ http_dispatcher_opts = [
 ]
 
 
+@removals.removed_class("HttpDispatcher", message="Use http publisher instead",
+                        removal_version="9.0.0")
 class HttpDispatcher(dispatcher.MeterDispatcherBase,
                      dispatcher.EventDispatcherBase):
     """Dispatcher class for posting metering/event data into a http target.
