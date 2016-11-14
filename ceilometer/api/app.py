@@ -107,6 +107,8 @@ def load_app(conf):
     APPCONFIGS[configkey] = conf
 
     LOG.info("Full WSGI config used: %s", cfg_file)
+    LOG.warning("Note: Ceilometer API is deprecated; use APIs from "
+                "Aodh (alarms), Gnocchi (metrics) and/or Panko (events).")
     return deploy.loadapp("config:" + cfg_file,
                           global_conf={'configkey': configkey})
 
