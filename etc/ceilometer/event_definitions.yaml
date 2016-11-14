@@ -7,6 +7,8 @@
       fields: payload.user_id
     instance_id:
       fields: payload.instance_id
+    resource_id:
+      fields: payload.instance_id
     host:
       fields: publisher_id.`split(., 1, 1)`
     service:
