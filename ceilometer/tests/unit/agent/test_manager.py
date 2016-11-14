@@ -379,12 +379,13 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     @mock.patch('ceilometer.agent.manager.LOG')
     def test_polling_exception(self, LOG):
         source_name = 'test_pollingexception'
+        res_list = ['test://']
         self.pipeline_cfg = {
             'sources': [{
                 'name': source_name,
                 'interval': 10,
                 'meters': ['testpollingexception'],
-                'resources': ['test://'],
+                'resources': res_list,
                 'sinks': ['test_sink']}],
             'sinks': [{
                 'name': 'test_sink',
@@ -402,9 +403,10 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         samples = self.notified_samples
         self.assertEqual(2, len(samples))
         LOG.error.assert_called_once_with((
-            'Prevent pollster %(name)s for '
-            'polling source %(source)s anymore!')
-            % ({'name': pollster.name, 'source': source_name}))
+            'Prevent pollster %(name)s from '
+            'polling %(res_list)s on source %(source)s anymore!')
+            % ({'name': pollster.name, 'res_list': res_list,
+                'source': source_name}))
 
     def test_batching_polled_samples_false(self):
         self.CONF.set_override('batch_polled_samples', False)
