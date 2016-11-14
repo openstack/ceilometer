@@ -51,6 +51,7 @@ import ceilometer.sample
 import ceilometer.service
 import ceilometer.storage
 import ceilometer.utils
+import ceilometer.volume.discovery
 
 
 def list_opts():
@@ -107,7 +108,8 @@ def list_opts():
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,
-                         ceilometer.objectstore.swift.SERVICE_OPTS,)),
+                         ceilometer.objectstore.swift.SERVICE_OPTS,
+                         ceilometer.volume.discovery.SERVICE_OPTS,)),
         ('storage', ceilometer.dispatcher.STORAGE_OPTS),
         ('vmware', ceilometer.compute.virt.vmware.inspector.OPTS),
         ('xenapi', ceilometer.compute.virt.xenapi.inspector.OPTS),

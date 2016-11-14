@@ -1,0 +1,4 @@
+---
+features:
+  - Add support of metering the size of cinder volume/snapshot/backup. Like
+    other meters, these are useful for billing system.
