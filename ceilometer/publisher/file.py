@@ -19,7 +19,6 @@ import logging.handlers
 from oslo_log import log
 from six.moves.urllib import parse as urlparse
 
-import ceilometer
 from ceilometer.i18n import _
 from ceilometer import publisher
 
@@ -29,7 +28,7 @@ LOG = log.getLogger(__name__)
 class FilePublisher(publisher.ConfigPublisherBase):
     """Publisher metering data to file.
 
-    The publisher which records metering data into a file. The file name and
+    The file publisher pushes metering data into a file. The file name and
     location should be configured in ceilometer pipeline configuration file.
     If a file name and location is not specified, this File Publisher will not
     log any meters other than log a warning in Ceilometer log file.
@@ -58,7 +57,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
 
         self.publisher_logger = None
         path = parsed_url.path
-        if not path or path.lower() == 'file':
+        if not path:
             LOG.error(_('The path for the file publisher is required'))
             return
 
@@ -101,4 +100,6 @@ class FilePublisher(publisher.ConfigPublisherBase):
 
         :param events: events from pipeline after transformation
         """
-        raise ceilometer.NotImplementedError
+        if self.publisher_logger:
+            for event in events:
+                self.publisher_logger.info(event.as_dict())

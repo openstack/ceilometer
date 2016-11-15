@@ -1,0 +1,6 @@
+---
+deprecations:
+  - With collector service being deprecated, we now have to
+    address the duplication between dispatchers and publishers.
+    The file dispatcher is now marked as deprecated. Use the
+    file publisher to push samples into a file.

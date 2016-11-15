@@ -16,6 +16,7 @@
 import logging
 import logging.handlers
 
+from debtcollector import removals
 from oslo_config import cfg
 
 from ceilometer import dispatcher
@@ -35,6 +36,8 @@ OPTS = [
 cfg.CONF.register_opts(OPTS, group="dispatcher_file")
 
 
+@removals.removed_class("FileDispatcher", message="Use file publisher instead",
+                        removal_version="9.0.0")
 class FileDispatcher(dispatcher.MeterDispatcherBase,
                      dispatcher.EventDispatcherBase):
     """Dispatcher class for recording metering data to a file.
