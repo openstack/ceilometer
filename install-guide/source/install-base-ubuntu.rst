@@ -68,7 +68,7 @@ Install and configure components
 Configure the Apache HTTP server
 --------------------------------
 
-#. Create the ``/etc/apache2/sites-available/wsgi-ceilometer.conf`` file
+#. Create the ``/etc/apache2/sites-available/ceilometer.conf`` file
    with the following content:
 
    .. code-block:: apache
