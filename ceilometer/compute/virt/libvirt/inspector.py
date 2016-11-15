@@ -15,54 +15,24 @@
 """Implementation of Inspector abstraction for libvirt."""
 
 from lxml import etree
-from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_utils import units
 import six
 
+try:
+    import libvirt
+except ImportError:
+    libvirt = None
+
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.compute.virt.libvirt import utils as libvirt_utils
 from ceilometer.i18n import _LW, _LE, _
-
-libvirt = None
 
 LOG = logging.getLogger(__name__)
 
-OPTS = [
-    cfg.StrOpt('libvirt_type',
-               default='kvm',
-               choices=['kvm', 'lxc', 'qemu', 'uml', 'xen'],
-               help='Libvirt domain type.'),
-    cfg.StrOpt('libvirt_uri',
-               default='',
-               help='Override the default libvirt URI '
-                    '(which is dependent on libvirt_type).'),
-]
-
-
-def retry_on_disconnect(function):
-    def decorator(self, *args, **kwargs):
-        try:
-            return function(self, *args, **kwargs)
-        except ImportError:
-            # NOTE(sileht): in case of libvirt failed to be imported
-            raise
-        except libvirt.libvirtError as e:
-            if (e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
-                                       libvirt.VIR_ERR_INTERNAL_ERROR) and
-                e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
-                                         libvirt.VIR_FROM_RPC)):
-                LOG.debug('Connection to libvirt broken')
-                self.connection = None
-                return function(self, *args, **kwargs)
-            else:
-                raise
-    return decorator
-
 
 class LibvirtInspector(virt_inspector.Inspector):
-
-    per_type_uris = dict(uml='uml:///system', xen='xen:///', lxc='lxc:///')
 
     def __init__(self, conf):
         super(LibvirtInspector, self).__init__(conf)
@@ -71,19 +41,10 @@ class LibvirtInspector(virt_inspector.Inspector):
     @property
     def connection(self):
         if not self._connection:
-            global libvirt
-            if libvirt is None:
-                libvirt = __import__('libvirt')
-
-            uri = (self.conf.libvirt_uri or
-                   self.per_type_uris.get(self.conf.libvirt_type,
-                                          'qemu:///system'))
-            LOG.debug('Connecting to libvirt: %s', uri)
-            self._connection = libvirt.openReadOnly(uri)
-
+            self._connection = libvirt_utils.get_libvirt_connection(self.conf)
         return self._connection
 
-    @retry_on_disconnect
+    @libvirt_utils.retry_on_disconnect
     def _lookup_by_uuid(self, instance):
         instance_name = util.instance_name(instance)
         try:

@@ -257,6 +257,7 @@ function _ceilometer_configure_storage_backend {
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
+        iniset $CEILOMETER_CONF compute instance_discovery_method libvirt_metadata
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
         iniset $CEILOMETER_CONF DEFAULT event_dispatchers gnocchi
         # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
