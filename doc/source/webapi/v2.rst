@@ -2,6 +2,15 @@
  V2 Web API
 ============
 
+.. note::
+
+   The Ceilometer API is deprecated.  Use the APIs from Aodh_ (alarms),
+   Gnocchi_ (metrics), and/or Panko_ (events).
+
+.. _Aodh: http://docs.openstack.org/developer/aodh/
+.. _Panko: http://docs.openstack.org/developer/panko/
+
+
 Resources
 =========
 

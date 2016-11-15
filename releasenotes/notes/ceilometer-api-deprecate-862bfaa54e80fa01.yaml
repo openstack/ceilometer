@@ -1,0 +1,5 @@
+---
+deprecations:
+  - Ceilometer API is deprecated. Use the APIs from Aodh (alarms),
+    Gnocchi (metrics), and/or Panko (events).
+
