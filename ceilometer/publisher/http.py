@@ -37,6 +37,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
 
         - ssl can be enabled by setting `verify_ssl`
         - batching can be configured by `batch`
+        - connection pool size configured using `poolsize`
 
     To use this publisher for samples, add the following section to the
     /etc/ceilometer/pipeline.yaml file or simply add it to an existing
@@ -91,11 +92,12 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         self.raw_only = strutils.bool_from_string(
             self._get_param(params, 'raw_only', False))
 
-        # TODO(gordc): support configurable max connections
+        pool_size = self._get_param(params, 'poolsize', 10, int)
+        kwargs = {'max_retries': self.max_retries,
+                  'pool_connections': pool_size, 'pool_maxsize': pool_size}
         self.session = requests.Session()
         # FIXME(gordc): support https in addition to http
-        self.session.mount(self.target,
-                           adapters.HTTPAdapter(max_retries=self.max_retries))
+        self.session.mount(self.target, adapters.HTTPAdapter(**kwargs))
 
         LOG.debug('HttpPublisher for endpoint %s is initialized!' %
                   self.target)
