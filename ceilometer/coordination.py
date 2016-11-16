@@ -18,7 +18,7 @@ import uuid
 
 from oslo_config import cfg
 from oslo_log import log
-import retrying
+import tenacity
 import tooz.coordination
 
 from ceilometer.i18n import _LE, _LI, _LW
@@ -65,14 +65,6 @@ class MemberNotInGroupError(Exception):
             'Group ID: %(group_id)s, Members: %(members)s, Me: %(me)s: '
             'Current agent is not part of group and cannot take tasks') %
             {'group_id': group_id, 'members': members, 'me': my_id})
-
-
-def retry_on_error_joining_partition(exception):
-    return isinstance(exception, ErrorJoiningPartitioningGroup)
-
-
-def retry_on_member_not_in_group(exception):
-    return isinstance(exception, MemberNotInGroupError)
 
 
 class PartitionCoordinator(object):
@@ -148,14 +140,12 @@ class PartitionCoordinator(object):
                 or not group_id):
             return
 
-        retry_backoff = self.conf.coordination.retry_backoff * 1000
-        max_retry_interval = self.conf.coordination.max_retry_interval * 1000
-
-        @retrying.retry(
-            wait_exponential_multiplier=retry_backoff,
-            wait_exponential_max=max_retry_interval,
-            retry_on_exception=retry_on_error_joining_partition,
-            wrap_exception=True)
+        @tenacity.retry(
+            wait=tenacity.wait_exponential(
+                multiplier=self.conf.coordination.retry_backoff,
+                max=self.conf.coordination.max_retry_interval),
+            retry=tenacity.retry_if_exception_type(
+                ErrorJoiningPartitioningGroup))
         def _inner():
             try:
                 join_req = self._coordinator.join_group(group_id)
@@ -197,8 +187,11 @@ class PartitionCoordinator(object):
             except tooz.coordination.GroupNotCreated:
                 self.join_group(group_id)
 
-    @retrying.retry(stop_max_attempt_number=5, wait_random_max=2000,
-                    retry_on_exception=retry_on_member_not_in_group)
+    @tenacity.retry(
+        wait=tenacity.wait_random(max=2),
+        stop=tenacity.stop_after_attempt(5),
+        retry=tenacity.retry_if_exception_type(MemberNotInGroupError),
+        reraise=True)
     def extract_my_subset(self, group_id, iterable):
         """Filters an iterable, returning only objects assigned to this agent.
 

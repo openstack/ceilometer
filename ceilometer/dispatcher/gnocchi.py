@@ -29,9 +29,9 @@ from oslo_log import log
 from oslo_serialization import jsonutils
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
-import retrying
 import six
 from stevedore import extension
+import tenacity
 
 from ceilometer import declarative
 from ceilometer import dispatcher
@@ -233,12 +233,13 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
 
         self._gnocchi = gnocchi_client.get_gnocchiclient(conf)
 
-        # Convert retry_interval secs to msecs for retry decorator
         retries = conf.storage.max_retries
 
-        @retrying.retry(wait_fixed=conf.storage.retry_interval * 1000,
-                        stop_max_attempt_number=(retries if retries >= 0
-                                                 else None))
+        @tenacity.retry(
+            wait=tenacity.wait_fixed(conf.storage.retry_interval),
+            stop=(tenacity.stop_after_attempt(retries) if retries >= 0
+                  else tenacity.stop_never),
+            reraise=True)
         def _get_connection():
             self._gnocchi.capabilities.list()
 
