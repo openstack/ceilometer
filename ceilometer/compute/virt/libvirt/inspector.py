@@ -27,7 +27,7 @@ except ImportError:
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import utils as libvirt_utils
-from ceilometer.i18n import _LW, _LE, _
+from ceilometer.i18n import _LW, _
 
 LOG = logging.getLogger(__name__)
 
@@ -36,37 +36,32 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     def __init__(self, conf):
         super(LibvirtInspector, self).__init__(conf)
-        self._connection = None
+        # NOTE(sileht): create a connection on startup
+        self.connection
 
     @property
     def connection(self):
-        if not self._connection:
-            self._connection = libvirt_utils.get_libvirt_connection(self.conf)
-        return self._connection
+        return libvirt_utils.refresh_libvirt_connection(self.conf, self)
 
-    @libvirt_utils.retry_on_disconnect
     def _lookup_by_uuid(self, instance):
         instance_name = util.instance_name(instance)
         try:
             return self.connection.lookupByUUIDString(instance.id)
-        except Exception as ex:
-            if not libvirt or not isinstance(ex, libvirt.libvirtError):
-                raise virt_inspector.InspectorException(six.text_type(ex))
-            error_code = ex.get_error_code()
-            if (error_code in (libvirt.VIR_ERR_SYSTEM_ERROR,
-                               libvirt.VIR_ERR_INTERNAL_ERROR) and
-                ex.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
-                                          libvirt.VIR_FROM_RPC)):
+        except libvirt.libvirtError as ex:
+            if libvirt_utils.is_disconnection_exception(ex):
                 raise
             msg = _("Error from libvirt while looking up instance "
                     "<name=%(name)s, id=%(id)s>: "
                     "[Error Code %(error_code)s] "
                     "%(ex)s") % {'name': instance_name,
                                  'id': instance.id,
-                                 'error_code': error_code,
+                                 'error_code': ex.get_error_code(),
                                  'ex': ex}
             raise virt_inspector.InstanceNotFoundException(msg)
+        except Exception as ex:
+            raise virt_inspector.InspectorException(six.text_type(ex))
 
+    @libvirt_utils.retry_on_disconnect
     def inspect_cpus(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         # TODO(gordc): this can probably be cached since it can be used to get
@@ -76,31 +71,15 @@ class LibvirtInspector(virt_inspector.Inspector):
         return virt_inspector.CPUStats(number=dom_stat['vcpu.current'],
                                        time=dom_stat['cpu.time'])
 
+    @libvirt_utils.raise_nodata_if_unsupported("l3 cache usage")
+    @libvirt_utils.retry_on_disconnect
     def inspect_cpu_l3_cache(self, instance):
         domain = self._lookup_by_uuid(instance)
-        try:
-            stats = self.connection.domainListGetStats(
-                [domain], libvirt.VIR_DOMAIN_STATS_PERF)
-            perf = stats[0][1]
-            usage = perf["perf.cmt"]
-            return virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=usage)
-        except (KeyError, AttributeError) as e:
-            # NOTE(sileht): KeyError if for libvirt >=2.0.0,<2.3.0, the perf
-            # subsystem ws existing but not  these attributes
-            # https://github.com/libvirt/libvirt/commit/bae660869de0612bee2a740083fb494c27e3f80c
-            msg = _('Perf is not supported by current version of libvirt, and '
-                    'failed to inspect l3 cache usage of %(instance_uuid)s, '
-                    'can not get info from libvirt: %(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
-        # domainListGetStats might launch an exception if the method or
-        # cmt perf event is not supported by the underlying hypervisor
-        # being used by libvirt.
-        except libvirt.libvirtError as e:
-            msg = _('Failed to inspect l3 cache usage of %(instance_uuid)s, '
-                    'can not get info from libvirt: %(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
+        stats = self.connection.domainListGetStats(
+            [domain], libvirt.VIR_DOMAIN_STATS_PERF)
+        perf = stats[0][1]
+        usage = perf["perf.cmt"]
+        return virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=usage)
 
     def _get_domain_not_shut_off_or_raise(self, instance):
         instance_name = util.instance_name(instance)
@@ -116,6 +95,7 @@ class LibvirtInspector(virt_inspector.Inspector):
 
         return domain
 
+    @libvirt_utils.retry_on_disconnect
     def inspect_vnics(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
@@ -150,6 +130,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                   tx_errors=dom_stats[7])
             yield (interface, stats)
 
+    @libvirt_utils.retry_on_disconnect
     def inspect_disks(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
@@ -167,34 +148,19 @@ class LibvirtInspector(virt_inspector.Inspector):
                                              errors=block_stats[4])
             yield (disk, stats)
 
+    @libvirt_utils.raise_nodata_if_unsupported("memory usge", False)
+    @libvirt_utils.retry_on_disconnect
     def inspect_memory_usage(self, instance, duration=None):
-        instance_name = util.instance_name(instance)
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
-        try:
-            memory_stats = domain.memoryStats()
-            if (memory_stats and
-                    memory_stats.get('available') and
-                    memory_stats.get('unused')):
-                memory_used = (memory_stats.get('available') -
-                               memory_stats.get('unused'))
-                # Stat provided from libvirt is in KB, converting it to MB.
-                memory_used = memory_used / units.Ki
-                return virt_inspector.MemoryUsageStats(usage=memory_used)
-            else:
-                msg = _('Failed to inspect memory usage of instance '
-                        '<name=%(name)s, id=%(id)s>, '
-                        'can not get info from libvirt.') % {
-                    'name': instance_name, 'id': instance.id}
-                raise virt_inspector.InstanceNoDataException(msg)
-        # memoryStats might launch an exception if the method is not supported
-        # by the underlying hypervisor being used by libvirt.
-        except libvirt.libvirtError as e:
-            msg = _('Failed to inspect memory usage of %(instance_uuid)s, '
-                    'can not get info from libvirt: %(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
+        memory_stats = domain.memoryStats()
+        memory_used = (memory_stats['available'] -
+                       memory_stats['unused'])
+        # Stat provided from libvirt is in KB, converting it to MB.
+        memory_used = memory_used / units.Ki
+        return virt_inspector.MemoryUsageStats(usage=memory_used)
 
+    @libvirt_utils.retry_on_disconnect
     def inspect_disk_info(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         tree = etree.fromstring(domain.XMLDesc(0))
@@ -222,65 +188,32 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                    physical=block_info[2])
                     yield (dsk, info)
 
+    @libvirt_utils.retry_on_disconnect
     def inspect_memory_resident(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         memory = domain.memoryStats()['rss'] / units.Ki
         return virt_inspector.MemoryResidentStats(resident=memory)
 
+    @libvirt_utils.raise_nodata_if_unsupported("memory bandwidth")
+    @libvirt_utils.retry_on_disconnect
     def inspect_memory_bandwidth(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
+        stats = self.connection.domainListGetStats(
+            [domain], libvirt.VIR_DOMAIN_STATS_PERF)
+        perf = stats[0][1]
+        return virt_inspector.MemoryBandwidthStats(total=perf["perf.mbmt"],
+                                                   local=perf["perf.mbml"])
 
-        try:
-            stats = self.connection.domainListGetStats(
-                [domain], libvirt.VIR_DOMAIN_STATS_PERF)
-            perf = stats[0][1]
-            return virt_inspector.MemoryBandwidthStats(total=perf["perf.mbmt"],
-                                                       local=perf["perf.mbml"])
-        except (KeyError, AttributeError) as e:
-            # NOTE(sileht): KeyError if for libvirt >=2.0.0,<2.3.0, the perf
-            # subsystem ws existing but not  these attributes
-            # https://github.com/libvirt/libvirt/commit/bae660869de0612bee2a740083fb494c27e3f80c
-            msg = _('Perf is not supported by current version of libvirt, and '
-                    'failed to inspect memory bandwidth of %(instance_uuid)s, '
-                    'can not get info from libvirt: %(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
-        # domainListGetStats might launch an exception if the method or
-        # mbmt/mbml perf event is not supported by the underlying hypervisor
-        # being used by libvirt.
-        except libvirt.libvirtError as e:
-            msg = _('Failed to inspect memory bandwidth of %(instance_uuid)s, '
-                    'can not get info from libvirt: %(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
-
+    @libvirt_utils.raise_nodata_if_unsupported("perf events")
+    @libvirt_utils.retry_on_disconnect
     def inspect_perf_events(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
-        try:
-            stats = self.connection.domainListGetStats(
-                [domain], libvirt.VIR_DOMAIN_STATS_PERF)
-            perf = stats[0][1]
-            return virt_inspector.PerfEventsStats(
-                cpu_cycles=perf["perf.cpu_cycles"],
-                instructions=perf["perf.instructions"],
-                cache_references=perf["perf.cache_references"],
-                cache_misses=perf["perf.cache_misses"])
-            # NOTE(sileht): KeyError if for libvirt >=2.0.0,<2.3.0, the perf
-            # subsystem ws existing but not  these attributes
-            # https://github.com/libvirt/libvirt/commit/bae660869de0612bee2a740083fb494c27e3f80c
-        except (AttributeError, KeyError) as e:
-            msg = _LE('Perf is not supported by current version of libvirt, '
-                      'and failed to inspect perf events of '
-                      '%(instance_uuid)s, can not get info from libvirt: '
-                      '%(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
-        # domainListGetStats might launch an exception if the method or
-        # mbmt/mbml perf event is not supported by the underlying hypervisor
-        # being used by libvirt.
-        except libvirt.libvirtError as e:
-            msg = _LE('Failed to inspect perf events of %(instance_uuid)s, '
-                      'can not get info from libvirt: %(error)s') % {
-                'instance_uuid': instance.id, 'error': e}
-            raise virt_inspector.NoDataException(msg)
+        stats = self.connection.domainListGetStats(
+            [domain], libvirt.VIR_DOMAIN_STATS_PERF)
+        perf = stats[0][1]
+        return virt_inspector.PerfEventsStats(
+            cpu_cycles=perf["perf.cpu_cycles"],
+            instructions=perf["perf.instructions"],
+            cache_references=perf["perf.cache_references"],
+            cache_misses=perf["perf.cache_misses"])

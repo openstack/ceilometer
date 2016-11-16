@@ -46,16 +46,14 @@ class TestPollsterBase(base.BaseTestCase):
             'metering.stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128',
             'project_cos': 'dev'}
 
-        patch_virt = mockpatch.Patch(
+        self.useFixture(mockpatch.Patch(
             'ceilometer.compute.virt.inspector.get_hypervisor_inspector',
-            new=mock.Mock(return_value=self.inspector))
-        self.useFixture(patch_virt)
+            new=mock.Mock(return_value=self.inspector)))
 
         # as we're having lazy hypervisor inspector singleton object in the
         # base compute pollster class, that leads to the fact that we
         # need to mock all this class property to avoid context sharing between
         # the tests
-        patch_inspector = mockpatch.Patch(
-            'ceilometer.compute.pollsters.BaseComputePollster.inspector',
-            self.inspector)
-        self.useFixture(patch_inspector)
+        self.useFixture(mockpatch.Patch(
+            'ceilometer.compute.pollsters.BaseComputePollster._get_inspector',
+            return_value=self.inspector))
