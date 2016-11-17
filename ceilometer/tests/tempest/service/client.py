@@ -26,8 +26,6 @@ from tempest import manager
 from tempest.services.object_storage import container_client as container_cli
 from tempest.services.object_storage import object_client as obj_cli
 
-from ceilometer.tests.tempest.service.images.v1 import images_client as \
-    img_cli_v1
 from ceilometer.tests.tempest.service.images.v2 import images_client as \
     img_cli_v2
 
@@ -104,7 +102,6 @@ class Manager(manager.Manager):
         'compute_networks_client',
         'compute_floating_ips_client',
         'flavors_client',
-        'image_client',
         'image_client_v2',
         'telemetry_client',
         'container_client',
@@ -174,11 +171,6 @@ class Manager(manager.Manager):
         self.flavors_client = flavor_cli.FlavorsClient(
             self.auth_provider,
             **self.compute_params)
-
-    def set_image_client(self):
-        self.image_client = img_cli_v1.ImagesClient(
-            self.auth_provider,
-            **self.image_params)
 
     def set_image_client_v2(self):
         self.image_client_v2 = img_cli_v2.ImagesClient(

@@ -33,7 +33,6 @@ class ClientManager(client.Manager):
         'compute_networks_client',
         'compute_floating_ips_client',
         'flavors_client',
-        'image_client',
         'image_client_v2',
         'telemetry_client',
     ]
@@ -63,7 +62,6 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
         cls.telemetry_client = cls.os_primary.telemetry_client
         cls.servers_client = cls.os_primary.servers_client
         cls.flavors_client = cls.os_primary.flavors_client
-        cls.image_client = cls.os_primary.image_client
         cls.image_client_v2 = cls.os_primary.image_client_v2
 
     @classmethod
@@ -71,8 +69,6 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
         super(BaseTelemetryTest, cls).resource_setup()
         cls.nova_notifications = ['memory', 'vcpus', 'disk.root.size',
                                   'disk.ephemeral.size']
-
-        cls.glance_notifications = ['image.size']
 
         cls.glance_v2_notifications = ['image.download', 'image.serve']
 
@@ -115,7 +111,7 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
     @classmethod
     def resource_cleanup(cls):
         cls.cleanup_resources(cls.servers_client.delete_server, cls.server_ids)
-        cls.cleanup_resources(cls.image_client.delete_image, cls.image_ids)
+        cls.cleanup_resources(cls.image_client_v2.delete_image, cls.image_ids)
         super(BaseTelemetryTest, cls).resource_cleanup()
 
     def await_samples(self, metric, query):
