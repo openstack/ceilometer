@@ -15,37 +15,20 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import mock
-from oslo_config import fixture as fixture_config
-from oslotest import mockpatch
 
 from ceilometer.agent import manager
 from ceilometer.compute.pollsters import disk
 from ceilometer.compute.virt import inspector as virt_inspector
-import ceilometer.tests.base as base
+from ceilometer.tests.unit.compute.pollsters import base
 
 
-class TestBaseDiskIO(base.BaseTestCase):
+class TestBaseDiskIO(base.TestPollsterBase):
 
     TYPE = 'cumulative'
 
     def setUp(self):
         super(TestBaseDiskIO, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.inspector = mock.Mock()
         self.instance = self._get_fake_instances()
-        patch_virt = mockpatch.Patch(
-            'ceilometer.compute.virt.inspector.get_hypervisor_inspector',
-            new=mock.Mock(return_value=self.inspector))
-        self.useFixture(patch_virt)
-
-        # as we're having lazy hypervisor inspector singleton object in the
-        # base compute pollster class, that leads to the fact that we
-        # need to mock all this class property to avoid context sharing between
-        # the tests
-        patch_inspector = mockpatch.Patch(
-            'ceilometer.compute.pollsters.BaseComputePollster.inspector',
-            self.inspector)
-        self.useFixture(patch_inspector)
 
     @staticmethod
     def _get_fake_instances():
