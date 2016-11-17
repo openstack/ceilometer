@@ -19,7 +19,6 @@ import unittest
 import mock
 from oslo_config import fixture as fixture_config
 from oslotest import base
-import retrying
 
 try:
     from ceilometer.event.storage import impl_hbase as impl_hbase_event
@@ -52,17 +51,15 @@ class ConnectionRetryTest(base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_retries(self):
-        with mock.patch.object(
-                retrying.Retrying, 'should_reject') as retry_reject:
+        with mock.patch.object(storage, 'get_connection') as retries:
             try:
                 self.CONF.set_override("connection", "no-such-engine://",
                                        group="database")
                 self.CONF.set_override("retry_interval", 0.00001,
                                        group="database")
                 storage.get_connection_from_config(self.CONF)
-            except RuntimeError as err:
-                self.assertIn('no-such-engine', six.text_type(err))
-                self.assertEqual(10, retry_reject.call_count)
+            except RuntimeError:
+                self.assertEqual(10, retries.call_count)
 
 
 class ConnectionConfigTest(base.BaseTestCase):

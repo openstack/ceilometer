@@ -18,9 +18,9 @@
 from oslo_config import cfg
 from oslo_db import options as db_options
 from oslo_log import log
-import retrying
 import six.moves.urllib.parse as urlparse
 from stevedore import driver
+import tenacity
 
 from ceilometer import utils
 
@@ -76,9 +76,11 @@ class StorageBadAggregate(Exception):
 def get_connection_from_config(conf, purpose='metering'):
     retries = conf.database.max_retries
 
-    # Convert retry_interval secs to msecs for retry decorator
-    @retrying.retry(wait_fixed=conf.database.retry_interval * 1000,
-                    stop_max_attempt_number=retries if retries >= 0 else None)
+    @tenacity.retry(
+        wait=tenacity.wait_fixed(conf.database.retry_interval),
+        stop=(tenacity.stop_after_attempt(retries) if retries >= 0
+              else tenacity.stop_never),
+        reraise=True)
     def _inner():
         namespace = 'ceilometer.%s.storage' % purpose
         url = (getattr(conf.database, '%s_connection' % purpose) or
