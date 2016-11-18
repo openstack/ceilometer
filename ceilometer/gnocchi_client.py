@@ -110,9 +110,6 @@ resources_initial = {
 
 def upgrade_resource_types(conf):
     gnocchi = get_gnocchiclient(conf)
-    # TODO(sileht): Detect what is the version of the schema created
-    # in Gnocchi, we don't have local database to store this.
-    # For now we can upgrade the schema so we are safe :p
     for name, attributes in resources_initial.items():
         try:
             gnocchi.resource_type.get(name=name)
