@@ -97,6 +97,18 @@ resources_initial = {
     },
 }
 
+# NOTE(sileht): Order matter this have to be considered like alembic migration
+# code, because it updates the resources schema of Gnocchi
+resources_update_operation = [
+    {"desc": "add volume_type to volume",
+     "type": "update_attribute_type",
+     "resource_type": "volume",
+     "data": {
+         "attribute": "/attributes/volume_type",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": False}}},
+]
+
 
 def upgrade_resource_types(conf):
     gnocchi = get_gnocchiclient(conf)
@@ -109,7 +121,13 @@ def upgrade_resource_types(conf):
                 gnocchi.resource_type.create(resource_type=rt)
             except Exception:
                 LOG.error("Gnocchi resource creation fail", exc_info=True)
-        else:
-            # NOTE(sileht): We have to handle this case when it will be
-            # possible to add/rm resource-types columns
-            pass
+                return
+
+    for op in resources_update_operation:
+        if op['type'] == 'update_attribute_type':
+            try:
+                gnocchi.resource_type.update(op['resource_type'], op['data'])
+            except Exception:
+                LOG.error("Gnocchi resource update fail: %s", op['desc'],
+                          exc_info=True)
+                return
