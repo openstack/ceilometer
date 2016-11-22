@@ -35,7 +35,6 @@ resources:
 
   - resource_type: instance
     metrics:
-      - 'instance'
       - 'memory'
       - 'memory.usage'
       - 'memory.resident'

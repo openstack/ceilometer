@@ -1,0 +1,11 @@
+---
+prelude: >
+    Samples are required to measure some aspect of a resource. Samples not
+    measuring anything will be dropped.
+upgrade:
+  - The `instance` meter no longer will be generated. For equivalent
+    functionality, perform the exact same query on any compute meter such as
+    `cpu`, `disk.read.requests`, `memory.usage`, `network.incoming.bytes`,
+    etc...
+deprecations:
+  - The `instance` meter no longer will be generated.
