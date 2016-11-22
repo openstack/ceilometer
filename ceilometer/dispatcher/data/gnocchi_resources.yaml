@@ -106,7 +106,6 @@ resources:
 
   - resource_type: image
     metrics:
-      - 'image'
       - 'image.size'
       - 'image.download'
       - 'image.serve'

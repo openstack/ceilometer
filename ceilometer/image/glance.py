@@ -46,21 +46,6 @@ class _Base(plugin_base.PollsterBase):
                         "virtual_size"])
 
 
-class ImagePollster(_Base):
-    def get_samples(self, manager, cache, resources):
-        for image in resources:
-            yield sample.Sample(
-                name='image',
-                type=sample.TYPE_GAUGE,
-                unit='image',
-                volume=1,
-                user_id=None,
-                project_id=image.owner,
-                resource_id=image.id,
-                resource_metadata=self.extract_image_metadata(image),
-            )
-
-
 class ImageSizePollster(_Base):
     def get_samples(self, manager, cache, resources):
         for image in resources:

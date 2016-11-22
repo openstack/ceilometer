@@ -101,23 +101,3 @@ class TestImagePollsterPageSize(base.BaseTestCase):
                          image_samples[0].project_id)
         self.assertEqual('fda54a44-3f96-40bf-ab07-0a4ce9e1761d',
                          image_samples[0].resource_id)
-
-
-class TestImagePageSize(base.BaseTestCase):
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def setUp(self):
-        super(TestImagePageSize, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.manager = manager.AgentManager(0, self.CONF)
-        self.pollster = glance.ImagePollster(self.CONF)
-
-    def test_image_pollster(self):
-        image_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=IMAGE_LIST))
-        self.assertEqual(3, len(image_samples))
-        self.assertEqual('image', image_samples[0].name)
-        self.assertEqual(1, image_samples[0].volume)
-        self.assertEqual('6824974c08974d4db864bbaa6bc08303',
-                         image_samples[0].project_id)
-        self.assertEqual('fda54a44-3f96-40bf-ab07-0a4ce9e1761d',
-                         image_samples[0].resource_id)
