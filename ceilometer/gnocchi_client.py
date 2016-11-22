@@ -13,10 +13,8 @@
 
 from gnocchiclient import client
 from gnocchiclient import exceptions as gnocchi_exc
-from keystoneauth1 import session as ka_session
 from oslo_config import cfg
 from oslo_log import log
-import requests
 
 from ceilometer import keystone_client
 
@@ -32,13 +30,7 @@ cfg.CONF.register_opts(OPTS, group="dispatcher_gnocchi")
 
 
 def get_gnocchiclient(conf, endpoint_override=None):
-    requests_session = requests.session()
-    for scheme in list(requests_session.adapters.keys()):
-        requests_session.mount(scheme, ka_session.TCPKeepAliveAdapter(
-            pool_block=True))
-
-    session = keystone_client.get_session(conf,
-                                          requests_session=requests_session)
+    session = keystone_client.get_session(conf)
     return client.Client('1', session,
                          interface=conf.service_credentials.interface,
                          region_name=conf.service_credentials.region_name,
