@@ -69,8 +69,12 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     def inspect_cpus(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
-        dom_info = domain.info()
-        return virt_inspector.CPUStats(number=dom_info[3], time=dom_info[4])
+        # TODO(gordc): this can probably be cached since it can be used to get
+        # all data related
+        stats = self.connection.domainListGetStats([domain])
+        dom_stat = stats[0][1]
+        return virt_inspector.CPUStats(number=dom_stat['vcpu.current'],
+                                       time=dom_stat['cpu.time'])
 
     def inspect_cpu_l3_cache(self, instance):
         domain = self._lookup_by_uuid(instance)
