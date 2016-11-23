@@ -24,9 +24,6 @@ from ceilometer.tests.unit.compute.pollsters import base
 
 class TestMemoryPollster(base.TestPollsterBase):
 
-    def setUp(self):
-        super(TestMemoryPollster, self).setUp()
-
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         next_value = iter((
@@ -88,9 +85,6 @@ class TestMemoryPollster(base.TestPollsterBase):
 
 class TestResidentMemoryPollster(base.TestPollsterBase):
 
-    def setUp(self):
-        super(TestResidentMemoryPollster, self).setUp()
-
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         next_value = iter((
@@ -135,9 +129,6 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
 
 
 class TestMemoryBandwidthPollster(base.TestPollsterBase):
-
-    def setUp(self):
-        super(TestMemoryBandwidthPollster, self).setUp()
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
