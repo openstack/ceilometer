@@ -80,7 +80,7 @@ if [ $EXIT_CODE -ne 0 ] ; then
     echo "* Heat stack:"
     openstack stack show integration_test
     echo "* Alarm list:"
-    ceilometer alarm-list
+    aodh alarm list
     echo "* Nova instance list:"
     openstack server list
 
