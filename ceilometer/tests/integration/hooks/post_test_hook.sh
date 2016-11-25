@@ -14,16 +14,20 @@
 
 # This script is executed inside post_test_hook function in devstack gate.
 
-function generate_testr_results {
+function export_subunit_data {
+    target="$1"
     if [ -f .testrepository/0 ]; then
-        sudo .tox/functional/bin/testr last --subunit > $WORKSPACE/testrepository.subunit
-        sudo mv $WORKSPACE/testrepository.subunit $BASE/logs/testrepository.subunit
-        sudo /usr/os-testr-env/bin/subunit2html $BASE/logs/testrepository.subunit $BASE/logs/testr_results.html
-        sudo gzip -9 $BASE/logs/testrepository.subunit
-        sudo gzip -9 $BASE/logs/testr_results.html
-        sudo chown jenkins:jenkins $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
-        sudo chmod a+r $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
+        sudo testr last --subunit > $WORKSPACE/testrepository.subunit.$target
     fi
+}
+
+function generate_testr_results {
+    cat $WORKSPACE/testrepository.subunit.* | sudo tee $BASE/logs/testrepository.subunit
+    sudo /usr/os-testr-env/bin/subunit2html $BASE/logs/testrepository.subunit $BASE/logs/testr_results.html
+    sudo gzip -9 $BASE/logs/testrepository.subunit
+    sudo gzip -9 $BASE/logs/testr_results.html
+    sudo chown jenkins:jenkins $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
+    sudo chmod a+r $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
 }
 
 # If we're running in the gate find our keystone endpoint to give to
@@ -57,6 +61,7 @@ if [ -d $BASE/new/devstack ]; then
     sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_autoscaling --concurrency=$TEMPEST_CONCURRENCY
     TEMPEST_EXIT_CODE=$?
     set -e
+    export_subunit_data "all-plugin"
     if [[ $TEMPEST_EXIT_CODE != 0 ]]; then
         # Collect and parse result
         generate_testr_results
@@ -109,6 +114,7 @@ set -e
 
 # Collect and parse result
 if [ -n "$CEILOMETER_DIR" ]; then
+    export_subunit_data "integration"
     generate_testr_results
 fi
 exit $EXIT_CODE
