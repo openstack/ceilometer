@@ -347,7 +347,7 @@ class ReadRequestsRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
         return self._get_sample_read_and_write(
-            instance, 'disk.read.requests.rate', 'requests/s', disk_rates_info,
+            instance, 'disk.read.requests.rate', 'request/s', disk_rates_info,
             'read_requests_rate', 'per_disk_rate')
 
 
@@ -356,7 +356,7 @@ class PerDeviceReadRequestsRatePollster(_DiskRatesPollsterBase):
     def _get_samples(self, instance, disk_rates_info):
         return self._get_samples_per_device(
             disk_rates_info, 'read_requests_rate', instance,
-            'disk.device.read.requests.rate', 'requests/s')
+            'disk.device.read.requests.rate', 'request/s')
 
 
 class WriteBytesRatePollster(_DiskRatesPollsterBase):
@@ -379,7 +379,7 @@ class WriteRequestsRatePollster(_DiskRatesPollsterBase):
 
     def _get_samples(self, instance, disk_rates_info):
         return self._get_sample_read_and_write(
-            instance, 'disk.write.requests.rate', 'requests/s',
+            instance, 'disk.write.requests.rate', 'request/s',
             disk_rates_info, 'write_requests_rate', 'per_disk_rate')
 
 
@@ -388,7 +388,7 @@ class PerDeviceWriteRequestsRatePollster(_DiskRatesPollsterBase):
     def _get_samples(self, instance, disk_rates_info):
         return self._get_samples_per_device(
             disk_rates_info, 'write_requests_rate', instance,
-            'disk.device.write.requests.rate', 'requests/s')
+            'disk.device.write.requests.rate', 'request/s')
 
 
 @six.add_metaclass(abc.ABCMeta)
