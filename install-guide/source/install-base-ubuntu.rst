@@ -78,7 +78,7 @@ Configure the Apache HTTP server
       <VirtualHost *:8777>
           WSGIDaemonProcess ceilometer-api processes=2 threads=10 user=ceilometer group=ceilometer display-name=%{GROUP}
           WSGIProcessGroup ceilometer-api
-          WSGIScriptAlias / "/var/www/cgi-bin/ceilometer/app"
+          WSGIScriptAlias / "/usr/lib/python2.7/dist-packages/ceilometer/api/app.wsgi"
           WSGIApplicationGroup %{GLOBAL}
           ErrorLog /var/log/apache2/ceilometer_error.log
           CustomLog /var/log/apache2/ceilometer_access.log combined
