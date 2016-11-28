@@ -216,24 +216,12 @@ class NoDataException(InspectorException):
     pass
 
 
-class NoSanityException(InspectorException):
-    pass
-
-
 # Main virt inspector abstraction layering over the hypervisor API.
 #
 class Inspector(object):
 
     def __init__(self, conf):
         self.conf = conf
-
-    def check_sanity(self):
-        """Check the sanity of hypervisor inspector.
-
-        Each subclass could overwrite it to throw any exception
-        when detecting mis-configured inspector
-        """
-        pass
 
     def inspect_cpus(self, instance):
         """Inspect the CPU statistics for an instance.

@@ -473,25 +473,3 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,
                           self.inspector.inspect_cpus, 'foo')
-
-
-class TestLibvirtInitWithError(base.BaseTestCase):
-
-    def setUp(self):
-        super(TestLibvirtInitWithError, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
-        libvirt_inspector.libvirt = mock.Mock()
-
-    def test_init_error(self):
-        with mock.patch.object(libvirt_inspector.libvirt,
-                               'openReadOnly',
-                               return_value=None):
-            self.assertRaises(virt_inspector.NoSanityException,
-                              self.inspector.check_sanity)
-
-    def test_init_exception(self):
-        with mock.patch.object(libvirt_inspector.libvirt,
-                               'openReadOnly',
-                               side_effect=ImportError):
-            self.assertRaises(ImportError, self.inspector.check_sanity)
