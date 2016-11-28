@@ -13,18 +13,11 @@
 
 from gnocchiclient import client
 from gnocchiclient import exceptions as gnocchi_exc
-from oslo_config import cfg
 from oslo_log import log
 
 from ceilometer import keystone_client
 
 LOG = log.getLogger(__name__)
-
-OPTS = [
-    cfg.StrOpt('url',
-               deprecated_for_removal=True,
-               help='URL to Gnocchi. default: autodetection'),
-]
 
 
 def get_gnocchiclient(conf, endpoint_override=None):
