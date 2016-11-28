@@ -44,9 +44,6 @@ class TestPollsterBuilder(agentbase.TestPollster):
         return [('builder1', cls()), ('builder2', cls())]
 
 
-@mock.patch('ceilometer.compute.pollsters.'
-            'BaseComputePollster.setup_environment',
-            mock.Mock(return_value=None))
 class TestManager(base.BaseTestCase):
     def setUp(self):
         super(TestManager, self).setUp()
@@ -219,9 +216,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             resource_metadata=agentbase.default_test_data.resource_metadata)
 
     @staticmethod
-    @mock.patch('ceilometer.compute.pollsters.'
-                'BaseComputePollster.setup_environment',
-                mock.Mock(return_value=None))
     def create_manager():
         return manager.AgentManager()
 
