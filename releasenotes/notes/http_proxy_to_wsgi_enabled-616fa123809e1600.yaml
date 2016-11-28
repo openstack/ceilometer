@@ -1,0 +1,13 @@
+---
+features:
+    - Ceilometer sets up the HTTPProxyToWSGI middleware in front of Ceilometer. The
+      purpose of this middleware is to set up the request URL correctly in
+      case there is a proxy (for instance, a loadbalancer such as HAProxy)
+      in front of Ceilometer.
+      So, for instance, when TLS connections are being terminated in the
+      proxy, and one tries to get the versions from the / resource of
+      Ceilometer, one will notice that the protocol is incorrect; It will show
+      'http' instead of 'https'. So this middleware handles such cases.
+      Thus helping Keystone discovery work correctly.
+      The HTTPProxyToWSGI is off by default and needs to be enabled via a
+      configuration value.
