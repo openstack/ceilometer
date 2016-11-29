@@ -107,7 +107,7 @@ class CPUL3CachePollster(pollsters.BaseComputePollster):
                 cpu_cache = self.inspector.inspect_cpu_l3_cache(instance)
                 LOG.debug(_("CPU cache size: %(id)s %(cache_size)d"),
                           ({'id': instance.id,
-                            'l3_cache_usage': cpu_cache.l3_cache_usage}))
+                            'cache_size': cpu_cache.l3_cache_usage}))
                 yield util.make_sample_from_instance(
                     self.conf,
                     instance,
