@@ -116,9 +116,6 @@ class Connection(hbase_base.Connection, base.Connection):
     RESOURCE_TABLE = "resource"
     METER_TABLE = "meter"
 
-    def __init__(self, url):
-        super(Connection, self).__init__(url)
-
     def upgrade(self):
         tables = [self.RESOURCE_TABLE, self.METER_TABLE]
         column_families = {'f': dict(max_versions=1)}

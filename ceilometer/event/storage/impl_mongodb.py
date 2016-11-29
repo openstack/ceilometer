@@ -12,7 +12,6 @@
 # under the License.
 """MongoDB storage backend"""
 
-from oslo_config import cfg
 from oslo_log import log
 import pymongo
 
@@ -29,13 +28,14 @@ class Connection(pymongo_base.Connection):
 
     CONNECTION_POOL = pymongo_utils.ConnectionPool()
 
-    def __init__(self, url):
+    def __init__(self, conf, url):
+        super(Connection, self).__init__(conf, url)
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new
         # connection since we instantiate a Pymongo client each time someone
         # requires a new storage connection.
-        self.conn = self.CONNECTION_POOL.connect(url)
+        self.conn = self.CONNECTION_POOL.connect(conf, url)
 
         # Require MongoDB 2.4 to use $setOnInsert
         if self.conn.server_info()['versionArray'] < [2, 4]:
@@ -64,7 +64,7 @@ class Connection(pymongo_base.Connection):
              ('timestamp', pymongo.ASCENDING)],
             name='event_type_idx'
         )
-        ttl = cfg.CONF.database.event_time_to_live
+        ttl = self.conf.database.event_time_to_live
         impl_mongodb.Connection.update_ttl(ttl, 'event_ttl', 'timestamp',
                                            self.db.event)
 

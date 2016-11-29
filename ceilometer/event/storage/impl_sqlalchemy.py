@@ -17,7 +17,6 @@ from __future__ import absolute_import
 import datetime
 import os
 
-from oslo_config import cfg
 from oslo_db import exception as dbexc
 from oslo_db.sqlalchemy import session as db_session
 from oslo_log import log
@@ -124,12 +123,13 @@ class Connection(base.Connection):
         AVAILABLE_STORAGE_CAPABILITIES,
     )
 
-    def __init__(self, url):
+    def __init__(self, conf, url):
+        super(Connection, self).__init__(conf, url)
         # Set max_retries to 0, since oslo.db in certain cases may attempt
         # to retry making the db connection retried max_retries ^ 2 times
         # in failure case and db reconnection has already been implemented
         # in storage.__init__.get_connection_from_config function
-        options = dict(cfg.CONF.database.items())
+        options = dict(self.conf.database.items())
         options['max_retries'] = 0
         # oslo.db doesn't support options defined by Ceilometer
         for opt in storage.OPTS:

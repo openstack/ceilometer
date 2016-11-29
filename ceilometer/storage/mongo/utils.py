@@ -19,7 +19,6 @@ import datetime
 import time
 import weakref
 
-from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import netutils
 import pymongo
@@ -239,7 +238,7 @@ class ConnectionPool(object):
     def __init__(self):
         self._pool = {}
 
-    def connect(self, url):
+    def connect(self, conf, url):
         connection_options = pymongo.uri_parser.parse_uri(url)
         del connection_options['database']
         del connection_options['username']
@@ -255,14 +254,14 @@ class ConnectionPool(object):
         log_data = {'db': splitted_url.scheme,
                     'nodelist': connection_options['nodelist']}
         LOG.info(_LI('Connecting to %(db)s on %(nodelist)s') % log_data)
-        client = self._mongo_connect(url)
+        client = self._mongo_connect(conf, url)
         self._pool[pool_key] = weakref.ref(client)
         return client
 
     @staticmethod
-    def _mongo_connect(url):
+    def _mongo_connect(conf, url):
         try:
-            return MongoProxy(pymongo.MongoClient(url))
+            return MongoProxy(conf, pymongo.MongoClient(url))
         except pymongo.errors.ConnectionFailure as e:
             LOG.warning(_('Unable to connect to the database server: '
                         '%(errmsg)s.') % {'errmsg': e})
@@ -394,16 +393,16 @@ class QueryTransformer(object):
 
 
 def safe_mongo_call(call):
-    def closure(*args, **kwargs):
+    def closure(self, *args, **kwargs):
         # NOTE(idegtiarov) options max_retries and retry_interval have been
         # registered in storage.__init__ in oslo_db.options.set_defaults
         # default values for both options are 10.
-        max_retries = cfg.CONF.database.max_retries
-        retry_interval = cfg.CONF.database.retry_interval
+        max_retries = self.conf.database.max_retries
+        retry_interval = self.conf.database.retry_interval
         attempts = 0
         while True:
             try:
-                return call(*args, **kwargs)
+                return call(self, *args, **kwargs)
             except pymongo.errors.AutoReconnect as err:
                 if 0 <= max_retries <= attempts:
                     LOG.error(_('Unable to reconnect to the primary mongodb '
@@ -420,7 +419,8 @@ def safe_mongo_call(call):
 
 
 class MongoConn(object):
-    def __init__(self, method):
+    def __init__(self, conf, method):
+        self.conf = conf
         self.method = method
 
     @safe_mongo_call
@@ -436,21 +436,22 @@ MONGO_METHODS.update(set([typ for typ in dir(pymongo)
 
 
 class MongoProxy(object):
-    def __init__(self, conn):
+    def __init__(self, conf, conn):
         self.conn = conn
+        self.conf = conf
 
     def __getitem__(self, item):
         """Create and return proxy around the method in the connection.
 
         :param item: name of the connection
         """
-        return MongoProxy(self.conn[item])
+        return MongoProxy(self.conf, self.conn[item])
 
     def find(self, *args, **kwargs):
         # We need this modifying method to return a CursorProxy object so that
         # we can handle the Cursor next function to catch the AutoReconnect
         # exception.
-        return CursorProxy(self.conn.find(*args, **kwargs))
+        return CursorProxy(self.conf, self.conn.find(*args, **kwargs))
 
     def create_index(self, keys, name=None, *args, **kwargs):
         try:
@@ -472,19 +473,22 @@ class MongoProxy(object):
         insert, wrap this method in the MongoConn.
         Else wrap getting attribute with MongoProxy.
         """
-        if item in ('name', 'database'):
+        if item in ("conf",):
+            return super(MongoProxy, self).__getattr__(item)
+        elif item in ('name', 'database'):
             return getattr(self.conn, item)
-        if item in MONGO_METHODS:
-            return MongoConn(getattr(self.conn, item))
-        return MongoProxy(getattr(self.conn, item))
+        elif item in MONGO_METHODS:
+            return MongoConn(self.conf, getattr(self.conn, item))
+        return MongoProxy(self.conf, getattr(self.conn, item))
 
     def __call__(self, *args, **kwargs):
         return self.conn(*args, **kwargs)
 
 
 class CursorProxy(pymongo.cursor.Cursor):
-    def __init__(self, cursor):
+    def __init__(self, conf, cursor):
         self.cursor = cursor
+        self.conf = conf
 
     def __getitem__(self, item):
         return self.cursor[item]

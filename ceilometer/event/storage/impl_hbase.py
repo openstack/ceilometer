@@ -67,9 +67,6 @@ class Connection(hbase_base.Connection, base.Connection):
 
     EVENT_TABLE = "event"
 
-    def __init__(self, url):
-        super(Connection, self).__init__(url)
-
     def upgrade(self):
         tables = [self.EVENT_TABLE]
         column_families = {'f': dict(max_versions=1)}

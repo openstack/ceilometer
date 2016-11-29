@@ -32,14 +32,20 @@ import six
 
 
 class EngineTest(base.BaseTestCase):
+    def setUp(self):
+        super(EngineTest, self).setUp()
+        self.CONF = self.useFixture(fixture_config.Config()).conf
+
     def test_get_connection(self):
-        engine = storage.get_connection('log://localhost',
+        engine = storage.get_connection(self.CONF,
+                                        'log://localhost',
                                         'ceilometer.metering.storage')
         self.assertIsInstance(engine, impl_log.Connection)
 
     def test_get_connection_no_such_engine(self):
         try:
-            storage.get_connection('no-such-engine://localhost',
+            storage.get_connection(self.CONF,
+                                   'no-such-engine://localhost',
                                    'ceilometer.metering.storage')
         except RuntimeError as err:
             self.assertIn('no-such-engine', six.text_type(err))

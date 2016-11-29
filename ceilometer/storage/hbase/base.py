@@ -28,7 +28,8 @@ class Connection(object):
 
     _memory_instance = None
 
-    def __init__(self, url):
+    def __init__(self, conf, url):
+        super(Connection, self).__init__(conf, url)
         """Hbase Connection Initialization."""
         opts = self._parse_connection_url(url)
 

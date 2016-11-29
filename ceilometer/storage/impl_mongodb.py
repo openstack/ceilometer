@@ -25,7 +25,6 @@ import uuid
 
 import bson.code
 import bson.objectid
-from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 import pymongo
@@ -138,13 +137,14 @@ class Connection(pymongo_base.Connection):
     _APOCALYPSE = datetime.datetime(year=datetime.MAXYEAR, month=12, day=31,
                                     hour=23, minute=59, second=59)
 
-    def __init__(self, url):
+    def __init__(self, conf, url):
+        super(Connection, self).__init__(conf, url)
 
         # NOTE(jd) Use our own connection pooling on top of the Pymongo one.
         # We need that otherwise we overflow the MongoDB instance with new
         # connection since we instantiate a Pymongo client each time someone
         # requires a new storage connection.
-        self.conn = self.CONNECTION_POOL.connect(url)
+        self.conn = self.CONNECTION_POOL.connect(conf, url)
         self.version = self.conn.server_info()['versionArray']
         # Require MongoDB 2.4 to use $setOnInsert
         if self.version < pymongo_utils.MINIMUM_COMPATIBLE_MONGODB_VERSION:
@@ -231,7 +231,7 @@ class Connection(pymongo_base.Connection):
                                       name='last_sample_timestamp_idx')
 
         # update or create time_to_live index
-        ttl = cfg.CONF.database.metering_time_to_live
+        ttl = self.conf.database.metering_time_to_live
         self.update_ttl(ttl, 'meter_ttl', 'timestamp', self.db.meter)
         self.update_ttl(ttl, 'resource_ttl', 'last_sample_timestamp',
                         self.db.resource)

@@ -30,12 +30,12 @@ from ceilometer.tests import db as tests_db
 @tests_db.run_with('mongodb')
 class MongoDBConnection(tests_db.TestBase):
     def test_connection_pooling(self):
-        test_conn = impl_mongodb.Connection(self.db_manager.url)
+        test_conn = impl_mongodb.Connection(self.CONF, self.db_manager.url)
         self.assertEqual(self.conn.conn, test_conn.conn)
 
     def test_replica_set(self):
         url = self.db_manager._url + '?replicaSet=foobar'
-        conn = impl_mongodb.Connection(url)
+        conn = impl_mongodb.Connection(self.CONF, url)
         self.assertTrue(conn.conn)
 
 
