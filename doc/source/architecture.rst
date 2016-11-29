@@ -7,10 +7,8 @@
 .. index::
    single: agent; architecture
    double: compute agent; architecture
-   double: collector; architecture
    double: data store; architecture
    double: database; architecture
-   double: API; architecture
 
 High-Level Architecture
 =======================
@@ -26,24 +24,19 @@ High-Level Architecture
 
 Each of Ceilometer's services are designed to scale horizontally. Additional
 workers and nodes can be added depending on the expected load. Ceilometer
-offers three core services, the data agents designed to work independently from
-collection, but also designed to work together as a complete solution:
+offers two core services:
 
 1. polling agent - daemon designed to poll OpenStack services and build Meters.
 2. notification agent - daemon designed to listen to notifications on message queue,
    convert them to Events and Samples, and apply pipeline actions.
-3. (optional) collector - daemon designed to gather and record event and metering data
-   created by notification and polling agents (if using Gnocchi or full-fidelity storage).
-4. (optional) api - service to query and view data recorded by collector
-   in internal full-fidelity database (if enabled).
 
 Data normalised and collected by Ceilometer can be sent to various targets.
-Gnocchi_ was developed to capture measurement data in a time series database to
+Gnocchi_ was developed to capture measurement data in a time series format to
 optimise storage and querying. Gnocchi is intended to replace the existing
 metering database interface. Additionally, Aodh_ is the alarming service which
-can be send notifications when user defined rules are broken. Lastly, Panko_ is
-the event storage project designed to capture document-oriented data such as
-logs and system event actions.
+can send alerts when user defined rules are broken. Lastly, Panko_ is the event
+storage project designed to capture document-oriented data such as logs and
+system event actions.
 
 .. _Gnocchi: http://docs.openstack.org/developer/gnocchi/
 .. _Aodh: http://docs.openstack.org/developer/aodh
@@ -66,8 +59,8 @@ How is data collected?
 
 The Ceilometer project created 2 methods to collect data:
 
-1. :term:`Bus listener agent` which takes events generated on the
-   notification bus and transforms them into Ceilometer samples. This
+1. :term:`Notification agent` which takes messages generated on the
+   notification bus and transforms them into Ceilometer samples or events. This
    is **the preferred method** of data collection. If you are working on some
    OpenStack related project and are using the Oslo library, you are kindly
    invited to come and talk to one of the project members to learn how you
@@ -96,14 +89,15 @@ Notification Agents: Listening for data
    Notification agents consuming messages from services.
 
 The heart of the system is the notification daemon (agent-notification)
-which monitors the message bus for data being provided by other
-OpenStack components such as Nova, Glance, Cinder, Neutron, Swift, Keystone,
-and Heat, as well as Ceilometer internal communication.
+which monitors the message queue for data sent by other OpenStack
+components such as Nova, Glance, Cinder, Neutron, Swift, Keystone, and Heat,
+as well as Ceilometer internal communication.
 
 The notification daemon loads one or more *listener* plugins, using the
-namespace ``ceilometer.notification``. Each plugin can listen to any topics,
-but by default it will listen to ``notifications.info``. The listeners grab
-messages off the defined topics and redistributes them to the appropriate
+namespace ``ceilometer.notification``. Each plugin can listen to any topic,
+but by default, will listen to ``notifications.info``,
+``notifications.sample``, and ``notifications.error``. The listeners grab
+messages off the configured topics and redistributes them to the appropriate
 plugins(endpoints) to be processed into Events and Samples.
 
 Sample-oriented plugins provide a method to list the event types they're interested
@@ -111,11 +105,7 @@ in and a callback for processing messages accordingly. The registered name of th
 callback is used to enable or disable it using the pipeline of the notification
 daemon. The incoming messages are filtered based on their event type value before
 being passed to the callback so the plugin only receives events it has
-expressed an interest in seeing. For example, a callback asking for
-``compute.instance.create.end`` events under
-``ceilometer.compute.notifications`` would be invoked for those notification
-events on the ``nova`` exchange using the ``notifications.info`` topic. Event
-matching can also work using wildcards e.g. ``compute.instance.*``.
+expressed an interest in seeing.
 
 .. _polling:
 
@@ -140,13 +130,13 @@ on a cloud controller node, often referred to the central-agent.
 A single agent can fulfill both roles in an all-in-one deployment.
 Conversely, multiple instances of an agent may be deployed, in
 which case the workload is shared. The polling agent
-daemon is configured to run one or more *pollster* plugins using either the
-``ceilometer.poll.compute`` and/or ``ceilometer.poll.central`` namespaces.
+daemon is configured to run one or more *pollster* plugins using any
+combination of ``ceilometer.poll.compute``, ``ceilometer.poll.central``, and
+``ceilometer.poll.ipmi`` namespaces
 
-The agents periodically ask each pollster for instances of
-``Sample`` objects. The frequency of polling is controlled via the pipeline
-configuration. See :ref:`Pipeline-Configuration` for details.
-The agent framework then passes the samples to the notification agent for processing.
+The frequency of polling is controlled via the pipeline configuration. See
+:ref:`Pipeline-Configuration` for details. The agent framework then passes the
+generated samples to the notification agent for processing.
 
 
 Processing the data
@@ -206,41 +196,11 @@ Currently, processed data can be published using 5 different transports:
    that supports Kafka.
 
 
-Storing the data
-================
+Storing/Accessing the data
+==========================
 
-Collector Service
------------------
-
-The collector daemon gathers the processed event and metering data captured by
-the notification and polling agents. It validates the incoming data and (if
-the signature is valid) then writes the messages to a declared target:
-database, file, gnocchi or http.
-
-More details on database and Gnocchi targets can be found in the
-:ref:`choosing_db_backend` guide.
-
-
-
-Accessing the data
-==================
-
-API Service
------------
-
-If the collected data from polling and notification agents are stored in Ceilometer's
-database(s) (see the section :ref:`choosing_db_backend`), a REST API is available
-to access the collected data rather than by accessing the underlying database directly.
-
-.. figure:: ./2-accessmodel.png
-   :width: 100%
-   :align: center
-   :alt: data access model
-
-   This is a representation of how to access data stored by Ceilometer
-
-Moreover, end users can also
-:ref:`send their own application specific data <user-defined-data>` into the
-database through the REST API for a various set of use cases.
-
-.. _send their own application centric data: ./webapi/v2.html#user-defined-data
+Ceilometer is designed solely to generate and normalise cloud data. The data
+created by Ceilometer can be pushed to any number of target using publishers
+mentioned in :ref:`pipeline-publishers` section. The recommended workflow is to
+push data to Gnocchi_ for efficient time-series storage and resource lifecycle
+tracking.
