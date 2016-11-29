@@ -28,7 +28,9 @@ LOG = log.getLogger(__name__)
 
 
 def upgrade():
-    cfg.CONF.register_cli_opts([
+    # FIXME(sileht): Use cfg.ConfigOpts()
+    conf = cfg.CONF
+    conf.register_cli_opts([
         cfg.BoolOpt('skip-metering-database',
                     help='Skip metering database upgrade.',
                     default=False),
@@ -40,55 +42,57 @@ def upgrade():
                     default=False),
     ])
 
-    service.prepare_service()
-    if cfg.CONF.skip_metering_database:
+    service.prepare_service(conf=conf)
+    if conf.skip_metering_database:
         LOG.info("Skipping metering database upgrade")
     else:
         LOG.debug("Upgrading metering database")
-        storage.get_connection_from_config(cfg.CONF, 'metering').upgrade()
+        storage.get_connection_from_config(conf, 'metering').upgrade()
 
-    if cfg.CONF.skip_event_database:
+    if conf.skip_event_database:
         LOG.info("Skipping event database upgrade")
     else:
         LOG.debug("Upgrading event database")
-        storage.get_connection_from_config(cfg.CONF, 'event').upgrade()
+        storage.get_connection_from_config(conf, 'event').upgrade()
 
-    if cfg.CONF.skip_gnocchi_resource_types:
+    if conf.skip_gnocchi_resource_types:
         LOG.info("Skipping Gnocchi resource types upgrade")
     else:
         LOG.debug("Upgrading Gnocchi resource types")
         from ceilometer import gnocchi_client
-        gnocchi_client.upgrade_resource_types(cfg.CONF)
+        gnocchi_client.upgrade_resource_types(conf)
 
 
 def expirer():
-    service.prepare_service()
+    conf = service.prepare_service()
 
-    if cfg.CONF.database.metering_time_to_live > 0:
+    if conf.database.metering_time_to_live > 0:
         LOG.debug("Clearing expired metering data")
-        storage_conn = storage.get_connection_from_config(cfg.CONF, 'metering')
+        storage_conn = storage.get_connection_from_config(conf, 'metering')
         storage_conn.clear_expired_metering_data(
-            cfg.CONF.database.metering_time_to_live)
+            conf.database.metering_time_to_live)
     else:
         LOG.info(_LI("Nothing to clean, database metering time to live "
                      "is disabled"))
 
-    if cfg.CONF.database.event_time_to_live > 0:
+    if conf.database.event_time_to_live > 0:
         LOG.debug("Clearing expired event data")
-        event_conn = storage.get_connection_from_config(cfg.CONF, 'event')
+        event_conn = storage.get_connection_from_config(conf, 'event')
         event_conn.clear_expired_event_data(
-            cfg.CONF.database.event_time_to_live)
+            conf.database.event_time_to_live)
     else:
         LOG.info(_LI("Nothing to clean, database event time to live "
                      "is disabled"))
 
 
 def db_clean_legacy():
-    cfg.CONF.register_cli_opts([
-        cfg.StrOpt('confirm-drop-alarm-table',
+    # FIXME(sileht): Use cfg.ConfigOpts()
+    conf = cfg.CONF
+    conf.register_cli_opts([
+        cfg.strOpt('confirm-drop-alarm-table',
                    short='n',
                    help='confirm to drop the legacy alarm tables')])
-    if not cfg.CONF.confirm_drop_alarm_table:
+    if not conf.confirm_drop_alarm_table:
         confirm = moves.input("Do you really want to drop the legacy alarm "
                               "tables? This will destroy data definitely "
                               "if it exist. Please type 'YES' to confirm: ")
@@ -96,10 +100,10 @@ def db_clean_legacy():
             print("DB legacy cleanup aborted!")
             return
 
-    service.prepare_service()
+    service.prepare_service(conf=conf)
     for purpose in ['metering', 'event']:
-        url = (getattr(cfg.CONF.database, '%s_connection' % purpose) or
-               cfg.CONF.database.connection)
+        url = (getattr(conf.database, '%s_connection' % purpose) or
+               conf.database.connection)
         parsed = urlparse.urlparse(url)
 
         if parsed.password:
@@ -113,7 +117,7 @@ def db_clean_legacy():
             'purpose': purpose, 'url': masked_url})
 
         connection_scheme = parsed.scheme
-        conn = storage.get_connection_from_config(cfg.CONF, purpose)
+        conn = storage.get_connection_from_config(conf, purpose)
         if connection_scheme in ('mysql', 'mysql+pymysql', 'postgresql',
                                  'sqlite'):
             engine = conn._engine_facade.get_engine()
