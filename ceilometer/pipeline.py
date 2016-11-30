@@ -29,13 +29,11 @@ import six
 from stevedore import extension
 import yaml
 
-
 from ceilometer.event.storage import models
-from ceilometer.i18n import _, _LI, _LW
+from ceilometer.i18n import _LI, _LW, _LE
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
-
 
 OPTS = [
     cfg.StrOpt('pipeline_cfg_file',
@@ -203,7 +201,6 @@ class EventPipelineTransportManager(_PipelineTransportManager):
 
 
 class PublishContext(object):
-
     def __init__(self, pipelines=None):
         pipelines = pipelines or []
         self.pipelines = set(pipelines)
@@ -387,7 +384,8 @@ class Sink(object):
                 self.publishers.append(publisher.get_publisher(
                     self.conf, p, self.NAMESPACE))
             except Exception:
-                LOG.exception(_("Unable to load publisher %s"), p)
+                LOG.error(_LE("Unable to load publisher %s"), p,
+                          exc_info=True)
 
         self.multi_publish = True if len(self.publishers) > 1 else False
         self.transformers = self._setup_transformers(cfg, transformer_manager)
@@ -425,11 +423,12 @@ class EventSink(Sink):
                 try:
                     p.publish_events(events)
                 except Exception:
-                    LOG.exception(_("Pipeline %(pipeline)s: %(status)s"
-                                    " after error from publisher %(pub)s") %
-                                   ({'pipeline': self, 'status': 'Continue' if
-                                     self.multi_publish else 'Exit', 'pub': p}
-                                    ))
+                    LOG.error(_LE("Pipeline %(pipeline)s: %(status)s "
+                                  "after error from publisher %(pub)s") %
+                              {'pipeline': self,
+                               'status': 'Continue' if
+                               self.multi_publish else 'Exit', 'pub': p},
+                              exc_info=True)
                     if not self.multi_publish:
                         raise
 
@@ -453,14 +452,13 @@ class SampleSink(Sink):
                                                   'trans': transformer})
                     return
             return sample
-        except Exception as err:
-            # TODO(gordc): only use one log level.
-            LOG.warning(_("Pipeline %(pipeline)s: "
-                          "Exit after error from transformer "
-                          "%(trans)s for %(smp)s") % ({'pipeline': self,
-                                                       'trans': transformer,
-                                                       'smp': sample}))
-            LOG.exception(err)
+        except Exception:
+            LOG.error(_LE("Pipeline %(pipeline)s: Exit after error "
+                          "from transformer %(trans)s "
+                          "for %(smp)s") % {'pipeline': self,
+                                            'trans': transformer,
+                                            'smp': sample},
+                      exc_info=True)
 
     def _publish_samples(self, start, samples):
         """Push samples into pipeline for publishing.
@@ -491,10 +489,10 @@ class SampleSink(Sink):
                 try:
                     p.publish_samples(transformed_samples)
                 except Exception:
-                    LOG.exception(_(
-                        "Pipeline %(pipeline)s: Continue after error "
-                        "from publisher %(pub)s") % ({'pipeline': self,
-                                                      'pub': p}))
+                    LOG.error(_LE("Pipeline %(pipeline)s: Continue after "
+                                  "error from publisher %(pub)s")
+                              % {'pipeline': self, 'pub': p},
+                              exc_info=True)
 
     def publish_samples(self, samples):
         self._publish_samples(0, samples)
@@ -506,12 +504,11 @@ class SampleSink(Sink):
             try:
                 self._publish_samples(i + 1,
                                       list(transformer.flush()))
-            except Exception as err:
-                LOG.warning(_(
-                    "Pipeline %(pipeline)s: Error flushing "
-                    "transformer %(trans)s") % ({'pipeline': self,
-                                                 'trans': transformer}))
-                LOG.exception(err)
+            except Exception:
+                LOG.error(_LE("Pipeline %(pipeline)s: Error "
+                              "flushing transformer %(trans)s")
+                          % {'pipeline': self, 'trans': transformer},
+                          exc_info=True)
 
 
 @six.add_metaclass(abc.ABCMeta)
