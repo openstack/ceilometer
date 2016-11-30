@@ -301,13 +301,13 @@ function configure_ceilometer {
     # with rootwrap installation done elsewhere and also clobber
     # ceilometer.conf settings that have already been made.
     # Anyway, explicit is better than implicit.
-    for conffile in policy.json api_paste.ini pipeline.yaml \
+    for conffile in policy.json api_paste.ini pipeline.yaml polling.yaml \
                     event_definitions.yaml event_pipeline.yaml; do
         cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
     done
 
     if [ "$CEILOMETER_PIPELINE_INTERVAL" ]; then
-        sed -i "s/interval:.*/interval: ${CEILOMETER_PIPELINE_INTERVAL}/" $CEILOMETER_CONF_DIR/pipeline.yaml
+        sed -i "s/interval:.*/interval: ${CEILOMETER_PIPELINE_INTERVAL}/" $CEILOMETER_CONF_DIR/polling.yaml
     fi
     if [ "$CEILOMETER_EVENT_ALARM" == "True" ]; then
         if ! grep -q '^ *- notifier://?topic=alarm.all$' $CEILOMETER_CONF_DIR/event_pipeline.yaml; then

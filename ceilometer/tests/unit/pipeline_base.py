@@ -213,21 +213,8 @@ class BasePipelineTestCase(base.BaseTestCase):
         self._unset_pipeline_cfg('name')
         self._exception_create_pipelinemanager()
 
-    def test_no_interval(self):
-        self._unset_pipeline_cfg('interval')
-        pipeline_manager = pipeline.PipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
-        pipe = pipeline_manager.pipelines[0]
-        self.assertEqual(600, pipe.get_interval())
-
     def test_no_publishers(self):
         self._unset_pipeline_cfg('publishers')
-        self._exception_create_pipelinemanager()
-
-    def test_invalid_resources(self):
-        invalid_resource = {'invalid': 1}
-        self._set_pipeline_cfg('resources', invalid_resource)
         self._exception_create_pipelinemanager()
 
     def test_check_counters_include_exclude_same(self):
@@ -249,10 +236,6 @@ class BasePipelineTestCase(base.BaseTestCase):
         publisher_cfg = ['test_invalid']
         self._set_pipeline_cfg('publishers', publisher_cfg)
 
-    def test_invalid_string_interval(self):
-        self._set_pipeline_cfg('interval', 'string')
-        self._exception_create_pipelinemanager()
-
     def test_check_transformer_invalid_transformer(self):
         transformer_cfg = [
             {'name': "test_invalid",
@@ -260,13 +243,6 @@ class BasePipelineTestCase(base.BaseTestCase):
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
         self._exception_create_pipelinemanager()
-
-    def test_get_interval(self):
-        pipeline_manager = pipeline.PipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
-        pipe = pipeline_manager.pipelines[0]
-        self.assertEqual(5, pipe.get_interval())
 
     def test_publisher_transformer_invoked(self):
         pipeline_manager = pipeline.PipelineManager(
@@ -1195,21 +1171,6 @@ class BasePipelineTestCase(base.BaseTestCase):
             'dropping out of time order sample: %s',
             (counters[1],)
         )
-
-    def test_resources(self):
-        resources = ['test1://', 'test2://']
-        self._set_pipeline_cfg('resources', resources)
-        pipeline_manager = pipeline.PipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
-        self.assertEqual(resources,
-                         pipeline_manager.pipelines[0].resources)
-
-    def test_no_resources(self):
-        pipeline_manager = pipeline.PipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
-        self.assertEqual(0, len(pipeline_manager.pipelines[0].resources))
 
     def _do_test_rate_of_change_mapping(self, pipe, meters, units):
         now = timeutils.utcnow()

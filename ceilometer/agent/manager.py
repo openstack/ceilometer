@@ -57,6 +57,10 @@ OPTS = [
 ]
 
 POLLING_OPTS = [
+    cfg.StrOpt('cfg_file',
+               default="polling.yaml",
+               help="Configuration file for pipeline definition."
+               ),
     cfg.StrOpt('partitioning_group_prefix',
                deprecated_group='central',
                help='Work-load partitioning group prefix. Use only if you '
@@ -520,6 +524,7 @@ class AgentManager(service_base.PipelineBasedService):
             self.polling_periodics.wait()
         self.polling_periodics = None
 
+    # FIXME(gordc): refactor pipeline dependency out of polling agent.
     def reload_pipeline(self):
         if self.pipeline_validated:
             LOG.info(_LI("Reconfiguring polling tasks."))

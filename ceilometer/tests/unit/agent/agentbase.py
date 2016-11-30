@@ -19,18 +19,18 @@
 import abc
 import copy
 import datetime
+import os
+import tempfile
 import time
 
 import mock
 from oslo_config import fixture as fixture_config
-from oslotest import mockpatch
 import six
 from stevedore import extension
+import yaml
 
 from ceilometer.agent import plugin_base
 from ceilometer import pipeline
-from ceilometer import publisher
-from ceilometer.publisher import test as test_publisher
 from ceilometer import sample
 from ceilometer.tests import base
 from ceilometer import utils
@@ -195,7 +195,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def setup_polling(self):
         self.mgr.polling_manager = pipeline.PollingManager(
-            self.CONF, self.cfg2file(self.pipeline_cfg))
+            self.CONF, self.cfg2file(self.polling_cfg))
 
     def create_extension_list(self):
         return [extension.Extension('test',
@@ -250,8 +250,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         super(BaseAgentManagerTestCase, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
         self.CONF.set_override(
-            'pipeline_cfg_file',
-            self.path_get('etc/ceilometer/pipeline.yaml')
+            'cfg_file',
+            self.path_get('etc/ceilometer/polling.yaml'), group='polling'
         )
         self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.CONF(args=[])
@@ -262,27 +262,14 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         p_coord = self.mgr.partition_coordinator
         p_coord.extract_my_subset.side_effect = fake_subset
         self.mgr.tg = mock.MagicMock()
-        self.pipeline_cfg = {
+        self.polling_cfg = {
             'sources': [{
-                'name': 'test_pipeline',
+                'name': 'test_polling',
                 'interval': 60,
                 'meters': ['test'],
-                'resources': ['test://'],
-                'sinks': ['test_sink']}],
-            'sinks': [{
-                'name': 'test_sink',
-                'transformers': [],
-                'publishers': ["test"]}]
+                'resources': ['test://']}]
         }
         self.setup_polling()
-        self.useFixture(mockpatch.PatchObject(
-            publisher, 'get_publisher', side_effect=self.get_publisher))
-
-    def get_publisher(self, url, namespace=''):
-        fake_drivers = {'test://': test_publisher.TestPublisher,
-                        'new://': test_publisher.TestPublisher,
-                        'rpc://': test_publisher.TestPublisher}
-        return fake_drivers[url](self.CONF, url)
 
     def tearDown(self):
         self.Pollster.samples = []
@@ -334,7 +321,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.join_partitioning_groups()
         p_coord = self.mgr.partition_coordinator
         static_group_ids = [utils.hash_of_set(p['resources'])
-                            for p in self.pipeline_cfg['sources']
+                            for p in self.polling_cfg['sources']
                             if p['resources']]
         expected = [mock.call(self.mgr.construct_group_id(g))
                     for g in ['another_group', 'global'] + static_group_ids]
@@ -348,16 +335,15 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertIn(60, polling_tasks.keys())
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(1, len(per_task_resources))
-        self.assertEqual(set(self.pipeline_cfg['sources'][0]['resources']),
-                         set(per_task_resources['test_pipeline-test'].get({})))
+        self.assertEqual(set(self.polling_cfg['sources'][0]['resources']),
+                         set(per_task_resources['test_polling-test'].get({})))
 
     def test_setup_polling_tasks_multiple_interval(self):
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline_1',
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling_1',
             'interval': 10,
             'meters': ['test'],
             'resources': ['test://'],
-            'sinks': ['test_sink']
         })
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -366,12 +352,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertIn(10, polling_tasks.keys())
 
     def test_setup_polling_tasks_mismatch_counter(self):
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline_1',
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling_1',
             'interval': 10,
             'meters': ['test_invalid'],
             'resources': ['invalid://'],
-            'sinks': ['test_sink']
         })
         polling_tasks = self.mgr.setup_polling_tasks()
         self.assertEqual(1, len(polling_tasks))
@@ -379,12 +364,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertNotIn(10, polling_tasks.keys())
 
     def test_setup_polling_task_same_interval(self):
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline_1',
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling_1',
             'interval': 60,
             'meters': ['testanother'],
             'resources': ['testanother://'],
-            'sinks': ['test_sink']
         })
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -393,11 +377,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(2, len(pollsters))
         per_task_resources = polling_tasks[60].resources
         self.assertEqual(2, len(per_task_resources))
-        key = 'test_pipeline-test'
-        self.assertEqual(set(self.pipeline_cfg['sources'][0]['resources']),
+        key = 'test_polling-test'
+        self.assertEqual(set(self.polling_cfg['sources'][0]['resources']),
                          set(per_task_resources[key].get({})))
-        key = 'test_pipeline_1-testanother'
-        self.assertEqual(set(self.pipeline_cfg['sources'][1]['resources']),
+        key = 'test_polling_1-testanother'
+        self.assertEqual(set(self.polling_cfg['sources'][1]['resources']),
                          set(per_task_resources[key].get({})))
 
     def test_agent_manager_start(self):
@@ -408,12 +392,38 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.addCleanup(mgr.terminate)
         mgr.create_polling_task.assert_called_once_with()
 
+    def test_agent_manager_start_fallback(self):
+        pipeline_cfg = {
+            'sources': [{
+                'name': 'test_pipeline',
+                'interval': 60,
+                'meters': ['test'],
+                'resources': ['test://'],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ["test"]}]
+        }
+        tmp_cfg = tempfile.NamedTemporaryFile(mode='w', delete=False)
+        tmp_cfg.write(yaml.safe_dump(pipeline_cfg))
+        tmp_cfg.close()
+        self.CONF.set_override('pipeline_cfg_file', tmp_cfg.name)
+        self.CONF.set_override('cfg_file', None, group='polling')
+
+        mgr = self.create_manager()
+        mgr.extensions = self.mgr.extensions
+        mgr.create_polling_task = mock.MagicMock()
+        mgr.run()
+        self.addCleanup(mgr.terminate)
+        self.addCleanup(os.unlink, tmp_cfg.name)
+        mgr.create_polling_task.assert_called_once_with()
+
     def test_manager_exception_persistency(self):
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline_1',
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling_1',
             'interval': 60,
             'meters': ['testanother'],
-            'sinks': ['test_sink']
         })
         self.setup_polling()
 
@@ -430,13 +440,13 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.DiscoveryAnother.resources = [d[::-1]
                                            for d in discovered_resources]
         if static_resources:
-            # just so we can test that static + pre_pipeline amalgamated
+            # just so we can test that static + pre_polling amalgamated
             # override per_pollster
-            self.pipeline_cfg['sources'][0]['discovery'] = [
+            self.polling_cfg['sources'][0]['discovery'] = [
                 'testdiscoveryanother',
                 'testdiscoverynonexistent',
                 'testdiscoveryexception']
-        self.pipeline_cfg['sources'][0]['resources'] = static_resources
+        self.polling_cfg['sources'][0]['resources'] = static_resources
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
@@ -456,7 +466,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self._do_test_per_pollster_discovery(['discovered_1', 'discovered_2'],
                                              [])
 
-    def test_per_pollster_discovery_overridden_by_per_pipeline_discovery(self):
+    def test_per_pollster_discovery_overridden_by_per_polling_discovery(self):
         # ensure static+per_source_discovery overrides per_pollster_discovery
         self._do_test_per_pollster_discovery(['discovered_1', 'discovered_2'],
                                              ['static_1', 'static_2'])
@@ -477,8 +487,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.PollsterAnother.discovery = 'testdiscovery'
         self.mgr.discoveries = self.create_discoveries()
         self.Discovery.resources = discovered_resources
-        self.pipeline_cfg['sources'][0]['meters'].append('testanother')
-        self.pipeline_cfg['sources'][0]['resources'] = []
+        self.polling_cfg['sources'][0]['meters'].append('testanother')
+        self.polling_cfg['sources'][0]['resources'] = []
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
@@ -486,17 +496,16 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(discovered_resources, self.Pollster.resources)
         self.assertEqual(discovered_resources, self.PollsterAnother.resources)
 
-    def _do_test_per_pipeline_discovery(self,
-                                        discovered_resources,
-                                        static_resources):
+    def _do_test_per_polling_discovery(self, discovered_resources,
+                                       static_resources):
         self.mgr.discoveries = self.create_discoveries()
         self.Discovery.resources = discovered_resources
         self.DiscoveryAnother.resources = [d[::-1]
                                            for d in discovered_resources]
-        self.pipeline_cfg['sources'][0]['discovery'] = [
+        self.polling_cfg['sources'][0]['discovery'] = [
             'testdiscovery', 'testdiscoveryanother',
             'testdiscoverynonexistent', 'testdiscoveryexception']
-        self.pipeline_cfg['sources'][0]['resources'] = static_resources
+        self.polling_cfg['sources'][0]['resources'] = static_resources
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
@@ -509,35 +518,33 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         for x in self.Pollster.resources:
             self.assertEqual(1, self.Pollster.resources.count(x))
 
-    def test_per_pipeline_discovery_discovered_only(self):
-        self._do_test_per_pipeline_discovery(['discovered_1', 'discovered_2'],
-                                             [])
+    def test_per_polling_discovery_discovered_only(self):
+        self._do_test_per_polling_discovery(['discovered_1', 'discovered_2'],
+                                            [])
 
-    def test_per_pipeline_discovery_static_only(self):
-        self._do_test_per_pipeline_discovery([],
-                                             ['static_1', 'static_2'])
+    def test_per_polling_discovery_static_only(self):
+        self._do_test_per_polling_discovery([], ['static_1', 'static_2'])
 
-    def test_per_pipeline_discovery_discovered_augmented_by_static(self):
-        self._do_test_per_pipeline_discovery(['discovered_1', 'discovered_2'],
-                                             ['static_1', 'static_2'])
+    def test_per_polling_discovery_discovered_augmented_by_static(self):
+        self._do_test_per_polling_discovery(['discovered_1', 'discovered_2'],
+                                            ['static_1', 'static_2'])
 
-    def test_per_pipeline_discovery_discovered_duplicated_static(self):
-        self._do_test_per_pipeline_discovery(['discovered_1', 'pud'],
-                                             ['dup', 'static_1', 'dup'])
+    def test_per_polling_discovery_discovered_duplicated_static(self):
+        self._do_test_per_polling_discovery(['discovered_1', 'pud'],
+                                            ['dup', 'static_1', 'dup'])
 
-    def test_multiple_pipelines_different_static_resources(self):
+    def test_multiple_pollings_different_static_resources(self):
         # assert that the individual lists of static and discovered resources
-        # for each pipeline with a common interval are passed to individual
-        # pollsters matching each pipeline
-        self.pipeline_cfg['sources'][0]['resources'] = ['test://']
-        self.pipeline_cfg['sources'][0]['discovery'] = ['testdiscovery']
-        self.pipeline_cfg['sources'].append({
-            'name': 'another_pipeline',
+        # for each polling with a common interval are passed to individual
+        # pollsters matching each polling
+        self.polling_cfg['sources'][0]['resources'] = ['test://']
+        self.polling_cfg['sources'][0]['discovery'] = ['testdiscovery']
+        self.polling_cfg['sources'].append({
+            'name': 'another_polling',
             'interval': 60,
             'meters': ['test'],
             'resources': ['another://'],
             'discovery': ['testdiscoveryanother'],
-            'sinks': ['test_sink_new']
         })
         self.mgr.discoveries = self.create_discoveries()
         self.Discovery.resources = ['discovered_1', 'discovered_2']
@@ -566,20 +573,12 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         sources = [{'name': 'test_source_1',
                     'interval': 60,
                     'meters': ['test'],
-                    'discovery': ['testdiscovery'],
-                    'sinks': ['test_sink_1']},
+                    'discovery': ['testdiscovery']},
                    {'name': 'test_source_2',
                     'interval': 60,
                     'meters': ['testanother'],
-                    'discovery': ['testdiscoveryanother'],
-                    'sinks': ['test_sink_2']}]
-        sinks = [{'name': 'test_sink_1',
-                  'transformers': [],
-                  'publishers': ['test://']},
-                 {'name': 'test_sink_2',
-                  'transformers': [],
-                  'publishers': ['test://']}]
-        self.pipeline_cfg = {'sources': sources, 'sinks': sinks}
+                    'discovery': ['testdiscoveryanother']}]
+        self.polling_cfg = {'sources': sources}
         self.mgr.discoveries = self.create_discoveries()
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -593,37 +592,13 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.assertEqual(['discovered_3', 'discovered_4'],
                          self.PollsterAnother.resources)
 
-    def test_multiple_sinks_same_discoverer(self):
-        self.Discovery.resources = ['discovered_1', 'discovered_2']
-        sources = [{'name': 'test_source_1',
-                    'interval': 60,
-                    'meters': ['test'],
-                    'discovery': ['testdiscovery'],
-                    'sinks': ['test_sink_1', 'test_sink_2']}]
-        sinks = [{'name': 'test_sink_1',
-                  'transformers': [],
-                  'publishers': ['test://']},
-                 {'name': 'test_sink_2',
-                  'transformers': [],
-                  'publishers': ['test://']}]
-        self.pipeline_cfg = {'sources': sources, 'sinks': sinks}
-        self.mgr.discoveries = self.create_discoveries()
-        self.setup_polling()
-        polling_tasks = self.mgr.setup_polling_tasks()
-        self.assertEqual(1, len(polling_tasks))
-        self.assertIn(60, polling_tasks.keys())
-        self.mgr.interval_task(polling_tasks.get(60))
-        self.assertEqual(1, len(self.Pollster.samples))
-        self.assertEqual(['discovered_1', 'discovered_2'],
-                         self.Pollster.resources)
-
     def test_discovery_partitioning(self):
         self.mgr.discoveries = self.create_discoveries()
         p_coord = self.mgr.partition_coordinator
-        self.pipeline_cfg['sources'][0]['discovery'] = [
+        self.polling_cfg['sources'][0]['discovery'] = [
             'testdiscovery', 'testdiscoveryanother',
             'testdiscoverynonexistent', 'testdiscoveryexception']
-        self.pipeline_cfg['sources'][0]['resources'] = []
+        self.polling_cfg['sources'][0]['resources'] = []
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
@@ -640,26 +615,24 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         p_coord = self.mgr.partition_coordinator
         static_resources = ['static_1', 'static_2']
         static_resources2 = ['static_3', 'static_4']
-        self.pipeline_cfg['sources'][0]['resources'] = static_resources
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline2',
+        self.polling_cfg['sources'][0]['resources'] = static_resources
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling2',
             'interval': 60,
             'meters': ['test', 'test2'],
             'resources': static_resources2,
-            'sinks': ['test_sink']
         })
-        # have one pipeline without static resources defined
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline3',
+        # have one polling without static resources defined
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling3',
             'interval': 60,
             'meters': ['test', 'test2'],
             'resources': [],
-            'sinks': ['test_sink']
         })
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        # Only two groups need to be created, one for each pipeline,
+        # Only two groups need to be created, one for each polling,
         # even though counter test is used twice
         expected = [mock.call(self.mgr.construct_group_id(
                               utils.hash_of_set(resources)),
@@ -678,14 +651,14 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         polling_task.poll_and_notify()
         LOG.info.assert_called_with(
             'Polling pollster %(poll)s in the context of %(src)s',
-            {'poll': 'test', 'src': 'test_pipeline'})
+            {'poll': 'test', 'src': 'test_polling'})
 
     @mock.patch('ceilometer.agent.manager.LOG')
     def test_skip_polling_and_notify_with_no_resources(self, LOG):
-        self.pipeline_cfg['sources'][0]['resources'] = []
+        self.polling_cfg['sources'][0]['resources'] = []
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
-        pollster = list(polling_task.pollster_matches['test_pipeline'])[0]
+        pollster = list(polling_task.pollster_matches['test_polling'])[0]
         polling_task.poll_and_notify()
         LOG.info.assert_called_with(
             'Skip pollster %(name)s, no %(p_context)sresources found this '
@@ -693,12 +666,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     @mock.patch('ceilometer.agent.manager.LOG')
     def test_skip_polling_polled_resources(self, LOG):
-        self.pipeline_cfg['sources'].append({
-            'name': 'test_pipeline_1',
+        self.polling_cfg['sources'].append({
+            'name': 'test_polling_1',
             'interval': 60,
             'meters': ['test'],
             'resources': ['test://'],
-            'sinks': ['test_sink']
         })
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
