@@ -28,6 +28,7 @@ from six.moves.urllib import parse as urlparse
 import sqlalchemy
 from testtools import testcase
 
+from ceilometer import service
 from ceilometer import storage
 from ceilometer.tests import base as test_base
 try:
@@ -191,7 +192,7 @@ class TestBase(test_base.BaseTestCase):
                 'Test is not applicable for %s' % engine)
 
         self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF([], project='ceilometer', validate_default_values=True)
+        service.prepare_service([], [], self.CONF)
 
         manager = self.DRIVER_MANAGERS.get(engine)
         if not manager:

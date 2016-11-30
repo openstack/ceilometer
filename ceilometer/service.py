@@ -17,6 +17,7 @@ import sys
 
 from keystoneauth1 import loading as ka_loading
 from oslo_config import cfg
+from oslo_db import options as db_options
 import oslo_i18n
 from oslo_log import log
 from oslo_policy import opts as policy_opts
@@ -78,6 +79,7 @@ def prepare_service(argv=None, config_files=None, conf=None):
     log.set_defaults(default_log_levels=log_levels)
     defaults.set_cors_middleware_defaults()
     policy_opts.set_defaults(conf)
+    db_options.set_defaults(conf)
 
     conf(argv[1:], project='ceilometer', validate_default_values=True,
          version=version.version_info.version_string(),
