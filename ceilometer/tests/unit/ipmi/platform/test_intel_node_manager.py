@@ -34,13 +34,14 @@ class _Base(base.BaseTestCase):
     def setUp(self):
         super(_Base, self).setUp()
         self.init_test_engine()
-        self.nm = node_manager.NodeManager()
+        with mock.patch.object(node_manager.NodeManager, '__new__',
+                               side_effect=self._new_no_singleton):
+            self.nm = node_manager.NodeManager()
 
-    @classmethod
-    def tearDownClass(cls):
-        # reset inited to force an initialization of singleton for next test
-        node_manager.NodeManager()._inited = False
-        super(_Base, cls).tearDownClass()
+    @staticmethod
+    def _new_no_singleton(cls, *args, **kwargs):
+        return super(node_manager.NodeManager, cls).__new__(cls, *args,
+                                                            **kwargs)
 
 
 class TestNodeManagerV3(_Base):

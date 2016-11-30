@@ -24,6 +24,7 @@ system power and temperature data based on ipmitool.
 import binascii
 import collections
 import tempfile
+import threading
 import time
 
 from oslo_config import cfg
@@ -143,26 +144,24 @@ class NodeManager(object):
     compute node. It uses ipmitool to execute the IPMI command and parse
     the output into dict.
     """
-    _inited = False
     _instance = None
+    _instance_lock = threading.Lock()
 
     def __new__(cls, *args, **kwargs):
         """Singleton to avoid duplicated initialization."""
-        if not cls._instance:
-            cls._instance = super(NodeManager, cls).__new__(cls, *args,
-                                                            **kwargs)
+        if cls._instance:
+            # Shortcut with no lock
+            return cls._instance
+        with cls._instance_lock:
+            if not cls._instance:
+                cls._instance = super(NodeManager, cls).__new__(
+                    cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self):
-        if not (self._instance and self._inited):
-            # As singleton, only the 1st NM pollster would trigger its
-            # initialization. nm_version indicate init result, and is shared
-            # across all pollsters
-            self._inited = True
-            self.nm_version = 0
-            self.channel_slave = ''
-
-            self.nm_version = self.check_node_manager()
+        self.nm_version = 0
+        self.channel_slave = ''
+        self.nm_version = self.check_node_manager()
 
     @staticmethod
     def _parse_slave_and_channel(file_path):
