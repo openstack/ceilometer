@@ -25,5 +25,3 @@ OPTS = [
                     'before disable this pollster. '
                     'Negative indicates retrying forever.')
 ]
-
-cfg.CONF.register_opts(OPTS, group='ipmi')

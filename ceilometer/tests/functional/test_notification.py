@@ -100,8 +100,8 @@ class TestNotification(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestNotification, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("backend_url", None, group="coordination")
         self.CONF.set_override("disable_non_metric_meters", False,
@@ -226,8 +226,8 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
     def setUp(self):
         super(BaseRealNotification, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['vcpus', 'memory'])
@@ -524,8 +524,8 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestRealNotificationMultipleAgents, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])

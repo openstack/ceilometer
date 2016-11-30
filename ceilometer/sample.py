@@ -32,8 +32,6 @@ OPTS = [
                help='Source for samples emitted on this instance.'),
 ]
 
-cfg.CONF.register_opts(OPTS)
-
 
 # Fields explanation:
 #

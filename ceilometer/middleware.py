@@ -32,8 +32,6 @@ OPTS = [
                     help="Exchanges name to listen for notifications."),
 ]
 
-cfg.CONF.register_opts(OPTS)
-
 
 class HTTPRequest(plugin_base.NotificationBase,
                   plugin_base.NonMetricNotificationBase):

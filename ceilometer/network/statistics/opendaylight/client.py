@@ -15,17 +15,12 @@
 
 import abc
 
-from oslo_config import cfg
 from oslo_log import log
 import requests
 from requests import auth
 import six
 
 from ceilometer.i18n import _
-
-
-CONF = cfg.CONF
-CONF.import_opt('http_timeout', 'ceilometer.service')
 
 
 LOG = log.getLogger(__name__)

@@ -39,9 +39,6 @@ OPTS = [
                     '(which is dependent on libvirt_type).'),
 ]
 
-CONF = cfg.CONF
-CONF.register_opts(OPTS)
-
 
 def retry_on_disconnect(function):
     def decorator(self, *args, **kwargs):

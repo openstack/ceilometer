@@ -28,8 +28,7 @@ LOG = log.getLogger(__name__)
 
 
 def upgrade():
-    # FIXME(sileht): Use cfg.ConfigOpts()
-    conf = cfg.CONF
+    conf = cfg.ConfigOpts()
     conf.register_cli_opts([
         cfg.BoolOpt('skip-metering-database',
                     help='Skip metering database upgrade.',
@@ -86,8 +85,7 @@ def expirer():
 
 
 def db_clean_legacy():
-    # FIXME(sileht): Use cfg.ConfigOpts()
-    conf = cfg.CONF
+    conf = cfg.ConfigOpts()
     conf.register_cli_opts([
         cfg.strOpt('confirm-drop-alarm-table',
                    short='n',

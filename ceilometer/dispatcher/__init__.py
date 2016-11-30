@@ -35,7 +35,6 @@ OPTS = [
                     deprecated_name='dispatcher',
                     help='Dispatchers to process event data.'),
 ]
-cfg.CONF.register_opts(OPTS)
 
 STORAGE_OPTS = [
     cfg.IntOpt('max_retries',
@@ -48,7 +47,6 @@ STORAGE_OPTS = [
                deprecated_group='database',
                help='Interval (in seconds) between retries of connection.'),
 ]
-cfg.CONF.register_opts(STORAGE_OPTS, group='storage')
 
 
 def _load_dispatcher_manager(conf, dispatcher_type):

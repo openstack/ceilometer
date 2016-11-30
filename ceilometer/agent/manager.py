@@ -65,17 +65,6 @@ POLLING_OPTS = [
                     'subset of pollsters should be loaded.'),
 ]
 
-cfg.CONF.register_opts(OPTS)
-cfg.CONF.register_opts(POLLING_OPTS, group='polling')
-cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
-                    group='publisher_notifier')
-cfg.CONF.import_group('service_types', 'ceilometer.energy.kwapi')
-cfg.CONF.import_group('service_types', 'ceilometer.image.glance')
-cfg.CONF.import_group('service_types', 'ceilometer.neutron_client')
-cfg.CONF.import_group('service_types', 'ceilometer.nova_client')
-cfg.CONF.import_group('service_types', 'ceilometer.objectstore.rgw')
-cfg.CONF.import_group('service_types', 'ceilometer.objectstore.swift')
-
 
 class PollsterListForbidden(Exception):
     def __init__(self):

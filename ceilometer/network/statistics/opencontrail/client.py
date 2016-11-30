@@ -14,17 +14,12 @@
 
 import copy
 
-from oslo_config import cfg
 from oslo_log import log
 import requests
 import six
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.i18n import _
-
-
-CONF = cfg.CONF
-CONF.import_opt('http_timeout', 'ceilometer.service')
 
 
 LOG = log.getLogger(__name__)

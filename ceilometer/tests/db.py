@@ -191,8 +191,8 @@ class TestBase(test_base.BaseTestCase):
             raise testcase.TestSkipped(
                 'Test is not applicable for %s' % engine)
 
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         manager = self.DRIVER_MANAGERS.get(engine)
         if not manager:

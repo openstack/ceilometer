@@ -41,10 +41,6 @@ CREDENTIAL_OPTS = [
                help='Secret key for Radosgw Admin.')
 ]
 
-cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.register_opts(CREDENTIAL_OPTS, group='rgw_admin_credentials')
-cfg.CONF.import_group('rgw_admin_credentials', 'ceilometer.service')
-
 
 class _Base(plugin_base.PollsterBase):
     METHOD = 'bucket'

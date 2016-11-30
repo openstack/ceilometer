@@ -190,8 +190,8 @@ class DispatcherTest(base.BaseTestCase):
 
     def setUp(self):
         super(DispatcherTest, self).setUp()
-        self.conf = self.useFixture(config_fixture.Config())
-        ceilometer_service.prepare_service(argv=[], config_files=[])
+        conf = ceilometer_service.prepare_service(argv=[], config_files=[])
+        self.conf = self.useFixture(config_fixture.Config(conf))
         self.conf.config(
             resources_definition_file=self.path_get(
                 'etc/ceilometer/gnocchi_resources.yaml'),
@@ -484,11 +484,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
     def setUp(self):
         super(DispatcherWorkflowTest, self).setUp()
-        self.conf = self.useFixture(config_fixture.Config())
-        # Set this explicitly to avoid conflicts with any existing
-        # configuration.
-        self.conf.config(url='http://localhost:8041',
-                         group='dispatcher_gnocchi')
+        conf = ceilometer_service.prepare_service(argv=[], config_files=[])
+        self.conf = self.useFixture(config_fixture.Config(conf))
         ks_client = mock.Mock()
         ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
@@ -497,7 +494,6 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             return_value=ks_client))
         self.ks_client = ks_client
 
-        ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf.config(
             resources_definition_file=self.path_get(
                 'etc/ceilometer/gnocchi_resources.yaml'),

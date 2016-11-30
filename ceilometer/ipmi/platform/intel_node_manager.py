@@ -43,9 +43,6 @@ OPTS = [
 ]
 
 
-CONF = cfg.CONF
-CONF.register_opts(OPTS, group='ipmi')
-
 IPMICMD = {"sdr_dump": "sdr dump",
            "sdr_info": "sdr info",
            "sensor_dump": "sdr -v"}

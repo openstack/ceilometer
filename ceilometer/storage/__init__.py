@@ -53,8 +53,6 @@ OPTS = [
                 " resource and meter definition data will remain."),
 ]
 
-cfg.CONF.register_opts(OPTS, group='database')
-
 
 class StorageUnknownWriteError(Exception):
     """Error raised when an unknown error occurs while recording."""

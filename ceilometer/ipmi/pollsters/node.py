@@ -14,7 +14,6 @@
 
 import abc
 
-from oslo_config import cfg
 from oslo_log import log
 import six
 
@@ -23,10 +22,6 @@ from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as nmexcept
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
 from ceilometer import sample
-
-cfg.CONF.import_opt('host', 'ceilometer.service')
-cfg.CONF.import_opt('polling_retry', 'ceilometer.ipmi.pollsters',
-                    group='ipmi')
 
 LOG = log.getLogger(__name__)
 

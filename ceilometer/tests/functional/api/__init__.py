@@ -15,15 +15,12 @@
 """Base classes for API tests.
 """
 
-from oslo_config import cfg
 from oslo_config import fixture as fixture_config
-from oslo_policy import opts
 import pecan
 import pecan.testing
 
+from ceilometer import service
 from ceilometer.tests import db as db_test_base
-
-cfg.CONF.import_group('api', 'ceilometer.api.controllers.v2.root')
 
 
 class FunctionalTest(db_test_base.TestBase):
@@ -37,9 +34,9 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.setup_messaging(self.CONF)
-        opts.set_defaults(self.CONF)
 
         self.CONF.set_override("policy_file",
                                self.path_get('etc/ceilometer/policy.json'),

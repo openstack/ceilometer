@@ -1,4 +1,6 @@
-# Copyright 2014 Red Hat, Inc
+#
+# Copyright 2012 New Dream Network, LLC (DreamHost)
+# Copyright 2015-2016 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,17 +14,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.agent import plugin_base as plugin
+
+from ceilometer.api import app
+from ceilometer import service
 
 
-class TenantDiscovery(plugin.DiscoveryBase):
-    """Discovery that supplies keystone tenants.
-
-    This discovery should be used when the pollster's work can't be divided
-    into smaller pieces than per-tenants. Example of this is the Swift
-    pollster, which polls account details and does so per-project.
-    """
-
-    def discover(self, manager, param=None):
-        tenants = manager.keystone.projects.list()
-        return tenants or []
+def build_wsgi_app(argv=None):
+    return app.load_app(service.prepare_service(argv=argv))

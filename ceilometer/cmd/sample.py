@@ -29,7 +29,8 @@ from ceilometer import service
 
 
 def send_sample():
-    cfg.CONF.register_cli_opts([
+    conf = cfg.ConfigOpts()
+    conf.register_cli_opts([
         cfg.StrOpt('sample-name',
                    short='n',
                    help='Meter name.',
@@ -65,7 +66,7 @@ def send_sample():
                    help='Meter metadata.'),
     ])
 
-    conf = service.prepare_service()
+    service.prepare_service(conf=conf)
 
     # Set up logging to use the console
     console = logging.StreamHandler(sys.stderr)

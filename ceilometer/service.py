@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import socket
 import sys
 
 from keystoneauth1 import loading as ka_loading
@@ -26,52 +25,23 @@ from oslo_reports import guru_meditation_report as gmr
 from ceilometer.conf import defaults
 from ceilometer import keystone_client
 from ceilometer import messaging
+from ceilometer import opts
 from ceilometer import sample
 from ceilometer import utils
 from ceilometer import version
-
-OPTS = [
-    cfg.StrOpt('host',
-               default=socket.gethostname(),
-               sample_default='<your_hostname>',
-               help='Name of this node, which must be valid in an AMQP '
-               'key. Can be an opaque identifier. For ZeroMQ only, must '
-               'be a valid host name, FQDN, or IP address.'),
-    cfg.IntOpt('http_timeout',
-               default=600,
-               help='Timeout seconds for HTTP requests. Set it to None to '
-                    'disable timeout.'),
-]
-cfg.CONF.register_opts(OPTS)
-
-NOTI_OPT = cfg.IntOpt('workers',
-                      default=1,
-                      min=1,
-                      deprecated_group='DEFAULT',
-                      deprecated_name='notification_workers',
-                      help='Number of workers for notification service, '
-                           'default value is 1.')
-cfg.CONF.register_opt(NOTI_OPT, 'notification')
-
-COLL_OPT = cfg.IntOpt('workers',
-                      default=1,
-                      min=1,
-                      deprecated_group='DEFAULT',
-                      deprecated_name='collector_workers',
-                      help='Number of workers for collector service. '
-                           'default value is 1.')
-cfg.CONF.register_opt(COLL_OPT, 'collector')
 
 
 def prepare_service(argv=None, config_files=None, conf=None):
     if argv is None:
         argv = sys.argv
 
-    # FIXME(sileht): Use ConfigOpts() instead
     if conf is None:
-        conf = cfg.CONF
+        conf = cfg.ConfigOpts()
 
     oslo_i18n.enable_lazy()
+    for group, options in opts.list_opts():
+        conf.register_opts(list(options),
+                           group=None if group == "DEFAULT" else group)
     keystone_client.register_keystoneauth_opts(conf)
     log.register_options(conf)
     log_levels = (conf.default_log_levels +

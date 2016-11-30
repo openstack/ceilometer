@@ -32,9 +32,6 @@ OPTS = [
 ]
 
 
-cfg.CONF.register_opts(OPTS)
-
-
 # Map unit name to SI
 UNIT_MAP = {
     'Watts': 'W',

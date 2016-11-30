@@ -33,8 +33,6 @@ OPTS = [
                help='The max number of the files to keep.'),
 ]
 
-cfg.CONF.register_opts(OPTS, group="dispatcher_file")
-
 
 @removals.removed_class("FileDispatcher", message="Use file publisher instead",
                         removal_version="9.0.0")

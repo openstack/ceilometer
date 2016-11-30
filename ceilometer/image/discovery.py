@@ -23,9 +23,6 @@ SERVICE_OPTS = [
                help='Glance service type.'),
 ]
 
-cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
-
 
 class ImagesDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):

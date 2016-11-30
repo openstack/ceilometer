@@ -24,6 +24,7 @@ import requests
 from ceilometer.dispatcher import http
 from ceilometer.event.storage import models as event_models
 from ceilometer.publisher import utils
+from ceilometer import service
 
 
 class TestDispatcherHttp(base.BaseTestCase):
@@ -31,7 +32,8 @@ class TestDispatcherHttp(base.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherHttp, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.msg = {'counter_name': 'test',
                     'resource_id': self.id(),
                     'counter_volume': 1,
@@ -142,7 +144,8 @@ class TestEventDispatcherHttp(base.BaseTestCase):
     """Test sending events with the http dispatcher"""
     def setUp(self):
         super(TestEventDispatcherHttp, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         # repr(uuid.uuid4()) is used in test event creation to avoid an
         # exception being thrown when the uuid is serialized to JSON

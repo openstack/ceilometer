@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 from oslo_log import log
 
 from ceilometer.agent import plugin_base as plugin
@@ -20,8 +19,6 @@ from ceilometer.i18n import _LW
 from ceilometer import keystone_client
 
 LOG = log.getLogger(__name__)
-
-cfg.CONF.import_group('service_credentials', 'ceilometer.keystone_client')
 
 
 class EndpointDiscovery(plugin.DiscoveryBase):

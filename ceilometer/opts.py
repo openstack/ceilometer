@@ -12,12 +12,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import itertools
+import socket
 
 from keystoneauth1 import loading
+from oslo_config import cfg
 
 import ceilometer.agent.manager
 import ceilometer.api.app
-import ceilometer.cmd.polling
+import ceilometer.api.controllers.v2.root
 import ceilometer.collector
 import ceilometer.compute.discovery
 import ceilometer.compute.util
@@ -28,10 +30,13 @@ import ceilometer.compute.virt.xenapi.inspector
 import ceilometer.coordination
 import ceilometer.dispatcher
 import ceilometer.dispatcher.file
-import ceilometer.dispatcher.gnocchi
+import ceilometer.dispatcher.gnocchi_opts
+import ceilometer.dispatcher.http
 import ceilometer.energy.kwapi
 import ceilometer.event.converter
+import ceilometer.exchange_control
 import ceilometer.hardware.discovery
+import ceilometer.hardware.pollsters.generic
 import ceilometer.image.discovery
 import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
@@ -48,18 +53,32 @@ import ceilometer.pipeline
 import ceilometer.publisher.messaging
 import ceilometer.publisher.utils
 import ceilometer.sample
-import ceilometer.service
 import ceilometer.storage
 import ceilometer.utils
 import ceilometer.volume.discovery
 
 
+OPTS = [
+    cfg.StrOpt('host',
+               default=socket.gethostname(),
+               sample_default='<your_hostname>',
+               help='Name of this node, which must be valid in an AMQP '
+               'key. Can be an opaque identifier. For ZeroMQ only, must '
+               'be a valid host name, FQDN, or IP address.'),
+    cfg.IntOpt('http_timeout',
+               default=600,
+               help='Timeout seconds for HTTP requests. Set it to None to '
+                    'disable timeout.'),
+]
+
+
 def list_opts():
+    # FIXME(sileht): readd pollster namespaces in the generated configfile
+    # This have been removed due to a recursive import issue
     return [
         ('DEFAULT',
          itertools.chain(ceilometer.agent.manager.OPTS,
                          ceilometer.api.app.OPTS,
-                         ceilometer.cmd.polling.CLI_OPTS,
                          ceilometer.compute.util.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.inspector.OPTS,
@@ -70,27 +89,28 @@ def list_opts():
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.sample.OPTS,
-                         ceilometer.service.OPTS,
-                         ceilometer.utils.OPTS,)),
-        ('api', ceilometer.api.app.API_OPTS),
-        ('collector',
-         itertools.chain(ceilometer.collector.OPTS,
-                         [ceilometer.service.COLL_OPT])),
+                         ceilometer.utils.OPTS,
+                         ceilometer.exchange_control.EXCHANGE_OPTS,
+                         OPTS)),
+        ('api', itertools.chain(ceilometer.api.app.API_OPTS,
+                                ceilometer.api.controllers.v2.root.API_OPTS)),
+        ('collector', ceilometer.collector.OPTS),
         ('compute', ceilometer.compute.discovery.OPTS),
         ('coordination', ceilometer.coordination.OPTS),
         ('database', ceilometer.storage.OPTS),
         ('dispatcher_file', ceilometer.dispatcher.file.OPTS),
-        ('dispatcher_gnocchi', ceilometer.dispatcher.gnocchi.dispatcher_opts),
+        ('dispatcher_http', ceilometer.dispatcher.http.http_dispatcher_opts),
+        ('dispatcher_gnocchi',
+         ceilometer.dispatcher.gnocchi_opts.dispatcher_opts),
         ('event', ceilometer.event.converter.OPTS),
-        ('exchange_control', ceilometer.exchange_control.EXCHANGE_OPTS),
-        ('hardware', ceilometer.hardware.discovery.OPTS),
+        ('hardware', itertools.chain(
+            ceilometer.hardware.discovery.OPTS,
+            ceilometer.hardware.pollsters.generic.OPTS)),
         ('ipmi',
          itertools.chain(ceilometer.ipmi.platform.intel_node_manager.OPTS,
                          ceilometer.ipmi.pollsters.OPTS)),
         ('meter', ceilometer.meter.notifications.OPTS),
-        ('notification',
-         itertools.chain(ceilometer.notification.OPTS,
-                         [ceilometer.service.NOTI_OPT])),
+        ('notification', ceilometer.notification.OPTS),
         ('polling', ceilometer.agent.manager.POLLING_OPTS),
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
@@ -98,10 +118,7 @@ def list_opts():
         # NOTE(sileht): the configuration file contains only the options
         # for the password plugin that handles keystone v2 and v3 API
         # with discovery. But other options are possible.
-        ('service_credentials', (
-            ceilometer.keystone_client.CLI_OPTS +
-            loading.get_auth_common_conf_options() +
-            loading.get_auth_plugin_conf_options('password'))),
+        ('service_credentials', ceilometer.keystone_client.CLI_OPTS),
         ('service_types',
          itertools.chain(ceilometer.energy.kwapi.SERVICE_OPTS,
                          ceilometer.image.discovery.SERVICE_OPTS,
@@ -114,3 +131,12 @@ def list_opts():
         ('vmware', ceilometer.compute.virt.vmware.inspector.OPTS),
         ('xenapi', ceilometer.compute.virt.xenapi.inspector.OPTS),
     ]
+
+
+def list_keystoneauth_opts():
+    # NOTE(sileht): the configuration file contains only the options
+    # for the password plugin that handles keystone v2 and v3 API
+    # with discovery. But other options are possible.
+    return [('service_credentials', (
+            loading.get_auth_common_conf_options() +
+            loading.get_auth_plugin_conf_options('password')))]

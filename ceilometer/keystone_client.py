@@ -62,8 +62,6 @@ CLI_OPTS = [
                     'communication with OpenStack services.'),
 ]
 
-cfg.CONF.register_cli_opts(CLI_OPTS, group=CFG_GROUP)
-
 
 def register_keystoneauth_opts(conf):
     ka_loading.register_auth_conf_options(conf, CFG_GROUP)

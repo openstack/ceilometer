@@ -31,8 +31,6 @@ SERVICE_OPTS = [
                help='Kwapi service type.'),
 ]
 
-cfg.CONF.register_opts(SERVICE_OPTS, group='service_types')
-
 
 class KwapiClient(object):
     """Kwapi API client."""

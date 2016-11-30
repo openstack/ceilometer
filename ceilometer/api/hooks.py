@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
 from oslo_policy import policy
@@ -25,9 +24,6 @@ from ceilometer import messaging
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
-
-cfg.CONF.import_opt('telemetry_driver', 'ceilometer.publisher.messaging',
-                    group='publisher_notifier')
 
 
 class ConfigHook(hooks.PecanHook):

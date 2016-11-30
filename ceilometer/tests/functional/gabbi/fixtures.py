@@ -24,7 +24,6 @@ import uuid
 from gabbi import fixture
 from oslo_config import cfg
 from oslo_config import fixture as fixture_config
-from oslo_policy import opts
 from oslo_utils import fileutils
 import six
 from six.moves.urllib import parse as urlparse
@@ -33,6 +32,7 @@ from ceilometer.api import app
 from ceilometer.event.storage import models
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer import service
 from ceilometer import storage
 
 # TODO(chdent): For now only MongoDB is supported, because of easy
@@ -72,11 +72,9 @@ class ConfigFixture(fixture.GabbiFixture):
         if engine not in ENGINES:
             raise case.SkipTest('Database engine not supported')
 
-        conf = fixture_config.Config().conf
+        conf = service.prepare_service([], [])
+        conf = fixture_config.Config(conf).conf
         self.conf = conf
-        self.conf([], project='ceilometer', validate_default_values=True)
-        opts.set_defaults(self.conf)
-        conf.import_group('api', 'ceilometer.api.controllers.v2.root')
 
         content = ('{"default": ""}')
         if six.PY3:
@@ -94,7 +92,6 @@ class ConfigFixture(fixture.GabbiFixture):
         )
 
         # A special pipeline is required to use the direct publisher.
-        conf.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
         conf.set_override('pipeline_cfg_file',
                           'ceilometer/tests/functional/gabbi_pipeline.yaml')
 
@@ -123,7 +120,8 @@ class SampleDataFixture(fixture.GabbiFixture):
 
     def start_fixture(self):
         """Create some samples."""
-        conf = fixture_config.Config().conf
+        global LOAD_APP_KWARGS
+        conf = LOAD_APP_KWARGS['conf']
         self.conn = storage.get_connection_from_config(conf)
         timestamp = datetime.datetime.utcnow()
         project_id = str(uuid.uuid4())
@@ -160,7 +158,8 @@ class EventDataFixture(fixture.GabbiFixture):
 
     def start_fixture(self):
         """Create some events."""
-        conf = fixture_config.Config().conf
+        global LOAD_APP_KWARGS
+        conf = LOAD_APP_KWARGS['conf']
         self.conn = storage.get_connection_from_config(conf, 'event')
         events = []
         name_list = ['chocolate.chip', 'peanut.butter', 'sugar']

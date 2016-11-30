@@ -47,8 +47,6 @@ http_dispatcher_opts = [
                 help='Indicates whether samples are published in a batch.'),
 ]
 
-cfg.CONF.register_opts(http_dispatcher_opts, group="dispatcher_http")
-
 
 class HttpDispatcher(dispatcher.MeterDispatcherBase,
                      dispatcher.EventDispatcherBase):
