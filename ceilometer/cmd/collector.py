@@ -15,6 +15,7 @@
 # under the License.
 
 import cotyledon
+from cotyledon import oslo_config_glue
 
 from ceilometer import collector
 from ceilometer import service
@@ -25,4 +26,5 @@ def main():
     sm = cotyledon.ServiceManager()
     sm.add(collector.CollectorService, workers=conf.collector.workers,
            args=(conf,))
+    oslo_config_glue.setup(sm, conf)
     sm.run()
