@@ -60,8 +60,6 @@ COLL_OPT = cfg.IntOpt('workers',
                            'default value is 1.')
 cfg.CONF.register_opt(COLL_OPT, 'collector')
 
-keystone_client.register_keystoneauth_opts(cfg.CONF)
-
 
 def prepare_service(argv=None, config_files=None, conf=None):
     if argv is None:
@@ -72,6 +70,7 @@ def prepare_service(argv=None, config_files=None, conf=None):
         conf = cfg.CONF
 
     oslo_i18n.enable_lazy()
+    keystone_client.register_keystoneauth_opts(conf)
     log.register_options(conf)
     log_levels = (conf.default_log_levels +
                   ['futurist=INFO', 'neutronclient=INFO',

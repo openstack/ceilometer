@@ -22,6 +22,7 @@ from oslotest import base
 from ceilometer.agent.discovery import endpoint
 from ceilometer.agent.discovery import localnode
 from ceilometer.hardware import discovery as hardware
+from ceilometer import service
 
 
 class TestEndpointDiscovery(base.BaseTestCase):
@@ -29,6 +30,7 @@ class TestEndpointDiscovery(base.BaseTestCase):
     def setUp(self):
         super(TestEndpointDiscovery, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [], self.CONF)
         self.CONF.set_override('interface', 'publicURL',
                                group='service_credentials')
         self.CONF.set_override('region_name', 'test-region-name',
@@ -63,6 +65,7 @@ class TestLocalnodeDiscovery(base.BaseTestCase):
     def setUp(self):
         super(TestLocalnodeDiscovery, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [], self.CONF)
         self.discovery = localnode.LocalNodeDiscovery(self.CONF)
         self.manager = mock.MagicMock()
 
@@ -101,6 +104,7 @@ class TestHardwareDiscovery(base.BaseTestCase):
     def setUp(self):
         super(TestHardwareDiscovery, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [], self.CONF)
         self.discovery = hardware.NodesDiscoveryTripleO(self.CONF)
         self.discovery.nova_cli = mock.MagicMock()
         self.manager = mock.MagicMock()

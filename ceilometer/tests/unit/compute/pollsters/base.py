@@ -18,6 +18,7 @@ import mock
 from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
+from ceilometer import service
 import ceilometer.tests.base as base
 
 
@@ -26,6 +27,7 @@ class TestPollsterBase(base.BaseTestCase):
     def setUp(self):
         super(TestPollsterBase, self).setUp()
         self.CONF = self.useFixture(fixture_config.Config()).conf
+        service.prepare_service([], [], self.CONF)
 
         self.inspector = mock.Mock()
         self.instance = mock.MagicMock()
