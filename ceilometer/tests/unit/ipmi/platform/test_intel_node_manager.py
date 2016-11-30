@@ -16,10 +16,12 @@ import abc
 import tempfile
 
 import mock
+from oslo_config import fixture as fixture_config
 from oslotest import base
 import six
 
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
+from ceilometer import service
 from ceilometer.tests.unit.ipmi.platform import fake_utils
 from ceilometer import utils
 
@@ -33,15 +35,24 @@ class _Base(base.BaseTestCase):
 
     def setUp(self):
         super(_Base, self).setUp()
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.init_test_engine()
         with mock.patch.object(node_manager.NodeManager, '__new__',
                                side_effect=self._new_no_singleton):
-            self.nm = node_manager.NodeManager()
+            self.nm = node_manager.NodeManager(self.CONF)
 
     @staticmethod
     def _new_no_singleton(cls, *args, **kwargs):
-        return super(node_manager.NodeManager, cls).__new__(cls, *args,
-                                                            **kwargs)
+        if six.PY3:
+            # We call init manually due to a py3 bug:
+            # https://bugs.python.org/issue25731
+            obj = super(node_manager.NodeManager, cls).__new__(cls)
+            obj.__init__(*args, **kwargs)
+            return obj
+        else:
+            return super(node_manager.NodeManager, cls).__new__(
+                cls, *args, **kwargs)
 
 
 class TestNodeManagerV3(_Base):

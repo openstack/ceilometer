@@ -158,7 +158,8 @@ class NodeManager(object):
                     cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, conf):
+        self.conf = conf
         self.nm_version = 0
         self.channel_slave = ''
         self.nm_version = self.check_node_manager()
@@ -287,7 +288,7 @@ class NodeManager(object):
         if self._init_sensor_agent_process()['ret'] == ['01']:
             return
         # Run sensor initialization agent
-        for i in range(CONF.ipmi.node_manager_init_retry):
+        for i in range(self.conf.ipmi.node_manager_init_retry):
             self._init_sensor_agent()
             time.sleep(1)
             if self._init_sensor_agent_process()['ret'] == ['01']:
