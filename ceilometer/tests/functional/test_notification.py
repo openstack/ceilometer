@@ -104,8 +104,6 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("backend_url", None, group="coordination")
-        self.CONF.set_override("disable_non_metric_meters", False,
-                               group="notification")
         self.CONF.set_override("workload_partitioning", True,
                                group='notification')
         self.setup_messaging(self.CONF)
@@ -534,8 +532,6 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         self.CONF.set_override("event_pipeline_cfg_file",
                                event_pipeline_cfg_file)
         self.CONF.set_override("backend_url", None, group="coordination")
-        self.CONF.set_override("disable_non_metric_meters", False,
-                               group="notification")
         self.CONF.set_override('workload_partitioning', True,
                                group='notification')
         self.CONF.set_override('pipeline_processing_queues', 2,

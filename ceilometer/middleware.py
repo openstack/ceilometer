@@ -33,8 +33,7 @@ OPTS = [
 ]
 
 
-class HTTPRequest(plugin_base.NotificationBase,
-                  plugin_base.NonMetricNotificationBase):
+class HTTPRequest(plugin_base.NotificationBase):
     event_types = ['http.request']
 
     def get_targets(self, conf):

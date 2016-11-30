@@ -171,22 +171,19 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
             pkg_resources.resource_filename(__name__, "data/meters.yaml"))
 
         definitions = {}
-        disable_non_metric_meters = (self.manager.conf.notification.
-                                     disable_non_metric_meters)
         for meter_cfg in reversed(meters_cfg['metric']):
             if meter_cfg.get('name') in definitions:
                 # skip duplicate meters
                 LOG.warning(_LW("Skipping duplicate meter definition %s")
                             % meter_cfg)
                 continue
-            if (meter_cfg.get('volume') != 1 or not disable_non_metric_meters):
-                try:
-                    md = MeterDefinition(meter_cfg, plugin_manager)
-                except declarative.DefinitionException as e:
-                    errmsg = _LE("Error loading meter definition: %s")
-                    LOG.error(errmsg, six.text_type(e))
-                else:
-                    definitions[meter_cfg['name']] = md
+            try:
+                md = MeterDefinition(meter_cfg, plugin_manager)
+            except declarative.DefinitionException as e:
+                errmsg = _LE("Error loading meter definition: %s")
+                LOG.error(errmsg, six.text_type(e))
+            else:
+                definitions[meter_cfg['name']] = md
         return definitions.values()
 
     def get_targets(self, conf):
