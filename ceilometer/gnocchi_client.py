@@ -105,9 +105,7 @@ def upgrade_resource_types(conf):
     for name, attributes in resources_initial.items():
         try:
             gnocchi.resource_type.get(name=name)
-        except gnocchi_exc.NotFound:
-            # FIXME(sileht): It should be ResourceTypeNotFound but
-            # gnocchiclient doesn't raise that :(
+        except gnocchi_exc.ResourceTypeNotFound:
             rt = {'name': name, 'attributes': attributes}
             try:
                 gnocchi.resource_type.create(resource_type=rt)
