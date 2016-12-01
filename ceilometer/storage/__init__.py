@@ -47,7 +47,7 @@ OPTS = [
                secret=True,
                help='The connection string used to connect to the event '
                'database. (if unset, connection is used)'),
-    cfg.BoolOpt('sql-expire-samples-only',
+    cfg.BoolOpt('sql_expire_samples_only',
                 default=False,
                 help="Indicates if expirer expires only samples. If set true,"
                 " expired samples will be deleted, but residual"
