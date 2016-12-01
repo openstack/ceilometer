@@ -210,8 +210,8 @@ class BasePipelineTestCase(base.BaseTestCase):
                           self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)
 
-    def test_no_counters(self):
-        self._unset_pipeline_cfg('counters')
+    def test_no_meters(self):
+        self._unset_pipeline_cfg('meters')
         self._exception_create_pipelinemanager()
 
     def test_no_transformers(self):
@@ -243,17 +243,17 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_check_counters_include_exclude_same(self):
         counter_cfg = ['a', '!a']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         self._exception_create_pipelinemanager()
 
     def test_check_counters_include_exclude(self):
         counter_cfg = ['a', '!b']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         self._exception_create_pipelinemanager()
 
     def test_check_counters_wildcard_included(self):
         counter_cfg = ['a', '*']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         self._exception_create_pipelinemanager()
 
     def test_check_publishers_invalid_publisher(self):
@@ -295,7 +295,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_multiple_included_counters(self):
         counter_cfg = ['a', 'b']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -328,7 +328,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.LOG')
     def test_none_volume_counter(self, LOG):
-        self._set_pipeline_cfg('counters', ['empty_volume'])
+        self._set_pipeline_cfg('meters', ['empty_volume'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -362,7 +362,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     @mock.patch('ceilometer.pipeline.LOG')
     def test_fake_volume_counter(self, LOG):
-        self._set_pipeline_cfg('counters', ['fake_volume'])
+        self._set_pipeline_cfg('meters', ['fake_volume'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -396,7 +396,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_counter_dont_match(self):
         counter_cfg = ['nomatch']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -409,7 +409,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_wildcard_counter(self):
         counter_cfg = ['*']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -423,7 +423,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_wildcard_excluded_counters(self):
         counter_cfg = ['*', '!a']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -431,7 +431,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_wildcard_excluded_counters_not_excluded(self):
         counter_cfg = ['*', '!b']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -444,7 +444,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_all_excluded_counters_not_excluded(self):
         counter_cfg = ['!b', '!c']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -460,7 +460,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_all_excluded_counters_is_excluded(self):
         counter_cfg = ['!a', '!c']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -470,7 +470,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_wildcard_and_excluded_wildcard_counters(self):
         counter_cfg = ['*', '!disk.*']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -480,7 +480,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_included_counter_and_wildcard_counters(self):
         counter_cfg = ['cpu', 'disk.*']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -492,7 +492,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def test_excluded_counter_and_excluded_wildcard_counters(self):
         counter_cfg = ['!cpu', '!disk.*']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        self._set_pipeline_cfg('meters', counter_cfg)
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -733,7 +733,7 @@ class BasePipelineTestCase(base.BaseTestCase):
                          getattr(new_publisher.samples[0], 'name'))
 
     def test_multiple_counter_pipeline(self):
-        self._set_pipeline_cfg('counters', ['a', 'b'])
+        self._set_pipeline_cfg('meters', ['a', 'b'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -811,7 +811,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._extend_pipeline_cfg('transformers', extra_transformer_cfg)
-        self._set_pipeline_cfg('counters', ['a', 'b'])
+        self._set_pipeline_cfg('meters', ['a', 'b'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -874,7 +874,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['cpu'])
+        self._set_pipeline_cfg('meters', ['cpu'])
         counters = [
             sample.Sample(
                 name='cpu',
@@ -916,8 +916,8 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['core_temperature',
-                                            'ambient_temperature'])
+        self._set_pipeline_cfg('meters', ['core_temperature',
+                                          'ambient_temperature'])
         counters = [
             sample.Sample(
                 name='core_temperature',
@@ -978,7 +978,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['cpu'])
+        self._set_pipeline_cfg('meters', ['cpu'])
         now = timeutils.utcnow()
         later = now + datetime.timedelta(minutes=offset)
         um = {'autoscaling_weight': weight} if weight else {}
@@ -1102,7 +1102,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['cpu'])
+        self._set_pipeline_cfg('meters', ['cpu'])
         now = timeutils.utcnow()
         counters = [
             sample.Sample(
@@ -1144,7 +1144,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['cpu'])
+        self._set_pipeline_cfg('meters', ['cpu'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -1280,8 +1280,8 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['disk.read.bytes',
-                                            'disk.write.requests'])
+        self._set_pipeline_cfg('meters', ['disk.read.bytes',
+                                          'disk.write.requests'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -1298,7 +1298,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['storage.objects.incoming.bytes'])
+        self._set_pipeline_cfg('meters', ['storage.objects.incoming.bytes'])
         counters = [
             sample.Sample(
                 name='storage.objects.incoming.bytes',
@@ -1387,7 +1387,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters',
+        self._set_pipeline_cfg('meters',
                                ['testgauge', 'testcumulative', 'testdelta'])
         counters = []
         for sample_type in sample.TYPES:
@@ -1574,7 +1574,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['storage.objects.incoming.bytes'])
+        self._set_pipeline_cfg('meters', ['storage.objects.incoming.bytes'])
         counters = [
             sample.Sample(
                 name='storage.objects.incoming.bytes',
@@ -1623,7 +1623,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['storage.objects.incoming.bytes'])
+        self._set_pipeline_cfg('meters', ['storage.objects.incoming.bytes'])
         counters = [
             sample.Sample(
                 name='storage.objects.incoming.bytes',
@@ -1660,7 +1660,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['storage.objects.outgoing.bytes'])
+        self._set_pipeline_cfg('meters', ['storage.objects.outgoing.bytes'])
         counters = [
             sample.Sample(
                 name='storage.objects.outgoing.bytes',
@@ -1815,7 +1815,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters',
+        self._set_pipeline_cfg('meters',
                                list(set(s['name'] for s in scenario)))
         counters = []
         test_resources = ['test_resource1', 'test_resource2']
@@ -1940,7 +1940,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['memory.usage'])
+        self._set_pipeline_cfg('meters', ['memory.usage'])
         counter = sample.Sample(
             name='memory.usage',
             type=sample.TYPE_GAUGE,
@@ -1982,7 +1982,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['unrelated-sample'])
+        self._set_pipeline_cfg('meters', ['unrelated-sample'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
@@ -2003,7 +2003,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             },
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._set_pipeline_cfg('counters', ['cpu'])
+        self._set_pipeline_cfg('meters', ['cpu'])
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)

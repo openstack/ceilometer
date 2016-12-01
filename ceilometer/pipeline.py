@@ -308,8 +308,10 @@ class SampleSource(Source):
 
     def __init__(self, cfg):
         super(SampleSource, self).__init__(cfg)
-        # Support 'counters' for backward compatibility
-        self.meters = cfg.get('meters', cfg.get('counters'))
+        try:
+            self.meters = cfg['meters']
+        except KeyError:
+            raise PipelineException("Missing meters value", cfg)
         try:
             self.interval = int(cfg.get('interval', 600))
         except ValueError:
