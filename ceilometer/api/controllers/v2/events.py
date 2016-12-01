@@ -33,7 +33,7 @@ from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
 from ceilometer.event import storage
 from ceilometer.event.storage import models as event_models
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LE
 
 LOG = log.getLogger(__name__)
 
@@ -315,8 +315,8 @@ class EventsController(rest.RestController):
             raise base.EntityNotFound(_("Event"), message_id)
 
         if len(events) > 1:
-            LOG.error(_("More than one event with "
-                        "id %s returned from storage driver") % message_id)
+            LOG.error(_LE("More than one event with "
+                          "id %s returned from storage driver") % message_id)
 
         event = events[0]
 

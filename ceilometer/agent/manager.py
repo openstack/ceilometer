@@ -200,7 +200,7 @@ class PollingTask(object):
                         self._send_notification(sample_batch)
 
                 except plugin_base.PollsterPermanentError as err:
-                    LOG.error(_(
+                    LOG.error(_LE(
                         'Prevent pollster %(name)s from '
                         'polling %(res_list)s on source %(source)s anymore!')
                         % ({'name': pollster.name, 'source': source_name,
@@ -299,8 +299,8 @@ class AgentManager(service_base.PipelineBasedService):
                 LOG.exception(_LE("Skip loading extension for %s"), ep.name)
                 return
             if isinstance(exc, ImportError):
-                LOG.error(_("Failed to import extension for %(name)s: "
-                            "%(error)s"),
+                LOG.error(_LE("Failed to import extension for %(name)s: "
+                              "%(error)s"),
                           {'name': ep.name, 'error': exc})
                 return
             raise exc

@@ -19,7 +19,7 @@ import logging.handlers
 from oslo_log import log
 from six.moves.urllib import parse as urlparse
 
-from ceilometer.i18n import _
+from ceilometer.i18n import _LE
 from ceilometer import publisher
 
 LOG = log.getLogger(__name__)
@@ -58,7 +58,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
         self.publisher_logger = None
         path = parsed_url.path
         if not path:
-            LOG.error(_('The path for the file publisher is required'))
+            LOG.error(_LE('The path for the file publisher is required'))
             return
 
         rfh = None
@@ -72,8 +72,8 @@ class FilePublisher(publisher.ConfigPublisherBase):
                     max_bytes = int(params.get('max_bytes')[0])
                     backup_count = int(params.get('backup_count')[0])
                 except ValueError:
-                    LOG.error(_('max_bytes and backup_count should be '
-                              'numbers.'))
+                    LOG.error(_LE('max_bytes and backup_count should be '
+                                  'numbers.'))
                     return
         # create rotating file handler
         rfh = logging.handlers.RotatingFileHandler(

@@ -27,7 +27,7 @@ import six
 import webob
 
 from ceilometer import i18n
-from ceilometer.i18n import _
+from ceilometer.i18n import _LE
 
 LOG = log.getLogger(__name__)
 
@@ -99,7 +99,7 @@ class ParsableErrorMiddleware(object):
                                      error_message,
                                      b'</error_message>'))
                 except etree.XMLSyntaxError as err:
-                    LOG.error(_('Error parsing HTTP response: %s'), err)
+                    LOG.error(_LE('Error parsing HTTP response: %s'), err)
                     error_message = state['status_code']
                     body = '<error_message>%s</error_message>' % error_message
                     if six.PY3:

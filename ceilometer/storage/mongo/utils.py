@@ -26,7 +26,7 @@ import pymongo.errors
 import six
 from six.moves.urllib import parse
 
-from ceilometer.i18n import _, _LI
+from ceilometer.i18n import _, _LI, _LE
 
 ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS = 86
 
@@ -405,8 +405,8 @@ def safe_mongo_call(call):
                 return call(self, *args, **kwargs)
             except pymongo.errors.AutoReconnect as err:
                 if 0 <= max_retries <= attempts:
-                    LOG.error(_('Unable to reconnect to the primary mongodb '
-                                'after %(retries)d retries. Giving up.') %
+                    LOG.error(_LE('Unable to reconnect to the primary mongodb '
+                                  'after %(retries)d retries. Giving up.') %
                               {'retries': max_retries})
                     raise
                 LOG.warning(_('Unable to reconnect to the primary '
