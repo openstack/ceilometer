@@ -16,7 +16,6 @@ import testtools
 
 from ceilometer.tests.tempest.api import base
 from tempest import config
-from tempest.lib import decorators
 from tempest import test
 
 
@@ -57,14 +56,9 @@ class TelemetryNotificationAdminAPITest(base.BaseTelemetryAdminTest):
 
     @test.idempotent_id('29604198-8b45-4fc0-8af8-1cae4f94ebea')
     @test.services('compute')
-    @decorators.skip_because(bug='1480490')
     def test_check_nova_notification_event_and_meter(self):
 
         body = self.create_server()
-
-        if CONF.telemetry.event_enabled:
-            query = ('instance_id', 'eq', body['id'])
-            self.await_events(query)
 
         query = ('resource', 'eq', body['id'])
         for metric in self.nova_notifications:
