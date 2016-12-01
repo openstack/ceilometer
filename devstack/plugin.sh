@@ -34,7 +34,7 @@
 # of Ceilometer (see within for additional settings):
 #
 #   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 600.
-#   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'es')
+#   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'es', 'gnocchi', 'none')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
 
@@ -237,7 +237,13 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
-    if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
+    if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
+        inidelete $CEILOMETER_CONF DEFAULT meter_dispatchers
+        inidelete $CEILOMETER_CONF DEFAULT event_dispatchers
+        if ! is_service_enabled panko-api; then
+            echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
+        fi
+    elif [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
