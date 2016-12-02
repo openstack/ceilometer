@@ -29,8 +29,6 @@ from ceilometer.tests import base as tests_base
 
 
 @mock.patch('ceilometer.publisher.kafka_broker.LOG', mock.Mock())
-@mock.patch('ceilometer.publisher.kafka_broker.kafka.KafkaClient',
-            mock.Mock())
 class TestKafkaPublisher(tests_base.BaseTestCase):
     test_event_data = [
         event.Event(message_id=uuid.uuid4(),
