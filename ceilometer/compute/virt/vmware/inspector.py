@@ -17,13 +17,13 @@
 
 from oslo_config import cfg
 from oslo_utils import units
-from oslo_vmware import api
 import six
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.vmware import vsphere_operations
 from ceilometer.i18n import _
 
+vmware_api = None
 
 opt_group = cfg.OptGroup(name='vmware',
                          title='Options for VMware')
@@ -76,7 +76,10 @@ VC_DISK_WRITE_REQUESTS_RATE_CNTR = "disk:numberWriteAveraged:average"
 
 
 def get_api_session(conf):
-    api_session = api.VMwareAPISession(
+    global vmware_api
+    if vmware_api is None:
+        vmware_api = __import__('oslo_vmware.api')
+    api_session = vmware_api.VMwareAPISession(
         conf.vmware.host_ip,
         conf.vmware.host_username,
         conf.vmware.host_password,

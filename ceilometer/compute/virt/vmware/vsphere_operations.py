@@ -13,7 +13,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from oslo_vmware import vim_util
+try:
+    from oslo_vmware import vim_util
+except ImportError:
+    # NOTE(sileht): this is safe because inspector will not load
+    vim_util = None
 
 
 PERF_MANAGER_TYPE = "PerformanceManager"
