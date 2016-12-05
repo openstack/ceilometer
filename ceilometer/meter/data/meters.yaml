@@ -254,6 +254,17 @@ metric:
       host: $.publisher_id
       source: $.payload.metrics[?(@.name='cpu.percent')].source
 
+  # Identity
+  # NOTE(gordc): hack because jsonpath-rw-ext can't concat starting with string.
+  - name: $.payload.outcome - $.payload.outcome + 'identity.authenticate.' + $.payload.outcome
+    type: 'delta'
+    unit: 'user'
+    volume: 1
+    event_type:
+      - 'identity.authenticate'
+    resource_id: $.payload.initiator.id
+    user_id: $.payload.initiator.id
+
   # DNS
   - name: 'dns.domain.exists'
     event_type: 'dns.domain.exists'
