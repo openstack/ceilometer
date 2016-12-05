@@ -135,6 +135,13 @@ class VsphereInspector(virt_inspector.Inspector):
             net_counter_id = self._ops.get_perf_counter_id(net_counter)
             vnic_id_to_stats_map = self._ops.query_vm_device_stats(
                 vm_mobj, net_counter_id, duration)
+            # The sample for this map is: {4000: 0.0, vmnic5: 0.0, vmnic4: 0.0,
+            #               vmnic3: 0.0, vmnic2: 0.0, vmnic1: 0.0, vmnic0: 0.0}
+            # "4000" is the virtual nic which we need.
+            # And these "vmnic*" are phynical nics in the host, so we remove it
+            vnic_id_to_stats_map = {k: v for (k, v)
+                                    in vnic_id_to_stats_map.items()
+                                    if not k.startswith('vmnic')}
             vnic_stats[net_counter] = vnic_id_to_stats_map
             vnic_ids.update(six.iterkeys(vnic_id_to_stats_map))
 
