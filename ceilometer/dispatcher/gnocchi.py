@@ -58,18 +58,17 @@ class ResourcesDefinition(object):
     MANDATORY_FIELDS = {'resource_type': six.string_types,
                         'metrics': list}
 
+    MANDATORY_EVENT_FIELDS = {'id': six.string_types}
+
     def __init__(self, definition_cfg, default_archive_policy, plugin_manager):
         self._default_archive_policy = default_archive_policy
         self.cfg = definition_cfg
 
-        for field, field_type in self.MANDATORY_FIELDS.items():
-            if field not in self.cfg:
-                raise declarative.ResourceDefinitionException(
-                    _LE("Required field %s not specified") % field, self.cfg)
-            if not isinstance(self.cfg[field], field_type):
-                raise declarative.ResourceDefinitionException(
-                    _LE("Required field %(field)s should be a %(type)s") %
-                    {'field': field, 'type': field_type}, self.cfg)
+        self._check_required_and_types(self.MANDATORY_FIELDS, self.cfg)
+
+        if self.support_events():
+            self._check_required_and_types(self.MANDATORY_EVENT_FIELDS,
+                                           self.cfg['event_attributes'])
 
         self._attributes = {}
         for name, attr_cfg in self.cfg.get('attributes', {}).items():
@@ -91,6 +90,17 @@ class ResourcesDefinition(object):
                 self.metrics[t] = dict(archive_policy_name=archive_policy)
 
     @staticmethod
+    def _check_required_and_types(expected, definition):
+        for field, field_type in expected.items():
+            if field not in definition:
+                raise declarative.ResourceDefinitionException(
+                    _LE("Required field %s not specified") % field, definition)
+            if not isinstance(definition[field], field_type):
+                raise declarative.ResourceDefinitionException(
+                    _LE("Required field %(field)s should be a %(type)s") %
+                    {'field': field, 'type': field_type}, definition)
+
+    @staticmethod
     def _ensure_list(value):
         if isinstance(value, list):
             return value
@@ -102,7 +112,6 @@ class ResourcesDefinition(object):
                 return True
         return False
 
-    @property
     def support_events(self):
         for e in ["event_create", "event_delete", "event_update"]:
             if e in self.cfg:
