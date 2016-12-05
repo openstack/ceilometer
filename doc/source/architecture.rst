@@ -194,16 +194,17 @@ Publishing the data
 
    This figure shows how a sample can be published to multiple destinations.
 
-Currently, processed data can be published using 5 different transports:
+Currently, processed data can be published using 7 different transports:
 
-1. direct, which publishes samples to a configured dispatcher directly, default
-   is database dispatcher;
+1. gnocchi, which publishes samples/events to Gnocchi API;
 2. notifier, a notification based publisher which pushes samples to a message queue
-   which can be consumed by the collector or an external system;
+   which can be consumed by an external system;
 3. udp, which publishes samples using UDP packets;
 4. http, which targets a REST interface;
 5. kafka, which publishes data to a Kafka message queue to be consumed by any system
    that supports Kafka.
+6. file, which publishes samples to a file with specified name and location;
+7. database, which stores samples/events to the legacy ceilometer database system.
 
 
 Storing the data
