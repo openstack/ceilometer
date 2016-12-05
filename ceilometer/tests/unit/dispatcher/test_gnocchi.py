@@ -452,10 +452,9 @@ class DispatcherWorkflowTest(base.BaseTestCase,
     ]
 
     default_workflow = dict(resource_exists=True,
-                            metric_exists=True,
                             post_measure_fail=False,
                             create_resource_fail=False,
-                            create_metric_fail=False,
+                            create_resource_race=False,
                             update_resource_fail=False,
                             retry_post_measures_fail=False)
     workflow_scenarios = [
@@ -463,10 +462,9 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         ('new_resource', dict(resource_exists=False)),
         ('new_resource_fail', dict(resource_exists=False,
                                    create_resource_fail=True)),
+        ('new_resource_race', dict(resource_exists=False,
+                                   create_resource_race=True)),
         ('resource_update_fail', dict(update_resource_fail=True)),
-        ('new_metric', dict(metric_exists=False)),
-        ('new_metric_fail', dict(metric_exists=False,
-                                 create_metric_fail=True)),
         ('retry_fail', dict(resource_exists=False,
                             retry_post_measures_fail=True)),
         ('measure_fail', dict(post_measure_fail=True)),
@@ -572,7 +570,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         expected_calls = [
             mock.call.capabilities.list(),
             mock.call.metric.batch_resources_metrics_measures(
-                {gnocchi_id: {metric_name: self.measures_attributes}})
+                {gnocchi_id: {metric_name: self.measures_attributes}},
+                create_metrics=True)
         ]
         expected_debug = [
             mock.call('gnocchi project found: %s',
@@ -583,11 +582,11 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         batch_side_effect = []
         if self.post_measure_fail:
             batch_side_effect += [Exception('boom!')]
-        elif not self.resource_exists or not self.metric_exists:
+        elif not self.resource_exists:
             batch_side_effect += [
                 gnocchi_exc.BadRequest(
-                    400, "Unknown metrics: %s/%s" % (gnocchi_id,
-                                                     metric_name))]
+                    400, {"cause": "Unknown resources",
+                          'detail': [gnocchi_id]})]
             attributes = self.postable_attributes.copy()
             attributes.update(self.patchable_attributes)
             attributes['id'] = self.sample['resource_id']
@@ -605,30 +604,18 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
             if self.create_resource_fail:
                 fakeclient.resource.create.side_effect = [Exception('boom!')]
-            elif self.resource_exists:
+            elif self.create_resource_race:
                 fakeclient.resource.create.side_effect = [
                     gnocchi_exc.ResourceAlreadyExists(409)]
-
-                expected_calls.append(mock.call.metric.create({
-                    'name': self.sample['counter_name'],
-                    'unit': self.sample['counter_unit'],
-                    'resource_id': resource_id}))
-                if self.create_metric_fail:
-                    fakeclient.metric.create.side_effect = [Exception('boom!')]
-                elif self.metric_exists:
-                    fakeclient.metric.create.side_effect = [
-                        gnocchi_exc.NamedMetricAlreadyExists(409)]
-                else:
-                    fakeclient.metric.create.side_effect = [None]
-
             else:  # not resource_exists
                 expected_debug.append(mock.call(
                     'Resource %s created', self.sample['resource_id']))
 
-            if not self.create_resource_fail and not self.create_metric_fail:
+            if not self.create_resource_fail:
                 expected_calls.append(
                     mock.call.metric.batch_resources_metrics_measures(
-                        {gnocchi_id: {metric_name: self.measures_attributes}})
+                        {gnocchi_id: {metric_name: self.measures_attributes}},
+                        create_metrics=True)
                 )
 
                 if self.retry_post_measures_fail:
@@ -664,7 +651,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.dispatcher.record_metering_data([self.sample])
 
         # Check that the last log message is the expected one
-        if (self.post_measure_fail or self.create_metric_fail
+        if (self.post_measure_fail
                 or self.create_resource_fail
                 or self.retry_post_measures_fail
                 or (self.update_resource_fail and self.patchable_attributes)):
