@@ -62,8 +62,6 @@ Appendix
 
    releasenotes/index
    glossary
-   api/index
-
 
 .. update index
 
