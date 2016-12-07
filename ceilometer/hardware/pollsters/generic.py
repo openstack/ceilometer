@@ -113,7 +113,7 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
                 LOG.exception(_LE("Cannot load inspector %(name)s: %(err)s"),
                               dict(name=parsed_url.scheme,
                                    err=err))
-                raise err
+                raise
         return self.inspectors[parsed_url.scheme]
 
     def get_samples(self, manager, cache, resources=None):
