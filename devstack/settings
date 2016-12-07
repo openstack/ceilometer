@@ -5,8 +5,6 @@ enable_service ceilometer-acompute ceilometer-acentral
 enable_service ceilometer-anotification
 # Data Collector
 enable_service ceilometer-collector
-# API service
-enable_service ceilometer-api
 
 # Default directories
 CEILOMETER_DIR=$DEST/ceilometer
@@ -17,6 +15,9 @@ CEILOMETER_WSGI_DIR=${CEILOMETER_WSGI_DIR:-/var/www/ceilometer}
 
 # Set up no backend
 CEILOMETER_BACKEND=${CEILOMETER_BACKEND:-none}
+if [ "$CEILOMETER_BACKEND" = "es" ] || [ "$CEILOMETER_BACKEND" = "mysql" ] || [ "$CEILOMETER_BACKEND" = "postgresql" ] || [ "$CEILOMETER_BACKEND" = "mongodb" ]; then
+    enable_service ceilometer-api
+fi
 
 # Gnocchi default archive_policy for Ceilometer
 GNOCCHI_ARCHIVE_POLICY=${GNOCCHI_ARCHIVE_POLICY:-low}
