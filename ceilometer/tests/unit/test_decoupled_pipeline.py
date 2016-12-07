@@ -17,7 +17,7 @@ import yaml
 
 from ceilometer import pipeline
 from ceilometer import sample
-from ceilometer.tests import pipeline_base
+from ceilometer.tests.unit import pipeline_base
 
 
 class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
