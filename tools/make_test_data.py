@@ -29,15 +29,15 @@ import datetime
 import random
 import uuid
 
-from oslo_config import cfg
 from oslo_utils import timeutils
 
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer import service
 from ceilometer import storage
 
 
-def make_test_data(name, meter_type, unit, volume, random_min,
+def make_test_data(conf, name, meter_type, unit, volume, random_min,
                    random_max, user_id, project_id, resource_id, start,
                    end, interval, resource_metadata=None, source='artificial'):
     resource_metadata = resource_metadata or {'display_name': 'toto',
@@ -82,7 +82,7 @@ def make_test_data(name, meter_type, unit, volume, random_min,
                           source=source,
                           )
         data = utils.meter_message_from_counter(
-            c, cfg.CONF.publisher.telemetry_secret)
+            c, conf.publisher.telemetry_secret)
         # timestamp should be string when calculating signature, but should be
         # datetime object when calling record_metering_data.
         data['timestamp'] = timestamp
@@ -99,8 +99,8 @@ def make_test_data(name, meter_type, unit, volume, random_min,
     print('Added %d new samples for meter %s.' % (n, name))
 
 
-def record_test_data(conn, *args, **kwargs):
-    for data in make_test_data(*args, **kwargs):
+def record_test_data(conf, conn, *args, **kwargs):
+    for data in make_test_data(conf, *args, **kwargs):
         conn.record_metering_data(data)
 
 
@@ -183,12 +183,12 @@ def get_parser():
 
 
 def main():
-    cfg.CONF([], project='ceilometer')
 
     args = get_parser().parse_args()
+    conf = service.prepare_service([])
 
     # Connect to the metering database
-    conn = storage.get_connection_from_config(cfg.CONF)
+    conn = storage.get_connection_from_config(conf)
 
     # Find the user and/or project for a real resource
     if not (args.user_id or args.project_id):
@@ -220,7 +220,7 @@ def main():
             raise
     args.start = start
     args.end = end
-    record_test_data(conn=conn, **args.__dict__)
+    record_test_data(conf, conn=conn, **args.__dict__)
 
     return 0
 
