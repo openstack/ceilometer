@@ -464,7 +464,7 @@ if is_service_enabled ceilometer; then
         preinstall_ceilometer
     elif [[ "$1" == "stack" && "$2" == "install" ]]; then
         echo_summary "Installing Ceilometer"
-        # Use stack_install_service here to account for vitualenv
+        # Use stack_install_service here to account for virtualenv
         stack_install_service ceilometer
     elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
         echo_summary "Configuring Ceilometer"
