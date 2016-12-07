@@ -185,6 +185,129 @@ IMAGE_DELETE_START = {
 }
 
 
+VOLUME_DELETE_START = {
+    'event_type': u'volume.delete.start',
+    'traits': [
+        [
+            u'availability_zone',
+            1,
+            u'nova'
+        ],
+        [
+            u'created_at',
+            1,
+            u'2016-11-28T13:19:53+00:00'
+        ],
+        [
+            u'display_name',
+            1,
+            u'vol-001'
+        ],
+        [
+            u'host',
+            1,
+            u'zhangguoqing-dev@lvmdriver-1#lvmdriver-1'
+        ],
+        [
+            u'project_id',
+            1,
+            u'd53fcc7dc53c4662ad77822c36a21f00'
+        ],
+        [
+            u'replication_status',
+            1,
+            u'disabled'
+        ],
+        [
+            u'request_id',
+            1,
+            u'req-f44df096-50d4-4211-95ea-64be6f5e4f60'
+        ],
+        [
+            u'resource_id',
+            1,
+            u'6cc6e7dd-d17d-460f-ae79-7e08a216ce96'
+        ],
+        [
+            u'service',
+            1,
+            u'volume.zhangguoqing-dev@lvmdriver-1'
+        ],
+        [
+            u'size',
+            1,
+            u'1'
+        ],
+        [
+            u'status',
+            1,
+            u'deleting'
+        ],
+        [
+            u'tenant_id',
+            1,
+            u'd53fcc7dc53c4662ad77822c36a21f00'
+        ],
+        [
+            u'type',
+            1,
+            u'af6271fa-13c4-44e6-9246-754ce9dc7df8'
+        ],
+        [
+            u'user_id',
+            1,
+            u'819bbd28f5374506b8502521c89430b5'
+        ]
+    ],
+    'message_signature':
+        '831719d54059734f82e7d6498c6d7a8fd637568732e79c1fd375e128f142373a',
+    'raw': {},
+    'generated': '2016-11-28T13:42:15.484674',
+    'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
+}
+
+FLOATINGIP_DELETE_END = {
+    'event_type': u'floatingip.delete.end',
+    'traits': [
+        [
+            u'project_id',
+            1,
+            u'd53fcc7dc53c4662ad77822c36a21f00'
+        ],
+        [
+            u'request_id',
+            1,
+            'req-443ddb77-31f7-41fe-abbf-921107dd9f00'
+        ],
+        [
+            u'resource_id',
+            1,
+            u'705e2c08-08e8-45cb-8673-5c5be955569b'
+        ],
+        [
+            u'service',
+            1,
+            u'network.zhangguoqing-dev'
+        ],
+        [
+            u'tenant_id',
+            1,
+            u'd53fcc7dc53c4662ad77822c36a21f00'
+        ],
+        [
+            u'user_id',
+            1,
+            u'819bbd28f5374506b8502521c89430b5'
+        ]
+    ],
+    'message_signature':
+        '831719d54059734f82e7d6498c6d7a8fd637568732e79c1fd375e128f142373a',
+    'raw': {},
+    'generated': '2016-11-29T09:25:55.474710',
+    'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
+}
+
+
 @mock.patch('gnocchiclient.v1.client.Client', mock.Mock())
 class DispatcherTest(base.BaseTestCase):
 
@@ -542,12 +665,20 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 {'ended_at': now.isoformat()}),
             mock.call.resource.update(
                 'image', 'dc337359-de70-4044-8e2c-80573ba6e577',
+                {'ended_at': now.isoformat()}),
+            mock.call.resource.update(
+                'volume', '6cc6e7dd-d17d-460f-ae79-7e08a216ce96',
+                {'ended_at': now.isoformat()}),
+            mock.call.resource.update(
+                'network', '705e2c08-08e8-45cb-8673-5c5be955569b',
                 {'ended_at': now.isoformat()})
         ]
 
         self.dispatcher.record_events([INSTANCE_DELETE_START,
-                                      IMAGE_DELETE_START])
-        self.assertEqual(7, len(fakeclient.mock_calls))
+                                      IMAGE_DELETE_START,
+                                      VOLUME_DELETE_START,
+                                      FLOATINGIP_DELETE_END])
+        self.assertEqual(9, len(fakeclient.mock_calls))
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 

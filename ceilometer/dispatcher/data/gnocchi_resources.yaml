@@ -150,6 +150,9 @@ resources:
       - 'ip.floating'
       - 'ip.floating.create'
       - 'ip.floating.update'
+    event_delete: floatingip.delete.end
+    event_attributes:
+      id: resource_id
 
   - resource_type: stack
     metrics:
@@ -182,6 +185,9 @@ resources:
       - 'volume.detach'
     attributes:
       display_name: resource_metadata.display_name
+    event_delete: volume.delete.start
+    event_attributes:
+      id: resource_id
 
   - resource_type: host
     metrics:
