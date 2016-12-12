@@ -45,27 +45,22 @@ class ConfigHook(hooks.PecanHook):
 class DBHook(hooks.PecanHook):
 
     def __init__(self, conf):
-        self.storage_connection = self.get_connection(conf, 'metering')
-        self.event_storage_connection = self.get_connection(conf, 'event')
+        self.storage_connection = self.get_connection(conf)
 
-        if (not self.storage_connection
-           and not self.event_storage_connection):
-            raise Exception("Api failed to start. Failed to connect to "
-                            "databases, purpose:  %s" %
-                            ', '.join(['metering', 'event']))
+        if not self.storage_connection:
+            raise Exception(
+                "API failed to start. Failed to connect to database")
 
     def before(self, state):
         state.request.storage_conn = self.storage_connection
-        state.request.event_storage_conn = self.event_storage_connection
 
     @staticmethod
-    def get_connection(conf, purpose):
+    def get_connection(conf):
         try:
-            return storage.get_connection_from_config(conf, purpose)
+            return storage.get_connection_from_config(conf)
         except Exception as err:
-            params = {"purpose": purpose, "err": err}
-            LOG.exception(_LE("Failed to connect to db, purpose %(purpose)s "
-                              "retry later: %(err)s") % params)
+            LOG.exception(_LE("Failed to connect to db" "retry later: %s"),
+                          err)
 
 
 class NotifierHook(hooks.PecanHook):

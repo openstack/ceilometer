@@ -36,9 +36,9 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
         self.conf.import_opt('telemetry_secret',
                              'ceilometer.publisher.utils',
                              'publisher')
-        self.conf.set_override("event_dispatchers", ['database'])
+        self.conf.set_override("event_dispatchers", ['file'])
         self.useFixture(mockpatch.Patch(
-            'ceilometer.dispatcher.database.EventDatabaseDispatcher',
+            'ceilometer.dispatcher.file.FileDispatcher',
             new=FakeDispatcher))
 
     @mock.patch('ceilometer.publisher.utils.verify_signature')
@@ -50,9 +50,9 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
         manager = dispatcher.load_dispatcher_manager(self.conf)[1]
         v = collector.EventEndpoint("secret", manager)
         v.sample([sample])
-        self.assertEqual([], manager['database'].obj.events)
+        self.assertEqual([], manager['file'].obj.events)
         del sample['payload'][0]['message_signature']
         sample['payload'][0]['message_signature'] = utils.compute_signature(
             sample['payload'][0], "secret")
         v.sample([sample])
-        self.assertEqual(sample['payload'], manager['database'].obj.events)
+        self.assertEqual(sample['payload'], manager['file'].obj.events)

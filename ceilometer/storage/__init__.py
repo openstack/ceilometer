@@ -34,17 +34,9 @@ OPTS = [
                "in the database for (<= 0 means forever).",
                deprecated_opts=[cfg.DeprecatedOpt('time_to_live',
                                                   'database')]),
-    cfg.IntOpt('event_time_to_live',
-               default=-1,
-               help=("Number of seconds that events are kept "
-                     "in the database for (<= 0 means forever).")),
     cfg.StrOpt('metering_connection',
                secret=True,
                help='The connection string used to connect to the metering '
-               'database. (if unset, connection is used)'),
-    cfg.StrOpt('event_connection',
-               secret=True,
-               help='The connection string used to connect to the event '
                'database. (if unset, connection is used)'),
     cfg.BoolOpt('sql_expire_samples_only',
                 default=False,
@@ -67,7 +59,7 @@ class StorageBadAggregate(Exception):
     code = 400
 
 
-def get_connection_from_config(conf, purpose='metering'):
+def get_connection_from_config(conf):
     retries = conf.database.max_retries
 
     @tenacity.retry(
@@ -76,20 +68,20 @@ def get_connection_from_config(conf, purpose='metering'):
               else tenacity.stop_never),
         reraise=True)
     def _inner():
-        namespace = 'ceilometer.%s.storage' % purpose
-        url = (getattr(conf.database, '%s_connection' % purpose) or
+        url = (getattr(conf.database, 'metering_connection') or
                conf.database.connection)
-        return get_connection(conf, url, namespace)
+        return get_connection(conf, url)
 
     return _inner()
 
 
-def get_connection(conf, url, namespace):
+def get_connection(conf, url):
     """Return an open connection to the database."""
     connection_scheme = urlparse.urlparse(url).scheme
     # SqlAlchemy connections specify may specify a 'dialect' or
     # 'dialect+driver'. Handle the case where driver is specified.
     engine_name = connection_scheme.split('+')[0]
+    namespace = 'ceilometer.metering.storage'
     # NOTE: translation not applied bug #1446983
     LOG.debug('looking for %(name)r driver in %(namespace)r',
               {'name': engine_name, 'namespace': namespace})

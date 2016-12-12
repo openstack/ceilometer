@@ -34,7 +34,7 @@
 # of Ceilometer (see within for additional settings):
 #
 #   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 600.
-#   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'es', 'gnocchi', 'none')
+#   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'gnocchi', 'none')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
 
@@ -138,11 +138,6 @@ function _ceilometer_prepare_storage_backend {
         pip_install_gr pymongo
         _ceilometer_install_mongodb
     fi
-
-    if [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-        ${TOP_DIR}/pkg/elasticsearch.sh download
-        ${TOP_DIR}/pkg/elasticsearch.sh install
-    fi
 }
 
 
@@ -205,8 +200,6 @@ function _ceilometer_drop_database {
     if is_service_enabled ceilometer-collector ceilometer-api ; then
         if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
             mongo ceilometer --eval "db.dropDatabase();"
-        elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-            curl -XDELETE "localhost:9200/events_*"
         fi
     fi
 }
@@ -245,16 +238,9 @@ function _ceilometer_configure_storage_backend {
         fi
     elif [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
-        iniset $CEILOMETER_CONF database event_connection $(database_connection_url ceilometer)
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-    elif [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-        # es is only supported for events. we will use sql for metering.
-        iniset $CEILOMETER_CONF database event_connection es://localhost:9200
-        iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-        ${TOP_DIR}/pkg/elasticsearch.sh start
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
-        iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
@@ -371,7 +357,7 @@ function init_ceilometer {
         if is_service_enabled gnocchi ; then
             if [ "$CEILOMETER_BACKEND" = 'gnocchi' ]; then
                 set -e
-                $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database --skip-event-database
+                $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
                 set +e
             fi
         fi

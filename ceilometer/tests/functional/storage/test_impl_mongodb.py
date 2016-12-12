@@ -21,7 +21,6 @@
 
 """
 
-from ceilometer.event.storage import impl_mongodb as impl_mongodb_event
 from ceilometer.storage import impl_mongodb
 from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
@@ -60,10 +59,6 @@ class IndexTest(tests_db.TestBase):
         self._test_ttl_index_absent(self.conn, 'meter',
                                     'metering_time_to_live')
 
-    def test_event_ttl_index_absent(self):
-        self._test_ttl_index_absent(self.event_conn, 'event',
-                                    'event_time_to_live')
-
     def _test_ttl_index_present(self, conn, coll_name, ttl_opt):
         coll = getattr(conn.db, coll_name)
         self.CONF.set_override(ttl_opt, 456789, group='database')
@@ -80,10 +75,6 @@ class IndexTest(tests_db.TestBase):
     def test_meter_ttl_index_present(self):
         self._test_ttl_index_present(self.conn, 'meter',
                                      'metering_time_to_live')
-
-    def test_event_ttl_index_present(self):
-        self._test_ttl_index_present(self.event_conn, 'event',
-                                     'event_time_to_live')
 
 
 class CapabilitiesTest(test_base.BaseTestCase):
@@ -115,13 +106,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
         }
 
         actual_capabilities = impl_mongodb.Connection.get_capabilities()
-        self.assertEqual(expected_capabilities, actual_capabilities)
-
-    def test_event_capabilities(self):
-        expected_capabilities = {
-            'events': {'query': {'simple': True}},
-        }
-        actual_capabilities = impl_mongodb_event.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
 
     def test_storage_capabilities(self):

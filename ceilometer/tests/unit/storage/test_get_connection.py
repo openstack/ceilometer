@@ -14,16 +14,10 @@
 # under the License.
 """Tests for ceilometer/storage/
 """
-import unittest
-
 import mock
 from oslo_config import fixture as fixture_config
 from oslotest import base
 
-try:
-    from ceilometer.event.storage import impl_hbase as impl_hbase_event
-except ImportError:
-    impl_hbase_event = None
 from ceilometer import storage
 from ceilometer.storage import impl_log
 from ceilometer.storage import impl_sqlalchemy
@@ -38,15 +32,13 @@ class EngineTest(base.BaseTestCase):
 
     def test_get_connection(self):
         engine = storage.get_connection(self.CONF,
-                                        'log://localhost',
-                                        'ceilometer.metering.storage')
+                                        'log://localhost')
         self.assertIsInstance(engine, impl_log.Connection)
 
     def test_get_connection_no_such_engine(self):
         try:
             storage.get_connection(self.CONF,
-                                   'no-such-engine://localhost',
-                                   'ceilometer.metering.storage')
+                                   'no-such-engine://localhost')
         except RuntimeError as err:
             self.assertIn('no-such-engine', six.text_type(err))
 
@@ -77,44 +69,14 @@ class ConnectionConfigTest(base.BaseTestCase):
         self.CONF.set_override("connection", "log://", group="database")
         conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'metering')
-        self.assertIsInstance(conn, impl_log.Connection)
 
     def test_two_urls(self):
         self.CONF.set_override("connection", "log://", group="database")
         conn = storage.get_connection_from_config(self.CONF)
         self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'metering')
-        self.assertIsInstance(conn, impl_log.Connection)
-
-    @unittest.skipUnless(impl_hbase_event, 'need hbase implementation')
-    def test_three_urls(self):
-        self.CONF.set_override("connection", "log://", group="database")
-        self.CONF.set_override("event_connection", "hbase://__test__",
-                               group="database")
-        conn = storage.get_connection_from_config(self.CONF)
-        self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'metering')
-        self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'event')
-        self.assertIsInstance(conn, impl_hbase_event.Connection)
-
-    @unittest.skipUnless(impl_hbase_event, 'need hbase implementation')
-    def test_three_urls_no_default(self):
-        self.CONF.set_override("connection", None, group="database")
-        self.CONF.set_override("metering_connection", "log://",
-                               group="database")
-        self.CONF.set_override("event_connection", "hbase://__test__",
-                               group="database")
-        conn = storage.get_connection_from_config(self.CONF)
-        self.assertIsInstance(conn, impl_log.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'event')
-        self.assertIsInstance(conn, impl_hbase_event.Connection)
 
     def test_sqlalchemy_driver(self):
         self.CONF.set_override("connection", "sqlite+pysqlite://",
                                group="database")
         conn = storage.get_connection_from_config(self.CONF)
-        self.assertIsInstance(conn, impl_sqlalchemy.Connection)
-        conn = storage.get_connection_from_config(self.CONF, 'metering')
         self.assertIsInstance(conn, impl_sqlalchemy.Connection)

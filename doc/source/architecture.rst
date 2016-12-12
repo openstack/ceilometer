@@ -194,7 +194,7 @@ Currently, processed data can be published using 7 different transports:
 5. kafka, which publishes data to a Kafka message queue to be consumed by any system
    that supports Kafka.
 6. file, which publishes samples to a file with specified name and location;
-7. database, which stores samples/events to the legacy ceilometer database system.
+7. database, which stores samples to the legacy ceilometer database system.
 
 
 Storing/Accessing the data

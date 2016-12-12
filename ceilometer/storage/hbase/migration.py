@@ -13,8 +13,6 @@
 """HBase storage backend migrations
 """
 
-import re
-
 from ceilometer.storage.hbase import utils as hbase_utils
 
 
@@ -64,35 +62,8 @@ def migrate_meter_table(conn, table):
         meter_table.delete(row)
 
 
-def migrate_event_table(conn, table):
-    """Migrate table 'event' in HBase.
-
-    Change row format from ""%d_%s" % timestamp, event_id,
-    to new separator format "%s:%s" % timestamp, event_id
-    Also change trait columns from %s+%s % trait.name, trait.dtype
-    to %s:%s % trait.name, trait.dtype
-    """
-    event_table = conn.table(table)
-    event_filter = "RowFilter(=, 'regexstring:\\d*_\\w*')"
-    gen = event_table.scan(filter=event_filter)
-    trait_pattern = re.compile("f:[\w\-_]*\+\w")
-    column_prefix = "f:"
-    for row, data in gen:
-        row_parts = row.split("_", 1)
-        update_data = {}
-        for column, value in data.items():
-            if trait_pattern.match(column):
-                trait_parts = column[2:].rsplit('+', 1)
-                column = hbase_utils.prepare_key(*trait_parts)
-            update_data[column_prefix + column] = value
-        new_row = hbase_utils.prepare_key(*row_parts)
-        event_table.put(new_row, update_data)
-        event_table.delete(row)
-
-
 TABLE_MIGRATION_FUNCS = {'resource': migrate_resource_table,
-                         'meter': migrate_meter_table,
-                         'event': migrate_event_table}
+                         'meter': migrate_meter_table}
 
 
 def migrate_tables(conn, tables):

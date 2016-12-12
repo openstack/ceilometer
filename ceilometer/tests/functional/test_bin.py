@@ -54,8 +54,6 @@ class BinTestCase(base.BaseTestCase):
         self.assertEqual(0, subp.poll())
         self.assertIn(b"Nothing to clean, database metering "
                       b"time to live is disabled", stdout)
-        self.assertIn(b"Nothing to clean, database event "
-                      b"time to live is disabled", stdout)
 
     def _test_run_expirer_ttl_enabled(self, ttl_name, data_name):
         content = ("[DEFAULT]\n"
@@ -83,7 +81,6 @@ class BinTestCase(base.BaseTestCase):
         self._test_run_expirer_ttl_enabled('metering_time_to_live',
                                            'metering')
         self._test_run_expirer_ttl_enabled('time_to_live', 'metering')
-        self._test_run_expirer_ttl_enabled('event_time_to_live', 'event')
 
 
 class BinSendSampleTestCase(base.BaseTestCase):

@@ -24,10 +24,7 @@ import warnings
 import mock
 from oslo_db import exception
 from oslo_utils import timeutils
-from six.moves import reprlib
 
-from ceilometer.event.storage import impl_sqlalchemy as impl_sqla_event
-from ceilometer.event.storage import models
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.storage import impl_sqlalchemy
@@ -53,69 +50,8 @@ class EngineFacadeTest(tests_db.TestBase):
     @mock.patch.object(warnings, 'warn')
     def test_no_not_supported_warning(self, mocked):
         impl_sqlalchemy.Connection(self.CONF, 'sqlite://')
-        impl_sqla_event.Connection(self.CONF, 'sqlite://')
         self.assertNotIn(mock.call(mock.ANY, exception.NotSupportedWarning),
                          mocked.call_args_list)
-
-
-@tests_db.run_with('sqlite', 'mysql', 'pgsql')
-class EventTypeTest(tests_db.TestBase):
-    # EventType is a construct specific to sqlalchemy
-    # Not applicable to other drivers.
-
-    def test_event_type_exists(self):
-        et1 = self.event_conn._get_or_create_event_type("foo")
-        self.assertTrue(et1.id >= 0)
-        et2 = self.event_conn._get_or_create_event_type("foo")
-        self.assertEqual(et2.id, et1.id)
-        self.assertEqual(et2.desc, et1.desc)
-
-    def test_event_type_unique(self):
-        et1 = self.event_conn._get_or_create_event_type("foo")
-        self.assertTrue(et1.id >= 0)
-        et2 = self.event_conn._get_or_create_event_type("blah")
-        self.assertNotEqual(et1.id, et2.id)
-        self.assertNotEqual(et1.desc, et2.desc)
-        # Test the method __repr__ returns a string
-        self.assertTrue(reprlib.repr(et2))
-
-
-@tests_db.run_with('sqlite', 'mysql', 'pgsql')
-class EventTest(tests_db.TestBase):
-    def _verify_data(self, trait, trait_table):
-        now = datetime.datetime.utcnow()
-        ev = models.Event('1', 'name', now, [trait], {})
-        self.event_conn.record_events([ev])
-        session = self.event_conn._engine_facade.get_session()
-        t_tables = [sql_models.TraitText, sql_models.TraitFloat,
-                    sql_models.TraitInt, sql_models.TraitDatetime]
-        for table in t_tables:
-            if table == trait_table:
-                self.assertEqual(1, session.query(table).count())
-            else:
-                self.assertEqual(0, session.query(table).count())
-
-    def test_string_traits(self):
-        model = models.Trait("Foo", models.Trait.TEXT_TYPE, "my_text")
-        self._verify_data(model, sql_models.TraitText)
-
-    def test_int_traits(self):
-        model = models.Trait("Foo", models.Trait.INT_TYPE, 100)
-        self._verify_data(model, sql_models.TraitInt)
-
-    def test_float_traits(self):
-        model = models.Trait("Foo", models.Trait.FLOAT_TYPE, 123.456)
-        self._verify_data(model, sql_models.TraitFloat)
-
-    def test_datetime_traits(self):
-        now = datetime.datetime.utcnow()
-        model = models.Trait("Foo", models.Trait.DATETIME_TYPE, now)
-        self._verify_data(model, sql_models.TraitDatetime)
-
-    def test_event_repr(self):
-        ev = sql_models.Event('msg_id', None, False, {})
-        ev.id = 100
-        self.assertTrue(reprlib.repr(ev))
 
 
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')
@@ -173,13 +109,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
         }
 
         actual_capabilities = impl_sqlalchemy.Connection.get_capabilities()
-        self.assertEqual(expected_capabilities, actual_capabilities)
-
-    def test_event_capabilities(self):
-        expected_capabilities = {
-            'events': {'query': {'simple': True}},
-        }
-        actual_capabilities = impl_sqla_event.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
 
     def test_storage_capabilities(self):

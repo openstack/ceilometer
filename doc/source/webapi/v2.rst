@@ -102,26 +102,6 @@ available in the backend.
 .. autotype:: ceilometer.api.controllers.v2.capabilities.Capabilities
    :members:
 
-Events and Traits
-=================
-
-.. rest-controller:: ceilometer.api.controllers.v2.events:EventTypesController
-   :webprefix: /v2/event_types
-
-.. rest-controller:: ceilometer.api.controllers.v2.events:TraitsController
-   :webprefix: /v2/event_types/(event_type)/traits
-
-.. rest-controller:: ceilometer.api.controllers.v2.events:EventsController
-   :webprefix: /v2/events
-
-.. autotype:: ceilometer.api.controllers.v2.events.Event
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.events.Trait
-   :members:
-
-.. autotype:: ceilometer.api.controllers.v2.events.TraitDescription
-   :members:
 
 Filtering Queries
 =================
@@ -158,18 +138,6 @@ field of *Sample*). See :ref:`api-queries` for how to query the API.
 .. autotype:: ceilometer.api.controllers.v2.base.Query
    :members:
 
-Event Query
-+++++++++++
-
-Event query is similar to simple query, its type EventQuery is actually
-a subclass of Query, so EventQuery has every attribute Query has.
-But there are some differences. If a field is one of the following:
-event_type, message_id, start_timestamp, end_timestamp, then this field
-will be applied on event, otherwise it will be treated as trait name and
-applied on trait. See :ref:`api-queries` for how to query the API.
-
-.. autotype:: ceilometer.api.controllers.v2.events.EventQuery
-   :members:
 
 Complex Query
 +++++++++++++

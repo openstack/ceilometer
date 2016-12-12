@@ -15,16 +15,12 @@
 """Test ACL."""
 
 import datetime
-import os
 import uuid
 
 from keystonemiddleware import fixture as ksm_fixture
-from oslo_utils import fileutils
-import six
 import webtest
 
 from ceilometer.api import app
-from ceilometer.event.storage import models as ev_model
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer.tests.functional.api import v2
@@ -182,103 +178,3 @@ class TestAPIACL(v2.FunctionalTest):
                                  'value': 'project-naughty',
                                  }])
         self.assertEqual(401, data.status_int)
-
-
-class TestAPIEventACL(TestAPIACL):
-
-    PATH = '/events'
-
-    def test_non_admin_get_event_types(self):
-        data = self.get_json('/event_types', expect_errors=True,
-                             headers={"X-Roles": "Member",
-                                      "X-Auth-Token": VALID_TOKEN2,
-                                      "X-Project-Id": "project-good"})
-        self.assertEqual(401, data.status_int)
-
-
-class TestBaseApiEventRBAC(v2.FunctionalTest):
-
-    PATH = '/events'
-
-    def setUp(self):
-        super(TestBaseApiEventRBAC, self).setUp()
-        traits = [ev_model.Trait('project_id', 1, 'project-good'),
-                  ev_model.Trait('user_id', 1, 'user-good')]
-        self.message_id = str(uuid.uuid4())
-        ev = ev_model.Event(self.message_id, 'event_type',
-                            datetime.datetime.now(), traits, {})
-        self.event_conn.record_events([ev])
-
-    def test_get_events_without_project(self):
-        headers_no_proj = {"X-Roles": "admin", "X-User-Id": "user-good"}
-        resp = self.get_json(self.PATH, expect_errors=True,
-                             headers=headers_no_proj, status=403)
-        self.assertEqual(403, resp.status_int)
-
-    def test_get_events_without_user(self):
-        headers_no_user = {"X-Roles": "admin", "X-Project-Id": "project-good"}
-        resp = self.get_json(self.PATH, expect_errors=True,
-                             headers=headers_no_user, status=403)
-        self.assertEqual(403, resp.status_int)
-
-    def test_get_events_without_scope(self):
-        headers_no_user_proj = {"X-Roles": "admin"}
-        resp = self.get_json(self.PATH,
-                             expect_errors=True,
-                             headers=headers_no_user_proj,
-                             status=403)
-        self.assertEqual(403, resp.status_int)
-
-    def test_get_events(self):
-        headers = {"X-Roles": "Member", "X-User-Id": "user-good",
-                   "X-Project-Id": "project-good"}
-        self.get_json(self.PATH, headers=headers, status=200)
-
-    def test_get_event(self):
-        headers = {"X-Roles": "Member", "X-User-Id": "user-good",
-                   "X-Project-Id": "project-good"}
-        self.get_json(self.PATH + "/" + self.message_id, headers=headers,
-                      status=200)
-
-
-class TestApiEventAdminRBAC(TestBaseApiEventRBAC):
-
-    def _make_app(self, enable_acl=False):
-        content = ('{"context_is_admin": "role:admin",'
-                   '"telemetry:events:index": "rule:context_is_admin",'
-                   '"telemetry:events:show": "rule:context_is_admin"}')
-        if six.PY3:
-            content = content.encode('utf-8')
-        self.tempfile = fileutils.write_to_tempfile(content=content,
-                                                    prefix='policy',
-                                                    suffix='.json')
-
-        self.CONF.set_override("policy_file", self.tempfile,
-                               group='oslo_policy')
-        return super(TestApiEventAdminRBAC, self)._make_app()
-
-    def tearDown(self):
-        os.remove(self.tempfile)
-        super(TestApiEventAdminRBAC, self).tearDown()
-
-    def test_get_events(self):
-        headers_rbac = {"X-Roles": "admin", "X-User-Id": "user-good",
-                        "X-Project-Id": "project-good"}
-        self.get_json(self.PATH, headers=headers_rbac, status=200)
-
-    def test_get_events_bad(self):
-        headers_rbac = {"X-Roles": "Member", "X-User-Id": "user-good",
-                        "X-Project-Id": "project-good"}
-        self.get_json(self.PATH, headers=headers_rbac, status=403)
-
-    def test_get_event(self):
-        headers = {"X-Roles": "admin", "X-User-Id": "user-good",
-                   "X-Project-Id": "project-good"}
-        self.get_json(self.PATH + "/" + self.message_id, headers=headers,
-                      status=200)
-
-    def test_get_event_bad(self):
-        headers = {"X-Roles": "Member", "X-User-Id": "user-good",
-                   "X-Project-Id": "project-good"}
-        self.get_json(self.PATH + "/" + self.message_id, headers=headers,
-                      status=403)
