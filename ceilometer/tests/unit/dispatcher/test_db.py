@@ -32,7 +32,6 @@ class TestDispatcherDB(base.BaseTestCase):
         self.CONF.set_override('connection', 'sqlite://', group='database')
         self.meter_dispatcher = database.MeterDatabaseDispatcher(self.CONF)
         self.event_dispatcher = database.EventDatabaseDispatcher(self.CONF)
-        self.ctx = None
 
     def test_event_conn(self):
         event = event_models.Event(uuid.uuid4(), 'test',
