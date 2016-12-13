@@ -160,7 +160,7 @@ class TestHttpPublisher(base.BaseTestCase):
         res.status_code = 401
         with mock.patch.object(requests.Session, 'post',
                                return_value=res) as m_req:
-            publisher.publish_samples(self.event_data)
+            publisher.publish_events(self.event_data)
 
         self.assertEqual(1, m_req.call_count)
         self.assertTrue(thelog.error.called)
