@@ -179,7 +179,6 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
     look like the following:
 
     [dispatcher_gnocchi]
-    url = http://localhost:8041
     archive_policy = low
 
     To enable this dispatcher, the following section needs to be present in

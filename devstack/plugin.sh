@@ -257,7 +257,6 @@ function _ceilometer_configure_storage_backend {
         iniset $CEILOMETER_CONF database event_connection mongodb://localhost:27017/ceilometer
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        gnocchi_url=$(gnocchi_service_url)
         iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
         iniset $CEILOMETER_CONF DEFAULT event_dispatchers gnocchi
         # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
@@ -265,7 +264,6 @@ function _ceilometer_configure_storage_backend {
         # NOTE(gordc): set batching to better handle recording on a slow machine
         iniset $CEILOMETER_CONF collector batch_size 50
         iniset $CEILOMETER_CONF collector batch_timeout 5
-        iniset $CEILOMETER_CONF dispatcher_gnocchi url $gnocchi_url
         iniset $CEILOMETER_CONF dispatcher_gnocchi archive_policy ${GNOCCHI_ARCHIVE_POLICY}
         if is_service_enabled swift && [[ "$GNOCCHI_STORAGE_BACKEND" = 'swift' ]] ; then
             iniset $CEILOMETER_CONF dispatcher_gnocchi filter_service_activity "True"
