@@ -22,10 +22,9 @@ from oslo_log import log
 import oslo_messaging
 from stevedore import extension
 
-from ceilometer.agent import plugin_base as base
 from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer.i18n import _, _LI, _LW
+from ceilometer.i18n import _, _LI
 from ceilometer import messaging
 from ceilometer import pipeline
 from ceilometer import service_base
@@ -47,12 +46,6 @@ OPTS = [
                 default=True,
                 deprecated_group='collector',
                 help='Acknowledge message when event persistence fails.'),
-    cfg.BoolOpt('disable_non_metric_meters',
-                default=True,
-                help='WARNING: Ceilometer historically offered the ability to '
-                     'store events as meters. This usage is NOT advised as it '
-                     'can flood the metering database and cause performance '
-                     'degradation.'),
     cfg.BoolOpt('workload_partitioning',
                 default=False,
                 help='Enable workload partitioning, allowing multiple '
@@ -214,11 +207,6 @@ class NotificationService(service_base.PipelineBasedService):
             with self.coord_lock:
                 self._configure_pipeline_listener()
 
-        if not self.conf.notification.disable_non_metric_meters:
-            LOG.warning(_LW('Non-metric meters may be collected. It is highly '
-                            'advisable to disable these meters using '
-                            'ceilometer.conf or the pipeline.yaml'))
-
         self.init_pipeline_refresh()
 
     def _configure_main_queue_listeners(self, pipe_manager,
@@ -237,9 +225,6 @@ class NotificationService(service_base.PipelineBasedService):
         targets = []
         for ext in notification_manager:
             handler = ext.obj
-            if (self.conf.notification.disable_non_metric_meters and
-                    isinstance(handler, base.NonMetricNotificationBase)):
-                continue
             LOG.debug('Event types from %(name)s: %(type)s'
                       ' (ack_on_error=%(error)s)',
                       {'name': ext.name,
