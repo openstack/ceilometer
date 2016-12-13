@@ -47,6 +47,11 @@
     deleted_at:
       type: datetime
       fields: payload.deleted_at
+- event_type: compute.instance.update
+  traits:
+    <<: *instance_traits
+    old_state:
+      fields: payload.old_state
 - event_type: compute.instance.exists
   traits:
     <<: *instance_traits
