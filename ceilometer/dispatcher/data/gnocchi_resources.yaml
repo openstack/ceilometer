@@ -58,6 +58,7 @@ resources:
       - 'disk.capacity'
       - 'disk.allocation'
       - 'disk.usage'
+      - 'compute.instance.booting.time'
     attributes:
       host: resource_metadata.(instance_host|host)
       image_ref: resource_metadata.image_ref
@@ -77,6 +78,10 @@ resources:
       - 'network.incoming.packets.rate'
       - 'network.outgoing.packets'
       - 'network.incoming.packets'
+      - 'network.outgoing.packets.drop'
+      - 'network.incoming.packets.drop'
+      - 'network.outgoing.packets.error'
+      - 'network.incoming.packets.error'
       - 'network.outgoing.bytes.rate'
       - 'network.incoming.bytes.rate'
       - 'network.outgoing.bytes'
@@ -177,12 +182,8 @@ resources:
     metrics:
       - 'volume'
       - 'volume.size'
-      - 'volume.create'
-      - 'volume.delete'
-      - 'volume.update'
-      - 'volume.resize'
-      - 'volume.attach'
-      - 'volume.detach'
+      - 'snapshot.size'
+      - 'volume.snapshot.size'
     attributes:
       display_name: resource_metadata.display_name
     event_delete: volume.delete.start

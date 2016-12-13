@@ -536,7 +536,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 'disk.write.requests.rate', 'disk.read.bytes',
                 'disk.read.bytes.rate', 'disk.write.bytes',
                 'disk.write.bytes.rate', 'disk.latency', 'disk.iops',
-                'disk.capacity', 'disk.allocation', 'disk.usage'],
+                'disk.capacity', 'disk.allocation', 'disk.usage',
+                'compute.instance.booting.time'],
             resource_type='instance')),
         ('hardware.ipmi.node.power', dict(
             sample={
