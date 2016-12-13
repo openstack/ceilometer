@@ -17,7 +17,7 @@ from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _
+from ceilometer.i18n import _LE
 from ceilometer import nova_client
 
 
@@ -124,7 +124,7 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
 
                 resources.append(resource)
             except KeyError:
-                LOG.error(_("Couldn't obtain IP address of "
-                            "instance %s") % instance.id)
+                LOG.error(_LE("Couldn't obtain IP address of "
+                              "instance %s") % instance.id)
 
         return resources
