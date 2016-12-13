@@ -149,13 +149,6 @@ def sanitize_timestamp(timestamp):
     return timeutils.normalize_time(timestamp)
 
 
-def stringify_timestamps(data):
-    """Stringify any datetime in given dict."""
-    isa_timestamp = lambda v: isinstance(v, datetime.datetime)
-    return dict((k, v.isoformat() if isa_timestamp(v) else v)
-                for (k, v) in six.iteritems(data))
-
-
 def dict_to_keyval(value, key_base=None):
     """Expand a given dict to its corresponding key-value pairs.
 
