@@ -75,11 +75,10 @@ class DirectPublisher(publisher.ConfigPublisherBase):
 
         if not isinstance(samples, list):
             samples = [samples]
+        # not published externally; skip signing
         self.get_sample_dispatcher().record_metering_data([
-            utils.meter_message_from_counter(
-                sample, self.conf.publisher.telemetry_secret)
-            for sample in samples
-        ])
+            utils.meter_message_from_counter(sample, secret=None)
+            for sample in samples])
 
     def publish_events(self, events):
         if not self.event_driver:
@@ -89,7 +88,6 @@ class DirectPublisher(publisher.ConfigPublisherBase):
 
         if not isinstance(events, list):
             events = [events]
+        # not published externally; skip signing
         self.get_event_dispatcher().record_events([
-            utils.message_from_event(
-                event, self.conf.publisher.telemetry_secret)
-            for event in events])
+            utils.message_from_event(event, secret=None) for event in events])
