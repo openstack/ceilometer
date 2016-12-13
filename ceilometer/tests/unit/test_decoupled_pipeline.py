@@ -24,7 +24,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
     def _setup_pipeline_cfg(self):
         source = {'name': 'test_source',
                   'interval': 5,
-                  'counters': ['a'],
+                  'meters': ['a'],
                   'resources': [],
                   'sinks': ['test_sink']}
         sink = {'name': 'test_sink',
@@ -36,7 +36,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self.pipeline_cfg['sources'].append({
             'name': 'second_source',
             'interval': 5,
-            'counters': ['b'],
+            'meters': ['b'],
             'resources': [],
             'sinks': ['second_sink']
         })
@@ -56,7 +56,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self.pipeline_cfg['sources'].append({
             'name': 'second_source',
             'interval': 5,
-            'counters': ['b'],
+            'meters': ['b'],
             'resources': [],
             'sinks': ['second_sink']
         })
@@ -76,7 +76,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self.pipeline_cfg['sources'].append({
             'name': 'test_source',
             'interval': 5,
-            'counters': ['b'],
+            'meters': ['b'],
             'resources': [],
             'sinks': ['test_sink']
         })
@@ -103,15 +103,11 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         del self.pipeline_cfg['sinks']
         self._exception_create_pipelinemanager()
 
-    def test_source_no_meters_or_counters(self):
-        del self.pipeline_cfg['sources'][0]['counters']
-        self._exception_create_pipelinemanager()
-
     def test_source_dangling_sink(self):
         self.pipeline_cfg['sources'].append({
             'name': 'second_source',
             'interval': 5,
-            'counters': ['b'],
+            'meters': ['b'],
             'resources': [],
             'sinks': ['second_sink']
         })
@@ -122,8 +118,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self._exception_create_pipelinemanager()
 
     def test_source_with_multiple_sinks(self):
-        counter_cfg = ['a', 'b']
-        self._set_pipeline_cfg('counters', counter_cfg)
+        meter_cfg = ['a', 'b']
+        self._set_pipeline_cfg('meters', meter_cfg)
         self.pipeline_cfg['sinks'].append({
             'name': 'second_sink',
             'transformers': [{
@@ -175,7 +171,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self.pipeline_cfg['sources'].append({
             'name': 'second_source',
             'interval': 5,
-            'counters': ['b'],
+            'meters': ['b'],
             'resources': [],
             'sinks': ['test_sink']
         })
@@ -288,7 +284,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self.pipeline_cfg['sources'].append({
             'name': 'test_source',
             'interval': 5,
-            'counters': ['a'],
+            'meters': ['a'],
             'resources': [],
             'sinks': ['test_sink']
         })
