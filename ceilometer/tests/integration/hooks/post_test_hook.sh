@@ -55,6 +55,7 @@ EXIT_CODE=$?
 
 echo "* Message queue status:"
 sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
+sudo rabbitmqctl list_consumers
 
 if [ $EXIT_CODE -ne 0 ] ; then
     set +x
