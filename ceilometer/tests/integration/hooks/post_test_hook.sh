@@ -30,6 +30,51 @@ function generate_testr_results {
     sudo chmod a+r $BASE/logs/testrepository.subunit.gz $BASE/logs/testr_results.html.gz
 }
 
+function generate_telemetry_report(){
+    set +x
+
+    echo "* Message queue status:"
+    sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
+
+    echo "* Heat stack:"
+    openstack stack show integration_test
+    echo "* Alarm list:"
+    aodh alarm list
+    echo "* Nova instance list:"
+    openstack server list
+
+    echo "* Gnocchi instance list:"
+    gnocchi resource list -t instance
+    for instance_id in $(openstack server list -f value -c ID); do
+        echo "* Nova instance detail:"
+        openstack server show $instance_id
+        echo "* Gnocchi instance detail:"
+        gnocchi resource show -t instance $instance_id
+        echo "* Gnocchi measures for instance ${instance_id}:"
+        gnocchi measures show -r $instance_id cpu_util
+    done
+
+    gnocchi status
+
+    # Be sure to source Gnocchi settings before
+    source $BASE/new/gnocchi/devstack/settings
+    echo "* Unprocessed measures:"
+    sudo find $GNOCCHI_DATA_DIR/measure
+
+    set -x
+}
+
+function generate_reports_and_maybe_exit() {
+    local ret="$1"
+    if [[ $ret != 0 ]]; then
+        # Collect and parse result
+        generate_telemetry_report
+        generate_testr_results
+        exit $ret
+    fi
+}
+
+
 # If we're running in the gate find our keystone endpoint to give to
 # gabbi tests and do a chown. Otherwise the existing environment
 # should provide URL and TOKEN.
@@ -62,12 +107,7 @@ if [ -d $BASE/new/devstack ]; then
     TEMPEST_EXIT_CODE=$?
     set -e
     export_subunit_data "all-plugin"
-    if [[ $TEMPEST_EXIT_CODE != 0 ]]; then
-        # Collect and parse result
-        generate_testr_results
-        exit $TEMPEST_EXIT_CODE
-    fi
-
+    generate_reports_and_maybe_exit $TEMPEST_EXIT_CODE
     cd $CEILOMETER_DIR
 fi
 
@@ -77,44 +117,9 @@ set +e
 sudo -E -H -u ${STACK_USER:-${USER}} tox -eintegration
 EXIT_CODE=$?
 
-echo "* Message queue status:"
-sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
-
-if [ $EXIT_CODE -ne 0 ] ; then
-    set +x
-    echo "* Heat stack:"
-    openstack stack show integration_test
-    echo "* Alarm list:"
-    aodh alarm list
-    echo "* Nova instance list:"
-    openstack server list
-
-    echo "* Gnocchi instance list:"
-    gnocchi resource list -t instance
-    for instance_id in $(openstack server list -f value -c ID); do
-        echo "* Nova instance detail:"
-        openstack server show $instance_id
-        echo "* Gnocchi instance detail:"
-        gnocchi resource show -t instance $instance_id
-        echo "* Gnocchi measures for instance ${instance_id}:"
-        gnocchi measures show -r $instance_id cpu_util
-    done
-
-    gnocchi status
-
-    # Be sure to source Gnocchi settings before
-    source $BASE/new/gnocchi/devstack/settings
-    echo "* Unprocessed measures:"
-    sudo find $GNOCCHI_DATA_DIR/measure
-
-    set -x
-fi
-
-set -e
-
-# Collect and parse result
-if [ -n "$CEILOMETER_DIR" ]; then
+if [ -d $BASE/new/devstack ]; then
     export_subunit_data "integration"
-    generate_testr_results
+    generate_reports_and_maybe_exit $EXIT_CODE
 fi
+
 exit $EXIT_CODE
