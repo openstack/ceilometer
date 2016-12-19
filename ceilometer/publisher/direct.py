@@ -33,7 +33,7 @@ class DirectPublisher(publisher.ConfigPublisherBase):
 
     By default, the database dispatcher is used to select another one we
     can use direct://?dispatcher=gnocchi, direct://?dispatcher=http,
-    direct://?dispatcher=log, ...
+    direct://?dispatcher=file, ...
     """
     def __init__(self, conf, parsed_url):
         super(DirectPublisher, self).__init__(conf, parsed_url)
