@@ -1,0 +1,7 @@
+---
+other:
+  - |
+    Ship YAML files to ceilometer/pipeline/data/ make it convenient
+    to update all the files on upgrade. Users can copy yaml files from
+    /usr/share/ceilometer and customise their own files located in
+    /etc/ceilometer/.

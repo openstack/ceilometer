@@ -270,14 +270,14 @@ function _ceilometer_configure_storage_backend {
     fi
 
     if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'mongodb' ]; then
-        sed -i 's/gnocchi:\/\//database:\/\//g' $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
+        sed -i 's/gnocchi:\/\//database:\/\//g' $CEILOMETER_DIR/ceilometer/pipeline/data/event_pipeline.yaml $CEILOMETER_DIR/ceilometer/pipeline/data/pipeline.yaml
     fi
 
     # configure panko
     if is_service_enabled panko-api; then
         iniadd $CEILOMETER_CONF DEFAULT event_dispatchers panko
         if ! grep -q 'panko' $CEILOMETER_CONF_DIR/event_pipeline.yaml ; then
-            echo '          - direct://?dispatcher=panko' >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
+            echo '          - direct://?dispatcher=panko' >> $CEILOMETER_DIR/ceilometer/pipeline/data/event_pipeline.yaml
         fi
     fi
 
@@ -310,8 +310,7 @@ function configure_ceilometer {
     # with rootwrap installation done elsewhere and also clobber
     # ceilometer.conf settings that have already been made.
     # Anyway, explicit is better than implicit.
-    for conffile in policy.json api_paste.ini pipeline.yaml polling.yaml \
-                    event_definitions.yaml event_pipeline.yaml; do
+    for conffile in policy.json api_paste.ini polling.yaml; do
         cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
     done
 

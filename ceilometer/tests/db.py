@@ -186,10 +186,6 @@ class TestBase(test_base.BaseTestCase):
         # tests work even if ceilometer is not installed globally on
         # the system.
         self.CONF.import_opt('pipeline_cfg_file', 'ceilometer.pipeline')
-        self.CONF.set_override(
-            'pipeline_cfg_file',
-            self.path_get('etc/ceilometer/pipeline.yaml')
-        )
 
     def tearDown(self):
         self.conn.clear()

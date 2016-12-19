@@ -114,7 +114,6 @@ Installing the notification agent
    to their final location::
 
    $ mkdir -p /etc/ceilometer
-   $ cp etc/ceilometer/*.yaml /etc/ceilometer
    $ cp etc/ceilometer/ceilometer.conf /etc/ceilometer
 
 5. Edit ``/etc/ceilometer/ceilometer.conf``
@@ -192,7 +191,6 @@ Installing the Polling Agent
    to their final location::
 
    $ mkdir -p /etc/ceilometer
-   $ cp etc/ceilometer/*.yaml /etc/ceilometer
    $ cp etc/ceilometer/ceilometer.conf /etc/ceilometer/ceilometer.conf
 
 5. Configure messaging by editing ``/etc/ceilometer/ceilometer.conf``::
