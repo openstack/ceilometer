@@ -95,22 +95,6 @@ export NOVA_SERVICE_URL=$(openstack catalog show compute -c endpoints -f value |
 export GLANCE_IMAGE_NAME=$(openstack image list | awk '/ cirros.*uec /{print $4}')
 export ADMIN_TOKEN=$(openstack token issue -c id -f value)
 
-if [ -d $BASE/new/devstack ]; then
-    # NOTE(sileht): on swift job permissions are wrong, I don't known why
-    sudo chown -R tempest:stack $BASE/new/tempest
-    sudo chown -R tempest:stack $BASE/data/tempest
-
-    # Run tests with tempest
-    cd $BASE/new/tempest
-    set +e
-    sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_autoscaling --concurrency=$TEMPEST_CONCURRENCY
-    TEMPEST_EXIT_CODE=$?
-    set -e
-    export_subunit_data "all-plugin"
-    generate_reports_and_maybe_exit $TEMPEST_EXIT_CODE
-    cd $CEILOMETER_DIR
-fi
-
 # Run tests with gabbi
 echo "Running telemetry integration test suite"
 set +e
@@ -119,6 +103,17 @@ EXIT_CODE=$?
 
 if [ -d $BASE/new/devstack ]; then
     export_subunit_data "integration"
+    generate_reports_and_maybe_exit $EXIT_CODE
+
+    # NOTE(sileht): on swift job permissions are wrong, I don't known why
+    sudo chown -R tempest:stack $BASE/new/tempest
+    sudo chown -R tempest:stack $BASE/data/tempest
+
+    # Run tests with tempest
+    cd $BASE/new/tempest
+    sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_autoscaling --concurrency=$TEMPEST_CONCURRENCY
+    EXIT_CODE=$?
+    export_subunit_data "all-plugin"
     generate_reports_and_maybe_exit $EXIT_CODE
 fi
 
