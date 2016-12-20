@@ -20,8 +20,8 @@
 
 Ceilometer has several daemons. The basic are: :term:`polling agent` running
 either on the Nova compute node(s) or :term:`polling agent` running on the
-central management node(s), :term:`collector` and :term:`notification agent`
-running on the cloud's management node(s).
+central management node(s), :term:`notification agent` running on the cloud's
+management node(s).
 
 In a development environment created by devstack_, these services are
 typically running on the same server.
