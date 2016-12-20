@@ -156,7 +156,7 @@ tests:
       redirects: true
       method: GET
       poll:
-          count: 240
+          count: 300
           delay: 1
       status: 404
 
