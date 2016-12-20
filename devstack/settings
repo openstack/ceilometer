@@ -60,8 +60,8 @@ function _ceilometer_check_for_gnocchi {
         for plugin in ${plugins//,/ }; do
             if [ "$plugin" == 'gnocchi' ]; then
                 seen_gnocchi=True
-            elif [ "$plugin" == 'ceilometer' ]; then
-                [[ "$seen_gnocchi" == 'False' ]] && die $LINENO "gnocchi must be enabled before ceilometer!"
+            elif [ "$plugin" == 'ceilometer' ] && [ "$seen_gnocchi" == 'False' ]; then
+                die $LINENO "gnocchi must be enabled before ceilometer!"
             fi
         done
     fi
