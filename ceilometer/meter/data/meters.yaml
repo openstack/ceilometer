@@ -88,6 +88,7 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
+    user_metadata: $.payload.metadata
 
   - name: 'vcpus'
     event_type: 'compute.instance.*'
@@ -97,6 +98,7 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
+    user_metadata: $.payload.metadata
 
   - name: 'compute.instance.booting.time'
     event_type: 'compute.instance.create.end'
@@ -107,6 +109,7 @@ metric:
       plugin: 'timedelta'
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
+    user_metadata: $.payload.metadata
 
   - name: 'disk.root.size'
     event_type: 'compute.instance.*'
@@ -116,6 +119,7 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
+    user_metadata: $.payload.metadata
 
   - name: 'disk.ephemeral.size'
     event_type: 'compute.instance.*'
@@ -125,6 +129,7 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
+    user_metadata: $.payload.metadata
 
   - name: 'bandwidth'
     event_type: 'l3.meter'

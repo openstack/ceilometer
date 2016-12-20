@@ -24,7 +24,7 @@ from stevedore import extension
 from ceilometer.agent import plugin_base
 from ceilometer import declarative
 from ceilometer.i18n import _LE, _LW
-from ceilometer import sample
+from ceilometer import sample as sample_util
 
 OPTS = [
     cfg.StrOpt('meter_definitions_cfg_file',
@@ -44,7 +44,8 @@ class MeterDefinition(object):
     REQUIRED_FIELDS = ['name', 'type', 'event_type', 'unit', 'volume',
                        'resource_id']
 
-    def __init__(self, definition_cfg, plugin_manager):
+    def __init__(self, definition_cfg, conf, plugin_manager):
+        self.conf = conf
         self.cfg = definition_cfg
         missing = [field for field in self.REQUIRED_FIELDS
                    if not self.cfg.get(field)]
@@ -57,7 +58,7 @@ class MeterDefinition(object):
             self._event_type = [self._event_type]
 
         if ('type' not in self.cfg.get('lookup', []) and
-                self.cfg['type'] not in sample.TYPES):
+                self.cfg['type'] not in sample_util.TYPES):
             raise declarative.MeterDefinitionException(
                 _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
@@ -67,6 +68,7 @@ class MeterDefinition(object):
             'project_id', "_context_tenant_id|_context_tenant", plugin_manager)
         self._attributes = {}
         self._metadata_attributes = {}
+        self._user_meta = None
 
         for name in self.SAMPLE_ATTRIBUTES:
             attr_cfg = self.cfg.get(name)
@@ -77,6 +79,10 @@ class MeterDefinition(object):
         for name in metadata:
             self._metadata_attributes[name] = declarative.Definition(
                 name, metadata[name], plugin_manager)
+        user_meta = self.cfg.get('user_metadata')
+        if user_meta:
+            self._user_meta = declarative.Definition(None, user_meta,
+                                                     plugin_manager)
 
         # List of fields we expected when multiple meter are in the payload
         self.lookup = self.cfg.get('lookup')
@@ -101,6 +107,12 @@ class MeterDefinition(object):
             value = parser.parse(message)
             if value:
                 sample['metadata'][name] = value
+
+        if self._user_meta:
+            meta = self._user_meta.parse(message)
+            if meta:
+                sample_util.add_reserved_user_metadata(
+                    self.conf, meta, sample['metadata'])
 
         # NOTE(sileht): We expect multiple samples in the payload
         # so put each attribute into a list
@@ -178,7 +190,8 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
                             % meter_cfg)
                 continue
             try:
-                md = MeterDefinition(meter_cfg, plugin_manager)
+                md = MeterDefinition(meter_cfg, self.manager.conf,
+                                     plugin_manager)
             except declarative.DefinitionException as e:
                 errmsg = _LE("Error loading meter definition: %s")
                 LOG.error(errmsg, six.text_type(e))
@@ -221,4 +234,4 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
         for d in self.definitions:
             if d.match_type(notification_body['event_type']):
                 for s in d.to_samples(notification_body):
-                    yield sample.Sample.from_notification(**s)
+                    yield sample_util.Sample.from_notification(**s)

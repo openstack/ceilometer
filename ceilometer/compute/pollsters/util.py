@@ -14,7 +14,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.compute import util as compute_util
 from ceilometer import sample
 
 
@@ -72,8 +71,8 @@ def _get_metadata_from_object(conf, instance):
     metadata['root_gb'] = (int(metadata['disk_gb']) -
                            int(metadata['ephemeral_gb']))
 
-    return compute_util.add_reserved_user_metadata(conf, instance.metadata,
-                                                   metadata)
+    return sample.add_reserved_user_metadata(conf, instance.metadata,
+                                             metadata)
 
 
 def make_sample_from_instance(conf, instance, name, type, unit, volume,
