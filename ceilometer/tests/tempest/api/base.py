@@ -16,7 +16,6 @@ from oslo_utils import timeutils
 from tempest.common import compute
 from tempest.common.utils import data_utils
 from tempest import config
-from tempest import exceptions
 from tempest.lib import exceptions as lib_exc
 import tempest.test
 
@@ -128,7 +127,7 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
                 return body
             time.sleep(CONF.compute.build_interval)
 
-        raise exceptions.TimeoutException(
+        raise lib_exc.TimeoutException(
             'Sample for metric:%s with query:%s has not been added to the '
             'database within %d seconds' % (metric, query,
                                             CONF.compute.build_timeout))
