@@ -14,7 +14,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -68,7 +68,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -77,7 +77,7 @@ tests:
 - name: get events that match query via request data
   url: /v2/events
   request_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
       X-Roles: admin
       X-User-Id: user1
       X-Project-Id: project1
@@ -88,7 +88,7 @@ tests:
           type: string
           value: cookies_chocolate.chip
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -101,7 +101,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -110,7 +110,7 @@ tests:
 - name: get events that match bad query via request data
   url: /v2/events
   request_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
       X-Roles: admin
       X-User-Id: user1
       X-Project-Id: project1
@@ -121,7 +121,7 @@ tests:
           type: string
           value: cookies_chocolate.chip
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -130,7 +130,7 @@ tests:
 - name: get events that match bad query via request data malformed list
   url: /v2/events
   request_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
       X-Roles: admin
       X-User-Id: user1
       X-Project-Id: project1
@@ -172,7 +172,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -193,7 +193,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"
 
@@ -205,6 +205,6 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json; charset=UTF-8
+      content-type: application/json
   response_strings:
       - "[]"

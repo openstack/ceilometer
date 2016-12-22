@@ -72,7 +72,7 @@ class Client(object):
 
             # nova adapter options
             region_name=creds.region_name,
-            interface=creds.interface,
+            endpoint_type=creds.interface,
             service_type=conf.service_types.nova,
             logger=logger)
 

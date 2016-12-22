@@ -18,12 +18,10 @@ import shutil
 
 from keystoneauth1 import exceptions as ka_exceptions
 import mock
-from novaclient import client as novaclient
 from oslo_config import fixture as fixture_config
 from oslo_utils import fileutils
 from oslotest import base
 from oslotest import mockpatch
-import requests
 import six
 from stevedore import extension
 import yaml
@@ -325,11 +323,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     @mock.patch('ceilometer.agent.manager.LOG')
     @mock.patch('ceilometer.nova_client.LOG')
     def test_hardware_discover_fail_minimize_logs(self, novalog, baselog):
-        self.useFixture(mockpatch.PatchObject(
-            novaclient.HTTPClient,
-            'authenticate',
-            side_effect=requests.ConnectionError))
-
         class PollsterHardware(agentbase.TestPollster):
             discovery = 'tripleo_overcloud_nodes'
 

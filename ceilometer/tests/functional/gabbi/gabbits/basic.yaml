@@ -10,7 +10,7 @@ tests:
 -    name: quick root check
      url: /
      response_headers:
-         content-type: application/json; charset=UTF-8
+         content-type: application/json
      response_strings:
          - '"base": "application/json"'
      response_json_paths:
