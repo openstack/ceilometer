@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# nova documentation build configuration file, created by
+# ceilometer documentation build configuration file, created by
 # sphinx-quickstart on Sat May  1 15:17:47 2010.
 #
 # This file is execfile()d with the current directory set to
@@ -201,7 +201,7 @@ except Exception:
 # html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'novadoc'
+htmlhelp_basename = 'ceilometerdoc'
 
 
 # -- Options for LaTeX output -------------------------------------------------
