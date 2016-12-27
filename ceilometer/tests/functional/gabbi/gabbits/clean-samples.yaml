@@ -33,7 +33,7 @@ tests:
           $.[0].counter_name: apples
       status: 201
       response_headers:
-          content-type: application/json; charset=UTF-8
+          content-type: application/json
 
 # When POSTing a sample perhaps we should get back a location header
 # with the URI of the posted sample

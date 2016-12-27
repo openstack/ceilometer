@@ -75,7 +75,7 @@ class Client(object):
 
             # nova adapter options
             region_name=conf.region_name,
-            interface=conf.interface,
+            endpoint_type=conf.interface,
             service_type=cfg.CONF.service_types.nova,
 
             # keystone adapter options
