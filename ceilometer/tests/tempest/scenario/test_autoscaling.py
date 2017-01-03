@@ -66,11 +66,14 @@ class TestAutoscalingGabbi(test.BaseTestCase):
         images = cls.os_admin.image_client_v2.list_images()["images"]
         for img in images:
             name = img["name"]
-            if name.startswith("cirros") and name.endswith("-uec"):
+            # devstack or tempest format
+            if ((name.startswith("cirros") and name.endswith("-uec")) or
+                    name == 'scenario-img'):
                 os.environ["GLANCE_IMAGE_NAME"] = name
                 break
+
         else:
-            cls.skipException("A cirros-.*-uec image is required")
+            cls.skipException("A cirros-.*-uec/cirros image is required")
 
     @staticmethod
     def clear_credentials():
