@@ -115,10 +115,6 @@ def list_opts():
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
-        # NOTE(sileht): the configuration file contains only the options
-        # for the password plugin that handles keystone v2 and v3 API
-        # with discovery. But other options are possible.
-        ('service_credentials', ceilometer.keystone_client.CLI_OPTS),
         ('service_types',
          itertools.chain(ceilometer.energy.kwapi.SERVICE_OPTS,
                          ceilometer.image.discovery.SERVICE_OPTS,
@@ -137,6 +133,8 @@ def list_keystoneauth_opts():
     # NOTE(sileht): the configuration file contains only the options
     # for the password plugin that handles keystone v2 and v3 API
     # with discovery. But other options are possible.
-    return [('service_credentials', (
-            loading.get_auth_common_conf_options() +
-            loading.get_auth_plugin_conf_options('password')))]
+    return [('service_credentials', itertools.chain(
+        loading.get_auth_common_conf_options(),
+        loading.get_auth_plugin_conf_options('password'),
+        ceilometer.keystone_client.CLI_OPTS
+    ))]

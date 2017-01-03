@@ -21,10 +21,11 @@ LOG = log.getLogger(__name__)
 
 
 def get_gnocchiclient(conf, endpoint_override=None):
-    session = keystone_client.get_session(conf)
+    group = conf.dispatcher_gnocchi.auth_section
+    session = keystone_client.get_session(conf, group=group)
     return client.Client('1', session,
-                         interface=conf.service_credentials.interface,
-                         region_name=conf.service_credentials.region_name,
+                         interface=conf[group].interface,
+                         region_name=conf[group].region_name,
                          endpoint_override=endpoint_override)
 
 

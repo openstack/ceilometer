@@ -14,7 +14,6 @@
 
 import sys
 
-from keystoneauth1 import loading as ka_loading
 from oslo_config import cfg
 from oslo_db import options as db_options
 import oslo_i18n
@@ -56,7 +55,7 @@ def prepare_service(argv=None, config_files=None, conf=None):
          version=version.version_info.version_string(),
          default_config_files=config_files)
 
-    ka_loading.load_auth_from_conf_options(conf, "service_credentials")
+    keystone_client.post_register_keystoneauth_opts(conf)
 
     log.setup(conf, 'ceilometer')
     utils.setup_root_helper(conf)
