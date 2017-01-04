@@ -50,11 +50,12 @@ GITBRANCH["python-ceilometerclient"]=${CEILOMETERCLIENT_BRANCH:-master}
 GITDIR["python-ceilometerclient"]=$DEST/python-ceilometerclient
 GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
 
-# Make sure gnocchi is enabled before ceilometer
-function _ceilometer_check_for_gnocchi {
+# Make sure gnocchi and panko plugin is enabled before ceilometer
+function _ceilometer_check_for_storage  {
+    local plugins="${DEVSTACK_PLUGINS}"
+    local plugin
+
     if [ "$CEILOMETER_BACKEND" == 'gnocchi' ]; then
-        local plugins="${DEVSTACK_PLUGINS}"
-        local plugin
         local seen_gnocchi=False
 
         for plugin in ${plugins//,/ }; do
@@ -65,9 +66,20 @@ function _ceilometer_check_for_gnocchi {
             fi
         done
     fi
+
+    local seen_ceilometer=False
+
+    for plugin in ${plugins//,/ }; do
+        if [ "$plugin" == 'ceilometer' ]; then
+             seen_ceilometer=True
+        elif [ "$plugin" == 'panko' ] && [[ "$seen_ceilometer" == 'True' ]]; then
+             die $LINENO "Panko must be enabled before ceilometer!"
+        fi
+    done
 }
 
-_ceilometer_check_for_gnocchi
+_ceilometer_check_for_storage
+
 # Get rid of this before done.
 # Tell emacs to use shell-script-mode
 ## Local variables:
