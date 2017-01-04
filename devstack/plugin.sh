@@ -163,28 +163,28 @@ function _ceilometer_prepare_virt_drivers {
 
 # Create ceilometer related accounts in Keystone
 function ceilometer_create_accounts {
+    # At this time, the /etc/openstack/clouds.yaml is available,
+    # we could leverage that by setting OS_CLOUD
+    OLD_OS_CLOUD=$OS_CLOUD
+    export OS_CLOUD='devstack-admin'
+
+    create_service_user "ceilometer" "admin"
+
     if is_service_enabled ceilometer-api; then
-        # At this time, the /etc/openstack/clouds.yaml is available,
-        # we could leverage that by setting OS_CLOUD
-        OLD_OS_CLOUD=$OS_CLOUD
-        export OS_CLOUD='devstack-admin'
-
-        create_service_user "ceilometer" "admin"
-
         get_or_create_service "ceilometer" "metering" "OpenStack Telemetry Service"
         get_or_create_endpoint "metering" \
             "$REGION_NAME" \
             "$(ceilometer_service_url)" \
             "$(ceilometer_service_url)" \
             "$(ceilometer_service_url)"
-
-        if is_service_enabled swift; then
-            # Ceilometer needs ResellerAdmin role to access Swift account stats.
-            get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
-        fi
-
-        export OS_CLOUD=$OLD_OS_CLOUD
     fi
+
+    if is_service_enabled swift; then
+        # Ceilometer needs ResellerAdmin role to access Swift account stats.
+        get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
+    fi
+
+    export OS_CLOUD=$OLD_OS_CLOUD
 }
 
 # Activities to do before ceilometer has been installed.
