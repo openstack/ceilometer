@@ -24,8 +24,6 @@
 Storage Backend Installation
 ============================
 
-This step is a prerequisite for the collector and API services. You may use
-one of the listed database backends below to store Ceilometer data.
 
 Gnocchi
 -------
@@ -76,100 +74,14 @@ Gnocchi
 
    2. Enable batch processing::
 
-        [collector]
+        [notification]
         batch_size = 100
         batch_timeout = 5
 
-6. Start collector service
+6. Start notification service
 
 .. _oslo.cache: http://docs.openstack.org/developer/oslo.cache/opts.html
-
-
-MongoDB
--------
-
-   Follow the instructions to install the MongoDB_ package for your operating
-   system, then start the service. The required minimum version of MongoDB is
-   2.4.x. You will also need to have pymongo_ 2.4 installed
-
-   To use MongoDB as the storage backend, change the 'database' section in
-   ceilometer.conf as follows::
-
-    [database]
-    connection = mongodb://username:password@host:27017/ceilometer
-
-SQLalchemy-supported DBs
-------------------------
-
-   You may alternatively use any SQLAlchemy-supported DB such as
-   `PostgreSQL` or `MySQL`.
-
-   To use MySQL as the storage backend, change the 'database' section in
-   ceilometer.conf as follows::
-
-    [database]
-    connection = mysql+pymysql://username:password@host/ceilometer?charset=utf8
-
-HBase
------
-
-   HBase backend is implemented to use HBase Thrift interface, therefore it is
-   mandatory to have the HBase Thrift server installed and running. To start
-   the Thrift server, please run the following command::
-
-    ${HBASE_HOME}/bin/hbase thrift start
-
-   The implementation uses `HappyBase`_, which is a wrapper library used to
-   interact with HBase via Thrift protocol. You can verify the Thrift
-   connection by running a quick test from a client:
-
-   .. code-block:: python
-
-    import happybase
-
-    conn = happybase.Connection(host=$hbase-thrift-server,
-                                port=9090,
-                                table_prefix=None,
-                                table_prefix_separator='_')
-    print conn.tables() # this returns a list of HBase tables in your HBase server
-
-   .. note::
-
-      HappyBase version 0.5 or greater is required. Additionally, version 0.7
-      is not currently supported.
-
-   In the case of HBase, the required database tables (`project`, `user`, `resource`,
-   `meter`) should be created manually with `f` column family for each one.
-
-   To use HBase as the storage backend, change the 'database' section in
-   ceilometer.conf as follows::
-
-    [database]
-    connection = hbase://hbase-thrift-host:9090
-
-   It is possible to customize happybase's `table_prefix` and `table_prefix_separator`
-   via query string. By default `table_prefix` is not set and `table_prefix_separator`
-   is '_'. When `table_prefix` is not specified `table_prefix_separator` is not taken
-   into account. E.g. the resource table in the default case will be 'resource' while
-   with `table_prefix` set to 'ceilo' and `table_prefix_separator` to '.' the resulting
-   table will be 'ceilo.resource'. For this second case this is the database connection
-   configuration::
-
-    [database]
-    connection = hbase://hbase-thrift-host:9090?table_prefix=ceilo&table_prefix_separator=.
-
-   To ensure proper configuration, please add the following lines to the
-   `hbase-site.xml` configuration file::
-
-    <property>
-      <name>hbase.thrift.minWorkerThreads</name>
-      <value>200</value>
-    </property>
-
 .. _`Gnocchi installation`: http://docs.openstack.org/developer/gnocchi/install.html
-.. _HappyBase: http://happybase.readthedocs.org/en/latest/index.html#
-.. _MongoDB: http://www.mongodb.org/
-.. _pymongo: https://pypi.python.org/pypi/pymongo/
 
 
 Installing the notification agent
@@ -189,15 +101,18 @@ Installing the notification agent
    $ cd ceilometer
    $ sudo python setup.py install
 
-3. Copy the sample configuration files from the source tree
+3. Generate configuration file::
+
+   $ tox -egenconfig
+
+4. Copy the sample configuration files from the source tree
    to their final location::
 
    $ mkdir -p /etc/ceilometer
-   $ cp etc/ceilometer/*.json /etc/ceilometer
    $ cp etc/ceilometer/*.yaml /etc/ceilometer
-   $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
+   $ cp etc/ceilometer/ceilometer.conf /etc/ceilometer
 
-4. Edit ``/etc/ceilometer/ceilometer.conf``
+5. Edit ``/etc/ceilometer/ceilometer.conf``
 
    1. Configure messaging::
 
@@ -223,72 +138,23 @@ Installing the notification agent
    Refer to :doc:`/configuration` for details about any other options
    you might want to modify before starting the service.
 
+6. Edit ``/etc/ceilometer/ceilometer.conf``:
+
+   Change publisher endpoints to expected targets. By default, it pushes to a
+   `metering.sample` topic on the oslo.messaging queue. Available publishers
+   are listed in :ref:`pipeline-publishers` section.
+
 5. Start the notification daemon::
 
      $ ceilometer-agent-notification
 
    .. note::
 
-      The default development configuration of the collector logs to
+      The default development configuration of the notification logs to
       stderr, so you may want to run this step using a screen session
       or other tool for maintaining a long-running program in the
       background.
 
-
-Installing the collector
-========================
-
-.. index::
-   double: installing; collector
-
-.. _storage_backends:
-
-1. Clone the ceilometer git repository to the management server::
-
-   $ cd /opt/stack
-   $ git clone https://git.openstack.org/openstack/ceilometer.git
-
-2. As a user with ``root`` permissions or ``sudo`` privileges, run the
-   ceilometer installer::
-
-   $ cd ceilometer
-   $ sudo python setup.py install
-
-3. Copy the sample configuration files from the source tree
-   to their final location::
-
-   $ mkdir -p /etc/ceilometer
-   $ cp etc/ceilometer/*.json /etc/ceilometer
-   $ cp etc/ceilometer/*.yaml /etc/ceilometer
-   $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
-
-4. Edit ``/etc/ceilometer/ceilometer.conf``
-
-   1. Configure messaging::
-
-        [oslo_messaging_notifications]
-        topics = notifications
-
-        [oslo_messaging_rabbit]
-        rabbit_userid = stackrabbit
-        rabbit_password = openstack1
-        rabbit_hosts = 10.0.2.15
-
-   2. Set the ``telemetry_secret`` value (if enabled for notification agent)
-
-   Refer to :doc:`/configuration` for details about any other options
-   you might want to modify before starting the service.
-
-5. Start the collector::
-
-     $ ceilometer-collector
-
-   .. note::
-
-      The default development configuration of the collector logs to
-      stderr, so you may want to run this step using a screen session
-      or other tool for maintaining a long-running program in the
-      background.
 
 Installing the Polling Agent
 ============================
@@ -313,25 +179,25 @@ Installing the Polling Agent
    $ cd ceilometer
    $ sudo python setup.py install
 
-3. Copy the sample configuration files from the source tree
+3. Generate configuration file::
+
+   $ tox -egenconfig
+
+4. Copy the sample configuration files from the source tree
    to their final location::
 
    $ mkdir -p /etc/ceilometer
-   $ cp etc/ceilometer/*.json /etc/ceilometer
    $ cp etc/ceilometer/*.yaml /etc/ceilometer
-   $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
+   $ cp etc/ceilometer/ceilometer.conf /etc/ceilometer/ceilometer.conf
 
-4. Configure messaging by editing ``/etc/ceilometer/ceilometer.conf``::
-
-     [oslo_messaging_notifications]
-     topics = notifications
+5. Configure messaging by editing ``/etc/ceilometer/ceilometer.conf``::
 
      [oslo_messaging_rabbit]
      rabbit_userid = stackrabbit
      rabbit_password = openstack1
      rabbit_hosts = 10.0.2.15
 
-5. In order to retrieve object store statistics, ceilometer needs
+6. In order to retrieve object store statistics, ceilometer needs
    access to swift with ``ResellerAdmin`` role. You should give this
    role to your ``os_username`` user for tenant ``os_tenant_name``::
 
@@ -348,11 +214,11 @@ Installing the Polling Agent
                           --project $SERVICE_TENANT \
                           --user $CEILOMETER_USER
 
-6. Start the agent::
+7. Start the agent::
 
    $ ceilometer-polling
 
-7. By default, the polling agent polls the `compute` and `central` namespaces.
+8. By default, the polling agent polls the `compute` and `central` namespaces.
    You can specify which namespace to poll in the `ceilometer.conf`
    configuration file or on the command line::
 
@@ -367,80 +233,8 @@ Installing the API Server
 
 .. note::
 
-   The API server needs to be able to talk to keystone and ceilometer's
-   database. It is only required if you choose to store data in legacy
-   database or if you inject new samples via REST API.
-
-1. Clone the ceilometer git repository to the server::
-
-   $ cd /opt/stack
-   $ git clone https://git.openstack.org/openstack/ceilometer.git
-
-2. As a user with ``root`` permissions or ``sudo`` privileges, run the
-   ceilometer installer::
-
-   $ cd ceilometer
-   $ sudo python setup.py install
-
-3. Copy the sample configuration files from the source tree
-   to their final location::
-
-   $ mkdir -p /etc/ceilometer
-   $ cp etc/ceilometer/api_paste.ini /etc/ceilometer
-   $ cp etc/ceilometer/*.json /etc/ceilometer
-   $ cp etc/ceilometer/*.yaml /etc/ceilometer
-   $ cp etc/ceilometer/ceilometer.conf.sample /etc/ceilometer/ceilometer.conf
-
-4. Configure messaging by editing ``/etc/ceilometer/ceilometer.conf``::
-
-     [oslo_messaging_notifications]
-     topics = notifications
-
-     [oslo_messaging_rabbit]
-     rabbit_userid = stackrabbit
-     rabbit_password = openstack1
-     rabbit_hosts = 10.0.2.15
-
-5. Create a service for ceilometer in keystone::
-
-     $ openstack service create metering --name=ceilometer \
-                                         --description="Ceilometer Service"
-
-6. Create an endpoint in keystone for ceilometer::
-
-     $ openstack endpoint create $CEILOMETER_SERVICE \
-                                 --region RegionOne \
-                                 --publicurl "http://$SERVICE_HOST:8777" \
-                                 --adminurl "http://$SERVICE_HOST:8777" \
-                                 --internalurl "http://$SERVICE_HOST:8777"
-
-   .. note::
-
-     CEILOMETER_SERVICE is the id of the service created by the first command
-     and SERVICE_HOST is the host where the Ceilometer API is running. The
-     default port value for ceilometer API is 8777. If the port value
-     has been customized, adjust accordingly.
-
-7. Choose and start the API server.
-
-   Ceilometer includes the ``ceilometer-api`` command. This can be
-   used to run the API server. For smaller or proof-of-concept
-   installations this is a reasonable choice. For larger installations it
-   is strongly recommended to install the API server in a WSGI host
-   such as mod_wsgi (see :doc:`mod_wsgi`). Doing so will provide better
-   performance and more options for making adjustments specific to the
-   installation environment.
-
-   If you are using the ``ceilometer-api`` command it can be started
-   as::
-
-    $ ceilometer-api
-
-.. note::
-
-   The development version of the API server logs to stderr, so you
-   may want to run this step using a screen session or other tool for
-   maintaining a long-running program in the background.
+   The Ceilometer's API service is no longer supported. Data storage should be
+   handled by a separate service such as Gnocchi.
 
 
 Enabling Service Notifications
