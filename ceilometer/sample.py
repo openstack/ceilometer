@@ -25,12 +25,53 @@ import uuid
 
 from oslo_config import cfg
 from oslo_utils import timeutils
+import six
 
 OPTS = [
     cfg.StrOpt('sample_source',
                default='openstack',
                help='Source for samples emitted on this instance.'),
+    cfg.ListOpt('reserved_metadata_namespace',
+                default=['metering.'],
+                help='List of metadata prefixes reserved for metering use.'),
+    cfg.IntOpt('reserved_metadata_length',
+               default=256,
+               help='Limit on length of reserved metadata values.'),
+    cfg.ListOpt('reserved_metadata_keys',
+                default=[],
+                help='List of metadata keys reserved for metering use. And '
+                     'these keys are additional to the ones included in the '
+                     'namespace.'),
 ]
+
+
+def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
+    limit = conf.reserved_metadata_length
+    user_metadata = {}
+    for prefix in conf.reserved_metadata_namespace:
+        md = dict(
+            (k[len(prefix):].replace('.', '_'),
+             v[:limit] if isinstance(v, six.string_types) else v)
+            for k, v in src_metadata.items()
+            if (k.startswith(prefix) and
+                k[len(prefix):].replace('.', '_') not in dest_metadata)
+        )
+        user_metadata.update(md)
+
+    for metadata_key in conf.reserved_metadata_keys:
+        md = dict(
+            (k.replace('.', '_'),
+             v[:limit] if isinstance(v, six.string_types) else v)
+            for k, v in src_metadata.items()
+            if (k == metadata_key and
+                k.replace('.', '_') not in dest_metadata)
+        )
+        user_metadata.update(md)
+
+    if user_metadata:
+        dest_metadata['user_metadata'] = user_metadata
+
+    return dest_metadata
 
 
 # Fields explanation:
