@@ -32,7 +32,7 @@ from stevedore import extension
 
 from ceilometer.agent import plugin_base
 from ceilometer import coordination
-from ceilometer.i18n import _, _LE, _LI, _LW
+from ceilometer.i18n import _LE, _LI, _LW
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
@@ -207,7 +207,7 @@ class PollingTask(object):
                             'res_list': err.fail_res_list}))
                     self.resources[key].blacklist.extend(err.fail_res_list)
                 except Exception as err:
-                    LOG.warning(_(
+                    LOG.error(_LE(
                         'Continue after error from %(name)s: %(error)s')
                         % ({'name': pollster.name, 'error': err}),
                         exc_info=True)
