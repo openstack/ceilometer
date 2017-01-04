@@ -201,6 +201,9 @@ the number of processing queues, at the very least, match the number of agents.
    previously created queues may no longer be assigned to active agents. It
    is only recommended that you **increase** processing queues.
 
+
+.. _pipeline-publishers:
+
 Publishers
 ~~~~~~~~~~
 
