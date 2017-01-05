@@ -191,6 +191,7 @@ resources:
       - 'volume.size'
       - 'snapshot.size'
       - 'volume.snapshot.size'
+      - 'volume.backup.size'
     attributes:
       display_name: resource_metadata.display_name
     event_delete: volume.delete.start
