@@ -18,9 +18,9 @@ from ceilometer.agent import plugin_base
 from ceilometer import keystone_client
 
 SERVICE_OPTS = [
-    cfg.StrOpt('cinderv2',
-               default='volumev2',
-               help='Cinder V2 service type.'),
+    cfg.StrOpt('cinder', deprecated_name='cinderv2',
+               default='volumev3',
+               help='Cinder service type.'),
 ]
 
 
@@ -29,11 +29,11 @@ class _BaseDiscovery(plugin_base.DiscoveryBase):
         super(_BaseDiscovery, self).__init__(conf)
         creds = conf.service_credentials
         self.client = cinder_client.Client(
-            version='2',
+            version='3',
             session=keystone_client.get_session(conf),
             region_name=creds.region_name,
             interface=creds.interface,
-            service_type=conf.service_types.cinderv2
+            service_type=conf.service_types.cinder
         )
 
 
