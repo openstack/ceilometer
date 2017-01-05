@@ -98,7 +98,8 @@ resources_update_operation = [
      "type": "update_attribute_type",
      "resource_type": "volume",
      "data": {
-         "attribute": "/attributes/volume_type",
+         "op": "add",
+         "path": "/attributes/volume_type",
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}}},
 ]
@@ -119,6 +120,12 @@ def upgrade_resource_types(conf):
 
     for op in resources_update_operation:
         if op['type'] == 'update_attribute_type':
+            rt = gnocchi.resource_type.get(name=op['resource_type'])
+            attrib = op['data']['path'].replace('/attributes', '')
+            if op['data']['op'] == 'add' and attrib in rt['attributes']:
+                continue
+            if op['data']['op'] == 'remove' and attrib not in rt['attributes']:
+                continue
             try:
                 gnocchi.resource_type.update(op['resource_type'], op['data'])
             except Exception:
