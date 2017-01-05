@@ -45,6 +45,9 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.volume_id
+    metadata:
+      display_name: $.payload.display_name
+      volume_type: $.payload.volume_type
 
   - name: 'snapshot.size'
     event_type:
@@ -57,6 +60,23 @@ metric:
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
     resource_id: $.payload.snapshot_id
+    metadata:
+      display_name: $.payload.display_name
+
+  - name: 'backup.size'
+    event_type:
+      - 'backup.exists'
+      - 'backup.create.*'
+      - 'backup.delete.*'
+      - 'backup.restore.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.size
+    user_id: $.payload.user_id
+    project_id: $.payload.tenant_id
+    resource_id: $.payload.backup_id
+    metadata:
+      display_name: $.payload.display_name
 
   # Magnum
   - name: $.payload.metrics.[*].name
