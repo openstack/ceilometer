@@ -93,15 +93,16 @@ resources_initial = {
 
 # NOTE(sileht): Order matter this have to be considered like alembic migration
 # code, because it updates the resources schema of Gnocchi
-resources_update_operation = [
+resources_update_operations = [
     {"desc": "add volume_type to volume",
      "type": "update_attribute_type",
      "resource_type": "volume",
-     "data": {
+     "data": [{
          "op": "add",
          "path": "/attributes/volume_type",
          "value": {"type": "string", "min_length": 0, "max_length": 255,
-                   "required": False}}},
+                   "required": False}
+     }]},
 ]
 
 
@@ -112,23 +113,15 @@ def upgrade_resource_types(conf):
             gnocchi.resource_type.get(name=name)
         except gnocchi_exc.ResourceTypeNotFound:
             rt = {'name': name, 'attributes': attributes}
-            try:
-                gnocchi.resource_type.create(resource_type=rt)
-            except Exception:
-                LOG.error("Gnocchi resource creation fail", exc_info=True)
-                return
+            gnocchi.resource_type.create(resource_type=rt)
 
-    for op in resources_update_operation:
-        if op['type'] == 'update_attribute_type':
-            rt = gnocchi.resource_type.get(name=op['resource_type'])
-            attrib = op['data']['path'].replace('/attributes', '')
-            if op['data']['op'] == 'add' and attrib in rt['attributes']:
+    for ops in resources_update_operations:
+        if ops['type'] == 'update_attribute_type':
+            rt = gnocchi.resource_type.get(name=ops['resource_type'])
+            first_op = ops['data'][0]
+            attrib = first_op['path'].replace('/attributes', '')
+            if first_op['op'] == 'add' and attrib in rt['attributes']:
                 continue
-            if op['data']['op'] == 'remove' and attrib not in rt['attributes']:
+            if first_op['op'] == 'remove' and attrib not in rt['attributes']:
                 continue
-            try:
-                gnocchi.resource_type.update(op['resource_type'], op['data'])
-            except Exception:
-                LOG.error("Gnocchi resource update fail: %s", op['desc'],
-                          exc_info=True)
-                return
+            gnocchi.resource_type.update(ops['resource_type'], ops['data'])

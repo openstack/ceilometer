@@ -350,16 +350,12 @@ function init_ceilometer {
         if is_service_enabled mysql postgresql ; then
             if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
                 recreate_database ceilometer
-                set -e
                 $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-gnocchi-resource-types
-                set +e
             fi
         fi
         if is_service_enabled gnocchi ; then
             if [ "$CEILOMETER_BACKEND" = 'gnocchi' ]; then
-                set -e
                 $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
-                set +e
             fi
         fi
     fi
