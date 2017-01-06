@@ -102,6 +102,15 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}
      }]},
+    {"desc": "add flavor_name to instance",
+     "type": "update_attribute_type",
+     "resource_type": "instance",
+     "data": [{
+         "op": "add",
+         "path": "/attributes/flavor_name",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": True, "options": {'fill': ''}}
+     }]},
 ]
 
 
