@@ -25,8 +25,6 @@ from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
-EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
-                     'datetime': 4}
 OP_SIGN = {'eq': '=', 'lt': '<', 'le': '<=', 'ne': '!=', 'gt': '>', 'ge': '>='}
 # We need this additional dictionary because we have reverted timestamp in
 # row-keys for stored metrics
@@ -56,31 +54,6 @@ def timestamp(dt, reverse=True):
     td = dt - epoch
     ts = td.microseconds + td.seconds * 1000000 + td.days * 86400000000
     return 0x7fffffffffffffff - ts if reverse else ts
-
-
-def make_events_query_from_filter(event_filter):
-    """Return start and stop row for filtering and a query.
-
-    Query is based on the selected parameter.
-    :param event_filter: storage.EventFilter object.
-    """
-    start = "%s" % (timestamp(event_filter.start_timestamp, reverse=False)
-                    if event_filter.start_timestamp else "")
-    stop = "%s" % (timestamp(event_filter.end_timestamp, reverse=False)
-                   if event_filter.end_timestamp else "")
-    kwargs = {'event_type': event_filter.event_type,
-              'event_id': event_filter.message_id}
-    res_q = make_query(**kwargs)
-
-    if event_filter.traits_filter:
-        for trait_filter in event_filter.traits_filter:
-            q_trait = make_query(trait_query=True, **trait_filter)
-            if q_trait:
-                if res_q:
-                    res_q += " AND " + q_trait
-                else:
-                    res_q = q_trait
-    return res_q, start, stop
 
 
 def make_timestamp_query(func, start=None, start_op=None, end=None,
@@ -127,30 +100,15 @@ def get_start_end_rts(start, end):
     return rts_start, rts_end
 
 
-def make_query(metaquery=None, trait_query=None, **kwargs):
+def make_query(metaquery=None, **kwargs):
     """Return a filter query string based on the selected parameters.
 
     :param metaquery: optional metaquery dict
-    :param trait_query: optional boolean, for trait_query from kwargs
     :param kwargs: key-value pairs to filter on. Key should be a real
       column name in db
     """
     q = []
     res_q = None
-
-    # Query for traits differs from others. It is constructed with
-    # SingleColumnValueFilter with the possibility to choose comparison
-    # operator
-    if trait_query:
-        trait_name = kwargs.pop('key')
-        op = kwargs.pop('op', 'eq')
-        for k, v in kwargs.items():
-            if v is not None:
-                res_q = ("SingleColumnValueFilter "
-                         "('f', '%s', %s, 'binary:%s', true, true)" %
-                         (prepare_key(trait_name, EVENT_TRAIT_TYPES[k]),
-                          OP_SIGN[op], dump(v)))
-        return res_q
 
     # Note: we use extended constructor for SingleColumnValueFilter here.
     # It is explicitly specified that entry should not be returned if CF is not
@@ -161,10 +119,6 @@ def make_query(metaquery=None, trait_query=None, **kwargs):
                 q.append("SingleColumnValueFilter "
                          "('f', 's_%s', =, 'binary:%s', true, true)" %
                          (value, dump('1')))
-            elif key == 'trait_type':
-                q.append("ColumnPrefixFilter('%s')" % value)
-            elif key == 'event_id':
-                q.append("RowFilter ( = , 'regexstring:\d*:%s')" % value)
             else:
                 q.append("SingleColumnValueFilter "
                          "('f', '%s', =, 'binary:%s', true, true)" %

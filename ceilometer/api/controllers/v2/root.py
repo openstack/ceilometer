@@ -25,7 +25,6 @@ from oslo_utils import strutils
 import pecan
 
 from ceilometer.api.controllers.v2 import capabilities
-from ceilometer.api.controllers.v2 import events
 from ceilometer.api.controllers.v2 import meters
 from ceilometer.api.controllers.v2 import query
 from ceilometer.api.controllers.v2 import resources
@@ -209,14 +208,10 @@ class V2Controller(object):
             aodh_abort()
         elif kind == 'alarms' and self.aodh_url:
             _redirect(self.aodh_url)
-        elif kind == 'events':
-            if self.panko_url:
-                return _redirect(self.panko_url)
-            return events.EventsController(), remainder
-        elif kind == 'event_types':
-            if self.panko_url:
-                return _redirect(self.panko_url)
-            return events.EventTypesController(), remainder
+        elif kind == 'events' and self.panko_url:
+            return _redirect(self.panko_url)
+        elif kind == 'event_types' and self.panko_url:
+            return _redirect(self.panko_url)
         else:
             pecan.abort(404)
 

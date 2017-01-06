@@ -24,11 +24,6 @@ class FakeMeterDispatcher(dispatcher.MeterDispatcherBase):
         pass
 
 
-class FakeEventDispatcher(dispatcher.EventDispatcherBase):
-    def record_events(self, events):
-        pass
-
-
 class TestDispatchManager(base.BaseTestCase):
     def setUp(self):
         super(TestDispatchManager, self).setUp()
@@ -42,11 +37,7 @@ class TestDispatchManager(base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.dispatcher.database.MeterDatabaseDispatcher',
             new=FakeMeterDispatcher))
-        self.useFixture(mockpatch.Patch(
-            'ceilometer.dispatcher.database.EventDatabaseDispatcher',
-            new=FakeEventDispatcher))
 
     def test_load(self):
         sample_mg, event_mg = dispatcher.load_dispatcher_manager(self.CONF)
         self.assertEqual(2, len(list(sample_mg)))
-        self.assertEqual(1, len(list(event_mg)))

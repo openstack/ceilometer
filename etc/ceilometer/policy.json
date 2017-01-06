@@ -12,7 +12,4 @@
 
     "telemetry:get_resource": "",
     "telemetry:get_resources": "",
-
-    "telemetry:events:index": "",
-    "telemetry:events:show": ""
 }

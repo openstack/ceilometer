@@ -29,7 +29,6 @@ except ImportError:
     import testtools.testcase
     raise testtools.testcase.TestSkipped("happybase is needed")
 
-from ceilometer.event.storage import impl_hbase as hbase_event
 from ceilometer.storage import impl_hbase as hbase
 from ceilometer.tests import base as test_base
 from ceilometer.tests import db as tests_db
@@ -85,14 +84,6 @@ class CapabilitiesTest(test_base.BaseTestCase):
         }
 
         actual_capabilities = hbase.Connection.get_capabilities()
-        self.assertEqual(expected_capabilities, actual_capabilities)
-
-    def test_event_capabilities(self):
-        expected_capabilities = {
-            'events': {'query': {'simple': True}},
-        }
-
-        actual_capabilities = hbase_event.Connection.get_capabilities()
         self.assertEqual(expected_capabilities, actual_capabilities)
 
     def test_storage_capabilities(self):

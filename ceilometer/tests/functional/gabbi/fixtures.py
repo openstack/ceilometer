@@ -29,7 +29,6 @@ import six
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.api import app
-from ceilometer.event.storage import models
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import service
@@ -98,7 +97,6 @@ class ConfigFixture(fixture.GabbiFixture):
         database_name = '%s-%s' % (db_url, str(uuid.uuid4()))
         conf.set_override('connection', database_name, group='database')
         conf.set_override('metering_connection', '', group='database')
-        conf.set_override('event_connection', '', group='database')
 
         conf.set_override('gnocchi_is_enabled', False, group='api')
         conf.set_override('aodh_is_enabled', False, group='api')
@@ -151,33 +149,6 @@ class SampleDataFixture(fixture.GabbiFixture):
         print('resource',
               self.conn.db.resource.remove({'source': self.source}))
         print('meter', self.conn.db.meter.remove({'source': self.source}))
-
-
-class EventDataFixture(fixture.GabbiFixture):
-    """Instantiate some sample event data for use in testing."""
-
-    def start_fixture(self):
-        """Create some events."""
-        global LOAD_APP_KWARGS
-        conf = LOAD_APP_KWARGS['conf']
-        self.conn = storage.get_connection_from_config(conf, 'event')
-        events = []
-        name_list = ['chocolate.chip', 'peanut.butter', 'sugar']
-        for ix, name in enumerate(name_list):
-            timestamp = datetime.datetime.utcnow()
-            message_id = 'fea1b15a-1d47-4175-85a5-a4bb2c72924{}'.format(ix)
-            traits = [models.Trait('type', 1, name),
-                      models.Trait('ate', 2, ix)]
-            event = models.Event(message_id,
-                                 'cookies_{}'.format(name),
-                                 timestamp,
-                                 traits, {'nested': {'inside': 'value'}})
-            events.append(event)
-        self.conn.record_events(events)
-
-    def stop_fixture(self):
-        """Destroy the events."""
-        self.conn.db.event.remove({'event_type': '/^cookies_/'})
 
 
 class CORSConfigFixture(fixture.GabbiFixture):

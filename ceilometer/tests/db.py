@@ -52,10 +52,7 @@ class MongoDbManager(DBManager):
                 action='ignore',
                 message='.*you must provide a username and password.*')
             try:
-                self.connection = storage.get_connection(
-                    self._conf, self.url, 'ceilometer.metering.storage')
-                self.event_connection = storage.get_connection(
-                    self._conf, self.url, 'ceilometer.event.storage')
+                self.connection = storage.get_connection(self._conf, self.url)
             except storage.StorageBadVersion as e:
                 raise testcase.TestSkipped(six.text_type(e))
 
@@ -82,10 +79,7 @@ class SQLManager(DBManager):
 
     def setUp(self):
         super(SQLManager, self).setUp()
-        self.connection = storage.get_connection(
-            self._conf, self.url, 'ceilometer.metering.storage')
-        self.event_connection = storage.get_connection(
-            self._conf, self.url, 'ceilometer.event.storage')
+        self.connection = storage.get_connection(self._conf, self.url)
 
 
 class PgSQLManager(SQLManager):
@@ -102,26 +96,10 @@ class MySQLManager(SQLManager):
         conn.execute('CREATE DATABASE %s;' % db_name)
 
 
-class ElasticSearchManager(DBManager):
-    def setUp(self):
-        super(ElasticSearchManager, self).setUp()
-        self.connection = storage.get_connection(
-            self._conf, 'sqlite://', 'ceilometer.metering.storage')
-        self.event_connection = storage.get_connection(
-            self._conf, self.url, 'ceilometer.event.storage')
-        # prefix each test with unique index name
-        self.event_connection.index_name = 'events_%s' % uuid.uuid4().hex
-        # force index on write so data is queryable right away
-        self.event_connection._refresh_on_write = True
-
-
 class HBaseManager(DBManager):
     def setUp(self):
         super(HBaseManager, self).setUp()
-        self.connection = storage.get_connection(
-            self._conf, self.url, 'ceilometer.metering.storage')
-        self.event_connection = storage.get_connection(
-            self._conn, self.url, 'ceilometer.event.storage')
+        self.connection = storage.get_connection(self._conf, self.url)
         # Unique prefix for each test to keep data is distinguished because
         # all test data is stored in one table
         data_prefix = str(uuid.uuid4().hex)
@@ -155,10 +133,7 @@ class SQLiteManager(DBManager):
     def setUp(self):
         super(SQLiteManager, self).setUp()
         self.url = self._url
-        self.connection = storage.get_connection(
-            self._conf, self._url, 'ceilometer.metering.storage')
-        self.event_connection = storage.get_connection(
-            self._conf, self._url, 'ceilometer.event.storage')
+        self.connection = storage.get_connection(self._conf, self._url)
 
 
 @six.add_metaclass(test_base.SkipNotImplementedMeta)
@@ -169,7 +144,6 @@ class TestBase(test_base.BaseTestCase):
         'mysql': MySQLManager,
         'postgresql': PgSQLManager,
         'sqlite': SQLiteManager,
-        'es': ElasticSearchManager,
     }
     if mocks is not None:
         DRIVER_MANAGERS['hbase'] = HBaseManager
@@ -205,9 +179,6 @@ class TestBase(test_base.BaseTestCase):
         self.conn = self.db_manager.connection
         self.conn.upgrade()
 
-        self.event_conn = self.db_manager.event_connection
-        self.event_conn.upgrade()
-
         self.useFixture(mockpatch.Patch('ceilometer.storage.get_connection',
                                         side_effect=self._get_connection))
 
@@ -221,15 +192,11 @@ class TestBase(test_base.BaseTestCase):
         )
 
     def tearDown(self):
-        self.event_conn.clear()
-        self.event_conn = None
         self.conn.clear()
         self.conn = None
         super(TestBase, self).tearDown()
 
-    def _get_connection(self, conf, url, namespace):
-        if namespace == "ceilometer.event.storage":
-            return self.event_conn
+    def _get_connection(self, conf, url):
         return self.conn
 
 

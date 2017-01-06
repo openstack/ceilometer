@@ -32,10 +32,6 @@ ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS = 86
 
 LOG = log.getLogger(__name__)
 
-EVENT_TRAIT_TYPES = {'none': 0, 'string': 1, 'integer': 2, 'float': 3,
-                     'datetime': 4}
-OP_SIGN = {'lt': '$lt', 'le': '$lte', 'ne': '$ne', 'gt': '$gt', 'ge': '$gte'}
-
 MINIMUM_COMPATIBLE_MONGODB_VERSION = [2, 4]
 COMPLETE_AGGREGATE_COMPATIBLE_VERSION = [2, 6]
 
@@ -71,54 +67,6 @@ def make_timestamp_range(start, end,
             end_timestamp_op = '$lt'
         ts_range[end_timestamp_op] = end
     return ts_range
-
-
-def make_events_query_from_filter(event_filter):
-    """Return start and stop row for filtering and a query.
-
-    Query is based on the selected parameter.
-
-    :param event_filter: storage.EventFilter object.
-    """
-    query = {}
-    q_list = []
-    ts_range = make_timestamp_range(event_filter.start_timestamp,
-                                    event_filter.end_timestamp)
-    if ts_range:
-        q_list.append({'timestamp': ts_range})
-    if event_filter.event_type:
-        q_list.append({'event_type': event_filter.event_type})
-    if event_filter.message_id:
-        q_list.append({'_id': event_filter.message_id})
-
-    if event_filter.traits_filter:
-        for trait_filter in event_filter.traits_filter:
-            op = trait_filter.pop('op', 'eq')
-            dict_query = {}
-            for k, v in six.iteritems(trait_filter):
-                if v is not None:
-                    # All parameters in EventFilter['traits'] are optional, so
-                    # we need to check if they are in the query or no.
-                    if k == 'key':
-                        dict_query.setdefault('trait_name', v)
-                    elif k in ['string', 'integer', 'datetime', 'float']:
-                        dict_query.setdefault('trait_type',
-                                              EVENT_TRAIT_TYPES[k])
-                        dict_query.setdefault('trait_value',
-                                              v if op == 'eq'
-                                              else {OP_SIGN[op]: v})
-            dict_query = {'$elemMatch': dict_query}
-            q_list.append({'traits': dict_query})
-    if event_filter.admin_proj:
-        q_list.append({'$or': [
-            {'traits': {'$not': {'$elemMatch': {'trait_name': 'project_id'}}}},
-            {'traits': {
-                '$elemMatch': {'trait_name': 'project_id',
-                               'trait_value': event_filter.admin_proj}}}]})
-    if q_list:
-        query = {'$and': q_list}
-
-    return query
 
 
 def make_query_from_filter(sample_filter, require_meter=True):

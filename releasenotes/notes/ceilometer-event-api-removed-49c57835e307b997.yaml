@@ -1,0 +1,6 @@
+---
+other:
+  - >-
+    The Events API (exposed at /v2/events) which was deprecated has been
+    removed. The Panko project is now responsible for providing this API and can
+    be installed separately.

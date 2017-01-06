@@ -13,19 +13,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from debtcollector import removals
 from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer import dispatcher
-from ceilometer.event.storage import models
 from ceilometer.i18n import _LE
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
 
 
-class DatabaseDispatcher(dispatcher.Base):
+class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase):
     """Dispatcher class for recording metering data into database.
 
     The dispatcher class which records each meter into a database configured
@@ -36,20 +34,14 @@ class DatabaseDispatcher(dispatcher.Base):
 
     [DEFAULT]
     meter_dispatchers = database
-    event_dispatchers = database
     """
 
     @property
     def conn(self):
         if not hasattr(self, "_conn"):
             self._conn = storage.get_connection_from_config(
-                self.conf, self.CONNECTION_TYPE)
+                self.conf)
         return self._conn
-
-
-class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase,
-                              DatabaseDispatcher):
-    CONNECTION_TYPE = 'metering'
 
     def record_metering_data(self, data):
         # We may have receive only one counter on the wire
@@ -78,35 +70,3 @@ class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase,
             LOG.error(_LE('Failed to record %(len)s: %(err)s.'),
                       {'len': len(data), 'err': err})
             raise
-
-
-@removals.removed_class("EventDatabaseDispatcher",
-                        message="Use panko instead",
-                        removal_version="8.0.0")
-class EventDatabaseDispatcher(dispatcher.EventDispatcherBase,
-                              DatabaseDispatcher):
-    CONNECTION_TYPE = 'event'
-
-    def record_events(self, events):
-        if not isinstance(events, list):
-            events = [events]
-
-        event_list = []
-        for ev in events:
-            try:
-                event_list.append(
-                    models.Event(
-                        message_id=ev['message_id'],
-                        event_type=ev['event_type'],
-                        generated=timeutils.normalize_time(
-                            timeutils.parse_isotime(ev['generated'])),
-                        traits=[models.Trait(
-                                name, dtype,
-                                models.Trait.convert_value(dtype, value))
-                                for name, dtype, value in ev['traits']],
-                        raw=ev.get('raw', {}))
-                )
-            except Exception:
-                LOG.exception(_LE("Error processing event and it will be "
-                                  "dropped: %s"), ev)
-        self.conn.record_events(event_list)
