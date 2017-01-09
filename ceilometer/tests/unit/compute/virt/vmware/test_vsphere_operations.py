@@ -45,7 +45,8 @@ class VsphereOperationsTest(base.BaseTestCase):
             vm_object.propSet[0].val = vm_instance
             return vm_object
 
-        def retrieve_props_side_effect(pc, specSet, options):
+        def retrieve_props_side_effect(pc, specSet,
+                                       options, skip_op_id=False):
             # assert inputs
             self.assertEqual(self._vsphere_ops._max_objects,
                              options.maxObjects)
