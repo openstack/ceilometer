@@ -23,7 +23,7 @@ import ceilometer.api.controllers.v2.root
 import ceilometer.collector
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
-import ceilometer.compute.virt.libvirt.inspector
+import ceilometer.compute.virt.libvirt.utils
 import ceilometer.compute.virt.vmware.inspector
 import ceilometer.compute.virt.xenapi.inspector
 import ceilometer.coordination
@@ -79,7 +79,7 @@ def list_opts():
          itertools.chain(ceilometer.agent.manager.OPTS,
                          ceilometer.api.app.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
-                         ceilometer.compute.virt.libvirt.inspector.OPTS,
+                         ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.dispatcher.OPTS,
                          ceilometer.ipmi.notifications.ironic.OPTS,
                          ceilometer.middleware.OPTS,

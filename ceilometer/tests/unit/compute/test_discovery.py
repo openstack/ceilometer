@@ -18,7 +18,67 @@ from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
 from ceilometer.compute import discovery
+from ceilometer.compute.pollsters import util
+from ceilometer.compute.virt.libvirt import utils
 import ceilometer.tests.base as base
+
+
+LIBVIRT_METADATA_XML = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+  </flavor>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+  <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_DESC_XML = """
+<domain type='kvm' id='1'>
+  <name>instance-00000001</name>
+  <uuid>a75c2fa5-6c03-45a8-bbf7-b993cfcdec27</uuid>
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-xenial'>hvm</type>
+    <kernel>/opt/stack/data/nova/instances/a75c2fa5-6c03-45a8-bbf7-b993cfcdec27/kernel</kernel>
+    <initrd>/opt/stack/data/nova/instances/a75c2fa5-6c03-45a8-bbf7-b993cfcdec27/ramdisk</initrd>
+    <cmdline>root=/dev/vda console=tty0 console=ttyS0</cmdline>
+    <boot dev='hd'/>
+    <smbios mode='sysinfo'/>
+  </os>
+</domain>
+"""
+
+
+class FakeDomain(object):
+    def state(self):
+        return [1, 2]
+
+    def name(self):
+        return "instance-00000001"
+
+    def UUIDString(self):
+        return "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27"
+
+    def XMLDesc(self):
+        return LIBVIRT_DESC_XML
+
+    def metadata(self, flags, url):
+        return LIBVIRT_METADATA_XML
+
+
+class FakeConn(object):
+    def listAllDomains(self):
+        return [FakeDomain()]
 
 
 class TestDiscovery(base.BaseTestCase):
@@ -32,6 +92,8 @@ class TestDiscovery(base.BaseTestCase):
                 self.instance.name)
         setattr(self.instance, 'OS-EXT-STS:vm_state',
                 'active')
+        # FIXME(sileht): This is wrong, this should be a uuid
+        # The internal id of nova can't be retrieved via API or notification
         self.instance.id = 1
         self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
                                 'ram': 512, 'disk': 20, 'ephemeral': 0}
@@ -97,3 +159,47 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual(1, list(resources)[0].id)
         self.client.instance_get_all_by_host.assert_called_once_with(
             self.CONF.host, "2016-01-01T00:00:00+00:00")
+
+    @mock.patch.object(utils, "libvirt")
+    @mock.patch.object(discovery, "libvirt")
+    def test_discovery_with_libvirt(self, libvirt, libvirt2):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        libvirt.VIR_DOMAIN_METADATA_ELEMENT = 2
+        libvirt2.openReadOnly.return_value = FakeConn()
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+        self.assertEqual("a75c2fa5-6c03-45a8-bbf7-b993cfcdec27",
+                         s.resource_id)
+        self.assertEqual("d99c829753f64057bc0f2030da309943",
+                         s.project_id)
+        self.assertEqual("a1f4684e58bd4c88aefd2ecb0783b497",
+                         s.user_id)
+
+        metadata = s.resource_metadata
+        self.assertEqual(1, metadata["vcpus"])
+        self.assertEqual(512, metadata["memory_mb"])
+        self.assertEqual(1, metadata["disk_gb"])
+        self.assertEqual(0, metadata["ephemeral_gb"])
+        self.assertEqual(1, metadata["root_gb"])
+        self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
+                         metadata["image_ref"])
+        self.assertEqual("test.dom.com", metadata["display_name"])
+        self.assertEqual("instance-00000001", metadata["name"])
+        self.assertEqual("a75c2fa5-6c03-45a8-bbf7-b993cfcdec27",
+                         metadata["instance_id"])
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual(
+            "4d0bc931ea7f0513da2efd9acb4cf3a273c64b7bcc544e15c070e662",
+            metadata["host"])
+        self.assertEqual(self.CONF.host, metadata["instance_host"])
+        self.assertEqual("active", metadata["status"])
+        self.assertEqual("running", metadata["state"])
+        self.assertEqual("hvm", metadata["os_type"])
+        self.assertEqual("x86_64", metadata["architecture"])

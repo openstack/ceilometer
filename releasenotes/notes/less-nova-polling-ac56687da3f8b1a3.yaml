@@ -1,0 +1,22 @@
+---
+features:
+  - The Ceilometer compute agent can now retrieve some instance metadata from
+    the metadata libvirt API instead of polling the Nova API. Since Mitaka,
+    Nova fills this metadata with some information about the instance.
+    To enable this feature you should set [compute]/instance_discovery_method =
+    libvirt_metadata in the configuration file.
+
+    The only downside of this method is that user_metadata (and some other
+    instance attributes) are no longer part of the samples created by the
+    agent. But when Gnocchi is used as backend, this is not an issue since
+    Gnocchi doesn't store resource metadata aside of the measurements. And the
+    missing informations are still retrieved through the Nova notifications
+    and will fully update the resource information in Gnocchi.
+upgrade:
+  - If you are using Gnocchi as backend it's strongly
+    recommended to switch [compute]/instance_discovery_method to
+    libvirt_metadata. This will reduce the load on the Nova API
+    especially if you have many compute nodes.
+deprecations:
+  - The [compute]/workload_partitioning = True is deprecated in favor
+    of [compute]/instance_discovery_method = workload_partitioning

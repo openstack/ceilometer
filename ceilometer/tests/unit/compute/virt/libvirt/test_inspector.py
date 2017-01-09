@@ -27,6 +27,7 @@ from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
+from ceilometer.compute.virt.libvirt import utils
 
 
 class TestLibvirtInspection(base.BaseTestCase):
@@ -46,6 +47,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.VIR_DOMAIN_SHUTOFF = 5
         libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
+        utils.libvirt = libvirt_inspector.libvirt
         self.domain = mock.Mock()
         self.addCleanup(mock.patch.stopall)
 
@@ -469,6 +471,7 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
             mock.MagicMock(side_effect=Exception('dummy'))))
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.libvirtError = self.fakeLibvirtError
+        utils.libvirt = libvirt_inspector.libvirt
 
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,
