@@ -52,13 +52,17 @@ class TestLibvirtInspection(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
 
     def test_inspect_cpus(self):
+        fake_stats = [({}, {'cpu.time': 999999, 'vcpu.current': 2})]
         with contextlib.ExitStack() as stack:
             stack.enter_context(mock.patch.object(self.inspector.connection,
                                                   'lookupByUUIDString',
                                                   return_value=self.domain))
             stack.enter_context(mock.patch.object(self.domain, 'info',
                                                   return_value=(0, 0, 0,
-                                                                2, 999999)))
+                                                                None, None)))
+            stack.enter_context(mock.patch.object(self.inspector.connection,
+                                                  'domainListGetStats',
+                                                  return_value=fake_stats))
             cpu_info = self.inspector.inspect_cpus(self.instance)
             self.assertEqual(2, cpu_info.number)
             self.assertEqual(999999, cpu_info.time)
