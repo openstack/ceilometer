@@ -47,8 +47,9 @@ class BaseTelemetryTest(tempest.test.BaseTestCase):
     @classmethod
     def skip_checks(cls):
         super(BaseTelemetryTest, cls).skip_checks()
-        if not CONF.service_available.ceilometer:
-            raise cls.skipException("Ceilometer support is required")
+        if (not CONF.service_available.ceilometer or
+                not CONF.telemetry.deprecated_api_enabled):
+            raise cls.skipException("Ceilometer API support is required")
 
     @classmethod
     def setup_credentials(cls):

@@ -36,4 +36,8 @@ TelemetryGroup = [
     cfg.BoolOpt('event_enabled',
                 default=True,
                 help="Runs Ceilometer event-related tests"),
+    cfg.BoolOpt('deprecated_api_enabled',
+                default=True,
+                help="Runs Ceilometer deprecated API tests"),
+
 ]
