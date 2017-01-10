@@ -320,7 +320,10 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         resource_grouped_samples = itertools.groupby(
             data, key=operator.itemgetter('resource_id'))
 
-        gnocchi_data = {}
+        gnocchi_data = {
+            'by-gnocchi-id': {},
+            'by-ceilometer-id': {}
+        }
         measures = {}
         stats = dict(measures=0, resources=0, metrics=0)
         for resource_id, samples_of_resource in resource_grouped_samples:
@@ -331,7 +334,9 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
 
             # NOTE(sileht): We convert resource id to Gnocchi format
             # because batch_resources_metrics_measures exception
-            # returns this id and not the ceilometer one
+            # returns this id and not the ceilometer one for Gnocchi < 3.1
+            # We can get rid of gnocchi ids when Ceilometer will depends
+            # on Gnocchi >= 3.1 only
             gnocchi_id = gnocchi_utils.encode_resource_id(resource_id)
             res_info = {}
             for metric_name, samples in metric_grouped_samples:
@@ -357,7 +362,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 for sample in samples:
                     res_info.setdefault("resource_extra", {}).update(
                         rd.sample_attributes(sample))
-                    m = measures.setdefault(gnocchi_id, {}).setdefault(
+                    m = measures.setdefault(resource_id, {}).setdefault(
                         metric_name, [])
                     m.append({'timestamp': sample['timestamp'],
                               'value': sample['counter_volume']})
@@ -365,10 +370,11 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                     metric = sample['counter_name']
                     res_info['resource']['metrics'][metric]['unit'] = unit
 
-                stats['measures'] += len(measures[gnocchi_id][metric_name])
+                stats['measures'] += len(measures[resource_id][metric_name])
                 res_info["resource"].update(res_info["resource_extra"])
                 if res_info:
-                    gnocchi_data[gnocchi_id] = res_info
+                    gnocchi_data['by-gnocchi-id'][gnocchi_id] = res_info
+                    gnocchi_data['by-ceilometer-id'][resource_id] = res_info
 
         try:
             self.batch_measures(measures, gnocchi_data, stats)
@@ -378,7 +384,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         except Exception as e:
             LOG.error(six.text_type(e), exc_info=True)
 
-        for gnocchi_id, info in gnocchi_data.items():
+        for info in gnocchi_data['by-ceilometer-id'].values():
             resource = info["resource"]
             resource_type = info["resource_type"]
             resource_extra = info["resource_extra"]
@@ -404,9 +410,17 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             if e.message.get('cause') != 'Unknown resources':
                 raise
 
-            for gnocchi_id in e.message['detail']:
-                resource = resource_infos[gnocchi_id]['resource']
-                resource_type = resource_infos[gnocchi_id]['resource_type']
+            for resource_detail in e.message['detail']:
+                if isinstance(resource_detail, dict):
+                    rid = resource_detail['original_resource_id']
+                    r_info = resource_infos['by-ceilometer-id'][rid]
+                    resource = r_info['resource']
+                    resource_type = r_info['resource_type']
+                else:
+                    r_info = resource_infos['by-gnocchi-id'][resource_detail]
+                    resource = r_info['resource']
+                    resource_type = r_info['resource_type']
+
                 try:
                     self._if_not_cached("create", resource_type, resource,
                                         self._create_resource)
@@ -416,7 +430,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 except gnocchi_exc.ClientException as e:
                     LOG.error(six.text_type(e))
                     # We cannot post measures for this resource
-                    del measures[gnocchi_id]
+                    del measures[resource['id']]
 
             # NOTE(sileht): we have created missing resources/metrics,
             # now retry to post measures
