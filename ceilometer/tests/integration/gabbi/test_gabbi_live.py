@@ -26,7 +26,7 @@ TESTS_DIR = 'gabbits-live'
 def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     NEEDED_ENV = ["AODH_SERVICE_URL", "GNOCCHI_SERVICE_URL",
-                  "HEAT_SERVICE_URL", "NOVA_SERVICE_URL",
+                  "HEAT_SERVICE_URL", "NOVA_SERVICE_URL", "PANKO_SERVICE_URL",
                   "GLANCE_IMAGE_NAME", "ADMIN_TOKEN"]
 
     for env_variable in NEEDED_ENV:
