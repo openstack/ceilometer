@@ -230,21 +230,22 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
-    if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
-        inidelete $CEILOMETER_CONF DEFAULT meter_dispatchers
-        inidelete $CEILOMETER_CONF DEFAULT event_dispatchers
-        if ! is_service_enabled panko-api; then
-            echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
-        fi
+    # clear all old dispatchers since iniset/iniadd functions don't support
+    # multivalue options well.
+    inidelete $CEILOMETER_CONF DEFAULT meter_dispatchers
+    inidelete $CEILOMETER_CONF DEFAULT event_dispatchers
+
+    if [ "$CEILOMETER_BACKEND" = 'none' ] && ! is_service_enabled panko-api; then
+        echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
     elif [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
-        iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
+        iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-        iniset $CEILOMETER_CONF DEFAULT meter_dispatchers database
+        iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        iniset $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
-        iniset $CEILOMETER_CONF DEFAULT event_dispatchers gnocchi
+        iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
+        iniadd $CEILOMETER_CONF DEFAULT event_dispatchers gnocchi
         # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
         iniset $CEILOMETER_CONF storage max_retries 20
         # NOTE(gordc): set batching to better handle recording on a slow machine
@@ -260,6 +261,12 @@ function _ceilometer_configure_storage_backend {
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
+
+    # configure panko
+    if is_service_enabled panko-api; then
+        iniadd $CEILOMETER_CONF DEFAULT event_dispatchers panko
+    fi
+
     _ceilometer_drop_database
 }
 
