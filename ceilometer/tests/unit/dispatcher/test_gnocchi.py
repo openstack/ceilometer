@@ -625,7 +625,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             group="dispatcher_gnocchi"
         )
 
-        self.sample['resource_id'] = str(uuid.uuid4()) + "/foobar"
+        self.sample['resource_id'] = str(uuid.uuid4()) + "_foobar"
         self.sample['message_signature'] = utils.compute_signature(
             self.sample, self.conf.conf.publisher.telemetry_secret)
 
@@ -693,12 +693,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
         fakeclient = fakeclient_cls.return_value
 
-        # FIXME(sileht): we don't use urlparse.quote here
-        # to ensure / is converted in %2F
-        # temporary disabled until we find a solution
-        # on gnocchi side. Current gnocchiclient doesn't
-        # encode the resource_id
-        resource_id = self.sample['resource_id']  # .replace("/", "%2F"),
+        resource_id = self.sample['resource_id'].replace("/", "_")
         metric_name = self.sample['counter_name']
         gnocchi_id = gnocchi_utils.encode_resource_id(resource_id)
 

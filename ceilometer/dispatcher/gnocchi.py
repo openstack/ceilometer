@@ -324,6 +324,9 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         measures = {}
         stats = dict(measures=0, resources=0, metrics=0)
         for resource_id, samples_of_resource in resource_grouped_samples:
+            # NOTE(sileht): / is forbidden by Gnocchi
+            resource_id = resource_id.replace('/', '_')
+
             stats['resources'] += 1
             metric_grouped_samples = itertools.groupby(
                 list(samples_of_resource),
