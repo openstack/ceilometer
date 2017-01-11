@@ -193,10 +193,10 @@ resources:
       - 'volume.backup.size'
     attributes:
       display_name: resource_metadata.(display_name|name)
+      volume_type: resource_metadata.volume_type
     event_delete: volume.delete.start
     event_attributes:
       id: resource_id
-      volume_type: resource_metadata.volume_type
 
   - resource_type: host
     metrics:
