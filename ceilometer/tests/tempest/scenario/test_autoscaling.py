@@ -15,20 +15,11 @@ import unittest
 
 from gabbi import driver
 from tempest import config
-from tempest import test
-
-from ceilometer.tests.tempest.service import client
+from tempest.scenario import manager
 
 
-class ClientManager(client.Manager):
-    load_clients = [
-        'image_client_v2',
-    ]
-
-
-class TestAutoscalingGabbi(test.BaseTestCase):
-    credentials = ['admin']
-    client_manager = ClientManager
+class TestAutoscalingGabbi(manager.ScenarioTest):
+    credentials = ['admin', 'primary']
 
     @classmethod
     def skip_checks(cls):
@@ -63,17 +54,6 @@ class TestAutoscalingGabbi(test.BaseTestCase):
             auth, "orchestration")
         os.environ["NOVA_SERVICE_URL"] = cls._get_endpoint_for(auth, "compute")
         os.environ["GLANCE_SERVICE_URL"] = cls._get_endpoint_for(auth, "image")
-        images = cls.os_admin.image_client_v2.list_images()["images"]
-        for img in images:
-            name = img["name"]
-            # devstack or tempest format
-            if ((name.startswith("cirros") and name.endswith("-uec")) or
-                    name == 'scenario-img'):
-                os.environ["GLANCE_IMAGE_NAME"] = name
-                break
-
-        else:
-            cls.skipException("A cirros-.*-uec/cirros image is required")
 
     @staticmethod
     def clear_credentials():
@@ -85,6 +65,7 @@ class TestAutoscalingGabbi(test.BaseTestCase):
 
     def run(self, result=None):
         self.setUp()
+        os.environ["GLANCE_IMAGE_NAME"] = self.glance_image_create()
         try:
             self.tests.run(result)
         finally:
