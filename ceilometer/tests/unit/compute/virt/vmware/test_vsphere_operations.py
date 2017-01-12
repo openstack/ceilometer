@@ -78,7 +78,8 @@ class VsphereOperationsTest(base.BaseTestCase):
         vm_property_name = "runtime.powerState"
         vm_property_val = "poweredON"
 
-        def retrieve_props_side_effect(pc, specSet, options):
+        def retrieve_props_side_effect(pc, specSet, options,
+                                       skip_op_id=False):
             # assert inputs
             self.assertEqual(vm_object.value, specSet[0].obj.value)
             self.assertEqual(vm_property_name, specSet[0].pathSet[0])
@@ -105,7 +106,8 @@ class VsphereOperationsTest(base.BaseTestCase):
             counter_info.key = counter_id
             return counter_info
 
-        def retrieve_props_side_effect(pc, specSet, options):
+        def retrieve_props_side_effect(pc, specSet, options,
+                                       skip_op_id=False):
             # assert inputs
             self.assertEqual(vsphere_operations.PERF_COUNTER_PROPERTY,
                              specSet[0].pathSet[0])
