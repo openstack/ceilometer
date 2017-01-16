@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    Ceilometer legacy backends and Ceilometer API are now deprecated. Polling
+    all nova instances from compute agent is no more required with Gnocchi. So
+    we switch the [compute]instance_discovery_method to libvirt_metadata.
+    To switch back to the old deprecated behavior you can set it back to 'naive'.

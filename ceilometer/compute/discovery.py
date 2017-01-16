@@ -41,7 +41,7 @@ OPTS = [
                      'compute agents to be run simultaneously. '
                      '(replaced by instance_discovery_method)'),
     cfg.StrOpt('instance_discovery_method',
-               default='naive',
+               default='libvirt_metadata',
                choices=['naive', 'workload_partitioning', 'libvirt_metadata'],
                help="Ceilometer offers many methods to discover the instance"
                     "running on a compute node: \n"
