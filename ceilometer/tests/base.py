@@ -14,7 +14,8 @@
 """Test base classes.
 """
 import functools
-import os.path
+import os
+import tempfile
 
 import oslo_messaging.conffixture
 from oslo_utils import timeutils
@@ -23,6 +24,7 @@ from oslotest import mockpatch
 import six
 from testtools import testcase
 import webtest
+import yaml
 
 import ceilometer
 from ceilometer import messaging
@@ -42,6 +44,13 @@ class BaseTestCase(base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.messaging.get_transport',
             return_value=self.transport))
+
+    def cfg2file(self, data):
+        cfgfile = tempfile.NamedTemporaryFile(mode='w', delete=False)
+        self.addCleanup(os.remove, cfgfile.name)
+        cfgfile.write(yaml.safe_dump(data))
+        cfgfile.close()
+        return cfgfile.name
 
     def assertTimestampEqual(self, first, second, msg=None):
         """Checks that two timestamps are equals.

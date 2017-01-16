@@ -626,20 +626,17 @@ class ConfigManagerBase(object):
         self.conf = conf
         self.cfg_loc = None
 
-    def load_config(self, cfg_info):
+    def load_config(self, cfg_file):
         """Load a configuration file and set its refresh values."""
-        if isinstance(cfg_info, dict):
-            conf = cfg_info
+        if os.path.exists(cfg_file):
+            self.cfg_loc = cfg_file
         else:
-            if not os.path.exists(cfg_info):
-                cfg_info = self.conf.find_file(cfg_info)
-            with open(cfg_info) as fap:
-                data = fap.read()
-
-            conf = yaml.safe_load(data)
-            self.cfg_loc = cfg_info
-            self.cfg_mtime = self.get_cfg_mtime()
-            self.cfg_hash = self.get_cfg_hash()
+            self.cfg_loc = self.conf.find_file(cfg_file)
+        with open(self.cfg_loc) as fap:
+            data = fap.read()
+        conf = yaml.safe_load(data)
+        self.cfg_mtime = self.get_cfg_mtime()
+        self.cfg_hash = self.get_cfg_hash()
         LOG.info("Config file: %s", conf)
         return conf
 
@@ -682,7 +679,7 @@ class PipelineManager(ConfigManagerBase):
 
     """
 
-    def __init__(self, conf, cfg_info, transformer_manager,
+    def __init__(self, conf, cfg_file, transformer_manager,
                  p_type=SAMPLE_TYPE):
         """Setup the pipelines according to config.
 
@@ -751,7 +748,7 @@ class PipelineManager(ConfigManagerBase):
 
         """
         super(PipelineManager, self).__init__(conf)
-        cfg = self.load_config(cfg_info)
+        cfg = self.load_config(cfg_file)
         self.pipelines = []
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
@@ -810,13 +807,13 @@ class PollingManager(ConfigManagerBase):
     Polling manager sets up polling according to config file.
     """
 
-    def __init__(self, conf, cfg_info):
+    def __init__(self, conf, cfg_file):
         """Setup the polling according to config.
 
         The configuration is the sources half of the Pipeline Config.
         """
         super(PollingManager, self).__init__(conf)
-        cfg = self.load_config(cfg_info)
+        cfg = self.load_config(cfg_file)
         self.sources = []
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",

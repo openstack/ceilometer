@@ -313,8 +313,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
-                                                           self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(
+            self.CONF,
+            self.cfg2file(self.pipeline_cfg))
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
@@ -357,8 +358,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
-                                                           self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(
+            self.CONF,
+            self.cfg2file(self.pipeline_cfg))
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertEqual(1, novalog.exception.call_count)
@@ -380,8 +382,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
-                                                           self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(
+            self.CONF,
+            self.cfg2file(self.pipeline_cfg))
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches[source_name])[0]
 
@@ -423,8 +426,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         }
 
-        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
-                                                           pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(
+            self.CONF,
+            self.cfg2file(pipeline_cfg))
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
 
         self.mgr.interval_task(polling_task)

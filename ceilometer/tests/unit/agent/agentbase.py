@@ -194,8 +194,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         params = []
 
     def setup_polling(self):
-        self.mgr.polling_manager = pipeline.PollingManager(self.CONF,
-                                                           self.pipeline_cfg)
+        self.mgr.polling_manager = pipeline.PollingManager(
+            self.CONF, self.cfg2file(self.pipeline_cfg))
 
     def create_extension_list(self):
         return [extension.Extension('test',
