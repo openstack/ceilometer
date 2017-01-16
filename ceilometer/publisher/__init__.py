@@ -22,7 +22,7 @@ import six
 from stevedore import driver
 
 
-def get_publisher(conf, url, namespace='ceilometer.publisher'):
+def get_publisher(conf, url, namespace):
     """Get publisher driver and load it.
 
     :param URL: URL for the publisher
