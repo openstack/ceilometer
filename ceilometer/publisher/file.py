@@ -34,7 +34,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
     log any meters other than log a warning in Ceilometer log file.
 
     To enable this publisher, add the following section to the
-    /etc/ceilometer/publisher.yaml file or simply add it to an existing
+    /etc/ceilometer/pipeline.yaml file or simply add it to an existing
     pipeline::
 
         -

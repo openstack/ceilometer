@@ -34,7 +34,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
     and retry_count will be set to 1000 and 2 respectively.
 
     To use this publisher for samples, add the following section to the
-    /etc/ceilometer/publisher.yaml file or simply add it to an existing
+    /etc/ceilometer/pipeline.yaml file or simply add it to an existing
     pipeline::
 
           - name: meter_file
