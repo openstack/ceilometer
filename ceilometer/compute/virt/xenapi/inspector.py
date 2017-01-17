@@ -85,7 +85,7 @@ def get_api_session(conf):
                 session = api.Session(url)
                 session.login_with_password(username, password)
             except api.Failure as es:
-                raise XenapiException(_('Could not connect slave host: %s ') %
+                raise XenapiException(_('Could not connect slave host: %s') %
                                       es.details[0])
         else:
             msg = _("Could not connect to XenAPI: %s") % e.details[0]
