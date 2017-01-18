@@ -207,31 +207,18 @@ class TestFilterSyntaxValidation(base.BaseTestCase):
         self.query._validate_filter(filter)
 
     def test_valid_value_types(self):
-        filter = {"=": {"project_id": "string_value"}}
-        self.query._validate_filter(filter)
-
-        filter = {"=": {"project_id": 42}}
-        self.query._validate_filter(filter)
-
-        filter = {"=": {"project_id": 3.14}}
-        self.query._validate_filter(filter)
-
-        filter = {"=": {"project_id": True}}
-        self.query._validate_filter(filter)
-
-        filter = {"=": {"project_id": False}}
-        self.query._validate_filter(filter)
+        valid_values = ["string_value", 42, 3.14, True, False]
+        for valid_value in valid_values:
+            filter = {"=": {"project_id": valid_value}}
+            self.query._validate_filter(filter)
 
     def test_invalid_simple_operator(self):
-        filter = {"==": {"project_id": "string_value"}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query._validate_filter,
-                          filter)
-
-        filter = {"": {"project_id": "string_value"}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query._validate_filter,
-                          filter)
+        invalid_operators = ["==", ""]
+        for invalid_operator in invalid_operators:
+            filter = {invalid_operator: {"project_id": "string_value"}}
+            self.assertRaises(jsonschema.ValidationError,
+                              self.query._validate_filter,
+                              filter)
 
     def test_more_than_one_operator_is_invalid(self):
         filter = {"=": {"project_id": "string_value"},
@@ -247,20 +234,12 @@ class TestFilterSyntaxValidation(base.BaseTestCase):
                           filter)
 
     def test_invalid_field_name(self):
-        filter = {"=": {"": "value"}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query._validate_filter,
-                          filter)
-
-        filter = {"=": {" ": "value"}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query._validate_filter,
-                          filter)
-
-        filter = {"=": {"\t": "value"}}
-        self.assertRaises(jsonschema.ValidationError,
-                          self.query._validate_filter,
-                          filter)
+        invalid_names = ["", " ", "\t"]
+        for invalid_name in invalid_names:
+            filter = {"=": {invalid_name: "value"}}
+            self.assertRaises(jsonschema.ValidationError,
+                              self.query._validate_filter,
+                              filter)
 
     def test_more_than_one_field_is_invalid(self):
         filter = {"=": {"project_id": "value", "resource_id": "value"}}
