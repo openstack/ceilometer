@@ -89,7 +89,7 @@ class DirectPublisher(publisher.ConfigPublisherBase):
 
     def publish_events(self, events):
         if not self.event_driver:
-            LOG.error(_LE("Can't publish events to a non-existing dispatcher"
+            LOG.error(_LE("Can't publish events to a non-existing dispatcher "
                           "'%s'"), self.dispatcher_name)
             return
 
