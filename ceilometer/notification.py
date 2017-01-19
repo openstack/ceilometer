@@ -12,9 +12,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
 import itertools
 import threading
 
+from ceilometer.agent import plugin_base
 from concurrent import futures
 from futurist import periodics
 from oslo_config import cfg
@@ -77,6 +79,17 @@ OPTS = [
                deprecated_name='notification_workers',
                help='Number of workers for notification service, '
                'default value is 1.')
+]
+
+
+EXCHANGES_OPTS = [
+    cfg.MultiStrOpt('notification_control_exchanges',
+                    default=['nova', 'glance', 'neutron', 'cinder', 'heat',
+                             'keystone', 'sahara', 'trove', 'zaqar', 'swift',
+                             'ceilometer', 'magnum', 'dns'],
+                    deprecated_group='DEFAULT',
+                    deprecated_name="http_control_exchanges",
+                    help="Exchanges name to listen for notifications."),
 ]
 
 
@@ -334,3 +347,17 @@ class NotificationService(service_base.PipelineBasedService):
             # is enabled.
             if self.conf.notification.workload_partitioning:
                 self._configure_pipeline_listener()
+
+
+class NotificationProcessBase(plugin_base.NotificationBase):
+
+    def get_targets(self, conf):
+        """Return a sequence of oslo_messaging.Target
+
+        This sequence is defining the exchange and topics to be connected for
+        this plugin.
+        """
+        return [oslo_messaging.Target(topic=topic, exchange=exchange)
+                for topic in self.get_notification_topics(conf)
+                for exchange in
+                conf.notification.notification_control_exchanges]
