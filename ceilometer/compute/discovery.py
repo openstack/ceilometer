@@ -43,7 +43,7 @@ OPTS = [
     cfg.StrOpt('instance_discovery_method',
                default='libvirt_metadata',
                choices=['naive', 'workload_partitioning', 'libvirt_metadata'],
-               help="Ceilometer offers many methods to discover the instance"
+               help="Ceilometer offers many methods to discover the instance "
                     "running on a compute node: \n"
                     "* naive: poll nova to get all instances\n"
                     "* workload_partitioning: poll nova to get instances of "

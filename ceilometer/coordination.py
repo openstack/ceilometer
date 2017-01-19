@@ -43,7 +43,7 @@ OPTS = [
                       'membership has changed'),
     cfg.IntOpt('retry_backoff',
                default=1,
-               help='Retry backoff factor when retrying to connect with'
+               help='Retry backoff factor when retrying to connect with '
                     'coordination backend'),
     cfg.IntOpt('max_retry_interval',
                default=30,

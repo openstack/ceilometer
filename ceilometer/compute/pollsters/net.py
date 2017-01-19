@@ -104,7 +104,7 @@ class _Base(pollsters.BaseComputePollster):
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug('%(inspector)s does not provide data for '
-                          ' %(pollster)s',
+                          '%(pollster)s',
                           {'inspector': self.inspector.__class__.__name__,
                            'pollster': self.__class__.__name__})
                 raise plugin_base.PollsterPermanentError(resources)
