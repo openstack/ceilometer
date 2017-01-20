@@ -478,7 +478,7 @@ class DispatcherTest(base.BaseTestCase):
         }]
         d = gnocchi.GnocchiDispatcher(self.conf.conf)
         d.record_metering_data(samples)
-        self.assertEqual(0, len(fake_batch.call_args[0][1]))
+        self.assertEqual(0, len(fake_batch.call_args[0][1]['by-gnocchi-id']))
 
 
 class MockResponse(mock.NonCallableMock):
@@ -579,6 +579,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
     ]
 
     default_workflow = dict(resource_exists=True,
+                            resource_exists_old_exception=False,
                             post_measure_fail=False,
                             create_resource_fail=False,
                             create_resource_race=False,
@@ -587,6 +588,8 @@ class DispatcherWorkflowTest(base.BaseTestCase,
     workflow_scenarios = [
         ('normal_workflow', {}),
         ('new_resource', dict(resource_exists=False)),
+        ('new_resource_compat', dict(resource_exists=False,
+                                     resource_exists_old_exception=True)),
         ('new_resource_fail', dict(resource_exists=False,
                                    create_resource_fail=True)),
         ('new_resource_race', dict(resource_exists=False,
@@ -700,7 +703,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         expected_calls = [
             mock.call.capabilities.list(),
             mock.call.metric.batch_resources_metrics_measures(
-                {gnocchi_id: {metric_name: self.measures_attributes}},
+                {resource_id: {metric_name: self.measures_attributes}},
                 create_metrics=True)
         ]
         expected_debug = [
@@ -713,10 +716,19 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         if self.post_measure_fail:
             batch_side_effect += [Exception('boom!')]
         elif not self.resource_exists:
-            batch_side_effect += [
-                gnocchi_exc.BadRequest(
-                    400, {"cause": "Unknown resources",
-                          'detail': [gnocchi_id]})]
+            if self.resource_exists_old_exception:
+                batch_side_effect += [
+                    gnocchi_exc.BadRequest(
+                        400, {"cause": "Unknown resources",
+                              'detail': [gnocchi_id]})]
+            else:
+                batch_side_effect += [
+                    gnocchi_exc.BadRequest(
+                        400, {"cause": "Unknown resources",
+                              'detail': [{
+                                  'resource_id': gnocchi_id,
+                                  'original_resource_id': resource_id}]})]
+
             attributes = self.postable_attributes.copy()
             attributes.update(self.patchable_attributes)
             attributes['id'] = self.sample['resource_id']
@@ -744,7 +756,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             if not self.create_resource_fail:
                 expected_calls.append(
                     mock.call.metric.batch_resources_metrics_measures(
-                        {gnocchi_id: {metric_name: self.measures_attributes}},
+                        {resource_id: {metric_name: self.measures_attributes}},
                         create_metrics=True)
                 )
 
