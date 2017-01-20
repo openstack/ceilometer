@@ -64,11 +64,11 @@ OPTS = [
     cfg.IntOpt('batch_size',
                default=100, min=1,
                help='Number of notification messages to wait before '
-               'publishing them. Batching is advised when transformations are'
+               'publishing them. Batching is advised when transformations are '
                'applied in pipeline.'),
     cfg.IntOpt('batch_timeout',
                default=5,
-               help='Number of seconds to wait before publishing samples'
+               help='Number of seconds to wait before publishing samples '
                'when batch_size is not reached (None means indefinitely)'),
     cfg.IntOpt('workers',
                default=1,

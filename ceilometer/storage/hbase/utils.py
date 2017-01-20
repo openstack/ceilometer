@@ -424,7 +424,7 @@ def create_tables(conn, tables, column_families):
                               separator=conn.table_prefix_separator,
                               table_name=table))
 
-            LOG.warning(_("Cannot create table %(table_name)s   "
+            LOG.warning(_("Cannot create table %(table_name)s, "
                         "it already exists. Ignoring error")
                         % {'table_name': table})
 

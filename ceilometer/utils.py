@@ -41,7 +41,7 @@ ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
 OPTS = [
     cfg.StrOpt('rootwrap_config',
                default=ROOTWRAP_CONF,
-               help='Path to the rootwrap configuration file to'
+               help='Path to the rootwrap configuration file to '
                     'use for running commands as root'),
 ]
 
