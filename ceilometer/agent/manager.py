@@ -16,6 +16,7 @@
 
 import collections
 import itertools
+import logging
 import random
 
 from concurrent import futures
@@ -298,10 +299,14 @@ class AgentManager(service_base.PipelineBasedService):
             if isinstance(exc, plugin_base.ExtensionLoadError):
                 LOG.exception(_LE("Skip loading extension for %s"), ep.name)
                 return
+
+            show_exception = (LOG.isEnabledFor(logging.DEBUG)
+                              and isinstance(exc, ImportError))
+            LOG.error(_LE("Failed to import extension for %(name)r: "
+                          "%(error)s"),
+                      {'name': ep.name, 'error': exc},
+                      exc_info=show_exception)
             if isinstance(exc, ImportError):
-                LOG.error(_LE("Failed to import extension for %(name)s: "
-                              "%(error)s"),
-                          {'name': ep.name, 'error': exc})
                 return
             raise exc
 
