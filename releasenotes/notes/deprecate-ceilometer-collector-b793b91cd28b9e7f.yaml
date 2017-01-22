@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Because of deprecating the collector, the default publishers in
+    pipeline.yaml and event_pipeline.yaml are now changed using database
+    instead of notifier.
+deprecations:
+  - |
+    Collector is no longer supported in this release. The collector
+    introduces lags in pushing data to backend. To optimize the
+    architecture, Ceilometer push data through dispatchers using
+    publishers in notification agent directly.

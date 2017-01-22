@@ -70,6 +70,11 @@ class CollectorService(cotyledon.Service):
         self.event_listener = None
         self.udp_thread = None
 
+        import debtcollector
+        debtcollector.deprecate("Ceilometer collector service is deprecated."
+                                "Use publishers to push data instead",
+                                version="9.0", removal_version="10.0")
+
     def run(self):
         if self.conf.collector.udp_address:
             self.udp_thread = utils.spawn_thread(self.start_udp)

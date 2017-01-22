@@ -64,6 +64,7 @@ For polling agent using ceilometer-polling.conf, settings like::
 
 Doing this, it's easy to listen/receive data from multiple internal and external services.
 
+..  _dispatcher-configuration:
 
 Using multiple dispatchers
 ==========================
