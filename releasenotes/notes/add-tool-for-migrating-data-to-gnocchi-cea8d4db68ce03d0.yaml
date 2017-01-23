@@ -1,0 +1,7 @@
+---
+upgrade:
+  - >
+    Add a tool for migratinig metrics data from Ceilometer's native storage
+    to Gnocchi. Since we have deprecated Ceilometer API and the Gnocchi will
+    be the recommended metrics data storage backend.
+
