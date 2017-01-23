@@ -62,10 +62,6 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
         self.last_run = None
         self.instances = {}
 
-    def _address(self, instance, field):
-        addresses = instance.addresses[self.conf.hardware.tripleo_network_name]
-        return addresses[0].get(field)
-
     def _make_resource_url(self, ip):
         hwconf = self.conf.hardware
         url = hwconf.url_scheme
@@ -112,15 +108,21 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
 
         resources = []
         for instance in self.instances.values():
+            addresses = instance.addresses.get(
+                self.conf.hardware.tripleo_network_name)
+            if addresses is None:
+                # NOTE(sileht): This is not a tripleo undercloud instance, this
+                # is a cheap detection if ironic node deployed by tripleo, but
+                # nova don't expose anything more useful and we must not log a
+                # ERROR when the instance is not a tripleo undercloud one.
+                continue
             try:
-                ip_address = self._address(instance, 'addr')
+                ip_address = addresses[0].get('addr')
                 final_address = self._make_resource_url(ip_address)
-
                 resource = {
                     'resource_id': instance.id,
                     'resource_url': final_address,
-                    'mac_addr': self._address(instance,
-                                              'OS-EXT-IPS-MAC:mac_addr'),
+                    'mac_addr': addresses[0].get('OS-EXT-IPS-MAC:mac_addr'),
                     'image_id': instance.image['id'],
                     'flavor_id': instance.flavor['id']
                 }
