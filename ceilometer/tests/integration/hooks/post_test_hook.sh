@@ -40,6 +40,8 @@ function generate_telemetry_report(){
     openstack stack show integration_test
     echo "* Alarm list:"
     aodh alarm list
+    echo "* Event list:"
+    ceilometer event-list -q 'event_type=string::compute.instance.create.end'
     echo "* Nova instance list:"
     openstack server list
 
