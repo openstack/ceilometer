@@ -235,8 +235,13 @@ function _ceilometer_configure_storage_backend {
     inidelete $CEILOMETER_CONF DEFAULT meter_dispatchers
     inidelete $CEILOMETER_CONF DEFAULT event_dispatchers
 
-    if [ "$CEILOMETER_BACKEND" = 'none' ] && ! is_service_enabled panko-api; then
-        echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
+    if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
+        # It's ok for the backend to be 'none', if panko is enabled. We do not
+        # combine this condition with the outer if statement, so that the else
+        # clause below is not executed.
+        if ! is_service_enabled panko-api; then
+            echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
+        fi
     elif [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
         iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
