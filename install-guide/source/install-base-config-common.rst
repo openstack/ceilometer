@@ -68,3 +68,11 @@
 
      Replace ``CEILOMETER_PASS`` with the password you chose for
      the ``ceilometer`` user in the Identity service.
+
+
+3. Stop and disable the ceilometer-api which is dedicated for testing only
+
+   .. code-block:: console
+
+      # systemctl disable ceilometer-api
+      # systemctl stop ceilometer-api
