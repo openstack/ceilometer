@@ -18,7 +18,7 @@ oslo.cache>=1.5.0 # Apache-2.0
 oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
 reno>=0.1.1 # Apache2
 oslotest>=1.10.0 # Apache-2.0
-oslo.vmware>=1.16.0 # Apache-2.0
+oslo.vmware>=1.16.0,<2.17.0 # Apache-2.0
 overtest>=0.10.0 # Apache-2.0
 psycopg2>=2.5 # LGPL/ZPL
 pylint==1.4.5 # GNU GPL v2
