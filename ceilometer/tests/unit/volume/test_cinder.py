@@ -94,6 +94,8 @@ BACKUP_LIST = [
           u'description': None,
           u'has_dependent_backups': False,
           u'volume_id': u'6f27bc42-c834-49ea-ae75-8d1073b37806',
+          u'os-backup-project-attr:project_id':
+              u'6824974c08974d4db864bbaa6bc08303',
           u'fail_reason': u"",
           u'is_incremental': False,
           u'id': u'75a52125-85ff-4a8d-b2aa-580f3b22273f',

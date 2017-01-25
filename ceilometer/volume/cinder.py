@@ -102,10 +102,8 @@ class VolumeBackupSize(_Base):
                 unit='GB',
                 volume=backup.size,
                 user_id=None,
-                # TODO(liusheng): the tenant attribute isn't supported now,
-                # see: https://blueprints.launchpad.net/cinder/+spec/
-                # backup-tenant-attribute-support
-                project_id=None,
+                project_id=getattr(
+                    backup, 'os-backup-project-attr:project_id', None),
                 resource_id=backup.id,
                 resource_metadata=self.extract_metadata(backup),
             )
