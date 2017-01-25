@@ -24,7 +24,7 @@ class TestAutoscalingGabbi(manager.ScenarioTest):
     @classmethod
     def skip_checks(cls):
         super(TestAutoscalingGabbi, cls).skip_checks()
-        for name in ["aodh_plugin", "gnocchi", "nova", "heat",
+        for name in ["aodh_plugin", "gnocchi", "nova", "heat", "panko",
                      "ceilometer", "glance"]:
             cls._check_service(name)
 
@@ -50,6 +50,8 @@ class TestAutoscalingGabbi(manager.ScenarioTest):
             auth, "alarming_plugin")
         os.environ["GNOCCHI_SERVICE_URL"] = cls._get_endpoint_for(
             auth, "metric")
+        os.environ["PANKO_SERVICE_URL"] = cls._get_endpoint_for(
+            auth, "event")
         os.environ["HEAT_SERVICE_URL"] = cls._get_endpoint_for(
             auth, "orchestration")
         os.environ["NOVA_SERVICE_URL"] = cls._get_endpoint_for(auth, "compute")
