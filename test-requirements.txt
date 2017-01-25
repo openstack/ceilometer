@@ -15,7 +15,7 @@ openstackdocstheme>=1.0.3  # Apache-2.0
 oslosphinx!=3.4.0,>=2.5.0 # Apache-2.0
 reno>=1.6.2 # Apache2
 oslotest>=1.10.0 # Apache-2.0
-oslo.vmware>=1.16.0 # Apache-2.0
+oslo.vmware>=1.16.0,<2.17.0 # Apache-2.0
 python-subunit>=0.0.18 # Apache-2.0/BSD
 sphinx!=1.2.0,!=1.3b1,<1.3,>=1.1.2 # BSD
 sphinxcontrib-httpdomain # BSD
