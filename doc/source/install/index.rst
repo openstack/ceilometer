@@ -27,4 +27,3 @@
    manual
    custom
    upgrade
-   mod_wsgi
