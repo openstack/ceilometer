@@ -9,8 +9,7 @@ tests:
 
     - name: post sample for meter
       desc: post a single sample
-      url: /v2/meters/apples?direct=True
-      method: POST
+      POST: /v2/meters/apples?direct=True
       request_headers:
           content-type: application/json
       data: |
@@ -38,13 +37,13 @@ tests:
 
     - name: get resources
       desc: get the resources that exist because of the sample
-      url: /v2/resources
+      GET: /v2/resources
       response_json_paths:
           $.[0].metadata.name2: value2
 
     - name: get resource
       desc: get just one of those resources via self
-      url: $RESPONSE['$[0].links[0].href']
+      GET: $RESPONSE['$[0].links[0].href']
       response_json_paths:
           $.metadata.name2: value2
       response_strings:

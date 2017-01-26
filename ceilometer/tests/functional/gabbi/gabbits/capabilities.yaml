@@ -8,6 +8,6 @@ tests:
 
 - name: get capabilities
   desc: retrieve capabilities for the mongo store
-  url: /v2/capabilities
+  GET: /v2/capabilities
   response_json_paths:
       $.storage.['storage:production_ready']: true

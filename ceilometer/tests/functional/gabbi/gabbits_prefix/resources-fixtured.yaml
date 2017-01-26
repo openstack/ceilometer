@@ -10,7 +10,7 @@ fixtures:
 tests:
 
     - name: list all resources
-      url: /v2/resources
+      GET: /v2/resources
       response_json_paths:
           $[0].user_id: farmerjon
           $[0].links[1].rel: livestock
@@ -19,6 +19,6 @@ tests:
 
     - name: get one resource
       desc: get a resource via the links in the first resource listed above
-      url: $RESPONSE['$[0].links[0].href']
+      GET: $RESPONSE['$[0].links[0].href']
       response_json_paths:
           $.resource_id: $RESPONSE['$[0].resource_id']
