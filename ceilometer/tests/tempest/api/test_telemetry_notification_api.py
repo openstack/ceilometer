@@ -12,9 +12,11 @@
 
 # Change-Id: I14e16a1a7d9813b324ee40545c07f0e88fb637b7
 
+import six
 import testtools
 
 from ceilometer.tests.tempest.api import base
+from tempest.common.utils import data_utils
 from tempest import config
 from tempest.lib import decorators
 from tempest import test
@@ -44,7 +46,9 @@ class TelemetryNotificationAPITest(base.BaseTelemetryTest):
     def test_check_glance_v2_notifications(self):
         body = self.create_image(self.image_client_v2, visibility='private')
 
-        self.image_client_v2.store_image_file(body['id'], "file")
+        file_content = data_utils.random_bytes()
+        image_file = six.BytesIO(file_content)
+        self.image_client_v2.store_image_file(body['id'], image_file)
         self.image_client_v2.show_image_file(body['id'])
 
         query = 'resource', 'eq', body['id']

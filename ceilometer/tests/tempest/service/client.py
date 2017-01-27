@@ -22,12 +22,10 @@ from tempest.lib.services.compute import flavors_client as flavor_cli
 from tempest.lib.services.compute import floating_ips_client as floatingip_cli
 from tempest.lib.services.compute import networks_client as network_cli
 from tempest.lib.services.compute import servers_client as server_cli
+from tempest.lib.services.image.v2 import images_client as img_cli_v2
 from tempest import manager
 from tempest.services.object_storage import container_client as container_cli
 from tempest.services.object_storage import object_client as obj_cli
-
-from ceilometer.tests.tempest.service.images.v2 import images_client as \
-    img_cli_v2
 
 
 CONF = config.CONF
@@ -121,7 +119,7 @@ class Manager(manager.Manager):
     compute_params.update(default_params)
 
     image_params = {
-        'catalog_type': CONF.image.catalog_type,
+        'service': CONF.image.catalog_type,
         'region': CONF.image.region or CONF.identity.region,
         'endpoint_type': CONF.image.endpoint_type,
         'build_interval': CONF.image.build_interval,
