@@ -23,9 +23,6 @@ Telemetry Data Collection service
    configure_services/swift/install-swift-ubuntu.rst
    verify.rst
    next-steps.rst
-   database/environment-nosql-database-obs.rst
-   database/environment-nosql-database-rdo.rst
-   database/environment-nosql-database-ubuntu.rst
 
 This chapter assumes a working setup of OpenStack following the base
 Installation Guide.
