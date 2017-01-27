@@ -16,6 +16,7 @@ import testtools
 
 from ceilometer.tests.tempest.api import base
 from tempest import config
+from tempest.lib import decorators
 from tempest import test
 
 
@@ -24,7 +25,7 @@ CONF = config.CONF
 
 class TelemetryNotificationAPITest(base.BaseTelemetryTest):
 
-    @test.idempotent_id('d7f8c1c8-d470-4731-8604-315d3956caae')
+    @decorators.idempotent_id('d7f8c1c8-d470-4731-8604-315d3956caae')
     @test.services('compute')
     def test_check_nova_notification(self):
 
@@ -36,7 +37,7 @@ class TelemetryNotificationAPITest(base.BaseTelemetryTest):
             self.await_samples(metric, query)
 
     @test.attr(type="smoke")
-    @test.idempotent_id('c240457d-d943-439b-8aea-85e26d64fe8f')
+    @decorators.idempotent_id('c240457d-d943-439b-8aea-85e26d64fe8f')
     @test.services("image")
     @testtools.skipIf(not CONF.image_feature_enabled.api_v2,
                       "Glance api v2 is disabled")
@@ -54,7 +55,7 @@ class TelemetryNotificationAPITest(base.BaseTelemetryTest):
 
 class TelemetryNotificationAdminAPITest(base.BaseTelemetryAdminTest):
 
-    @test.idempotent_id('29604198-8b45-4fc0-8af8-1cae4f94ebea')
+    @decorators.idempotent_id('29604198-8b45-4fc0-8af8-1cae4f94ebea')
     @test.services('compute')
     def test_check_nova_notification_event_and_meter(self):
 

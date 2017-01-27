@@ -17,6 +17,7 @@
 from oslo_log import log as logging
 from tempest.common.utils import data_utils
 from tempest import config
+from tempest.lib import decorators
 from tempest import test
 
 from ceilometer.tests.tempest.service import client
@@ -138,7 +139,7 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
                         obj_name)
         return obj_name
 
-    @test.idempotent_id('6d6b88e5-3e38-41bc-b34a-79f713a6cb85')
+    @decorators.idempotent_id('6d6b88e5-3e38-41bc-b34a-79f713a6cb85')
     @test.services('object_storage')
     def test_swift_middleware_notifies(self):
         container_name = self.create_container()
