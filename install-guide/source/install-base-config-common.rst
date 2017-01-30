@@ -1,78 +1,55 @@
 2. Edit the ``/etc/ceilometer/ceilometer.conf`` file and complete
    the following actions:
 
-   * In the ``[database]`` section, configure database access:
+   * Configure Gnocchi connection:
 
      .. code-block:: ini
 
-        [database]
+        [DEFAULT]
         ...
-        connection = mongodb://ceilometer:CEILOMETER_DBPASS@controller:27017/ceilometer
+        meter_dispatchers=gnocchi
+        event_dispatchers=gnocchi
 
-     Replace ``CEILOMETER_DBPASS`` with the password you chose for the
-     Telemetry service database. You must escape special characters such
-     as ':', '/', '+', and '@' in the connection string in accordance
-     with `RFC2396 <https://www.ietf.org/rfc/rfc2396.txt>`_.
+        [dispatcher_gnocchi]
+        # filter out Gnocchi-related activity meters (Swift driver)
+        filter_service_activity = False
+        # default metric storage archival policy
+        archive_policy = low
 
-      * In the ``[DEFAULT]`` section,
-        configure ``RabbitMQ`` message queue access:
+     .. note::
 
-        .. code-block:: ini
+        It is possible forego the collector service by modifying the
+        pipeline.yaml to use the ``gnocchi://`` publisher rather than
+        ``notifier://``. Doing so will minimise resource requirements.
+        In this case, dispatchers do not need to be added to conf file.
 
-           [DEFAULT]
-           ...
-           transport_url = rabbit://openstack:RABBIT_PASS@controller
+   * In the ``[DEFAULT]`` section,
+     configure ``RabbitMQ`` message queue access:
 
-        Replace ``RABBIT_PASS`` with the password you chose for the
-        ``openstack`` account in ``RabbitMQ``.
+     .. code-block:: ini
 
-      * In the ``[DEFAULT]`` and ``[keystone_authtoken]`` sections,
-        configure Identity service access:
+        [DEFAULT]
+        ...
+        transport_url = rabbit://openstack:RABBIT_PASS@controller
 
-        .. code-block:: ini
-
-           [DEFAULT]
-           ...
-           auth_strategy = keystone
-
-           [keystone_authtoken]
-           ...
-           auth_uri = http://controller:5000
-           auth_url = http://controller:35357
-           memcached_servers = controller:11211
-           auth_type = password
-           project_domain_name = default
-           user_domain_name = default
-           project_name = service
-           username = ceilometer
-           password = CEILOMETER_PASS
-
-        Replace ``CEILOMETER_PASS`` with the password you chose for
-        the ``ceilometer`` user in the Identity service.
+     Replace ``RABBIT_PASS`` with the password you chose for the
+     ``openstack`` account in ``RabbitMQ``.
 
    * In the ``[service_credentials]`` section, configure service credentials:
 
      .. code-block:: ini
 
-        [service_credentials]
-        ...
-        auth_type = password
-        auth_url = http://controller:5000/v3
-        project_domain_name = default
-        user_domain_name = default
-        project_name = service
-        username = ceilometer
-        password = CEILOMETER_PASS
-        interface = internalURL
-        region_name = RegionOne
+     [service_credentials]
+     ...
+     auth_type = password
+     auth_url = http://controller:5000/v3
+     project_domain_name = default
+     user_domain_name = default
+     project_name = service
+     username = ceilometer
+     password = CEILOMETER_PASS
+     interface = internalURL
+     region_name = RegionOne
 
      Replace ``CEILOMETER_PASS`` with the password you chose for
      the ``ceilometer`` user in the Identity service.
-
-
-3. Stop and disable the ceilometer-api which is dedicated for testing only
-
-   .. code-block:: console
-
-      # systemctl disable ceilometer-api
-      # systemctl stop ceilometer-api
