@@ -21,7 +21,6 @@ import threading
 import uuid
 
 from gnocchiclient import exceptions as gnocchi_exc
-from gnocchiclient import utils as gnocchi_utils
 from keystoneauth1 import exceptions as ka_exceptions
 from oslo_log import log
 from oslo_serialization import jsonutils
@@ -320,10 +319,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         resource_grouped_samples = itertools.groupby(
             data, key=operator.itemgetter('resource_id'))
 
-        gnocchi_data = {
-            'by-gnocchi-id': {},
-            'by-ceilometer-id': {}
-        }
+        gnocchi_data = {}
         measures = {}
         stats = dict(measures=0, resources=0, metrics=0)
         for resource_id, samples_of_resource in resource_grouped_samples:
@@ -335,12 +331,6 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 list(samples_of_resource),
                 key=operator.itemgetter('counter_name'))
 
-            # NOTE(sileht): We convert resource id to Gnocchi format
-            # because batch_resources_metrics_measures exception
-            # returns this id and not the ceilometer one for Gnocchi < 3.1
-            # We can get rid of gnocchi ids when Ceilometer will depends
-            # on Gnocchi >= 3.1 only
-            gnocchi_id = gnocchi_utils.encode_resource_id(resource_id)
             res_info = {}
             for metric_name, samples in metric_grouped_samples:
                 stats['metrics'] += 1
@@ -376,8 +366,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 stats['measures'] += len(measures[resource_id][metric_name])
                 res_info["resource"].update(res_info["resource_extra"])
                 if res_info:
-                    gnocchi_data['by-gnocchi-id'][gnocchi_id] = res_info
-                    gnocchi_data['by-ceilometer-id'][resource_id] = res_info
+                    gnocchi_data[resource_id] = res_info
 
         try:
             self.batch_measures(measures, gnocchi_data, stats)
@@ -387,7 +376,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         except Exception as e:
             LOG.error(six.text_type(e), exc_info=True)
 
-        for info in gnocchi_data['by-ceilometer-id'].values():
+        for info in gnocchi_data.values():
             resource = info["resource"]
             resource_type = info["resource_type"]
             resource_extra = info["resource_extra"]
@@ -401,6 +390,14 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             except Exception as e:
                 LOG.error(six.text_type(e), exc_info=True)
 
+    @staticmethod
+    def _extract_resources_from_error(e, resource_infos):
+        resource_ids = [r['original_resource_id']
+                        for r in e.message['detail']]
+        return [(resource_infos[rid]['resource_type'],
+                 resource_infos[rid]['resource'])
+                for rid in resource_ids]
+
     def batch_measures(self, measures, resource_infos, stats):
         # NOTE(sileht): We don't care about error here, we want
         # resources metadata always been updated
@@ -413,17 +410,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             if e.message.get('cause') != 'Unknown resources':
                 raise
 
-            for resource_detail in e.message['detail']:
-                if isinstance(resource_detail, dict):
-                    rid = resource_detail['original_resource_id']
-                    r_info = resource_infos['by-ceilometer-id'][rid]
-                    resource = r_info['resource']
-                    resource_type = r_info['resource_type']
-                else:
-                    r_info = resource_infos['by-gnocchi-id'][resource_detail]
-                    resource = r_info['resource']
-                    resource_type = r_info['resource_type']
-
+            resources = self._extract_resources_from_error(e, resource_infos)
+            for resource_type, resource in resources:
                 try:
                     self._if_not_cached("create", resource_type, resource,
                                         self._create_resource)
