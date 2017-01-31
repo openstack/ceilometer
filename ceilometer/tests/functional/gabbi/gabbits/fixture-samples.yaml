@@ -8,7 +8,7 @@ fixtures:
 tests:
 - name: get fixture samples
   desc: get all the samples at livestock
-  url: /v2/meters/livestock
+  GET: /v2/meters/livestock
   response_json_paths:
       $.[0].counter_name: livestock
       $.[1].counter_name: livestock
