@@ -53,3 +53,10 @@
 
      Replace ``CEILOMETER_PASS`` with the password you chose for
      the ``ceilometer`` user in the Identity service.
+
+   * Create Ceilometer resources in Gnocchi. Gnocchi should be running by this
+     stage:
+
+     .. code-block:: console
+
+        # ceilometer-upgrade --skip-metering-database
