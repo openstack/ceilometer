@@ -17,7 +17,6 @@ import os
 import uuid
 
 from gnocchiclient import exceptions as gnocchi_exc
-from gnocchiclient import utils as gnocchi_utils
 from keystoneauth1 import exceptions as ka_exceptions
 import mock
 from oslo_config import fixture as config_fixture
@@ -696,7 +695,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
         resource_id = self.sample['resource_id'].replace("/", "_")
         metric_name = self.sample['counter_name']
-        gnocchi_id = gnocchi_utils.encode_resource_id(resource_id)
+        gnocchi_id = uuid.uuid4()
 
         expected_calls = [
             mock.call.capabilities.list(),
