@@ -56,7 +56,7 @@ tests:
       request_headers:
           content-type: application/json
       data:
-          id: gabbi-mock-resource
+          id: 662e46f3-8c06-430c-8a9c-adcaedd1272c
           user_id:      27e342e4-4489-424f-a7e4-ba8ed9ad729c
           project_id:   d6d32769-c351-4758-b0a2-458fa1a065a3
           metrics:
@@ -159,7 +159,7 @@ tests:
           gnocchi_resources_threshold_rule:
               evaluation_periods: 3
               metric: "radosgw.objects.size"
-              resource_id: "gabbi-mock-resource"
+              resource_id: "662e46f3-8c06-430c-8a9c-adcaedd1272c"
               aggregation_method: "mean"
               granularity: 60
               threshold: 5.0
@@ -212,7 +212,7 @@ tests:
           gnocchi_resources_threshold_rule:
               evaluation_periods: 3
               metric: "radosgw.objects.size"
-              resource_id: "gabbi-mock-resource"
+              resource_id: "662e46f3-8c06-430c-8a9c-adcaedd1272c"
               aggregation_method: "mean"
               granularity: 60
               threshold: 5.0
@@ -280,7 +280,7 @@ tests:
           $.alarm_id: $RESPONSE['$.[0].alarm_id']
           $.alarm_actions: ["http://site:8000/gnocchi-threshold-resource"]
           $.name: gabbi-gnocchi-threshold-resource-alarm
-          $.gnocchi_resources_threshold_rule.resource_id: "gabbi-mock-resource"
+          $.gnocchi_resources_threshold_rule.resource_id: "662e46f3-8c06-430c-8a9c-adcaedd1272c"
           $.gnocchi_resources_threshold_rule.metric: "radosgw.objects.size"
           $.gnocchi_resources_threshold_rule.resource_type: "ceph_account"
           $.user_id: c8ecb587-d38c-426f-a58d-22b8d4a9a1d3
@@ -321,13 +321,13 @@ tests:
       DELETE: $ENVIRON['AODH_SERVICE_URL']/v2/alarms/$RESPONSE['$.[0].alarm_id']
       status: 204
 
-    - name: CLEANUP. Get resource by name 'gabbi-mock-resource'
-      desc: retrieve resource by gabbi-mock-resource to get its ID
-      GET: $ENVIRON['GNOCCHI_SERVICE_URL']/v1/resource/generic/gabbi-mock-resource
+    - name: CLEANUP. Get resource by name '662e46f3-8c06-430c-8a9c-adcaedd1272c'
+      desc: retrieve resource by 662e46f3-8c06-430c-8a9c-adcaedd1272c to get its ID
+      GET: $ENVIRON['GNOCCHI_SERVICE_URL']/v1/resource/generic/662e46f3-8c06-430c-8a9c-adcaedd1272c
       status: 200
 
-    - name: CLEANUP. delete test ceph_resource 'gabbi-mock-resource'
-      desc: delete ceph_account resource gabbi-mock-resource
+    - name: CLEANUP. delete test ceph_resource '662e46f3-8c06-430c-8a9c-adcaedd1272c'
+      desc: delete ceph_account resource 662e46f3-8c06-430c-8a9c-adcaedd1272c
       DELETE: $ENVIRON['GNOCCHI_SERVICE_URL']/v1/resource/generic/$RESPONSE['$.id']
       status: 204
 
