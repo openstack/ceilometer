@@ -13,7 +13,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_json_paths:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
@@ -46,7 +46,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_json_paths:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
@@ -56,7 +56,7 @@ tests:
 - name: get events that match query via data
   url: /v2/events
   request_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
       X-Roles: admin
       X-User-Id: user1
       X-Project-Id: project1
@@ -67,7 +67,7 @@ tests:
           type: string
           value: cookies_chocolate.chip
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_json_paths:
       $.[0].event_type: cookies_chocolate.chip
       $.[0].traits.[0].value: chocolate.chip
@@ -81,7 +81,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_strings:
       - "[]"
 
@@ -90,7 +90,7 @@ tests:
 - name: get events that match bad query via data
   url: /v2/events
   request_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
       X-Roles: admin
       X-User-Id: user1
       X-Project-Id: project1
@@ -101,7 +101,7 @@ tests:
           type: string
           value: cookies_chocolate.chip
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_strings:
       - "[]"
 
@@ -110,7 +110,7 @@ tests:
 - name: get events that match bad query via data list
   url: /v2/events
   request_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
       X-Roles: admin
       X-User-Id: user1
       X-Project-Id: project1
@@ -129,7 +129,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_json_paths:
       $.event_type: cookies_chocolate.chip
       $.traits.[0].value: chocolate.chip
@@ -152,7 +152,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_strings:
       - cookies_chocolate.chip
       - cookies_peanut.butter
@@ -184,7 +184,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_json_paths:
       $.[0].type: string
       $.[1].name: ate
@@ -197,7 +197,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_strings:
       - "[]"
 
@@ -210,7 +210,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_json_paths:
       $.[0].name: ate
       $.[0].value: '0'
@@ -224,7 +224,7 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_strings:
       - "[]"
 
@@ -237,6 +237,6 @@ tests:
       X-User-Id: user1
       X-Project-Id: project1
   response_headers:
-      content-type: application/json
+      content-type: application/json; charset=UTF-8
   response_strings:
       - "[]"

@@ -34,7 +34,7 @@ tests:
           $.[0].counter_name: apples
       status: 201
       response_headers:
-          content-type: application/json
+          content-type: application/json; charset=UTF-8
 
     - name: get resources
       desc: get the resources that exist because of the sample
