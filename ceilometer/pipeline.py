@@ -63,13 +63,24 @@ OPTS = [
 LOG = log.getLogger(__name__)
 
 
-class PipelineException(Exception):
-    def __init__(self, message, pipeline_cfg):
+class ConfigException(Exception):
+    def __init__(self, cfg_type, message, cfg):
+        self.cfg_type = cfg_type
         self.msg = message
-        self.pipeline_cfg = pipeline_cfg
+        self.cfg = cfg
 
     def __str__(self):
-        return 'Pipeline %s: %s' % (self.pipeline_cfg, self.msg)
+        return '%s %s: %s' % (self.cfg_type, self.cfg, self.msg)
+
+
+class PollingException(ConfigException):
+    def __init__(self, message, cfg):
+        super(PollingException, self).__init__('Polling', message, cfg)
+
+
+class PipelineException(ConfigException):
+    def __init__(self, message, cfg):
+        super(PipelineException, self).__init__('Pipeline', message, cfg)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -219,31 +230,18 @@ class PublishContext(object):
 
 
 class Source(object):
-    """Represents a source of samples or events."""
+    """Represents a generic source"""
 
     def __init__(self, cfg):
         self.cfg = cfg
-
         try:
             self.name = cfg['name']
-            self.sinks = cfg.get('sinks')
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
 
     def __str__(self):
         return self.name
-
-    def check_sinks(self, sinks):
-        if not self.sinks:
-            raise PipelineException(
-                "No sink defined in source %s" % self,
-                self.cfg)
-        for sink in self.sinks:
-            if sink not in sinks:
-                raise PipelineException(
-                    "Dangling sink %s from source %s" % (sink, self),
-                    self.cfg)
 
     def check_source_filtering(self, data, d_type):
         """Source data rules checking
@@ -282,7 +280,30 @@ class Source(object):
         return all(datapoint.startswith('!') for datapoint in dataset)
 
 
-class EventSource(Source):
+class PipelineSource(Source):
+    """Represents a source of samples or events."""
+
+    def __init__(self, cfg):
+        super(PipelineSource, self).__init__(cfg)
+        try:
+            self.sinks = cfg['sinks']
+        except KeyError as err:
+            raise PipelineException(
+                "Required field %s not specified" % err.args[0], cfg)
+
+    def check_sinks(self, sinks):
+        if not self.sinks:
+            raise PipelineException(
+                "No sink defined in source %s" % self,
+                self.cfg)
+        for sink in self.sinks:
+            if sink not in sinks:
+                raise PipelineException(
+                    "Dangling sink %s from source %s" % (sink, self),
+                    self.cfg)
+
+
+class EventSource(PipelineSource):
     """Represents a source of events.
 
     In effect it is a set of notification handlers capturing events for a set
@@ -298,13 +319,12 @@ class EventSource(Source):
         return self.is_supported(self.events, event_name)
 
 
-class SampleSource(Source):
+class SampleSource(PipelineSource):
     """Represents a source of samples.
 
-    In effect it is a set of pollsters and/or notification handlers emitting
+    In effect it is a set of notification handlers processing
     samples for a set of matching meters. Each source encapsulates meter name
-    matching, polling interval determination, optional resource enumeration or
-    discovery, and mapping to one or more sinks for publication.
+    matching and mapping to one or more sinks for publication.
     """
 
     def __init__(self, cfg):
@@ -313,10 +333,33 @@ class SampleSource(Source):
             self.meters = cfg['meters']
         except KeyError:
             raise PipelineException("Missing meters value", cfg)
+        self.check_source_filtering(self.meters, 'meters')
+
+    def support_meter(self, meter_name):
+        return self.is_supported(self.meters, meter_name)
+
+
+class PollingSource(Source):
+    """Represents a source of pollsters
+
+    In effect it is a set of pollsters emitting
+    samples for a set of matching meters. Each source encapsulates meter name
+    matching, polling interval determination, optional resource enumeration or
+    discovery.
+    """
+
+    def __init__(self, cfg):
+        super(PollingSource, self).__init__(cfg)
         try:
-            self.interval = int(cfg.get('interval', 600))
+            self.meters = cfg['meters']
+        except KeyError:
+            raise PipelineException("Missing meters value", cfg)
+        try:
+            self.interval = int(cfg['interval'])
         except ValueError:
             raise PipelineException("Invalid interval value", cfg)
+        except KeyError:
+            raise PipelineException("Missing interval value", cfg)
         if self.interval <= 0:
             raise PipelineException("Interval value should > 0", cfg)
 
@@ -560,17 +603,6 @@ class EventPipeline(Pipeline):
 class SamplePipeline(Pipeline):
     """Represents a pipeline for Samples."""
 
-    def get_interval(self):
-        return self.source.interval
-
-    @property
-    def resources(self):
-        return self.source.resources
-
-    @property
-    def discovery(self):
-        return self.source.discovery
-
     def support_meter(self, meter_name):
         return self.source.support_meter(meter_name)
 
@@ -692,9 +724,6 @@ class PipelineManager(ConfigManagerBase):
     """Pipeline Manager
 
     Pipeline manager sets up pipelines according to config file
-
-    Usually only one pipeline manager exists in the system.
-
     """
 
     def __init__(self, conf, cfg_file, transformer_manager,
@@ -705,7 +734,7 @@ class PipelineManager(ConfigManagerBase):
 
         Decoupled: the source and sink configuration are separately
         specified before being linked together. This allows source-
-        specific configuration, such as resource discovery, to be
+        specific configuration, such as meter handling, to be
         kept focused only on the fine-grained source while avoiding
         the necessity for wide duplication of sink-related config.
 
@@ -713,13 +742,10 @@ class PipelineManager(ConfigManagerBase):
         of dictionaries defining sources and sinks, for example:
 
         {"sources": [{"name": source_1,
-                      "interval": interval_time,
                       "meters" : ["meter_1", "meter_2"],
-                      "resources": ["resource_uri1", "resource_uri2"],
                       "sinks" : ["sink_1", "sink_2"]
                      },
                      {"name": source_2,
-                      "interval": interval_time,
                       "meters" : ["meter_3"],
                       "sinks" : ["sink_2"]
                      },
@@ -740,25 +766,14 @@ class PipelineManager(ConfigManagerBase):
                    ]
         }
 
-        The interval determines the cadence of sample injection into
-        the pipeline where samples are produced under the direct control
-        of an agent, i.e. via a polling cycle as opposed to incoming
-        notifications.
-
         Valid meter format is '*', '!meter_name', or 'meter_name'.
         '*' is wildcard symbol means any meters; '!meter_name' means
         "meter_name" will be excluded; 'meter_name' means 'meter_name'
         will be included.
 
-        The 'meter_name" is Sample name field.
-
         Valid meters definition is all "included meter names", all
         "excluded meter names", wildcard and "excluded meter names", or
         only wildcard.
-
-        The resources is list of URI indicating the resources from where
-        the meters should be polled. It's optional and it's up to the
-        specific pollster to decide how to use it.
 
         Transformer's name is plugin name in setup.cfg.
 
@@ -830,26 +845,48 @@ class PollingManager(ConfigManagerBase):
     def __init__(self, conf, cfg_file):
         """Setup the polling according to config.
 
-        The configuration is the sources half of the Pipeline Config.
+        The configuration is supported as follows:
+
+        {"sources": [{"name": source_1,
+                      "interval": interval_time,
+                      "meters" : ["meter_1", "meter_2"],
+                      "resources": ["resource_uri1", "resource_uri2"],
+                     },
+                     {"name": source_2,
+                      "interval": interval_time,
+                      "meters" : ["meter_3"],
+                     },
+                    ]}
+        }
+
+        The interval determines the cadence of sample polling
+
+        Valid meter format is '*', '!meter_name', or 'meter_name'.
+        '*' is wildcard symbol means any meters; '!meter_name' means
+        "meter_name" will be excluded; 'meter_name' means 'meter_name'
+        will be included.
+
+        Valid meters definition is all "included meter names", all
+        "excluded meter names", wildcard and "excluded meter names", or
+        only wildcard.
+
+        The resources is list of URI indicating the resources from where
+        the meters should be polled. It's optional and it's up to the
+        specific pollster to decide how to use it.
+
         """
         super(PollingManager, self).__init__(conf)
-        cfg = self.load_config(cfg_file)
+        try:
+            cfg = self.load_config(cfg_file)
+        except (TypeError, IOError):
+            LOG.warning(_LW('Unable to locate polling configuration, falling '
+                            'back to pipeline configuration.'))
+            cfg = self.load_config(conf.pipeline_cfg_file)
         self.sources = []
-        if not ('sources' in cfg and 'sinks' in cfg):
-            raise PipelineException("Both sources & sinks are required",
-                                    cfg)
-        LOG.info(_LI('detected decoupled pipeline config format'))
-
-        unique_names = set()
+        if 'sources' not in cfg:
+            raise PollingException("sources required", cfg)
         for s in cfg.get('sources'):
-            name = s.get('name')
-            if name in unique_names:
-                raise PipelineException("Duplicated source names: %s" %
-                                        name, self)
-            else:
-                unique_names.add(name)
-                self.sources.append(SampleSource(s))
-        unique_names.clear()
+            self.sources.append(PollingSource(s))
 
 
 def setup_event_pipeline(conf, transformer_manager=None):
@@ -870,7 +907,7 @@ def setup_pipeline(conf, transformer_manager=None):
 
 def setup_polling(conf):
     """Setup polling manager according to yaml config file."""
-    cfg_file = conf.pipeline_cfg_file
+    cfg_file = conf.polling.cfg_file
     return PollingManager(conf, cfg_file)
 
 

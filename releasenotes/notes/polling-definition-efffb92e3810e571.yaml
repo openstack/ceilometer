@@ -1,0 +1,10 @@
+---
+upgrade:
+  - Pipeline processing in polling agents was removed in Liberty cycle. A new
+    polling specific definition file is created to handle polling functionality
+    and pipeline definition file is now reserved exclusively for
+    transformations and routing. The polling.yaml file follows the same syntax
+    as the pipeline.yaml but only handles polling attributes such as interval,
+    discovery, resources, meter matching. It is configured by setting cfg_file
+    under the polling section.If no polling definition file is found, it will
+    fallback to reuse pipeline_cfg_file.
