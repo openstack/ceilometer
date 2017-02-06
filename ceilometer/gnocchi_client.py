@@ -20,13 +20,12 @@ from ceilometer import keystone_client
 LOG = log.getLogger(__name__)
 
 
-def get_gnocchiclient(conf, endpoint_override=None):
+def get_gnocchiclient(conf):
     group = conf.dispatcher_gnocchi.auth_section
     session = keystone_client.get_session(conf, group=group)
     return client.Client('1', session,
                          interface=conf[group].interface,
-                         region_name=conf[group].region_name,
-                         endpoint_override=endpoint_override)
+                         region_name=conf[group].region_name)
 
 
 # NOTE(sileht): This is the initial resource types created in Gnocchi
