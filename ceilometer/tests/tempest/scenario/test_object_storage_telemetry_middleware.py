@@ -27,15 +27,6 @@ CONF = config.CONF
 
 LOG = logging.getLogger(__name__)
 
-# Loop for up to 120 seconds waiting on notifications
-# NOTE(chdent): The choice of 120 seconds is fairly
-# arbitrary: Long enough to give the notifications the
-# chance to travel across a highly latent bus but not
-# so long as to allow excessive latency to never be visible.
-# TODO(chdent): Ideally this value would come from configuration.
-NOTIFICATIONS_WAIT = 120
-NOTIFICATIONS_SLEEP = 1
-
 
 class ClientManager(client.Manager):
 
@@ -114,11 +105,12 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
 
             return (container_name in containers and obj_name in objects)
 
-        self.assertTrue(test.call_until_true(_check_samples,
-                                             NOTIFICATIONS_WAIT,
-                                             NOTIFICATIONS_SLEEP),
-                        'Correct notifications were not received after '
-                        '%s seconds.' % NOTIFICATIONS_WAIT)
+        self.assertTrue(
+            test.call_until_true(_check_samples,
+                                 CONF.telemetry.notification_wait,
+                                 CONF.telemetry.notification_sleep),
+            'Correct notifications were not received after '
+            '%s seconds.' % CONF.telemetry.notification_wait)
 
     def create_container(self):
         name = data_utils.rand_name('swift-scenario-container')

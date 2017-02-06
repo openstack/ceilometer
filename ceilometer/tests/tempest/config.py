@@ -39,5 +39,12 @@ TelemetryGroup = [
     cfg.BoolOpt('deprecated_api_enabled',
                 default=True,
                 help="Runs Ceilometer deprecated API tests"),
-
+    cfg.IntOpt('notification_wait',
+               default=120,
+               help="The seconds to wait for notifications which "
+                    "containers and objects sent to swift."),
+    cfg.IntOpt('notification_sleep',
+               default=1,
+               help="The seconds to sleep after an unsuccessful "
+                    "notification received."),
 ]
