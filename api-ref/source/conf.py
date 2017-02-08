@@ -79,7 +79,7 @@ version = ceilometer_version.canonical_version_string()
 
 # Config logABug feature
 giturl = (
-    u'http://git.openstack.org/cgit/openstack/ceilometer/tree/api-ref/source')
+    u'https://git.openstack.org/cgit/openstack/ceilometer/tree/api-ref/source')
 # source tree
 # html_context allows us to pass arbitrary values into the html template
 html_context = {'bug_tag': 'api-ref',
