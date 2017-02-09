@@ -17,6 +17,7 @@
 from oslo_log import log as logging
 from tempest.common.utils import data_utils
 from tempest import config
+from tempest.lib.common.utils import test_utils
 from tempest.lib import decorators
 from tempest import test
 
@@ -106,9 +107,9 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
             return (container_name in containers and obj_name in objects)
 
         self.assertTrue(
-            test.call_until_true(_check_samples,
-                                 CONF.telemetry.notification_wait,
-                                 CONF.telemetry.notification_sleep),
+            test_utils.call_until_true(_check_samples,
+                                       CONF.telemetry.notification_wait,
+                                       CONF.telemetry.notification_sleep),
             'Correct notifications were not received after '
             '%s seconds.' % CONF.telemetry.notification_wait)
 
