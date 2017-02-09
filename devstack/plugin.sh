@@ -219,11 +219,13 @@ function cleanup_ceilometer {
 function _ceilometer_configure_cache_backend {
     iniset $CEILOMETER_CONF cache enabled True
     iniset $CEILOMETER_CONF cache backend $CEILOMETER_CACHE_BACKEND
-    iniset $CEILOMETER_CONF cache backend_argument url:$CEILOMETER_CACHE_URL
-    iniadd_literal $CEILOMETER_CONF cache backend_argument distributed_lock:True
+
+    inidelete $CEILOMETER_CONF cache backend_argument
+    iniadd $CEILOMETER_CONF cache backend_argument url:$CEILOMETER_CACHE_URL
+    iniadd $CEILOMETER_CONF cache backend_argument distributed_lock:True
     if [[ "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" ]]; then
-        iniadd_literal $CEILOMETER_CONF cache backend_argument db:0
-        iniadd_literal $CEILOMETER_CONF cache backend_argument redis_expiration_time:600
+        iniadd $CEILOMETER_CONF cache backend_argument db:0
+        iniadd $CEILOMETER_CONF cache backend_argument redis_expiration_time:600
     fi
 }
 
