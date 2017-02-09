@@ -17,6 +17,7 @@
 from oslo_log import log as logging
 from tempest.common.utils import data_utils
 from tempest import config
+from tempest.lib.common.utils import test_utils
 from tempest.lib import decorators
 from tempest import test
 
@@ -114,11 +115,12 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
 
             return (container_name in containers and obj_name in objects)
 
-        self.assertTrue(test.call_until_true(_check_samples,
-                                             NOTIFICATIONS_WAIT,
-                                             NOTIFICATIONS_SLEEP),
-                        'Correct notifications were not received after '
-                        '%s seconds.' % NOTIFICATIONS_WAIT)
+        self.assertTrue(
+            test_utils.call_until_true(_check_samples,
+                                       NOTIFICATIONS_WAIT,
+                                       NOTIFICATIONS_SLEEP),
+            'Correct notifications were not received after '
+            '%s seconds.' % NOTIFICATIONS_WAIT)
 
     def create_container(self):
         name = data_utils.rand_name('swift-scenario-container')
