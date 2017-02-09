@@ -207,10 +207,9 @@ should be set. This value defines how many pipeline queues to create which will
 then be distributed to the active notification agents. It is recommended that
 the number of processing queues, at the very least, match the number of agents.
 
-.. note::
-
-   Increasing the number of processing queues will improve the distribution
-   of messages across the agents.
+Increasing the number of processing queues will improve the distribution of
+messages across the agents. It will also help batching which minimises the
+requests to Gnocchi storage backend.
 
 .. warning::
 
