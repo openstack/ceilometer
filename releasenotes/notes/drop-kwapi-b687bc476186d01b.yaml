@@ -1,0 +1,4 @@
+---
+deprecations:
+  - |
+    Previously deprecated kwapi meters are not removed.
