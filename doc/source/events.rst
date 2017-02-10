@@ -283,12 +283,7 @@ Building Notifications
 In general, the payload format OpenStack services emit could be described as
 the Wild West. The payloads are often arbitrary data dumps at the time of
 the event which is often susceptible to change. To make consumption easier,
-the Ceilometer team offers two proposals: CADF_, an open, cloud standard
-which helps model cloud events and the PaaS Event Format.
-
-.. toctree::
-   :maxdepth: 1
-
-   format
+the Ceilometer team offers: CADF_, an open, cloud standard which helps model
+cloud events.
 
 .. _CADF: http://docs.openstack.org/developer/pycadf/
