@@ -50,7 +50,7 @@ tests:
       response_json_paths:
           $.stack.stack_status: "CREATE_COMPLETE"
 
-    - name: list servers
+    - name: list servers grow
       desc: Wait the autoscaling stack grow to two servers
       url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
       method: GET
@@ -75,16 +75,6 @@ tests:
           - '"id": "$RESPONSE["$.servers[0].id"]"'
           - '"id": "$RESPONSE["$.servers[1].id"]"'
 
-    - name: list servers again
-      desc: grab servers to check for events
-      url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
-      method: GET
-      poll:
-          count: 5
-          delay: 1
-      response_json_paths:
-          $.servers.`len`: 2
-
     - name: check event
       desc: Check panko for new instance.create.end event
       url: $ENVIRON['PANKO_SERVICE_URL']/v2/events
@@ -100,14 +90,14 @@ tests:
             - field: resource_id
               op: eq
               type: string
-              value: $RESPONSE['$.servers[0].id']
+              value: $HISTORY['list servers grow'].$RESPONSE['$.servers[0].id']
       poll:
           count: 30
           delay: 1
       response_json_paths:
           $.`len`: 1
           $[0].event_type: compute.instance.create.end
-          $[0].traits[?(@.name='resource_id')].value: $RESPONSE['$.servers[0].id']
+          $[0].traits[?(@.name='resource_id')].value: $HISTORY['list servers grow'].$RESPONSE['$.servers[0].id']
 
     - name: check alarm
       desc: Check the aodh alarm and its state
@@ -160,7 +150,7 @@ tests:
       response_json_paths:
           $.stack.stack_status: "UPDATE_COMPLETE"
 
-    - name: list servers
+    - name: list servers shrink
       desc: Wait the autoscaling stack shrink to one server
       url: $ENVIRON['NOVA_SERVICE_URL']/servers/detail
       method: GET
