@@ -39,17 +39,17 @@
 
      .. code-block:: ini
 
-     [service_credentials]
-     ...
-     auth_type = password
-     auth_url = http://controller:5000/v3
-     project_domain_name = default
-     user_domain_name = default
-     project_name = service
-     username = ceilometer
-     password = CEILOMETER_PASS
-     interface = internalURL
-     region_name = RegionOne
+        [service_credentials]
+        ...
+        auth_type = password
+        auth_url = http://controller:5000/v3
+        project_domain_name = default
+        user_domain_name = default
+        project_name = service
+        username = ceilometer
+        password = CEILOMETER_PASS
+        interface = internalURL
+        region_name = RegionOne
 
      Replace ``CEILOMETER_PASS`` with the password you chose for
      the ``ceilometer`` user in the Identity service.
