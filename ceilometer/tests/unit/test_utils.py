@@ -146,35 +146,3 @@ class TestUtils(base.BaseTestCase):
         self.assertEqual(utils.hash_of_set(x), utils.hash_of_set(y))
         self.assertNotEqual(utils.hash_of_set(x), utils.hash_of_set(z))
         self.assertNotEqual(utils.hash_of_set(y), utils.hash_of_set(z))
-
-    def test_hash_ring(self):
-        num_nodes = 10
-        num_keys = 1000
-
-        nodes = [str(x) for x in range(num_nodes)]
-        hr = utils.HashRing(nodes)
-
-        buckets = [0] * num_nodes
-        assignments = [-1] * num_keys
-        for k in range(num_keys):
-            n = int(hr.get_node(str(k)))
-            self.assertTrue(0 <= n <= num_nodes)
-            buckets[n] += 1
-            assignments[k] = n
-
-        # at least something in each bucket
-        self.assertTrue(all((c > 0 for c in buckets)))
-
-        # approximately even distribution
-        diff = max(buckets) - min(buckets)
-        self.assertTrue(diff < 0.3 * (num_keys / num_nodes))
-
-        # consistency
-        num_nodes += 1
-        nodes.append(str(num_nodes + 1))
-        hr = utils.HashRing(nodes)
-        for k in range(num_keys):
-            n = int(hr.get_node(str(k)))
-            assignments[k] -= n
-        reassigned = len([c for c in assignments if c != 0])
-        self.assertTrue(reassigned < num_keys / num_nodes)

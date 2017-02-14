@@ -20,9 +20,9 @@ from oslo_config import cfg
 from oslo_log import log
 import tenacity
 import tooz.coordination
+from tooz import hashring
 
 from ceilometer.i18n import _LE, _LI, _LW
-from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -216,10 +216,10 @@ class PartitionCoordinator(object):
                     raise MemberNotInGroupError(group_id, members, self._my_id)
                 LOG.debug('Members of group %s are: %s, Me: %s',
                           group_id, members, self._my_id)
-            hr = utils.HashRing(members)
+            hr = hashring.HashRing(members, partitions=100)
             iterable = list(iterable)
             filtered = [v for v in iterable
-                        if hr.get_node(six.text_type(v)) == self._my_id]
+                        if self._my_id in hr.get_nodes(self.encode_task(v))]
             LOG.debug('The universal set: %s, my subset: %s',
                       [six.text_type(f) for f in iterable],
                       [six.text_type(f) for f in filtered])
@@ -228,3 +228,8 @@ class PartitionCoordinator(object):
             LOG.exception(_LE('Error getting group membership info from '
                               'coordination backend.'))
             return []
+
+    @staticmethod
+    def encode_task(value):
+        """encode to bytes"""
+        return six.text_type(value).encode('utf-8')

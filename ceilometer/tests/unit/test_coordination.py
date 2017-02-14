@@ -18,10 +18,10 @@ import logging
 import mock
 from oslo_config import fixture as fixture_config
 import tooz.coordination
+from tooz import hashring
 
 from ceilometer import coordination
 from ceilometer.tests import base
-from ceilometer import utils
 
 
 class MockToozCoordinator(object):
@@ -204,9 +204,10 @@ class TestPartitioning(base.BaseTestCase):
         agents = ['agent_%s' % i for i in range(10)]
 
         expected_resources = [list() for _ in range(len(agents))]
-        hr = utils.HashRing(agents)
+        hr = hashring.HashRing(agents, partitions=100)
         for r in all_resources:
-            key = agents.index(hr.get_node(r))
+            encode = coordination.PartitionCoordinator.encode_task
+            key = agents.index(list(hr.get_nodes(encode(r)))[0])
             expected_resources[key].append(r)
 
         agents_kwargs = []
@@ -289,9 +290,10 @@ class TestPartitioning(base.BaseTestCase):
         agents = ['agent_%s' % i for i in range(2)]
 
         expected_resources = [list() for _ in range(len(agents))]
-        hr = utils.HashRing(agents)
+        hr = hashring.HashRing(agents, partitions=100)
         for r in all_resources:
-            key = agents.index(hr.get_node(r))
+            encode = coordination.PartitionCoordinator.encode_task
+            key = agents.index(list(hr.get_nodes(encode(r)))[0])
             expected_resources[key].append(r)
 
         agents_kwargs = []
