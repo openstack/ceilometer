@@ -43,8 +43,8 @@
         ...
         auth_type = password
         auth_url = http://controller:5000/v3
-        project_domain_name = default
-        user_domain_name = default
+        project_domain_id = default
+        user_domain_id = default
         project_name = service
         username = ceilometer
         password = CEILOMETER_PASS
