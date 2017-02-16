@@ -24,6 +24,7 @@ import pecan
 
 from ceilometer.api import hooks
 from ceilometer.api import middleware
+from ceilometer.i18n import _LI, _LW
 
 LOG = log.getLogger(__name__)
 
@@ -99,9 +100,9 @@ def load_app(conf):
     configkey = str(uuid.uuid4())
     APPCONFIGS[configkey] = conf
 
-    LOG.info("Full WSGI config used: %s", cfg_file)
-    LOG.warning("Note: Ceilometer API is deprecated; use APIs from "
-                "Aodh (alarms), Gnocchi (metrics) and/or Panko (events).")
+    LOG.info(_LI("Full WSGI config used: %s"), cfg_file)
+    LOG.warning(_LW("Note: Ceilometer API is deprecated; use APIs from Aodh"
+                    " (alarms), Gnocchi (metrics) and/or Panko (events)."))
     return deploy.loadapp("config:" + cfg_file,
                           global_conf={'configkey': configkey})
 
