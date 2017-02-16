@@ -97,6 +97,7 @@ export HEAT_SERVICE_URL=$(openstack catalog show orchestration -c endpoints -f v
 export NOVA_SERVICE_URL=$(openstack catalog show compute -c endpoints -f value | awk '/public/{print $2}')
 export GLANCE_IMAGE_NAME=$(openstack image list | awk '/ cirros.* /{print $4; exit}')
 export ADMIN_TOKEN=$(openstack token issue -c id -f value)
+export OS_AUTH_TYPE=password
 
 # Run tests with gabbi
 echo "Running telemetry integration test suite"
