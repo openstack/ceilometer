@@ -270,7 +270,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                     self.filter_service_activity = False
                     return None
                 except Exception:
-                    LOG.exception('fail to retrieve user of Gnocchi service')
+                    LOG.exception(_LE('fail to retrieve user of Gnocchi '
+                                      'service'))
                     raise
                 self._gnocchi_project_id = project.id
                 LOG.debug("gnocchi project found: %s", self.gnocchi_project_id)
