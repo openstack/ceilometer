@@ -392,8 +392,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
 
     @staticmethod
     def _extract_resources_from_error(e, resource_infos):
-        resource_ids = [r['original_resource_id']
-                        for r in e.message['detail']]
+        resource_ids = set([r['original_resource_id']
+                            for r in e.message['detail']])
         return [(resource_infos[rid]['resource_type'],
                  resource_infos[rid]['resource'])
                 for rid in resource_ids]
