@@ -109,6 +109,13 @@ metric:
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
     user_metadata: $.payload.metadata
+    metadata: &instance_meta
+      host: $.payload.host
+      flavor_id: $.payload.instance_flavor_id
+      flavor_name: $.payload.instance_type
+      display_name: $.payload.display_name
+      host: $.payload.host
+      image_ref: $.payload.image_meta.base_image_ref
 
   - name: 'vcpus'
     event_type: 'compute.instance.*'
@@ -119,6 +126,8 @@ metric:
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
     user_metadata: $.payload.metadata
+    metadata:
+       <<: *instance_meta
 
   - name: 'compute.instance.booting.time'
     event_type: 'compute.instance.create.end'
@@ -130,6 +139,8 @@ metric:
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
     user_metadata: $.payload.metadata
+    metadata:
+      <<: *instance_meta
 
   - name: 'disk.root.size'
     event_type: 'compute.instance.*'
@@ -140,6 +151,8 @@ metric:
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
     user_metadata: $.payload.metadata
+    metadata:
+       <<: *instance_meta
 
   - name: 'disk.ephemeral.size'
     event_type: 'compute.instance.*'
@@ -150,6 +163,8 @@ metric:
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
     user_metadata: $.payload.metadata
+    metadata:
+       <<: *instance_meta
 
   - name: 'bandwidth'
     event_type: 'l3.meter'
