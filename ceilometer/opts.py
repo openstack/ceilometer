@@ -31,7 +31,6 @@ import ceilometer.dispatcher
 import ceilometer.dispatcher.file
 import ceilometer.dispatcher.gnocchi_opts
 import ceilometer.dispatcher.http
-import ceilometer.energy.kwapi
 import ceilometer.event.converter
 import ceilometer.exchange_control
 import ceilometer.hardware.discovery
@@ -114,8 +113,7 @@ def list_opts():
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
         ('service_types',
-         itertools.chain(ceilometer.energy.kwapi.SERVICE_OPTS,
-                         ceilometer.image.discovery.SERVICE_OPTS,
+         itertools.chain(ceilometer.image.discovery.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,
