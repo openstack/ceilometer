@@ -9,4 +9,4 @@ sinks:
     - name: event_sink
       transformers:
       publishers:
-          - notifier://
+          - gnocchi://

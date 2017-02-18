@@ -3,8 +3,6 @@
 enable_service ceilometer-acompute ceilometer-acentral
 # Notification Agent
 enable_service ceilometer-anotification
-# Data Collector
-enable_service ceilometer-collector
 
 # Default directories
 CEILOMETER_DIR=$DEST/ceilometer

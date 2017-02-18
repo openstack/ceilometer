@@ -20,6 +20,11 @@
  Installing Manually
 =====================
 
+.. note::
+
+   Ceilometer collector service is deprecated. Configure dispatchers under publisher
+   in pipeline to push data instead. For more details about how to configure
+   dispatchers in the :ref:`dispatcher-configuration`.
 
 Storage Backend Installation
 ============================
