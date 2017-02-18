@@ -147,21 +147,7 @@ resources:
   - resource_type: network
     metrics:
       - 'bandwidth'
-      - 'network'
-      - 'network.create'
-      - 'network.update'
-      - 'subnet'
-      - 'subnet.create'
-      - 'subnet.update'
-      - 'port'
-      - 'port.create'
-      - 'port.update'
-      - 'router'
-      - 'router.create'
-      - 'router.update'
       - 'ip.floating'
-      - 'ip.floating.create'
-      - 'ip.floating.update'
     event_delete: floatingip.delete.end
     event_attributes:
       id: resource_id
