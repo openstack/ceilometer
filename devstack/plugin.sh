@@ -232,11 +232,6 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
-    # clear all old dispatchers since iniset/iniadd functions don't support
-    # multivalue options well.
-    inidelete $CEILOMETER_CONF DEFAULT meter_dispatchers
-    inidelete $CEILOMETER_CONF DEFAULT event_dispatchers
-
     if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
         # It's ok for the backend to be 'none', if panko is enabled. We do not
         # combine this condition with the outer if statement, so that the else
@@ -245,14 +240,10 @@ function _ceilometer_configure_storage_backend {
             echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
         fi
     elif [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
-        iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-        iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers database
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        iniadd $CEILOMETER_CONF DEFAULT meter_dispatchers gnocchi
-        iniadd $CEILOMETER_CONF DEFAULT event_dispatchers gnocchi
         # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
         iniset $CEILOMETER_CONF storage max_retries 20
         # NOTE(gordc): set batching to better handle recording on a slow machine
@@ -275,7 +266,6 @@ function _ceilometer_configure_storage_backend {
 
     # configure panko
     if is_service_enabled panko-api; then
-        iniadd $CEILOMETER_CONF DEFAULT event_dispatchers panko
         if ! grep -q 'panko' $CEILOMETER_CONF_DIR/event_pipeline.yaml ; then
             echo '          - direct://?dispatcher=panko' >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
         fi
