@@ -21,7 +21,7 @@ from ceilometer.agent import plugin_base
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LE
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -61,7 +61,7 @@ class CPUPollster(pollsters.BaseComputePollster):
                           self.inspector.__class__.__name__)
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
-                LOG.exception(_('could not get CPU time for %(id)s: %(e)s'),
+                LOG.exception(_LE('could not get CPU time for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
 
 
@@ -94,7 +94,7 @@ class CPUUtilPollster(pollsters.BaseComputePollster):
                           self.inspector.__class__.__name__)
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
-                LOG.exception(_('Could not get CPU Util for %(id)s: %(e)s'),
+                LOG.exception(_LE('Could not get CPU Util for %(id)s: %(e)s'),
                               {'id': instance.id, 'e': err})
 
 
@@ -131,5 +131,6 @@ class CPUL3CachePollster(pollsters.BaseComputePollster):
                           self.inspector.__class__.__name__)
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
-                LOG.exception(_('Could not get cache usage for %(id)s: %(e)s'),
-                              {'id': instance.id, 'e': err})
+                LOG.exception(
+                    _LE('Could not get cache usage for %(id)s: %(e)s'),
+                    {'id': instance.id, 'e': err})

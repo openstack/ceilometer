@@ -25,7 +25,7 @@ from ceilometer.agent import plugin_base
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _
+from ceilometer.i18n import _, _LE
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -163,7 +163,7 @@ class _Base(pollsters.BaseComputePollster):
                            'pollster': self.__class__.__name__})
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
-                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                LOG.exception(_LE('Ignoring instance %(name)s: %(error)s'),
                               {'name': instance_name, 'error': err})
 
 
@@ -302,7 +302,7 @@ class _DiskRatesPollsterBase(pollsters.BaseComputePollster):
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
-                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                LOG.exception(_LE('Ignoring instance %(name)s: %(error)s'),
                               {'name': instance_name, 'error': err})
 
     def _get_samples_per_device(self, disk_rates_info, _attr, instance,
@@ -429,7 +429,7 @@ class _DiskLatencyPollsterBase(pollsters.BaseComputePollster):
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
-                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                LOG.exception(_LE('Ignoring instance %(name)s: %(error)s'),
                               {'name': instance_name, 'error': err})
 
 
@@ -502,7 +502,7 @@ class _DiskIOPSPollsterBase(pollsters.BaseComputePollster):
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 instance_name = util.instance_name(instance)
-                LOG.exception(_('Ignoring instance %(name)s: %(error)s'),
+                LOG.exception(_LE('Ignoring instance %(name)s: %(error)s'),
                               {'name': instance_name, 'error': err})
 
 
