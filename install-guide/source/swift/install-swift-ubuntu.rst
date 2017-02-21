@@ -1,5 +1,5 @@
-Enable Object Storage meters for Red Hat Enterprise Linux and CentOS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enable Object Storage meters for Ubuntu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Telemetry uses a combination of polling and notifications to collect
 Object Storage meters.
@@ -8,7 +8,7 @@ Object Storage meters.
 
    Your environment must include the Object Storage service.
 
-.. include:: install-swift-prereq-common.rst
+.. include:: install-swift-prereq-common.inc
 
 Install components
 ------------------
@@ -17,9 +17,9 @@ Install components
 
   .. code-block:: console
 
-     # yum install python-ceilometermiddleware
+     # apt-get install python-ceilometermiddleware
 
-.. include:: install-swift-config-common.rst
+.. include:: install-swift-config-common.inc
 
 Finalize installation
 ---------------------
@@ -28,4 +28,4 @@ Finalize installation
 
   .. code-block:: console
 
-     # systemctl restart openstack-swift-proxy.service
+     # service swift-proxy restart

@@ -1,5 +1,5 @@
-Enable Compute service meters for openSUSE and SUSE Linux Enterprise
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enable Compute service meters for Red Hat Enterprise Linux and CentOS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Telemetry uses a combination of notifications and an agent to collect
 Compute meters. Perform these steps on each compute node.
@@ -11,9 +11,9 @@ Install and configure components
 
    .. code-block:: console
 
-      # zypper install openstack-ceilometer-agent-compute
+      # yum install openstack-ceilometer-compute
 
-.. include:: install-nova-common.rst
+.. include:: install-compute-common.inc
 
 Finalize installation
 ---------------------
@@ -22,8 +22,8 @@ Finalize installation
 
    .. code-block:: console
 
-      # systemctl enable openstack-ceilometer-agent-compute.service
-      # systemctl start openstack-ceilometer-agent-compute.service
+      # systemctl enable openstack-ceilometer-compute.service
+      # systemctl start openstack-ceilometer-compute.service
 
 #. Restart the Compute service:
 

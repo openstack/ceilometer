@@ -6,10 +6,6 @@ Install and configure for openSUSE and SUSE Linux Enterprise
 This section describes how to install and configure the
 Telemetry service, code-named ceilometer, on the controller node.
 
-This section assumes that you already have a working OpenStack
-environment with at least the following components installed:
-Compute, Image Service, Identity.
-
 Prerequisites
 -------------
 
@@ -18,7 +14,7 @@ configure a target to send metering data to. The recommended endpoint
 is Gnocchi_. To enable Gnocchi, please see its install guide.
 
 .. _Gnocchi: http://gnocchi.xyz
-.. include:: install-base-prereq-common.rst
+.. include:: install-base-prereq-common.inc
 
 Install and configure components
 --------------------------------
@@ -32,7 +28,7 @@ Install and configure components
         openstack-ceilometer-agent-notification \
         openstack-ceilometer-agent-central python-ceilometerclient
 
-.. include:: install-base-config-common.rst
+.. include:: install-base-config-common.inc
 
 Finalize installation
 ---------------------
