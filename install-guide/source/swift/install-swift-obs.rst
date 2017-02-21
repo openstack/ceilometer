@@ -8,7 +8,7 @@ Object Storage meters.
 
    Your environment must include the Object Storage service.
 
-.. include:: install-swift-prereq-common.rst
+.. include:: install-swift-prereq-common.inc
 
 Install components
 ------------------
@@ -19,7 +19,7 @@ Install components
 
      # zypper install python-ceilometermiddleware
 
-.. include:: install-swift-config-common.rst
+.. include:: install-swift-config-common.inc
 
 Finalize installation
 ---------------------

@@ -13,7 +13,7 @@ Install and configure components
 
       # apt-get install ceilometer-agent-compute
 
-.. include:: install-nova-common.rst
+.. include:: install-compute-common.inc
 
 Finalize installation
 ---------------------
