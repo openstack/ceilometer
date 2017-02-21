@@ -25,14 +25,8 @@ A central agent (``ceilometer-agent-central``)
 
 A notification agent (``ceilometer-agent-notification``)
   Runs on a central management server(s) and consumes messages from
-  the message queue(s) to build event and metering data.
-
-A collector (``ceilometer-collector``)
-  Runs on central management server(s) and dispatches collected
-  telemetry data to a data store or external consumer without
-  modification. This service is optional as the
-  ``ceilometer-agent-notification`` service can be configured to provide
-  the equivalent functionality.
+  the message queue(s) to build event and metering data. Data is then
+  published to defined targets. By default, data is pushed to Gnocchi_.
 
 These services communicate by using the OpenStack messaging bus. Ceilometer
 data is designed to be published to various endpoints for storage and

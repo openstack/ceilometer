@@ -23,9 +23,7 @@ Install and configure components
 
    .. code-block:: console
 
-      # zypper install
-        openstack-ceilometer-collector \
-        openstack-ceilometer-agent-notification \
+      # zypper install openstack-ceilometer-agent-notification \
         openstack-ceilometer-agent-central python-ceilometerclient
 
 .. include:: install-base-config-common.inc
@@ -39,8 +37,6 @@ Finalize installation
    .. code-block:: console
 
       # systemctl enable openstack-ceilometer-agent-notification.service \
-        openstack-ceilometer-agent-central.service \
-        openstack-ceilometer-collector.service
+        openstack-ceilometer-agent-central.service
       # systemctl start openstack-ceilometer-agent-notification.service \
-        openstack-ceilometer-agent-central.service \
-        openstack-ceilometer-collector.service
+        openstack-ceilometer-agent-central.service

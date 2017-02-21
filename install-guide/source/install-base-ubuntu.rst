@@ -23,9 +23,8 @@ Install and configure components
 
    .. code-block:: console
 
-      # apt-get install ceilometer-collector \
-        ceilometer-agent-central ceilometer-agent-notification \
-        python-ceilometerclient
+      # apt-get install ceilometer-agent-notification \
+        ceilometer-agent-central python-ceilometerclient
 
 .. include:: install-base-config-common.inc
 
@@ -38,4 +37,3 @@ Finalize installation
 
       # service ceilometer-agent-central restart
       # service ceilometer-agent-notification restart
-      # service ceilometer-collector restart

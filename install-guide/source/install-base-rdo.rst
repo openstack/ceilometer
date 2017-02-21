@@ -23,8 +23,7 @@ Install and configure components
 
    .. code-block:: console
 
-      # yum install
-        openstack-ceilometer-collector openstack-ceilometer-notification \
+      # yum install openstack-ceilometer-notification \
         openstack-ceilometer-central python-ceilometerclient
 
 .. include:: install-base-config-common.inc
@@ -38,8 +37,6 @@ Finalize installation
    .. code-block:: console
 
       # systemctl enable openstack-ceilometer-notification.service \
-        openstack-ceilometer-central.service \
-        openstack-ceilometer-collector.service
+        openstack-ceilometer-central.service
       # systemctl start openstack-ceilometer-notification.service \
-        openstack-ceilometer-central.service \
-        openstack-ceilometer-collector.service
+        openstack-ceilometer-central.service

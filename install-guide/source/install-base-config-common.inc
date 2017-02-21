@@ -5,23 +5,11 @@
 
      .. code-block:: ini
 
-        [DEFAULT]
-        ...
-        meter_dispatchers=gnocchi
-        event_dispatchers=gnocchi
-
         [dispatcher_gnocchi]
         # filter out Gnocchi-related activity meters (Swift driver)
         filter_service_activity = False
         # default metric storage archival policy
         archive_policy = low
-
-     .. note::
-
-        It is possible forego the collector service by modifying the
-        pipeline.yaml to use the ``gnocchi://`` publisher rather than
-        ``notifier://``. Doing so will minimise resource requirements.
-        In this case, dispatchers do not need to be added to conf file.
 
    * In the ``[DEFAULT]`` section,
      configure ``RabbitMQ`` message queue access:
