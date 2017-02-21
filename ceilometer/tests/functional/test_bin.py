@@ -86,7 +86,8 @@ class BinTestCase(base.BaseTestCase):
 class BinSendSampleTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinSendSampleTestCase, self).setUp()
-        pipeline_cfg_file = self.path_get('etc/ceilometer/pipeline.yaml')
+        pipeline_cfg_file = self.path_get(
+            'ceilometer/pipeline/data/pipeline.yaml')
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n"
                    "pipeline_cfg_file={0}\n".format(pipeline_cfg_file))

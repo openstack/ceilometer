@@ -37,11 +37,17 @@ from ceilometer import sample as sample_util
 
 OPTS = [
     cfg.StrOpt('pipeline_cfg_file',
-               default="pipeline.yaml",
+               default=os.path.abspath(
+                   os.path.join(
+                       os.path.dirname(__file__),
+                       "pipeline", "data", "pipeline.yaml")),
                help="Configuration file for pipeline definition."
                ),
     cfg.StrOpt('event_pipeline_cfg_file',
-               default="event_pipeline.yaml",
+               default=os.path.abspath(
+                   os.path.join(
+                       os.path.dirname(__file__),
+                       "pipeline", "data", "event_pipeline.yaml")),
                help="Configuration file for event pipeline definition."
                ),
     cfg.BoolOpt('refresh_pipeline_cfg',

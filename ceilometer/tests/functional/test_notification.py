@@ -241,10 +241,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
         self.CONF.set_override("event_pipeline_cfg_file",
                                ev_pipeline_cfg_file)
-        self.CONF.set_override(
-            "definitions_cfg_file",
-            self.path_get('etc/ceilometer/event_definitions.yaml'),
-            group='event')
+
         self.publisher = test_publisher.TestPublisher(self.CONF, "")
 
     def _check_notification_service(self):

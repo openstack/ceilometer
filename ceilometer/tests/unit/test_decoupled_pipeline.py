@@ -204,7 +204,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
 
     def _do_test_rate_of_change_in_boilerplate_pipeline_cfg(self, index,
                                                             meters, units):
-        with open('etc/ceilometer/pipeline.yaml') as fap:
+        with open('ceilometer/pipeline/data/pipeline.yaml') as fap:
             data = fap.read()
         pipeline_cfg = yaml.safe_load(data)
         for s in pipeline_cfg['sinks']:

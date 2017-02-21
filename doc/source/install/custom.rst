@@ -153,6 +153,20 @@ configuration settings should be added::
    If gnocchi dispatcher is enabled, Ceilometer api calls will return a 410 with
    an empty result. The Gnocchi Api should be used instead to access the data.
 
+Custom pipeline
+===============
+
+The paths of all pipeline files including ``pipeline.yaml`` and ``event_pipeline.yaml``
+are located to ceilometer/pipeline/data by default. And it's possible to set the
+path through ``pipeline_cfg_file`` being assigned to another one in ``ceilometer.conf``.
+
+Ceilometer allow users to customize pipeline files. Before that, copy the following
+yaml files::
+
+    $ cp ceilometer/pipeline/data/*.yaml /etc/ceilometer
+
+Then you can add configurations according to the former section.
+
 Efficient polling
 =================
 
