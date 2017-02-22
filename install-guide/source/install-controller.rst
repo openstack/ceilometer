@@ -42,6 +42,35 @@ Glance
    glance/install-glance-rdo.rst
    glance/install-glance-ubuntu.rst
 
+Heat
+----
+
+.. toctree::
+   :maxdepth: 1
+
+   heat/install-heat-obs.rst
+   heat/install-heat-rdo.rst
+   heat/install-heat-ubuntu.rst
+
+Keystone
+--------
+
+To enable auditing of API requests, Keystone provides middleware which captures
+API requests to a service and emits data to Ceilometer. Instructions to enable
+this functionality is available in `Keystone's developer documenation
+<https://docs.openstack.org/developer/keystonemiddleware/audit.html>`_.
+Ceilometer will captures this information as ``audit.http.*`` events.
+
+Neutron
+-------
+
+.. toctree::
+   :maxdepth: 1
+
+   neutron/install-neutron-obs.rst
+   neutron/install-neutron-rdo.rst
+   neutron/install-neutron-ubuntu.rst
+
 Swift
 -----
 

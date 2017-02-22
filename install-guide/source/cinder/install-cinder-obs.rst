@@ -22,6 +22,8 @@ following actions:
      ...
      driver = messagingv2
 
+.. include:: install-cinder-config-common.inc
+
 Finalize installation
 ---------------------
 
@@ -36,9 +38,3 @@ Finalize installation
    .. code-block:: console
 
       # systemctl restart openstack-cinder-volume.service
-
-#. Use the ``cinder-volume-usage-audit`` command on Block Storage nodes
-   to retrieve meters on demand. For more information, see the
-   `OpenStack Administrator Guide <http://docs.openstack.org/admin-guide/
-   telemetry-data-collection.html#block-storage-audit-script-setup-to-get-
-   notifications>`__.
