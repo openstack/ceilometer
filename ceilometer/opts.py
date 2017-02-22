@@ -119,7 +119,6 @@ def list_opts():
                          ceilometer.objectstore.rgw.SERVICE_OPTS,
                          ceilometer.objectstore.swift.SERVICE_OPTS,
                          ceilometer.volume.discovery.SERVICE_OPTS,)),
-        ('storage', ceilometer.dispatcher.STORAGE_OPTS),
         ('vmware', ceilometer.compute.virt.vmware.inspector.OPTS),
         ('xenapi', ceilometer.compute.virt.xenapi.inspector.OPTS),
     ]
