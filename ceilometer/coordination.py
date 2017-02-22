@@ -84,7 +84,8 @@ class PartitionCoordinator(object):
         self.conf = conf
         self._coordinator = None
         self._groups = set()
-        self._my_id = my_id or str(uuid.uuid4())
+        # XXX uuid4().bytes ought to work, but it requires ascii for now
+        self._my_id = my_id or str(uuid.uuid4()).encode('ascii')
 
     def start(self):
         backend_url = self.conf.coordination.backend_url
