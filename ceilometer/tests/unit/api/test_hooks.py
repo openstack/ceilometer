@@ -27,8 +27,6 @@ class TestTestNotifierHook(base.BaseTestCase):
         self.CONF = self.useFixture(fixture_config.Config()).conf
 
     def test_init_notifier_with_drivers(self):
-        self.CONF.set_override('telemetry_driver', 'messagingv2',
-                               group='publisher_notifier')
         hook = hooks.NotifierHook(self.CONF)
         notifier = hook.notifier
         self.assertIsInstance(notifier, oslo_messaging.Notifier)
