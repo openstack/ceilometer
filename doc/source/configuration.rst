@@ -189,7 +189,7 @@ publishers should be the same as the related names of the plugins in
 :file:`setup.cfg`.
 
 The default configuration can be found in `pipeline.yaml`_. For more details about
-how to configure dispatchers under publisher in the :ref:`dispatcher-configuration`.
+how to configure publishers, see :ref:`publisher-configuration`.
 
 .. _pipeline.yaml: https://git.openstack.org/cgit/openstack/ceilometer/tree/ceilometer/pipeline/data/pipeline.yaml
 

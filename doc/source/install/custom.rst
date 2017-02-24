@@ -64,50 +64,35 @@ For polling agent using ceilometer-polling.conf, settings like::
 
 Doing this, it's easy to listen/receive data from multiple internal and external services.
 
-..  _dispatcher-configuration:
+..  _publisher-configuration:
 
-Using multiple dispatchers
-==========================
+Using multiple publishers
+=========================
 
 .. index::
-   double: customizing deployment; multiple dispatchers
+   double: customizing deployment; multiple publishers
 
-Ceilometer allows multiple dispatchers to be configured in pipeline so that
-data can be easily sent to multiple internal and external systems. Dispatchers
-are divided between event dispatchers and meter dispatchers which can
-each be provided with their own set of receiving systems. Ceilometer allows to set two
-types of pipelines. One is ``pipeline.yaml`` which is for meters, another is ``event_pipeline.yaml``
-which is for events.
+Ceilometer allows multiple publishers to be configured in pipeline so that
+data can be easily sent to multiple internal and external systems. Ceilometer
+allows to set two types of pipelines. One is ``pipeline.yaml`` which is for
+meters, another is ``event_pipeline.yaml`` which is for events.
 
-By default, Ceilometer only saves event and meter data in a database. If you
+By default, Ceilometer only saves event and meter data into Gnocchi_. If you
 want Ceilometer to send data to other systems, instead of or in addition to
-the Ceilometer database, multiple dispatchers can be enabled by modifying the
-Ceilometer configuration file.
+the default storage services, multiple publishers can be enabled by modifying
+the Ceilometer pipeline.
 
-Ceilometer ships multiple dispatchers currently. They are ``database``,
-``file``, ``http`` and ``gnocchi`` dispatcher. As the names imply, database
-dispatcher sends metering data to a database, file dispatcher logs meters into
-a file, http dispatcher posts the meters onto a http target, gnocchi
-dispatcher posts the meters onto Gnocchi_ backend. Each dispatcher can have
-its own configuration parameters. Please see available configuration
-parameters at the beginning of each dispatcher file.
+Ceilometer ships multiple publishers currently. They are ``database``,
+``notifier``, ``file``, ``http`` and ``gnocchi`` publishers.
 
 .. _Gnocchi: http://gnocchi.xyz
 
-To check if any of the dispatchers is available in your system, you can
-inspect the Ceilometer ``setup.cfg`` file for the dispatcher parts, or you
-can scan them using entry_point_inspector::
+To configure one or multiple publishers for Ceilometer, find the Ceilometer
+configuration file ``pipeline.yaml`` and/or ``event_pipeline.yaml`` which is
+normally located at /etc/ceilometer directory and make changes accordingly.
+Your configuration file can be in a different directory.
 
-    $ pip install --user entry_point_inspector
-    $ epi group show ceilometer.dispatcher.meter
-    $ epi group show ceilometer.dispatcher.event
-
-To configure one or multiple dispatchers for Ceilometer, find the Ceilometer
-configuration file ``pipeline.yaml`` and/or ``event_pipeline.yaml`` which is normally
-located at /etc/ceilometer directory and make changes accordingly. Your
-configuration file can be in a different directory.
-
-To use multiple dispatchers, add multiple dispatcher lines in ``pipeline.yaml`` and/or
+To use multiple publishers, add multiple publisher lines in ``pipeline.yaml`` and/or
 ``event_pipeline.yaml`` file like the following::
 
    ---
@@ -125,15 +110,7 @@ To use multiple dispatchers, add multiple dispatcher lines in ``pipeline.yaml`` 
             - gnocchi://
             - file://
 
-``database://`` and ``gnocchi://`` are explicit publishers. You can choose
-dispatchers which you need to be configured under ``publishers`` parameter.
-
-.. note::
-   If there is no dispatcher present, database dispatcher is used as the
-   default on condition that you may use ``direct://`` as a publisher. But
-   direct publisher is deprecated, use an explicit publisher instead.
-
-For Gnocchi dispatcher, the following configuration settings should be added
+For the Gnocchi publisher, the following configuration settings should be added
 into /etc/ceilometer/ceilometer.conf::
 
     [dispatcher_gnocchi]
@@ -142,16 +119,12 @@ into /etc/ceilometer/ceilometer.conf::
 The value specified for ``archive_policy`` should correspond to the name of an
 ``archive_policy`` configured within Gnocchi.
 
-For Gnocchi dispatcher backed by Swift storage, the following additional
+For the Gnocchi publisher backed by Swift storage, the following additional
 configuration settings should be added::
 
     [dispatcher_gnocchi]
     filter_project = gnocchi_swift
     filter_service_activity = True
-
-.. note::
-   If gnocchi dispatcher is enabled, Ceilometer api calls will return a 410 with
-   an empty result. The Gnocchi Api should be used instead to access the data.
 
 Custom pipeline
 ===============

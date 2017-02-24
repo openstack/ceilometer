@@ -24,7 +24,7 @@
 
    Ceilometer collector service is deprecated. Configure dispatchers under publisher
    in pipeline to push data instead. For more details about how to configure
-   dispatchers in the :ref:`dispatcher-configuration`.
+   publishers in the :ref:`publisher-configuration`.
 
 Storage Backend Installation
 ============================
@@ -48,10 +48,6 @@ Gnocchi
 
    * With Keystone authentication enabled::
 
-       [DEFAULT]
-       meter_dispatchers = gnocchi
-       event_dispatchers = gnocchi
-
        [dispatcher_gnocchi]
        filter_service_activity = False # Enable if using swift backend
        filter_project = <project name associated with gnocchi user> # if using swift backend
@@ -70,10 +66,6 @@ Gnocchi
      Gnocchi to remove the overhead of token creation/verification when request
      authentication doesn't matter. This will increase the performance of
      Gnocchi::
-
-       [DEFAULT]
-       meter_dispatchers = gnocchi
-       event_dispatchers = gnocchi
 
        [dispatcher_gnocchi]
        filter_service_activity = False # Enable if using swift backend
