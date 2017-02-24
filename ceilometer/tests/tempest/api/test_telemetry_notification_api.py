@@ -38,7 +38,6 @@ class TelemetryNotificationAPITest(base.BaseTelemetryTest):
         for metric in self.nova_notifications:
             self.await_samples(metric, query)
 
-    @test.attr(type="smoke")
     @decorators.idempotent_id('c240457d-d943-439b-8aea-85e26d64fe8f')
     @test.services("image")
     @testtools.skipIf(not CONF.image_feature_enabled.api_v2,
