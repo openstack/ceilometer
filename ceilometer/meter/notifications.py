@@ -17,12 +17,11 @@ import six
 
 from oslo_config import cfg
 from oslo_log import log
-import oslo_messaging
 from oslo_utils import fnmatch
 from stevedore import extension
 
-from ceilometer.agent import plugin_base
 from ceilometer import declarative
+from ceilometer import notification
 from ceilometer.i18n import _LE, _LW
 from ceilometer import sample as sample_util
 
@@ -166,7 +165,7 @@ class MeterDefinition(object):
             yield sample
 
 
-class ProcessMeterNotifications(plugin_base.NotificationBase):
+class ProcessMeterNotifications(notification.NotificationProcessBase):
 
     event_types = []
 
@@ -198,37 +197,6 @@ class ProcessMeterNotifications(plugin_base.NotificationBase):
             else:
                 definitions[meter_cfg['name']] = md
         return definitions.values()
-
-    def get_targets(self, conf):
-        """Return a sequence of oslo_messaging.Target
-
-        It is defining the exchange and topics to be connected for this plugin.
-        :param conf: Configuration.
-        #TODO(prad): This should be defined in the notification agent
-        """
-        targets = []
-        exchanges = [
-            conf.nova_control_exchange,
-            conf.cinder_control_exchange,
-            conf.glance_control_exchange,
-            conf.neutron_control_exchange,
-            conf.heat_control_exchange,
-            conf.keystone_control_exchange,
-            conf.sahara_control_exchange,
-            conf.trove_control_exchange,
-            conf.zaqar_control_exchange,
-            conf.swift_control_exchange,
-            conf.ceilometer_control_exchange,
-            conf.magnum_control_exchange,
-            conf.dns_control_exchange,
-            ]
-
-        for exchange in exchanges:
-            targets.extend(oslo_messaging.Target(topic=topic,
-                                                 exchange=exchange)
-                           for topic in
-                           self.get_notification_topics(conf))
-        return targets
 
     def process_notification(self, notification_body):
         for d in self.definitions:
