@@ -33,16 +33,23 @@ Installation and configuration can be found in :ref:`installing_manually`.
 Differences between APIs can be found here_.
 
 There currently exists no migration tool between the services. To transition
-to Gnocchi, multiple dispatchers can be enabled in the Collector to capture
+to Gnocchi, multiple publishers can be enabled in the Collector to capture
 data in both the native Ceilometer database and Gnocchi. This will allow you
-to test Gnocchi and transition to it fully when comfortable. The following
-should be included in addition to the required configurations for each
-backend::
+to test Gnocchi and transition to it fully when comfortable. Edit the
+``pipeline.yaml`` and ``event_pipeline.yaml`` to include multiple publishers::
 
-  [DEFAULT]
-  meter_dispatchers=database
-  meter_dispatchers=gnocchi
-  event_dispatchers=gnocchi
+  ---
+  sources:
+      - name: event_source
+        events:
+            - "*"
+        sinks:
+            - event_sink
+  sinks:
+      - name: event_sink
+        publishers:
+            - gnocchi://
+            - database://
 
 .. _Gnocchi: http://gnocchi.xyz
 .. _Aodh: http://docs.openstack.org/developer/aodh/
