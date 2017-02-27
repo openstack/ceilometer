@@ -277,7 +277,7 @@ function _ceilometer_configure_storage_backend {
     if is_service_enabled panko-api; then
         iniadd $CEILOMETER_CONF DEFAULT event_dispatchers panko
         if ! grep -q 'panko' $CEILOMETER_CONF_DIR/event_pipeline.yaml ; then
-            echo '          - direct://?dispatcher=panko' >> $CEILOMETER_DIR/ceilometer/pipeline/data/event_pipeline.yaml
+            echo '          - panko://' >> $CEILOMETER_DIR/ceilometer/pipeline/data/event_pipeline.yaml
         fi
     fi
 
