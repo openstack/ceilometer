@@ -26,14 +26,15 @@ DEFAULT_GROUP = "service_credentials"
 OVERRIDABLE_GROUPS = ['dispatcher_gnocchi']
 
 
-def get_session(conf, requests_session=None, group=None):
+def get_session(conf, requests_session=None, group=None, timeout=None):
 
     """Get a ceilometer service credentials auth session."""
     group = group or DEFAULT_GROUP
     auth_plugin = ka_loading.load_auth_from_conf_options(conf, group)
-    session = ka_loading.load_session_from_conf_options(
-        conf, group, auth=auth_plugin, session=requests_session
-    )
+    kwargs = {'auth': auth_plugin, 'session': requests_session}
+    if timeout is not None:
+        kwargs['timeout'] = timeout
+    session = ka_loading.load_session_from_conf_options(conf, group, **kwargs)
     return session
 
 

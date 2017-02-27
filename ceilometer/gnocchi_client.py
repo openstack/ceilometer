@@ -20,9 +20,12 @@ from ceilometer import keystone_client
 LOG = log.getLogger(__name__)
 
 
-def get_gnocchiclient(conf):
+def get_gnocchiclient(conf, timeout_override=False):
     group = conf.dispatcher_gnocchi.auth_section
-    session = keystone_client.get_session(conf, group=group)
+    timeout = (None if (not conf.dispatcher_gnocchi.request_timeout or
+                        timeout_override)
+               else conf.dispatcher_gnocchi.request_timeout)
+    session = keystone_client.get_session(conf, group=group, timeout=timeout)
     return client.Client('1', session,
                          interface=conf[group].interface,
                          region_name=conf[group].region_name)
@@ -115,7 +118,7 @@ resources_update_operations = [
 
 
 def upgrade_resource_types(conf):
-    gnocchi = get_gnocchiclient(conf)
+    gnocchi = get_gnocchiclient(conf, True)
     for name, attributes in resources_initial.items():
         try:
             gnocchi.resource_type.get(name=name)

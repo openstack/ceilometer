@@ -29,4 +29,6 @@ dispatcher_opts = [
                default='gnocchi_resources.yaml',
                help=('The Yaml file that defines mapping between samples '
                      'and gnocchi resources/metrics')),
+    cfg.FloatOpt('request_timeout', default=6.05, min=0.0,
+                 help='Number of seconds before request to gnocchi times out'),
 ]
