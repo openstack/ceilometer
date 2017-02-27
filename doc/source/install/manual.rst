@@ -33,18 +33,9 @@ Storage Backend Installation
 Gnocchi
 -------
 
-1. Follow `Gnocchi installation`_ instructions
+#. Follow `Gnocchi installation`_ instructions
 
-2. Initialize Gnocchi for Ceilometer::
-
-    $ gnocchi-upgrade --create-legacy-resource-types
-
-   .. note::
-
-      Prior to Gnocchi 2.1, Ceilometer resource types were included, therefore
-      --create-legacy-resource-types flag is not needed.
-
-3. Edit `/etc/ceilometer/ceilometer.conf` for the collector service:
+#. Edit `/etc/ceilometer/ceilometer.conf` for the collector service:
 
    * With Keystone authentication enabled::
 
@@ -87,9 +78,13 @@ Gnocchi
        project_id = <ceilometer_project_id>
        endpoint = <gnocchi_endpoint>
 
-4. Copy gnocchi_resources.yaml to config directory (e.g./etc/ceilometer)
+#. Copy gnocchi_resources.yaml to config directory (e.g./etc/ceilometer)
 
-5. To minimize data requests, caching and batch processing should be enabled:
+#. Initialize Gnocchi database by creating ceilometer resources::
+
+   ceilometer-upgrade --skip-metering-database
+
+#. To minimize data requests, caching and batch processing should be enabled:
 
    1. Enable resource caching (oslo.cache_ should be installed)::
 
@@ -106,7 +101,7 @@ Gnocchi
         batch_size = 100
         batch_timeout = 5
 
-6. Start notification service
+#. Start notification service
 
 .. _oslo.cache: http://docs.openstack.org/developer/oslo.cache/opts.html
 .. _`Gnocchi installation`: http://docs.openstack.org/developer/gnocchi/install.html
