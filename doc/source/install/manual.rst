@@ -44,25 +44,48 @@ Gnocchi
       Prior to Gnocchi 2.1, Ceilometer resource types were included, therefore
       --create-legacy-resource-types flag is not needed.
 
-3. Edit `/etc/ceilometer/ceilometer.conf` for the collector service::
+3. Edit `/etc/ceilometer/ceilometer.conf` for the collector service:
 
-     [DEFAULT]
-     meter_dispatchers = gnocchi
-     event_dispatchers = gnocchi
+   * With Keystone authentication enabled::
 
-     [dispatcher_gnocchi]
-     filter_service_activity = False # Enable if using swift backend
-     filter_project = <project name associated with gnocchi user> # if using swift backend
+       [DEFAULT]
+       meter_dispatchers = gnocchi
+       event_dispatchers = gnocchi
 
-     [service_credentials]
-     auth_url = <auth_url>:5000
-     region_name = RegionOne
-     password = password
-     username = ceilometer
-     project_name = service
-     project_domain_id = default
-     user_domain_id = default
-     auth_type = password
+       [dispatcher_gnocchi]
+       filter_service_activity = False # Enable if using swift backend
+       filter_project = <project name associated with gnocchi user> # if using swift backend
+
+       [service_credentials]
+       auth_url = <auth_url>:5000
+       region_name = RegionOne
+       password = password
+       username = ceilometer
+       project_name = service
+       project_domain_id = default
+       user_domain_id = default
+       auth_type = password
+
+   * In somes cases, it is possible to disable keystone authentication for
+     Gnocchi to remove the overhead of token creation/verification when request
+     authentication doesn't matter. This will increase the performance of
+     Gnocchi::
+
+       [DEFAULT]
+       meter_dispatchers = gnocchi
+       event_dispatchers = gnocchi
+
+       [dispatcher_gnocchi]
+       filter_service_activity = False # Enable if using swift backend
+       filter_project = <project name associated with gnocchi user> # if using swift backend
+       auth_section=service_credentials_gnocchi
+
+       [service_credentials_gnocchi]
+       auth_type=gnocchi-noauth
+       roles = admin
+       user_id = <ceilometer_user_id>
+       project_id = <ceilometer_project_id>
+       endpoint = <gnocchi_endpoint>
 
 4. Copy gnocchi_resources.yaml to config directory (e.g./etc/ceilometer)
 
