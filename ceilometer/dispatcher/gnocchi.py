@@ -28,7 +28,6 @@ from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import six
 from stevedore import extension
-import tenacity
 
 from ceilometer import declarative
 from ceilometer import dispatcher
@@ -218,22 +217,6 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
         self._gnocchi = gnocchi_client.get_gnocchiclient(conf)
-
-        retries = conf.storage.max_retries
-
-        @tenacity.retry(
-            wait=tenacity.wait_fixed(conf.storage.retry_interval),
-            stop=(tenacity.stop_after_attempt(retries) if retries >= 0
-                  else tenacity.stop_never),
-            reraise=True)
-        def _get_connection():
-            self._gnocchi.capabilities.list()
-
-        try:
-            _get_connection()
-        except Exception:
-            LOG.error(_LE('Failed to connect to Gnocchi.'))
-            raise
 
     @classmethod
     def _load_resources_definitions(cls, conf):

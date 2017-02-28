@@ -307,7 +307,6 @@ FLOATINGIP_DELETE_END = {
 }
 
 
-@mock.patch('gnocchiclient.v1.client.Client', mock.Mock())
 class DispatcherTest(base.BaseTestCase):
 
     def setUp(self):
@@ -652,7 +651,6 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.useFixture(utils_fixture.TimeFixture(now))
 
         expected_calls = [
-            mock.call.capabilities.list(),
             mock.call.resource.search('instance_disk', search_params),
             mock.call.resource.search('instance_network_interface',
                                       search_params),
@@ -682,7 +680,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                                       IMAGE_DELETE_START,
                                       VOLUME_DELETE_START,
                                       FLOATINGIP_DELETE_END])
-        self.assertEqual(9, len(fakeclient.mock_calls))
+        self.assertEqual(8, len(fakeclient.mock_calls))
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 
@@ -698,7 +696,6 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         gnocchi_id = uuid.uuid4()
 
         expected_calls = [
-            mock.call.capabilities.list(),
             mock.call.metric.batch_resources_metrics_measures(
                 {resource_id: {metric_name: self.measures_attributes}},
                 create_metrics=True)
