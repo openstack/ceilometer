@@ -232,6 +232,9 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
+
+    inidelete $CEILOMETER_CONF database metering_connection
+
     if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
         # It's ok for the backend to be 'none', if panko is enabled. We do not
         # combine this condition with the outer if statement, so that the else
