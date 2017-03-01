@@ -29,10 +29,24 @@ OPTS = [
     cfg.MultiStrOpt('meter_dispatchers',
                     deprecated_name='dispatcher',
                     default=[],
+                    deprecated_for_removal=True,
+                    deprecated_reason='This option only be used in collector '
+                                      'service, the collector service has '
+                                      'been deprecated and will be removed '
+                                      'in the future, this should also be '
+                                      'deprecated for removal with collector '
+                                      'service.',
                     help='Dispatchers to process metering data.'),
     cfg.MultiStrOpt('event_dispatchers',
                     default=[],
                     deprecated_name='dispatcher',
+                    deprecated_for_removal=True,
+                    deprecated_reason='This option only be used in collector '
+                                      'service, the collector service has '
+                                      'been deprecated and will be removed '
+                                      'in the future, this should also be '
+                                      'deprecated for removal with collector '
+                                      'service.',
                     help='Dispatchers to process event data.'),
 ]
 
