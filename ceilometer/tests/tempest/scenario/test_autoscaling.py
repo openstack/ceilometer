@@ -15,7 +15,8 @@ import unittest
 
 from gabbi import driver
 from tempest import config
-from tempest.scenario import manager
+
+from ceilometer.tests.tempest.scenario import manager
 
 
 class TestAutoscalingGabbi(manager.ScenarioTest):
