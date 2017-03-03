@@ -26,6 +26,15 @@ CONF = config.CONF
 
 
 class TelemetryNotificationAPITest(base.BaseTelemetryTest):
+    @classmethod
+    def skip_checks(cls):
+        super(TelemetryNotificationAPITest, cls).skip_checks()
+
+        if ("gnocchi" in CONF.service_available and
+                CONF.service_available.gnocchi):
+            skip_msg = ("%s skipped as gnocchi is enabled" %
+                        cls.__name__)
+            raise cls.skipException(skip_msg)
 
     @decorators.idempotent_id('d7f8c1c8-d470-4731-8604-315d3956caae')
     @test.services('compute')
@@ -57,6 +66,15 @@ class TelemetryNotificationAPITest(base.BaseTelemetryTest):
 
 
 class TelemetryNotificationAdminAPITest(base.BaseTelemetryAdminTest):
+    @classmethod
+    def skip_checks(cls):
+        super(TelemetryNotificationAdminAPITest, cls).skip_checks()
+
+        if ("gnocchi" in CONF.service_available and
+                CONF.service_available.gnocchi):
+            skip_msg = ("%s skipped as gnocchi is enabled" %
+                        cls.__name__)
+            raise cls.skipException(skip_msg)
 
     @decorators.idempotent_id('29604198-8b45-4fc0-8af8-1cae4f94ebea')
     @test.services('compute')
