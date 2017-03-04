@@ -57,11 +57,12 @@ class RGWAdminClient(object):
         stats = {'num_buckets': 0, 'buckets': [], 'size': 0, 'num_objects': 0}
         stats['num_buckets'] = len(json_data)
         for it in json_data:
-            for k, v in it["usage"].items():
+            for v in it["usage"].values():
                 stats['num_objects'] += v["num_objects"]
                 stats['size'] += v["size_kb"]
                 stats['buckets'].append(self.Bucket(it["bucket"],
-                                        v["num_objects"], v["size_kb"]))
+                                                    v["num_objects"],
+                                                    v["size_kb"]))
         return stats
 
     def get_usage(self, tenant_id):
