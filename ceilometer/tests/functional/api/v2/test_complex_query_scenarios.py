@@ -102,7 +102,7 @@ class TestQueryMetersController(tests_api.FunctionalTest):
         for sample_item in data.json:
             result_time = timeutils.parse_isotime(sample_item['timestamp'])
             result_time = result_time.replace(tzinfo=None)
-            self.assertTrue(result_time >= date_time)
+            self.assertGreaterEqual(result_time, date_time)
 
     def test_non_admin_tenant_sees_only_its_own_project(self):
         data = self.post_json(self.url,
@@ -286,7 +286,8 @@ class TestQueryMetersController(tests_api.FunctionalTest):
 
         self.assertEqual(2, len(data.json))
         for sample_item in data.json:
-            self.assertTrue(float(sample_item["metadata"]["util"]) >= 0.5)
+            self.assertGreaterEqual(float(sample_item["metadata"]["util"]),
+                                    0.5)
 
     def test_filter_with_negation(self):
         filter_expr = '{"not": {">=": {"metadata.util": 0.5}}}'
@@ -295,7 +296,7 @@ class TestQueryMetersController(tests_api.FunctionalTest):
 
         self.assertEqual(1, len(data.json))
         for sample_item in data.json:
-            self.assertTrue(float(sample_item["metadata"]["util"]) < 0.5)
+            self.assertLess(float(sample_item["metadata"]["util"]), 0.5)
 
     def test_limit_must_be_positive(self):
         data = self.post_json(self.url,

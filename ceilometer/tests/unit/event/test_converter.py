@@ -53,9 +53,8 @@ class ConverterBase(base.BaseTestCase):
 
     def assertHasTrait(self, event, name, value=None, dtype=None):
         traits = [trait for trait in event.traits if trait.name == name]
-        self.assertTrue(
-            len(traits) > 0,
-            "Trait %s not found in event %s" % (name, event))
+        self.assertGreater(len(traits), 0,
+                           "Trait %s not found in event %s" % (name, event))
         trait = traits[0]
         if value is not None:
             self.assertEqual(value, trait.value)
