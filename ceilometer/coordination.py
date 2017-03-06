@@ -83,7 +83,6 @@ class PartitionCoordinator(object):
     def __init__(self, conf, my_id=None):
         self.conf = conf
         self._coordinator = None
-        self._groups = set()
         # XXX uuid4().bytes ought to work, but it requires ascii for now
         self._my_id = my_id or str(uuid.uuid4()).encode('ascii')
 
@@ -101,9 +100,6 @@ class PartitionCoordinator(object):
     def stop(self):
         if not self._coordinator:
             return
-
-        for group in list(self._groups):
-            self.leave_group(group)
 
         try:
             self._coordinator.stop()
@@ -164,17 +160,8 @@ class PartitionCoordinator(object):
                 LOG.exception(_LE('Error joining partitioning group %s,'
                                   ' re-trying'), group_id)
                 raise ErrorJoiningPartitioningGroup()
-            self._groups.add(group_id)
 
         return _inner()
-
-    def leave_group(self, group_id):
-        if group_id not in self._groups:
-            return
-        if self._coordinator:
-            self._coordinator.leave_group(group_id)
-            self._groups.remove(group_id)
-            LOG.info(_LI('Left partitioning group %s'), group_id)
 
     def _get_members(self, group_id):
         if not self._coordinator:
@@ -201,8 +188,6 @@ class PartitionCoordinator(object):
         """
         if not group_id:
             return iterable
-        if group_id not in self._groups:
-            self.join_group(group_id)
         try:
             members = self._get_members(group_id)
             LOG.debug('Members of group %s are: %s, Me: %s',
