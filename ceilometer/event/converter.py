@@ -13,11 +13,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
+import pkg_resources
 import six
 
 from ceilometer import declarative
@@ -26,10 +26,7 @@ from ceilometer.i18n import _
 
 OPTS = [
     cfg.StrOpt('definitions_cfg_file',
-               default=os.path.abspath(
-                   os.path.join(
-                       os.path.split(os.path.dirname(__file__))[0],
-                       "pipeline", "data", "event_definitions.yaml")),
+               default="event_definitions.yaml",
                help="Configuration file for event definitions."
                ),
     cfg.BoolOpt('drop_unmatched_notifications',
@@ -298,6 +295,8 @@ def setup_events(conf, trait_plugin_mgr):
     """Setup the event definitions from yaml config file."""
     return NotificationEventsConverter(
         conf,
-        declarative.load_definitions(conf, [],
-                                     conf.event.definitions_cfg_file),
+        declarative.load_definitions(
+            conf, [], conf.event.definitions_cfg_file,
+            pkg_resources.resource_filename(
+                'ceilometer', "pipeline/data/event_definitions.yaml")),
         trait_plugin_mgr)

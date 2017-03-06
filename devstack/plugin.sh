@@ -261,13 +261,13 @@ function _ceilometer_configure_storage_backend {
     fi
 
     if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'mongodb' ]; then
-        sed -i 's/gnocchi:\/\//database:\/\//g' $CEILOMETER_DIR/ceilometer/pipeline/data/event_pipeline.yaml $CEILOMETER_DIR/ceilometer/pipeline/data/pipeline.yaml
+        sed -i 's/gnocchi:\/\//database:\/\//g' $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
     fi
 
     # configure panko
     if is_service_enabled panko-api; then
         if ! grep -q 'panko' $CEILOMETER_CONF_DIR/event_pipeline.yaml ; then
-            echo '          - panko://' >> $CEILOMETER_DIR/ceilometer/pipeline/data/event_pipeline.yaml
+            echo '          - panko://' >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
         fi
     fi
 
@@ -303,6 +303,8 @@ function configure_ceilometer {
     for conffile in policy.json api_paste.ini polling.yaml; do
         cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
     done
+
+    cp $CEILOMETER_DIR/ceilometer/pipeline/data/*.yaml $CEILOMETER_CONF_DIR
 
     if [ "$CEILOMETER_PIPELINE_INTERVAL" ]; then
         sed -i "s/interval:.*/interval: ${CEILOMETER_PIPELINE_INTERVAL}/" $CEILOMETER_CONF_DIR/polling.yaml
