@@ -200,11 +200,6 @@ class NotificationService(cotyledon.Service):
             self.partition_coordinator.watch_group(self.group_id,
                                                    self._refresh_agent)
 
-            @periodics.periodic(spacing=self.conf.coordination.heartbeat,
-                                run_immediately=True)
-            def heartbeat():
-                self.partition_coordinator.heartbeat()
-
             @periodics.periodic(spacing=self.conf.coordination.check_watchers,
                                 run_immediately=True)
             def run_watchers():
@@ -213,7 +208,6 @@ class NotificationService(cotyledon.Service):
             self.periodic = periodics.PeriodicWorker.create(
                 [], executor_factory=lambda:
                 futures.ThreadPoolExecutor(max_workers=10))
-            self.periodic.add(heartbeat)
             self.periodic.add(run_watchers)
 
             utils.spawn_thread(self.periodic.start)

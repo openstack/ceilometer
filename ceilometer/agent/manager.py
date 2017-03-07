@@ -277,10 +277,6 @@ class AgentManager(cotyledon.Service):
 
         self.partition_coordinator = coordination.PartitionCoordinator(
             self.conf)
-        self.heartbeat_timer = utils.create_periodic(
-            target=self.partition_coordinator.heartbeat,
-            spacing=self.conf.coordination.heartbeat,
-            run_immediately=True)
 
         # Compose coordination group prefix.
         # We'll use namespaces as the basement for this partitioning.
@@ -356,11 +352,9 @@ class AgentManager(cotyledon.Service):
 
         if not self.groups and self.partition_coordinator.is_active():
             self.partition_coordinator.stop()
-            self.heartbeat_timer.stop()
 
         if self.groups and not self.partition_coordinator.is_active():
             self.partition_coordinator.start()
-            utils.spawn_thread(self.heartbeat_timer.start)
 
         for group in self.groups:
             self.partition_coordinator.join_group(group)
@@ -427,7 +421,6 @@ class AgentManager(cotyledon.Service):
 
     def terminate(self):
         self.stop_pollsters_tasks()
-        self.heartbeat_timer.stop()
         self.partition_coordinator.stop()
         super(AgentManager, self).terminate()
 
