@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Red Hat, Inc.
+# Copyright 2014-2017 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -21,6 +21,7 @@ import tooz.coordination
 from tooz import hashring
 
 from ceilometer import coordination
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -144,7 +145,8 @@ class TestPartitioning(base.BaseTestCase):
 
     def setUp(self):
         super(TestPartitioning, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        self.CONF = self.useFixture(fixture_config.Config(
+            service.prepare_service([], []))).conf
         self.str_handler = MockLoggingHandler()
         coordination.LOG.logger.addHandler(self.str_handler)
         self.shared_storage = {}
