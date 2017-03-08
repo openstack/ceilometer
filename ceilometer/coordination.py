@@ -137,8 +137,6 @@ class PartitionCoordinator(object):
         `tooz`. We then hash all the objects into buckets and return only
         the ones that hashed into *our* bucket.
         """
-        if not group_id:
-            return iterable
         try:
             members = self._get_members(group_id)
             hr = hashring.HashRing(members, partitions=100)
