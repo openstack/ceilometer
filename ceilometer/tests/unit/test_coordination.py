@@ -58,20 +58,6 @@ class MockToozCoordinator(tooz.coordination.CoordinationDriver):
         return MockAsyncResult(self._shared_storage[group_id])
 
 
-class MockToozCoordExceptionRaiser(MockToozCoordinator):
-    def start(self, start_heart=False):
-        raise tooz.coordination.ToozError('error')
-
-    def heartbeat(self):
-        raise tooz.coordination.ToozError('error')
-
-    def join_group(self, group_id, capabilities=b''):
-        raise tooz.coordination.ToozError('error')
-
-    def get_members(self, group_id):
-        raise tooz.coordination.ToozError('error')
-
-
 class MockToozCoordExceptionOnJoinRaiser(MockToozCoordinator):
     def __init__(self, member_id, shared_storage, retry_count=None):
         super(MockToozCoordExceptionOnJoinRaiser,
@@ -207,19 +193,6 @@ class TestPartitioning(base.BaseTestCase):
                                  all_resources=all_resources,
                                  expected_resources=expected_resources[i]))
         self._usage_simulation(*agents_kwargs)
-
-    def test_coordination_backend_offline(self):
-        agents = [dict(agent_id='agent1',
-                       group_id='group',
-                       all_resources=['res1', 'res2'],
-                       expected_resources=[],
-                       coordinator_cls=MockToozCoordExceptionRaiser)]
-        self._usage_simulation(*agents)
-        expected_errors = ['Error getting group membership info from '
-                           'coordination backend.',
-                           'Error connecting to coordination backend.']
-        for e in expected_errors:
-            self.assertIn(e, self.str_handler.messages['error'])
 
     def test_coordination_backend_connection_fail_on_join(self):
         coord = self._get_new_started_coordinator(
