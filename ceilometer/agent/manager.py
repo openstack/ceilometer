@@ -275,8 +275,11 @@ class AgentManager(cotyledon.Service):
         self.discoveries = list(itertools.chain(*list(discoveries)))
         self.polling_periodics = None
 
-        self.partition_coordinator = coordination.PartitionCoordinator(
-            self.conf)
+        if self.conf.coordination.backend_url:
+            self.partition_coordinator = coordination.PartitionCoordinator(
+                self.conf)
+        else:
+            self.partition_coordinator = None
 
         # Compose coordination group prefix.
         # We'll use namespaces as the basement for this partitioning.
@@ -406,13 +409,15 @@ class AgentManager(cotyledon.Service):
     def run(self):
         super(AgentManager, self).run()
         self.polling_manager = pipeline.setup_polling(self.conf)
-        self.partition_coordinator.start()
-        self.join_partitioning_groups()
+        if self.partition_coordinator:
+            self.partition_coordinator.start()
+            self.join_partitioning_groups()
         self.start_polling_tasks()
 
     def terminate(self):
         self.stop_pollsters_tasks()
-        self.partition_coordinator.stop()
+        if self.partition_coordinator:
+            self.partition_coordinator.stop()
         super(AgentManager, self).terminate()
 
     def interval_task(self, task):
@@ -487,9 +492,14 @@ class AgentManager(cotyledon.Service):
                             continue
 
                     discovered = discoverer.discover(self, param)
-                    partitioned = self.partition_coordinator.extract_my_subset(
-                        self.construct_group_id(discoverer.group_id),
-                        discovered)
+                    if self.partition_coordinator:
+                        partitioned = (
+                            self.partition_coordinator.extract_my_subset(
+                                self.construct_group_id(discoverer.group_id),
+                                discovered)
+                        )
+                    else:
+                        partitioned = discovered
                     resources.extend(partitioned)
                     if discovery_cache is not None:
                         discovery_cache[url] = partitioned
