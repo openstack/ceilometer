@@ -293,7 +293,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def test_start(self, setup_polling):
         self.mgr.setup_polling_tasks = mock.MagicMock()
         mpc = self.mgr.partition_coordinator
-        mpc.is_active.return_value = False
         self.mgr.run()
         setup_polling.assert_called_once_with(self.CONF)
         mpc.start.assert_called_once_with()
