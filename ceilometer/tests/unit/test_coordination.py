@@ -142,8 +142,7 @@ class TestPartitioning(base.BaseTestCase):
         self.shared_storage = {}
 
     def _get_new_started_coordinator(self, shared_storage, agent_id=None,
-                                     coordinator_cls=None, retry_count=None,
-                                     cleanup_stop=True):
+                                     coordinator_cls=None, retry_count=None):
         coordinator_cls = coordinator_cls or MockToozCoordinator
         self.CONF.set_override('backend_url', 'xxx://yyy',
                                group='coordination')
@@ -154,8 +153,7 @@ class TestPartitioning(base.BaseTestCase):
                         coordinator_cls(member_id, shared_storage)):
             pc = coordination.PartitionCoordinator(self.CONF, agent_id)
             pc.start()
-            if cleanup_stop:
-                self.addCleanup(pc.stop)
+            self.addCleanup(pc.stop)
             return pc
 
     def _usage_simulation(self, *agents_kwargs):
@@ -244,13 +242,6 @@ class TestPartitioning(base.BaseTestCase):
         with mock.patch.object(coord._coordinator, 'join_group') as mocked:
             coord.join_group(None)
             self.assertEqual(0, mocked.call_count)
-
-    def test_stop(self):
-        coord = self._get_new_started_coordinator({}, 'a', cleanup_stop=False)
-        self.assertTrue(coord._coordinator.is_started)
-        coord.join_group("123")
-        coord.stop()
-        self.assertIsNone(coord._coordinator)
 
     def test_partitioning_with_unicode(self):
         all_resources = [u'\u0634\u0628\u06a9\u0647',
