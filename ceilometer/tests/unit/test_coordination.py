@@ -235,14 +235,6 @@ class TestPartitioning(base.BaseTestCase):
                            ' re-trying']
         self.assertEqual(expected_errors, self.str_handler.messages['error'])
 
-    def test_group_id_none(self):
-        coord = self._get_new_started_coordinator({}, 'a')
-        self.assertTrue(coord._coordinator.is_started)
-
-        with mock.patch.object(coord._coordinator, 'join_group') as mocked:
-            coord.join_group(None)
-            self.assertEqual(0, mocked.call_count)
-
     def test_partitioning_with_unicode(self):
         all_resources = [u'\u0634\u0628\u06a9\u0647',
                          u'\u0627\u0647\u0644',

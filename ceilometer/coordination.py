@@ -87,7 +87,7 @@ class PartitionCoordinator(object):
         self._coordinator.run_watchers()
 
     def join_group(self, group_id):
-        if not self._coordinator.is_started or not group_id:
+        if not self._coordinator.is_started:
             return
 
         @tenacity.retry(
