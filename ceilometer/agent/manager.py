@@ -340,23 +340,17 @@ class AgentManager(cotyledon.Service):
             return []
 
     def join_partitioning_groups(self):
-        self.groups = set([self.construct_group_id(d.obj.group_id)
-                          for d in self.discoveries])
+        groups = set([self.construct_group_id(d.obj.group_id)
+                      for d in self.discoveries])
         # let each set of statically-defined resources have its own group
         static_resource_groups = set([
             self.construct_group_id(utils.hash_of_set(p.resources))
             for p in self.polling_manager.sources
             if p.resources
         ])
-        self.groups.update(static_resource_groups)
+        groups.update(static_resource_groups)
 
-        if not self.groups and self.partition_coordinator.is_active():
-            self.partition_coordinator.stop()
-
-        if self.groups and not self.partition_coordinator.is_active():
-            self.partition_coordinator.start()
-
-        for group in self.groups:
+        for group in groups:
             self.partition_coordinator.join_group(group)
 
     def create_polling_task(self):
@@ -382,9 +376,6 @@ class AgentManager(cotyledon.Service):
                 if discovery_group_id else None)
 
     def start_polling_tasks(self):
-        # allow time for coordination if necessary
-        delay_start = self.partition_coordinator.is_active()
-
         # set shuffle time before polling task if necessary
         delay_polling_time = random.randint(
             0, self.conf.shuffle_time_before_polling_task)
@@ -401,8 +392,7 @@ class AgentManager(cotyledon.Service):
             futures.ThreadPoolExecutor(max_workers=len(data)))
 
         for interval, polling_task in data.items():
-            delay_time = (interval + delay_polling_time if delay_start
-                          else delay_polling_time)
+            delay_time = interval + delay_polling_time
 
             @periodics.periodic(spacing=interval, run_immediately=False)
             def task(running_task):
@@ -416,6 +406,7 @@ class AgentManager(cotyledon.Service):
     def run(self):
         super(AgentManager, self).run()
         self.polling_manager = pipeline.setup_polling(self.conf)
+        self.partition_coordinator.start()
         self.join_partitioning_groups()
         self.start_polling_tasks()
 

@@ -95,9 +95,6 @@ class PartitionCoordinator(object):
         finally:
             self._coordinator = None
 
-    def is_active(self):
-        return self._coordinator is not None
-
     def watch_group(self, namespace, callback):
         if self._coordinator:
             self._coordinator.watch_join_group(namespace, callback)
