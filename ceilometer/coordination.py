@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Red Hat, Inc.
+# Copyright 2014-2017 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,7 +14,6 @@
 # under the License.
 
 import six
-import uuid
 
 from oslo_config import cfg
 from oslo_log import log
@@ -59,22 +58,18 @@ class PartitionCoordinator(object):
     empty iterable in this case.
     """
 
-    def __init__(self, conf, my_id=None):
+    def __init__(self, conf, my_id):
         self.conf = conf
-        self._coordinator = None
-        # XXX uuid4().bytes ought to work, but it requires ascii for now
-        self._my_id = my_id or str(uuid.uuid4()).encode('ascii')
+        self._my_id = my_id
+        self._coordinator = tooz.coordination.get_coordinator(
+            conf.coordination.backend_url, my_id)
 
     def start(self):
-        backend_url = self.conf.coordination.backend_url
-        if backend_url:
-            try:
-                self._coordinator = tooz.coordination.get_coordinator(
-                    backend_url, self._my_id)
-                self._coordinator.start(start_heart=True)
-                LOG.info(_LI('Coordination backend started successfully.'))
-            except tooz.coordination.ToozError:
-                LOG.exception(_LE('Error connecting to coordination backend.'))
+        try:
+            self._coordinator.start(start_heart=True)
+            LOG.info(_LI('Coordination backend started successfully.'))
+        except tooz.coordination.ToozError:
+            LOG.exception(_LE('Error connecting to coordination backend.'))
 
     def stop(self):
         if not self._coordinator:

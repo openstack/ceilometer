@@ -1,6 +1,6 @@
 #
 # Copyright 2013 Julien Danjou
-# Copyright 2014 Red Hat, Inc
+# Copyright 2014-2017 Red Hat, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -18,6 +18,7 @@ import collections
 import itertools
 import logging
 import random
+import uuid
 
 from concurrent import futures
 import cotyledon
@@ -276,8 +277,10 @@ class AgentManager(cotyledon.Service):
         self.polling_periodics = None
 
         if self.conf.coordination.backend_url:
+            # XXX uuid4().bytes ought to work, but it requires ascii for now
+            coordination_id = str(uuid.uuid4()).encode('ascii')
             self.partition_coordinator = coordination.PartitionCoordinator(
-                self.conf)
+                self.conf, coordination_id)
         else:
             self.partition_coordinator = None
 
