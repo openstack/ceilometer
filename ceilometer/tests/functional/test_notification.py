@@ -14,7 +14,6 @@
 # under the License.
 """Tests for Ceilometer notify daemon."""
 
-import shutil
 import time
 
 import mock
@@ -264,69 +263,6 @@ class BaseRealNotification(tests_base.BaseTestCase):
         self.assertEqual(["9f9d01b9-4a58-4271-9e27-398b21ab20d1"], resources)
 
 
-class TestRealNotificationReloadablePipeline(BaseRealNotification):
-
-    def setUp(self):
-        super(TestRealNotificationReloadablePipeline, self).setUp()
-        self.CONF.set_override('refresh_pipeline_cfg', True)
-        self.CONF.set_override('refresh_event_pipeline_cfg', True)
-        self.CONF.set_override('pipeline_polling_interval', 1)
-        self.srv = notification.NotificationService(0, self.CONF)
-
-    @mock.patch('ceilometer.publisher.test.TestPublisher')
-    def test_notification_pipeline_poller(self, fake_publisher_cls):
-        fake_publisher_cls.return_value = self.publisher
-        self.srv.run()
-        self.addCleanup(self.srv.terminate)
-        self.assertIsNotNone(self.srv.refresh_pipeline_periodic)
-
-    def test_notification_reloaded_pipeline(self):
-        pipeline_cfg_file = self.setup_pipeline(['instance'])
-        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
-
-        self.srv.run()
-        self.addCleanup(self.srv.terminate)
-
-        pipeline = self.srv.pipeline_manager.cfg_hash
-
-        # Modify the collection targets
-        updated_pipeline_cfg_file = self.setup_pipeline(['vcpus',
-                                                         'disk.root.size'])
-        # Move/rename the updated pipeline file to the original pipeline
-        # file path as recorded in oslo config
-        shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
-        start = time.time()
-        while time.time() - start < 10:
-            if pipeline != self.srv.pipeline_manager.cfg_hash:
-                break
-        else:
-            self.fail("Pipeline failed to reload")
-
-    def test_notification_reloaded_event_pipeline(self):
-        ev_pipeline_cfg_file = self.setup_event_pipeline(
-            ['compute.instance.create.start'])
-        self.CONF.set_override("event_pipeline_cfg_file", ev_pipeline_cfg_file)
-
-        self.srv.run()
-        self.addCleanup(self.srv.terminate)
-
-        pipeline = self.srv.event_pipeline_manager.cfg_hash
-
-        # Modify the collection targets
-        updated_ev_pipeline_cfg_file = self.setup_event_pipeline(
-            ['compute.instance.*'])
-
-        # Move/rename the updated pipeline file to the original pipeline
-        # file path as recorded in oslo config
-        shutil.move(updated_ev_pipeline_cfg_file, ev_pipeline_cfg_file)
-        start = time.time()
-        while time.time() - start < 10:
-            if pipeline != self.srv.event_pipeline_manager.cfg_hash:
-                break
-        else:
-            self.fail("Pipeline failed to reload")
-
-
 class TestRealNotification(BaseRealNotification):
 
     def setUp(self):
@@ -435,8 +371,12 @@ class TestRealNotificationHA(BaseRealNotification):
             endpoints[pipe.name] = endpoint
 
         notifiers = []
-        notifiers.extend(self.srv.pipe_manager.transporters[0][2])
-        notifiers.extend(self.srv.event_pipe_manager.transporters[0][2])
+        pipe_manager = self.srv._get_pipe_manager(
+            self.srv.transport, self.srv.pipeline_manager)
+        notifiers.extend(pipe_manager.transporters[0][2])
+        event_pipe_manager = self.srv._get_event_pipeline_manager(
+            self.srv.transport)
+        notifiers.extend(event_pipe_manager.transporters[0][2])
         for notifier in notifiers:
             filter_rule = endpoints[notifier.publisher_id].filter_rule
             self.assertEqual(True, filter_rule.match(None,

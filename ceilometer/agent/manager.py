@@ -20,6 +20,7 @@ import logging
 import random
 
 from concurrent import futures
+import cotyledon
 from futurist import periodics
 from keystoneauth1 import exceptions as ka_exceptions
 from oslo_config import cfg
@@ -38,7 +39,6 @@ from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
 from ceilometer.publisher import utils as publisher_utils
-from ceilometer import service_base
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
@@ -225,10 +225,9 @@ class PollingTask(object):
         )
 
 
-class AgentManager(service_base.PipelineBasedService):
+class AgentManager(cotyledon.Service):
 
-    def __init__(self, worker_id, conf, namespaces=None, pollster_list=None, ):
-
+    def __init__(self, worker_id, conf, namespaces=None, pollster_list=None):
         namespaces = namespaces or ['compute', 'central']
         pollster_list = pollster_list or []
         group_prefix = conf.polling.partitioning_group_prefix
@@ -239,7 +238,9 @@ class AgentManager(service_base.PipelineBasedService):
         if pollster_list and conf.coordination.backend_url:
             raise PollsterListForbidden()
 
-        super(AgentManager, self).__init__(worker_id, conf)
+        super(AgentManager, self).__init__(worker_id)
+
+        self.conf = conf
 
         def _match(pollster):
             """Find out if pollster name matches to one of the list."""
@@ -423,7 +424,6 @@ class AgentManager(service_base.PipelineBasedService):
         self.polling_manager = pipeline.setup_polling(self.conf)
         self.join_partitioning_groups()
         self.start_polling_tasks()
-        self.init_pipeline_refresh()
 
     def terminate(self):
         self.stop_pollsters_tasks()
@@ -523,18 +523,3 @@ class AgentManager(service_base.PipelineBasedService):
             self.polling_periodics.stop()
             self.polling_periodics.wait()
         self.polling_periodics = None
-
-    # FIXME(gordc): refactor pipeline dependency out of polling agent.
-    def reload_pipeline(self):
-        if self.pipeline_validated:
-            LOG.info(_LI("Reconfiguring polling tasks."))
-
-            # stop existing pollsters and leave partitioning groups
-            self.stop_pollsters_tasks()
-            for group in self.groups:
-                self.partition_coordinator.leave_group(group)
-
-            # re-create partitioning groups according to pipeline
-            # and configure polling tasks with latest pipeline conf
-            self.join_partitioning_groups()
-            self.start_polling_tasks()

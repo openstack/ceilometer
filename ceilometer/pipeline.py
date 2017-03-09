@@ -50,19 +50,6 @@ OPTS = [
                        "pipeline", "data", "event_pipeline.yaml")),
                help="Configuration file for event pipeline definition."
                ),
-    cfg.BoolOpt('refresh_pipeline_cfg',
-                default=False,
-                help="Refresh Pipeline configuration on-the-fly."
-                ),
-    cfg.BoolOpt('refresh_event_pipeline_cfg',
-                default=False,
-                help="Refresh Event Pipeline configuration on-the-fly."
-                ),
-    cfg.IntOpt('pipeline_polling_interval',
-               default=20,
-               help="Polling interval for pipeline file configuration"
-                    " in seconds."
-               ),
 ]
 
 

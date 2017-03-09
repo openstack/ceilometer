@@ -14,8 +14,6 @@
 # under the License.
 """Tests for ceilometer agent manager"""
 
-import shutil
-
 from keystoneauth1 import exceptions as ka_exceptions
 import mock
 from oslo_config import fixture as fixture_config
@@ -24,7 +22,6 @@ from oslotest import base
 from oslotest import mockpatch
 import six
 from stevedore import extension
-import yaml
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
@@ -435,64 +432,3 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         samples = self.notified_samples
         self.assertEqual(expected_samples, len(samples))
         self.assertEqual(call_count, self.notifier.sample.call_count)
-
-    def test_start_with_reloadable_pipeline(self):
-
-        self.CONF.set_override('heartbeat', 1.0, group='coordination')
-        self.CONF.set_override('refresh_pipeline_cfg', True)
-        self.CONF.set_override('pipeline_polling_interval', 2)
-
-        pipeline = yaml.dump({
-            'sources': [{
-                'name': 'test_pipeline',
-                'interval': 1,
-                'meters': ['test'],
-                'resources': ['test://'],
-                'sinks': ['test_sink']}],
-            'sinks': [{
-                'name': 'test_sink',
-                'transformers': [],
-                'publishers': ["test"]}]
-        })
-
-        pipeline_cfg_file = self.setup_pipeline_file(pipeline)
-
-        self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
-        self.mgr.run()
-        self.addCleanup(self.mgr.terminate)
-
-        # we only got the old name of meters
-        for sample in self.notified_samples:
-            self.assertEqual('test', sample['counter_name'])
-            self.assertEqual(1, sample['counter_volume'])
-            self.assertEqual('test_run_tasks', sample['resource_id'])
-
-        # Modify the collection targets
-        pipeline = yaml.dump({
-            'sources': [{
-                'name': 'test_pipeline',
-                'interval': 1,
-                'meters': ['testanother'],
-                'resources': ['test://'],
-                'sinks': ['test_sink']}],
-            'sinks': [{
-                'name': 'test_sink',
-                'transformers': [],
-                'publishers': ["test"]}]
-        })
-
-        updated_pipeline_cfg_file = self.setup_pipeline_file(pipeline)
-
-        # Move/rename the updated pipeline file to the original pipeline
-        # file path as recorded in oslo config
-        shutil.move(updated_pipeline_cfg_file, pipeline_cfg_file)
-
-        # Flush notified samples to test only new, nothing latent on
-        # fake message bus.
-        self.notified_samples = []
-
-        # we only got the new name of meters
-        for sample in self.notified_samples:
-            self.assertEqual('testanother', sample['counter_name'])
-            self.assertEqual(1, sample['counter_volume'])
-            self.assertEqual('test_run_tasks', sample['resource_id'])

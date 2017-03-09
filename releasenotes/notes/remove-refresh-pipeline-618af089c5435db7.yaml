@@ -1,0 +1,9 @@
+---
+deprecations:
+  - |
+    The pipeline dynamic refresh code has been removed. Ceilometer relies on
+    the cotyledon library for a few releases which provides reload
+    functionality by sending the SIGHUP signal to the process. This achieves
+    the same feature while making sure the reload is explicit once the file is
+    correctly and entirely written to the disk, avoiding the failing load of
+    half-written files.
