@@ -21,7 +21,6 @@ import copy
 import datetime
 import os
 import tempfile
-import time
 
 import mock
 from oslo_config import fixture as fixture_config
@@ -253,7 +252,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'cfg_file',
             self.path_get('etc/ceilometer/polling.yaml'), group='polling'
         )
-        self.CONF.set_override('heartbeat', 1.0, group='coordination')
         self.CONF(args=[])
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
@@ -296,23 +294,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.mgr.setup_polling_tasks = mock.MagicMock()
         mpc = self.mgr.partition_coordinator
         mpc.is_active.return_value = False
-        self.CONF.set_override('heartbeat', 1.0, group='coordination')
-        self.mgr.partition_coordinator.heartbeat = mock.MagicMock()
         self.mgr.run()
         setup_polling.assert_called_once_with(self.CONF)
         mpc.start.assert_called_once_with()
         self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
-
-        # Wait first heatbeat
-        runs = 0
-        for i in six.moves.range(10):
-            runs = list(self.mgr.heartbeat_timer.iter_watchers())[0].runs
-            if runs > 0:
-                break
-            time.sleep(0.5)
-        self.assertGreaterEqual(1, runs)
-
         self.mgr.terminate()
         mpc.stop.assert_called_once_with()
 

@@ -33,10 +33,6 @@ OPTS = [
                     'compute agent won\'t do workload '
                     'partitioning and will only function correctly if a '
                     'single instance of that service is running.'),
-    cfg.FloatOpt('heartbeat',
-                 default=1.0,
-                 help='Number of seconds between heartbeats for distributed '
-                      'coordination.'),
     cfg.FloatOpt('check_watchers',
                  default=10.0,
                  help='Number of seconds between checks to see if group '
@@ -65,9 +61,6 @@ class PartitionCoordinator(object):
 
     This class uses the `tooz` library to manage group membership.
 
-    To ensure that the other agents know this agent is still alive,
-    the `heartbeat` method should be called periodically.
-
     Coordination errors and reconnects are handled under the hood, so the
     service using the partition coordinator need not care whether the
     coordination backend is down. The `extract_my_subset` will simply return an
@@ -86,7 +79,7 @@ class PartitionCoordinator(object):
             try:
                 self._coordinator = tooz.coordination.get_coordinator(
                     backend_url, self._my_id)
-                self._coordinator.start()
+                self._coordinator.start(start_heart=True)
                 LOG.info(_LI('Coordination backend started successfully.'))
             except tooz.coordination.ToozError:
                 LOG.exception(_LE('Error connecting to coordination backend.'))
@@ -104,17 +97,6 @@ class PartitionCoordinator(object):
 
     def is_active(self):
         return self._coordinator is not None
-
-    def heartbeat(self):
-        if self._coordinator:
-            if not self._coordinator.is_started:
-                # re-connect
-                self.start()
-            try:
-                self._coordinator.heartbeat()
-            except tooz.coordination.ToozError:
-                LOG.exception(_LE('Error sending a heartbeat to coordination '
-                                  'backend.'))
 
     def watch_group(self, namespace, callback):
         if self._coordinator:

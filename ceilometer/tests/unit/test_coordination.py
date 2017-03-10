@@ -59,7 +59,7 @@ class MockToozCoordinator(tooz.coordination.CoordinationDriver):
 
 
 class MockToozCoordExceptionRaiser(MockToozCoordinator):
-    def start(self):
+    def start(self, start_heart=False):
         raise tooz.coordination.ToozError('error')
 
     def heartbeat(self):
@@ -236,25 +236,6 @@ class TestPartitioning(base.BaseTestCase):
                            'Error joining partitioning group group,'
                            ' re-trying']
         self.assertEqual(expected_errors, self.str_handler.messages['error'])
-
-    def test_reconnect(self):
-        coord = self._get_new_started_coordinator({}, 'a',
-                                                  MockToozCoordExceptionRaiser)
-        with mock.patch('tooz.coordination.get_coordinator',
-                        return_value=MockToozCoordExceptionRaiser('a', {})):
-            coord.heartbeat()
-        expected_errors = ['Error connecting to coordination backend.',
-                           'Error sending a heartbeat to coordination '
-                           'backend.']
-        for e in expected_errors:
-            self.assertIn(e, self.str_handler.messages['error'])
-
-        self.str_handler.messages['error'] = []
-        with mock.patch('tooz.coordination.get_coordinator',
-                        return_value=MockToozCoordinator('a', {})):
-            coord.heartbeat()
-        for e in expected_errors:
-            self.assertNotIn(e, self.str_handler.messages['error'])
 
     def test_group_id_none(self):
         coord = self._get_new_started_coordinator({}, 'a')
