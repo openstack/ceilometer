@@ -1,0 +1,4 @@
+---
+fixes:
+  - The transport_url defined in [oslo_messaging_notifications] was never used,
+    which contradicts the oslo_messaging documentation. This is now fixed.
