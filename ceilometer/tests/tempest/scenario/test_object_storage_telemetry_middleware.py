@@ -53,6 +53,11 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
     @classmethod
     def skip_checks(cls):
         super(TestObjectStorageTelemetry, cls).skip_checks()
+        if ("gnocchi" in CONF.service_available and
+                CONF.service_available.gnocchi):
+            skip_msg = ("%s skipped as gnocchi is enabled" %
+                        cls.__name__)
+            raise cls.skipException(skip_msg)
         if not CONF.service_available.swift:
             skip_msg = ("%s skipped as swift is not available" %
                         cls.__name__)
