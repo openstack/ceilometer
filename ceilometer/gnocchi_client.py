@@ -28,7 +28,8 @@ def get_gnocchiclient(conf, timeout_override=False):
     session = keystone_client.get_session(conf, group=group, timeout=timeout)
     return client.Client('1', session,
                          interface=conf[group].interface,
-                         region_name=conf[group].region_name)
+                         region_name=conf[group].region_name,
+                         adapter_options={'connect_retries': 3})
 
 
 # NOTE(sileht): This is the initial resource types created in Gnocchi
