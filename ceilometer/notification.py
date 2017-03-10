@@ -18,6 +18,7 @@ import threading
 
 from ceilometer.agent import plugin_base
 from concurrent import futures
+import cotyledon
 from futurist import periodics
 from oslo_config import cfg
 from oslo_log import log
@@ -26,10 +27,9 @@ from stevedore import extension
 
 from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
-from ceilometer.i18n import _, _LI
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer import pipeline
-from ceilometer import service_base
 from ceilometer import utils
 
 
@@ -93,7 +93,7 @@ EXCHANGES_OPTS = [
 ]
 
 
-class NotificationService(service_base.PipelineBasedService):
+class NotificationService(cotyledon.Service):
     """Notification service.
 
     When running multiple agents, additional queuing sequence is required for
@@ -105,6 +105,10 @@ class NotificationService(service_base.PipelineBasedService):
 
     NOTIFICATION_NAMESPACE = 'ceilometer.notification'
     NOTIFICATION_IPC = 'ceilometer-pipe'
+
+    def __init__(self, worker_id, conf):
+        super(NotificationService, self).__init__(worker_id)
+        self.conf = conf
 
     @classmethod
     def _get_notifications_manager(cls, pm):
@@ -184,13 +188,11 @@ class NotificationService(service_base.PipelineBasedService):
             messaging.get_notifier(self.transport, '')
             self.group_id = None
 
-        self.pipe_manager = self._get_pipe_manager(self.transport,
-                                                   self.pipeline_manager)
-        self.event_pipe_manager = self._get_event_pipeline_manager(
-            self.transport)
+        pipe_manager = self._get_pipe_manager(self.transport,
+                                              self.pipeline_manager)
+        event_pipe_manager = self._get_event_pipeline_manager(self.transport)
 
-        self._configure_main_queue_listeners(self.pipe_manager,
-                                             self.event_pipe_manager)
+        self._configure_main_queue_listeners(pipe_manager, event_pipe_manager)
 
         if self.conf.notification.workload_partitioning:
             # join group after all manager set up is configured
@@ -219,8 +221,6 @@ class NotificationService(service_base.PipelineBasedService):
             # configure pipelines after all coordination is configured.
             with self.coord_lock:
                 self._configure_pipeline_listener()
-
-        self.init_pipeline_refresh()
 
     def _configure_main_queue_listeners(self, pipe_manager,
                                         event_pipe_manager):
@@ -320,33 +320,6 @@ class NotificationService(service_base.PipelineBasedService):
                 utils.kill_listeners([self.pipeline_listener])
             utils.kill_listeners(self.listeners)
         super(NotificationService, self).terminate()
-
-    def reload_pipeline(self):
-        LOG.info(_LI("Reloading notification agent and listeners."))
-
-        if self.pipeline_validated:
-            self.pipe_manager = self._get_pipe_manager(
-                self.transport, self.pipeline_manager)
-
-        if self.event_pipeline_validated:
-            self.event_pipe_manager = self._get_event_pipeline_manager(
-                self.transport)
-
-        with self.coord_lock:
-            if self.shutdown:
-                # NOTE(sileht): We are going to shutdown we everything will be
-                # stopped, we should not restart them
-                return
-
-            # restart the main queue listeners.
-            utils.kill_listeners(self.listeners)
-            self._configure_main_queue_listeners(
-                self.pipe_manager, self.event_pipe_manager)
-
-            # restart the pipeline listeners if workload partitioning
-            # is enabled.
-            if self.conf.notification.workload_partitioning:
-                self._configure_pipeline_listener()
 
 
 class NotificationProcessBase(plugin_base.NotificationBase):
