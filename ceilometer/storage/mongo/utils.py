@@ -406,7 +406,7 @@ class MongoProxy(object):
             self.conn.create_index(keys, name=name, *args, **kwargs)
         except pymongo.errors.OperationFailure as e:
             if e.code is ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS:
-                LOG.info(_LI("Index %s will be recreate.") % name)
+                LOG.info(_LI("Index %s will be recreate."), name)
                 self._recreate_index(keys, name, *args, **kwargs)
 
     @safe_mongo_call
