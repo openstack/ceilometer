@@ -367,11 +367,9 @@ function init_ceilometer {
                 $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-gnocchi-resource-types
             fi
         fi
-        if is_service_enabled gnocchi ; then
-            if [ "$CEILOMETER_BACKEND" = 'gnocchi' ]; then
-                $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
-            fi
-        fi
+    fi
+    if is_service_enabled gnocchi && [ "$CEILOMETER_BACKEND" = 'gnocchi' ]; then
+        $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
     fi
 }
 
