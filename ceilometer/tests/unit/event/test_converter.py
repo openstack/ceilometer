@@ -770,7 +770,8 @@ class TestNotificationConverter(ConverterBase):
         self.assertTrue(self._convert_message(c, 'info').raw)
         self.assertFalse(self._convert_message(c, 'error').raw)
 
-    def test_setup_events_default_config(self):
+    @mock.patch('ceilometer.declarative.LOG')
+    def test_setup_events_load_config_in_code_tree(self, mocked_log):
         self.CONF.set_override('definitions_cfg_file',
                                '/not/existing/file', group='event')
         self.CONF.set_override('drop_unmatched_notifications',
@@ -778,12 +779,9 @@ class TestNotificationConverter(ConverterBase):
 
         c = converter.setup_events(self.CONF, self.fake_plugin_mgr)
         self.assertIsInstance(c, converter.NotificationEventsConverter)
-        self.assertEqual(1, len(c.definitions))
-        self.assertTrue(c.definitions[0].is_catchall)
-
-        self.CONF.set_override('drop_unmatched_notifications',
-                               True, group='event')
-
-        c = converter.setup_events(self.CONF, self.fake_plugin_mgr)
-        self.assertIsInstance(c, converter.NotificationEventsConverter)
-        self.assertEqual(0, len(c.definitions))
+        log_called_args = mocked_log.debug.call_args_list
+        self.assertEqual(
+            'No Definitions configuration file found! Using default config.',
+            log_called_args[0][0][0])
+        self.assertTrue(log_called_args[1][0][0].startswith(
+            'Loading definitions configuration file:'))

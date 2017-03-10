@@ -19,6 +19,7 @@ import hashlib
 from itertools import chain
 from operator import methodcaller
 import os
+import pkg_resources
 
 from oslo_config import cfg
 from oslo_log import log
@@ -37,17 +38,11 @@ from ceilometer import sample as sample_util
 
 OPTS = [
     cfg.StrOpt('pipeline_cfg_file',
-               default=os.path.abspath(
-                   os.path.join(
-                       os.path.dirname(__file__),
-                       "pipeline", "data", "pipeline.yaml")),
+               default="pipeline.yaml",
                help="Configuration file for pipeline definition."
                ),
     cfg.StrOpt('event_pipeline_cfg_file',
-               default=os.path.abspath(
-                   os.path.join(
-                       os.path.dirname(__file__),
-                       "pipeline", "data", "event_pipeline.yaml")),
+               default="event_pipeline.yaml",
                help="Configuration file for event pipeline definition."
                ),
     cfg.BoolOpt('refresh_pipeline_cfg',
@@ -667,12 +662,17 @@ class ConfigManagerBase(object):
         self.conf = conf
         self.cfg_loc = None
 
-    def load_config(self, cfg_file):
+    def load_config(self, cfg_file, fallback_cfg_prefix='pipeline/data/'):
         """Load a configuration file and set its refresh values."""
         if os.path.exists(cfg_file):
             self.cfg_loc = cfg_file
         else:
             self.cfg_loc = self.conf.find_file(cfg_file)
+        if not self.cfg_loc and fallback_cfg_prefix is not None:
+            LOG.debug("No pipeline definitions configuration file found! "
+                      "Using default config.")
+            self.cfg_loc = pkg_resources.resource_filename(
+                __name__, fallback_cfg_prefix + cfg_file)
         with open(self.cfg_loc) as fap:
             data = fap.read()
         conf = yaml.safe_load(data)
