@@ -197,7 +197,7 @@ function _ceilometer_cleanup_apache_wsgi {
 }
 
 function _ceilometer_drop_database {
-    if is_service_enabled ceilometer-collector ceilometer-api ; then
+    if is_service_enabled ceilometer-api ; then
         if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
             mongo ceilometer --eval "db.dropDatabase();"
         fi
@@ -332,8 +332,11 @@ function configure_ceilometer {
     configure_auth_token_middleware $CEILOMETER_CONF ceilometer $CEILOMETER_AUTH_CACHE_DIR
 
     # Configure storage
-    if is_service_enabled ceilometer-collector ceilometer-api; then
+    if is_service_enabled ceilometer-api; then
         _ceilometer_configure_storage_backend
+    fi
+
+    if is_service_enabled ceilometer-collector; then
         iniset $CEILOMETER_CONF collector workers $API_WORKERS
     fi
 
@@ -360,7 +363,7 @@ function init_ceilometer {
     sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
     rm -f $CEILOMETER_AUTH_CACHE_DIR/*
 
-    if is_service_enabled ceilometer-collector ceilometer-api; then
+    if is_service_enabled ceilometer-api; then
         if is_service_enabled mysql postgresql ; then
             if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
                 recreate_database ceilometer
@@ -383,7 +386,7 @@ function install_ceilometer {
         _ceilometer_prepare_coordination
     fi
 
-    if is_service_enabled ceilometer-collector ceilometer-api; then
+    if is_service_enabled ceilometer-api; then
         _ceilometer_prepare_storage_backend
     fi
 
