@@ -60,9 +60,6 @@ class MockToozCoordinator(object):
         }
         return MockAsyncResult(None)
 
-    def leave_group(self, group_id):
-        return MockAsyncResult(None)
-
     def get_members(self, group_id):
         if group_id not in self._groups:
             return MockAsyncError(
@@ -273,16 +270,12 @@ class TestPartitioning(base.BaseTestCase):
         with mock.patch.object(coord._coordinator, 'join_group') as mocked:
             coord.join_group(None)
             self.assertEqual(0, mocked.call_count)
-        with mock.patch.object(coord._coordinator, 'leave_group') as mocked:
-            coord.leave_group(None)
-            self.assertEqual(0, mocked.call_count)
 
     def test_stop(self):
         coord = self._get_new_started_coordinator({}, 'a', cleanup_stop=False)
         self.assertTrue(coord._coordinator.is_started)
         coord.join_group("123")
         coord.stop()
-        self.assertIsEmpty(coord._groups)
         self.assertIsNone(coord._coordinator)
 
     def test_partitioning_with_unicode(self):
