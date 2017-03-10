@@ -52,12 +52,6 @@ OPTS = [
 ]
 
 
-class ErrorJoiningPartitioningGroup(Exception):
-    def __init__(self):
-        super(ErrorJoiningPartitioningGroup, self).__init__(_LE(
-            'Coordination join_group Error joining partitioning group'))
-
-
 class MemberNotInGroupError(Exception):
     def __init__(self, group_id, members, my_id):
         super(MemberNotInGroupError, self).__init__(_LE(
@@ -140,8 +134,7 @@ class PartitionCoordinator(object):
             wait=tenacity.wait_exponential(
                 multiplier=self.conf.coordination.retry_backoff,
                 max=self.conf.coordination.max_retry_interval),
-            retry=tenacity.retry_if_exception_type(
-                ErrorJoiningPartitioningGroup))
+            retry=tenacity.retry_never)
         def _inner():
             try:
                 join_req = self._coordinator.join_group(group_id)
@@ -155,11 +148,11 @@ class PartitionCoordinator(object):
                     create_grp_req.get()
                 except tooz.coordination.GroupAlreadyExist:
                     pass
-                raise ErrorJoiningPartitioningGroup()
+                raise tenacity.TryAgain
             except tooz.coordination.ToozError:
                 LOG.exception(_LE('Error joining partitioning group %s,'
                                   ' re-trying'), group_id)
-                raise ErrorJoiningPartitioningGroup()
+                raise tenacity.TryAgain
 
         return _inner()
 
