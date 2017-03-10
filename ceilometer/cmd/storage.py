@@ -42,8 +42,15 @@ def upgrade():
     if conf.skip_metering_database:
         LOG.info("Skipping metering database upgrade")
     else:
-        LOG.debug("Upgrading metering database")
-        storage.get_connection_from_config(conf).upgrade()
+
+        url = (getattr(conf.database, 'metering_connection') or
+               conf.database.connection)
+        if url:
+            LOG.debug("Upgrading metering database")
+            storage.get_connection(conf, url).upgrade()
+        else:
+            LOG.info("Skipping metering database upgrade, "
+                     "legacy database backend not configured.")
 
     if conf.skip_gnocchi_resource_types:
         LOG.info("Skipping Gnocchi resource types upgrade")
