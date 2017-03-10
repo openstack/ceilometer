@@ -137,22 +137,14 @@ class PartitionCoordinator(object):
             retry=tenacity.retry_never)
         def _inner():
             try:
-                join_req = self._coordinator.join_group(group_id)
-                join_req.get()
-                LOG.info(_LI('Joined partitioning group %s'), group_id)
+                self._coordinator.join_group_create(group_id)
             except tooz.coordination.MemberAlreadyExist:
-                return
-            except tooz.coordination.GroupNotCreated:
-                create_grp_req = self._coordinator.create_group(group_id)
-                try:
-                    create_grp_req.get()
-                except tooz.coordination.GroupAlreadyExist:
-                    pass
-                raise tenacity.TryAgain
+                pass
             except tooz.coordination.ToozError:
                 LOG.exception(_LE('Error joining partitioning group %s,'
                                   ' re-trying'), group_id)
                 raise tenacity.TryAgain
+            LOG.info(_LI('Joined partitioning group %s'), group_id)
 
         return _inner()
 

@@ -25,46 +25,37 @@ from ceilometer import service
 from ceilometer.tests import base
 
 
-class MockToozCoordinator(object):
+class MockToozCoordinator(tooz.coordination.CoordinationDriver):
     def __init__(self, member_id, shared_storage):
+        super(MockToozCoordinator, self).__init__(member_id)
         self._member_id = member_id
-        self._groups = shared_storage
-        self.is_started = False
-
-    def start(self):
-        self.is_started = True
-
-    def stop(self):
-        pass
-
-    def heartbeat(self):
-        pass
+        self._shared_storage = shared_storage
 
     def create_group(self, group_id):
-        if group_id in self._groups:
+        if group_id in self._shared_storage:
             return MockAsyncError(
                 tooz.coordination.GroupAlreadyExist(group_id))
-        self._groups[group_id] = {}
+        self._shared_storage[group_id] = {}
         return MockAsyncResult(None)
 
     def join_group(self, group_id, capabilities=b''):
-        if group_id not in self._groups:
+        if group_id not in self._shared_storage:
             return MockAsyncError(
                 tooz.coordination.GroupNotCreated(group_id))
-        if self._member_id in self._groups[group_id]:
+        if self._member_id in self._shared_storage[group_id]:
             return MockAsyncError(
                 tooz.coordination.MemberAlreadyExist(group_id,
                                                      self._member_id))
-        self._groups[group_id][self._member_id] = {
+        self._shared_storage[group_id][self._member_id] = {
             "capabilities": capabilities,
         }
         return MockAsyncResult(None)
 
     def get_members(self, group_id):
-        if group_id not in self._groups:
+        if group_id not in self._shared_storage:
             return MockAsyncError(
                 tooz.coordination.GroupNotCreated(group_id))
-        return MockAsyncResult(self._groups[group_id])
+        return MockAsyncResult(self._shared_storage[group_id])
 
 
 class MockToozCoordExceptionRaiser(MockToozCoordinator):
@@ -88,9 +79,11 @@ class MockToozCoordExceptionOnJoinRaiser(MockToozCoordinator):
         self.tooz_error_count = retry_count
         self.count = 0
 
-    def join_group(self, group_id, capabilities=b''):
+    def join_group_create(self, group_id, capabilities=b''):
         if self.count == self.tooz_error_count:
-            return MockAsyncResult(None)
+            return super(
+                MockToozCoordExceptionOnJoinRaiser, self).join_group_create(
+                    group_id, capabilities)
         else:
             self.count += 1
             raise tooz.coordination.ToozError('error')
@@ -232,7 +225,7 @@ class TestPartitioning(base.BaseTestCase):
 
     def test_coordination_backend_connection_fail_on_join(self):
         coord = self._get_new_started_coordinator(
-            {'group'}, 'agent1', MockToozCoordExceptionOnJoinRaiser,
+            {'group': {}}, 'agent1', MockToozCoordExceptionOnJoinRaiser,
             retry_count=2)
         with mock.patch('tooz.coordination.get_coordinator',
                         return_value=MockToozCoordExceptionOnJoinRaiser):
