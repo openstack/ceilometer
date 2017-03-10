@@ -210,7 +210,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         except ImportError:
             pass
         except oslo_cache.exception.ConfigurationError as exc:
-            LOG.warning(_LW('unable to configure oslo_cache: %s') % exc)
+            LOG.warning(_LW('unable to configure oslo_cache: %s'), exc)
 
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
