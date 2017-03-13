@@ -419,9 +419,12 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                     # NOTE(sileht): resource created in the meantime
                     pass
                 except gnocchi_exc.ClientException as e:
-                    LOG.error(six.text_type(e))
+                    LOG.error(_LE('Error creating resource %(id)s: %(err)s'),
+                              {'id': resource['id'], 'err': six.text_type(e)})
                     # We cannot post measures for this resource
+                    # and we can't patch it later
                     del measures[resource['id']]
+                    del resource_infos[resource['id']]
 
             # NOTE(sileht): we have created missing resources/metrics,
             # now retry to post measures
