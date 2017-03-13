@@ -102,39 +102,6 @@ tests:
       response_json_paths:
           $.`len`: 0
 
-    - name: fail to create alarm 'gabbi-gnocchi-threshold-resource-alarm'
-      desc: fails until resource exists in gnocchi
-      POST: $ENVIRON['AODH_SERVICE_URL']/v2/alarms
-      request_headers:
-          content-type: application/json
-      data:
-          alarm_actions:
-              - "http://site:8000/gnocchi-threshold-resource"
-          alarm_id: null
-          description: An gabbilive threshold based alarm
-          enabled: true
-          insufficient_data_actions:
-              - "http://site:8000/nodata-gnocchi-threshold-resource"
-          name: "gabbi-gnocchi-threshold-resource-alarm"
-          ok_actions:
-              - "http://site:8000/ok-gnocchi-threshold-resource"
-          project_id: 709f6ed6-bfb3-4649-b303-0019a7f6aef2
-          repeat_actions: false
-          severity: moderate
-          state: "insufficient data"
-          type: gnocchi_resources_threshold
-          gnocchi_resources_threshold_rule:
-              evaluation_periods: 3
-              metric: "radosgw.containers.objects"
-              resource_id: "fake-mock-up"
-              aggregation_method: "mean"
-              granularity: 60
-              threshold: 5.0
-              comparison_operator: "ge"
-              resource_type: ceph_account
-          user_id: c8ecb587-d38c-426f-a58d-22b8d4a9a1d3
-      status: 404
-
     - name: create alarm 'gabbi-gnocchi-threshold-resource-alarm'
       desc: create a threshold alarm gabbi-gnocchi-threshold-resource-alarm
       POST: $ENVIRON['AODH_SERVICE_URL']/v2/alarms
