@@ -1,4 +1,5 @@
 #
+# Copyright 2017 Red Hat, Inc.
 # Copyright 2012-2013 eNovance <licensing@enovance.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -25,9 +26,10 @@ from futurist import periodics
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
+import six
 from stevedore import extension
+from tooz import coordination
 
-from ceilometer import coordination
 from ceilometer.event import endpoint as event_endpoint
 from ceilometer.i18n import _
 from ceilometer import messaging
@@ -112,9 +114,14 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).__init__(worker_id)
         self.startup_delay = worker_id
         self.conf = conf
-        # XXX uuid4().bytes ought to work, but it requires ascii for now
-        self.coordination_id = (coordination_id or
-                                str(uuid.uuid4()).encode('ascii'))
+        if self.conf.notification.workload_partitioning:
+            # XXX uuid4().bytes ought to work, but it requires ascii for now
+            coordination_id = (coordination_id or
+                               str(uuid.uuid4()).encode('ascii'))
+            self.partition_coordinator = coordination.get_coordinator(
+                self.conf.coordination.backend_url, coordination_id)
+        else:
+            self.partition_coordinator = None
 
     @classmethod
     def _get_notifications_manager(cls, pm):
@@ -168,7 +175,6 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).run()
         self.shutdown = False
         self.periodic = None
-        self.partition_coordinator = None
         self.coord_lock = threading.Lock()
 
         self.listeners = []
@@ -184,9 +190,6 @@ class NotificationService(cotyledon.Service):
         self.transport = messaging.get_transport(self.conf)
 
         if self.conf.notification.workload_partitioning:
-            self.group_id = self.NOTIFICATION_NAMESPACE
-            self.partition_coordinator = coordination.PartitionCoordinator(
-                self.conf, self.coordination_id)
             self.partition_coordinator.start()
         else:
             # FIXME(sileht): endpoint uses the notification_topics option
@@ -204,9 +207,8 @@ class NotificationService(cotyledon.Service):
 
         if self.conf.notification.workload_partitioning:
             # join group after all manager set up is configured
-            self.partition_coordinator.join_group(self.group_id)
-            self.partition_coordinator.watch_group(self.group_id,
-                                                   self._refresh_agent)
+            self.hashring = self.partition_coordinator.join_partitioned_group(
+                self.NOTIFICATION_NAMESPACE)
 
             @periodics.periodic(spacing=self.conf.coordination.check_watchers,
                                 run_immediately=True)
@@ -219,7 +221,6 @@ class NotificationService(cotyledon.Service):
             self.periodic.add(run_watchers)
 
             utils.spawn_thread(self.periodic.start)
-
             # configure pipelines after all coordination is configured.
             with self.coord_lock:
                 self._configure_pipeline_listener()
@@ -275,14 +276,13 @@ class NotificationService(cotyledon.Service):
         ev_pipes = self.event_pipeline_manager.pipelines
         pipelines = self.pipeline_manager.pipelines + ev_pipes
         transport = messaging.get_transport(self.conf)
+        partitioned = six.moves.range(
+            self.conf.notification.pipeline_processing_queues
+        )
+
         if self.partition_coordinator:
-            partitioned = self.partition_coordinator.extract_my_subset(
-                self.group_id,
-                range(self.conf.notification.pipeline_processing_queues))
-        else:
-            partitioned = range(
-                self.conf.notification.pipeline_processing_queues
-            )
+            partitioned = list(filter(
+                self.hashring.belongs_to_self, partitioned))
 
         endpoints = []
         targets = []

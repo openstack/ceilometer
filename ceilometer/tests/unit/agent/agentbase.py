@@ -32,7 +32,6 @@ from ceilometer import pipeline
 from ceilometer import sample
 from ceilometer import service
 from ceilometer.tests import base
-from ceilometer import utils
 
 
 class TestSample(sample.Sample):
@@ -248,16 +247,20 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
         self.CONF = service.prepare_service([], [])
+        self.CONF.set_override("backend_url", "zake://", "coordination")
         self.CONF.set_override(
             'cfg_file',
             self.path_get('etc/ceilometer/polling.yaml'), group='polling'
         )
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
-        self.mgr.partition_coordinator = mock.MagicMock()
-        fake_subset = lambda _, x: x
-        p_coord = self.mgr.partition_coordinator
-        p_coord.extract_my_subset.side_effect = fake_subset
+
+        self.hashring = mock.MagicMock()
+        self.hashring.belongs_to_self = mock.MagicMock()
+        self.hashring.belongs_to_self.return_value = True
+
+        self.mgr.hashrings = mock.MagicMock()
+        self.mgr.hashrings.__getitem__.return_value = self.hashring
         self.mgr.tg = mock.MagicMock()
         self.polling_cfg = {
             'sources': [{
@@ -291,27 +294,10 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_polling')
     def test_start(self, setup_polling):
         self.mgr.setup_polling_tasks = mock.MagicMock()
-        mpc = self.mgr.partition_coordinator
         self.mgr.run()
         setup_polling.assert_called_once_with(self.CONF)
-        mpc.start.assert_called_once_with()
-        self.assertEqual(2, mpc.join_group.call_count)
         self.mgr.setup_polling_tasks.assert_called_once_with()
         self.mgr.terminate()
-        mpc.stop.assert_called_once_with()
-
-    def test_join_partitioning_groups(self):
-        self.mgr.discoveries = self.create_discoveries()
-        self.mgr.join_partitioning_groups()
-        p_coord = self.mgr.partition_coordinator
-        static_group_ids = [utils.hash_of_set(p['resources'])
-                            for p in self.polling_cfg['sources']
-                            if p['resources']]
-        expected = [mock.call(self.mgr.construct_group_id(g))
-                    for g in ['another_group', 'global'] + static_group_ids]
-        self.assertEqual(len(expected), len(p_coord.join_group.call_args_list))
-        for c in expected:
-            self.assertIn(c, p_coord.join_group.call_args_list)
 
     def test_setup_polling_tasks(self):
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -578,7 +564,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
     def test_discovery_partitioning(self):
         self.mgr.discoveries = self.create_discoveries()
-        p_coord = self.mgr.partition_coordinator
         self.polling_cfg['sources'][0]['discovery'] = [
             'testdiscovery', 'testdiscoveryanother',
             'testdiscoverynonexistent', 'testdiscoveryexception']
@@ -586,17 +571,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        expected = [mock.call(self.mgr.construct_group_id(d.obj.group_id),
-                              d.obj.resources)
-                    for d in self.mgr.discoveries
-                    if hasattr(d.obj, 'resources')]
-        self.assertEqual(len(expected),
-                         len(p_coord.extract_my_subset.call_args_list))
-        for c in expected:
-            self.assertIn(c, p_coord.extract_my_subset.call_args_list)
+        self.mgr.hashrings.__getitem__.assert_called_with(
+            'central-compute-another_group')
+        self.hashring.belongs_to_self.assert_not_called()
 
     def test_static_resources_partitioning(self):
-        p_coord = self.mgr.partition_coordinator
         static_resources = ['static_1', 'static_2']
         static_resources2 = ['static_3', 'static_4']
         self.polling_cfg['sources'][0]['resources'] = static_resources
@@ -616,17 +595,12 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        # Only two groups need to be created, one for each polling,
-        # even though counter test is used twice
-        expected = [mock.call(self.mgr.construct_group_id(
-                              utils.hash_of_set(resources)),
-                              resources)
-                    for resources in [static_resources,
-                                      static_resources2]]
-        self.assertEqual(len(expected),
-                         len(p_coord.extract_my_subset.call_args_list))
-        for c in expected:
-            self.assertIn(c, p_coord.extract_my_subset.call_args_list)
+        self.hashring.belongs_to_self.assert_has_calls([
+            mock.call('static_1'),
+            mock.call('static_2'),
+            mock.call('static_3'),
+            mock.call('static_4'),
+        ], any_order=True)
 
     @mock.patch('ceilometer.agent.manager.LOG')
     def test_polling_and_notify_with_resources(self, LOG):
