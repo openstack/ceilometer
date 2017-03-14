@@ -15,6 +15,7 @@
 
 import itertools
 import threading
+import time
 
 from ceilometer.agent import plugin_base
 from concurrent import futures
@@ -108,6 +109,7 @@ class NotificationService(cotyledon.Service):
 
     def __init__(self, worker_id, conf):
         super(NotificationService, self).__init__(worker_id)
+        self.startup_delay = worker_id
         self.conf = conf
 
     @classmethod
@@ -156,6 +158,9 @@ class NotificationService(cotyledon.Service):
         return event_pipe_manager
 
     def run(self):
+        # Delay startup so workers are jittered
+        time.sleep(self.startup_delay)
+
         super(NotificationService, self).run()
         self.shutdown = False
         self.periodic = None
