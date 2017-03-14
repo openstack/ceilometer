@@ -12,7 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_log import log
+
 from ceilometer.agent import plugin_base as plugin
+
+LOG = log.getLogger(__name__)
 
 
 class TenantDiscovery(plugin.DiscoveryBase):
@@ -24,5 +28,17 @@ class TenantDiscovery(plugin.DiscoveryBase):
     """
 
     def discover(self, manager, param=None):
-        tenants = manager.keystone.projects.list()
+        domains = manager.keystone.domains.list()
+        LOG.debug('Found %s keystone domains', len(domains))
+        if domains:
+            tenants = []
+            for domain in domains:
+                domain_tenants = manager.keystone.projects.list(domain)
+                LOG.debug("Found %s tenants in domain %s", len(domain_tenants),
+                          domain.name)
+                tenants = tenants + domain_tenants
+        else:
+            tenants = manager.keystone.projects.list()
+            LOG.debug("No domains - found %s tenants in default domain",
+                      len(tenants))
         return tenants or []
