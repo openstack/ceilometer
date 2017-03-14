@@ -22,7 +22,7 @@ import tenacity
 import tooz.coordination
 from tooz import hashring
 
-from ceilometer.i18n import _LE, _LI, _LW
+from ceilometer.i18n import _LE, _LI
 
 LOG = log.getLogger(__name__)
 
@@ -46,14 +46,6 @@ OPTS = [
                help='Maximum number of seconds between retry to join '
                     'partitioning group')
 ]
-
-
-class MemberNotInGroupError(Exception):
-    def __init__(self, group_id, members, my_id):
-        super(MemberNotInGroupError, self).__init__(_LE(
-            'Group ID: %(group_id)s, Members: %(members)s, Me: %(me)s: '
-            'Current agent is not part of group and cannot take tasks') %
-            {'group_id': group_id, 'members': members, 'me': my_id})
 
 
 class PartitionCoordinator(object):
@@ -138,11 +130,6 @@ class PartitionCoordinator(object):
             except tooz.coordination.GroupNotCreated:
                 self.join_group(group_id)
 
-    @tenacity.retry(
-        wait=tenacity.wait_random(max=2),
-        stop=tenacity.stop_after_attempt(5),
-        retry=tenacity.retry_if_exception_type(MemberNotInGroupError),
-        reraise=True)
     def extract_my_subset(self, group_id, iterable):
         """Filters an iterable, returning only objects assigned to this agent.
 
@@ -154,17 +141,6 @@ class PartitionCoordinator(object):
             return iterable
         try:
             members = self._get_members(group_id)
-            LOG.debug('Members of group %s are: %s, Me: %s',
-                      group_id, members, self._my_id)
-            if self._my_id not in members:
-                LOG.warning(_LW('Cannot extract tasks because agent failed to '
-                                'join group properly. Rejoining group.'))
-                self.join_group(group_id)
-                members = self._get_members(group_id)
-                if self._my_id not in members:
-                    raise MemberNotInGroupError(group_id, members, self._my_id)
-                LOG.debug('Members of group %s are: %s, Me: %s',
-                          group_id, members, self._my_id)
             hr = hashring.HashRing(members, partitions=100)
             iterable = list(iterable)
             filtered = [v for v in iterable
