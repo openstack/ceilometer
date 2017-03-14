@@ -28,6 +28,7 @@ import yaml
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
+from ceilometer.compute import discovery as nova_discover
 from ceilometer.hardware import discovery
 from ceilometer import pipeline
 from ceilometer import service
@@ -194,6 +195,7 @@ class TestPollsterKeystone(agentbase.TestPollster):
 
 
 class TestPollsterPollingException(agentbase.TestPollster):
+    discovery = 'test'
     polling_failures = 0
 
     def get_samples(self, manager, cache, resources):
@@ -397,6 +399,38 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             'Prevent pollster %(name)s from '
             'polling %(res_list)s on source %(source)s anymore!')
             % ({'name': pollster.name, 'res_list': res_list,
+                'source': source_name}))
+
+    @mock.patch('ceilometer.agent.manager.LOG')
+    def test_polling_novalike_exception(self, LOG):
+        source_name = 'test_pollingexception'
+        self.polling_cfg = {
+            'sources': [{
+                'name': source_name,
+                'interval': 10,
+                'meters': ['testpollingexception'],
+                'sinks': ['test_sink']}],
+            'sinks': [{
+                'name': 'test_sink',
+                'transformers': [],
+                'publishers': ["test"]}]
+        }
+        self.mgr.polling_manager = pipeline.PollingManager(
+            self.CONF, self.cfg2file(self.polling_cfg))
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
+        pollster = list(polling_task.pollster_matches[source_name])[0]
+
+        with mock.patch.object(polling_task.manager, 'discover') as disco:
+            # NOTE(gordc): polling error on 3rd poll
+            for __ in range(4):
+                disco.return_value = (
+                    [nova_discover.NovaLikeServer(**{'id': 1})])
+                self.mgr.interval_task(polling_task)
+        LOG.error.assert_called_once_with((
+            'Prevent pollster %(name)s from '
+            'polling %(res_list)s on source %(source)s anymore!')
+            % ({'name': pollster.name,
+                'res_list': '[<NovaLikeServer: unknown-name>]',
                 'source': source_name}))
 
     def test_batching_polled_samples_false(self):
