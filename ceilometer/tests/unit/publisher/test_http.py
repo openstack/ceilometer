@@ -232,6 +232,27 @@ class TestHttpPublisher(base.BaseTestCase):
             publisher.publish_samples(self.sample_data)
             self.assertEqual('/path/to/cert.crt', post.call_args[1]['verify'])
 
+    def test_post_basic_auth(self):
+        parsed_url = urlparse.urlparse(
+            'http://alice:l00kingGla$$@localhost:90/path1?')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_samples(self.sample_data)
+            self.assertEqual(('alice', 'l00kingGla$$'),
+                             post.call_args[1]['auth'])
+
+    def test_post_client_cert_auth(self):
+        parsed_url = urlparse.urlparse('http://localhost:90/path1?'
+                                       'clientcert=/path/to/cert.crt&'
+                                       'clientkey=/path/to/cert.key')
+        publisher = http.HttpPublisher(self.CONF, parsed_url)
+
+        with mock.patch.object(requests.Session, 'post') as post:
+            publisher.publish_samples(self.sample_data)
+            self.assertEqual(('/path/to/cert.crt', '/path/to/cert.key'),
+                             post.call_args[1]['cert'])
+
     def test_post_raw_only(self):
         parsed_url = urlparse.urlparse('http://localhost:90/path1?raw_only=1')
         publisher = http.HttpPublisher(self.CONF, parsed_url)

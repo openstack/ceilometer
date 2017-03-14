@@ -1,0 +1,14 @@
+---
+features:
+  - In the 'publishers' section of a meter/event pipeline definition, https://
+    can now be used in addition to http://. Furthermore, either Basic or
+    client-certificate authentication can be used (obviously, client cert only
+    makes sense in the https case).
+    For Basic authentication, use the form http://username:password@hostname/.
+    For client certificate authentication pass the client certificate's path
+    (and the key file path, if the key is not in the certificate file) using
+    the parameters 'clientcert' and 'clientkey', e.g.
+    https://hostname/path?clientcert=/path/to/cert&clientkey=/path/to/key.
+    Any parameters or credentials used for http(s) publishers are removed from
+    the URL before the actual HTTP request is made.
+
