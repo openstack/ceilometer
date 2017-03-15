@@ -19,7 +19,7 @@ from ceilometer import sample
 
 
 class InstanceStatsPollster(pollsters.GenericComputePollster):
-    cache_key = "instance_stats"
+    inspector_method = 'inspect_instance'
 
 
 class CPUPollster(InstanceStatsPollster):

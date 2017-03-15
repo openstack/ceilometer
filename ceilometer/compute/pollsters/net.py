@@ -14,294 +14,98 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import copy
-
-from oslo_log import log
-
-import ceilometer
-from ceilometer.agent import plugin_base
 from ceilometer.compute import pollsters
 from ceilometer.compute.pollsters import util
-from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _LE
 from ceilometer import sample
 
-LOG = log.getLogger(__name__)
 
+class NetworkPollster(pollsters.GenericComputePollster):
+    inspector_method = "inspect_vnics"
 
-class _Base(pollsters.BaseComputePollster):
+    @staticmethod
+    def get_additional_metadata(instance, stats):
+        additional_stats = {k: getattr(stats, k)
+                            for k in ["name", "mac", "fref", "parameters"]}
+        if stats.fref is not None:
+            additional_stats['vnic_name'] = stats.fref
+        else:
+            additional_stats['vnic_name'] = stats.name
+        return additional_stats
 
-    NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:", "read-bytes=%d",
-                                  "write-bytes=%d"])
-
-    def make_vnic_sample(self, instance, name, type, unit, volume, vnic_data):
-        metadata = copy.copy(vnic_data)
-        additional_metadata = dict(zip(metadata._fields, metadata))
-        if vnic_data.fref is not None:
-            rid = vnic_data.fref
-            additional_metadata['vnic_name'] = vnic_data.fref
+    @staticmethod
+    def get_resource_id(instance, stats):
+        if stats.fref is not None:
+            return stats.fref
         else:
             instance_name = util.instance_name(instance)
-            rid = "%s-%s-%s" % (instance_name, instance.id, vnic_data.name)
-            additional_metadata['vnic_name'] = vnic_data.name
-
-        return util.make_sample_from_instance(
-            conf=self.conf,
-            instance=instance,
-            name=name,
-            type=type,
-            unit=unit,
-            volume=volume,
-            resource_id=rid,
-            additional_metadata=additional_metadata
-        )
-
-    CACHE_KEY_VNIC = 'vnics'
-
-    def _get_vnic_info(self, inspector, instance):
-        return inspector.inspect_vnics(instance)
-
-    @staticmethod
-    def _get_rx_info(info):
-        return info.rx_bytes
-
-    @staticmethod
-    def _get_tx_info(info):
-        return info.tx_bytes
-
-    def _get_vnics_for_instance(self, cache, inspector, instance):
-        i_cache = cache.setdefault(self.CACHE_KEY_VNIC, {})
-        if instance.id not in i_cache:
-            i_cache[instance.id] = list(
-                self._get_vnic_info(inspector, instance)
-            )
-        return i_cache[instance.id]
-
-    def get_samples(self, manager, cache, resources):
-        self._inspection_duration = self._record_poll_time()
-        for instance in resources:
-            instance_name = util.instance_name(instance)
-            LOG.debug('checking net info for instance %s', instance.id)
-            try:
-                vnics = self._get_vnics_for_instance(
-                    cache,
-                    self.inspector,
-                    instance,
-                )
-                for vnic, info in vnics:
-                    LOG.debug(self.NET_USAGE_MESSAGE, instance_name,
-                              vnic.name, self._get_rx_info(info),
-                              self._get_tx_info(info))
-                    yield self._get_sample(instance, vnic, info)
-            except virt_inspector.InstanceNotFoundException as err:
-                # Instance was deleted while getting samples. Ignore it.
-                LOG.debug('Exception while getting samples %s', err)
-            except virt_inspector.InstanceShutOffException as e:
-                LOG.debug('Instance %(instance_id)s was shut off while '
-                          'getting samples of %(pollster)s: %(exc)s',
-                          {'instance_id': instance.id,
-                           'pollster': self.__class__.__name__, 'exc': e})
-            except ceilometer.NotImplementedError:
-                # Selected inspector does not implement this pollster.
-                LOG.debug('%(inspector)s does not provide data for '
-                          '%(pollster)s',
-                          {'inspector': self.inspector.__class__.__name__,
-                           'pollster': self.__class__.__name__})
-                raise plugin_base.PollsterPermanentError(resources)
-            except Exception as err:
-                LOG.exception(_LE('Ignoring instance %(name)s: %(error)s'),
-                              {'name': instance_name, 'error': err})
+            return "%s-%s-%s" % (instance_name, instance.id, stats.name)
 
 
-class _RateBase(_Base):
-
-    NET_USAGE_MESSAGE = ' '.join(["NETWORK RATE:", "%s %s:",
-                                  "read-bytes-rate=%d",
-                                  "write-bytes-rate=%d"])
-
-    CACHE_KEY_VNIC = 'vnic-rates'
-
-    def _get_vnic_info(self, inspector, instance):
-        return inspector.inspect_vnic_rates(instance,
-                                            self._inspection_duration)
-
-    @staticmethod
-    def _get_rx_info(info):
-        return info.rx_bytes_rate
-
-    @staticmethod
-    def _get_tx_info(info):
-        return info.tx_bytes_rate
+class IncomingBytesPollster(NetworkPollster):
+    sample_name = 'network.incoming.bytes'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'B'
+    sample_stats_key = 'rx_bytes'
 
 
-class _PacketsBase(_Base):
-
-    NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:",
-                                  "read-packets=%d",
-                                  "write-packets=%d"])
-
-    @staticmethod
-    def _get_rx_info(info):
-        return info.rx_packets
-
-    @staticmethod
-    def _get_tx_info(info):
-        return info.tx_packets
+class IncomingPacketsPollster(NetworkPollster):
+    sample_name = 'network.incoming.packets'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'packet'
+    sample_stats_key = 'rx_packets'
 
 
-class _DropBase(_Base):
-
-    NET_USAGE_MESSAGE = ' '.join(["NETWORK PACKET DROPS:", "%s %s:",
-                                  "rx-drop=%d", "tx-drop=%d"])
-
-    @staticmethod
-    def _get_rx_info(info):
-        return info.rx_drop
-
-    @staticmethod
-    def _get_tx_info(info):
-        return info.tx_drop
+class OutgoingBytesPollster(NetworkPollster):
+    sample_name = 'network.outgoing.bytes'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'B'
+    sample_stats_key = 'tx_bytes'
 
 
-class _ErrorsBase(_Base):
-
-    NET_USAGE_MESSAGE = ' '.join(["NETWORK PACKET ERRORS:", "%s %s:",
-                                  "rx-errors=%d", "tx-errors=%d"])
-
-    @staticmethod
-    def _get_rx_info(info):
-        return info.rx_errors
-
-    @staticmethod
-    def _get_tx_info(info):
-        return info.tx_errors
+class OutgoingPacketsPollster(NetworkPollster):
+    sample_name = 'network.outgoing.packets'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'packet'
+    sample_stats_key = 'tx_packets'
 
 
-class IncomingBytesPollster(_Base):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.incoming.bytes',
-            type=sample.TYPE_CUMULATIVE,
-            unit='B',
-            volume=info.rx_bytes,
-            vnic_data=vnic,
-        )
+class IncomingBytesRatePollster(NetworkPollster):
+    inspector_method = "inspect_vnic_rates"
+    sample_name = 'network.incoming.bytes.rate'
+    sample_unit = 'B/s'
+    sample_stats_key = 'rx_bytes_rate'
 
 
-class IncomingPacketsPollster(_PacketsBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.incoming.packets',
-            type=sample.TYPE_CUMULATIVE,
-            unit='packet',
-            volume=info.rx_packets,
-            vnic_data=vnic,
-        )
+class OutgoingBytesRatePollster(NetworkPollster):
+    inspector_method = "inspect_vnic_rates"
+    sample_name = 'network.outgoing.bytes.rate'
+    sample_unit = 'B/s'
+    sample_stats_key = 'tx_bytes_rate'
 
 
-class OutgoingBytesPollster(_Base):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.outgoing.bytes',
-            type=sample.TYPE_CUMULATIVE,
-            unit='B',
-            volume=info.tx_bytes,
-            vnic_data=vnic,
-        )
+class IncomingDropPollster(NetworkPollster):
+    sample_name = 'network.incoming.packets.drop'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'packet'
+    sample_stats_key = 'rx_drop'
 
 
-class OutgoingPacketsPollster(_PacketsBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.outgoing.packets',
-            type=sample.TYPE_CUMULATIVE,
-            unit='packet',
-            volume=info.tx_packets,
-            vnic_data=vnic,
-        )
+class OutgoingDropPollster(NetworkPollster):
+    sample_name = 'network.outgoing.packets.drop'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'packet'
+    sample_stats_key = 'tx_drop'
 
 
-class IncomingBytesRatePollster(_RateBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.incoming.bytes.rate',
-            type=sample.TYPE_GAUGE,
-            unit='B/s',
-            volume=info.rx_bytes_rate,
-            vnic_data=vnic,
-        )
+class IncomingErrorsPollster(NetworkPollster):
+    sample_name = 'network.incoming.packets.error'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'packet'
+    sample_stats_key = 'rx_errors'
 
 
-class OutgoingBytesRatePollster(_RateBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.outgoing.bytes.rate',
-            type=sample.TYPE_GAUGE,
-            unit='B/s',
-            volume=info.tx_bytes_rate,
-            vnic_data=vnic,
-        )
-
-
-class IncomingDropPollster(_DropBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.incoming.packets.drop',
-            type=sample.TYPE_CUMULATIVE,
-            unit='packet',
-            volume=info.rx_drop,
-            vnic_data=vnic,
-        )
-
-
-class OutgoingDropPollster(_DropBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.outgoing.packets.drop',
-            type=sample.TYPE_CUMULATIVE,
-            unit='packet',
-            volume=info.tx_drop,
-            vnic_data=vnic,
-        )
-
-
-class IncomingErrorsPollster(_ErrorsBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.incoming.packets.error',
-            type=sample.TYPE_CUMULATIVE,
-            unit='packet',
-            volume=info.rx_errors,
-            vnic_data=vnic,
-        )
-
-
-class OutgoingErrorsPollster(_ErrorsBase):
-
-    def _get_sample(self, instance, vnic, info):
-        return self.make_vnic_sample(
-            instance,
-            name='network.outgoing.packets.error',
-            type=sample.TYPE_CUMULATIVE,
-            unit='packet',
-            volume=info.tx_errors,
-            vnic_data=vnic,
-        )
+class OutgoingErrorsPollster(NetworkPollster):
+    sample_name = 'network.outgoing.packets.error'
+    sample_type = sample.TYPE_CUMULATIVE
+    sample_unit = 'packet'
+    sample_stats_key = 'tx_errors'

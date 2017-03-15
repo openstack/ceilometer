@@ -151,11 +151,11 @@ class TestXenapiInspection(base.BaseTestCase):
                     self.inspector.inspect_vnics(fake_instance))
 
                 self.assertEqual(1, len(interfaces))
-                vnic0, info0 = interfaces[0]
+                vnic0 = interfaces[0]
                 self.assertEqual('vif_uuid', vnic0.name)
                 self.assertEqual('vif_mac', vnic0.mac)
-                self.assertEqual(1024, info0.rx_bytes)
-                self.assertEqual(2048, info0.tx_bytes)
+                self.assertEqual(1024, vnic0.rx_bytes)
+                self.assertEqual(2048, vnic0.tx_bytes)
 
     def test_inspect_vnic_rates(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
@@ -175,11 +175,11 @@ class TestXenapiInspection(base.BaseTestCase):
             interfaces = list(self.inspector.inspect_vnic_rates(fake_instance))
 
             self.assertEqual(1, len(interfaces))
-            vnic0, info0 = interfaces[0]
+            vnic0 = interfaces[0]
             self.assertEqual('vif_uuid', vnic0.name)
             self.assertEqual('vif_mac', vnic0.mac)
-            self.assertEqual(1024.0, info0.rx_bytes_rate)
-            self.assertEqual(2048.0, info0.tx_bytes_rate)
+            self.assertEqual(1024.0, vnic0.rx_bytes_rate)
+            self.assertEqual(2048.0, vnic0.tx_bytes_rate)
 
     def test_inspect_disk_rates(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',

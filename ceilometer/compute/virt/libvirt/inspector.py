@@ -76,7 +76,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         return domain
 
     @libvirt_utils.retry_on_disconnect
-    def inspect_vnics(self, instance):
+    def inspect_vnics(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
         tree = etree.fromstring(domain.XMLDesc(0))
@@ -97,18 +97,19 @@ class LibvirtInspector(virt_inspector.Inspector):
 
             params = dict((p.get('name').lower(), p.get('value'))
                           for p in iface.findall('filterref/parameter'))
-            interface = virt_inspector.Interface(name=name, mac=mac_address,
-                                                 fref=fref, parameters=params)
             dom_stats = domain.interfaceStats(name)
-            stats = virt_inspector.InterfaceStats(rx_bytes=dom_stats[0],
-                                                  rx_packets=dom_stats[1],
-                                                  rx_drop=dom_stats[2],
-                                                  rx_errors=dom_stats[3],
-                                                  tx_bytes=dom_stats[4],
-                                                  tx_packets=dom_stats[5],
-                                                  tx_drop=dom_stats[6],
-                                                  tx_errors=dom_stats[7])
-            yield (interface, stats)
+            yield virt_inspector.InterfaceStats(name=name,
+                                                mac=mac_address,
+                                                fref=fref,
+                                                parameters=params,
+                                                rx_bytes=dom_stats[0],
+                                                rx_packets=dom_stats[1],
+                                                rx_drop=dom_stats[2],
+                                                rx_errors=dom_stats[3],
+                                                tx_bytes=dom_stats[4],
+                                                tx_packets=dom_stats[5],
+                                                tx_drop=dom_stats[6],
+                                                tx_errors=dom_stats[7])
 
     @libvirt_utils.retry_on_disconnect
     def inspect_disks(self, instance):

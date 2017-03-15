@@ -105,16 +105,14 @@ class HyperVInspector(virt_inspector.Inspector):
             cpu_time=cpu_time,
             memory_usage=memory_usage)
 
-    def inspect_vnics(self, instance):
+    def inspect_vnics(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         for vnic_metrics in self._utils.get_vnic_metrics(instance_name):
-            interface = virt_inspector.Interface(
+            yield virt_inspector.InterfaceStats(
                 name=vnic_metrics["element_name"],
                 mac=vnic_metrics["address"],
                 fref=None,
-                parameters=None)
-
-            stats = virt_inspector.InterfaceStats(
+                parameters=None,
                 rx_bytes=vnic_metrics['rx_mb'] * units.Mi,
                 rx_packets=0,
                 rx_drop=0,
@@ -123,8 +121,6 @@ class HyperVInspector(virt_inspector.Inspector):
                 tx_packets=0,
                 tx_drop=0,
                 tx_errors=0)
-
-            yield (interface, stats)
 
     def inspect_disks(self, instance):
         instance_name = util.instance_name(instance)
