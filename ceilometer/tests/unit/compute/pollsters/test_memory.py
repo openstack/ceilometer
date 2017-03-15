@@ -17,7 +17,7 @@ import mock
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
-from ceilometer.compute.pollsters import memory
+from ceilometer.compute.pollsters import instance_stats
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests.unit.compute.pollsters import base
 
@@ -26,27 +26,17 @@ class TestMemoryPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        next_value = iter((
-            virt_inspector.MemoryUsageStats(usage=1.0),
-            virt_inspector.MemoryUsageStats(usage=2.0),
-            virt_inspector.InstanceNoDataException(),
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(memory_usage=1.0),
+            virt_inspector.InstanceStats(memory_usage=2.0),
+            virt_inspector.InstanceStats(),
             virt_inspector.InstanceShutOffException(),
-        ))
-
-        def inspect_memory_usage(instance, duration):
-            value = next(next_value)
-            if isinstance(value, virt_inspector.MemoryUsageStats):
-                return value
-            else:
-                raise value
-
-        self.inspector.inspect_memory_usage = mock.Mock(
-            side_effect=inspect_memory_usage)
+        )
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryUsagePollster(self.CONF)
+        pollster = instance_stats.MemoryUsagePollster(self.CONF)
 
-        @mock.patch('ceilometer.compute.pollsters.memory.LOG')
+        @mock.patch('ceilometer.compute.pollsters.LOG')
         def _verify_memory_metering(expected_count, expected_memory_mb,
                                     expected_warnings, mylog):
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
@@ -67,14 +57,9 @@ class TestMemoryPollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
 
-        def inspect_memory_usage(instance, duration):
-            raise virt_inspector.NoDataException()
-
-        self.inspector.inspect_memory_usage = mock.Mock(
-            side_effect=inspect_memory_usage)
-
+        self._mock_inspect_instance(virt_inspector.NoDataException())
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryUsagePollster(self.CONF)
+        pollster = instance_stats.MemoryUsagePollster(self.CONF)
 
         def all_samples():
             return list(pollster.get_samples(mgr, {}, [self.instance]))
@@ -87,27 +72,17 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        next_value = iter((
-            virt_inspector.MemoryResidentStats(resident=1.0),
-            virt_inspector.MemoryResidentStats(resident=2.0),
-            virt_inspector.NoDataException(),
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(memory_resident=1.0),
+            virt_inspector.InstanceStats(memory_resident=2.0),
+            virt_inspector.InstanceStats(),
             virt_inspector.InstanceShutOffException(),
-        ))
-
-        def inspect_memory_resident(instance, duration):
-            value = next(next_value)
-            if isinstance(value, virt_inspector.MemoryResidentStats):
-                return value
-            else:
-                raise value
-
-        self.inspector.inspect_memory_resident = mock.Mock(
-            side_effect=inspect_memory_resident)
+        )
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryResidentPollster(self.CONF)
+        pollster = instance_stats.MemoryResidentPollster(self.CONF)
 
-        @mock.patch('ceilometer.compute.pollsters.memory.LOG')
+        @mock.patch('ceilometer.compute.pollsters.LOG')
         def _verify_resident_memory_metering(expected_count,
                                              expected_resident_memory_mb,
                                              expected_warnings, mylog):
@@ -132,20 +107,17 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        next_value = iter((
-            virt_inspector.MemoryBandwidthStats(total=1892352, local=1802240),
-            virt_inspector.MemoryBandwidthStats(total=1081344, local=90112),
-        ))
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(memory_bandwidth_total=1892352,
+                                         memory_bandwidth_local=1802240),
+            virt_inspector.InstanceStats(memory_bandwidth_total=1081344,
+                                         memory_bandwidth_local=90112),
+        )
 
-        def inspect_memory_bandwidth(instance, duration):
-            return next(next_value)
-
-        self.inspector.inspect_memory_bandwidth = mock.Mock(
-            side_effect=inspect_memory_bandwidth)
         mgr = manager.AgentManager(0, self.CONF)
 
         def _check_memory_bandwidth_total(expected_usage):
-            pollster = memory.MemoryBandwidthTotalPollster(self.CONF)
+            pollster = instance_stats.MemoryBandwidthTotalPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -154,7 +126,7 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_memory_bandwidth_local(expected_usage):
-            pollster = memory.MemoryBandwidthLocalPollster(self.CONF)
+            pollster = instance_stats.MemoryBandwidthLocalPollster(self.CONF)
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
@@ -167,18 +139,11 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
-
-        def inspect_memory_bandwidth(instance, duration):
-            raise virt_inspector.NoDataException()
-
-        self.inspector.inspect_memory_bandwidth = mock.Mock(
-            side_effect=inspect_memory_bandwidth)
-
+        self._mock_inspect_instance(virt_inspector.NoDataException())
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = memory.MemoryBandwidthTotalPollster(self.CONF)
+        pollster = instance_stats.MemoryBandwidthTotalPollster(self.CONF)
 
         def all_samples():
             return list(pollster.get_samples(mgr, {}, [self.instance]))
 
-        self.assertRaises(plugin_base.PollsterPermanentError,
-                          all_samples)
+        self.assertRaises(plugin_base.PollsterPermanentError, all_samples)

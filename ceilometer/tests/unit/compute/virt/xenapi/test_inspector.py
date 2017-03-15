@@ -18,7 +18,6 @@ import mock
 from oslo_config import fixture as fixture_config
 from oslotest import base
 
-from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector
 from ceilometer.tests.unit.compute.virt.xenapi import fake_XenAPI
 
@@ -59,10 +58,11 @@ class TestXenapiInspection(base.BaseTestCase):
         xenapi_inspector.get_api_session = mock.Mock(return_value=api_session)
         self.inspector = xenapi_inspector.XenapiInspector(self.CONF)
 
-    def test_inspect_cpu_util(self):
+    def test_inspect_instance(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
                          'id': 'fake_instance_id'}
-        fake_stat = virt_inspector.CPUUtilStats(util=40)
+        fake_total_mem = 134217728.0
+        fake_free_mem = 65536.0
 
         def fake_xenapi_request(method, args):
             if method == 'VM.get_by_name_label':
@@ -70,32 +70,12 @@ class TestXenapiInspection(base.BaseTestCase):
             elif method == 'VM.get_VCPUs_max':
                 return '1'
             elif method == 'VM.query_data_source':
-                return 0.4
-            else:
-                return None
-
-        session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               side_effect=fake_xenapi_request):
-            cpu_util_stat = self.inspector.inspect_cpu_util(fake_instance)
-            self.assertEqual(fake_stat, cpu_util_stat)
-
-    def test_inspect_memory_usage(self):
-        fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
-                         'id': 'fake_instance_id'}
-        fake_stat = virt_inspector.MemoryUsageStats(usage=64)
-
-        def _fake_xenapi_request(method, args):
-            fake_total_mem = 134217728.0
-            fake_free_mem = 65536.0
-
-            if method == 'VM.get_by_name_label':
-                return ['vm_ref']
-            elif method == 'VM.query_data_source':
                 if 'memory' in args:
                     return fake_total_mem
                 elif 'memory_internal_free' in args:
                     return fake_free_mem
+                elif 'cpu0' in args:
+                    return 0.4
                 else:
                     return None
             else:
@@ -103,14 +83,14 @@ class TestXenapiInspection(base.BaseTestCase):
 
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
-                               side_effect=_fake_xenapi_request):
-            memory_stat = self.inspector.inspect_memory_usage(fake_instance)
-            self.assertEqual(fake_stat, memory_stat)
+                               side_effect=fake_xenapi_request):
+            stats = self.inspector.inspect_instance(fake_instance)
+            self.assertEqual(40, stats.cpu_util)
+            self.assertEqual(64, stats.memory_usage)
 
     def test_inspect_memory_usage_without_freeMem(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
                          'id': 'fake_instance_id'}
-        fake_stat = virt_inspector.MemoryUsageStats(usage=128)
 
         def _fake_xenapi_request(method, args):
             if xenapi_inspector.api is None:
@@ -123,11 +103,15 @@ class TestXenapiInspection(base.BaseTestCase):
 
             if method == 'VM.get_by_name_label':
                 return ['vm_ref']
+            elif method == 'VM.get_VCPUs_max':
+                return '1'
             elif method == 'VM.query_data_source':
                 if 'memory' in args:
                     return fake_total_mem
                 elif 'memory_internal_free' in args:
                     raise xenapi_inspector.api.Failure(fake_details)
+                elif 'cpu0' in args:
+                    return 0.4
                 else:
                     return None
             else:
@@ -136,8 +120,8 @@ class TestXenapiInspection(base.BaseTestCase):
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
                                side_effect=_fake_xenapi_request):
-            memory_stat = self.inspector.inspect_memory_usage(fake_instance)
-            self.assertEqual(fake_stat, memory_stat)
+            stats = self.inspector.inspect_instance(fake_instance)
+            self.assertEqual(128, stats.memory_usage)
 
     def test_inspect_vnics(self):
         fake_instance = {

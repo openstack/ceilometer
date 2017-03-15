@@ -35,68 +35,42 @@ OPTS = [
 
 LOG = log.getLogger(__name__)
 
+
+# Named tuple representing instance statistics
+
+class InstanceStats(object):
+    fields = [
+        'cpu_number',              # number: number of CPUs
+        'cpu_time',                # time: cumulative CPU time
+        'cpu_util',                # util: CPU utilization in percentage
+        'cpu_l3_cache_usage',      # cachesize: Amount of CPU L3 cache used
+        'memory_usage',            # usage: Amount of memory used
+        'memory_resident',         #
+        'memory_bandwidth_total',  # total: total system bandwidth from one
+                                   #   level of cache
+        'memory_bandwidth_local',  # local: bandwidth of memory traffic for a
+                                   #   memory controller
+        'cpu_cycles',              # cpu_cycles: the number of cpu cycles one
+                                   #   instruction needs
+        'instructions',            # instructions: the count of instructions
+        'cache_references',        # cache_references: the count of cache hits
+        'cache_misses',            # cache_misses: the count of caches misses
+    ]
+
+    def __init__(self, **kwargs):
+        for k in self.fields:
+            setattr(self, k, kwargs.pop(k, None))
+        if kwargs:
+            raise AttributeError(
+                "'InstanceStats' object has no attributes '%s'" % kwargs)
+
+
 # Named tuple representing instances.
 #
 # name: the name of the instance
 # uuid: the UUID associated with the instance
 #
 Instance = collections.namedtuple('Instance', ['name', 'UUID'])
-
-
-# Named tuple representing CPU statistics.
-#
-# number: number of CPUs
-# time: cumulative CPU time
-#
-CPUStats = collections.namedtuple('CPUStats', ['number', 'time'])
-
-# Named tuple representing CPU Utilization statistics.
-#
-# util: CPU utilization in percentage
-#
-CPUUtilStats = collections.namedtuple('CPUUtilStats', ['util'])
-
-# Named tuple representing CPU L3 cache usage statistics.
-#
-# cachesize: Amount of CPU L3 cache used
-#
-CPUL3CacheUsageStats = collections.namedtuple('CPUL3CacheUsageStats',
-                                              ['l3_cache_usage'])
-
-# Named tuple representing Memory usage statistics.
-#
-# usage: Amount of memory used
-#
-MemoryUsageStats = collections.namedtuple('MemoryUsageStats', ['usage'])
-
-
-# Named tuple representing Resident Memory usage statistics.
-#
-# resident: Amount of resident memory
-#
-MemoryResidentStats = collections.namedtuple('MemoryResidentStats',
-                                             ['resident'])
-
-
-# Named tuple representing memory bandwidth statistics.
-#
-# total: total system bandwidth from one level of cache
-# local: bandwidth of memory traffic for a memory controller
-#
-MemoryBandwidthStats = collections.namedtuple('MemoryBandwidthStats',
-                                              ['total', 'local'])
-
-
-# Named tuple representing perf events statistics.
-#
-# cpu_cycles: the number of cpu cycles one instruction needs
-# instructions: the count of instructions
-# cache_references: the count of cache hits
-# cache_misses: the count of caches misses
-#
-PerfEventsStats = collections.namedtuple('PerfEventsStats',
-                                         ['cpu_cycles', 'instructions',
-                                          'cache_references', 'cache_misses'])
 
 
 # Named tuple representing vNICs.
@@ -208,10 +182,6 @@ class InstanceShutOffException(InspectorException):
     pass
 
 
-class InstanceNoDataException(InspectorException):
-    pass
-
-
 class NoDataException(InspectorException):
     pass
 
@@ -223,29 +193,13 @@ class Inspector(object):
     def __init__(self, conf):
         self.conf = conf
 
-    def inspect_cpus(self, instance):
+    def inspect_instance(self, instance, duration=None):
         """Inspect the CPU statistics for an instance.
-
-        :param instance: the target instance
-        :return: the number of CPUs and cumulative CPU time
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_cpu_util(self, instance, duration=None):
-        """Inspect the CPU Utilization (%) for an instance.
 
         :param instance: the target instance
         :param duration: the last 'n' seconds, over which the value should be
                inspected
-        :return: the percentage of CPU utilization
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_cpu_l3_cache(self, instance):
-        """Inspect the CPU L3 cache usage for an instance.
-
-        :param instance: the target instance
-        :return: the amount of cpu l3 cache used
+        :return: the instance stats
         """
         raise ceilometer.NotImplementedError
 
@@ -275,36 +229,6 @@ class Inspector(object):
         :param instance: the target instance
         :return: for each disk, the number of bytes & operations
                  read and written, and the error count
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_memory_usage(self, instance, duration=None):
-        """Inspect the memory usage statistics for an instance.
-
-        :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
-        :return: the amount of memory used
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_memory_resident(self, instance, duration=None):
-        """Inspect the resident memory statistics for an instance.
-
-        :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
-        :return: the amount of resident memory
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_memory_bandwidth(self, instance, duration=None):
-        """Inspect the memory bandwidth statistics for an instance.
-
-        :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
-        :return:
         """
         raise ceilometer.NotImplementedError
 
@@ -340,16 +264,6 @@ class Inspector(object):
 
         :param instance: the target instance
         :return: for each disk , capacity , allocation and usage
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_perf_events(self, instance, duration=None):
-        """Inspect the perf events statistics for an instance.
-
-        :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
-        :return:
         """
         raise ceilometer.NotImplementedError
 

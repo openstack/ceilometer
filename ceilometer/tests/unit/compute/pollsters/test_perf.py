@@ -16,58 +16,56 @@ import mock
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
-from ceilometer.compute.pollsters import perf
+from ceilometer.compute.pollsters import instance_stats
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests.unit.compute.pollsters import base
 
 
-class TestPerfEventsPollster(base.TestPollsterBase):
+class TestPerfPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        fake_value = virt_inspector.PerfEventsStats(cpu_cycles=7259361,
-                                                    instructions=8815623,
-                                                    cache_references=74184,
-                                                    cache_misses=16737)
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(cpu_cycles=7259361,
+                                         instructions=8815623,
+                                         cache_references=74184,
+                                         cache_misses=16737)
+        )
 
-        def inspect_perf_events(instance, duration):
-            return fake_value
-
-        self.inspector.inspect_perf_events = mock.Mock(
-            side_effect=inspect_perf_events)
         mgr = manager.AgentManager(0, self.CONF)
+        cache = {}
 
         def _check_perf_events_cpu_cycles(expected_usage):
-            pollster = perf.PerfEventsCPUCyclesPollster(self.CONF)
+            pollster = instance_stats.PerfCPUCyclesPollster(self.CONF)
 
-            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
             self.assertEqual(set(['perf.cpu.cycles']),
                              set([s.name for s in samples]))
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_instructions(expected_usage):
-            pollster = perf.PerfEventsInstructionsPollster(self.CONF)
-
-            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            pollster = instance_stats.PerfInstructionsPollster(self.CONF)
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
             self.assertEqual(set(['perf.instructions']),
                              set([s.name for s in samples]))
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_cache_references(expected_usage):
-            pollster = perf.PerfEventsCacheReferencesPollster(self.CONF)
+            pollster = instance_stats.PerfCacheReferencesPollster(
+                self.CONF)
 
-            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
             self.assertEqual(set(['perf.cache.references']),
                              set([s.name for s in samples]))
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_cache_misses(expected_usage):
-            pollster = perf.PerfEventsCacheMissesPollster(self.CONF)
+            pollster = instance_stats.PerfCacheMissesPollster(self.CONF)
 
-            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
             self.assertEqual(set(['perf.cache.misses']),
                              set([s.name for s in samples]))
@@ -80,18 +78,11 @@ class TestPerfEventsPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
-
-        def inspect_perf_events(instance, duration):
-            raise virt_inspector.NoDataException()
-
-        self.inspector.inspect_perf_events = mock.Mock(
-            side_effect=inspect_perf_events)
-
+        self._mock_inspect_instance(virt_inspector.NoDataException())
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = perf.PerfEventsCPUCyclesPollster(self.CONF)
+        pollster = instance_stats.PerfCPUCyclesPollster(self.CONF)
 
         def all_samples():
             return list(pollster.get_samples(mgr, {}, [self.instance]))
 
-        self.assertRaises(plugin_base.PollsterPermanentError,
-                          all_samples)
+        self.assertRaises(plugin_base.PollsterPermanentError, all_samples)

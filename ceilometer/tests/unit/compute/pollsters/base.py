@@ -18,6 +18,7 @@ import mock
 from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
+from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer import service
 import ceilometer.tests.base as base
 
@@ -57,3 +58,15 @@ class TestPollsterBase(base.BaseTestCase):
         self.useFixture(mockpatch.Patch(
             'ceilometer.compute.pollsters.BaseComputePollster._get_inspector',
             return_value=self.inspector))
+
+    def _mock_inspect_instance(self, *data):
+        next_value = iter(data)
+
+        def inspect(instance, duration):
+            value = next(next_value)
+            if isinstance(value, virt_inspector.InstanceStats):
+                return value
+            else:
+                raise value
+
+        self.inspector.inspect_instance = mock.Mock(side_effect=inspect)

@@ -42,27 +42,47 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         self.instance = VMInstance()
         libvirt_inspector.libvirt = mock.Mock()
+        libvirt_inspector.libvirt.getVersion.return_value = 5001001
         libvirt_inspector.libvirt.VIR_DOMAIN_SHUTOFF = 5
         libvirt_inspector.libvirt.libvirtError = FakeLibvirtError
         utils.libvirt = libvirt_inspector.libvirt
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=None):
             self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
-        self.domain = mock.Mock()
 
-    def test_inspect_cpus(self):
+    def test_inspect_instance_stats(self):
         domain = mock.Mock()
-        domain.info.return_value = (0, 0, 0, None, None)
+        domain.info.return_value = (0, 0, 0, 2, 999999)
+        domain.memoryStats.return_value = {'available': 51200,
+                                           'unused': 25600,
+                                           'rss': 30000}
         conn = mock.Mock()
         conn.lookupByUUIDString.return_value = domain
-        conn.domainListGetStats.return_value = [({}, {'cpu.time': 999999,
-                                                      'vcpu.current': 2})]
+        conn.domainListGetStats.return_value = [({}, {
+            'cpu.time': 999999,
+            'vcpu.current': 2,
+            'perf.cmt': 90112,
+            'perf.cpu_cycles': 7259361,
+            'perf.instructions': 8815623,
+            'perf.cache_references': 74184,
+            'perf.cache_misses': 16737,
+            'perf.mbmt': 1892352,
+            'perf.mbml': 1802240})]
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            cpu_info = self.inspector.inspect_cpus(self.instance)
-            self.assertEqual(2, cpu_info.number)
-            self.assertEqual(999999, cpu_info.time)
+            stats = self.inspector.inspect_instance(self.instance)
+            self.assertEqual(2, stats.cpu_number)
+            self.assertEqual(999999, stats.cpu_time)
+            self.assertEqual(90112, stats.cpu_l3_cache_usage)
+            self.assertEqual(25600 / units.Ki, stats.memory_usage)
+            self.assertEqual(30000 / units.Ki, stats.memory_resident)
+            self.assertEqual(1892352, stats.memory_bandwidth_total)
+            self.assertEqual(1802240, stats.memory_bandwidth_local)
+            self.assertEqual(7259361, stats.cpu_cycles)
+            self.assertEqual(8815623, stats.instructions)
+            self.assertEqual(74184, stats.cache_references)
+            self.assertEqual(16737, stats.cache_misses)
 
     def test_inspect_cpus_with_domain_shutoff(self):
         domain = mock.Mock()
@@ -73,20 +93,8 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             self.assertRaises(virt_inspector.InstanceShutOffException,
-                              self.inspector.inspect_cpus,
+                              self.inspector.inspect_instance,
                               self.instance)
-
-    def test_inspect_cpu_l3_cache(self):
-        domain = mock.Mock()
-        domain.info.return_value = (0, 0, 0, 2, 999999)
-        conn = mock.Mock()
-        conn.domainListGetStats.return_value = [({}, {'perf.cmt': 90112})]
-        conn.lookupByUUIDString.return_value = domain
-
-        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
-                        'refresh_libvirt_connection', return_value=conn):
-            cpu_info = self.inspector.inspect_cpu_l3_cache(self.instance)
-            self.assertEqual(90112, cpu_info.l3_cache_usage)
 
     def test_inspect_vnics(self):
         dom_xml = """
@@ -259,18 +267,6 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertRaises(virt_inspector.InstanceShutOffException,
                               list, inspect(self.instance))
 
-    def test_inspect_memory_usage(self):
-        domain = mock.Mock()
-        domain.info.return_value = (0, 0, 0, 2, 999999)
-        domain.memoryStats.return_value = {'available': 51200, 'unused': 25600}
-        conn = mock.Mock()
-        conn.lookupByUUIDString.return_value = domain
-
-        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
-                        'refresh_libvirt_connection', return_value=conn):
-            memory = self.inspector.inspect_memory_usage(self.instance)
-            self.assertEqual(25600 / units.Ki, memory.usage)
-
     def test_inspect_disk_info(self):
         dom_xml = """
              <domain type='kvm'>
@@ -368,67 +364,43 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             self.assertRaises(virt_inspector.InstanceShutOffException,
-                              self.inspector.inspect_memory_usage,
+                              self.inspector.inspect_instance,
                               self.instance)
 
-    def test_inspect_memory_usage_with_empty_stats(self):
+    def test_inspect_memory_with_empty_stats(self):
         domain = mock.Mock()
         domain.info.return_value = (0, 0, 51200, 2, 999999)
         domain.memoryStats.return_value = {}
-        conn = mock.Mock()
-        conn.lookupByUUIDString.return_value = domain
-
-        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
-                        'refresh_libvirt_connection', return_value=conn):
-            self.assertRaises(virt_inspector.InstanceNoDataException,
-                              self.inspector.inspect_memory_usage,
-                              self.instance)
-
-    def test_inspect_memory_bandwidth(self):
-        domain = mock.Mock()
-        domain.info.return_value = (0, 0, 51200, 2, 999999)
-        conn = mock.Mock()
-        conn.domainListGetStats.return_value = [
-            ({}, {'perf.mbmt': 1892352, 'perf.mbml': 1802240})]
-        conn.lookupByUUIDString.return_value = domain
-
-        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
-                        'refresh_libvirt_connection', return_value=conn):
-            mb = self.inspector.inspect_memory_bandwidth(self.instance)
-            self.assertEqual(1892352, mb.total)
-            self.assertEqual(1802240, mb.local)
-
-    def test_inspect_perf_events(self):
-        domain = mock.Mock()
-        domain.info.return_value = (0, 0, 51200, 2, 999999)
-        conn = mock.Mock()
-        conn.domainListGetStats.return_value = [
-            ({}, {'perf.cpu_cycles': 7259361,
-                  'perf.instructions': 8815623,
-                  'perf.cache_references': 74184,
-                  'perf.cache_misses': 16737})]
-        conn.lookupByUUIDString.return_value = domain
-
-        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
-                        'refresh_libvirt_connection', return_value=conn):
-            pe = self.inspector.inspect_perf_events(self.instance)
-            self.assertEqual(7259361, pe.cpu_cycles)
-            self.assertEqual(8815623, pe.instructions)
-            self.assertEqual(74184, pe.cache_references)
-            self.assertEqual(16737, pe.cache_misses)
-
-    def test_inspect_perf_events_libvirt_less_than_2_3_0(self):
-        domain = mock.Mock()
-        domain.info.return_value = (0, 0, 51200, 2, 999999)
         conn = mock.Mock()
         conn.domainListGetStats.return_value = [({}, {})]
         conn.lookupByUUIDString.return_value = domain
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            self.assertRaises(virt_inspector.NoDataException,
-                              self.inspector.inspect_perf_events,
-                              self.instance)
+            stats = self.inspector.inspect_instance(self.instance)
+            self.assertIsNone(stats.memory_usage)
+            self.assertIsNone(stats.memory_resident)
+
+    def test_inspect_perf_events_libvirt_less_than_2_3_0(self):
+        domain = mock.Mock()
+        domain.info.return_value = (0, 0, 51200, 2, 999999)
+        domain.memoryStats.return_value = {'rss': 0,
+                                           'available': 51200,
+                                           'unused': 25600}
+        conn = mock.Mock()
+        conn.domainListGetStats.return_value = [({}, {})]
+        conn.lookupByUUIDString.return_value = domain
+
+        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
+                        'refresh_libvirt_connection', return_value=conn):
+            stats = self.inspector.inspect_instance(self.instance)
+            self.assertIsNone(stats.cpu_l3_cache_usage)
+            self.assertIsNone(stats.memory_bandwidth_total)
+            self.assertIsNone(stats.memory_bandwidth_local)
+            self.assertIsNone(stats.cpu_cycles)
+            self.assertIsNone(stats.instructions)
+            self.assertIsNone(stats.cache_references)
+            self.assertIsNone(stats.cache_misses)
 
 
 class TestLibvirtInspectionWithError(base.BaseTestCase):
@@ -447,4 +419,4 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
 
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,
-                          self.inspector.inspect_cpus, 'foo')
+                          self.inspector.inspect_instance, 'foo')

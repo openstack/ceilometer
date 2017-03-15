@@ -91,22 +91,19 @@ class HyperVInspector(virt_inspector.Inspector):
 
         return float(host_cpu_clock * host_cpu_count)
 
-    def inspect_cpus(self, instance):
+    def inspect_instance(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         (cpu_clock_used,
          cpu_count, uptime) = self._utils.get_cpu_metrics(instance_name)
-
         cpu_percent_used = cpu_clock_used / self._host_max_cpu_clock
-
         # Nanoseconds
         cpu_time = (int(uptime * cpu_percent_used) * units.k)
+        memory_usage = self._utils.get_memory_metrics(instance_name)
 
-        return virt_inspector.CPUStats(number=cpu_count, time=cpu_time)
-
-    def inspect_memory_usage(self, instance, duration=None):
-        instance_name = util.instance_name(instance)
-        usage = self._utils.get_memory_metrics(instance_name)
-        return virt_inspector.MemoryUsageStats(usage=usage)
+        return virt_inspector.InstanceStats(
+            cpu_number=cpu_count,
+            cpu_time=cpu_time,
+            memory_usage=memory_usage)
 
     def inspect_vnics(self, instance):
         instance_name = util.instance_name(instance)

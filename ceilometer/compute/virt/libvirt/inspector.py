@@ -61,26 +61,6 @@ class LibvirtInspector(virt_inspector.Inspector):
         except Exception as ex:
             raise virt_inspector.InspectorException(six.text_type(ex))
 
-    @libvirt_utils.retry_on_disconnect
-    def inspect_cpus(self, instance):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
-        # TODO(gordc): this can probably be cached since it can be used to get
-        # all data related
-        stats = self.connection.domainListGetStats([domain])
-        dom_stat = stats[0][1]
-        return virt_inspector.CPUStats(number=dom_stat['vcpu.current'],
-                                       time=dom_stat['cpu.time'])
-
-    @libvirt_utils.raise_nodata_if_unsupported("l3 cache usage")
-    @libvirt_utils.retry_on_disconnect
-    def inspect_cpu_l3_cache(self, instance):
-        domain = self._lookup_by_uuid(instance)
-        stats = self.connection.domainListGetStats(
-            [domain], libvirt.VIR_DOMAIN_STATS_PERF)
-        perf = stats[0][1]
-        usage = perf["perf.cmt"]
-        return virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=usage)
-
     def _get_domain_not_shut_off_or_raise(self, instance):
         instance_name = util.instance_name(instance)
         domain = self._lookup_by_uuid(instance)
@@ -148,18 +128,6 @@ class LibvirtInspector(virt_inspector.Inspector):
                                              errors=block_stats[4])
             yield (disk, stats)
 
-    @libvirt_utils.raise_nodata_if_unsupported("memory usge", False)
-    @libvirt_utils.retry_on_disconnect
-    def inspect_memory_usage(self, instance, duration=None):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
-
-        memory_stats = domain.memoryStats()
-        memory_used = (memory_stats['available'] -
-                       memory_stats['unused'])
-        # Stat provided from libvirt is in KB, converting it to MB.
-        memory_used = memory_used / units.Ki
-        return virt_inspector.MemoryUsageStats(usage=memory_used)
-
     @libvirt_utils.retry_on_disconnect
     def inspect_disk_info(self, instance):
         domain = self._get_domain_not_shut_off_or_raise(instance)
@@ -188,32 +156,34 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                    physical=block_info[2])
                     yield (dsk, info)
 
+    @libvirt_utils.raise_nodata_if_unsupported
     @libvirt_utils.retry_on_disconnect
-    def inspect_memory_resident(self, instance, duration=None):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
-        memory = domain.memoryStats()['rss'] / units.Ki
-        return virt_inspector.MemoryResidentStats(resident=memory)
-
-    @libvirt_utils.raise_nodata_if_unsupported("memory bandwidth")
-    @libvirt_utils.retry_on_disconnect
-    def inspect_memory_bandwidth(self, instance, duration=None):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
-        stats = self.connection.domainListGetStats(
-            [domain], libvirt.VIR_DOMAIN_STATS_PERF)
-        perf = stats[0][1]
-        return virt_inspector.MemoryBandwidthStats(total=perf["perf.mbmt"],
-                                                   local=perf["perf.mbml"])
-
-    @libvirt_utils.raise_nodata_if_unsupported("perf events")
-    @libvirt_utils.retry_on_disconnect
-    def inspect_perf_events(self, instance, duration=None):
+    def inspect_instance(self, instance,  duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
-        stats = self.connection.domainListGetStats(
-            [domain], libvirt.VIR_DOMAIN_STATS_PERF)
-        perf = stats[0][1]
-        return virt_inspector.PerfEventsStats(
-            cpu_cycles=perf["perf.cpu_cycles"],
-            instructions=perf["perf.instructions"],
-            cache_references=perf["perf.cache_references"],
-            cache_misses=perf["perf.cache_misses"])
+        memory_used = memory_resident = None
+        memory_stats = domain.memoryStats()
+        # Stat provided from libvirt is in KB, converting it to MB.
+        if 'available' in memory_stats and 'unused' in memory_stats:
+            memory_used = (memory_stats['available'] -
+                           memory_stats['unused']) / units.Ki
+        if 'rss' in memory_stats:
+            memory_resident = memory_stats['rss'] / units.Ki
+
+        # TODO(sileht): stats also have the disk/vnic info
+        # we could use that instead of the old method for Queen
+        stats = self.connection.domainListGetStats([domain], 0)[0][1]
+
+        return virt_inspector.InstanceStats(
+            cpu_number=stats.get('vcpu.current'),
+            cpu_time=stats.get('cpu.time'),
+            memory_usage=memory_used,
+            memory_resident=memory_resident,
+            cpu_cycles=stats.get("perf.cpu_cycles"),
+            instructions=stats.get("perf.instructions"),
+            cache_references=stats.get("perf.cache_references"),
+            cache_misses=stats.get("perf.cache_misses"),
+            memory_bandwidth_total=stats.get("perf.mbmt"),
+            memory_bandwidth_local=stats.get("perf.mbml"),
+            cpu_l3_cache_usage=stats.get("perf.cmt"),
+        )
