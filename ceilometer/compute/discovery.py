@@ -80,11 +80,15 @@ LOG = log.getLogger(__name__)
 
 class NovaLikeServer(object):
     def __init__(self, **kwargs):
+        self.id = kwargs.pop('id')
         for k, v in kwargs.items():
             setattr(self, k, v)
 
     def __repr__(self):
         return '<NovaLikeServer: %s>' % getattr(self, 'name', 'unknown-name')
+
+    def __eq__(self, other):
+        return self.id == other.id
 
 
 class InstanceDiscovery(plugin_base.DiscoveryBase):
