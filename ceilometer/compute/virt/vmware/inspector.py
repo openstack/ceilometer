@@ -172,15 +172,14 @@ class VsphereInspector(virt_inspector.Inspector):
             def stat_val(counter_name):
                 return disk_stats[counter_name].get(disk_id, 0)
 
-            disk = virt_inspector.Disk(device=disk_id)
             # Stats provided from vSphere are in KB/s, converting it to B/s.
-            disk_rate_info = virt_inspector.DiskRateStats(
+            yield virt_inspector.DiskRateStats(
+                device=disk_id,
                 read_bytes_rate=stat_val(VC_DISK_READ_RATE_CNTR) * units.Ki,
                 read_requests_rate=stat_val(VC_DISK_READ_REQUESTS_RATE_CNTR),
                 write_bytes_rate=stat_val(VC_DISK_WRITE_RATE_CNTR) * units.Ki,
                 write_requests_rate=stat_val(VC_DISK_WRITE_REQUESTS_RATE_CNTR)
             )
-            yield(disk, disk_rate_info)
 
     def inspect_instance(self, instance, duration=None):
         vm_mobj = self._get_vm_mobj_not_power_off_or_raise(instance)

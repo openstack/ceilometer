@@ -56,7 +56,8 @@ class TestPollsterBase(base.BaseTestCase):
         # need to mock all this class property to avoid context sharing between
         # the tests
         self.useFixture(mockpatch.Patch(
-            'ceilometer.compute.pollsters.BaseComputePollster._get_inspector',
+            'ceilometer.compute.pollsters.'
+            'GenericComputePollster._get_inspector',
             return_value=self.inspector))
 
     def _mock_inspect_instance(self, *data):

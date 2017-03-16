@@ -112,7 +112,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                 tx_errors=dom_stats[7])
 
     @libvirt_utils.retry_on_disconnect
-    def inspect_disks(self, instance):
+    def inspect_disks(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
         tree = etree.fromstring(domain.XMLDesc(0))
@@ -120,17 +120,16 @@ class LibvirtInspector(virt_inspector.Inspector):
                 bool,
                 [target.get("dev")
                  for target in tree.findall('devices/disk/target')]):
-            disk = virt_inspector.Disk(device=device)
             block_stats = domain.blockStats(device)
-            stats = virt_inspector.DiskStats(read_requests=block_stats[0],
-                                             read_bytes=block_stats[1],
-                                             write_requests=block_stats[2],
-                                             write_bytes=block_stats[3],
-                                             errors=block_stats[4])
-            yield (disk, stats)
+            yield virt_inspector.DiskStats(device=device,
+                                           read_requests=block_stats[0],
+                                           read_bytes=block_stats[1],
+                                           write_requests=block_stats[2],
+                                           write_bytes=block_stats[3],
+                                           errors=block_stats[4])
 
     @libvirt_utils.retry_on_disconnect
-    def inspect_disk_info(self, instance):
+    def inspect_disk_info(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         tree = etree.fromstring(domain.XMLDesc(0))
         for disk in tree.findall('devices/disk'):
@@ -150,12 +149,11 @@ class LibvirtInspector(virt_inspector.Inspector):
                 target = disk.find('target')
                 device = target.get('dev')
                 if device:
-                    dsk = virt_inspector.Disk(device=device)
                     block_info = domain.blockInfo(device)
-                    info = virt_inspector.DiskInfo(capacity=block_info[0],
-                                                   allocation=block_info[1],
-                                                   physical=block_info[2])
-                    yield (dsk, info)
+                    yield virt_inspector.DiskInfo(device=device,
+                                                  capacity=block_info[0],
+                                                  allocation=block_info[1],
+                                                  physical=block_info[2])
 
     @libvirt_utils.raise_nodata_if_unsupported
     @libvirt_utils.retry_on_disconnect

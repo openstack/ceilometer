@@ -248,12 +248,11 @@ class TestLibvirtInspection(base.BaseTestCase):
             disks = list(self.inspector.inspect_disks(self.instance))
 
             self.assertEqual(1, len(disks))
-            disk0, info0 = disks[0]
-            self.assertEqual('vda', disk0.device)
-            self.assertEqual(1, info0.read_requests)
-            self.assertEqual(2, info0.read_bytes)
-            self.assertEqual(3, info0.write_requests)
-            self.assertEqual(4, info0.write_bytes)
+            self.assertEqual('vda', disks[0].device)
+            self.assertEqual(1, disks[0].read_requests)
+            self.assertEqual(2, disks[0].read_bytes)
+            self.assertEqual(3, disks[0].write_requests)
+            self.assertEqual(4, disks[0].write_bytes)
 
     def test_inspect_disks_with_domain_shutoff(self):
         domain = mock.Mock()
@@ -294,11 +293,10 @@ class TestLibvirtInspection(base.BaseTestCase):
             disks = list(self.inspector.inspect_disk_info(self.instance))
 
             self.assertEqual(1, len(disks))
-            disk0, info0 = disks[0]
-            self.assertEqual('vda', disk0.device)
-            self.assertEqual(1, info0.capacity)
-            self.assertEqual(2, info0.allocation)
-            self.assertEqual(3, info0.physical)
+            self.assertEqual('vda', disks[0].device)
+            self.assertEqual(1, disks[0].capacity)
+            self.assertEqual(2, disks[0].allocation)
+            self.assertEqual(3, disks[0].physical)
 
     def test_inspect_disk_info_network_type(self):
         dom_xml = """

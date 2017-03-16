@@ -185,9 +185,9 @@ class TestVsphereInspection(base.BaseTestCase):
 
         # validate result
         expected_stats = {
-            disk1: virt_inspector.DiskRateStats(1024, 300, 5120, 700),
-            disk2: virt_inspector.DiskRateStats(2048, 400, 6144, 0)
+            disk1: virt_inspector.DiskRateStats(disk1, 1024, 300, 5120, 700),
+            disk2: virt_inspector.DiskRateStats(disk2, 2048, 400, 6144, 0)
         }
 
-        actual_stats = dict((disk.device, rates) for (disk, rates) in result)
+        actual_stats = dict((stats.device, stats) for stats in result)
         self.assertEqual(expected_stats, actual_stats)

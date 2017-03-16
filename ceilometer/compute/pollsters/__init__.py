@@ -12,12 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import abc
 import collections
 
 from oslo_log import log
 from oslo_utils import timeutils
-import six
 
 import ceilometer
 from ceilometer.agent import plugin_base
@@ -29,12 +27,32 @@ from ceilometer import sample
 LOG = log.getLogger(__name__)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BaseComputePollster(plugin_base.PollsterBase):
+class NoVolumeException(Exception):
+    pass
+
+
+class GenericComputePollster(plugin_base.PollsterBase):
+    """This class aims to cache instance statistics data
+
+    First polled pollsters that inherit of this will retrieve and cache
+    stats of an instance, then other pollsters will just build the samples
+    without queyring the backend anymore.
+    """
+
+    sample_name = None
+    sample_unit = ''
+    sample_type = sample.TYPE_GAUGE
+    sample_stats_key = None
+    inspector_method = None
 
     def setup_environment(self):
-        super(BaseComputePollster, self).setup_environment()
+        super(GenericComputePollster, self).setup_environment()
         self.inspector = self._get_inspector(self.conf)
+
+    @staticmethod
+    def aggregate_method(stats):
+        # Don't aggregate anything by default
+        return stats
 
     @classmethod
     def _get_inspector(cls, conf):
@@ -50,27 +68,6 @@ class BaseComputePollster(plugin_base.PollsterBase):
     def default_discovery(self):
         return 'local_instances'
 
-    @staticmethod
-    def _populate_cache_create(_i_cache, _instance, _inspector,
-                               _DiskData, _inspector_attr, _stats_attr):
-        """Settings and return cache."""
-        if _instance.id not in _i_cache:
-            _data = 0
-            _per_device_data = {}
-            disk_rates = getattr(_inspector, _inspector_attr)(_instance)
-            for disk, stats in disk_rates:
-                _data += getattr(stats, _stats_attr)
-                _per_device_data[disk.device] = (
-                    getattr(stats, _stats_attr))
-            _per_disk_data = {
-                _stats_attr: _per_device_data
-            }
-            _i_cache[_instance.id] = _DiskData(
-                _data,
-                _per_disk_data
-            )
-        return _i_cache[_instance.id]
-
     def _record_poll_time(self):
         """Method records current time as the poll time.
 
@@ -83,41 +80,6 @@ class BaseComputePollster(plugin_base.PollsterBase):
                                                current_time)
         self._last_poll_time = current_time
         return duration
-
-    def _get_samples_per_devices(self, attribute, instance, _name, _type,
-                                 _unit):
-        samples = []
-        for disk, value in six.iteritems(attribute):
-            samples.append(util.make_sample_from_instance(
-                self.conf,
-                instance,
-                name=_name,
-                type=_type,
-                unit=_unit,
-                volume=value,
-                resource_id="%s-%s" % (instance.id, disk),
-                additional_metadata={'disk_name': disk},
-            ))
-        return samples
-
-
-class NoVolumeException(Exception):
-    pass
-
-
-class GenericComputePollster(BaseComputePollster):
-    """This class aims to cache instance statistics data
-
-    First polled pollsters that inherit of this will retrieve and cache
-    stats of an instance, then other pollsters will just build the samples
-    without querying the backend anymore.
-    """
-
-    sample_name = None
-    sample_unit = ''
-    sample_type = sample.TYPE_GAUGE
-    sample_stats_key = None
-    inspector_method = None
 
     @staticmethod
     def get_additional_metadata(instance, stats):
@@ -168,11 +130,13 @@ class GenericComputePollster(BaseComputePollster):
             try:
                 result = self._inspect_cached(cache, instance,
                                               self._inspection_duration)
-                if isinstance(result, collections.Iterable):
-                    for stats in result:
-                        yield self._stats_to_sample(instance, stats)
-                else:
-                    yield self._stats_to_sample(instance, result)
+                if not result:
+                    continue
+
+                if not isinstance(result, collections.Iterable):
+                    result = [result]
+                for stats in self.aggregate_method(result):
+                    yield self._stats_to_sample(instance, stats)
             except NoVolumeException:
                 # FIXME(sileht): This should be a removed... but I will
                 # not change the test logic for now

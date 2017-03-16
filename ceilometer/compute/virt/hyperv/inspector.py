@@ -122,11 +122,11 @@ class HyperVInspector(virt_inspector.Inspector):
                 tx_drop=0,
                 tx_errors=0)
 
-    def inspect_disks(self, instance):
+    def inspect_disks(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         for disk_metrics in self._utils.get_disk_metrics(instance_name):
-            disk = virt_inspector.Disk(device=disk_metrics['instance_id'])
-            stats = virt_inspector.DiskStats(
+            yield virt_inspector.DiskStats(
+                device=disk_metrics['instance_id'],
                 read_requests=0,
                 # Return bytes
                 read_bytes=disk_metrics['read_mb'] * units.Mi,
@@ -134,23 +134,17 @@ class HyperVInspector(virt_inspector.Inspector):
                 write_bytes=disk_metrics['write_mb'] * units.Mi,
                 errors=0)
 
-            yield (disk, stats)
-
-    def inspect_disk_latency(self, instance):
+    def inspect_disk_latency(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         for disk_metrics in self._utils.get_disk_latency_metrics(
                 instance_name):
-            disk = virt_inspector.Disk(device=disk_metrics['instance_id'])
-            stats = virt_inspector.DiskLatencyStats(
-                disk_latency=disk_metrics['disk_latency'])
+            yield virt_inspector.DiskLatencyStats(
+                device=disk_metrics['instance_id'],
+                disk_latency=disk_metrics['disk_latency'] / 1000)
 
-            yield (disk, stats)
-
-    def inspect_disk_iops(self, instance):
+    def inspect_disk_iops(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         for disk_metrics in self._utils.get_disk_iops_count(instance_name):
-            disk = virt_inspector.Disk(device=disk_metrics['instance_id'])
-            stats = virt_inspector.DiskIOPSStats(
+            yield virt_inspector.DiskIOPSStats(
+                device=disk_metrics['instance_id'],
                 iops_count=disk_metrics['iops_count'])
-
-            yield (disk, stats)
