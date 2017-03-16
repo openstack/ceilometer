@@ -324,18 +324,9 @@ class TestRealNotificationHA(BaseRealNotification):
         self.srv.run()
         self.addCleanup(self.srv.terminate)
 
-        def _check_listener_targets():
-            args, kwargs = mock_listener.call_args
-            self.assertEqual(20, len(args[1]))
-            self.assertIsInstance(args[1][0], oslo_messaging.Target)
-
-        _check_listener_targets()
-
         listener = self.srv.pipeline_listener
         self.srv._configure_pipeline_listener()
         self.assertIsNot(listener, self.srv.pipeline_listener)
-
-        _check_listener_targets()
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_retain_common_targets_on_refresh(self, mock_listener):
