@@ -12,18 +12,18 @@
 # Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 8.0.2.dev3\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2017-03-16 21:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-07 03:44+0000\n"
-"Last-Translator: SeYeon Lee <sy_lee@kr.ibm.com>\n"
+"PO-Revision-Date: 2016-04-12 04:27+0000\n"
+"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
 "Language: ko-KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.7.3\n"
+"X-Generator: Zanata 3.9.6\n"
 "Language-Team: Korean (South Korea)\n"
 
 #, python-format
@@ -35,36 +35,8 @@ msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "'%s' 표현식에서 산술 변환기는 하나 이상의 미터를 사용해야 함"
 
 #, python-format
-msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
-msgstr "%(table_name)s 테이블을 작성할 수 없음, 이미 존재합니다. 오류 무시"
-
-#, python-format
-msgid "Continue after error from %(name)s: %(error)s"
-msgstr "%(name)s에서 오류 후 계속: %(error)s"
-
-#, python-format
-msgid "Could not connect slave host: %s "
-msgstr "슬레이브 호스트를 연결할 수 없음: %s "
-
-#, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "XenAPI를 연결할 수 없음: %s"
-
-#, python-format
-msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr "%(id)s에 대해 CPU Util을 가져올 수 없음: %(e)s"
-
-#, python-format
-msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr "%(id)s에 대한 메모리 사용을 가져올 수 없음: %(e)s"
-
-#, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "VM %s CPU 이용률을 가져올 수 없음"
-
-#, python-format
-msgid "Couldn't obtain IP address of instance %s"
-msgstr "%s 인스턴스의 IP 주소를 얻을 수 없음"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -78,22 +50,8 @@ msgstr ""
 "인스턴스 <name=%(name)s, id=%(id)s> 검색 중 libvirt에서 오류 발생: [오류 코"
 "드 %(error_code)s] %(ex)s"
 
-#, python-format
-msgid "Error parsing HTTP response: %s"
-msgstr "HTTP 응답 구문 분석 중 오류 발생: %s"
-
-msgid "Error stopping pollster."
-msgstr "의견조사자를 중지하는 중에 오류가 발생했습니다. "
-
-msgid "Event"
-msgstr "이벤트"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "표현식이 NaN 값으로 평가되었습니다!"
-
-#, python-format
-msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr "%(name)s 확장자를 가져오는 데 실패함: %(error)s"
 
 #, python-format
 msgid ""
@@ -144,18 +102,6 @@ msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "인스턴스 %(name)s (%(instance_id)s) 무시 중: %(error)s"
 
 #, python-format
-msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "인스턴스 %(name)s 무시 중: %(error)s"
-
-#, python-format
-msgid "Ignoring loadbalancer %(loadbalancer_id)s"
-msgstr "로드 밸런서 %(loadbalancer_id)s 무시"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s"
-msgstr "풀 %(pool_id)s 무시"
-
-#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -173,10 +119,6 @@ msgstr "특성 %(trait)s에 대한 올바르지 않은 특성 유형 '%(type)s'"
 
 msgid "Limit must be positive"
 msgstr "제한 값은 양수여야 합니다."
-
-#, python-format
-msgid "More than one event with id %s returned from storage driver"
-msgstr "ID가 %s인 둘 이상의 이벤트가 스토리지 드라이버에서 리턴됨"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -205,22 +147,6 @@ msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail API가 %(status)s 리턴: %(reason)s"
 
 #, python-format
-msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr ""
-"연산자 %(operator)s이(가) 지원되지 않습니다. 필드 %(field)s에는 등호 연산자"
-"만 사용할 수 있습니다."
-
-#, python-format
-msgid ""
-"Operator %(operator)s is not supported. The supported operators are: "
-"%(supported)s"
-msgstr ""
-"연산자 %(operator)s이(가) 지원되지 않습니다. 지원되는 연산자는 %(supported)s"
-"입니다. "
-
-#, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "Order-by 표현식이 올바르지 않음: %s"
 
@@ -232,24 +158,6 @@ msgstr ""
 
 msgid "Period must be positive."
 msgstr "기간은 양수여야 합니다. "
-
-#, python-format
-msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
-msgstr "파이프라인 %(pipeline)s: 공개자 %(pub)s에서 오류 후 %(status)s"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "파이프라인 %(pipeline)s: 공개자 %(pub)s에서 오류 후 계속"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr "파이프라인 %(pipeline)s: 변환기 %(trans)s을(를) 비우는 중 오류 발생"
-
-#, python-format
-msgid ""
-"Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
-"%(smp)s"
-msgstr "파이프라인 %(pipeline)s: %(smp)s의 변환기 %(trans)s에서 오류 후 종료"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -268,11 +176,6 @@ msgid "Pollster for %s is disabled!"
 msgstr "%s의 의견조사자가 사용 안함으로 설정되어 있습니다!"
 
 #, python-format
-msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
-msgstr ""
-"의견조사자 %(name)s이(가) 소스 %(source)s를 더 이상 폴링하지 않도록 하십시오!"
-
-#, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr "공개자 최대 local_queue 길이가 초과됨. %d 가장 오래된 샘플 삭제 중"
@@ -284,9 +187,6 @@ msgstr "공개 정책을 알 수 없음(%s). 기본값으로 강제 설정함"
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API가 %(status)s %(reason)s을(를) 리턴함"
-
-msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
-msgstr "요청이 NorthBound REST API로 OpenDaylight에 연결하는 데 실패함"
 
 #, python-format
 msgid "Required field %s not specified"
@@ -302,19 +202,6 @@ msgid "Samples should be included in request body"
 msgstr "샘플이 요청 본문에 포함되어야 함"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "%s 확장자 로드 건너뛰기"
-
-#, python-format
-msgid "String %s is not a valid isotime"
-msgstr "문자열 %s이(가) 올바른 등시간이 아님"
-
-msgid ""
-"The Yaml file that defines mapping between samples and gnocchi resources/"
-"metrics"
-msgstr "샘플과 gnocchi resources/ 메트릭 간 맵핑을 정의하는 Yaml 파일"
-
-#, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
@@ -325,9 +212,6 @@ msgstr ""
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s에 'fields' 필드 필요"
-
-msgid "The path for the file publisher is required"
-msgstr "파일 공개자의 경로가 필요함"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -346,28 +230,8 @@ msgid ""
 msgstr "%(value)s 값을 예상 데이터 유형 %(type)s(으)로 변환할 수 없습니다."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "자원을 검색할 수 없음: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "%(expr)s 표현식을 평가할 수 없음: %(exc)s"
-
-#, python-format
-msgid "Unable to load publisher %s"
-msgstr "공개자 %s을(를) 로드할 수 없음"
-
-#, python-format
-msgid "Unable to load the hypervisor inspector: %s"
-msgstr "하이퍼바이저 검사기를 로드할 수 없음: %s"
-
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
-"up."
-msgstr ""
-"%(retries)d회 재시도한 이후에는 1차 mongodb에 다시 연결할 수 없습니다. 포기하"
-"는 중입니다."
 
 #, python-format
 msgid ""
@@ -386,10 +250,6 @@ msgid ""
 msgstr ""
 "%(value)s을(를) 예상된 데이터 유형으로 변환하는 중에 예상치 않은 예외 발생 "
 "%(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "알 수 없는 검색 확장자: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
@@ -452,10 +312,6 @@ msgstr ""
 "Aodh를 사용하지 않게 설정하거나 사용할 수 없는 경우 경보 URL을 사용할 수 없습"
 "니다."
 
-#, python-format
-msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "%(id)s의 CPU 시간을 가져올 수 없음: %(e)s"
-
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "Gnocchi를 사용할 때 직접 옵션은 true일 수 없습니다."
 
@@ -469,9 +325,6 @@ msgstr "선행 작업이 없는 샘플 삭제: %s"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 출력 길이 불일치"
-
-msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes 및 backup_count는 숫자여야 합니다."
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""

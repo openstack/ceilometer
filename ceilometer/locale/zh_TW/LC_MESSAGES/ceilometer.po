@@ -8,9 +8,9 @@
 # Jennifer <cristxu@tw.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 8.0.2.dev3\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2017-03-16 21:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Language: zh-TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.7.3\n"
+"X-Generator: Zanata 3.9.6\n"
 "Language-Team: Chinese (Taiwan)\n"
 
 #, python-format
@@ -31,36 +31,8 @@ msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "在表示式 '%s' 中，算術轉換器必須至少使用一種計量"
 
 #, python-format
-msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
-msgstr "無法建立表格 %(table_name)s，該表格已經存在。將忽略錯誤"
-
-#, python-format
-msgid "Continue after error from %(name)s: %(error)s"
-msgstr "在 %(name)s 傳回錯誤 %(error)s 後繼續"
-
-#, python-format
-msgid "Could not connect slave host: %s "
-msgstr "無法連接附屬主機：%s"
-
-#, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "無法連接 XenAPI：%s"
-
-#, python-format
-msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr "無法取得 %(id)s 的 CPU 使用率：%(e)s"
-
-#, python-format
-msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr "無法取得 %(id)s 的記憶體用量：%(e)s"
-
-#, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "無法取得 VM %s CPU 使用率"
-
-#, python-format
-msgid "Couldn't obtain IP address of instance %s"
-msgstr "無法取得實例 %s 的 IP 位址"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -74,22 +46,8 @@ msgstr ""
 "查閱實例 <名稱=%(name)s，ID=%(id)s> 時，libvirt 中發生錯誤：[錯誤碼 "
 "%(error_code)s] %(ex)s"
 
-#, python-format
-msgid "Error parsing HTTP response: %s"
-msgstr "剖析 HTTP 回應時發生錯誤：%s"
-
-msgid "Error stopping pollster."
-msgstr "停止 pollster 時發生錯誤。"
-
-msgid "Event"
-msgstr "事件"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "表示式已求值為非數字值！"
-
-#, python-format
-msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr "無法匯入 %(name)s 的延伸：%(error)s"
 
 #, python-format
 msgid ""
@@ -137,18 +95,6 @@ msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "正在忽略實例 %(name)s (%(instance_id)s)：%(error)s"
 
 #, python-format
-msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "正在忽略實例 %(name)s：%(error)s"
-
-#, python-format
-msgid "Ignoring loadbalancer %(loadbalancer_id)s"
-msgstr "正在忽略負載平衡器 %(loadbalancer_id)s"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s"
-msgstr "正在忽略儲存區 %(pool_id)s"
-
-#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -164,10 +110,6 @@ msgstr "特徵 %(trait)s 的特徵類型 '%(type)s' 無效"
 
 msgid "Limit must be positive"
 msgstr "限制值必須是正數"
-
-#, python-format
-msgid "More than one event with id %s returned from storage driver"
-msgstr "從儲存體驅動程式傳回了多個 ID 為 %s 的事件"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -196,18 +138,6 @@ msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail API 傳回了 %(status)s %(reason)s"
 
 #, python-format
-msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr "運算子 %(operator)s 不受支援。只有等式運算子才可供欄位 %(field)s 使用"
-
-#, python-format
-msgid ""
-"Operator %(operator)s is not supported. The supported operators are: "
-"%(supported)s"
-msgstr "運算子 %(operator)s 不受支援。受支援的運算子為：%(supported)s"
-
-#, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "排序方式表示式無效：%s"
 
@@ -218,24 +148,6 @@ msgstr "%(name)s 的 JSONPath 規格 '%(jsonpath)s' 中發生剖析錯誤：%(er
 
 msgid "Period must be positive."
 msgstr "期間必須是正數。"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
-msgstr "管線 %(pipeline)s：在發佈者 %(pub)s 傳回錯誤後處於%(status)s狀態"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "管線 %(pipeline)s：在發佈者 %(pub)s 傳回錯誤後繼續"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr "管線 %(pipeline)s：清除轉換器 %(trans)s 時發生錯誤"
-
-#, python-format
-msgid ""
-"Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
-"%(smp)s"
-msgstr "管線 %(pipeline)s：%(smp)s 的轉換器 %(trans)s傳回錯誤後結束"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -254,10 +166,6 @@ msgid "Pollster for %s is disabled!"
 msgstr "已停用 %s 的 Pollster！"
 
 #, python-format
-msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
-msgstr "阻止 pollster %(name)s 再次輪詢資源 %(source)s！"
-
-#, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr "已超出發佈者 local_queue 長度上限，正在捨棄 %d 個最舊的樣本"
@@ -269,9 +177,6 @@ msgstr "發佈原則不明 (%s)，強制設為預設值"
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API 傳回了 %(status)s %(reason)s"
-
-msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
-msgstr "要求無法使用 NorthBound REST API 來連接至 OpenDaylight"
 
 #, python-format
 msgid "Required field %s not specified"
@@ -287,19 +192,6 @@ msgid "Samples should be included in request body"
 msgstr "要求內文中應該包括範例"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "跳過載入 %s 的延伸"
-
-#, python-format
-msgid "String %s is not a valid isotime"
-msgstr "字串 %s 不是有效的 ISO 時間"
-
-msgid ""
-"The Yaml file that defines mapping between samples and gnocchi resources/"
-"metrics"
-msgstr "用來在範例與 gnocchi 資源/度量之間定義對映的Yaml 檔案"
-
-#, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
@@ -308,9 +200,6 @@ msgstr "不支援資料類型 %(type)s。支援的資料類型清單為：%(supp
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s 需要欄位「欄位」"
-
-msgid "The path for the file publisher is required"
-msgstr "需要檔案發佈者的路徑"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -329,26 +218,8 @@ msgid ""
 msgstr "無法將值 %(value)s 轉換成預期的資料類型 %(type)s。"
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "無法探索資源：%s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "無法對表示式 %(expr)s 進行求值：%(exc)s"
-
-#, python-format
-msgid "Unable to load publisher %s"
-msgstr "無法載入發佈者 %s"
-
-#, python-format
-msgid "Unable to load the hypervisor inspector: %s"
-msgstr "無法載入 Hypervisor 檢查程式：%s"
-
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
-"up."
-msgstr "在 %(retries)d 次重試之後仍無法重新連接至主要 MongoDB。正在放棄。"
 
 #, python-format
 msgid ""
@@ -365,10 +236,6 @@ msgstr "無法透過 UDP 來傳送樣本"
 msgid ""
 "Unexpected exception converting %(value)s to the expected data type %(type)s."
 msgstr "將 %(value)s 轉換為預期的資料類型%(type)s 時發生非預期的異常狀況。"
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "不明的探索延伸：%s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
@@ -424,10 +291,6 @@ msgstr "讀取定義檔 %(file)s 時發生 YAML 錯誤"
 msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
 msgstr "當已停用或無法使用 Aodh 時，無法使用警示 URL"
 
-#, python-format
-msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "無法取得 %(id)s 的 CPU 時間：%(e)s"
-
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "已啟用 Gnocchi 時，直接選項不能為 true。"
 
@@ -441,9 +304,6 @@ msgstr "正在捨棄不含前一版本的樣本：%s"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 輸出長度不符"
-
-msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes 及 backup_count 應該是數字。"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr "剖析 IPMI 感應器資料失敗，未從給定的輸入擷取任何資料"

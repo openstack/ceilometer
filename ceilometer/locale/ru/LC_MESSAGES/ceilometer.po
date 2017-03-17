@@ -6,20 +6,20 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 8.0.2.dev3\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2017-03-16 21:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-03-10 08:01+0000\n"
-"Last-Translator: Grigory Mokhin <mokhin@gmail.com>\n"
+"PO-Revision-Date: 2016-04-12 04:26+0000\n"
+"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.7.3\n"
+"X-Generator: Zanata 3.9.6\n"
 "Language-Team: Russian\n"
 
 #, python-format
@@ -33,41 +33,8 @@ msgstr ""
 "выражении %s'"
 
 #, python-format
-msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
-msgstr ""
-"Не удалось создать таблицу %(table_name)s: уже существует. Игнорирование "
-"ошибки"
-
-#, python-format
-msgid "Continue after error from %(name)s: %(error)s"
-msgstr "Продолжить после ошибки с %(name)s: %(error)s"
-
-#, python-format
-msgid "Could not connect slave host: %s "
-msgstr "Не удалось подключиться к подчиненному хосту: %s "
-
-#, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "Не удалось подключиться к XenAPI: %s"
-
-#, python-format
-msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr ""
-"Не удалось получить информацию об использовании процессора для %(id)s: %(e)s"
-
-#, python-format
-msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr ""
-"Не удалось получить информацию об использовании памяти для %(id)s: %(e)s"
-
-#, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr ""
-"Не удалось получить информацию об использовании CPU для виртуальной машины %s"
-
-#, python-format
-msgid "Couldn't obtain IP address of instance %s"
-msgstr "Не удалось получить IP-адрес экземпляра %s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -81,22 +48,8 @@ msgstr ""
 "Возникла ошибка в libvirt при поиске экземпляра <имя=%(name)s, ИД=%(id)s>: "
 "[Код ошибки: %(error_code)s] %(ex)s"
 
-#, python-format
-msgid "Error parsing HTTP response: %s"
-msgstr "Ошибка анализа ответа HTTP: %s"
-
-msgid "Error stopping pollster."
-msgstr "Ошибка остановки опрашивающего объекта."
-
-msgid "Event"
-msgstr "Событие"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "Результат вычисления выражения - значение NaN!"
-
-#, python-format
-msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr "Не удалось импортировать расширение для %(name)s: %(error)s"
 
 #, python-format
 msgid ""
@@ -147,18 +100,6 @@ msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "Игнорирование экземпляра %(name)s (%(instance_id)s) : %(error)s"
 
 #, python-format
-msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "Игнорирование экземпляра %(name)s: %(error)s"
-
-#, python-format
-msgid "Ignoring loadbalancer %(loadbalancer_id)s"
-msgstr "Балансировщик нагрузки %(loadbalancer_id)s игнорируется"
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s"
-msgstr "Пул %(pool_id)s игнорируется"
-
-#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -176,10 +117,6 @@ msgstr "Недопустимый тип особенности %(type)s для �
 
 msgid "Limit must be positive"
 msgstr "Ограничение должно быть положительным"
-
-#, python-format
-msgid "More than one event with id %s returned from storage driver"
-msgstr "Из драйвера хранилища возвращено несколько событий с ИД %s"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -208,22 +145,6 @@ msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "API Opencontrail возвратил %(status)s %(reason)s"
 
 #, python-format
-msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr ""
-"Оператор %(operator)s не поддерживается. Для поля %(field)s возможен только "
-"оператор равенства"
-
-#, python-format
-msgid ""
-"Operator %(operator)s is not supported. The supported operators are: "
-"%(supported)s"
-msgstr ""
-"Оператор %(operator)s не поддерживается. Поддерживаемые операторы: "
-"%(supported)s"
-
-#, python-format
 msgid "Order-by expression not valid: %s"
 msgstr "Недопустимое выражение сортировки: %s"
 
@@ -235,26 +156,6 @@ msgstr ""
 
 msgid "Period must be positive."
 msgstr "Период должен быть положительным."
-
-#, python-format
-msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
-msgstr "Конвейер %(pipeline)s: %(status)s после ошибки от публикатора %(pub)s"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "Конвейер %(pipeline)s: Продолжение после ошибки из публикатора %(pub)s"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr "Конвейер %(pipeline)s: Ошибка выгрузки преобразователя %(trans)s"
-
-#, python-format
-msgid ""
-"Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
-"%(smp)s"
-msgstr ""
-"Конвейер %(pipeline)s: Выход после ошибки из преобразователя %(trans)s для "
-"%(smp)s"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -273,12 +174,6 @@ msgid "Pollster for %s is disabled!"
 msgstr "Опрашивающий объект для %s выключен!"
 
 #, python-format
-msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
-msgstr ""
-"Сделайте так, чтобы опрашивающий объект %(name)s больше не опрашивал "
-"источник %(source)s!"
-
-#, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr ""
@@ -292,9 +187,6 @@ msgstr "Стратегия публикации неизвестна (%s). По 
 #, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "Функция API RGW AdminOps вернула %(status)s %(reason)s"
-
-msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
-msgstr "Сбой запроса на подключение к OpenDaylight с API REST NorthBound"
 
 #, python-format
 msgid "Required field %s not specified"
@@ -310,21 +202,6 @@ msgid "Samples should be included in request body"
 msgstr "Образцы должны включаться в тело запроса"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "Пропустить загрузку расширения для %s"
-
-#, python-format
-msgid "String %s is not a valid isotime"
-msgstr "Строка %s не является допустимым значением isotime"
-
-msgid ""
-"The Yaml file that defines mapping between samples and gnocchi resources/"
-"metrics"
-msgstr ""
-"Файл Yaml, определяющий связи между образцами и ресурсами gnocchi "
-"(показателями)"
-
-#, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
@@ -335,9 +212,6 @@ msgstr ""
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Поле 'fields' является обязательным для %s"
-
-msgid "The path for the file publisher is required"
-msgstr "Требуется путь для публикатора файлов"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -357,28 +231,8 @@ msgstr ""
 "Преобразовать значение %(value)s в ожидаемый тип данных %(type)s невозможно."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "Не удалось найти ресурсы: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Вычислить выражение %(expr)s невозможно: %(exc)s"
-
-#, python-format
-msgid "Unable to load publisher %s"
-msgstr "Не удалось загрузить публикатор %s"
-
-#, python-format
-msgid "Unable to load the hypervisor inspector: %s"
-msgstr "Не удалось загрузить инспектор гипервизора: %s"
-
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
-"up."
-msgstr ""
-"Не удалось повторно подключиться к основной базе данных mongodb после "
-"%(retries)d попыток. Дальнейшие попытки прекращены."
 
 #, python-format
 msgid ""
@@ -397,10 +251,6 @@ msgid ""
 msgstr ""
 "Возникла непредвиденная исключительная ситуация при преобразовании %(value)s "
 "в ожидаемый тип данных %(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "Неизвестное расширение поиска: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
@@ -463,10 +313,6 @@ msgstr "XenAPI не установлен"
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "Ошибка YAML при чтении файла определений %(file)s"
 
-#, python-format
-msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "не удалось получить процессорное время для %(id)s: %(e)s"
-
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "Параметр direct не может быть равен true, если включен Gnocchi."
 
@@ -480,9 +326,6 @@ msgstr "удаление образца без предшественника: %
 
 msgid "ipmitool output length mismatch"
 msgstr "несоответствие длины вывода ipmitool"
-
-msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes и backup_count должны быть числами."
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
