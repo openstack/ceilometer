@@ -15,11 +15,15 @@
 
 from oslo_config import cfg
 from oslo_log import log as logging
+import tenacity
 
 try:
     import libvirt
 except ImportError:
     libvirt = None
+
+from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.i18n import _LE
 
 LOG = logging.getLogger(__name__)
 
@@ -75,7 +79,7 @@ LIBVIRT_STATUS = {
 }
 
 
-def get_libvirt_connection(conf):
+def new_libvirt_connection(conf):
     if not libvirt:
         raise ImportError("python-libvirt module is missing")
     uri = (conf.libvirt_uri or LIBVIRT_PER_TYPE_URIS.get(conf.libvirt_type,
@@ -84,21 +88,46 @@ def get_libvirt_connection(conf):
     return libvirt.openReadOnly(uri)
 
 
-def retry_on_disconnect(function):
-    def decorator(self, *args, **kwargs):
-        try:
-            return function(self, *args, **kwargs)
-        except ImportError:
-            # NOTE(sileht): in case of libvirt failed to be imported
-            raise
-        except libvirt.libvirtError as e:
-            if (e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
-                                       libvirt.VIR_ERR_INTERNAL_ERROR) and
-                e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
-                                         libvirt.VIR_FROM_RPC)):
-                LOG.debug('Connection to libvirt broken')
-                self.connection = None
-                return function(self, *args, **kwargs)
-            else:
-                raise
-    return decorator
+def refresh_libvirt_connection(conf, klass):
+    connection = getattr(klass, '_libvirt_connection', None)
+    if not connection or not connection.isAlive():
+        connection = new_libvirt_connection(conf)
+        setattr(klass,  '_libvirt_connection', connection)
+    return connection
+
+
+def is_disconnection_exception(e):
+    return (isinstance(e, libvirt.libvirtError)
+            and e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
+                                       libvirt.VIR_ERR_INTERNAL_ERROR)
+            and e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
+                                         libvirt.VIR_FROM_RPC))
+
+
+retry_on_disconnect = tenacity.retry(
+    retry=tenacity.retry_if_exception(is_disconnection_exception),
+    stop=tenacity.stop_after_attempt(2))
+
+
+class raise_nodata_if_unsupported(object):
+    def __init__(self, meter, permanent=True):
+        self.meter = meter
+        self.permanent = permanent
+
+    def __call__(self, method):
+        def inner(in_self, instance, *args, **kwargs):
+            try:
+                return method(in_self, instance, *args, **kwargs)
+            except (libvirt.libvirtError, KeyError, AttributeError) as e:
+                # NOTE(sileht): At this point libvirt connection error
+                # have been reraise as tenacity.RetryError()
+                msg = _LE('Failed to inspect %(meter)s of %(instance_uuid)s, '
+                          'can not get info from libvirt: %(error)s') % {
+                              "meter": self.meter,
+                              "instance_uuid": instance.id,
+                              "error": e}
+                if self.permanent:
+                    raise virt_inspector.NoDataException(msg)
+                else:
+                    raise virt_inspector.InstanceNoDataException(msg)
+        return inner

@@ -107,7 +107,6 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
         self.expiration_time = conf.compute.resource_update_interval
         self.cache_expiry = conf.compute.resource_cache_expiry
         if self.method == "libvirt_metadata":
-            self._connection = None
             # 4096 instances on a compute should be enough :)
             self._flavor_cache = cachetools.LRUCache(4096)
         else:
@@ -117,9 +116,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
     @property
     def connection(self):
-        if not self._connection:
-            self._connection = libvirt_utils.get_libvirt_connection(self.conf)
-        return self._connection
+        return libvirt_utils.refresh_libvirt_connection(self.conf, self)
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""

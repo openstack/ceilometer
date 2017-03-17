@@ -25,13 +25,18 @@ from ceilometer.compute.virt import inspector as virt_inspector
 @six.add_metaclass(abc.ABCMeta)
 class BaseComputePollster(plugin_base.PollsterBase):
 
-    @property
-    def inspector(self):
+    def setup_environment(self):
+        super(BaseComputePollster, self).setup_environment()
+        self.inspector = self._get_inspector(self.conf)
+
+    @classmethod
+    def _get_inspector(cls, conf):
+        # FIXME(sileht): This doesn't looks threadsafe...
         try:
-            inspector = self._inspector
+            inspector = cls._inspector
         except AttributeError:
-            inspector = virt_inspector.get_hypervisor_inspector(self.conf)
-            BaseComputePollster._inspector = inspector
+            inspector = virt_inspector.get_hypervisor_inspector(conf)
+            cls._inspector = inspector
         return inspector
 
     @property
