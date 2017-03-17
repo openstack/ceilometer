@@ -29,9 +29,9 @@ opt_group = cfg.OptGroup(name='vmware',
                          title='Options for VMware')
 
 OPTS = [
-    cfg.StrOpt('host_ip',
-               default='',
-               help='IP address of the VMware vSphere host.'),
+    cfg.HostAddressOpt('host_ip',
+                       default='127.0.0.1',
+                       help='IP address of the VMware vSphere host.'),
     cfg.PortOpt('host_port',
                 default=443,
                 help='Port of the VMware vSphere host.'),
