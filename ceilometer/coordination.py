@@ -72,28 +72,22 @@ class PartitionCoordinator(object):
             LOG.exception(_LE('Error connecting to coordination backend.'))
 
     def stop(self):
-        if not self._coordinator:
-            return
-
         try:
             self._coordinator.stop()
         except tooz.coordination.ToozError:
             LOG.exception(_LE('Error connecting to coordination backend.'))
         finally:
-            self._coordinator = None
+            del self._coordinator
 
     def watch_group(self, namespace, callback):
-        if self._coordinator:
-            self._coordinator.watch_join_group(namespace, callback)
-            self._coordinator.watch_leave_group(namespace, callback)
+        self._coordinator.watch_join_group(namespace, callback)
+        self._coordinator.watch_leave_group(namespace, callback)
 
     def run_watchers(self):
-        if self._coordinator:
-            self._coordinator.run_watchers()
+        self._coordinator.run_watchers()
 
     def join_group(self, group_id):
-        if (not self._coordinator or not self._coordinator.is_started
-                or not group_id):
+        if not self._coordinator.is_started or not group_id:
             return
 
         @tenacity.retry(
@@ -115,9 +109,6 @@ class PartitionCoordinator(object):
         return _inner()
 
     def _get_members(self, group_id):
-        if not self._coordinator:
-            return [self._my_id]
-
         while True:
             get_members_req = self._coordinator.get_members(group_id)
             try:
