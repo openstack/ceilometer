@@ -102,7 +102,7 @@ class TestNotification(tests_base.BaseTestCase):
         conf = service.prepare_service([], [])
         self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override("connection", "log://", group='database')
-        self.CONF.set_override("backend_url", None, group="coordination")
+        self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.CONF.set_override("workload_partitioning", True,
                                group='notification')
         self.setup_messaging(self.CONF)
@@ -124,7 +124,6 @@ class TestNotification(tests_base.BaseTestCase):
     @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
     def _do_process_notification_manager_start(self,
                                                fake_event_endpoint_class):
-        self.CONF([], project='ceilometer', validate_default_values=True)
         with mock.patch.object(self.srv,
                                '_get_notifications_manager') as get_nm:
             get_nm.side_effect = self.fake_get_notifications_manager
@@ -168,7 +167,6 @@ class TestNotification(tests_base.BaseTestCase):
                 [extension.Extension('test', None, None, plugin),
                  extension.Extension('test', None, None, plugin)])
 
-        self.CONF([], project='ceilometer', validate_default_values=True)
         with mock.patch.object(self.srv,
                                '_get_notifications_manager') as get_nm:
             get_nm.side_effect = fake_get_notifications_manager_dup_targets
@@ -232,8 +230,6 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
         self.expected_samples = 2
 
-        self.CONF.set_override("backend_url", None, group="coordination")
-
         ev_pipeline_cfg_file = self.setup_event_pipeline(
             ['compute.instance.*'])
         self.expected_events = 1
@@ -296,6 +292,7 @@ class TestRealNotificationHA(BaseRealNotification):
         super(TestRealNotificationHA, self).setUp()
         self.CONF.set_override('workload_partitioning', True,
                                group='notification')
+        self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.srv = notification.NotificationService(0, self.CONF)
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
@@ -459,7 +456,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         self.CONF.set_override("pipeline_cfg_file", pipeline_cfg_file)
         self.CONF.set_override("event_pipeline_cfg_file",
                                event_pipeline_cfg_file)
-        self.CONF.set_override("backend_url", None, group="coordination")
+        self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.CONF.set_override('workload_partitioning', True,
                                group='notification')
         self.CONF.set_override('pipeline_processing_queues', 2,
@@ -470,15 +467,13 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
     def _check_notifications(self, fake_publisher_cls):
         fake_publisher_cls.side_effect = [self.publisher, self.publisher2]
 
-        self.srv = notification.NotificationService(0, self.CONF)
-        self.srv2 = notification.NotificationService(0, self.CONF)
+        self.srv = notification.NotificationService(0, self.CONF, 'harry')
+        self.srv2 = notification.NotificationService(0, self.CONF, 'lloyd')
         with mock.patch('ceilometer.coordination.PartitionCoordinator'
                         '._get_members', return_value=['harry', 'lloyd']):
-            with mock.patch('uuid.uuid4', return_value='harry'):
-                self.srv.run()
+            self.srv.run()
             self.addCleanup(self.srv.terminate)
-            with mock.patch('uuid.uuid4', return_value='lloyd'):
-                self.srv2.run()
+            self.srv2.run()
             self.addCleanup(self.srv2.terminate)
 
         notifier = messaging.get_notifier(self.transport,

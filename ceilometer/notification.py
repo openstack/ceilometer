@@ -16,6 +16,7 @@
 import itertools
 import threading
 import time
+import uuid
 
 from ceilometer.agent import plugin_base
 from concurrent import futures
@@ -107,10 +108,13 @@ class NotificationService(cotyledon.Service):
     NOTIFICATION_NAMESPACE = 'ceilometer.notification'
     NOTIFICATION_IPC = 'ceilometer-pipe'
 
-    def __init__(self, worker_id, conf):
+    def __init__(self, worker_id, conf, coordination_id=None):
         super(NotificationService, self).__init__(worker_id)
         self.startup_delay = worker_id
         self.conf = conf
+        # XXX uuid4().bytes ought to work, but it requires ascii for now
+        self.coordination_id = (coordination_id or
+                                str(uuid.uuid4()).encode('ascii'))
 
     @classmethod
     def _get_notifications_manager(cls, pm):
@@ -182,7 +186,7 @@ class NotificationService(cotyledon.Service):
         if self.conf.notification.workload_partitioning:
             self.group_id = self.NOTIFICATION_NAMESPACE
             self.partition_coordinator = coordination.PartitionCoordinator(
-                self.conf)
+                self.conf, self.coordination_id)
             self.partition_coordinator.start()
         else:
             # FIXME(sileht): endpoint uses the notification_topics option
