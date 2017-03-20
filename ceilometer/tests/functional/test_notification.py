@@ -491,6 +491,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
                 if (len(self.publisher.samples + self.publisher2.samples) >=
                         self.expected_samples):
                     break
+                time.sleep(0.1)
 
         self.assertEqual(2, len(self.publisher.samples))
         self.assertEqual(2, len(self.publisher2.samples))
