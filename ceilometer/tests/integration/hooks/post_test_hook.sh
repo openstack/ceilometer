@@ -61,7 +61,7 @@ function generate_telemetry_report(){
     # Be sure to source Gnocchi settings before
     source $BASE/new/gnocchi/devstack/settings
     echo "* Unprocessed measures:"
-    sudo find $GNOCCHI_DATA_DIR/measure
+    for key in $(redis-cli --scan --pattern 'incoming*'); do echo -n $key && redis-cli llen $key; done
 
     set -x
 }
