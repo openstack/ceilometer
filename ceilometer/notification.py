@@ -191,7 +191,6 @@ class NotificationService(cotyledon.Service):
             # notification_topics in another way, we must create a transport
             # to ensure the option has been registered by oslo_messaging.
             messaging.get_notifier(self.transport, '')
-            self.group_id = None
 
         pipe_manager = self._get_pipe_manager(self.transport,
                                               self.pipeline_manager)
@@ -272,9 +271,14 @@ class NotificationService(cotyledon.Service):
         ev_pipes = self.event_pipeline_manager.pipelines
         pipelines = self.pipeline_manager.pipelines + ev_pipes
         transport = messaging.get_transport(self.conf)
-        partitioned = self.partition_coordinator.extract_my_subset(
-            self.group_id,
-            range(self.conf.notification.pipeline_processing_queues))
+        if self.partition_coordinator:
+            partitioned = self.partition_coordinator.extract_my_subset(
+                self.group_id,
+                range(self.conf.notification.pipeline_processing_queues))
+        else:
+            partitioned = range(
+                self.conf.notification.pipeline_processing_queues
+            )
 
         endpoints = []
         targets = []

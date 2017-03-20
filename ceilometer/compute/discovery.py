@@ -264,7 +264,4 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
     @property
     def group_id(self):
-        if self.method == "workload_partitioning":
-            return self.conf.host
-        else:
-            return None
+        return self.conf.host

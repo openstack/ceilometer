@@ -374,9 +374,7 @@ class AgentManager(cotyledon.Service):
         return polling_tasks
 
     def construct_group_id(self, discovery_group_id):
-        return ('%s-%s' % (self.group_prefix,
-                           discovery_group_id)
-                if discovery_group_id else None)
+        return '%s-%s' % (self.group_prefix, discovery_group_id)
 
     def start_polling_tasks(self):
         # set shuffle time before polling task if necessary
