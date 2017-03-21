@@ -65,15 +65,7 @@ class InstanceStats(object):
                 "'InstanceStats' object has no attributes '%s'" % kwargs)
 
 
-# Named tuple representing instances.
-#
-# name: the name of the instance
-# uuid: the UUID associated with the instance
-#
-Instance = collections.namedtuple('Instance', ['name', 'UUID'])
-
-
-# Named tuple representing vNICs.
+# Named tuple representing vNIC statistics.
 #
 # name: the name of the vNIC
 # mac: the MAC address
