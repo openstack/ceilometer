@@ -43,17 +43,20 @@ class TestHyperVInspection(base.BaseTestCase):
         self._inspector._utils.get_cpu_metrics.side_effect = (
             os_win_exc.OSWinException)
         self.assertRaises(virt_inspector.InspectorException,
-                          self._inspector.inspect_cpus, mock.sentinel.instance)
+                          self._inspector.inspect_instance,
+                          mock.sentinel.instance)
 
         self._inspector._utils.get_cpu_metrics.side_effect = (
             os_win_exc.HyperVException)
         self.assertRaises(virt_inspector.InspectorException,
-                          self._inspector.inspect_cpus, mock.sentinel.instance)
+                          self._inspector.inspect_instance,
+                          mock.sentinel.instance)
 
         self._inspector._utils.get_cpu_metrics.side_effect = (
             os_win_exc.NotFound(resource='foofoo'))
         self.assertRaises(virt_inspector.InstanceNotFoundException,
-                          self._inspector.inspect_cpus, mock.sentinel.instance)
+                          self._inspector.inspect_instance,
+                          mock.sentinel.instance)
 
     def test_assert_original_traceback_maintained(self):
         def bar(self):
@@ -62,7 +65,7 @@ class TestHyperVInspection(base.BaseTestCase):
 
         self._inspector._utils.get_cpu_metrics.side_effect = bar
         try:
-            self._inspector.inspect_cpus(mock.sentinel.instance)
+            self._inspector.inspect_instance(mock.sentinel.instance)
             self.fail("Test expected exception, but it was not raised.")
         except virt_inspector.InstanceNotFoundException:
             # exception has been raised as expected.
@@ -83,7 +86,7 @@ class TestHyperVInspection(base.BaseTestCase):
         cpu_clock = self._inspector._compute_host_max_cpu_clock()
         self.assertEqual(2000.0, cpu_clock)
 
-    def test_inspect_cpus(self):
+    def test_inspect_instance(self):
         fake_instance_name = 'fake_instance_name'
         fake_cpu_clock_used = 2000
         fake_cpu_count = 3000
@@ -96,17 +99,13 @@ class TestHyperVInspection(base.BaseTestCase):
                          1000)
         self._inspector._utils.get_cpu_metrics.return_value = (
             fake_cpu_clock_used, fake_cpu_count, fake_uptime)
-
-        cpu_stats = self._inspector.inspect_cpus(fake_instance_name)
-
-        self.assertEqual(fake_cpu_count, cpu_stats.number)
-        self.assertEqual(fake_cpu_time, cpu_stats.time)
-
-    def test_inspect_memory_usage(self):
         fake_usage = self._inspector._utils.get_memory_metrics.return_value
-        usage = self._inspector.inspect_memory_usage(
-            mock.sentinel.FAKE_INSTANCE, mock.sentinel.FAKE_DURATION)
-        self.assertEqual(fake_usage, usage.usage)
+
+        stats = self._inspector.inspect_instance(fake_instance_name)
+
+        self.assertEqual(fake_cpu_count, stats.cpu_number)
+        self.assertEqual(fake_cpu_time, stats.cpu_time)
+        self.assertEqual(fake_usage, stats.memory_usage)
 
     def test_inspect_vnics(self):
         fake_instance_name = 'fake_instance_name'

@@ -19,7 +19,7 @@ import time
 import mock
 
 from ceilometer.agent import manager
-from ceilometer.compute.pollsters import cpu
+from ceilometer.compute.pollsters import instance_stats
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.tests.unit.compute.pollsters import base
 
@@ -28,20 +28,15 @@ class TestCPUPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        next_value = iter((
-            virt_inspector.CPUStats(time=1 * (10 ** 6), number=2),
-            virt_inspector.CPUStats(time=3 * (10 ** 6), number=2),
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(cpu_time=1 * (10 ** 6), cpu_number=2),
+            virt_inspector.InstanceStats(cpu_time=3 * (10 ** 6), cpu_number=2),
             # cpu_time resets on instance restart
-            virt_inspector.CPUStats(time=2 * (10 ** 6), number=2),
-        ))
-
-        def inspect_cpus(name):
-            return next(next_value)
-
-        self.inspector.inspect_cpus = mock.Mock(side_effect=inspect_cpus)
+            virt_inspector.InstanceStats(cpu_time=2 * (10 ** 6), cpu_number=2),
+        )
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
 
         def _verify_cpu_metering(expected_time):
             cache = {}
@@ -57,27 +52,13 @@ class TestCPUPollster(base.TestPollsterBase):
         _verify_cpu_metering(3 * (10 ** 6))
         _verify_cpu_metering(2 * (10 ** 6))
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
-    def test_get_samples_no_caching(self):
-        cpu_stats = virt_inspector.CPUStats(time=1 * (10 ** 6), number=2)
-        self.inspector.inspect_cpus = mock.Mock(return_value=cpu_stats)
-
-        mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
-
-        cache = {}
-        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-        self.assertEqual(1, len(samples))
-        self.assertEqual(10 ** 6, samples[0].volume)
-        self.assertEqual(0, len(cache))
-
     # the following apply to all instance resource pollsters but are tested
     # here alone.
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_metadata(self):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(1, len(samples))
         self.assertEqual(1, samples[0].resource_metadata['vcpus'])
@@ -94,7 +75,7 @@ class TestCPUPollster(base.TestPollsterBase):
         self.CONF.set_override('reserved_metadata_keys', ['fqdn'])
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual({'fqdn': 'vm_fqdn',
                           'stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128'},
@@ -103,21 +84,21 @@ class TestCPUPollster(base.TestPollsterBase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_namespace(self):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual({'stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128'},
                          samples[0].resource_metadata['user_metadata'])
 
         self.CONF.set_override('reserved_metadata_namespace', [])
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertNotIn('user_metadata', samples[0].resource_metadata)
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_flavor_name_as_metadata_instance_type(self):
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUPollster(self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(1, len(samples))
         self.assertEqual('m1.small',
@@ -128,19 +109,13 @@ class TestCPUUtilPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        next_value = iter((
-            virt_inspector.CPUUtilStats(util=40),
-            virt_inspector.CPUUtilStats(util=60),
-        ))
-
-        def inspect_cpu_util(name, duration):
-            return next(next_value)
-
-        self.inspector.inspect_cpu_util = (mock.
-                                           Mock(side_effect=inspect_cpu_util))
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(cpu_util=40),
+            virt_inspector.InstanceStats(cpu_util=60),
+        )
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUUtilPollster(self.CONF)
+        pollster = instance_stats.CPUUtilPollster(self.CONF)
 
         def _verify_cpu_util_metering(expected_util):
             cache = {}
@@ -158,19 +133,13 @@ class TestCPUL3CachePollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
-        next_value = iter((
-            virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=90112),
-            virt_inspector.CPUL3CacheUsageStats(l3_cache_usage=180224),
-        ))
-
-        def inspect_cpu_l3_cache(name):
-            return next(next_value)
-
-        self.inspector.inspect_cpu_l3_cache = (mock.Mock(
-            side_effect=inspect_cpu_l3_cache))
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(cpu_l3_cache_usage=90112),
+            virt_inspector.InstanceStats(cpu_l3_cache_usage=180224),
+        )
 
         mgr = manager.AgentManager(0, self.CONF)
-        pollster = cpu.CPUL3CachePollster(self.CONF)
+        pollster = instance_stats.CPUL3CachePollster(self.CONF)
 
         def _verify_cpu_l3_cache_metering(expected_usage):
             cache = {}

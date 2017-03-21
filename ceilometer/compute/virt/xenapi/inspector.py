@@ -133,24 +133,27 @@ class XenapiInspector(virt_inspector.Inspector):
         else:
             return vm_refs[0]
 
-    def inspect_cpu_util(self, instance, duration=None):
+    def inspect_instance(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
+        cpu_util = self._get_cpu_usage(vm_ref, instance_name)
+        memory_usage = self._get_memory_usage(vm_ref)
+        return virt_inspector.InstanceStats(cpu_util=cpu_util,
+                                            memory_usage=memory_usage)
+
+    def _get_cpu_usage(self, vm_ref, instance_name):
         vcpus_number = int(self._call_xenapi("VM.get_VCPUs_max", vm_ref))
         if vcpus_number <= 0:
             msg = _("Could not get VM %s CPU number") % instance_name
             raise XenapiException(msg)
-        utils = 0.0
+        cpu_util = 0.0
         for index in range(vcpus_number):
-            utils += float(self._call_xenapi("VM.query_data_source",
-                                             vm_ref,
-                                             "cpu%d" % index))
-        utils = utils / int(vcpus_number) * 100
-        return virt_inspector.CPUUtilStats(util=utils)
+            cpu_util += float(self._call_xenapi("VM.query_data_source",
+                                                vm_ref,
+                                                "cpu%d" % index))
+        return cpu_util / int(vcpus_number) * 100
 
-    def inspect_memory_usage(self, instance, duration=None):
-        instance_name = util.instance_name(instance)
-        vm_ref = self._lookup_by_name(instance_name)
+    def _get_memory_usage(self, vm_ref):
         total_mem = float(self._call_xenapi("VM.query_data_source",
                                             vm_ref,
                                             "memory"))
@@ -166,8 +169,7 @@ class XenapiInspector(virt_inspector.Inspector):
         # memory provided from XenServer is in Bytes;
         # memory_internal_free provided from XenServer is in KB,
         # converting it to MB.
-        memory_usage = (total_mem - free_mem * units.Ki) / units.Mi
-        return virt_inspector.MemoryUsageStats(usage=memory_usage)
+        return (total_mem - free_mem * units.Ki) / units.Mi
 
     def inspect_vnics(self, instance):
         instance_name = util.instance_name(instance)

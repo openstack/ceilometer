@@ -109,25 +109,16 @@ retry_on_disconnect = tenacity.retry(
     stop=tenacity.stop_after_attempt(2))
 
 
-class raise_nodata_if_unsupported(object):
-    def __init__(self, meter, permanent=True):
-        self.meter = meter
-        self.permanent = permanent
-
-    def __call__(self, method):
-        def inner(in_self, instance, *args, **kwargs):
-            try:
-                return method(in_self, instance, *args, **kwargs)
-            except (libvirt.libvirtError, KeyError, AttributeError) as e:
-                # NOTE(sileht): At this point libvirt connection error
-                # have been reraise as tenacity.RetryError()
-                msg = _LE('Failed to inspect %(meter)s of %(instance_uuid)s, '
-                          'can not get info from libvirt: %(error)s') % {
-                              "meter": self.meter,
-                              "instance_uuid": instance.id,
-                              "error": e}
-                if self.permanent:
-                    raise virt_inspector.NoDataException(msg)
-                else:
-                    raise virt_inspector.InstanceNoDataException(msg)
-        return inner
+def raise_nodata_if_unsupported(method):
+    def inner(in_self, instance, *args, **kwargs):
+        try:
+            return method(in_self, instance, *args, **kwargs)
+        except libvirt.libvirtError as e:
+            # NOTE(sileht): At this point libvirt connection error
+            # have been reraise as tenacity.RetryError()
+            msg = _LE('Failed to inspect instance %(instance_uuid)s stats, '
+                      'can not get info from libvirt: %(error)s') % {
+                          "instance_uuid": instance.id,
+                          "error": e}
+            raise virt_inspector.NoDataException(msg)
+    return inner
