@@ -19,7 +19,7 @@ import collections
 from oslo_log import log
 import six
 
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _
 from ceilometer.network.services import base
 from ceilometer import neutron_client
 from ceilometer import sample
@@ -288,7 +288,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
                     c_data = self._populate_stats_cache(pool['id'], cache)
                     yield self._get_sample(pool, c_data)
                 except Exception:
-                    LOG.exception(_LE('Ignoring pool %(pool_id)s'),
+                    LOG.exception('Ignoring pool %(pool_id)s',
                                   {'pool_id': pool['id']})
         elif self.lb_version == 'v2':
             for loadbalancer in resources:
@@ -298,7 +298,7 @@ class _LBStatsPollster(base.BaseServicesPollster):
                     yield self._get_sample(loadbalancer, c_data)
                 except Exception:
                     LOG.exception(
-                        _LE('Ignoring loadbalancer %(loadbalancer_id)s'),
+                        'Ignoring loadbalancer %(loadbalancer_id)s',
                         {'loadbalancer_id': loadbalancer['id']})
 
 

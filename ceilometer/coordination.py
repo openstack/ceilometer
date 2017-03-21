@@ -21,7 +21,6 @@ import tenacity
 import tooz.coordination
 from tooz import hashring
 
-from ceilometer.i18n import _LE, _LI
 
 LOG = log.getLogger(__name__)
 
@@ -67,15 +66,15 @@ class PartitionCoordinator(object):
     def start(self):
         try:
             self._coordinator.start(start_heart=True)
-            LOG.info(_LI('Coordination backend started successfully.'))
+            LOG.info('Coordination backend started successfully.')
         except tooz.coordination.ToozError:
-            LOG.exception(_LE('Error connecting to coordination backend.'))
+            LOG.exception('Error connecting to coordination backend.')
 
     def stop(self):
         try:
             self._coordinator.stop()
         except tooz.coordination.ToozError:
-            LOG.exception(_LE('Error connecting to coordination backend.'))
+            LOG.exception('Error connecting to coordination backend.')
         finally:
             del self._coordinator
 
@@ -99,10 +98,10 @@ class PartitionCoordinator(object):
             except tooz.coordination.MemberAlreadyExist:
                 pass
             except tooz.coordination.ToozError:
-                LOG.exception(_LE('Error joining partitioning group %s,'
-                                  ' re-trying'), group_id)
+                LOG.exception('Error joining partitioning group %s,'
+                              ' re-trying', group_id)
                 raise tenacity.TryAgain
-            LOG.info(_LI('Joined partitioning group %s'), group_id)
+            LOG.info('Joined partitioning group %s', group_id)
 
         return _inner()
 
@@ -132,8 +131,8 @@ class PartitionCoordinator(object):
                       [six.text_type(f) for f in filtered])
             return filtered
         except tooz.coordination.ToozError:
-            LOG.exception(_LE('Error getting group membership info from '
-                              'coordination backend.'))
+            LOG.exception('Error getting group membership info from '
+                          'coordination backend.')
             return []
 
     @staticmethod

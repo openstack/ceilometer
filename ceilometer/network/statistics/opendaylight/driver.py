@@ -18,7 +18,6 @@ import six
 from six import moves
 from six.moves.urllib import parse as urlparse
 
-from ceilometer.i18n import _LE
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opendaylight import client
 from ceilometer import utils
@@ -161,8 +160,8 @@ class OpenDayLightDriver(driver.Driver):
                     cs.host_tracker.get_inactive_hosts(container_name))
                 data[container_name] = container_data
             except Exception:
-                LOG.exception(_LE('Request failed to connect to OpenDaylight'
-                                  ' with NorthBound REST API'))
+                LOG.exception('Request failed to connect to OpenDaylight'
+                              ' with NorthBound REST API')
 
         cache['network.statistics.opendaylight'] = data
 

@@ -35,7 +35,6 @@ from stevedore import extension
 
 from ceilometer.agent import plugin_base
 from ceilometer import coordination
-from ceilometer.i18n import _LE, _LI, _LW
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
@@ -173,13 +172,13 @@ class PollingTask(object):
                 # If no resources, skip for this pollster
                 if not polling_resources:
                     p_context = 'new ' if history else ''
-                    LOG.info(_LI("Skip pollster %(name)s, no %(p_context)s"
-                                 "resources found this cycle"),
+                    LOG.info("Skip pollster %(name)s, no %(p_context)s"
+                             "resources found this cycle",
                              {'name': pollster.name, 'p_context': p_context})
                     continue
 
-                LOG.info(_LI("Polling pollster %(poll)s in the context of "
-                             "%(src)s"),
+                LOG.info("Polling pollster %(poll)s in the context of "
+                         "%(src)s",
                          dict(poll=pollster.name, src=source_name))
                 try:
                     polling_timestamp = timeutils.utcnow().isoformat()
@@ -206,15 +205,15 @@ class PollingTask(object):
                         self._send_notification(sample_batch)
 
                 except plugin_base.PollsterPermanentError as err:
-                    LOG.error(_LE(
+                    LOG.error(
                         'Prevent pollster %(name)s from '
-                        'polling %(res_list)s on source %(source)s anymore!')
+                        'polling %(res_list)s on source %(source)s anymore!'
                         % ({'name': pollster.name, 'source': source_name,
                             'res_list': err.fail_res_list}))
                     self.resources[key].blacklist.extend(err.fail_res_list)
                 except Exception as err:
-                    LOG.error(_LE(
-                        'Continue after error from %(name)s: %(error)s')
+                    LOG.error(
+                        'Continue after error from %(name)s: %(error)s'
                         % ({'name': pollster.name, 'error': err}),
                         exc_info=True)
 
@@ -304,13 +303,13 @@ class AgentManager(cotyledon.Service):
             # Extension raising ExtensionLoadError can be ignored,
             # and ignore anything we can't import as a safety measure.
             if isinstance(exc, plugin_base.ExtensionLoadError):
-                LOG.exception(_LE("Skip loading extension for %s"), ep.name)
+                LOG.exception("Skip loading extension for %s", ep.name)
                 return
 
             show_exception = (LOG.isEnabledFor(logging.DEBUG)
                               and isinstance(exc, ImportError))
-            LOG.error(_LE("Failed to import extension for %(name)r: "
-                          "%(error)s"),
+            LOG.error("Failed to import extension for %(name)r: "
+                      "%(error)s",
                       {'name': ep.name, 'error': exc},
                       exc_info=show_exception)
             if isinstance(exc, ImportError):
@@ -486,9 +485,9 @@ class AgentManager(cotyledon.Service):
                         if not keystone_client.get_service_catalog(
                                 self.keystone).get_endpoints(
                                     service_type=service_type):
-                            LOG.warning(_LW(
+                            LOG.warning(
                                 'Skipping %(name)s, %(service_type)s service '
-                                'is not registered in keystone'),
+                                'is not registered in keystone',
                                 {'name': name, 'service_type': service_type})
                             continue
 
@@ -505,12 +504,12 @@ class AgentManager(cotyledon.Service):
                     if discovery_cache is not None:
                         discovery_cache[url] = partitioned
                 except ka_exceptions.ClientException as e:
-                    LOG.error(_LE('Skipping %(name)s, keystone issue: '
-                                  '%(exc)s'), {'name': name, 'exc': e})
+                    LOG.error('Skipping %(name)s, keystone issue: '
+                              '%(exc)s', {'name': name, 'exc': e})
                 except Exception as err:
-                    LOG.exception(_LE('Unable to discover resources: %s'), err)
+                    LOG.exception('Unable to discover resources: %s', err)
             else:
-                LOG.warning(_LW('Unknown discovery extension: %s'), name)
+                LOG.warning('Unknown discovery extension: %s', name)
         return resources
 
     def stop_pollsters_tasks(self):

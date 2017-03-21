@@ -21,8 +21,8 @@ from oslo_utils import fnmatch
 from stevedore import extension
 
 from ceilometer import declarative
+from ceilometer.i18n import _
 from ceilometer import notification
-from ceilometer.i18n import _LE, _LW
 from ceilometer import sample as sample_util
 
 OPTS = [
@@ -50,7 +50,7 @@ class MeterDefinition(object):
                    if not self.cfg.get(field)]
         if missing:
             raise declarative.MeterDefinitionException(
-                _LE("Required fields %s not specified") % missing, self.cfg)
+                _("Required fields %s not specified") % missing, self.cfg)
 
         self._event_type = self.cfg.get('event_type')
         if isinstance(self._event_type, six.string_types):
@@ -59,7 +59,7 @@ class MeterDefinition(object):
         if ('type' not in self.cfg.get('lookup', []) and
                 self.cfg['type'] not in sample_util.TYPES):
             raise declarative.MeterDefinitionException(
-                _LE("Invalid type %s specified") % self.cfg['type'], self.cfg)
+                _("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
         self._fallback_user_id = declarative.Definition(
             'user_id', "_context_user_id|_context_user", plugin_manager)
@@ -185,14 +185,14 @@ class ProcessMeterNotifications(notification.NotificationProcessBase):
         for meter_cfg in reversed(meters_cfg['metric']):
             if meter_cfg.get('name') in definitions:
                 # skip duplicate meters
-                LOG.warning(_LW("Skipping duplicate meter definition %s")
+                LOG.warning("Skipping duplicate meter definition %s"
                             % meter_cfg)
                 continue
             try:
                 md = MeterDefinition(meter_cfg, self.manager.conf,
                                      plugin_manager)
             except declarative.DefinitionException as e:
-                errmsg = _LE("Error loading meter definition: %s")
+                errmsg = "Error loading meter definition: %s"
                 LOG.error(errmsg, six.text_type(e))
             else:
                 definitions[meter_cfg['name']] = md

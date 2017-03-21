@@ -15,7 +15,6 @@
 from oslo_log import log
 
 from ceilometer.agent import plugin_base as plugin
-from ceilometer.i18n import _LW
 from ceilometer import keystone_client
 
 LOG = log.getLogger(__name__)
@@ -36,7 +35,7 @@ class EndpointDiscovery(plugin.DiscoveryBase):
                 interface=self.conf.service_credentials.interface,
                 region_name=self.conf.service_credentials.region_name)
         if not endpoints:
-            LOG.warning(_LW('No endpoints found for service %s'),
+            LOG.warning('No endpoints found for service %s',
                         "<all services>" if param is None else param)
             return []
         return endpoints

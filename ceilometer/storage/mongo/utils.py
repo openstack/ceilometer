@@ -26,7 +26,7 @@ import pymongo.errors
 import six
 from six.moves.urllib import parse
 
-from ceilometer.i18n import _, _LI, _LE
+from ceilometer.i18n import _
 
 ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS = 86
 
@@ -201,7 +201,7 @@ class ConnectionPool(object):
         splitted_url = netutils.urlsplit(url)
         log_data = {'db': splitted_url.scheme,
                     'nodelist': connection_options['nodelist']}
-        LOG.info(_LI('Connecting to %(db)s on %(nodelist)s') % log_data)
+        LOG.info('Connecting to %(db)s on %(nodelist)s' % log_data)
         client = self._mongo_connect(conf, url)
         self._pool[pool_key] = weakref.ref(client)
         return client
@@ -353,8 +353,8 @@ def safe_mongo_call(call):
                 return call(self, *args, **kwargs)
             except pymongo.errors.AutoReconnect as err:
                 if 0 <= max_retries <= attempts:
-                    LOG.error(_LE('Unable to reconnect to the primary mongodb '
-                                  'after %(retries)d retries. Giving up.') %
+                    LOG.error('Unable to reconnect to the primary mongodb '
+                              'after %(retries)d retries. Giving up.' %
                               {'retries': max_retries})
                     raise
                 LOG.warning(_('Unable to reconnect to the primary '
@@ -406,7 +406,7 @@ class MongoProxy(object):
             self.conn.create_index(keys, name=name, *args, **kwargs)
         except pymongo.errors.OperationFailure as e:
             if e.code is ERROR_INDEX_WITH_DIFFERENT_SPEC_ALREADY_EXISTS:
-                LOG.info(_LI("Index %s will be recreate."), name)
+                LOG.info("Index %s will be recreate.", name)
                 self._recreate_index(keys, name, *args, **kwargs)
 
     @safe_mongo_call

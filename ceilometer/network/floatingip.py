@@ -18,7 +18,6 @@
 
 from oslo_log import log
 
-from ceilometer.i18n import _LW
 from ceilometer.network.services import base
 from ceilometer import sample
 
@@ -43,7 +42,7 @@ class FloatingIPPollster(base.BaseServicesPollster):
 
         for fip in resources or []:
             if fip['status'] is None:
-                LOG.warning(_LW("Invalid status, skipping IP address %s") %
+                LOG.warning("Invalid status, skipping IP address %s" %
                             fip['floating_ip_address'])
                 continue
             status = self.get_status_id(fip['status'])

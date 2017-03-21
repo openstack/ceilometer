@@ -17,7 +17,6 @@ import oslo_messaging
 from stevedore import extension
 
 from ceilometer.event import converter as event_converter
-from ceilometer.i18n import _LE
 from ceilometer import messaging
 
 LOG = log.getLogger(__name__)
@@ -63,5 +62,5 @@ class EventsNotificationEndpoint(object):
             except Exception:
                 if not self.manager.conf.notification.ack_on_event_error:
                     return oslo_messaging.NotificationResult.REQUEUE
-                LOG.error(_LE('Fail to process a notification'), exc_info=True)
+                LOG.error('Fail to process a notification', exc_info=True)
         return oslo_messaging.NotificationResult.HANDLED

@@ -21,7 +21,6 @@ from oslo_log import log
 from stevedore import driver
 
 import ceilometer
-from ceilometer.i18n import _LE
 
 
 OPTS = [
@@ -265,5 +264,5 @@ def get_hypervisor_inspector(conf):
                                    invoke_args=(conf, ))
         return mgr.driver
     except ImportError as e:
-        LOG.error(_LE("Unable to load the hypervisor inspector: %s") % e)
+        LOG.error("Unable to load the hypervisor inspector: %s" % e)
         return Inspector(conf)

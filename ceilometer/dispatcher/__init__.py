@@ -20,8 +20,6 @@ from oslo_log import log
 import six
 from stevedore import named
 
-from ceilometer.i18n import _LW
-
 
 LOG = log.getLogger(__name__)
 
@@ -65,7 +63,7 @@ def _load_dispatcher_manager(conf, dispatcher_type):
         invoke_args=[conf],
         propagate_map_exceptions=True)
     if not list(dispatcher_manager):
-        LOG.warning(_LW('Failed to load any dispatchers for %s'),
+        LOG.warning('Failed to load any dispatchers for %s',
                     namespace)
     return dispatcher_manager
 

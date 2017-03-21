@@ -20,8 +20,6 @@ from oslo_log import log
 from oslo_utils import timeutils
 import six
 
-from ceilometer.i18n import _LW
-
 LOG = log.getLogger(__name__)
 
 
@@ -123,9 +121,9 @@ class SplitterTraitPlugin(TraitPluginBase):
         :param  segment:    Which segment to return. (int) default 0
         :param  max_split: Limit number of splits. Default: None (no limit)
         """
-        LOG.warning(_LW('split plugin is deprecated, '
-                        'add ".`split(%(sep)s, %(segment)d, '
-                        '%(max_split)d)`" to your jsonpath instead') %
+        LOG.warning('split plugin is deprecated, '
+                    'add ".`split(%(sep)s, %(segment)d, '
+                    '%(max_split)d)`" to your jsonpath instead' %
                     dict(sep=separator,
                          segment=segment,
                          max_split=(-1 if max_split is None
@@ -213,17 +211,17 @@ class TimedeltaPlugin(TraitPluginBase):
 
     def trait_value(self, match_list):
         if len(match_list) != 2:
-            LOG.warning(_LW('Timedelta plugin is required two timestamp fields'
-                            ' to create timedelta value.'))
+            LOG.warning('Timedelta plugin is required two timestamp fields'
+                        ' to create timedelta value.')
             return
         start, end = match_list
         try:
             start_time = timeutils.parse_isotime(start[1])
             end_time = timeutils.parse_isotime(end[1])
         except Exception as err:
-            LOG.warning(_LW('Failed to parse date from set fields, both '
-                            'fields %(start)s and %(end)s must be datetime: '
-                            '%(err)s') %
+            LOG.warning('Failed to parse date from set fields, both '
+                        'fields %(start)s and %(end)s must be datetime: '
+                        '%(err)s' %
                         dict(start=start[0], end=end[0], err=err)
                         )
             return

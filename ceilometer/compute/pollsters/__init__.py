@@ -21,7 +21,6 @@ import ceilometer
 from ceilometer.agent import plugin_base
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _LE, _LW
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -140,8 +139,8 @@ class GenericComputePollster(plugin_base.PollsterBase):
             except NoVolumeException:
                 # FIXME(sileht): This should be a removed... but I will
                 # not change the test logic for now
-                LOG.warning(_LW("%(name)s statistic in not available for "
-                                "instance %(instance_id)s") %
+                LOG.warning("%(name)s statistic in not available for "
+                            "instance %(instance_id)s" %
                             {'name': self.sample_name,
                              'instance_id': instance.id})
             except virt_inspector.InstanceNotFoundException as err:
@@ -153,8 +152,8 @@ class GenericComputePollster(plugin_base.PollsterBase):
                           {'instance_id': instance.id,
                            'name': self.sample_name, 'exc': e})
             except virt_inspector.NoDataException as e:
-                LOG.warning(_LW('Cannot inspect data of %(pollster)s for '
-                                '%(instance_id)s, non-fatal reason: %(exc)s'),
+                LOG.warning('Cannot inspect data of %(pollster)s for '
+                            '%(instance_id)s, non-fatal reason: %(exc)s',
                             {'pollster': self.__class__.__name__,
                              'instance_id': instance.id, 'exc': e})
                 raise plugin_base.PollsterPermanentError(resources)
@@ -167,6 +166,6 @@ class GenericComputePollster(plugin_base.PollsterBase):
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.error(
-                    _LE('Could not get %(name)s events for %(id)s: %(e)s'), {
+                    'Could not get %(name)s events for %(id)s: %(e)s', {
                         'name': self.sample_name, 'id': instance.id, 'e': err},
                     exc_info=True)

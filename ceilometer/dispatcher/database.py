@@ -17,7 +17,6 @@ from oslo_log import log
 from oslo_utils import timeutils
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _LE
 from ceilometer import storage
 
 LOG = log.getLogger(__name__)
@@ -67,6 +66,6 @@ class MeterDatabaseDispatcher(dispatcher.MeterDispatcherBase):
         try:
             self.conn.record_metering_data_batch(data)
         except Exception as err:
-            LOG.error(_LE('Failed to record %(len)s: %(err)s.'),
+            LOG.error('Failed to record %(len)s: %(err)s.',
                       {'len': len(data), 'err': err})
             raise

@@ -19,7 +19,6 @@ from oslo_policy import policy
 
 from pecan import hooks
 
-from ceilometer.i18n import _LE
 from ceilometer import messaging
 from ceilometer import storage
 
@@ -59,7 +58,7 @@ class DBHook(hooks.PecanHook):
         try:
             return storage.get_connection_from_config(conf)
         except Exception as err:
-            LOG.exception(_LE("Failed to connect to db" "retry later: %s"),
+            LOG.exception("Failed to connect to db" "retry later: %s",
                           err)
 
 

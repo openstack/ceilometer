@@ -31,7 +31,6 @@ from stevedore import extension
 import yaml
 
 from ceilometer.event.storage import models
-from ceilometer.i18n import _LI, _LW, _LE
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
@@ -416,7 +415,7 @@ class Sink(object):
             try:
                 self.publishers.append(publisher_manager.get(p))
             except Exception:
-                LOG.error(_LE("Unable to load publisher %s"), p,
+                LOG.error("Unable to load publisher %s", p,
                           exc_info=True)
 
         self.multi_publish = True if len(self.publishers) > 1 else False
@@ -436,11 +435,11 @@ class Sink(object):
                     "No transformer named %s loaded" % transformer['name'],
                     cfg)
             transformers.append(ext.plugin(**parameter))
-            LOG.info(_LI(
+            LOG.info(
                 "Pipeline %(pipeline)s: Setup transformer instance %(name)s "
-                "with parameter %(param)s") % ({'pipeline': self,
-                                                'name': transformer['name'],
-                                                'param': parameter}))
+                "with parameter %(param)s" % ({'pipeline': self,
+                                               'name': transformer['name'],
+                                               'param': parameter}))
 
         return transformers
 
@@ -455,8 +454,8 @@ class EventSink(Sink):
                 try:
                     p.publish_events(events)
                 except Exception:
-                    LOG.error(_LE("Pipeline %(pipeline)s: %(status)s "
-                                  "after error from publisher %(pub)s") %
+                    LOG.error("Pipeline %(pipeline)s: %(status)s "
+                              "after error from publisher %(pub)s" %
                               {'pipeline': self,
                                'status': 'Continue' if
                                self.multi_publish else 'Exit', 'pub': p},
@@ -485,11 +484,11 @@ class SampleSink(Sink):
                     return
             return sample
         except Exception:
-            LOG.error(_LE("Pipeline %(pipeline)s: Exit after error "
-                          "from transformer %(trans)s "
-                          "for %(smp)s") % {'pipeline': self,
-                                            'trans': transformer,
-                                            'smp': sample},
+            LOG.error("Pipeline %(pipeline)s: Exit after error "
+                      "from transformer %(trans)s "
+                      "for %(smp)s" % {'pipeline': self,
+                                       'trans': transformer,
+                                       'smp': sample},
                       exc_info=True)
 
     def _publish_samples(self, start, samples):
@@ -521,8 +520,8 @@ class SampleSink(Sink):
                 try:
                     p.publish_samples(transformed_samples)
                 except Exception:
-                    LOG.error(_LE("Pipeline %(pipeline)s: Continue after "
-                                  "error from publisher %(pub)s")
+                    LOG.error("Pipeline %(pipeline)s: Continue after "
+                              "error from publisher %(pub)s"
                               % {'pipeline': self, 'pub': p},
                               exc_info=True)
 
@@ -537,8 +536,8 @@ class SampleSink(Sink):
                 self._publish_samples(i + 1,
                                       list(transformer.flush()))
             except Exception:
-                LOG.error(_LE("Pipeline %(pipeline)s: Error "
-                              "flushing transformer %(trans)s")
+                LOG.error("Pipeline %(pipeline)s: Error "
+                          "flushing transformer %(trans)s"
                           % {'pipeline': self, 'trans': transformer},
                           exc_info=True)
 
@@ -597,10 +596,10 @@ class SamplePipeline(Pipeline):
     def _validate_volume(self, s):
         volume = s.volume
         if volume is None:
-            LOG.warning(_LW(
+            LOG.warning(
                 'metering data %(counter_name)s for %(resource_id)s '
                 '@ %(timestamp)s has no volume (volume: None), the sample will'
-                ' be dropped')
+                ' be dropped'
                 % {'counter_name': s.name,
                    'resource_id': s.resource_id,
                    'timestamp': s.timestamp if s.timestamp else 'NO TIMESTAMP'}
@@ -610,10 +609,10 @@ class SamplePipeline(Pipeline):
             try:
                 volume = float(volume)
             except ValueError:
-                LOG.warning(_LW(
+                LOG.warning(
                     'metering data %(counter_name)s for %(resource_id)s '
                     '@ %(timestamp)s has volume which is not a number '
-                    '(volume: %(counter_volume)s), the sample will be dropped')
+                    '(volume: %(counter_volume)s), the sample will be dropped'
                     % {'counter_name': s.name,
                        'resource_id': s.resource_id,
                        'timestamp': (
@@ -689,11 +688,11 @@ class ConfigManagerBase(object):
         """Returns hash of changed cfg else False."""
         mtime = self.get_cfg_mtime()
         if mtime > self.cfg_mtime:
-            LOG.info(_LI('Configuration file has been updated.'))
+            LOG.info('Configuration file has been updated.')
             self.cfg_mtime = mtime
             _hash = self.get_cfg_hash()
             if _hash != self.cfg_hash:
-                LOG.info(_LI("Detected change in configuration."))
+                LOG.info("Detected change in configuration.")
                 return _hash
         return False
 
@@ -779,7 +778,7 @@ class PipelineManager(ConfigManagerBase):
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
                                     cfg)
-        LOG.info(_LI('detected decoupled pipeline config format'))
+        LOG.info('detected decoupled pipeline config format')
         publisher_manager = PublisherManager(self.conf, p_type['name'])
 
         unique_names = set()
@@ -872,9 +871,9 @@ class PollingManager(ConfigManagerBase):
         try:
             cfg = self.load_config(cfg_file)
         except (TypeError, IOError):
-            LOG.warning(_LW('Using the pipeline configuration for polling '
-                            'is deprecated. %s should '
-                            'be used instead.'), cfg_file)
+            LOG.warning('Using the pipeline configuration for polling '
+                        'is deprecated. %s should '
+                        'be used instead.', cfg_file)
             cfg = self.load_config(conf.pipeline_cfg_file)
         self.sources = []
         if 'sources' not in cfg:

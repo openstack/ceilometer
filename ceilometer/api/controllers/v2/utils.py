@@ -31,7 +31,7 @@ import wsme
 
 from ceilometer.api.controllers.v2 import base
 from ceilometer.api import rbac
-from ceilometer.i18n import _, _LI
+from ceilometer.i18n import _
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
@@ -41,8 +41,8 @@ def enforce_limit(limit):
     """Ensure limit is defined and is valid. if not, set a default."""
     if limit is None:
         limit = pecan.request.cfg.api.default_api_return_limit
-        LOG.info(_LI('No limit value provided, result set will be'
-                     ' limited to %(limit)d.'), {'limit': limit})
+        LOG.info('No limit value provided, result set will be'
+                 ' limited to %(limit)d.', {'limit': limit})
     if not limit or limit <= 0:
         raise base.ClientSideError(_("Limit must be positive"))
     return limit

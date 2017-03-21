@@ -31,8 +31,8 @@ from stevedore import extension
 
 from ceilometer import declarative
 from ceilometer import dispatcher
-from ceilometer.i18n import _LE, _LW
 from ceilometer import gnocchi_client
+from ceilometer.i18n import _
 from ceilometer import keystone_client
 
 NAME_ENCODED = __name__.encode('utf-8')
@@ -95,10 +95,10 @@ class ResourcesDefinition(object):
         for field, field_type in expected.items():
             if field not in definition:
                 raise declarative.ResourceDefinitionException(
-                    _LE("Required field %s not specified") % field, definition)
+                    _("Required field %s not specified") % field, definition)
             if not isinstance(definition[field], field_type):
                 raise declarative.ResourceDefinitionException(
-                    _LE("Required field %(field)s should be a %(type)s") %
+                    _("Required field %(field)s should be a %(type)s") %
                     {'field': field, 'type': field_type}, definition)
 
     @staticmethod
@@ -214,7 +214,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         except ImportError:
             pass
         except oslo_cache.exception.ConfigurationError as exc:
-            LOG.warning(_LW('unable to configure oslo_cache: %s'), exc)
+            LOG.warning('unable to configure oslo_cache: %s', exc)
 
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
@@ -237,7 +237,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                     resource,
                     conf.dispatcher_gnocchi.archive_policy, plugin_manager))
             except Exception as exc:
-                LOG.error(_LE("Failed to load resource due to error %s") %
+                LOG.error("Failed to load resource due to error %s" %
                           exc)
         return resource_defs
 
@@ -251,14 +251,14 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                     project = self._ks_client.projects.find(
                         name=self.conf.dispatcher_gnocchi.filter_project)
                 except ka_exceptions.NotFound:
-                    LOG.warning(_LW('gnocchi project not found in keystone,'
-                                    ' ignoring the filter_service_activity '
-                                    'option'))
+                    LOG.warning('gnocchi project not found in keystone,'
+                                ' ignoring the filter_service_activity '
+                                'option')
                     self.filter_service_activity = False
                     return None
                 except Exception:
-                    LOG.exception(_LE('fail to retrieve user of Gnocchi '
-                                      'service'))
+                    LOG.exception('fail to retrieve user of Gnocchi '
+                                  'service')
                     raise
                 self._gnocchi_project_id = project.id
                 LOG.debug("gnocchi project found: %s", self.gnocchi_project_id)
@@ -319,7 +319,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 samples = list(samples)
                 rd = self._get_resource_definition_from_metric(metric_name)
                 if rd is None:
-                    LOG.warning(_LW("metric %s is not handled by Gnocchi") %
+                    LOG.warning("metric %s is not handled by Gnocchi" %
                                 metric_name)
                     continue
                 if rd.cfg.get("ignore"):
@@ -400,7 +400,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                     # NOTE(sileht): resource created in the meantime
                     pass
                 except gnocchi_exc.ClientException as e:
-                    LOG.error(_LE('Error creating resource %(id)s: %(err)s'),
+                    LOG.error('Error creating resource %(id)s: %(err)s',
                               {'id': resource['id'], 'err': six.text_type(e)})
                     # We cannot post measures for this resource
                     # and we can't patch it later
@@ -498,8 +498,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             return self._gnocchi.resource.search(
                 resource_type, jsonutils.loads(query))
         except Exception:
-            LOG.error(_LE("Fail to search resource type %{resource_type}s "
-                          "with '%{query}s'"),
+            LOG.error("Fail to search resource type %{resource_type}s "
+                      "with '%{query}s'",
                       {'resource_type': resource_type, 'query': query},
                       exc_info=True)
         return []
@@ -512,6 +512,6 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             LOG.debug("Delete event received on unexisting resource (%s), "
                       "ignore it.", resource['id'])
         except Exception:
-            LOG.error(_LE("Fail to update the resource %s"), resource,
+            LOG.error("Fail to update the resource %s", resource,
                       exc_info=True)
         LOG.debug('Resource %s ended at %s' % (resource["id"], ended_at))
