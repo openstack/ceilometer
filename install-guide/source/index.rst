@@ -11,5 +11,5 @@ Telemetry Data Collection service
    verify.rst
    next-steps.rst
 
-This chapter assumes a working setup of OpenStack following the base
-Installation Guide.
+This chapter assumes a working setup of OpenStack following the
+`OpenStack Installation Tutorials and Guides <http://docs.openstack.org/#install-guides>`_.
