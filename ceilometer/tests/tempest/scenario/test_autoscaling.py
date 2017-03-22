@@ -89,13 +89,13 @@ class TestAutoscalingGabbi(manager.ScenarioTest):
                          if e['type'] == opt_section.catalog_type]
             if not endpoints:
                 raise Exception("%s endpoint not found" %
-                                config.CONF.metric.catalog_type)
+                                opt_section.catalog_type)
             endpoints = [e['url'] for e in endpoints[0]
                          if e['interface'] == endpoint_type]
             if not endpoints:
                 raise Exception("%s interface not found for endpoint %s" %
                                 (endpoint_type,
-                                 config.CONF.metric.catalog_type))
+                                 opt_section.catalog_type))
             return endpoints[0]
 
         else:
@@ -106,7 +106,7 @@ class TestAutoscalingGabbi(manager.ScenarioTest):
                          if e['type'] == opt_section.catalog_type]
             if not endpoints:
                 raise Exception("%s endpoint not found" %
-                                config.CONF.metric.catalog_type)
+                                opt_section.catalog_type)
             return endpoints[0]['endpoints'][0][endpoint_type]
 
     @staticmethod
