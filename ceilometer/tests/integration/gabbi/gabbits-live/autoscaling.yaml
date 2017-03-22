@@ -26,18 +26,6 @@ tests:
       data: <@create_stack.json
       status: 201
 
-    - name: waiting for stack creation
-      desc: Wait for the second event on the stack resource, it can be a success or failure
-      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test/events?resource_name=integration_test
-      redirects: true
-      method: GET
-      status: 200
-      poll:
-          count: 300
-          delay: 1
-      response_json_paths:
-          $.events[1].resource_name: integration_test
-
     - name: control stack status
       desc: Checks the stack have been created successfully
       url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
@@ -45,7 +33,7 @@ tests:
       method: GET
       status: 200
       poll:
-          count: 5
+          count: 300
           delay: 1
       response_json_paths:
           $.stack.stack_status: "CREATE_COMPLETE"
@@ -126,18 +114,6 @@ tests:
       data: <@update_stack.json
       status: 202
 
-    - name: waiting for stack update
-      desc: Wait for the third event on the stack resource, it can be a success or failure
-      url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test/events?resource_name=integration_test
-      redirects: true
-      method: GET
-      status: 200
-      poll:
-          count: 300
-          delay: 1
-      response_json_paths:
-          $.events[3].resource_name: integration_test
-
     - name: control stack status
       desc: Checks the stack have been created successfully
       url: $ENVIRON['HEAT_SERVICE_URL']/stacks/integration_test
@@ -145,7 +121,7 @@ tests:
       method: GET
       status: 200
       poll:
-          count: 5
+          count: 300
           delay: 1
       response_json_paths:
           $.stack.stack_status: "UPDATE_COMPLETE"
