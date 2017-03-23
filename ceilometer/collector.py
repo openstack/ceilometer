@@ -32,10 +32,10 @@ from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
 
 OPTS = [
-    cfg.StrOpt('udp_address',
-               default='0.0.0.0',
-               help='Address to which the UDP socket is bound. Set to '
-               'an empty string to disable.'),
+    cfg.HostAddressOpt('udp_address',
+                       default='0.0.0.0',
+                       help='Address to which the UDP socket is bound. Set to '
+                       'an empty string to disable.'),
     cfg.PortOpt('udp_port',
                 default=4952,
                 help='Port to which the UDP socket is bound.'),
