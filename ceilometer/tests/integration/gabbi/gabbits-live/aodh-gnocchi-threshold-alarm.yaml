@@ -216,7 +216,7 @@ tests:
       data: '"ok"'
       status: 200
       response_strings:
-          "ok"
+          - "ok"
 
     - name: search 'gabbi-gnocchi-threshold-resource-alarm' alarm exist
       desc: search for alarm using user_id, project_id, alarm_name
