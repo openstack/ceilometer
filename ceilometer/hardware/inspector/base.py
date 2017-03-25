@@ -29,10 +29,9 @@ class Inspector(object):
         :param cache: cache passed from the pollster
         :param extra_metadata: extra dict to be used as metadata
         :param param: a dict of inspector specific param
-        :return: an iterator of (value, metadata, extra)
-        :return value: the sample value
-        :return metadata: dict to construct sample's metadata
-        :return extra: dict of extra metadata to help constructing sample
+        :return: an iterator of (value, metadata, extra) containing the sample
+                 value, metadata dict to construct sample's metadata, and
+                 extra dict of extra metadata to help constructing sample
         """
 
     def prepare_params(self, param):
