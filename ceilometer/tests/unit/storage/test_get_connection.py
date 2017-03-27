@@ -15,7 +15,6 @@
 """Tests for ceilometer/storage/
 """
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer import service
@@ -29,8 +28,7 @@ import six
 class EngineTest(base.BaseTestCase):
     def setUp(self):
         super(EngineTest, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_get_connection(self):
         engine = storage.get_connection(self.CONF,
@@ -48,8 +46,7 @@ class EngineTest(base.BaseTestCase):
 class ConnectionRetryTest(base.BaseTestCase):
     def setUp(self):
         super(ConnectionRetryTest, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_retries(self):
         with mock.patch.object(storage, 'get_connection') as retries:
@@ -66,8 +63,7 @@ class ConnectionRetryTest(base.BaseTestCase):
 class ConnectionConfigTest(base.BaseTestCase):
     def setUp(self):
         super(ConnectionConfigTest, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_only_default_url(self):
         self.CONF.set_override("connection", "log://", group="database")

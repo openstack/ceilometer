@@ -13,7 +13,6 @@
 # under the License.
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 from six.moves.urllib import parse as urlparse
 
@@ -31,8 +30,7 @@ class TestOpencontrailDriver(base.BaseTestCase):
                                    return_value=self.fake_ports())
         self.nc_ports.start()
 
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.driver = driver.OpencontrailDriver(self.CONF)
         self.parse_url = urlparse.ParseResult('opencontrail',
                                               '127.0.0.1:8143',

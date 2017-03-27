@@ -16,7 +16,6 @@
 """
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.agent.discovery import endpoint
@@ -29,13 +28,12 @@ class TestEndpointDiscovery(base.BaseTestCase):
 
     def setUp(self):
         super(TestEndpointDiscovery, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.CONF.set_override('interface', 'publicURL',
-                               group='service_credentials')
-        self.CONF.set_override('region_name', 'test-region-name',
-                               group='service_credentials')
-        self.discovery = endpoint.EndpointDiscovery(self.CONF)
+        CONF = service.prepare_service([], [])
+        CONF.set_override('interface', 'publicURL',
+                          group='service_credentials')
+        CONF.set_override('region_name', 'test-region-name',
+                          group='service_credentials')
+        self.discovery = endpoint.EndpointDiscovery(CONF)
         self.manager = mock.MagicMock()
         self.catalog = (self.manager.keystone.session.auth.get_access.
                         return_value.service_catalog)
@@ -64,9 +62,8 @@ class TestEndpointDiscovery(base.BaseTestCase):
 class TestLocalnodeDiscovery(base.BaseTestCase):
     def setUp(self):
         super(TestLocalnodeDiscovery, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.discovery = localnode.LocalNodeDiscovery(self.CONF)
+        CONF = service.prepare_service([], [])
+        self.discovery = localnode.LocalNodeDiscovery(CONF)
         self.manager = mock.MagicMock()
 
     def test_lockalnode_discovery(self):
@@ -103,8 +100,7 @@ class TestHardwareDiscovery(base.BaseTestCase):
 
     def setUp(self):
         super(TestHardwareDiscovery, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.discovery = hardware.NodesDiscoveryTripleO(self.CONF)
         self.discovery.nova_cli = mock.MagicMock()
         self.manager = mock.MagicMock()

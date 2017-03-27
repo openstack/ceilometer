@@ -14,7 +14,6 @@ import datetime
 
 import iso8601
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 
 from ceilometer.compute import discovery
@@ -121,8 +120,7 @@ class TestDiscovery(base.BaseTestCase):
                                           self.utc_now)
         self.useFixture(patch_timeutils)
 
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.CONF.set_override('host', 'test')
 
     def test_normal_discovery(self):

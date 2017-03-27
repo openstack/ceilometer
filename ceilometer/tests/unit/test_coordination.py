@@ -16,7 +16,6 @@
 import logging
 
 import mock
-from oslo_config import fixture as fixture_config
 import tooz.coordination
 from tooz import hashring
 
@@ -121,8 +120,7 @@ class TestPartitioning(base.BaseTestCase):
 
     def setUp(self):
         super(TestPartitioning, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config(
-            service.prepare_service([], []))).conf
+        self.CONF = service.prepare_service([], [])
         self.str_handler = MockLoggingHandler()
         coordination.LOG.logger.addHandler(self.str_handler)
         self.shared_storage = {}

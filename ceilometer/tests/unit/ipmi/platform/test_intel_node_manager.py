@@ -16,7 +16,6 @@ import abc
 import tempfile
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 import six
 
@@ -36,11 +35,10 @@ class _Base(base.BaseTestCase):
     def setUp(self):
         super(_Base, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.init_test_engine()
         with mock.patch.object(node_manager.NodeManager, '__new__',
                                side_effect=self._new_no_singleton):
-            self.nm = node_manager.NodeManager(self.CONF)
+            self.nm = node_manager.NodeManager(conf)
 
     @staticmethod
     def _new_no_singleton(cls, *args, **kwargs):

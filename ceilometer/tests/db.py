@@ -21,7 +21,6 @@ import warnings
 
 import fixtures
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 import six
 from six.moves.urllib import parse as urlparse
@@ -165,8 +164,7 @@ class TestBase(test_base.BaseTestCase):
             raise testcase.TestSkipped(
                 'Test is not applicable for %s' % engine)
 
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
         manager = self.DRIVER_MANAGERS.get(engine)
         if not manager:

@@ -15,7 +15,6 @@
 
 import mock
 from oslo_config import cfg
-from oslo_config import fixture as fixture_config
 
 from ceilometer.api import app
 from ceilometer import service
@@ -26,8 +25,7 @@ class TestApp(base.BaseTestCase):
 
     def setUp(self):
         super(TestApp, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_api_paste_file_not_exist(self):
         self.CONF.set_override('api_paste_config', 'non-existent-file')

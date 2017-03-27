@@ -23,7 +23,6 @@ import os
 import tempfile
 
 import mock
-from oslo_config import fixture as fixture_config
 import six
 from stevedore import extension
 import yaml
@@ -248,8 +247,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.CONF.set_override(
             'cfg_file',
             self.path_get('etc/ceilometer/polling.yaml'), group='polling'

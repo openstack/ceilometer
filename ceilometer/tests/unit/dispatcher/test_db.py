@@ -15,7 +15,6 @@
 import datetime
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.dispatcher import database
@@ -27,8 +26,7 @@ class TestDispatcherDB(base.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherDB, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.CONF.set_override('connection', 'sqlite://', group='database')
         self.meter_dispatcher = database.MeterDatabaseDispatcher(self.CONF)
 

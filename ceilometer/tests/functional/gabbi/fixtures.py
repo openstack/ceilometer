@@ -23,7 +23,6 @@ import uuid
 
 from gabbi import fixture
 from oslo_config import cfg
-from oslo_config import fixture as fixture_config
 from oslo_utils import fileutils
 import six
 from six.moves.urllib import parse as urlparse
@@ -71,9 +70,7 @@ class ConfigFixture(fixture.GabbiFixture):
         if engine not in ENGINES:
             raise case.SkipTest('Database engine not supported')
 
-        conf = service.prepare_service([], [])
-        conf = fixture_config.Config(conf).conf
-        self.conf = conf
+        self.conf = service.prepare_service([], [])
 
         content = ('{"default": ""}')
         if six.PY3:
@@ -82,28 +79,29 @@ class ConfigFixture(fixture.GabbiFixture):
                                                     prefix='policy',
                                                     suffix='.json')
 
-        conf.set_override("policy_file", self.tempfile,
-                          group='oslo_policy')
-        conf.set_override(
+        self.conf.set_override("policy_file", self.tempfile,
+                               group='oslo_policy')
+        self.conf.set_override(
             'api_paste_config',
             os.path.abspath(
                 'ceilometer/tests/functional/gabbi/gabbi_paste.ini')
         )
 
         # A special pipeline is required to use the direct publisher.
-        conf.set_override('pipeline_cfg_file',
-                          'ceilometer/tests/functional/gabbi_pipeline.yaml')
+        self.conf.set_override(
+            'pipeline_cfg_file',
+            'ceilometer/tests/functional/gabbi_pipeline.yaml')
 
         database_name = '%s-%s' % (db_url, str(uuid.uuid4()))
-        conf.set_override('connection', database_name, group='database')
-        conf.set_override('metering_connection', '', group='database')
+        self.conf.set_override('connection', database_name, group='database')
+        self.conf.set_override('metering_connection', '', group='database')
 
-        conf.set_override('gnocchi_is_enabled', False, group='api')
-        conf.set_override('aodh_is_enabled', False, group='api')
-        conf.set_override('panko_is_enabled', False, group='api')
+        self.conf.set_override('gnocchi_is_enabled', False, group='api')
+        self.conf.set_override('aodh_is_enabled', False, group='api')
+        self.conf.set_override('panko_is_enabled', False, group='api')
 
         LOAD_APP_KWARGS = {
-            'conf': conf,
+            'conf': self.conf,
         }
 
     def stop_fixture(self):

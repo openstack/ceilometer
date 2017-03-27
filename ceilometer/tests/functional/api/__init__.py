@@ -15,7 +15,6 @@
 """Base classes for API tests.
 """
 
-from oslo_config import fixture as fixture_config
 import pecan
 import pecan.testing
 
@@ -34,8 +33,7 @@ class FunctionalTest(db_test_base.TestBase):
 
     def setUp(self):
         super(FunctionalTest, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF)
 
         self.CONF.set_override("policy_file",

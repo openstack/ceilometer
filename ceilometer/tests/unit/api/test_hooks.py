@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from oslo_config import fixture as fixture_config
 import oslo_messaging
 
 from ceilometer.api import hooks
@@ -25,8 +24,7 @@ class TestTestNotifierHook(base.BaseTestCase):
 
     def setUp(self):
         super(TestTestNotifierHook, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_init_notifier_with_drivers(self):
         hook = hooks.NotifierHook(self.CONF)

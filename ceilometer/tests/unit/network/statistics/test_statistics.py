@@ -15,7 +15,6 @@
 
 import datetime
 
-from oslo_config import fixture as fixture_config
 from oslo_utils import timeutils
 from oslotest import base
 
@@ -29,8 +28,7 @@ class TestBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_subclass_ok(self):
 
@@ -71,8 +69,7 @@ class TestBaseGetSamples(base.BaseTestCase):
 
     def setUp(self):
         super(TestBaseGetSamples, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
         class FakePollster(statistics._Base):
             meter_name = 'foo'

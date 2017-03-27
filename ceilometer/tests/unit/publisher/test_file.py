@@ -20,7 +20,6 @@ import logging.handlers
 import os
 import tempfile
 
-from oslo_config import fixture as fixture_config
 from oslo_utils import netutils
 from oslotest import base
 
@@ -69,8 +68,7 @@ class TestFilePublisher(base.BaseTestCase):
 
     def setUp(self):
         super(TestFilePublisher, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_file_publisher_maxbytes(self):
         # Test valid configurations

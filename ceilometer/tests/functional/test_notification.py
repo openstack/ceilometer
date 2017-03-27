@@ -17,7 +17,6 @@
 import time
 
 import mock
-from oslo_config import fixture as fixture_config
 import oslo_messaging
 from oslo_utils import fileutils
 import six
@@ -99,8 +98,7 @@ class TestNotification(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestNotification, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.CONF.set_override("workload_partitioning", True,
@@ -221,8 +219,7 @@ class BaseRealNotification(tests_base.BaseTestCase):
 
     def setUp(self):
         super(BaseRealNotification, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['vcpus', 'memory'])
@@ -447,8 +444,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestRealNotificationMultipleAgents, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF, 'nova')
 
         pipeline_cfg_file = self.setup_pipeline(['instance', 'memory'])

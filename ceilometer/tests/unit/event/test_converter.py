@@ -17,7 +17,6 @@ import datetime
 
 import jsonpath_rw_ext
 import mock
-from oslo_config import fixture as fixture_config
 import six
 
 from ceilometer import declarative
@@ -598,8 +597,7 @@ class TestNotificationConverter(ConverterBase):
 
     def setUp(self):
         super(TestNotificationConverter, self).setUp()
-        conf = ceilometer_service.prepare_service(argv=[], config_files=[])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = ceilometer_service.prepare_service([], [])
         self.valid_event_def1 = [{
             'event_type': 'compute.instance.create.*',
             'traits': {

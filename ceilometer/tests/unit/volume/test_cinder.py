@@ -12,7 +12,6 @@
 # under the License.
 
 import mock
-from oslo_config import fixture as fixture_config
 
 from ceilometer.agent import manager
 from ceilometer import service
@@ -109,9 +108,8 @@ class TestVolumeSizePollster(base.BaseTestCase):
     def setUp(self):
         super(TestVolumeSizePollster, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.manager = manager.AgentManager(0, self.CONF)
-        self.pollster = cinder.VolumeSizePollster(self.CONF)
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeSizePollster(conf)
 
     def test_volume_size_pollster(self):
         volume_size_samples = list(
@@ -130,9 +128,8 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
     def setUp(self):
         super(TestVolumeSnapshotSizePollster, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.manager = manager.AgentManager(0, self.CONF)
-        self.pollster = cinder.VolumeSnapshotSize(self.CONF)
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeSnapshotSize(conf)
 
     def test_volume_snapshot_size_pollster(self):
         volume_snapshot_size_samples = list(
@@ -153,9 +150,8 @@ class TestVolumeBackupSizePollster(base.BaseTestCase):
     def setUp(self):
         super(TestVolumeBackupSizePollster, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.manager = manager.AgentManager(0, self.CONF)
-        self.pollster = cinder.VolumeBackupSize(self.CONF)
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeBackupSize(conf)
 
     def test_volume_backup_size_pollster(self):
         volume_backup_size_samples = list(

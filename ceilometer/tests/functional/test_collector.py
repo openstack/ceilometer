@@ -16,7 +16,6 @@ import socket
 
 import mock
 import msgpack
-from oslo_config import fixture as fixture_config
 import oslo_messaging
 from oslo_utils import timeutils
 from oslotest import mockpatch
@@ -42,8 +41,7 @@ class FakeConnection(object):
 class TestCollector(tests_base.BaseTestCase):
     def setUp(self):
         super(TestCollector, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.CONF.import_opt("connection", "oslo_db.options", group="database")
         self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override('telemetry_secret', 'not-so-secret',

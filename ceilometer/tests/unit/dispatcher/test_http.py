@@ -17,7 +17,6 @@ import datetime
 import uuid
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 import requests
 
@@ -32,8 +31,7 @@ class TestDispatcherHttp(base.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherHttp, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.msg = {'counter_name': 'test',
                     'resource_id': self.id(),
                     'counter_volume': 1,
@@ -144,8 +142,7 @@ class TestEventDispatcherHttp(base.BaseTestCase):
     """Test sending events with the http dispatcher"""
     def setUp(self):
         super(TestEventDispatcherHttp, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
         # repr(uuid.uuid4()) is used in test event creation to avoid an
         # exception being thrown when the uuid is serialized to JSON

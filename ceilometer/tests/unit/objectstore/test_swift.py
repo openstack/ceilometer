@@ -16,7 +16,6 @@ import collections
 
 from keystoneauth1 import exceptions
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 from swiftclient import client as swift_client
@@ -106,8 +105,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
 

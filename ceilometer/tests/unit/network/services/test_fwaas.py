@@ -14,7 +14,6 @@
 # under the License.
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
@@ -31,8 +30,7 @@ class _BaseTestFWPollster(base.BaseTestCase):
     def setUp(self):
         super(_BaseTestFWPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
         plugin_base._get_keystone = mock.Mock()
         catalog = (plugin_base._get_keystone.session.auth.get_access.

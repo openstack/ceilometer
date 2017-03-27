@@ -21,7 +21,6 @@ import traceback
 import unittest
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslo_utils import timeutils
 from oslotest import mockpatch
 import six
@@ -133,8 +132,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(BasePipelineTestCase, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
         self.test_counter = sample.Sample(
             name='a',
