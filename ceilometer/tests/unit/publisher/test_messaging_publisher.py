@@ -25,6 +25,7 @@ import testscenarios.testcase
 from ceilometer.event.storage import models as event
 from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
+from ceilometer import service
 from ceilometer.tests import base as tests_base
 
 
@@ -97,7 +98,8 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
 
     def setUp(self):
         super(BasePublisherTestCase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.setup_messaging(self.CONF)
 
 

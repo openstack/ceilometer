@@ -18,6 +18,7 @@ from oslotest import base
 from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics.opencontrail import driver
+from ceilometer import service
 
 
 class TestOpencontrailDriver(base.BaseTestCase):
@@ -30,7 +31,8 @@ class TestOpencontrailDriver(base.BaseTestCase):
                                    return_value=self.fake_ports())
         self.nc_ports.start()
 
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.driver = driver.OpencontrailDriver(self.CONF)
         self.parse_url = urlparse.ParseResult('opencontrail',
                                               '127.0.0.1:8143',

@@ -16,6 +16,7 @@ from oslo_config import fixture
 from oslotest import mockpatch
 
 from ceilometer import dispatcher
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -27,7 +28,8 @@ class FakeMeterDispatcher(dispatcher.MeterDispatcherBase):
 class TestDispatchManager(base.BaseTestCase):
     def setUp(self):
         super(TestDispatchManager, self).setUp()
-        self.conf = self.useFixture(fixture.Config())
+        conf = service.prepare_service([], [])
+        self.conf = self.useFixture(fixture.Config(conf))
         self.conf.config(meter_dispatchers=['database', 'gnocchi'],
                          event_dispatchers=['database'])
         self.CONF = self.conf.conf

@@ -25,6 +25,7 @@ from ceilometer.event.storage import models as event
 from ceilometer.publisher import kafka_broker as kafka
 from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
+from ceilometer import service
 from ceilometer.tests import base as tests_base
 
 
@@ -98,7 +99,8 @@ class TestKafkaPublisher(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestKafkaPublisher, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def test_publish(self):
         publisher = kafka.KafkaBrokerPublisher(self.CONF, netutils.urlsplit(

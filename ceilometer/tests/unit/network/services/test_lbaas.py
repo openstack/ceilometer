@@ -23,6 +23,7 @@ from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
 from ceilometer.network.services import discovery
 from ceilometer.network.services import lbaas
+from ceilometer import service
 
 
 class _BaseTestLBPollster(base.BaseTestCase):
@@ -31,7 +32,8 @@ class _BaseTestLBPollster(base.BaseTestCase):
     def setUp(self):
         super(_BaseTestLBPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.manager = manager.AgentManager(0, self.CONF)
         self.CONF.set_override('neutron_lbaas_version',
                                'v1',

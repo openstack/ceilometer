@@ -27,6 +27,7 @@ from oslotest import base
 from ceilometer.publisher import udp
 from ceilometer.publisher import utils
 from ceilometer import sample
+from ceilometer import service
 
 
 COUNTER_SOURCE = 'testsource'
@@ -110,7 +111,8 @@ class TestUDPPublisher(base.BaseTestCase):
 
     def setUp(self):
         super(TestUDPPublisher, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.publisher.telemetry_secret = 'not-so-secret'
 
     def _check_udp_socket(self, url, expected_addr_family):

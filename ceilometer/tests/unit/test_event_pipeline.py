@@ -25,7 +25,7 @@ from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
 from ceilometer.publisher import utils
-
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -46,8 +46,8 @@ class EventPipelineTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(EventPipelineTestCase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF([])
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         self.p_type = pipeline.EVENT_TYPE
         self.transformer_manager = None

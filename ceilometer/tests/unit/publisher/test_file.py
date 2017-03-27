@@ -26,6 +26,7 @@ from oslotest import base
 
 from ceilometer.publisher import file
 from ceilometer import sample
+from ceilometer import service
 
 
 class TestFilePublisher(base.BaseTestCase):
@@ -68,7 +69,8 @@ class TestFilePublisher(base.BaseTestCase):
 
     def setUp(self):
         super(TestFilePublisher, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def test_file_publisher_maxbytes(self):
         # Test valid configurations

@@ -23,6 +23,7 @@ from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
 from ceilometer.network import floatingip
 from ceilometer.network.services import discovery
+from ceilometer import service
 
 
 class _BaseTestFloatingIPPollster(base.BaseTestCase):
@@ -30,7 +31,8 @@ class _BaseTestFloatingIPPollster(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestFloatingIPPollster, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.manager = manager.AgentManager(0, self.CONF)
         plugin_base._get_keystone = mock.Mock()
 

@@ -31,6 +31,7 @@ from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
 from ceilometer import sample
+from ceilometer import service
 from ceilometer import transformer
 from ceilometer.transformer import accumulator
 from ceilometer.transformer import arithmetic
@@ -132,7 +133,8 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(BasePipelineTestCase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         self.test_counter = sample.Sample(
             name='a',

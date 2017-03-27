@@ -16,6 +16,7 @@ from oslotest import mockpatch
 from ceilometer import collector
 from ceilometer import dispatcher
 from ceilometer.publisher import utils
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -32,7 +33,8 @@ class FakeDispatcher(dispatcher.EventDispatcherBase):
 class TestEventDispatcherVerifier(base.BaseTestCase):
     def setUp(self):
         super(TestEventDispatcherVerifier, self).setUp()
-        self.conf = self.useFixture(fixture.Config()).conf
+        conf = service.prepare_service([], [])
+        self.conf = self.useFixture(fixture.Config(conf)).conf
         self.conf.import_opt('telemetry_secret',
                              'ceilometer.publisher.utils',
                              'publisher')

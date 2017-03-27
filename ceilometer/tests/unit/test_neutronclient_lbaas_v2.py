@@ -17,13 +17,15 @@ from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer import neutron_client
+from ceilometer import service
 
 
 class TestNeutronClientLBaaSV2(base.BaseTestCase):
 
     def setUp(self):
         super(TestNeutronClientLBaaSV2, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.nc = neutron_client.Client(self.CONF)
 
     @staticmethod

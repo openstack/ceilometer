@@ -29,8 +29,8 @@ class TestEndpointDiscovery(base.BaseTestCase):
 
     def setUp(self):
         super(TestEndpointDiscovery, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override('interface', 'publicURL',
                                group='service_credentials')
         self.CONF.set_override('region_name', 'test-region-name',
@@ -64,8 +64,8 @@ class TestEndpointDiscovery(base.BaseTestCase):
 class TestLocalnodeDiscovery(base.BaseTestCase):
     def setUp(self):
         super(TestLocalnodeDiscovery, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.discovery = localnode.LocalNodeDiscovery(self.CONF)
         self.manager = mock.MagicMock()
 
@@ -103,8 +103,8 @@ class TestHardwareDiscovery(base.BaseTestCase):
 
     def setUp(self):
         super(TestHardwareDiscovery, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.discovery = hardware.NodesDiscoveryTripleO(self.CONF)
         self.discovery.nova_cli = mock.MagicMock()
         self.manager = mock.MagicMock()

@@ -15,6 +15,7 @@ import mock
 from oslo_config import fixture as fixture_config
 
 from ceilometer.agent import manager
+from ceilometer import service
 import ceilometer.tests.base as base
 from ceilometer.volume import cinder
 
@@ -107,7 +108,8 @@ class TestVolumeSizePollster(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestVolumeSizePollster, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.manager = manager.AgentManager(0, self.CONF)
         self.pollster = cinder.VolumeSizePollster(self.CONF)
 
@@ -127,7 +129,8 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestVolumeSnapshotSizePollster, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.manager = manager.AgentManager(0, self.CONF)
         self.pollster = cinder.VolumeSnapshotSize(self.CONF)
 
@@ -149,7 +152,8 @@ class TestVolumeBackupSizePollster(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestVolumeBackupSizePollster, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.manager = manager.AgentManager(0, self.CONF)
         self.pollster = cinder.VolumeBackupSize(self.CONF)
 
