@@ -247,8 +247,6 @@ function _ceilometer_configure_storage_backend {
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        # NOTE(gordc): set higher retry in case gnocchi is started after ceilometer on a slow machine
-        iniset $CEILOMETER_CONF storage max_retries 20
         # NOTE(gordc): set batching to better handle recording on a slow machine
         iniset $CEILOMETER_CONF collector batch_size 50
         iniset $CEILOMETER_CONF collector batch_timeout 5
