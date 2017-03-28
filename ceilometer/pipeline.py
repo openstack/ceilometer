@@ -872,8 +872,9 @@ class PollingManager(ConfigManagerBase):
         try:
             cfg = self.load_config(cfg_file)
         except (TypeError, IOError):
-            LOG.warning(_LW('Unable to locate polling configuration, falling '
-                            'back to pipeline configuration.'))
+            LOG.warning(_LW('Using the pipeline configuration for polling '
+                            'is deprecated. %s should '
+                            'be used instead.'), cfg_file)
             cfg = self.load_config(conf.pipeline_cfg_file)
         self.sources = []
         if 'sources' not in cfg:
