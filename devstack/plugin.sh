@@ -411,7 +411,6 @@ function install_ceilometerclient {
 # start_ceilometer() - Start running processes, including screen
 function start_ceilometer {
     run_process ceilometer-acentral "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces central --config-file $CEILOMETER_CONF"
-    run_process ceilometer-anotification "$CEILOMETER_BIN_DIR/ceilometer-agent-notification --config-file $CEILOMETER_CONF"
     run_process ceilometer-aipmi "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces ipmi --config-file $CEILOMETER_CONF"
 
     if [[ "$CEILOMETER_USE_MOD_WSGI" == "False" ]]; then
@@ -423,8 +422,9 @@ function start_ceilometer {
         tail_log ceilometer-api /var/log/$APACHE_NAME/ceilometer_access.log
     fi
 
-    # run the collector after restarting apache as it needs
+    # run the notification agent/collector after restarting apache as it needs
     # operational keystone if using gnocchi
+    run_process ceilometer-anotification "$CEILOMETER_BIN_DIR/ceilometer-agent-notification --config-file $CEILOMETER_CONF"
     run_process ceilometer-collector "$CEILOMETER_BIN_DIR/ceilometer-collector --config-file $CEILOMETER_CONF"
 
     # Start the compute agent late to allow time for the collector to
