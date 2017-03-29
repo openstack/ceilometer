@@ -173,10 +173,30 @@ class LibvirtInspector(virt_inspector.Inspector):
         # TODO(sileht): stats also have the disk/vnic info
         # we could use that instead of the old method for Queen
         stats = self.connection.domainListGetStats([domain], 0)[0][1]
+        cpu_time = 0
+        current_cpus = stats.get('vcpu.current')
+        # Iterate over the maximum number of CPUs here, and count the
+        # actual number encountered, since the vcpu.x structure can
+        # have holes according to
+        # https://libvirt.org/git/?p=libvirt.git;a=blob;f=src/libvirt-domain.c
+        # virConnectGetAllDomainStats()
+        for vcpu in six.moves.range(stats.get('vcpu.maximum', 0)):
+            try:
+                cpu_time += (stats.get('vcpu.%s.time' % vcpu) +
+                             stats.get('vcpu.%s.wait' % vcpu))
+                current_cpus -= 1
+            except TypeError:
+                # pass here, if there are too many holes, the cpu count will
+                # not match, so don't need special error handling.
+                pass
+
+        if current_cpus:
+            # There wasn't enough data, so fall back
+            cpu_time = stats.get('cpu.time')
 
         return virt_inspector.InstanceStats(
             cpu_number=stats.get('vcpu.current'),
-            cpu_time=stats.get('cpu.time'),
+            cpu_time=cpu_time,
             memory_usage=memory_used,
             memory_resident=memory_resident,
             cpu_cycles=stats.get("perf.cpu_cycles"),
