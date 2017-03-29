@@ -75,10 +75,30 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         # TODO(gordc): this can probably be cached since it can be used to get
         # all data related
-        stats = self.connection.domainListGetStats([domain])
-        dom_stat = stats[0][1]
-        return virt_inspector.CPUStats(number=dom_stat['vcpu.current'],
-                                       time=dom_stat['cpu.time'])
+        stats = self.connection.domainListGetStats([domain], 0)[0][1]
+        cpu_time = 0
+        current_cpus = stats.get('vcpu.current')
+        # Iterate over the maximum number of CPUs here, and count the
+        # actual number encountered, since the vcpu.x structure can
+        # have holes according to
+        # https://libvirt.org/git/?p=libvirt.git;a=blob;f=src/libvirt-domain.c
+        # virConnectGetAllDomainStats()
+        for vcpu in six.moves.range(stats.get('vcpu.maximum', 0)):
+            try:
+                cpu_time += (stats.get('vcpu.%s.time' % vcpu) +
+                             stats.get('vcpu.%s.wait' % vcpu))
+                current_cpus -= 1
+            except TypeError:
+                # pass here, if there are too many holes, the cpu count will
+                # not match, so don't need special error handling.
+                pass
+
+        if current_cpus:
+            # There wasn't enough data, so fall back
+            cpu_time = stats.get('cpu.time')
+
+        return virt_inspector.CPUStats(number=stats['vcpu.current'],
+                                       time=cpu_time)
 
     def inspect_cpu_l3_cache(self, instance):
         domain = self._lookup_by_uuid(instance)
