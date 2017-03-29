@@ -37,7 +37,8 @@ LOAD_BALANCER_STATUS_V2 = {
     'online': 1,
     'no_monitor': 3,
     'error': 4,
-    'degraded': 5
+    'degraded': 5,
+    'disabled': 6
 }
 
 
