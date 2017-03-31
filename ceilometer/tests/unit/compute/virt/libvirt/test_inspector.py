@@ -71,7 +71,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            stats = self.inspector.inspect_instance(self.instance)
+            stats = self.inspector.inspect_instance(self.instance, None)
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(999999, stats.cpu_time)
             self.assertEqual(90112, stats.cpu_l3_cache_usage)
@@ -94,7 +94,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                         'refresh_libvirt_connection', return_value=conn):
             self.assertRaises(virt_inspector.InstanceShutOffException,
                               self.inspector.inspect_instance,
-                              self.instance)
+                              self.instance, None)
 
     def test_inspect_vnics(self):
         dom_xml = """
@@ -170,7 +170,8 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            interfaces = list(self.inspector.inspect_vnics(self.instance))
+            interfaces = list(self.inspector.inspect_vnics(
+                self.instance, None))
 
             self.assertEqual(3, len(interfaces))
             vnic0 = interfaces[0]
@@ -219,7 +220,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                         'refresh_libvirt_connection', return_value=conn):
             inspect = self.inspector.inspect_vnics
             self.assertRaises(virt_inspector.InstanceShutOffException,
-                              list, inspect(self.instance))
+                              list, inspect(self.instance, None))
 
     def test_inspect_disks(self):
         dom_xml = """
@@ -245,7 +246,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            disks = list(self.inspector.inspect_disks(self.instance))
+            disks = list(self.inspector.inspect_disks(self.instance, None))
 
             self.assertEqual(1, len(disks))
             self.assertEqual('vda', disks[0].device)
@@ -264,7 +265,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                         'refresh_libvirt_connection', return_value=conn):
             inspect = self.inspector.inspect_disks
             self.assertRaises(virt_inspector.InstanceShutOffException,
-                              list, inspect(self.instance))
+                              list, inspect(self.instance, None))
 
     def test_inspect_disk_info(self):
         dom_xml = """
@@ -290,7 +291,8 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            disks = list(self.inspector.inspect_disk_info(self.instance))
+            disks = list(self.inspector.inspect_disk_info(
+                self.instance, None))
 
             self.assertEqual(1, len(disks))
             self.assertEqual('vda', disks[0].device)
@@ -322,7 +324,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            disks = list(self.inspector.inspect_disk_info(self.instance))
+            disks = list(self.inspector.inspect_disk_info(self.instance, None))
             self.assertEqual(0, len(disks))
 
     def test_inspect_disk_info_without_source_element(self):
@@ -350,7 +352,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            disks = list(self.inspector.inspect_disk_info(self.instance))
+            disks = list(self.inspector.inspect_disk_info(self.instance, None))
             self.assertEqual(0, len(disks))
 
     def test_inspect_memory_usage_with_domain_shutoff(self):
@@ -363,7 +365,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                         'refresh_libvirt_connection', return_value=conn):
             self.assertRaises(virt_inspector.InstanceShutOffException,
                               self.inspector.inspect_instance,
-                              self.instance)
+                              self.instance, None)
 
     def test_inspect_memory_with_empty_stats(self):
         domain = mock.Mock()
@@ -375,7 +377,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            stats = self.inspector.inspect_instance(self.instance)
+            stats = self.inspector.inspect_instance(self.instance, None)
             self.assertIsNone(stats.memory_usage)
             self.assertIsNone(stats.memory_resident)
 
@@ -391,7 +393,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            stats = self.inspector.inspect_instance(self.instance)
+            stats = self.inspector.inspect_instance(self.instance, None)
             self.assertIsNone(stats.cpu_l3_cache_usage)
             self.assertIsNone(stats.memory_bandwidth_total)
             self.assertIsNone(stats.memory_bandwidth_local)
@@ -417,4 +419,4 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
 
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,
-                          self.inspector.inspect_instance, 'foo')
+                          self.inspector.inspect_instance, 'foo', None)

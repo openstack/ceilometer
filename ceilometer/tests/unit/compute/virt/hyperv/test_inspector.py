@@ -44,19 +44,19 @@ class TestHyperVInspection(base.BaseTestCase):
             os_win_exc.OSWinException)
         self.assertRaises(virt_inspector.InspectorException,
                           self._inspector.inspect_instance,
-                          mock.sentinel.instance)
+                          mock.sentinel.instance, None)
 
         self._inspector._utils.get_cpu_metrics.side_effect = (
             os_win_exc.HyperVException)
         self.assertRaises(virt_inspector.InspectorException,
                           self._inspector.inspect_instance,
-                          mock.sentinel.instance)
+                          mock.sentinel.instance, None)
 
         self._inspector._utils.get_cpu_metrics.side_effect = (
             os_win_exc.NotFound(resource='foofoo'))
         self.assertRaises(virt_inspector.InstanceNotFoundException,
                           self._inspector.inspect_instance,
-                          mock.sentinel.instance)
+                          mock.sentinel.instance, None)
 
     def test_assert_original_traceback_maintained(self):
         def bar(self):
@@ -65,7 +65,7 @@ class TestHyperVInspection(base.BaseTestCase):
 
         self._inspector._utils.get_cpu_metrics.side_effect = bar
         try:
-            self._inspector.inspect_instance(mock.sentinel.instance)
+            self._inspector.inspect_instance(mock.sentinel.instance, None)
             self.fail("Test expected exception, but it was not raised.")
         except virt_inspector.InstanceNotFoundException:
             # exception has been raised as expected.
@@ -101,7 +101,7 @@ class TestHyperVInspection(base.BaseTestCase):
             fake_cpu_clock_used, fake_cpu_count, fake_uptime)
         fake_usage = self._inspector._utils.get_memory_metrics.return_value
 
-        stats = self._inspector.inspect_instance(fake_instance_name)
+        stats = self._inspector.inspect_instance(fake_instance_name, None)
 
         self.assertEqual(fake_cpu_count, stats.cpu_number)
         self.assertEqual(fake_cpu_time, stats.cpu_time)
@@ -121,7 +121,7 @@ class TestHyperVInspection(base.BaseTestCase):
             'address': fake_address}]
 
         inspected_vnics = list(self._inspector.inspect_vnics(
-            fake_instance_name))
+            fake_instance_name, None))
 
         self.assertEqual(1, len(inspected_vnics))
 
@@ -145,7 +145,7 @@ class TestHyperVInspection(base.BaseTestCase):
             'host_resource': fake_host_resource}]
 
         inspected_disks = list(self._inspector.inspect_disks(
-            fake_instance_name))
+            fake_instance_name, None))
 
         self.assertEqual(1, len(inspected_disks))
 
@@ -164,7 +164,7 @@ class TestHyperVInspection(base.BaseTestCase):
             'instance_id': fake_instance_id}]
 
         inspected_disks = list(self._inspector.inspect_disk_latency(
-            fake_instance_name))
+            fake_instance_name, None))
 
         self.assertEqual(1, len(inspected_disks))
 
@@ -182,7 +182,7 @@ class TestHyperVInspection(base.BaseTestCase):
             'instance_id': fake_instance_id}]
 
         inspected_disks = list(self._inspector.inspect_disk_iops(
-            fake_instance_name))
+            fake_instance_name, None))
 
         self.assertEqual(1, len(inspected_disks))
 

@@ -84,7 +84,7 @@ class TestXenapiInspection(base.BaseTestCase):
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
                                side_effect=fake_xenapi_request):
-            stats = self.inspector.inspect_instance(fake_instance)
+            stats = self.inspector.inspect_instance(fake_instance, None)
             self.assertEqual(40, stats.cpu_util)
             self.assertEqual(64, stats.memory_usage)
 
@@ -120,7 +120,7 @@ class TestXenapiInspection(base.BaseTestCase):
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
                                side_effect=_fake_xenapi_request):
-            stats = self.inspector.inspect_instance(fake_instance)
+            stats = self.inspector.inspect_instance(fake_instance, None)
             self.assertEqual(128, stats.memory_usage)
 
     def test_inspect_vnics(self):
@@ -148,7 +148,7 @@ class TestXenapiInspection(base.BaseTestCase):
                                    side_effect=bandwidth_returns):
 
                 interfaces = list(
-                    self.inspector.inspect_vnics(fake_instance))
+                    self.inspector.inspect_vnics(fake_instance, None))
 
                 self.assertEqual(1, len(interfaces))
                 vnic0 = interfaces[0]
@@ -172,7 +172,8 @@ class TestXenapiInspection(base.BaseTestCase):
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
                                side_effect=side_effects):
-            interfaces = list(self.inspector.inspect_vnic_rates(fake_instance))
+            interfaces = list(self.inspector.inspect_vnic_rates(
+                fake_instance, None))
 
             self.assertEqual(1, len(interfaces))
             vnic0 = interfaces[0]
@@ -193,7 +194,8 @@ class TestXenapiInspection(base.BaseTestCase):
         session = self.inspector.session
         with mock.patch.object(session, 'xenapi_request',
                                side_effect=side_effects):
-            disks = list(self.inspector.inspect_disk_rates(fake_instance))
+            disks = list(self.inspector.inspect_disk_rates(
+                fake_instance, None))
 
             self.assertEqual(1, len(disks))
             disk0 = disks[0]
