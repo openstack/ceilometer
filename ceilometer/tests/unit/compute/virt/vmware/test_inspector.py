@@ -23,13 +23,15 @@ from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.vmware import inspector as vsphere_inspector
+from ceilometer import service
 
 
 class TestVsphereInspection(base.BaseTestCase):
 
     def setUp(self):
         super(TestVsphereInspection, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         api_session = api.VMwareAPISession("test_server", "test_user",
                                            "test_password", 0, None,
                                            create_session=False, port=7443)

@@ -19,6 +19,7 @@ from oslotest import base
 import yaml
 
 from ceilometer import pipeline
+from ceilometer import service
 
 
 class PollingTestCase(base.BaseTestCase):
@@ -30,7 +31,8 @@ class PollingTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(PollingTestCase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         self.tmp_cfg = tempfile.NamedTemporaryFile(mode='w', delete=False)
         self.poll_cfg = {'sources': [{'name': 'test_source',

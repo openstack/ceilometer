@@ -17,12 +17,14 @@ import oslo_messaging.conffixture
 from oslotest import base
 
 from ceilometer import messaging
+from ceilometer import service
 
 
 class MessagingTests(base.BaseTestCase):
     def setUp(self):
         super(MessagingTests, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.useFixture(oslo_messaging.conffixture.ConfFixture(self.CONF))
 
     def test_get_transport_invalid_url(self):

@@ -16,11 +16,14 @@
 from oslo_config import fixture as fixture_config
 from oslotest import base
 
+from ceilometer import service
+
 
 class _PollsterTestBase(base.BaseTestCase):
     def setUp(self):
         super(_PollsterTestBase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def _test_pollster(self, pollster_class, meter_name,
                        meter_type, meter_unit):

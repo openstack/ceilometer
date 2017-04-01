@@ -24,6 +24,7 @@ import testscenarios.testcase
 from ceilometer.agent import manager
 from ceilometer.objectstore import rgw
 from ceilometer.objectstore import rgw_client
+from ceilometer import service
 
 bucket_list1 = [rgw_client.RGWAdminClient.Bucket('somefoo1', 10, 7)]
 bucket_list2 = [rgw_client.RGWAdminClient.Bucket('somefoo2', 2, 9)]
@@ -88,7 +89,8 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestRgwPollster, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override('radosgw', 'object-store',
                                group='service_types')
         self.pollster = self.factory(self.CONF)

@@ -17,6 +17,7 @@ from oslo_config import fixture as fixture_config
 import oslo_messaging
 
 from ceilometer.api import hooks
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -24,7 +25,8 @@ class TestTestNotifierHook(base.BaseTestCase):
 
     def setUp(self):
         super(TestTestNotifierHook, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def test_init_notifier_with_drivers(self):
         hook = hooks.NotifierHook(self.CONF)

@@ -31,6 +31,7 @@ import yaml
 from ceilometer.agent import plugin_base
 from ceilometer import pipeline
 from ceilometer import sample
+from ceilometer import service
 from ceilometer.tests import base
 from ceilometer import utils
 
@@ -247,12 +248,12 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override(
             'cfg_file',
             self.path_get('etc/ceilometer/polling.yaml'), group='polling'
         )
-        self.CONF(args=[])
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
         self.mgr.partition_coordinator = mock.MagicMock()

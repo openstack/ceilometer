@@ -19,6 +19,7 @@ from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector
+from ceilometer import service
 from ceilometer.tests.unit.compute.virt.xenapi import fake_XenAPI
 
 
@@ -53,7 +54,8 @@ class TestXenapiInspection(base.BaseTestCase):
 
     def setUp(self):
         super(TestXenapiInspection, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         api_session = mock.Mock()
         xenapi_inspector.get_api_session = mock.Mock(return_value=api_session)
         self.inspector = xenapi_inspector.XenapiInspector(self.CONF)

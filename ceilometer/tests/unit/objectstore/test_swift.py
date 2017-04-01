@@ -24,6 +24,7 @@ import testscenarios.testcase
 
 from ceilometer.agent import manager
 from ceilometer.objectstore import swift
+from ceilometer import service
 
 HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                                  'x-account-bytes-used': 321321321,
@@ -105,7 +106,8 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
 

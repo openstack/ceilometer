@@ -22,6 +22,7 @@ from six import moves
 from six.moves.urllib import parse as url_parse
 
 from ceilometer.network.statistics.opendaylight import driver
+from ceilometer import service
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -77,7 +78,8 @@ class _Base(base.BaseTestCase):
     def setUp(self):
         super(_Base, self).setUp()
         self.addCleanup(mock.patch.stopall)
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.driver = driver.OpenDayLightDriver(self.CONF)
 
         self.get_flow_statistics = mock.patch(

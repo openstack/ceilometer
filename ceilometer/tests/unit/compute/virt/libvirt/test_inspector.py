@@ -23,6 +23,7 @@ from oslotest import base
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
 from ceilometer.compute.virt.libvirt import utils
+from ceilometer import service
 
 
 class FakeLibvirtError(Exception):
@@ -38,7 +39,8 @@ class TestLibvirtInspection(base.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         self.instance = VMInstance()
         libvirt_inspector.libvirt = mock.Mock()
@@ -407,7 +409,8 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
 
     def setUp(self):
         super(TestLibvirtInspectionWithError, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.useFixture(fixtures.MonkeyPatch(
             'ceilometer.compute.virt.libvirt.utils.'
             'refresh_libvirt_connection',

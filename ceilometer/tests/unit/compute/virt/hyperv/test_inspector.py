@@ -25,6 +25,7 @@ from oslotest import base
 
 from ceilometer.compute.virt.hyperv import inspector as hyperv_inspector
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer import service
 
 
 class TestHyperVInspection(base.BaseTestCase):
@@ -33,7 +34,8 @@ class TestHyperVInspection(base.BaseTestCase):
     @mock.patch.object(hyperv_inspector.HyperVInspector,
                        '_compute_host_max_cpu_clock')
     def setUp(self, mock_compute_host_cpu_clock):
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self._inspector = hyperv_inspector.HyperVInspector(self.CONF)
         self._inspector._utils = mock.MagicMock()
 

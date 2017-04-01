@@ -26,6 +26,7 @@ import uuid
 from ceilometer.event.storage import models as event
 from ceilometer.publisher import http
 from ceilometer import sample
+from ceilometer import service
 
 
 class TestHttpPublisher(base.BaseTestCase):
@@ -75,7 +76,8 @@ class TestHttpPublisher(base.BaseTestCase):
 
     def setUp(self):
         super(TestHttpPublisher, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def test_http_publisher_config(self):
         """Test publisher config parameters."""

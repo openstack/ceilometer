@@ -27,8 +27,8 @@ class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         self.inspector = mock.Mock()
         self.instance = mock.MagicMock()

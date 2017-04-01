@@ -20,13 +20,15 @@ from oslotest import base
 
 from ceilometer.dispatcher import database
 from ceilometer.publisher import utils
+from ceilometer import service
 
 
 class TestDispatcherDB(base.BaseTestCase):
 
     def setUp(self):
         super(TestDispatcherDB, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override('connection', 'sqlite://', group='database')
         self.meter_dispatcher = database.MeterDatabaseDispatcher(self.CONF)
 

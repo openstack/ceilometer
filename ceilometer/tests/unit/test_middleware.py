@@ -16,6 +16,7 @@ import mock
 from oslo_config import fixture as fixture_config
 
 from ceilometer import middleware
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -69,7 +70,8 @@ class TestNotifications(base.BaseTestCase):
 
     def setUp(self):
         super(TestNotifications, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.setup_messaging(self.CONF)
 
     def test_process_request_notification(self):

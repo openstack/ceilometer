@@ -22,13 +22,15 @@ from oslotest import base
 from ceilometer.network import statistics
 from ceilometer.network.statistics import driver
 from ceilometer import sample
+from ceilometer import service
 
 
 class TestBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestBase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def test_subclass_ok(self):
 
@@ -69,7 +71,8 @@ class TestBaseGetSamples(base.BaseTestCase):
 
     def setUp(self):
         super(TestBaseGetSamples, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         class FakePollster(statistics._Base):
             meter_name = 'foo'

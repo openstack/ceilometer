@@ -20,6 +20,7 @@ from oslotest import mockpatch
 import six
 
 from ceilometer.agent import manager
+from ceilometer import service
 from ceilometer.tests import base
 
 
@@ -28,7 +29,8 @@ class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
     def fake_data(self):
         """Fake data used for test."""

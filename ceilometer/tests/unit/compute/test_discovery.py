@@ -121,8 +121,8 @@ class TestDiscovery(base.BaseTestCase):
                                           self.utc_now)
         self.useFixture(patch_timeutils)
 
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.CONF)
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override('host', 'test')
 
     def test_normal_discovery(self):

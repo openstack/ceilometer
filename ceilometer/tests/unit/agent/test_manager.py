@@ -49,8 +49,8 @@ class TestPollsterBuilder(agentbase.TestPollster):
 class TestManager(base.BaseTestCase):
     def setUp(self):
         super(TestManager, self).setUp()
-        self.conf = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.conf)
+        conf = service.prepare_service([], [])
+        self.conf = self.useFixture(fixture_config.Config(conf)).conf
 
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def test_load_plugins(self):
@@ -258,8 +258,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             self.notified_samples.append(m)
 
     def setUp(self):
-        self.conf = self.useFixture(fixture_config.Config()).conf
-        service.prepare_service([], [], self.conf)
         self.notified_samples = []
         self.notifier = mock.Mock()
         self.notifier.sample.side_effect = self.fake_notifier_sample

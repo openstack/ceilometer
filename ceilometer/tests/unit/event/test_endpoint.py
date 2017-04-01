@@ -26,6 +26,7 @@ from ceilometer.event import endpoint as event_endpoint
 from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test
+from ceilometer import service
 from ceilometer.tests import base as tests_base
 
 
@@ -123,8 +124,8 @@ class TestEventEndpoint(tests_base.BaseTestCase):
 
     def setUp(self):
         super(TestEventEndpoint, self).setUp()
-        self.CONF = self.useFixture(fixture_config.Config()).conf
-        self.CONF([])
+        conf = service.prepare_service([], [])
+        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.CONF.set_override("connection", "log://", group='database')
         self.setup_messaging(self.CONF)
 
