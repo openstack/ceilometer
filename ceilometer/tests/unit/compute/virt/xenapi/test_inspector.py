@@ -196,7 +196,7 @@ class TestXenapiInspection(base.BaseTestCase):
             disks = list(self.inspector.inspect_disk_rates(fake_instance))
 
             self.assertEqual(1, len(disks))
-            disk0, info0 = disks[0]
+            disk0 = disks[0]
             self.assertEqual('xvdd', disk0.device)
-            self.assertEqual(1024.0, info0.read_bytes_rate)
-            self.assertEqual(2048.0, info0.write_bytes_rate)
+            self.assertEqual(1024.0, disk0.read_bytes_rate)
+            self.assertEqual(2048.0, disk0.write_bytes_rate)

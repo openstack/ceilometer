@@ -99,13 +99,6 @@ InterfaceRateStats = collections.namedtuple('InterfaceRateStats',
                                              'rx_bytes_rate', 'tx_bytes_rate'])
 
 
-# Named tuple representing disks.
-#
-# device: the device name for the disk
-#
-Disk = collections.namedtuple('Disk', ['device'])
-
-
 # Named tuple representing disk statistics.
 #
 # read_bytes: number of bytes read
@@ -115,7 +108,8 @@ Disk = collections.namedtuple('Disk', ['device'])
 # errors: number of errors
 #
 DiskStats = collections.namedtuple('DiskStats',
-                                   ['read_bytes', 'read_requests',
+                                   ['device',
+                                    'read_bytes', 'read_requests',
                                     'write_bytes', 'write_requests',
                                     'errors'])
 
@@ -127,7 +121,8 @@ DiskStats = collections.namedtuple('DiskStats',
 # write_requests_rate: number of write operations per second
 #
 DiskRateStats = collections.namedtuple('DiskRateStats',
-                                       ['read_bytes_rate',
+                                       ['device',
+                                        'read_bytes_rate',
                                         'read_requests_rate',
                                         'write_bytes_rate',
                                         'write_requests_rate'])
@@ -137,14 +132,14 @@ DiskRateStats = collections.namedtuple('DiskRateStats',
 # disk_latency: average disk latency
 #
 DiskLatencyStats = collections.namedtuple('DiskLatencyStats',
-                                          ['disk_latency'])
+                                          ['device', 'disk_latency'])
 
 # Named tuple representing disk iops statistics.
 #
 # iops: number of iops per second
 #
 DiskIOPSStats = collections.namedtuple('DiskIOPSStats',
-                                       ['iops_count'])
+                                       ['device', 'iops_count'])
 
 
 # Named tuple representing disk Information.
@@ -154,7 +149,8 @@ DiskIOPSStats = collections.namedtuple('DiskIOPSStats',
 # physical: usage of the disk
 
 DiskInfo = collections.namedtuple('DiskInfo',
-                                  ['capacity',
+                                  ['device',
+                                   'capacity',
                                    'allocation',
                                    'physical'])
 
