@@ -76,7 +76,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         return domain
 
     @libvirt_utils.retry_on_disconnect
-    def inspect_vnics(self, instance, duration=None):
+    def inspect_vnics(self, instance, duration):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
         tree = etree.fromstring(domain.XMLDesc(0))
@@ -112,7 +112,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                 tx_errors=dom_stats[7])
 
     @libvirt_utils.retry_on_disconnect
-    def inspect_disks(self, instance, duration=None):
+    def inspect_disks(self, instance, duration):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
         tree = etree.fromstring(domain.XMLDesc(0))
@@ -129,7 +129,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                                            errors=block_stats[4])
 
     @libvirt_utils.retry_on_disconnect
-    def inspect_disk_info(self, instance, duration=None):
+    def inspect_disk_info(self, instance, duration):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         tree = etree.fromstring(domain.XMLDesc(0))
         for disk in tree.findall('devices/disk'):

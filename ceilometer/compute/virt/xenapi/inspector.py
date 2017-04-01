@@ -133,7 +133,7 @@ class XenapiInspector(virt_inspector.Inspector):
         else:
             return vm_refs[0]
 
-    def inspect_instance(self, instance, duration=None):
+    def inspect_instance(self, instance, duration):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         cpu_util = self._get_cpu_usage(vm_ref, instance_name)
@@ -171,7 +171,7 @@ class XenapiInspector(virt_inspector.Inspector):
         # converting it to MB.
         return (total_mem - free_mem * units.Ki) / units.Mi
 
-    def inspect_vnics(self, instance, duration=None):
+    def inspect_vnics(self, instance, duration):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         dom_id = self._call_xenapi("VM.get_domid", vm_ref)
@@ -194,7 +194,7 @@ class XenapiInspector(virt_inspector.Inspector):
                 rx_errors=-1, tx_bytes=bw_vif['bw_out'], tx_packets=-1,
                 tx_drop=-1, tx_errors=-1)
 
-    def inspect_vnic_rates(self, instance, duration=None):
+    def inspect_vnic_rates(self, instance, duration):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         vif_refs = self._call_xenapi("VM.get_VIFs", vm_ref)
@@ -217,7 +217,7 @@ class XenapiInspector(virt_inspector.Inspector):
                     rx_bytes_rate=rx_rate,
                     tx_bytes_rate=tx_rate)
 
-    def inspect_disk_rates(self, instance, duration=None):
+    def inspect_disk_rates(self, instance, duration):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         vbd_refs = self._call_xenapi("VM.get_VBDs", vm_ref)

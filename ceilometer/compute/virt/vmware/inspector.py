@@ -114,7 +114,7 @@ class VsphereInspector(virt_inspector.Inspector):
 
         return vm_mobj
 
-    def inspect_vnic_rates(self, instance, duration=None):
+    def inspect_vnic_rates(self, instance, duration):
         vm_mobj = self._get_vm_mobj_not_power_off_or_raise(instance)
 
         vnic_stats = {}
@@ -148,7 +148,7 @@ class VsphereInspector(virt_inspector.Inspector):
                 rx_bytes_rate=rx_bytes_rate,
                 tx_bytes_rate=tx_bytes_rate)
 
-    def inspect_disk_rates(self, instance, duration=None):
+    def inspect_disk_rates(self, instance, duration):
         vm_mobj = self._get_vm_mobj_not_power_off_or_raise(instance)
 
         disk_stats = {}
@@ -181,7 +181,7 @@ class VsphereInspector(virt_inspector.Inspector):
                 write_requests_rate=stat_val(VC_DISK_WRITE_REQUESTS_RATE_CNTR)
             )
 
-    def inspect_instance(self, instance, duration=None):
+    def inspect_instance(self, instance, duration):
         vm_mobj = self._get_vm_mobj_not_power_off_or_raise(instance)
         cpu_util_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_CPU_CONSUMED_CNTR)
