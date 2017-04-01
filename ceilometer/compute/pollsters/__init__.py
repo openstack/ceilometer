@@ -13,11 +13,13 @@
 # under the License.
 
 import abc
+import collections
 
 from oslo_log import log
 from oslo_utils import timeutils
 import six
 
+import ceilometer
 from ceilometer.agent import plugin_base
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -99,6 +101,10 @@ class BaseComputePollster(plugin_base.PollsterBase):
         return samples
 
 
+class NoVolumeException(Exception):
+    pass
+
+
 class GenericComputePollster(BaseComputePollster):
     """This class aims to cache instance statistics data
 
@@ -111,52 +117,69 @@ class GenericComputePollster(BaseComputePollster):
     sample_unit = ''
     sample_type = sample.TYPE_GAUGE
     sample_stats_key = None
+    inspector_method = None
 
     @staticmethod
     def get_additional_metadata(instance, stats):
         pass
 
+    @staticmethod
+    def get_resource_id(instance, stats):
+        return instance.id
+
     def _inspect_cached(self, cache, instance, duration):
-        cache.setdefault(self.cache_key, {})
-        if instance.id not in cache[self.cache_key]:
-            stats = self.inspector.inspect_instance(instance, duration)
-            cache[self.cache_key][instance.id] = stats
-        return cache[self.cache_key][instance.id]
+        cache.setdefault(self.inspector_method, {})
+        if instance.id not in cache[self.inspector_method]:
+            result = getattr(self.inspector, self.inspector_method)(
+                instance, duration)
+            # Ensure we don't cache an iterator
+            if isinstance(result, collections.Iterable):
+                result = list(result)
+            cache[self.inspector_method][instance.id] = result
+        return cache[self.inspector_method][instance.id]
+
+    def _stats_to_sample(self, instance, stats):
+        volume = getattr(stats, self.sample_stats_key)
+        LOG.debug("%(instance_id)s/%(name)s volume: "
+                  "%(volume)s" % {
+                      'name': self.sample_name,
+                      'instance_id': instance.id,
+                      'volume': (volume if volume is not None
+                                 else 'Unavailable')})
+
+        if volume is None:
+            raise NoVolumeException()
+
+        return util.make_sample_from_instance(
+            self.conf,
+            instance,
+            name=self.sample_name,
+            unit=self.sample_unit,
+            type=self.sample_type,
+            resource_id=self.get_resource_id(instance, stats),
+            volume=volume,
+            additional_metadata=self.get_additional_metadata(
+                instance, stats),
+        )
 
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
             try:
-                stats = self._inspect_cached(cache, instance,
-                                             self._inspection_duration)
-                volume = getattr(stats, self.sample_stats_key)
-
-                LOG.debug("%(instance_id)s/%(name)s volume: "
-                          "%(volume)s" % {
-                              'name': self.sample_name,
-                              'instance_id': instance.id,
-                              'volume': (volume if volume is not None
-                                         else 'Unavailable')})
-
-                if volume is None:
-                    # FIXME(sileht): This should be a removed... but I will
-                    # not change the test logic for now
-                    LOG.warning(_LW("%(name)s statistic in not available for "
-                                    "instance %(instance_id)s") %
-                                {'name': self.sample_name,
-                                 'instance_id': instance.id})
-                    continue
-
-                yield util.make_sample_from_instance(
-                    self.conf,
-                    instance,
-                    name=self.sample_name,
-                    unit=self.sample_unit,
-                    type=self.sample_type,
-                    volume=volume,
-                    additional_metadata=self.get_additional_metadata(
-                        instance, stats),
-                )
+                result = self._inspect_cached(cache, instance,
+                                              self._inspection_duration)
+                if isinstance(result, collections.Iterable):
+                    for stats in result:
+                        yield self._stats_to_sample(instance, stats)
+                else:
+                    yield self._stats_to_sample(instance, result)
+            except NoVolumeException:
+                # FIXME(sileht): This should be a removed... but I will
+                # not change the test logic for now
+                LOG.warning(_LW("%(name)s statistic in not available for "
+                                "instance %(instance_id)s") %
+                            {'name': self.sample_name,
+                             'instance_id': instance.id})
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug('Exception while getting samples %s', err)
@@ -170,6 +193,13 @@ class GenericComputePollster(BaseComputePollster):
                                 '%(instance_id)s, non-fatal reason: %(exc)s'),
                             {'pollster': self.__class__.__name__,
                              'instance_id': instance.id, 'exc': e})
+                raise plugin_base.PollsterPermanentError(resources)
+            except ceilometer.NotImplementedError:
+                # Selected inspector does not implement this pollster.
+                LOG.debug('%(inspector)s does not provide data for '
+                          '%(pollster)s',
+                          {'inspector': self.inspector.__class__.__name__,
+                           'pollster': self.__class__.__name__})
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
                 LOG.error(

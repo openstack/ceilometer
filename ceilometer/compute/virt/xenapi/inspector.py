@@ -171,7 +171,7 @@ class XenapiInspector(virt_inspector.Inspector):
         # converting it to MB.
         return (total_mem - free_mem * units.Ki) / units.Mi
 
-    def inspect_vnics(self, instance):
+    def inspect_vnics(self, instance, duration=None):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         dom_id = self._call_xenapi("VM.get_domid", vm_ref)
@@ -181,20 +181,18 @@ class XenapiInspector(virt_inspector.Inspector):
         for vif_ref in vif_refs or []:
             vif_rec = self._call_xenapi("VIF.get_record", vif_ref)
 
-            interface = virt_inspector.Interface(
-                name=vif_rec['uuid'],
-                mac=vif_rec['MAC'],
-                fref=None,
-                parameters=None)
             bw_vif = bw_all[dom_id][vif_rec['device']]
 
             # TODO(jianghuaw): Currently the plugin can only support
             # rx_bytes and tx_bytes, so temporarily set others as -1.
-            stats = virt_inspector.InterfaceStats(
+            yield virt_inspector.InterfaceStats(
+                name=vif_rec['uuid'],
+                mac=vif_rec['MAC'],
+                fref=None,
+                parameters=None,
                 rx_bytes=bw_vif['bw_in'], rx_packets=-1, rx_drop=-1,
                 rx_errors=-1, tx_bytes=bw_vif['bw_out'], tx_packets=-1,
                 tx_drop=-1, tx_errors=-1)
-            yield (interface, stats)
 
     def inspect_vnic_rates(self, instance, duration=None):
         instance_name = util.instance_name(instance)
@@ -211,13 +209,13 @@ class XenapiInspector(virt_inspector.Inspector):
                     "VM.query_data_source", vm_ref,
                     "vif_%s_tx" % vif_rec['device']))
 
-                interface = virt_inspector.Interface(
+                yield virt_inspector.InterfaceRateStats(
                     name=vif_rec['uuid'],
                     mac=vif_rec['MAC'],
                     fref=None,
-                    parameters=None)
-                stats = virt_inspector.InterfaceRateStats(rx_rate, tx_rate)
-                yield (interface, stats)
+                    parameters=None,
+                    rx_bytes_rate=rx_rate,
+                    tx_bytes_rate=tx_rate)
 
     def inspect_disk_rates(self, instance, duration=None):
         instance_name = util.instance_name(instance)

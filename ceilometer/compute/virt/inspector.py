@@ -71,20 +71,14 @@ class InstanceStats(object):
 # mac: the MAC address
 # fref: the filter ref
 # parameters: miscellaneous parameters
-#
-Interface = collections.namedtuple('Interface', ['name', 'mac',
-                                                 'fref', 'parameters'])
-
-
-# Named tuple representing vNIC statistics.
-#
 # rx_bytes: number of received bytes
 # rx_packets: number of received packets
 # tx_bytes: number of transmitted bytes
 # tx_packets: number of transmitted packets
 #
 InterfaceStats = collections.namedtuple('InterfaceStats',
-                                        ['rx_bytes', 'tx_bytes',
+                                        ['name', 'mac', 'fref', 'parameters',
+                                         'rx_bytes', 'tx_bytes',
                                          'rx_packets', 'tx_packets',
                                          'rx_drop', 'tx_drop',
                                          'rx_errors', 'tx_errors'])
@@ -92,11 +86,17 @@ InterfaceStats = collections.namedtuple('InterfaceStats',
 
 # Named tuple representing vNIC rate statistics.
 #
+# name: the name of the vNIC
+# mac: the MAC address
+# fref: the filter ref
+# parameters: miscellaneous parameters
 # rx_bytes_rate: rate of received bytes
 # tx_bytes_rate: rate of transmitted bytes
 #
 InterfaceRateStats = collections.namedtuple('InterfaceRateStats',
-                                            ['rx_bytes_rate', 'tx_bytes_rate'])
+                                            ['name', 'mac',
+                                             'fref', 'parameters',
+                                             'rx_bytes_rate', 'tx_bytes_rate'])
 
 
 # Named tuple representing disks.

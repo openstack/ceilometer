@@ -135,20 +135,18 @@ class VsphereInspector(virt_inspector.Inspector):
             vnic_ids.update(six.iterkeys(vnic_id_to_stats_map))
 
         # Stats provided from vSphere are in KB/s, converting it to B/s.
-        for vnic_id in vnic_ids:
+        for vnic_id in sorted(vnic_ids):
             rx_bytes_rate = (vnic_stats[VC_NETWORK_RX_COUNTER]
                              .get(vnic_id, 0) * units.Ki)
             tx_bytes_rate = (vnic_stats[VC_NETWORK_TX_COUNTER]
                              .get(vnic_id, 0) * units.Ki)
-
-            stats = virt_inspector.InterfaceRateStats(rx_bytes_rate,
-                                                      tx_bytes_rate)
-            interface = virt_inspector.Interface(
+            yield virt_inspector.InterfaceRateStats(
                 name=vnic_id,
                 mac=None,
                 fref=None,
-                parameters=None)
-            yield (interface, stats)
+                parameters=None,
+                rx_bytes_rate=rx_bytes_rate,
+                tx_bytes_rate=tx_bytes_rate)
 
     def inspect_disk_rates(self, instance, duration=None):
         vm_mobj = self._get_vm_mobj_not_power_off_or_raise(instance)

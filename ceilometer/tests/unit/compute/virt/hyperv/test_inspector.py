@@ -124,13 +124,10 @@ class TestHyperVInspection(base.BaseTestCase):
             fake_instance_name))
 
         self.assertEqual(1, len(inspected_vnics))
-        self.assertEqual(2, len(inspected_vnics[0]))
 
-        inspected_vnic, inspected_stats = inspected_vnics[0]
-
-        self.assertEqual(fake_element_name, inspected_vnic.name)
-        self.assertEqual(fake_address, inspected_vnic.mac)
-
+        inspected_stats = inspected_vnics[0]
+        self.assertEqual(fake_element_name, inspected_stats.name)
+        self.assertEqual(fake_address, inspected_stats.mac)
         self.assertEqual(fake_rx_mb * units.Mi, inspected_stats.rx_bytes)
         self.assertEqual(fake_tx_mb * units.Mi, inspected_stats.tx_bytes)
 

@@ -137,16 +137,12 @@ class TestVsphereInspection(base.BaseTestCase):
         ops_mock = self._inspector._ops
         ops_mock.get_perf_counter_id.side_effect = get_counter_id_side_effect
         ops_mock.query_vm_device_stats.side_effect = query_stat_side_effect
-        result = self._inspector.inspect_vnic_rates(mock.MagicMock())
+        result = list(self._inspector.inspect_vnic_rates(mock.MagicMock()))
 
-        # validate result
-        expected_stats = {
-            vnic1: virt_inspector.InterfaceRateStats(1024, 2048),
-            vnic2: virt_inspector.InterfaceRateStats(3072, 4096)
-        }
-
-        for vnic, rates_info in result:
-            self.assertEqual(expected_stats[vnic.name], rates_info)
+        self.assertEqual(1024.0, result[0].rx_bytes_rate)
+        self.assertEqual(2048.0, result[0].tx_bytes_rate)
+        self.assertEqual(3072.0, result[1].rx_bytes_rate)
+        self.assertEqual(4096.0, result[1].tx_bytes_rate)
 
     def test_inspect_disk_rates(self):
         # construct test data
