@@ -62,7 +62,12 @@ class TestLibvirtInspection(base.BaseTestCase):
         conn.lookupByUUIDString.return_value = domain
         conn.domainListGetStats.return_value = [({}, {
             'cpu.time': 999999,
+            'vcpu.maximum': 4,
             'vcpu.current': 2,
+            'vcpu.0.time': 10000,
+            'vcpu.0.wait': 10000,
+            'vcpu.2.time': 10000,
+            'vcpu.2.wait': 10000,
             'perf.cmt': 90112,
             'perf.cpu_cycles': 7259361,
             'perf.instructions': 8815623,
@@ -75,7 +80,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
             self.assertEqual(2, stats.cpu_number)
-            self.assertEqual(999999, stats.cpu_time)
+            self.assertEqual(40000, stats.cpu_time)
             self.assertEqual(90112, stats.cpu_l3_cache_usage)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)
@@ -85,6 +90,27 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(8815623, stats.instructions)
             self.assertEqual(74184, stats.cache_references)
             self.assertEqual(16737, stats.cache_misses)
+
+    def test_inspect_instance_stats_fallback_cpu_time(self):
+        domain = mock.Mock()
+        domain.info.return_value = (0, 0, 0, 2, 20000)
+        domain.memoryStats.return_value = {'available': 51200,
+                                           'unused': 25600,
+                                           'rss': 30000}
+        conn = mock.Mock()
+        conn.lookupByUUIDString.return_value = domain
+        conn.domainListGetStats.return_value = [({}, {
+            'vcpu.current': 2,
+            'vcpu.maximum': 4,
+            'vcpu.0.time': 10000,
+            'vcpu.1.time': 10000,
+            'cpu.time': 999999})]
+
+        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
+                        'refresh_libvirt_connection', return_value=conn):
+            stats = self.inspector.inspect_instance(self.instance)
+            self.assertEqual(2, stats.cpu_number)
+            self.assertEqual(999999, stats.cpu_time)
 
     def test_inspect_cpus_with_domain_shutoff(self):
         domain = mock.Mock()
