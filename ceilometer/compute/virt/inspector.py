@@ -181,7 +181,7 @@ class Inspector(object):
     def __init__(self, conf):
         self.conf = conf
 
-    def inspect_instance(self, instance, duration=None):
+    def inspect_instance(self, instance, duration):
         """Inspect the CPU statistics for an instance.
 
         :param instance: the target instance
@@ -191,16 +191,18 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_vnics(self, instance):
+    def inspect_vnics(self, instance, duration):
         """Inspect the vNIC statistics for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each vNIC, the number of bytes & packets
                  received and transmitted
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_vnic_rates(self, instance, duration=None):
+    def inspect_vnic_rates(self, instance, duration):
         """Inspect the vNIC rate statistics for an instance.
 
         :param instance: the target instance
@@ -211,16 +213,18 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_disks(self, instance):
+    def inspect_disks(self, instance, duration):
         """Inspect the disk statistics for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each disk, the number of bytes & operations
                  read and written, and the error count
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_disk_rates(self, instance, duration=None):
+    def inspect_disk_rates(self, instance, duration):
         """Inspect the disk statistics as rates for an instance.
 
         :param instance: the target instance
@@ -231,26 +235,32 @@ class Inspector(object):
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_disk_latency(self, instance):
+    def inspect_disk_latency(self, instance, duration):
         """Inspect the disk statistics as rates for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each disk, the average disk latency
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_disk_iops(self, instance):
+    def inspect_disk_iops(self, instance, duration):
         """Inspect the disk statistics as rates for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each disk, the number of iops per second
         """
         raise ceilometer.NotImplementedError
 
-    def inspect_disk_info(self, instance):
+    def inspect_disk_info(self, instance, duration):
         """Inspect the disk information for an instance.
 
         :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
         :return: for each disk , capacity , allocation and usage
         """
         raise ceilometer.NotImplementedError
