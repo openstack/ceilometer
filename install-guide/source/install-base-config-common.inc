@@ -56,16 +56,17 @@
 
 3. Edit the ``/etc/gnocchi/gnocchi.conf`` file and add Keystone options:
 
-   * In the ``[service_credentials]`` section, configure service credentials:
+   * In the ``[keystone_authtoken]`` section, configure keystone
+     authentication:
 
      .. code-block:: ini
 
-        [service_credentials]
+        [keystone_authtoken]
         ...
         auth_type = password
         auth_url = http://controller:5000/v3
-        project_domain_id = default
-        user_domain_id = default
+        project_domain_name = Default
+        user_domain_name = Default
         project_name = service
         username = gnocchi
         password = GNOCCHI_PASS
