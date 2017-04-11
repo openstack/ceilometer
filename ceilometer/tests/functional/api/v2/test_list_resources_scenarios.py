@@ -35,9 +35,10 @@ class TestListResources(v2.FunctionalTest):
     def _verify_resource_timestamps(self, res, first, last):
         # Bounds need not be tight (see ceilometer bug #1288372)
         self.assertIn('first_sample_timestamp', res)
-        self.assertTrue(first.isoformat() >= res['first_sample_timestamp'])
+        self.assertGreaterEqual(first.isoformat(),
+                                res['first_sample_timestamp'])
         self.assertIn('last_sample_timestamp', res)
-        self.assertTrue(last.isoformat() <= res['last_sample_timestamp'])
+        self.assertLessEqual(last.isoformat(), res['last_sample_timestamp'])
 
     def test_instance_no_metadata(self):
         timestamp = datetime.datetime(2012, 7, 2, 10, 40)
@@ -508,12 +509,12 @@ class TestListResources(v2.FunctionalTest):
         links = data[0]['links']
         self.assertEqual(2, len(links))
         self.assertEqual('self', links[0]['rel'])
-        self.assertTrue((self.PATH_PREFIX + '/resources/resource-id')
-                        in links[0]['href'])
+        self.assertIn((self.PATH_PREFIX + '/resources/resource-id'),
+                      links[0]['href'])
         self.assertEqual('instance', links[1]['rel'])
-        self.assertTrue((self.PATH_PREFIX + '/meters/instance?'
-                         'q.field=resource_id&q.value=resource-id')
-                        in links[1]['href'])
+        self.assertIn((self.PATH_PREFIX + '/meters/instance?'
+                      'q.field=resource_id&q.value=resource-id'),
+                      links[1]['href'])
 
     def test_resource_skip_meter_links(self):
         sample1 = sample.Sample(
@@ -539,8 +540,8 @@ class TestListResources(v2.FunctionalTest):
         links = data[0]['links']
         self.assertEqual(len(links), 1)
         self.assertEqual(links[0]['rel'], 'self')
-        self.assertTrue((self.PATH_PREFIX + '/resources/resource-id')
-                        in links[0]['href'])
+        self.assertIn((self.PATH_PREFIX + '/resources/resource-id'),
+                      links[0]['href'])
 
 
 class TestListResourcesRestriction(v2.FunctionalTest):
