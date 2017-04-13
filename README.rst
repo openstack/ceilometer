@@ -12,17 +12,17 @@ License, Version 2.0. The full terms and conditions of this
 license are detailed in the LICENSE file.
 
 For more information about Ceilometer APIs, see
-http://developer.openstack.org/api-ref-telemetry-v2.html
+https://developer.openstack.org/api-ref-telemetry-v2.html
 
 Release notes are available at
 https://releases.openstack.org/teams/telemetry.html
 
 Developer documentation is available at
-http://docs.openstack.org/developer/ceilometer/
+https://docs.openstack.org/developer/ceilometer/
 
 For information on how to contribute to ceilometer, see the CONTRIBUTING.rst
 file.
 
-The project home is at http://launchpad.net/ceilometer
+The project home is at https://launchpad.net/ceilometer
 
-To report any ceilometer related bugs, see http://bugs.launchpad.net/ceilometer/
+To report any ceilometer related bugs, see https://bugs.launchpad.net/ceilometer/
