@@ -16,6 +16,7 @@
 import hashlib
 from lxml import etree
 import operator
+import threading
 
 import cachetools
 from novaclient import exceptions
@@ -110,6 +111,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             # 4096 instances on a compute should be enough :)
             self._flavor_cache = cachetools.LRUCache(4096)
         else:
+            self.lock = threading.Lock()
             self.instances = {}
             self.last_run = None
             self.last_cache_expire = None
@@ -236,29 +238,32 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
         instances = []
         # NOTE(ityaptin) we update make a nova request only if
         # it's a first discovery or resources expired
-        if not self.last_run or secs_from_last_update >= self.expiration_time:
-            try:
-                if secs_from_last_expire < self.cache_expiry and self.last_run:
-                    since = self.last_run.isoformat()
-                else:
-                    since = None
-                    self.instances.clear()
-                    self.last_cache_expire = utc_now
-                instances = self.nova_cli.instance_get_all_by_host(
-                    self.conf.host, since)
-                self.last_run = utc_now
-            except Exception:
-                # NOTE(zqfan): instance_get_all_by_host is wrapped and will log
-                # exception when there is any error. It is no need to raise it
-                # again and print one more time.
-                return []
+        with self.lock:
+            if (not self.last_run or secs_from_last_update >=
+                    self.expiration_time):
+                try:
+                    if (secs_from_last_expire < self.cache_expiry and
+                            self.last_run):
+                        since = self.last_run.isoformat()
+                    else:
+                        since = None
+                        self.instances.clear()
+                        self.last_cache_expire = utc_now
+                    instances = self.nova_cli.instance_get_all_by_host(
+                        self.conf.host, since)
+                    self.last_run = utc_now
+                except Exception:
+                    # NOTE(zqfan): instance_get_all_by_host is wrapped and will
+                    # log exception when there is any error. It is no need to
+                    #  raise it again and print one more time.
+                    return []
 
-        for instance in instances:
-            if getattr(instance, 'OS-EXT-STS:vm_state', None) in ['deleted',
-                                                                  'error']:
-                self.instances.pop(instance.id, None)
-            else:
-                self.instances[instance.id] = instance
+            for instance in instances:
+                if getattr(instance, 'OS-EXT-STS:vm_state', None) in [
+                   'deleted', 'error']:
+                    self.instances.pop(instance.id, None)
+                else:
+                    self.instances[instance.id] = instance
 
         return self.instances.values()
 
