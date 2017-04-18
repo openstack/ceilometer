@@ -29,7 +29,7 @@ from ceilometer.api.controllers.v2 import meters
 from ceilometer.api.controllers.v2 import query
 from ceilometer.api.controllers.v2 import resources
 from ceilometer.api.controllers.v2 import samples
-from ceilometer.i18n import _, _LW
+from ceilometer.i18n import _
 from ceilometer import keystone_client
 
 
@@ -122,13 +122,13 @@ class V2Controller(object):
                 except exceptions.EndpointNotFound:
                     self._gnocchi_is_enabled = False
                 except exceptions.ClientException:
-                    LOG.warning(_LW("Can't connect to keystone, assuming "
-                                    "gnocchi is disabled and retry later"))
+                    LOG.warning("Can't connect to keystone, assuming "
+                                "gnocchi is disabled and retry later")
                 else:
                     self._gnocchi_is_enabled = True
-                    LOG.warning(_LW("ceilometer-api started with gnocchi "
-                                    "enabled. The resources/meters/samples "
-                                    "URLs are disabled."))
+                    LOG.warning("ceilometer-api started with gnocchi "
+                                "enabled. The resources/meters/samples "
+                                "URLs are disabled.")
         return self._gnocchi_is_enabled
 
     @property
@@ -148,12 +148,12 @@ class V2Controller(object):
                 except exceptions.EndpointNotFound:
                     self._aodh_url = ""
                 except exceptions.ClientException:
-                    LOG.warning(_LW("Can't connect to keystone, assuming aodh "
-                                    "is disabled and retry later."))
+                    LOG.warning("Can't connect to keystone, assuming aodh "
+                                "is disabled and retry later.")
                 else:
-                    LOG.warning(_LW("ceilometer-api started with aodh "
-                                    "enabled. Alarms URLs will be redirected "
-                                    "to aodh endpoint."))
+                    LOG.warning("ceilometer-api started with aodh "
+                                "enabled. Alarms URLs will be redirected "
+                                "to aodh endpoint.")
         return self._aodh_url
 
     @property
@@ -174,12 +174,12 @@ class V2Controller(object):
                     self._panko_url = ""
                 except exceptions.ClientException:
                     LOG.warning(
-                        _LW("Can't connect to keystone, assuming Panko "
-                            "is disabled and retry later."))
+                        "Can't connect to keystone, assuming Panko "
+                        "is disabled and retry later.")
                 else:
-                    LOG.warning(_LW("ceilometer-api started with Panko "
-                                    "enabled. Events URLs will be redirected "
-                                    "to Panko endpoint."))
+                    LOG.warning("ceilometer-api started with Panko "
+                                "enabled. Events URLs will be redirected "
+                                "to Panko endpoint.")
         return self._panko_url
 
     @pecan.expose()

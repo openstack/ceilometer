@@ -20,7 +20,6 @@ from six import moves
 import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
 
-from ceilometer.i18n import _LE, _LI
 from ceilometer import service
 from ceilometer import storage
 
@@ -69,8 +68,8 @@ def expirer():
         storage_conn.clear_expired_metering_data(
             conf.database.metering_time_to_live)
     else:
-        LOG.info(_LI("Nothing to clean, database metering time to live "
-                     "is disabled"))
+        LOG.info("Nothing to clean, database metering time to live "
+                 "is disabled")
 
 
 def db_clean_legacy():
@@ -100,8 +99,8 @@ def db_clean_legacy():
         masked_url = urlparse.urlunparse(masked_url)
     else:
         masked_url = url
-    LOG.info(_LI('Starting to drop event, alarm and alarm history tables in '
-                 'backend: %s'), masked_url)
+    LOG.info('Starting to drop event, alarm and alarm history tables in '
+             'backend: %s', masked_url)
 
     connection_scheme = parsed.scheme
     conn = storage.get_connection_from_config(conf)
@@ -116,10 +115,10 @@ def db_clean_legacy():
             if engine.has_table(table_name):
                 table = sa.Table(table_name, meta, autoload=True)
                 table.drop()
-                LOG.info(_LI("Legacy %s table of SQL backend has been "
-                             "dropped."), table_name)
+                LOG.info("Legacy %s table of SQL backend has been "
+                         "dropped.", table_name)
             else:
-                LOG.info(_LI('%s table does not exist.'), table_name)
+                LOG.info('%s table does not exist.', table_name)
 
     elif connection_scheme == 'hbase':
         with conn.conn_pool.connection() as h_conn:
@@ -132,22 +131,22 @@ def db_clean_legacy():
                     if table_name in tables:
                         h_conn.disable_table(table_name)
                         h_conn.delete_table(table_name)
-                        LOG.info(_LI("Legacy %s table of Hbase backend "
-                                     "has been dropped."),
+                        LOG.info("Legacy %s table of Hbase backend "
+                                 "has been dropped.",
                                  table_name_mapping[table_name])
                     else:
-                        LOG.info(_LI('%s table does not exist.'),
+                        LOG.info('%s table does not exist.',
                                  table_name_mapping[table_name])
                 except Exception as e:
-                    LOG.error(_LE('Error occurred while dropping alarm '
-                                  'tables of Hbase, %s'), e)
+                    LOG.error('Error occurred while dropping alarm '
+                              'tables of Hbase, %s', e)
 
     elif connection_scheme == 'mongodb':
         for table_name in ('alarm', 'alarm_history', 'event'):
             if table_name in conn.db.conn.collection_names():
                 conn.db.conn.drop_collection(table_name)
-                LOG.info(_LI("Legacy %s table of Mongodb backend has been "
-                             "dropped."), table_name)
+                LOG.info("Legacy %s table of Mongodb backend has been "
+                         "dropped.", table_name)
             else:
-                LOG.info(_LI('%s table does not exist.'), table_name)
+                LOG.info('%s table does not exist.', table_name)
     LOG.info('Legacy alarm and event tables cleanup done.')

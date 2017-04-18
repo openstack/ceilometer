@@ -18,7 +18,7 @@ from oslo_log import log
 import six
 import yaml
 
-from ceilometer.i18n import _, _LI
+from ceilometer.i18n import _
 
 LOG = log.getLogger(__name__)
 
@@ -183,5 +183,5 @@ def load_definitions(conf, defaults, config_file, fallback_file=None):
                   "Using default config.")
         definition_cfg = defaults
 
-    LOG.info(_LI("Definitions: %s"), definition_cfg)
+    LOG.info("Definitions: %s", definition_cfg)
     return definition_cfg

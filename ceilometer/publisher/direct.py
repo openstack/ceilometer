@@ -17,7 +17,6 @@ import six.moves.urllib.parse as urlparse
 from stevedore import driver
 import stevedore.exception
 
-from ceilometer.i18n import _LE, _LW
 from ceilometer import publisher
 from ceilometer.publisher import utils
 
@@ -39,9 +38,9 @@ class DirectPublisher(publisher.ConfigPublisherBase):
         super(DirectPublisher, self).__init__(conf, parsed_url)
         default_dispatcher = parsed_url.scheme
         if default_dispatcher == 'direct':
-            LOG.warning(_LW('Direct publisher is deprecated for removal. Use '
-                            'an explicit publisher instead, e.g. "gnocchi", '
-                            '"database", "file", ...'))
+            LOG.warning('Direct publisher is deprecated for removal. Use '
+                        'an explicit publisher instead, e.g. "gnocchi", '
+                        '"database", "file", ...')
             default_dispatcher = 'database'
         options = urlparse.parse_qs(parsed_url.query)
         self.dispatcher_name = options.get('dispatcher',
@@ -76,8 +75,8 @@ class DirectPublisher(publisher.ConfigPublisherBase):
 
     def publish_samples(self, samples):
         if not self.sample_driver:
-            LOG.error(_LE("Can't publish samples to a non-existing dispatcher "
-                          "'%s'"), self.dispatcher_name)
+            LOG.error("Can't publish samples to a non-existing dispatcher "
+                      "'%s'", self.dispatcher_name)
             return
 
         if not isinstance(samples, list):
@@ -89,8 +88,8 @@ class DirectPublisher(publisher.ConfigPublisherBase):
 
     def publish_events(self, events):
         if not self.event_driver:
-            LOG.error(_LE("Can't publish events to a non-existing dispatcher "
-                          "'%s'"), self.dispatcher_name)
+            LOG.error("Can't publish events to a non-existing dispatcher "
+                      "'%s'", self.dispatcher_name)
             return
 
         if not isinstance(events, list):

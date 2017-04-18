@@ -23,7 +23,6 @@ import oslo_messaging
 import six
 from stevedore import extension
 
-from ceilometer.i18n import _LE
 from ceilometer import messaging
 
 LOG = log.getLogger(__name__)
@@ -117,7 +116,7 @@ class NotificationBase(PluginBase):
                     priority, notification)
                 self.to_samples_and_publish(notification)
             except Exception:
-                LOG.error(_LE('Fail to process notification'), exc_info=True)
+                LOG.error('Fail to process notification', exc_info=True)
 
     def to_samples_and_publish(self, notification):
         """Return samples produced by *process_notification*.

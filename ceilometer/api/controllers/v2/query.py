@@ -32,7 +32,7 @@ from ceilometer.api.controllers.v2 import base
 from ceilometer.api.controllers.v2 import samples
 from ceilometer.api.controllers.v2 import utils as v2_utils
 from ceilometer.api import rbac
-from ceilometer.i18n import _, _LE
+from ceilometer.i18n import _
 from ceilometer import storage
 from ceilometer import utils
 
@@ -313,7 +313,7 @@ class ValidatedComplexQuery(object):
             date_time = date_time.replace(tzinfo=None)
             return date_time
         except ValueError:
-            LOG.exception(_LE("String %s is not a valid isotime") % isotime)
+            LOG.exception("String %s is not a valid isotime" % isotime)
             msg = _('Failed to parse the timestamp value %s') % isotime
             raise base.ClientSideError(msg)
 

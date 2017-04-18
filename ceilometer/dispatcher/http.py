@@ -21,7 +21,6 @@ from oslo_utils import strutils
 import requests
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _LE
 
 LOG = log.getLogger(__name__)
 
@@ -106,9 +105,9 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
     def record_metering_data(self, data):
         if self.target == '':
             # if the target was not set, do not do anything
-            LOG.error(_LE('Dispatcher target was not set, no meter will '
-                          'be posted. Set the target in the ceilometer.conf '
-                          'file.'))
+            LOG.error('Dispatcher target was not set, no meter will '
+                      'be posted. Set the target in the ceilometer.conf '
+                      'file.')
             return
 
         # We may have receive only one counter on the wire
@@ -136,16 +135,16 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
             res.raise_for_status()
 
         except requests.exceptions.HTTPError:
-            LOG.exception(_LE('Status Code: %(code)s. '
-                              'Failed to dispatch meter: %(meter)s') %
+            LOG.exception('Status Code: %(code)s. '
+                          'Failed to dispatch meter: %(meter)s' %
                           {'code': res.status_code, 'meter': meter_json})
 
     def record_events(self, events):
         if self.event_target == '':
             # if the event target was not set, do not do anything
-            LOG.error(_LE('Dispatcher event target was not set, no event will '
-                          'be posted. Set event_target in the ceilometer.conf '
-                          'file.'))
+            LOG.error('Dispatcher event target was not set, no event will '
+                      'be posted. Set event_target in the ceilometer.conf '
+                      'file.')
             return
 
         if not isinstance(events, list):
@@ -171,6 +170,6 @@ class HttpDispatcher(dispatcher.MeterDispatcherBase,
                       self.event_target, res.status_code)
             res.raise_for_status()
         except requests.exceptions.HTTPError:
-            LOG.exception(_LE('Status Code: %(code)s. '
-                              'Failed to dispatch event: %(event)s') %
+            LOG.exception('Status Code: %(code)s. '
+                          'Failed to dispatch event: %(event)s' %
                           {'code': res.status_code, 'event': event_json})

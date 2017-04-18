@@ -25,7 +25,6 @@ from swiftclient import client as swift
 from swiftclient.exceptions import ClientException
 
 from ceilometer.agent import plugin_base
-from ceilometer.i18n import _LI
 from ceilometer import keystone_client
 from ceilometer import sample
 
@@ -72,7 +71,7 @@ class _Base(plugin_base.PollsterBase):
                         interface=creds.interface,
                         region_name=creds.region_name)
             except exceptions.EndpointNotFound as e:
-                LOG.info(_LI("Swift endpoint not found: %s"), e)
+                LOG.info("Swift endpoint not found: %s", e)
         return _Base._ENDPOINT
 
     def _iter_accounts(self, ksclient, cache, tenants):

@@ -23,7 +23,7 @@ except ImportError:
     libvirt = None
 
 from ceilometer.compute.virt import inspector as virt_inspector
-from ceilometer.i18n import _LE
+from ceilometer.i18n import _
 
 LOG = logging.getLogger(__name__)
 
@@ -116,9 +116,9 @@ def raise_nodata_if_unsupported(method):
         except libvirt.libvirtError as e:
             # NOTE(sileht): At this point libvirt connection error
             # have been reraise as tenacity.RetryError()
-            msg = _LE('Failed to inspect instance %(instance_uuid)s stats, '
-                      'can not get info from libvirt: %(error)s') % {
-                          "instance_uuid": instance.id,
-                          "error": e}
+            msg = _('Failed to inspect instance %(instance_uuid)s stats, '
+                    'can not get info from libvirt: %(error)s') % {
+                        "instance_uuid": instance.id,
+                        "error": e}
             raise virt_inspector.NoDataException(msg)
     return inner

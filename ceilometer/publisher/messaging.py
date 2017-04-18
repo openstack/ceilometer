@@ -27,7 +27,7 @@ from oslo_utils import excutils
 import six
 import six.moves.urllib.parse as urlparse
 
-from ceilometer.i18n import _, _LE, _LI
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer import publisher
 from ceilometer.publisher import utils
@@ -87,7 +87,7 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
         self.local_queue = []
 
         if self.policy in ['default', 'queue', 'drop']:
-            LOG.info(_LI('Publishing policy set to %s'), self.policy)
+            LOG.info('Publishing policy set to %s', self.policy)
         else:
             LOG.warning(_('Publishing policy is unknown (%s) force to '
                           'default'), self.policy)
@@ -161,8 +161,8 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
                     return []
                 current_retry += 1
                 if current_retry >= self.max_retry:
-                    LOG.exception(_LE("Failed to retry to send sample data "
-                                      "with max_retry times"))
+                    LOG.exception("Failed to retry to send sample data "
+                                  "with max_retry times")
                     raise
             else:
                 queue.pop(0)

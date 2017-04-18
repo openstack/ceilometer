@@ -20,7 +20,6 @@ from oslo_config import cfg
 from oslo_log import log
 
 from ceilometer.agent import manager
-from ceilometer.i18n import _LW
 from ceilometer import service
 
 LOG = log.getLogger(__name__)
@@ -51,8 +50,8 @@ class DeduplicatedCfgList(cfg.types.List):
         result = super(DeduplicatedCfgList, self).__call__(*args, **kwargs)
         result_set = set(result)
         if len(result) != len(result_set):
-            LOG.warning(_LW("Duplicated values: %s found in CLI options, "
-                            "auto de-duplicated"), result)
+            LOG.warning("Duplicated values: %s found in CLI options, "
+                        "auto de-duplicated", result)
             result = list(result_set)
         if self.choices and not (result_set <= set(self.choices)):
             raise Exception('Valid values are %s, but found %s'

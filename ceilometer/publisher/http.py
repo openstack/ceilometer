@@ -20,7 +20,6 @@ import requests
 from requests import adapters
 from six.moves.urllib import parse as urlparse
 
-from ceilometer.i18n import _LE
 from ceilometer import publisher
 
 LOG = log.getLogger(__name__)
@@ -170,8 +169,8 @@ class HttpPublisher(publisher.ConfigPublisherBase):
             LOG.debug('Message posting to %s: status code %d.',
                       self.target, res.status_code)
         except requests.exceptions.HTTPError:
-            LOG.exception(_LE('Status Code: %(code)s. '
-                              'Failed to dispatch message: %(data)s') %
+            LOG.exception('Status Code: %(code)s. '
+                          'Failed to dispatch message: %(data)s' %
                           {'code': res.status_code, 'data': data})
 
     def publish_samples(self, samples):

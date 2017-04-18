@@ -19,7 +19,6 @@ from oslo_serialization import jsonutils
 from oslo_utils import netutils
 from six.moves.urllib import parse as urlparse
 
-from ceilometer.i18n import _LE
 from ceilometer.publisher import messaging
 
 LOG = log.getLogger(__name__)
@@ -80,11 +79,11 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
             self._producer = kafka.KafkaProducer(
                 bootstrap_servers=["%s:%s" % (self._host, self._port)])
         except kafka.errors.KafkaError as e:
-            LOG.exception(_LE("Failed to connect to Kafka service: %s"), e)
+            LOG.exception("Failed to connect to Kafka service: %s", e)
             raise messaging.DeliveryFailure('Kafka Client is not available, '
                                             'please restart Kafka client')
         except Exception as e:
-            LOG.exception(_LE("Failed to connect to Kafka service: %s"), e)
+            LOG.exception("Failed to connect to Kafka service: %s", e)
             raise messaging.DeliveryFailure('Kafka Client is not available, '
                                             'please restart Kafka client')
 

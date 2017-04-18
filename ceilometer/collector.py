@@ -26,7 +26,7 @@ from oslo_utils import netutils
 from oslo_utils import units
 
 from ceilometer import dispatcher
-from ceilometer.i18n import _, _LE, _LW
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
@@ -117,9 +117,9 @@ class CollectorService(cotyledon.Service):
             # NOTE(zhengwei): linux kernel >= 3.9
             udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         except Exception:
-            LOG.warning(_LW("System does not support socket.SO_REUSEPORT "
-                            "option. Only one worker will be able to process "
-                            "incoming data."))
+            LOG.warning("System does not support socket.SO_REUSEPORT "
+                        "option. Only one worker will be able to process "
+                        "incoming data.")
         udp.bind((self.conf.collector.udp_address,
                   self.conf.collector.udp_port))
 
@@ -146,8 +146,8 @@ class CollectorService(cotyledon.Service):
                     except Exception:
                         LOG.exception(_("UDP: Unable to store meter"))
                 else:
-                    LOG.warning(_LW('sample signature invalid, '
-                                    'discarding: %s'), sample)
+                    LOG.warning('sample signature invalid, '
+                                'discarding: %s', sample)
 
     def terminate(self):
         if self.sample_listener:
@@ -176,13 +176,13 @@ class CollectorEndpoint(object):
             if publisher_utils.verify_signature(sample, self.secret):
                 goods.append(sample)
             else:
-                LOG.warning(_LW('notification signature invalid, '
-                                'discarding: %s'), sample)
+                LOG.warning('notification signature invalid, '
+                            'discarding: %s', sample)
         try:
             self.dispatcher_manager.map_method(self.method, goods)
         except Exception:
-            LOG.exception(_LE("Dispatcher failed to handle the notification, "
-                              "re-queuing it."))
+            LOG.exception("Dispatcher failed to handle the notification, "
+                          "re-queuing it.")
             return oslo_messaging.NotificationResult.REQUEUE
 
 

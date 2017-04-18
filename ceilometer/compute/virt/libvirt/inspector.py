@@ -27,7 +27,7 @@ except ImportError:
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import utils as libvirt_utils
-from ceilometer.i18n import _LW, _
+from ceilometer.i18n import _
 
 LOG = logging.getLogger(__name__)
 
@@ -137,8 +137,8 @@ class LibvirtInspector(virt_inspector.Inspector):
             if disk_type:
                 if disk_type == 'network':
                     LOG.warning(
-                        _LW('Inspection disk usage of network disk '
-                            '%(instance_uuid)s unsupported by libvirt') % {
+                        'Inspection disk usage of network disk '
+                        '%(instance_uuid)s unsupported by libvirt' % {
                             'instance_uuid': instance.id})
                     continue
                 # NOTE(lhx): "cdrom" device associated to the configdrive
