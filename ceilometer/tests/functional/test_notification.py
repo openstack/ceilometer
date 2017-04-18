@@ -304,7 +304,8 @@ class TestRealNotificationHA(BaseRealNotification):
     def test_notification_threads(self, m_listener):
         self.CONF.set_override('batch_size', 1, group='notification')
         self.srv.run()
-        m_listener.assert_called_with(override_pool_size=None)
+        m_listener.assert_called_with(
+            override_pool_size=self.CONF.max_parallel_requests)
         m_listener.reset_mock()
         self.CONF.set_override('batch_size', 2, group='notification')
         self.srv.run()

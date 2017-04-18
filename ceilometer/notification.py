@@ -260,7 +260,9 @@ class NotificationService(cotyledon.Service):
             # to maintain sequencing as much as possible.
             listener = messaging.get_batch_notification_listener(
                 transport, targets, endpoints)
-            listener.start()
+            listener.start(
+                override_pool_size=self.conf.max_parallel_requests
+            )
             self.listeners.append(listener)
 
     def _refresh_agent(self, event):
@@ -312,7 +314,8 @@ class NotificationService(cotyledon.Service):
             batch_timeout=self.conf.notification.batch_timeout)
         # NOTE(gordc): set single thread to process data sequentially
         # if batching enabled.
-        batch = (1 if self.conf.notification.batch_size > 1 else None)
+        batch = (1 if self.conf.notification.batch_size > 1
+                 else self.conf.max_parallel_requests)
         self.pipeline_listener.start(override_pool_size=batch)
 
     def terminate(self):

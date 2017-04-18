@@ -37,7 +37,6 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         - ssl certificate verification can be disabled by setting `verify_ssl`
           to False
         - batching can be configured by `batch`
-        - connection pool size configured using `poolsize`
         - Basic authentication can be configured using the URL authentication
           scheme: http://username:password@example.com
         - For certificate authentication, `clientcert` and `clientkey` are the
@@ -121,9 +120,9 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         self.raw_only = strutils.bool_from_string(
             self._get_param(params, 'raw_only', False))
 
-        pool_size = self._get_param(params, 'poolsize', 10, int)
         kwargs = {'max_retries': self.max_retries,
-                  'pool_connections': pool_size, 'pool_maxsize': pool_size}
+                  'pool_connections': conf.max_parallel_requests,
+                  'pool_maxsize': conf.max_parallel_requests}
         self.session = requests.Session()
 
         # authentication & config params have been removed, so use URL with

@@ -68,6 +68,11 @@ OPTS = [
                default=600,
                help='Timeout seconds for HTTP requests. Set it to None to '
                     'disable timeout.'),
+    cfg.IntOpt('max_parallel_requests',
+               default=64,
+               min=1,
+               help='Maximum number of parallel requests for '
+               'services to handle at the same time.'),
 ]
 
 

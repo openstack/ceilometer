@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    A new option named `max_parallel_requests` is available to control the
+    maximum number of parallel requests that can be executed by the agents.
+    This option also replaces the `poolsize` option of the HTTP publisher.
