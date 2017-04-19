@@ -77,25 +77,9 @@ function generate_reports_and_maybe_exit() {
 }
 
 
-export CEILOMETER_DIR="$BASE/new/ceilometer"
-STACK_USER=stack
-sudo chown -R $STACK_USER:stack $CEILOMETER_DIR
-# NOTE(sileht): on swift job permissions are wrong, I don't known why
+# Run tests with tempest
 sudo chown -R tempest:stack $BASE/new/tempest
 sudo chown -R tempest:stack $BASE/data/tempest
-source $BASE/new/devstack/openrc admin admin
-
-openstack catalog list
-export AODH_SERVICE_URL=$(openstack catalog show alarming -c endpoints -f value | awk '/public/{print $2}')
-export PANKO_SERVICE_URL=$(openstack catalog show event -c endpoints -f value | awk '/public/{print $2}')
-export GNOCCHI_SERVICE_URL=$(openstack catalog show metric -c endpoints -f value | awk '/public/{print $2}')
-export HEAT_SERVICE_URL=$(openstack catalog show orchestration -c endpoints -f value | awk '/public/{print $2}')
-export NOVA_SERVICE_URL=$(openstack catalog show compute -c endpoints -f value | awk '/public/{print $2}')
-export GLANCE_IMAGE_NAME=$(openstack image list | awk '/ cirros.* /{print $4; exit}')
-export ADMIN_TOKEN=$(openstack token issue -c id -f value)
-export OS_AUTH_TYPE=password
-
-# Run tests with tempest
 cd $BASE/new/tempest
 sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_telemetry_integration --concurrency=$TEMPEST_CONCURRENCY
 EXIT_CODE=$?
