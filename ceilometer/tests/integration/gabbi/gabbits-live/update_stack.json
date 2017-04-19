@@ -12,7 +12,7 @@
                         "type": "OS::Nova::Server",
                         "properties": {
                             "networks": [{ "network": "private" }],
-                            "flavor": "m1.tiny",
+                            "flavor": "$ENVIRON['NOVA_FLAVOR_REF']",
                             "image": "$ENVIRON['GLANCE_IMAGE_NAME']",
                             "metadata": {
                                 "metering.server_group": { "get_param": "OS::stack_id" }

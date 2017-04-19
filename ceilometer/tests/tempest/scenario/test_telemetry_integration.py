@@ -86,6 +86,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
             "NOVA_SERVICE_URL": self._get_endpoint(auth, "compute"),
             "GLANCE_SERVICE_URL": self._get_endpoint(auth, "image"),
             "GLANCE_IMAGE_NAME": self.glance_image_create(),
+            "NOVA_FLAVOR_REF": config.CONF.compute.flavor_ref,
         })
 
         with file(os.path.join(TEST_DIR, filename)) as f:
