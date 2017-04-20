@@ -15,7 +15,6 @@
 import abc
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 import six
 from six import moves
@@ -79,8 +78,7 @@ class _Base(base.BaseTestCase):
         super(_Base, self).setUp()
         self.addCleanup(mock.patch.stopall)
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.driver = driver.OpenDayLightDriver(self.CONF)
+        self.driver = driver.OpenDayLightDriver(conf)
 
         self.get_flow_statistics = mock.patch(
             'ceilometer.network.statistics.opendaylight.client.'

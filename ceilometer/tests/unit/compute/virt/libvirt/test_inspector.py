@@ -16,7 +16,6 @@
 
 import fixtures
 import mock
-from oslo_config import fixture as fixture_config
 from oslo_utils import units
 from oslotest import base
 
@@ -40,7 +39,6 @@ class TestLibvirtInspection(base.BaseTestCase):
     def setUp(self):
         super(TestLibvirtInspection, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
 
         self.instance = VMInstance()
         libvirt_inspector.libvirt = mock.Mock()
@@ -50,7 +48,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         utils.libvirt = libvirt_inspector.libvirt
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=None):
-            self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
+            self.inspector = libvirt_inspector.LibvirtInspector(conf)
 
     def test_inspect_instance_stats(self):
         domain = mock.Mock()
@@ -436,7 +434,6 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
     def setUp(self):
         super(TestLibvirtInspectionWithError, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         self.useFixture(fixtures.MonkeyPatch(
             'ceilometer.compute.virt.libvirt.utils.'
             'refresh_libvirt_connection',
@@ -444,7 +441,7 @@ class TestLibvirtInspectionWithError(base.BaseTestCase):
         libvirt_inspector.libvirt = mock.Mock()
         libvirt_inspector.libvirt.libvirtError = FakeLibvirtError
         utils.libvirt = libvirt_inspector.libvirt
-        self.inspector = libvirt_inspector.LibvirtInspector(self.CONF)
+        self.inspector = libvirt_inspector.LibvirtInspector(conf)
 
     def test_inspect_unknown_error(self):
         self.assertRaises(virt_inspector.InspectorException,

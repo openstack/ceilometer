@@ -18,7 +18,6 @@ import os
 import six
 import yaml
 
-from oslo_config import fixture as fixture_config
 from oslo_utils import encodeutils
 from oslo_utils import fileutils
 
@@ -284,8 +283,7 @@ class TestMeterProcessing(test.BaseTestCase):
 
     def setUp(self):
         super(TestMeterProcessing, self).setUp()
-        conf = ceilometer_service.prepare_service(argv=[], config_files=[])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = ceilometer_service.prepare_service([], [])
         self.handler = notifications.ProcessMeterNotifications(
             mock.Mock(conf=self.CONF))
 

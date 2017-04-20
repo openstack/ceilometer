@@ -15,7 +15,6 @@
 import abc
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import mockpatch
 import six
 
@@ -29,8 +28,7 @@ class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def fake_data(self):
         """Fake data used for test."""

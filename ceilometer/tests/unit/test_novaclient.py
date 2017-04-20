@@ -15,7 +15,6 @@
 import glanceclient
 import mock
 import novaclient
-from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 
@@ -27,8 +26,7 @@ class TestNovaClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestNovaClient, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self._flavors_count = 0
         self._images_count = 0
         self.nv = nova_client.Client(self.CONF)

@@ -17,7 +17,6 @@
 
 import datetime
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 import requests
 from six.moves.urllib import parse as urlparse
@@ -76,8 +75,7 @@ class TestHttpPublisher(base.BaseTestCase):
 
     def setUp(self):
         super(TestHttpPublisher, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
     def test_http_publisher_config(self):
         """Test publisher config parameters."""

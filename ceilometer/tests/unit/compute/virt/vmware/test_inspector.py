@@ -17,7 +17,6 @@ Tests for VMware vSphere inspector.
 """
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslo_vmware import api
 from oslotest import base
 
@@ -31,13 +30,12 @@ class TestVsphereInspection(base.BaseTestCase):
     def setUp(self):
         super(TestVsphereInspection, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
         api_session = api.VMwareAPISession("test_server", "test_user",
                                            "test_password", 0, None,
                                            create_session=False, port=7443)
         vsphere_inspector.get_api_session = mock.Mock(
             return_value=api_session)
-        self._inspector = vsphere_inspector.VsphereInspector(self.CONF)
+        self._inspector = vsphere_inspector.VsphereInspector(conf)
         self._inspector._ops = mock.MagicMock()
 
     def test_instance_notFound(self):

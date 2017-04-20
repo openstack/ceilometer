@@ -14,7 +14,6 @@
 
 import mock
 
-from oslo_config import fixture as fixture_config
 from oslotest import base
 
 from ceilometer import neutron_client
@@ -25,8 +24,7 @@ class TestNeutronClient(base.BaseTestCase):
 
     def setUp(self):
         super(TestNeutronClient, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.nc = neutron_client.Client(self.CONF)
         self.nc.lb_version = 'v1'
 

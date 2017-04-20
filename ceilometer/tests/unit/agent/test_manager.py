@@ -16,7 +16,6 @@
 
 from keystoneauth1 import exceptions as ka_exceptions
 import mock
-from oslo_config import fixture as fixture_config
 from oslo_utils import fileutils
 from oslotest import base
 from oslotest import mockpatch
@@ -49,8 +48,7 @@ class TestPollsterBuilder(agentbase.TestPollster):
 class TestManager(base.BaseTestCase):
     def setUp(self):
         super(TestManager, self).setUp()
-        conf = service.prepare_service([], [])
-        self.conf = self.useFixture(fixture_config.Config(conf)).conf
+        self.conf = service.prepare_service([], [])
 
     @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
     def test_load_plugins(self):

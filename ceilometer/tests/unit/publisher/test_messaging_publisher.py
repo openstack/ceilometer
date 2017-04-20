@@ -18,7 +18,6 @@ import datetime
 import uuid
 
 import mock
-from oslo_config import fixture as fixture_config
 from oslo_utils import netutils
 import testscenarios.testcase
 
@@ -98,8 +97,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
 
     def setUp(self):
         super(BasePublisherTestCase, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF)
 
 

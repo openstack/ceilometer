@@ -16,7 +16,6 @@ import traceback
 import uuid
 
 import mock
-from oslo_config import fixture as fixture_config
 import oslo_messaging
 from oslotest import mockpatch
 
@@ -46,8 +45,7 @@ class EventPipelineTestCase(base.BaseTestCase):
 
     def setUp(self):
         super(EventPipelineTestCase, self).setUp()
-        conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
+        self.CONF = service.prepare_service([], [])
 
         self.p_type = pipeline.EVENT_TYPE
         self.transformer_manager = None

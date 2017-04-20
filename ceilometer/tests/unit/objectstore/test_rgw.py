@@ -16,7 +16,6 @@ import collections
 
 from keystoneauth1 import exceptions
 import mock
-from oslo_config import fixture as fixture_config
 from oslotest import base
 from oslotest import mockpatch
 import testscenarios.testcase
@@ -90,11 +89,10 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
     def setUp(self):
         super(TestRgwPollster, self).setUp()
         conf = service.prepare_service([], [])
-        self.CONF = self.useFixture(fixture_config.Config(conf)).conf
-        self.CONF.set_override('radosgw', 'object-store',
-                               group='service_types')
-        self.pollster = self.factory(self.CONF)
-        self.manager = TestManager(0, self.CONF)
+        conf.set_override('radosgw', 'object-store',
+                          group='service_types')
+        self.pollster = self.factory(conf)
+        self.manager = TestManager(0, conf)
 
         if self.pollster.CACHE_KEY_METHOD == 'rgw.get_bucket':
             self.ACCOUNTS = GET_BUCKETS
