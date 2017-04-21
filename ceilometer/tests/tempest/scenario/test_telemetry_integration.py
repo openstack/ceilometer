@@ -76,6 +76,8 @@ class TestTelemetryIntegration(manager.ScenarioTest):
 
     def _do_test(self, filename):
         auth = self.os_admin.auth_provider.get_auth()
+        networks = self.manager.networks_client.list_networks(
+            **{'router:external': False, 'fields': 'id'})['networks']
 
         os.environ.update({
             "ADMIN_TOKEN": auth[0],
@@ -87,6 +89,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
             "GLANCE_SERVICE_URL": self._get_endpoint(auth, "image"),
             "GLANCE_IMAGE_NAME": self.glance_image_create(),
             "NOVA_FLAVOR_REF": config.CONF.compute.flavor_ref,
+            "NEUTRON_NETWORK": networks[0].get('id'),
         })
 
         with file(os.path.join(TEST_DIR, filename)) as f:

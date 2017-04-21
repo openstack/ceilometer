@@ -11,7 +11,7 @@
                     "resource": {
                         "type": "OS::Nova::Server",
                         "properties": {
-                            "networks": [{ "network": "private" }],
+                            "networks": [{ "network": "$ENVIRON['NEUTRON_NETWORK']" }],
                             "flavor": "$ENVIRON['NOVA_FLAVOR_REF']",
                             "image": "$ENVIRON['GLANCE_IMAGE_NAME']",
                             "metadata": {
