@@ -1,0 +1,3 @@
+---
+features:
+  - Add a new publisher for pushing samples or events to a Zaqar queue.
