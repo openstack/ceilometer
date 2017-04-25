@@ -226,4 +226,4 @@ Publishers
 For more information about publishers see the `publishers`_ section of the
 Administrator Guide of Ceilometer.
 
-.. _publishers: http://docs.openstack.org/admin-guide/telemetry-data-retrieval.html#publishers
+.. _publishers: http://docs.openstack.org/admin-guide/telemetry-data-pipelines.html#publishers
