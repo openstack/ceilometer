@@ -19,6 +19,9 @@ fi
 
 # Gnocchi default archive_policy for Ceilometer
 GNOCCHI_ARCHIVE_POLICY=${GNOCCHI_ARCHIVE_POLICY:-low}
+# FIXME(sileht): put 300 by default to match the archive policy
+# when the gate job have overrided this.
+CEILOMETER_ALARM_GRANULARITY=${CEILOMETER_ALARM_GRANULARITY:-60}
 
 # Ceilometer connection info.
 CEILOMETER_SERVICE_PROTOCOL=http

@@ -83,6 +83,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
 
         os.environ.update({
             "ADMIN_TOKEN": auth[0],
+            "AODH_GRANULARITY": str(config.CONF.telemetry.alarm_granularity),
             "AODH_SERVICE_URL": self._get_endpoint(auth, "alarming_plugin"),
             "GNOCCHI_SERVICE_URL": self._get_endpoint(auth, "metric"),
             "PANKO_SERVICE_URL": self._get_endpoint(auth, "event"),
