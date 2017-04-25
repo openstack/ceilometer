@@ -1,6 +1,6 @@
 defaults:
     request_headers:
-        x-auth-token: $ENVIRON['ADMIN_TOKEN']
+        x-auth-token: $ENVIRON['USER_TOKEN']
 
 tests:
     - name: list alarms none
