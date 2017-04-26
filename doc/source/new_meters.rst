@@ -87,12 +87,12 @@ If you plan on adding meters, please follow the convention below:
 2. When a part of the name is a variable, it should always be at the end and start with a ':'.
    For example, do not use <type>.image but image:<type>, where type is your variable name.
 
-3. If you have any hesitation, come and ask in #openstack-ceilometer
+3. If you have any hesitation, come and ask in #openstack-telemetry
 
 Meter definitions
 -----------------
 Meters definitions by default, are stored in separate configuration
-file, called :file:`ceilometer/meter/data/meter.yaml`. This is essentially
+file, called :file:`ceilometer/meter/data/meters.yaml`. This is essentially
 a replacement for prior approach of writing notification handlers to consume
 specific topics.
 
