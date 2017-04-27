@@ -13,6 +13,7 @@
 
 from gnocchiclient import client
 from gnocchiclient import exceptions as gnocchi_exc
+import keystoneauth1.session
 from oslo_log import log
 
 from ceilometer import keystone_client
@@ -26,6 +27,10 @@ def get_gnocchiclient(conf, timeout_override=False):
                         timeout_override)
                else conf.dispatcher_gnocchi.request_timeout)
     session = keystone_client.get_session(conf, group=group, timeout=timeout)
+    adapter = keystoneauth1.session.TCPKeepAliveAdapter(
+        pool_maxsize=conf.max_parallel_requests)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
     return client.Client('1', session,
                          interface=conf[group].interface,
                          region_name=conf[group].region_name,
