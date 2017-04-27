@@ -33,7 +33,7 @@ from ceilometer import messaging
 class BaseTestCase(base.BaseTestCase):
     def setup_messaging(self, conf, exchange=None):
         self.useFixture(oslo_messaging.conffixture.ConfFixture(conf))
-        conf.set_override("notification_driver", "messaging")
+        conf.set_override("notification_driver", ["messaging"])
         if not exchange:
             exchange = 'ceilometer'
         conf.set_override("control_exchange", exchange)
