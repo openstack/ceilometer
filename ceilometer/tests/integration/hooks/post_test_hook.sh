@@ -36,6 +36,8 @@ function generate_telemetry_report(){
     echo "* Message queue status:"
     sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
 
+    source $BASE/new/devstack/openrc admin admin
+
     echo "* Heat stack:"
     openstack stack show integration_test
     echo "* Alarm list:"
@@ -43,7 +45,7 @@ function generate_telemetry_report(){
     echo "* Event list:"
     ceilometer event-list -q 'event_type=string::compute.instance.create.end'
     echo "* Nova instance list:"
-    openstack server list
+    openstack server list --all-projects
 
     echo "* Gnocchi instance list:"
     gnocchi resource list -t instance
@@ -81,8 +83,10 @@ function generate_reports_and_maybe_exit() {
 sudo chown -R tempest:stack $BASE/new/tempest
 sudo chown -R tempest:stack $BASE/data/tempest
 cd $BASE/new/tempest
+set +e
 sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_telemetry_integration --concurrency=$TEMPEST_CONCURRENCY
 EXIT_CODE=$?
+set -e
 export_subunit_data "all-plugin"
 generate_reports_and_maybe_exit $EXIT_CODE
 
