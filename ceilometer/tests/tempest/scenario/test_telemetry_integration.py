@@ -27,6 +27,8 @@ TEST_DIR = os.path.join(os.path.dirname(__file__), '..', '..',
 class TestTelemetryIntegration(manager.ScenarioTest):
     credentials = ['admin', 'primary']
 
+    TIMEOUT_SCALING_FACTOR = 5
+
     @classmethod
     def skip_checks(cls):
         super(TestTelemetryIntegration, cls).skip_checks()
