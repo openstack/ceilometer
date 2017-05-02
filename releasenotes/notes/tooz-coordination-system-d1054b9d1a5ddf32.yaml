@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    Ceilometer now leverages the latest distribution mechanism provided by the
+    tooz library. Therefore the options `coordination.retry_backoff` and
+    `coordination.max_retry_interval` do not exist anymore.

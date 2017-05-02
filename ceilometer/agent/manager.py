@@ -32,9 +32,9 @@ from oslo_utils import timeutils
 from six import moves
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
+from tooz import coordination
 
 from ceilometer.agent import plugin_base
-from ceilometer import coordination
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
@@ -102,14 +102,16 @@ class Resources(object):
         source_discovery = (self.agent_manager.discover(self._discovery,
                                                         discovery_cache)
                             if self._discovery else [])
-        static_resources = []
+
         if self._resources:
             static_resources_group = self.agent_manager.construct_group_id(
                 utils.hash_of_set(self._resources))
-            p_coord = self.agent_manager.partition_coordinator
-            static_resources = p_coord.extract_my_subset(
-                static_resources_group, self._resources)
-        return static_resources + source_discovery
+            return list(filter(
+                self.agent_manager.hashrings[
+                    static_resources_group].belongs_to_self, self._resources
+            )) + source_discovery
+
+        return source_discovery
 
     @staticmethod
     def key(source_name, pollster):
@@ -278,8 +280,8 @@ class AgentManager(cotyledon.Service):
         if self.conf.coordination.backend_url:
             # XXX uuid4().bytes ought to work, but it requires ascii for now
             coordination_id = str(uuid.uuid4()).encode('ascii')
-            self.partition_coordinator = coordination.PartitionCoordinator(
-                self.conf, coordination_id)
+            self.partition_coordinator = coordination.get_coordinator(
+                self.conf.coordination.backend_url, coordination_id)
         else:
             self.partition_coordinator = None
 
@@ -355,8 +357,9 @@ class AgentManager(cotyledon.Service):
         ])
         groups.update(static_resource_groups)
 
-        for group in groups:
-            self.partition_coordinator.join_group(group)
+        self.hashrings = dict(
+            (group, self.partition_coordinator.join_partitioned_group(group))
+            for group in groups)
 
     def create_polling_task(self):
         """Create an initially empty polling task."""
@@ -492,17 +495,17 @@ class AgentManager(cotyledon.Service):
                             continue
 
                     discovered = discoverer.discover(self, param)
+
                     if self.partition_coordinator:
-                        partitioned = (
-                            self.partition_coordinator.extract_my_subset(
-                                self.construct_group_id(discoverer.group_id),
-                                discovered)
-                        )
-                    else:
-                        partitioned = discovered
-                    resources.extend(partitioned)
+                        discovered = list(filter(
+                            self.hashrings[
+                                self.construct_group_id(discoverer.group_id)
+                            ].belongs_to_self, discovered
+                        ))
+
+                    resources.extend(discovered)
                     if discovery_cache is not None:
-                        discovery_cache[url] = partitioned
+                        discovery_cache[url] = discovered
                 except ka_exceptions.ClientException as e:
                     LOG.error('Skipping %(name)s, keystone issue: '
                               '%(exc)s', {'name': name, 'exc': e})

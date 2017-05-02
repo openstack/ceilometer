@@ -26,7 +26,6 @@ import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
 import ceilometer.compute.virt.vmware.inspector
 import ceilometer.compute.virt.xenapi.inspector
-import ceilometer.coordination
 import ceilometer.dispatcher
 import ceilometer.dispatcher.file
 import ceilometer.dispatcher.gnocchi_opts
@@ -98,7 +97,20 @@ def list_opts():
                                 ceilometer.api.controllers.v2.root.API_OPTS)),
         ('collector', ceilometer.collector.OPTS),
         ('compute', ceilometer.compute.discovery.OPTS),
-        ('coordination', ceilometer.coordination.OPTS),
+        ('coordination', [
+            cfg.StrOpt(
+                'backend_url',
+                help='The backend URL to use for distributed coordination. If '
+                'left empty, per-deployment central agent and per-host '
+                'compute agent won\'t do workload '
+                'partitioning and will only function correctly if a '
+                'single instance of that service is running.'),
+            cfg.FloatOpt(
+                'check_watchers',
+                default=10.0,
+                help='Number of seconds between checks to see if group '
+                'membership has changed'),
+        ]),
         ('database', ceilometer.storage.OPTS),
         ('dispatcher_file', ceilometer.dispatcher.file.OPTS),
         ('dispatcher_http', ceilometer.dispatcher.http.http_dispatcher_opts),

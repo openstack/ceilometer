@@ -297,6 +297,7 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
+    @mock.patch("ceilometer.utils.kill_listeners", mock.MagicMock())
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')
     def test_notification_threads(self, m_listener):
         self.CONF.set_override('batch_size', 1, group='notification')
@@ -304,6 +305,7 @@ class TestRealNotificationHA(BaseRealNotification):
         m_listener.assert_called_with(
             override_pool_size=self.CONF.max_parallel_requests)
         m_listener.reset_mock()
+        self.srv.terminate()
         self.CONF.set_override('batch_size', 2, group='notification')
         self.srv.run()
         m_listener.assert_called_with(override_pool_size=1)
@@ -325,22 +327,32 @@ class TestRealNotificationHA(BaseRealNotification):
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_retain_common_targets_on_refresh(self, mock_listener):
-        with mock.patch('ceilometer.coordination.PartitionCoordinator'
-                        '.extract_my_subset', return_value=[1, 2]):
-            self.srv.run()
-            self.addCleanup(self.srv.terminate)
+        maybe = {"maybe": 0}
+
+        def _once_over_five(item):
+            maybe["maybe"] += 1
+            return maybe["maybe"] % 5 == 0
+
+        hashring = mock.MagicMock()
+        hashring.belongs_to_self = _once_over_five
+        self.srv.partition_coordinator = pc = mock.MagicMock()
+        pc.join_partitioned_group.return_value = hashring
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
         listened_before = [target.topic for target in
                            mock_listener.call_args[0][1]]
         self.assertEqual(4, len(listened_before))
-        with mock.patch('ceilometer.coordination.PartitionCoordinator'
-                        '.extract_my_subset', return_value=[1, 3]):
-            self.srv._refresh_agent(None)
+        self.srv._refresh_agent(None)
         listened_after = [target.topic for target in
                           mock_listener.call_args[0][1]]
         self.assertEqual(4, len(listened_after))
         common = set(listened_before) & set(listened_after)
-        for topic in common:
-            self.assertTrue(topic.endswith('1'))
+        self.assertEqual(
+            {'ceilometer-pipe-test_pipeline:test_sink-4',
+             'ceilometer-pipe-event:test_event:test_sink-4',
+             'ceilometer-pipe-event:test_event:test_sink-9',
+             'ceilometer-pipe-test_pipeline:test_sink-9'},
+            common)
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_notify_to_relevant_endpoint(self, mock_listener):
@@ -464,14 +476,31 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
     def _check_notifications(self, fake_publisher_cls):
         fake_publisher_cls.side_effect = [self.publisher, self.publisher2]
 
-        self.srv = notification.NotificationService(0, self.CONF, 'harry')
-        self.srv2 = notification.NotificationService(0, self.CONF, 'lloyd')
-        with mock.patch('ceilometer.coordination.PartitionCoordinator'
-                        '._get_members', return_value=['harry', 'lloyd']):
-            self.srv.run()
-            self.addCleanup(self.srv.terminate)
-            self.srv2.run()
-            self.addCleanup(self.srv2.terminate)
+        maybe = {"srv": 0, "srv2": -1}
+
+        def _sometimes_srv(item):
+            maybe["srv"] += 1
+            return (maybe["srv"] % 2) == 0
+
+        self.srv = notification.NotificationService(0, self.CONF)
+        self.srv.partition_coordinator = pc = mock.MagicMock()
+        hashring = mock.MagicMock()
+        hashring.belongs_to_self = _sometimes_srv
+        pc.join_partitioned_group.return_value = hashring
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
+
+        def _sometimes_srv2(item):
+            maybe["srv2"] += 1
+            return (maybe["srv2"] % 2) == 0
+
+        self.srv2 = notification.NotificationService(0, self.CONF)
+        self.srv2.partition_coordinator = pc = mock.MagicMock()
+        hashring = mock.MagicMock()
+        hashring.belongs_to_self = _sometimes_srv2
+        pc.join_partitioned_group.return_value = hashring
+        self.srv2.run()
+        self.addCleanup(self.srv2.terminate)
 
         notifier = messaging.get_notifier(self.transport,
                                           "compute.vagrant-precise")
@@ -484,7 +513,7 @@ class TestRealNotificationMultipleAgents(tests_base.BaseTestCase):
         self.expected_samples = 4
         with mock.patch('six.moves.builtins.hash', lambda x: int(x)):
             start = time.time()
-            while time.time() - start < 60:
+            while time.time() - start < 10:
                 if (len(self.publisher.samples + self.publisher2.samples) >=
                         self.expected_samples):
                     break
