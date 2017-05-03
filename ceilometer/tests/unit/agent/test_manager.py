@@ -13,12 +13,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 """Tests for ceilometer agent manager"""
-
+import fixtures
 from keystoneauth1 import exceptions as ka_exceptions
 import mock
 from oslo_utils import fileutils
 from oslotest import base
-from oslotest import mockpatch
 import six
 from stevedore import extension
 
@@ -259,10 +258,10 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.notified_samples = []
         self.notifier = mock.Mock()
         self.notifier.sample.side_effect = self.fake_notifier_sample
-        self.useFixture(mockpatch.Patch('oslo_messaging.Notifier',
-                                        return_value=self.notifier))
+        self.useFixture(fixtures.MockPatch('oslo_messaging.Notifier',
+                                           return_value=self.notifier))
         super(TestRunTasks, self).setUp()
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'keystoneclient.v2_0.client.Client',
             return_value=mock.Mock()))
 
@@ -293,7 +292,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
 
     def test_when_keystone_fail(self):
         """Test for bug 1316532."""
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'keystoneclient.v2_0.client.Client',
             side_effect=ka_exceptions.ClientException))
         self.pipeline_cfg = {
@@ -438,8 +437,8 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self._batching_samples(4, 1)
 
     def _batching_samples(self, expected_samples, call_count):
-        self.useFixture(mockpatch.PatchObject(manager.utils, 'delayed',
-                                              side_effect=fakedelayed))
+        self.useFixture(fixtures.MockPatchObject(manager.utils, 'delayed',
+                                                 side_effect=fakedelayed))
         pipeline_cfg = {
             'sources': [{
                 'name': 'test_pipeline',

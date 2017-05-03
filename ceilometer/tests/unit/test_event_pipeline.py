@@ -15,9 +15,9 @@ import datetime
 import traceback
 import uuid
 
+import fixtures
 import mock
 import oslo_messaging
-from oslotest import mockpatch
 
 from ceilometer.event.storage import models
 from ceilometer import pipeline
@@ -76,13 +76,13 @@ class EventPipelineTestCase(base.BaseTestCase):
             raw={'status': 'stopped'}
         )
 
-        self.useFixture(mockpatch.PatchObject(
+        self.useFixture(fixtures.MockPatchObject(
             publisher, 'get_publisher', side_effect=self.get_publisher))
 
         self._setup_pipeline_cfg()
 
         self._reraise_exception = True
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.pipeline.LOG.exception',
             side_effect=self._handle_reraise_exception))
 
@@ -422,7 +422,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         test_data['message_signature'] = message_sign
 
         fake_publisher = mock.Mock()
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.publisher.test.TestPublisher',
             return_value=fake_publisher))
 

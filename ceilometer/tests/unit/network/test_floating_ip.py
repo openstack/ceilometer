@@ -14,9 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import mock
 from oslotest import base
-from oslotest import mockpatch
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
@@ -41,9 +41,9 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
         super(TestFloatingIPPollster, self).setUp()
         self.pollster = floatingip.FloatingIPPollster(self.CONF)
         fake_fip = self.fake_get_fip_service()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'fip_get_all',
-                                        return_value=fake_fip))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'fip_get_all',
+                                           return_value=fake_fip))
 
     @staticmethod
     def fake_get_fip_service():

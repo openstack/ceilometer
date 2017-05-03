@@ -21,7 +21,6 @@ import warnings
 
 import fixtures
 import mock
-from oslotest import mockpatch
 import six
 from six.moves.urllib import parse as urlparse
 import sqlalchemy
@@ -177,8 +176,8 @@ class TestBase(test_base.BaseTestCase):
         self.conn = self.db_manager.connection
         self.conn.upgrade()
 
-        self.useFixture(mockpatch.Patch('ceilometer.storage.get_connection',
-                                        side_effect=self._get_connection))
+        self.useFixture(fixtures.MockPatch('ceilometer.storage.get_connection',
+                                           side_effect=self._get_connection))
 
         # Set a default location for the pipeline config file so the
         # tests work even if ceilometer is not installed globally on

@@ -12,13 +12,14 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
 import socket
 
+import fixtures
 import mock
 import msgpack
 import oslo_messaging
 from oslo_utils import timeutils
-from oslotest import mockpatch
 from stevedore import extension
 
 from ceilometer import collector
@@ -83,7 +84,7 @@ class TestCollector(tests_base.BaseTestCase):
         if enabled:
             self.setup_messaging(self.CONF)
         else:
-            self.useFixture(mockpatch.Patch(
+            self.useFixture(fixtures.MockPatch(
                 'ceilometer.messaging.get_transport',
                 return_value=None))
 
@@ -92,7 +93,7 @@ class TestCollector(tests_base.BaseTestCase):
         fake_dispatcher = extension.ExtensionManager.make_test_instance([
             extension.Extension('test', None, None, plugin,),
         ], propagate_map_exceptions=True)
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.dispatcher.load_dispatcher_manager',
             return_value=(fake_dispatcher, fake_dispatcher)))
         return plugin

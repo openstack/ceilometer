@@ -12,10 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import mock
-
 from oslotest import base
-from oslotest import mockpatch
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
@@ -46,9 +45,9 @@ class TestLBListenerPollster(_BaseTestLBPollster):
         self.pollster = lbaas.LBListenerPollster(self.CONF)
         self.pollster.lb_version = 'v2'
         fake_listeners = self.fake_list_listeners()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'list_listener',
-                                        return_value=fake_listeners))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'list_listener',
+                                           return_value=fake_listeners))
 
     @staticmethod
     def fake_list_listeners():
@@ -144,9 +143,9 @@ class TestLBLoadBalancerPollster(_BaseTestLBPollster):
         self.pollster = lbaas.LBLoadBalancerPollster(self.CONF)
         self.pollster.lb_version = 'v2'
         fake_loadbalancers = self.fake_list_loadbalancers()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'list_loadbalancer',
-                                        return_value=fake_loadbalancers))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'list_loadbalancer',
+                                           return_value=fake_loadbalancers))
 
     @staticmethod
     def fake_list_loadbalancers():
@@ -232,14 +231,14 @@ class TestLBStatsPollster(_BaseTestLBPollster):
     def setUp(self):
         super(TestLBStatsPollster, self).setUp()
         fake_balancer_stats = self.fake_balancer_stats()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'get_loadbalancer_stats',
-                                        return_value=fake_balancer_stats))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'get_loadbalancer_stats',
+                                           return_value=fake_balancer_stats))
 
         fake_loadbalancers = self.fake_list_loadbalancers()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'list_loadbalancer',
-                                        return_value=fake_loadbalancers))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'list_loadbalancer',
+                                           return_value=fake_loadbalancers))
         self.CONF.set_override('neutron_lbaas_version',
                                'v2',
                                group='service_types')

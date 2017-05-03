@@ -20,9 +20,9 @@ import datetime
 import traceback
 import unittest
 
+import fixtures
 import mock
 from oslo_utils import timeutils
-from oslotest import mockpatch
 import six
 from stevedore import extension
 
@@ -146,7 +146,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             resource_metadata={}
         )
 
-        self.useFixture(mockpatch.PatchObject(
+        self.useFixture(fixtures.MockPatchObject(
             publisher, 'get_publisher', side_effect=self.get_publisher))
 
         self.transformer_manager = mock.MagicMock()
@@ -156,7 +156,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         self._setup_pipeline_cfg()
 
         self._reraise_exception = True
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.pipeline.LOG.exception',
             side_effect=self._handle_reraise_exception))
 

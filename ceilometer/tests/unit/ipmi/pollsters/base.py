@@ -14,8 +14,8 @@
 
 import abc
 
+import fixtures
 import mock
-from oslotest import mockpatch
 import six
 
 from ceilometer.agent import manager
@@ -53,11 +53,11 @@ class TestPollsterBase(base.BaseTestCase):
         nm.read_sensor_any.side_effect = self.fake_sensor_data
         # We should mock the pollster first before initialize the Manager
         # so that we don't trigger the sudo in pollsters' __init__().
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.ipmi.platform.intel_node_manager.NodeManager',
             return_value=nm))
 
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.ipmi.platform.ipmi_sensor.IPMISensor',
             return_value=nm))
 

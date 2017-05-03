@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import mock
-from oslotest import mockpatch
 
 from ceilometer import declarative
 from ceilometer.tests import base
@@ -31,7 +31,7 @@ class TestDefinition(base.BaseTestCase):
             {'fields': ['field5.arg', 'field6'], 'type': 'text'}
         ]
         self.parser = mock.MagicMock()
-        parser_patch = mockpatch.Patch(
+        parser_patch = fixtures.MockPatch(
             "jsonpath_rw_ext.parser.ExtentedJsonPathParser.parse",
             new=self.parser)
         self.useFixture(parser_patch)

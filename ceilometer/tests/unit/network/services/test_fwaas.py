@@ -13,9 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import mock
 from oslotest import base
-from oslotest import mockpatch
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
@@ -45,9 +45,9 @@ class TestFirewallPollster(_BaseTestFWPollster):
         super(TestFirewallPollster, self).setUp()
         self.pollster = fwaas.FirewallPollster(self.CONF)
         fake_fw = self.fake_get_fw_service()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'firewall_get_all',
-                                        return_value=fake_fw))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'firewall_get_all',
+                                           return_value=fake_fw))
 
     @staticmethod
     def fake_get_fw_service():
@@ -123,9 +123,9 @@ class TestIPSecConnectionsPollster(_BaseTestFWPollster):
         super(TestIPSecConnectionsPollster, self).setUp()
         self.pollster = fwaas.FirewallPolicyPollster(self.CONF)
         fake_fw_policy = self.fake_get_fw_policy()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'fw_policy_get_all',
-                                        return_value=fake_fw_policy))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'fw_policy_get_all',
+                                           return_value=fake_fw_policy))
 
     @staticmethod
     def fake_get_fw_policy():

@@ -16,6 +16,7 @@
 import os
 import uuid
 
+import fixtures
 from gnocchiclient import exceptions as gnocchi_exc
 from keystoneauth1 import exceptions as ka_exceptions
 import mock
@@ -23,7 +24,6 @@ from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
 from oslo_utils import fixture as utils_fixture
 from oslo_utils import timeutils
-from oslotest import mockpatch
 import requests
 import six
 from stevedore import extension
@@ -360,7 +360,7 @@ class DispatcherTest(base.BaseTestCase):
         ks_client = mock.Mock(auth_token='fake_token')
         ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
         self.ks_client = ks_client
@@ -613,7 +613,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         ks_client = mock.Mock()
         ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
         self.ks_client = ks_client
