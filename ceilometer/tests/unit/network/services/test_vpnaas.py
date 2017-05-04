@@ -13,9 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import mock
 from oslotest import base
-from oslotest import mockpatch
 
 from ceilometer.agent import manager
 from ceilometer.agent import plugin_base
@@ -45,9 +45,9 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
         super(TestVPNServicesPollster, self).setUp()
         self.pollster = vpnaas.VPNServicesPollster(self.CONF)
         fake_vpn = self.fake_get_vpn_service()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'vpn_get_all',
-                                        return_value=fake_vpn))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'vpn_get_all',
+                                           return_value=fake_vpn))
 
     @staticmethod
     def fake_get_vpn_service():
@@ -127,9 +127,9 @@ class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
         super(TestIPSecConnectionsPollster, self).setUp()
         self.pollster = vpnaas.IPSecConnectionsPollster(self.CONF)
         fake_conns = self.fake_get_ipsec_connections()
-        self.useFixture(mockpatch.Patch('ceilometer.neutron_client.Client.'
-                                        'ipsec_site_connections_get_all',
-                                        return_value=fake_conns))
+        self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
+                                           'ipsec_site_connections_get_all',
+                                           return_value=fake_conns))
 
     @staticmethod
     def fake_get_ipsec_connections():

@@ -14,9 +14,9 @@
 # under the License.
 """Tests for ceilometer/hardware/inspector/snmp/inspector.py
 """
+import fixtures
 import mock
 from oslo_utils import netutils
-from oslotest import mockpatch
 from pysnmp.proto.rfc1905 import noSuchObject
 
 from ceilometer.hardware.inspector import snmp
@@ -84,7 +84,7 @@ class TestSNMPInspector(test_base.BaseTestCase):
         super(TestSNMPInspector, self).setUp()
         self.inspector = snmp.SNMPInspector()
         self.host = netutils.urlsplit("snmp://localhost")
-        self.useFixture(mockpatch.PatchObject(
+        self.useFixture(fixtures.MockPatchObject(
             snmp.cmdgen, 'CommandGenerator',
             return_value=FakeCommandGenerator()))
 
@@ -95,7 +95,7 @@ class TestSNMPInspector(test_base.BaseTestCase):
         def faux_parse(ret, is_bulk):
             return (True, 'forced error')
 
-        self.useFixture(mockpatch.PatchObject(
+        self.useFixture(fixtures.MockPatchObject(
             snmp, 'parse_snmp_return', new=faux_parse))
 
         self.assertRaises(snmp.SNMPException,

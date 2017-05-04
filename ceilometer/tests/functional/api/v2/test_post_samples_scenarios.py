@@ -19,10 +19,10 @@ import copy
 import datetime
 import os
 
+import fixtures
 import mock
 from oslo_utils import fileutils
 from oslo_utils import timeutils
-from oslotest import mockpatch
 import six
 
 from ceilometer.tests.functional.api import v2
@@ -56,8 +56,8 @@ class TestPostSamples(v2.FunctionalTest):
         self.published = []
         notifier = mock.Mock()
         notifier.sample.side_effect = self.fake_notifier_sample
-        self.useFixture(mockpatch.Patch('oslo_messaging.Notifier',
-                                        return_value=notifier))
+        self.useFixture(fixtures.MockPatch('oslo_messaging.Notifier',
+                                           return_value=notifier))
         super(TestPostSamples, self).setUp()
 
     def test_one(self):

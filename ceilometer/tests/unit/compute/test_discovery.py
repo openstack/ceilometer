@@ -12,9 +12,9 @@
 # under the License.
 import datetime
 
+import fixtures
 import iso8601
 import mock
-from oslotest import mockpatch
 
 from ceilometer.compute import discovery
 from ceilometer.compute.pollsters import util
@@ -109,15 +109,15 @@ class TestDiscovery(base.BaseTestCase):
         # the tests
         self.client = mock.MagicMock()
         self.client.instance_get_all_by_host.return_value = [self.instance]
-        patch_client = mockpatch.Patch('ceilometer.nova_client.Client',
-                                       return_value=self.client)
+        patch_client = fixtures.MockPatch('ceilometer.nova_client.Client',
+                                          return_value=self.client)
         self.useFixture(patch_client)
 
         self.utc_now = mock.MagicMock(
             return_value=datetime.datetime(2016, 1, 1,
                                            tzinfo=iso8601.iso8601.UTC))
-        patch_timeutils = mockpatch.Patch('oslo_utils.timeutils.utcnow',
-                                          self.utc_now)
+        patch_timeutils = fixtures.MockPatch('oslo_utils.timeutils.utcnow',
+                                             self.utc_now)
         self.useFixture(patch_timeutils)
 
         self.CONF = service.prepare_service([], [])

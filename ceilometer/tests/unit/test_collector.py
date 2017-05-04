@@ -9,9 +9,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import fixtures
 import mock
 from oslo_config import fixture
-from oslotest import mockpatch
 
 from ceilometer import collector
 from ceilometer import dispatcher
@@ -39,7 +39,7 @@ class TestEventDispatcherVerifier(base.BaseTestCase):
                              'ceilometer.publisher.utils',
                              'publisher')
         self.conf.set_override("event_dispatchers", ['file'])
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.dispatcher.file.FileDispatcher',
             new=FakeDispatcher))
 

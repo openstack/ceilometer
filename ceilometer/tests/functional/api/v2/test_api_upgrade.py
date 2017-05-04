@@ -11,9 +11,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import mock
 from oslo_utils import fileutils
-from oslotest import mockpatch
 import six
 
 from ceilometer.tests.functional.api import v2
@@ -51,7 +51,7 @@ class TestAPIUpgradePath(v2.FunctionalTest):
         self.catalog = (self.ks.session.auth.get_access.
                         return_value.service_catalog)
         self.catalog.url_for.side_effect = self._url_for
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_client', return_value=self.ks))
 
     @staticmethod

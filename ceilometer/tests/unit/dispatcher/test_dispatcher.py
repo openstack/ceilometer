@@ -12,8 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 from oslo_config import fixture
-from oslotest import mockpatch
 
 from ceilometer import dispatcher
 from ceilometer import service
@@ -33,10 +33,10 @@ class TestDispatchManager(base.BaseTestCase):
         self.conf.config(meter_dispatchers=['database', 'gnocchi'],
                          event_dispatchers=['database'])
         self.CONF = self.conf.conf
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.dispatcher.gnocchi.GnocchiDispatcher',
             new=FakeMeterDispatcher))
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.dispatcher.database.MeterDatabaseDispatcher',
             new=FakeMeterDispatcher))
 

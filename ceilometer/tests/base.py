@@ -17,10 +17,10 @@ import functools
 import os
 import tempfile
 
+import fixtures
 import oslo_messaging.conffixture
 from oslo_utils import timeutils
 from oslotest import base
-from oslotest import mockpatch
 import six
 from testtools import testcase
 import webtest
@@ -41,7 +41,7 @@ class BaseTestCase(base.BaseTestCase):
         # NOTE(sileht): Ensure a new oslo.messaging driver is loaded
         # between each tests
         self.transport = messaging.get_transport(conf, "fake://", cache=False)
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.messaging.get_transport',
             return_value=self.transport))
 

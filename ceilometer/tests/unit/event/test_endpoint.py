@@ -14,10 +14,10 @@
 # under the License.
 """Tests for Ceilometer notify daemon."""
 
+import fixtures
 import mock
 import oslo_messaging
 from oslo_utils import fileutils
-from oslotest import mockpatch
 import six
 import yaml
 
@@ -127,10 +127,11 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         self.CONF.set_override("connection", "log://", group='database')
         self.setup_messaging(self.CONF)
 
-        self.useFixture(mockpatch.PatchObject(publisher, 'get_publisher',
-                                              side_effect=self.get_publisher))
+        self.useFixture(fixtures.MockPatchObject(
+            publisher, 'get_publisher',
+            side_effect=self.get_publisher))
         self.fake_publisher = mock.Mock()
-        self.useFixture(mockpatch.Patch(
+        self.useFixture(fixtures.MockPatch(
             'ceilometer.publisher.test.TestPublisher',
             return_value=self.fake_publisher))
 

@@ -14,10 +14,10 @@
 
 import collections
 
+import fixtures
 from keystoneauth1 import exceptions
 import mock
 from oslotest import base
-from oslotest import mockpatch
 import testscenarios.testcase
 
 from ceilometer.agent import manager
@@ -105,8 +105,8 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
 
     def test_iter_accounts_no_cache(self):
         cache = {}
-        with mockpatch.PatchObject(self.factory, '_get_account_info',
-                                   return_value=[]):
+        with fixtures.MockPatchObject(self.factory, '_get_account_info',
+                                      return_value=[]):
             data = list(self.pollster._iter_accounts(mock.Mock(), cache,
                                                      ASSIGNED_TENANTS))
 
@@ -123,24 +123,24 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
 
         api_method = 'get_%s' % self.pollster.METHOD
 
-        with mockpatch.PatchObject(rgw_client.RGWAdminClient,
-                                   api_method, new=mock_method):
+        with fixtures.MockPatchObject(rgw_client.RGWAdminClient,
+                                      api_method, new=mock_method):
             cache = {self.pollster.CACHE_KEY_METHOD: [self.ACCOUNTS[0]]}
             data = list(self.pollster._iter_accounts(mock.Mock(), cache,
                                                      ASSIGNED_TENANTS))
         self.assertEqual([self.ACCOUNTS[0]], data)
 
     def test_metering(self):
-        with mockpatch.PatchObject(self.factory, '_iter_accounts',
-                                   side_effect=self.fake_iter_accounts):
+        with fixtures.MockPatchObject(self.factory, '_iter_accounts',
+                                      side_effect=self.fake_iter_accounts):
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))
 
         self.assertEqual(2, len(samples), self.pollster.__class__)
 
     def test_get_meter_names(self):
-        with mockpatch.PatchObject(self.factory, '_iter_accounts',
-                                   side_effect=self.fake_iter_accounts):
+        with fixtures.MockPatchObject(self.factory, '_iter_accounts',
+                                      side_effect=self.fake_iter_accounts):
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))
 
@@ -151,9 +151,9 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         mock_method = mock.MagicMock()
         endpoint = 'http://127.0.0.1:8000/admin'
         api_method = 'get_%s' % self.pollster.METHOD
-        with mockpatch.PatchObject(rgw_client.RGWAdminClient,
-                                   api_method, new=mock_method):
-            with mockpatch.PatchObject(
+        with fixtures.MockPatchObject(rgw_client.RGWAdminClient,
+                                      api_method, new=mock_method):
+            with fixtures.MockPatchObject(
                     self.manager._catalog, 'url_for',
                     return_value=endpoint):
                 list(self.pollster.get_samples(self.manager, {},
@@ -166,9 +166,9 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         mock_url_for = mock.MagicMock()
         mock_url_for.return_value = '/endpoint'
         api_method = 'get_%s' % self.pollster.METHOD
-        with mockpatch.PatchObject(rgw_client.RGWAdminClient, api_method,
-                                   new=mock.MagicMock()):
-            with mockpatch.PatchObject(
+        with fixtures.MockPatchObject(rgw_client.RGWAdminClient, api_method,
+                                      new=mock.MagicMock()):
+            with fixtures.MockPatchObject(
                     self.manager._catalog, 'url_for',
                     new=mock_url_for):
                 list(self.pollster.get_samples(self.manager, {},
@@ -178,7 +178,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
         self.assertEqual(1, mock_url_for.call_count)
 
     def test_endpoint_notfound(self):
-        with mockpatch.PatchObject(
+        with fixtures.MockPatchObject(
                 self.manager._catalog, 'url_for',
                 side_effect=self.fake_ks_service_catalog_url_for):
             samples = list(self.pollster.get_samples(self.manager, {},

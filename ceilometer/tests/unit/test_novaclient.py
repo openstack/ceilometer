@@ -12,11 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import glanceclient
 import mock
 import novaclient
 from oslotest import base
-from oslotest import mockpatch
 
 from ceilometer import nova_client
 from ceilometer import service
@@ -30,10 +30,10 @@ class TestNovaClient(base.BaseTestCase):
         self._flavors_count = 0
         self._images_count = 0
         self.nv = nova_client.Client(self.CONF)
-        self.useFixture(mockpatch.PatchObject(
+        self.useFixture(fixtures.MockPatchObject(
             self.nv.nova_client.flavors, 'get',
             side_effect=self.fake_flavors_get))
-        self.useFixture(mockpatch.PatchObject(
+        self.useFixture(fixtures.MockPatchObject(
             self.nv.glance_client.images, 'get',
             side_effect=self.fake_images_get))
 
