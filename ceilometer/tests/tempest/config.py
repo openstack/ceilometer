@@ -47,4 +47,9 @@ TelemetryGroup = [
                default=1,
                help="The seconds to sleep after an unsuccessful "
                     "notification received."),
+    cfg.IntOpt('alarm_granularity',
+               default=300,
+               help="Granularity to use for aodh alarms. This must match the "
+                    "configured Gnocchi archive policy")
+
 ]

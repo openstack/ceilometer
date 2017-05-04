@@ -44,7 +44,7 @@
                     "description": "Scale-up if the mean CPU > 10% on 1 minute",
                     "metric": "cpu_util",
                     "aggregation_method": "mean",
-                    "granularity": 60,
+                    "granularity": $ENVIRON["AODH_GRANULARITY"],
                     "evaluation_periods": 1,
                     "threshold": 10,
                     "comparison_operator": "gt",
