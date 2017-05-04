@@ -32,6 +32,7 @@ function generate_testr_results {
 
 function generate_telemetry_report(){
     set +x
+    set +e
 
     echo "* Message queue status:"
     sudo rabbitmqctl list_queues | grep -e \\.sample -e \\.info
@@ -45,7 +46,7 @@ function generate_telemetry_report(){
     echo "* Event list:"
     ceilometer event-list -q 'event_type=string::compute.instance.create.end'
     echo "* Nova instance list:"
-    openstack server list --all-projects
+    openstack server list
 
     echo "* Gnocchi instance list:"
     gnocchi resource list -t instance
@@ -65,6 +66,7 @@ function generate_telemetry_report(){
     echo "* Unprocessed measures:"
     for key in $(redis-cli --scan --pattern 'incoming*'); do echo -n $key && redis-cli llen $key; done
 
+    set -e
     set -x
 }
 
