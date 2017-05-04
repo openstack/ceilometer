@@ -210,7 +210,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
 
                 # NOTE(sileht): Other fields that Ceilometer tracks
                 # where we can't get the value here, but their are
-                # retreived by notification
+                # retrieved by notification
                 "metadata": {},
                 # "OS-EXT-STS:task_state"
                 # 'reservation_id',
