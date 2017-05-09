@@ -78,7 +78,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
 
     def _do_test(self, filename):
         auth = self.os_admin.auth_provider.get_auth()
-        networks = self.manager.networks_client.list_networks(
+        networks = self.os_primary.networks_client.list_networks(
             **{'router:external': False, 'fields': 'id'})['networks']
 
         os.environ.update({
