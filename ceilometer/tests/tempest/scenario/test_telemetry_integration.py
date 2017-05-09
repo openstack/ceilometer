@@ -95,7 +95,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
             "NEUTRON_NETWORK": networks[0].get('id'),
         })
 
-        with file(os.path.join(TEST_DIR, filename)) as f:
+        with open(os.path.join(TEST_DIR, filename)) as f:
             test_suite = suitemaker.test_suite_from_dict(
                 loader=unittest.defaultTestLoader,
                 test_base_name="gabbi",
@@ -131,6 +131,7 @@ def test_maker(name, filename):
         self._do_test(filename)
         test.__name__ = name
     return test
+
 
 # Create one scenario per yaml file
 for filename in os.listdir(TEST_DIR):
