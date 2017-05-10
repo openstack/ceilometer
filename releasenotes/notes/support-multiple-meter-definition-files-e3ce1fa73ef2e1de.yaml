@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Support loading multiple meter definition files and
+    allow users to add their own meter definitions into
+    several files according to different types of metrics
+    under the directory of /etc/ceilometer/meters.d.
