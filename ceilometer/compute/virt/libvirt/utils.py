@@ -41,7 +41,7 @@ OPTS = [
 LIBVIRT_PER_TYPE_URIS = dict(uml='uml:///system', xen='xen:///', lxc='lxc:///')
 
 
-# We don't use the libvirt constants in case of libvirt is not avialable
+# We don't use the libvirt constants in case of libvirt is not available
 VIR_DOMAIN_NOSTATE = 0
 VIR_DOMAIN_RUNNING = 1
 VIR_DOMAIN_BLOCKED = 2
