@@ -19,34 +19,6 @@ from oslotest import base
 
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector
 from ceilometer import service
-from ceilometer.tests.unit.compute.virt.xenapi import fake_XenAPI
-
-
-class TestSwapXapiHost(base.BaseTestCase):
-
-    def test_swapping(self):
-        self.assertEqual(
-            "http://otherserver:8765/somepath",
-            xenapi_inspector.swap_xapi_host(
-                "http://someserver:8765/somepath", 'otherserver'))
-
-    def test_no_port(self):
-        self.assertEqual(
-            "http://otherserver/somepath",
-            xenapi_inspector.swap_xapi_host(
-                "http://someserver/somepath", 'otherserver'))
-
-    def test_no_path(self):
-        self.assertEqual(
-            "http://otherserver",
-            xenapi_inspector.swap_xapi_host(
-                "http://someserver", 'otherserver'))
-
-    def test_same_hostname_path(self):
-        self.assertEqual(
-            "http://other:80/some",
-            xenapi_inspector.swap_xapi_host(
-                "http://some:80/some", 'other'))
 
 
 class TestXenapiInspection(base.BaseTestCase):
@@ -64,26 +36,14 @@ class TestXenapiInspection(base.BaseTestCase):
         fake_total_mem = 134217728.0
         fake_free_mem = 65536.0
 
-        def fake_xenapi_request(method, args):
-            if method == 'VM.get_by_name_label':
-                return ['vm_ref']
-            elif method == 'VM.get_VCPUs_max':
-                return '1'
-            elif method == 'VM.query_data_source':
-                if 'memory' in args:
-                    return fake_total_mem
-                elif 'memory_internal_free' in args:
-                    return fake_free_mem
-                elif 'cpu0' in args:
-                    return 0.4
-                else:
-                    return None
-            else:
-                return None
-
         session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               side_effect=fake_xenapi_request):
+        with mock.patch.object(session.VM, 'get_by_name_label') as mock_name, \
+                mock.patch.object(session.VM, 'get_VCPUs_max') as mock_vcpu, \
+                mock.patch.object(session.VM, 'query_data_source') \
+                as mock_query:
+            mock_name.return_value = ['vm_ref']
+            mock_vcpu.return_value = '1'
+            mock_query.side_effect = [0.4, fake_total_mem, fake_free_mem]
             stats = self.inspector.inspect_instance(fake_instance, None)
             self.assertEqual(40, stats.cpu_util)
             self.assertEqual(64, stats.memory_usage)
@@ -91,35 +51,17 @@ class TestXenapiInspection(base.BaseTestCase):
     def test_inspect_memory_usage_without_freeMem(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
                          'id': 'fake_instance_id'}
-
-        def _fake_xenapi_request(method, args):
-            if xenapi_inspector.api is None:
-                # the XenAPI may not exist in the test environment.
-                # In that case, we use the fake XenAPI for testing.
-                xenapi_inspector.api = fake_XenAPI
-            fake_total_mem = 134217728.0
-            fake_details = ['INTERNAL_ERROR',
-                            'Rrd.Invalid_data_source("memory_internal_free")']
-
-            if method == 'VM.get_by_name_label':
-                return ['vm_ref']
-            elif method == 'VM.get_VCPUs_max':
-                return '1'
-            elif method == 'VM.query_data_source':
-                if 'memory' in args:
-                    return fake_total_mem
-                elif 'memory_internal_free' in args:
-                    raise xenapi_inspector.api.Failure(fake_details)
-                elif 'cpu0' in args:
-                    return 0.4
-                else:
-                    return None
-            else:
-                return None
+        fake_total_mem = 134217728.0
+        fake_free_mem = 0
 
         session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               side_effect=_fake_xenapi_request):
+        with mock.patch.object(session.VM, 'get_by_name_label') as mock_name, \
+                mock.patch.object(session.VM, 'get_VCPUs_max') as mock_vcpu, \
+                mock.patch.object(session.VM, 'query_data_source') \
+                as mock_query:
+            mock_name.return_value = ['vm_ref']
+            mock_vcpu.return_value = '1'
+            mock_query.side_effect = [0.4, fake_total_mem, fake_free_mem]
             stats = self.inspector.inspect_instance(fake_instance, None)
             self.assertEqual(128, stats.memory_usage)
 
@@ -132,7 +74,6 @@ class TestXenapiInspection(base.BaseTestCase):
             'MAC': 'vif_mac',
             'device': '0',
         }
-        request_returns = [['vm_ref'], '10', ['vif_ref'], vif_rec]
         bandwidth_returns = [{
             '10': {
                 '0': {
@@ -141,21 +82,26 @@ class TestXenapiInspection(base.BaseTestCase):
             }
         }]
         session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               side_effect=request_returns):
-            with mock.patch.object(self.inspector,
-                                   '_call_plugin_serialized',
-                                   side_effect=bandwidth_returns):
+        with mock.patch.object(session.VM, 'get_by_name_label') as mock_name, \
+                mock.patch.object(session.VM, 'get_domid') as mock_domid, \
+                mock.patch.object(session.VM, 'get_VIFs') as mock_vif, \
+                mock.patch.object(session.VIF, 'get_record') as mock_record, \
+                mock.patch.object(session, 'call_plugin_serialized') \
+                as mock_plugin:
+            mock_name.return_value = ['vm_ref']
+            mock_domid.return_value = '10'
+            mock_vif.return_value = ['vif_ref']
+            mock_record.return_value = vif_rec
+            mock_plugin.side_effect = bandwidth_returns
+            interfaces = list(self.inspector.inspect_vnics(
+                fake_instance, None))
 
-                interfaces = list(
-                    self.inspector.inspect_vnics(fake_instance, None))
-
-                self.assertEqual(1, len(interfaces))
-                vnic0 = interfaces[0]
-                self.assertEqual('vif_uuid', vnic0.name)
-                self.assertEqual('vif_mac', vnic0.mac)
-                self.assertEqual(1024, vnic0.rx_bytes)
-                self.assertEqual(2048, vnic0.tx_bytes)
+            self.assertEqual(1, len(interfaces))
+            vnic0 = interfaces[0]
+            self.assertEqual('vif_uuid', vnic0.name)
+            self.assertEqual('vif_mac', vnic0.mac)
+            self.assertEqual(1024, vnic0.rx_bytes)
+            self.assertEqual(2048, vnic0.tx_bytes)
 
     def test_inspect_vnic_rates(self):
         fake_instance = {'OS-EXT-SRV-ATTR:instance_name': 'fake_instance_name',
@@ -167,11 +113,17 @@ class TestXenapiInspection(base.BaseTestCase):
             'MAC': 'vif_mac',
             'device': '0',
         }
-        side_effects = [['vm_ref'], ['vif_ref'], vif_rec, 1024.0, 2048.0]
 
         session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               side_effect=side_effects):
+        with mock.patch.object(session.VM, 'get_by_name_label') as mock_name, \
+                mock.patch.object(session.VM, 'get_VIFs') as mock_vif, \
+                mock.patch.object(session.VIF, 'get_record') as mock_record, \
+                mock.patch.object(session.VM, 'query_data_source') \
+                as mock_query:
+            mock_name.return_value = ['vm_ref']
+            mock_vif.return_value = ['vif_ref']
+            mock_record.return_value = vif_rec
+            mock_query.side_effect = [1024.0, 2048.0]
             interfaces = list(self.inspector.inspect_vnic_rates(
                 fake_instance, None))
 
@@ -189,11 +141,17 @@ class TestXenapiInspection(base.BaseTestCase):
         vbd_rec = {
             'device': 'xvdd'
         }
-        side_effects = [['vm_ref'], ['vbd_ref'], vbd_rec, 1024.0, 2048.0]
 
         session = self.inspector.session
-        with mock.patch.object(session, 'xenapi_request',
-                               side_effect=side_effects):
+        with mock.patch.object(session.VM, 'get_by_name_label') as mock_name, \
+                mock.patch.object(session.VM, 'get_VBDs') as mock_vbds, \
+                mock.patch.object(session.VBD, 'get_record') as mock_records, \
+                mock.patch.object(session.VM, 'query_data_source') \
+                as mock_query:
+            mock_name.return_value = ['vm_ref']
+            mock_vbds.return_value = ['vbd_ref']
+            mock_records.return_value = vbd_rec
+            mock_query.side_effect = [1024.0, 2048.0]
             disks = list(self.inspector.inspect_disk_rates(
                 fake_instance, None))
 

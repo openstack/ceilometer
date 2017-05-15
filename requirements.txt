@@ -49,3 +49,4 @@ WSME>=0.8 # MIT
 # NOTE(jd) We do not import it directly, but WSME datetime string parsing
 # behaviour changes when this library is installed
 python-dateutil>=2.4.2 # BSD
+os-xenapi>=0.1.1 # Apache-2.0
