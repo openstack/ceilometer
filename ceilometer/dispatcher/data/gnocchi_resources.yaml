@@ -220,3 +220,18 @@ resources:
     attributes:
       host_name: resource_metadata.resource_url
       device_name: resource_metadata.name
+
+  - resource_type: nova_compute
+    metrics:
+      - 'compute.node.cpu.frequency'
+      - 'compute.node.cpu.idle.percent'
+      - 'compute.node.cpu.idle.time'
+      - 'compute.node.cpu.iowait.percent'
+      - 'compute.node.cpu.iowait.time'
+      - 'compute.node.cpu.kernel.percent'
+      - 'compute.node.cpu.kernel.time'
+      - 'compute.node.cpu.percent'
+      - 'compute.node.cpu.user.percent'
+      - 'compute.node.cpu.user.time'
+    attributes:
+      host_name: resource_metadata.host
