@@ -62,14 +62,6 @@ Install and configure components
 
 .. include:: install-base-config-common.inc
 
-* In the ``[collector]`` section, configure the dispatcher:
-
-  .. code-block:: ini
-
-     [collector]
-     ...
-     dispatcher = database
-
 Configure the Apache HTTP server
 --------------------------------
 
