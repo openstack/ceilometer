@@ -9,6 +9,15 @@ Telemetry service, code-named ceilometer, on the controller node.
 Prerequisites
 -------------
 
+.. warning::
+
+   Ceilometer's native storage has extremely large resource requirements. For
+   more efficient time-series storage, a time-series database such as Gnocchi_
+   is recommended. The following instructions are unsupported in future
+   releases.
+
+.. _Gnocchi: http://gnocchi.xyz/
+
 Before you install and configure the Telemetry service, you must
 create a database, service credentials, and API endpoints. However,
 unlike other services, the Telemetry service uses a NoSQL database.
@@ -63,6 +72,10 @@ Install and configure components
 
 Configure the Apache HTTP server
 --------------------------------
+
+.. note::
+
+   The following is only required if Ceilometer's native storage is enabled.
 
 #. Create the ``/etc/apache2/sites-available/ceilometer.conf`` file
    with the following content:
