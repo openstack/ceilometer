@@ -17,10 +17,23 @@ CEILOMETER_WSGI_DIR=${CEILOMETER_WSGI_DIR:-/var/www/ceilometer}
 CEILOMETER_BACKEND=${CEILOMETER_BACKEND:-none}
 if [ "$CEILOMETER_BACKEND" = "es" ] || [ "$CEILOMETER_BACKEND" = "mysql" ] || [ "$CEILOMETER_BACKEND" = "postgresql" ] || [ "$CEILOMETER_BACKEND" = "mongodb" ]; then
     enable_service ceilometer-api
+elif [ "$CEILOMETER_BACKEND" = "gnocchi" ]; then
+    enable_service gnocchi-api gnocchi-metricd
 fi
 
 # Gnocchi default archive_policy for Ceilometer
 GNOCCHI_ARCHIVE_POLICY=${GNOCCHI_ARCHIVE_POLICY:-low}
+GNOCCHI_CONF_DIR=${GNOCCHI_CONF_DIR:-/etc/gnocchi}
+GNOCCHI_CONF=${GNOCCHI_CONF:-${GNOCCHI_CONF_DIR}/gnocchi.conf}
+GNOCCHI_COORDINATOR_URL=${CEILOMETER_COORDINATOR_URL:-redis://localhost:6379}
+GNOCCHI_METRICD_PROCESSING_DELAY=${GNOCCHI_METRICD_PROCESSING_DELAY:-5}
+GNOCCHI_AUTH_CACHE_DIR=${GNOCCHI_AUTH_CACHE_DIR:-/var/cache/gnocchi}
+GNOCCHI_DATA_DIR=${GNOCCHI_DATA_DIR:-${DATA_DIR}/gnocchi}
+
+GNOCCHI_SERVICE_PROTOCOL=http
+GNOCCHI_SERVICE_HOST=${GNOCCHI_SERVICE_HOST:-${SERVICE_HOST}}
+GNOCCHI_SERVICE_PORT=${GNOCCHI_SERVICE_PORT:-8041}
+GNOCCHI_WSGI_DIR=${GNOCCHI_WSGI_DIR:-/var/www/gnocchi}
 
 # Ceilometer connection info.
 CEILOMETER_SERVICE_PROTOCOL=http
@@ -54,18 +67,6 @@ GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
 function _ceilometer_check_for_storage  {
     local plugins="${DEVSTACK_PLUGINS}"
     local plugin
-
-    if [ "$CEILOMETER_BACKEND" == 'gnocchi' ]; then
-        local seen_gnocchi=False
-
-        for plugin in ${plugins//,/ }; do
-            if [ "$plugin" == 'gnocchi' ]; then
-                seen_gnocchi=True
-            elif [ "$plugin" == 'ceilometer' ] && [ "$seen_gnocchi" == 'False' ]; then
-                die $LINENO "gnocchi must be enabled before ceilometer!"
-            fi
-        done
-    fi
 
     local seen_ceilometer=False
 
