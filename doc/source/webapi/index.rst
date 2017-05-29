@@ -8,7 +8,7 @@
    than full-resolution datapoints are required. The REST API for Gnocchi is
    captured here_.
 
-.. _here: http://docs.openstack.org/developer/gnocchi/rest.html
+.. _here: http://gnocchi.xyz/rest.html
 
 .. toctree::
    :maxdepth: 2

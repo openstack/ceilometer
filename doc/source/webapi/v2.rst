@@ -58,8 +58,8 @@ it will return the standard set of *Statistics*: *avg*, *sum*, *min*, *max*, and
    As they manage data differently, the API models returned by Ceilometer and Gnocchi
    are different. The Gnocchi API can be found here_.
 
-.. _Gnocchi: http://docs.openstack.org/developer/gnocchi/
-.. _here: http://docs.openstack.org/developer/gnocchi/rest.html
+.. _Gnocchi: http://gnocchi.xyz/
+.. _here: http://gnocchi.xyz/rest.html
 
 Selectable Aggregates
 +++++++++++++++++++++

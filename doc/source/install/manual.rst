@@ -96,7 +96,7 @@ Gnocchi
 #. Start notification service
 
 .. _oslo.cache: http://docs.openstack.org/developer/oslo.cache/opts.html
-.. _`Gnocchi installation`: http://docs.openstack.org/developer/gnocchi/install.html
+.. _`Gnocchi installation`: http://gnocchi.xyz/install.html
 
 
 Installing the notification agent
