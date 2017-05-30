@@ -143,7 +143,7 @@ class TestClientHTTPBasicAuth(base.BaseTestCase):
             self.fail('')
         except client.OpenDaylightRESTAPIFailed as e:
             self.assertEqual(
-                _('OpenDaylitght API returned %(status)s %(reason)s') %
+                _('OpenDaylight API returned %(status)s %(reason)s') %
                 {'status': self.resp.status_code,
                  'reason': self.resp.reason},
                 six.text_type(e))

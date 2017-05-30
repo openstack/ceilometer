@@ -1,7 +1,7 @@
 ---
 prelude: >
     In an effort to minimise the noise, Ceilometer will no longer produce
-    meters which have no measureable data associated with it. Image meter
+    meters which have no measurable data associated with it. Image meter
     only captures state information which is already captured in events and
     other meters.
 upgrade:

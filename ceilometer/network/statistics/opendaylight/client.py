@@ -223,7 +223,7 @@ class Client(object):
             self._log_res(resp)
         if resp.status_code // 100 != 2:
             raise OpenDaylightRESTAPIFailed(
-                _('OpenDaylitght API returned %(status)s %(reason)s') %
+                _('OpenDaylight API returned %(status)s %(reason)s') %
                 {'status': resp.status_code, 'reason': resp.reason})
 
         return resp.json()

@@ -104,7 +104,7 @@ Pipelines describe a coupling between sources of samples and the
 corresponding sinks for transformation and publication of the samples.
 
 A source is a set of samples that should be passed to specified sinks. These
-samples may come from polling agents or service notificaitons.
+samples may come from polling agents or service notifications.
 
 A sink on the other hand is a consumer of samples, providing logic for
 the transformation and publication of samples emitted from related sources.

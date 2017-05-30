@@ -6,7 +6,7 @@ features:
 issues:
   - >
     Neutron API is not designed to be polled against. When polling against
-    Neutron is enabled, Ceilometer's polling agents may generage a significant
+    Neutron is enabled, Ceilometer's polling agents may generate a significant
     load against the Neutron API. It is recommended that a dedicated API be
     enabled for polling while Neutron's API is improved to handle polling.
 upgrade:

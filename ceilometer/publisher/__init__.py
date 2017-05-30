@@ -25,7 +25,7 @@ from stevedore import driver
 def get_publisher(conf, url, namespace):
     """Get publisher driver and load it.
 
-    :param URL: URL for the publisher
+    :param url: URL for the publisher
     :param namespace: Namespace to use to look for drivers.
     """
     parse_result = netutils.urlsplit(url)

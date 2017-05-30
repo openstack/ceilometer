@@ -57,7 +57,7 @@ Keystone
 
 To enable auditing of API requests, Keystone provides middleware which captures
 API requests to a service and emits data to Ceilometer. Instructions to enable
-this functionality is available in `Keystone's developer documenation
+this functionality is available in `Keystone's developer documentation
 <https://docs.openstack.org/developer/keystonemiddleware/audit.html>`_.
 Ceilometer will captures this information as ``audit.http.*`` events.
 
