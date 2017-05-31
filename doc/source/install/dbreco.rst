@@ -54,4 +54,4 @@ to test Gnocchi and transition to it fully when comfortable. Edit the
 .. _Gnocchi: http://gnocchi.xyz
 .. _Aodh: http://docs.openstack.org/developer/aodh/
 .. _Panko: http://docs.openstack.org/developer/panko
-.. _here: https://docs.google.com/presentation/d/1PefouoeMVd27p2OGDfNQpx18mY-Wk5l0P1Ke2Vt5LwA/edit?usp=sharing
+.. _here: https://www.slideshare.net/GordonChung/ceilometer-to-gnocchi
