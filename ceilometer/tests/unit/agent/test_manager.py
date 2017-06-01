@@ -62,7 +62,7 @@ class TestManager(base.BaseTestCase):
     def test_load_invalid_plugins_pollster_list(self):
         # if no valid pollsters have been loaded, the ceilometer
         # polling program should exit
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             manager.EmptyPollstersList,
             'No valid pollsters can be loaded with the startup parameters'
             ' polling-namespaces and pollster-list.',
@@ -74,7 +74,7 @@ class TestManager(base.BaseTestCase):
         # list have no intersection.
         parameters = dict(namespaces=['compute'],
                           pollster_list=['storage.*'])
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             manager.EmptyPollstersList,
             'No valid pollsters can be loaded with the startup parameters'
             ' polling-namespaces and pollster-list.',
@@ -124,7 +124,7 @@ class TestManager(base.BaseTestCase):
     def test_import_error_in_plugin(self):
         parameters = dict(namespaces=['ipmi'],
                           pollster_list=['hardware.ipmi.node.*'])
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             manager.EmptyPollstersList,
             'No valid pollsters can be loaded with the startup parameters'
             ' polling-namespaces and pollster-list.',
