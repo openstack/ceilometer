@@ -221,6 +221,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
         self._gnocchi = gnocchi_client.get_gnocchiclient(conf)
+        self._already_logged_event_types = set()
+        self._already_logged_metric_names = set()
 
     @classmethod
     def _load_resources_definitions(cls, conf):
@@ -319,8 +321,10 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 samples = list(samples)
                 rd = self._get_resource_definition_from_metric(metric_name)
                 if rd is None:
-                    LOG.warning("metric %s is not handled by Gnocchi" %
-                                metric_name)
+                    if metric_name not in self._already_logged_metric_names:
+                        LOG.warning("metric %s is not handled by Gnocchi" %
+                                    metric_name)
+                        self._already_logged_metric_names.add(metric_name)
                     continue
                 if rd.cfg.get("ignore"):
                     continue
@@ -468,8 +472,10 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         for event in events:
             rd = self._get_resource_definition_from_event(event['event_type'])
             if not rd:
-                LOG.debug("No gnocchi definition for event type: %s",
-                          event['event_type'])
+                if event['event_type'] not in self._already_logged_event_types:
+                    LOG.debug("No gnocchi definition for event type: %s",
+                              event['event_type'])
+                    self._already_logged_event_types.add(event['event_type'])
                 continue
 
             rd, operation = rd
