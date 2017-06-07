@@ -62,6 +62,10 @@ function ceilometer_service_url {
 }
 
 
+function gnocchi_service_url {
+    echo "$GNOCCHI_SERVICE_PROTOCOL://$GNOCCHI_SERVICE_HOST/metric"
+}
+
 # _ceilometer_install_mongdb - Install mongodb and python lib.
 function _ceilometer_install_mongodb {
     # Server package is the same on all
@@ -127,7 +131,7 @@ function _ceilometer_config_apache_wsgi {
 function _ceilometer_prepare_coordination {
     if echo $CEILOMETER_COORDINATION_URL | grep -q '^memcached:'; then
         install_package memcached
-    elif [[ "${CEILOMETER_COORDINATOR_URL%%:*}" == "redis" || "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" ]]; then
+    elif [[ "${CEILOMETER_COORDINATOR_URL%%:*}" == "redis" || "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" || "${CEILOMETER_BACKEND}" == "gnocchi" ]]; then
         _ceilometer_install_redis
     fi
 }
@@ -179,7 +183,52 @@ function ceilometer_create_accounts {
         get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
     fi
 
+    if [ "$CEILOMETER_BACKEND" == "gnocchi" ]; then
+        create_service_user "gnocchi"
+        local gnocchi_service=$(get_or_create_service "gnocchi" \
+            "metric" "OpenStack Metric Service")
+        get_or_create_endpoint $gnocchi_service \
+            "$REGION_NAME" \
+            "$(gnocchi_service_url)" \
+            "$(gnocchi_service_url)" \
+            "$(gnocchi_service_url)"
+    fi
     export OS_CLOUD=$OLD_OS_CLOUD
+}
+
+
+function install_gnocchi {
+    echo_summary "Installing Gnocchi"
+    if [ $GNOCCHI_GIT_PATH ]; then
+        pip_install -e $GNOCCHI_GIT_PATH[redis,${DATABASE_TYPE},keystone] uwsgi
+    else
+        pip_install gnocchi[redis,${DATABASE_TYPE},keystone] uwsgi
+    fi
+    recreate_database gnocchi
+    sudo install -d -o $STACK_USER -m 755 $GNOCCHI_CONF_DIR
+
+    iniset $GNOCCHI_CONF DEFAULT debug "$ENABLE_DEBUG_LOG_LEVEL"
+    iniset $GNOCCHI_CONF indexer url `database_connection_url gnocchi`
+    iniset $GNOCCHI_CONF storage driver redis
+    iniset $GNOCCHI_CONF storage redis_url redis://localhost:6379
+    iniset $GNOCCHI_CONF metricd metric_processing_delay "$GNOCCHI_METRICD_PROCESSING_DELAY"
+
+    iniset $GNOCCHI_CONF api auth_mode keystone
+    configure_auth_token_middleware $GNOCCHI_CONF gnocchi $GNOCCHI_AUTH_CACHE_DIR
+
+    sudo mkdir -p $GNOCCHI_AUTH_CACHE_DIR
+    sudo chown $STACK_USER $GNOCCHI_AUTH_CACHE_DIR
+    rm -f $GNOCCHI_AUTH_CACHE_DIR/*
+
+    gnocchi-upgrade
+
+    rm -f "$GNOCCHI_UWSGI_FILE"
+
+    write_uwsgi_config "$GNOCCHI_UWSGI_FILE" "/usr/local/bin/gnocchi-api" "/metric"
+
+    if [ -n "$GNOCCHI_COORDINATOR_URL" ]; then
+        iniset $GNOCCHI_CONF storage coordination_url "$GNOCCHI_COORDINATOR_URL"
+    fi
 }
 
 # Activities to do before ceilometer has been installed.
@@ -370,9 +419,6 @@ function init_ceilometer {
             fi
         fi
     fi
-    if is_service_enabled gnocchi && [ "$CEILOMETER_BACKEND" = 'gnocchi' ]; then
-        $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
-    fi
 }
 
 # Install Ceilometer.
@@ -381,9 +427,11 @@ function init_ceilometer {
 # installed. The context is not active during preinstall (when it would
 # otherwise makes sense to do the backend services).
 function install_ceilometer {
-    if is_service_enabled ceilometer-acentral ceilometer-acompute ceilometer-anotification ; then
+    if is_service_enabled ceilometer-acentral ceilometer-acompute ceilometer-anotification gnocchi-api gnocchi-metricd; then
         _ceilometer_prepare_coordination
     fi
+
+    [ "$CEILOMETER_BACKEND" = 'gnocchi' ] && install_gnocchi
 
     if is_service_enabled ceilometer-api; then
         _ceilometer_prepare_storage_backend
@@ -411,6 +459,14 @@ function install_ceilometerclient {
 
 # start_ceilometer() - Start running processes, including screen
 function start_ceilometer {
+
+    if [ "$CEILOMETER_BACKEND" = "gnocchi" ] ; then
+        run_process gnocchi-api "/usr/local/bin/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
+        run_process gnocchi-metricd "/usr/local/bin/gnocchi-metricd --config-file $GNOCCHI_CONF"
+        wait_for_service 30 "$(gnocchi_service_url)"
+        $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
+    fi
+
     run_process ceilometer-acentral "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces central --config-file $CEILOMETER_CONF"
     run_process ceilometer-aipmi "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces ipmi --config-file $CEILOMETER_CONF"
 
