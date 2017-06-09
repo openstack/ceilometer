@@ -338,3 +338,22 @@ metric:
       service_id: $.payload.service_id
       instance_type: $.payload.instance_type
       instance_type_id: $.payload.instance_type_id
+
+  # Manila
+  - name: 'manila.share.size'
+    event_type:
+      - 'share.create.*'
+      - 'share.delete.*'
+      - 'share.extend.*'
+      - 'share.shrink.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.size
+    user_id: $.payload.user_id
+    project_id: $.payload.project_id
+    resource_id: $.payload.share_id
+    metadata:
+      name: $.payload.name
+      host: $.payload.host
+      availability_zone: $.payload.availability_zone
+      status: $.payload.status

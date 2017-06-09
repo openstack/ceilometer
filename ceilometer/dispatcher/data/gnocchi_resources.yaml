@@ -235,3 +235,12 @@ resources:
       - 'compute.node.cpu.user.time'
     attributes:
       host_name: resource_metadata.host
+
+  - resource_type: manila_share
+    metrics:
+      - 'manila.share.size'
+    attributes:
+      name: resource_metadata.name
+      host: resource_metadata.host
+      availability_zone: resource_metadata.availability_zone
+      status: resource_metadata.status

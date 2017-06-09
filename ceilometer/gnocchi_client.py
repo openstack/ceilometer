@@ -126,6 +126,22 @@ resources_update_operations = [
      "data": [{
          "attributes": {"host_name": {"type": "string", "min_length": 0,
                         "max_length": 255, "required": True}}
+     }]},
+    {"desc": "add manila share type",
+     "type": "create_resource_type",
+     "resource_type": "manila_share",
+     "data": [{
+         "attributes": {"name": {"type": "string", "min_length": 0,
+                                 "max_length": 255, "required": True},
+                        "host": {"type": "string", "min_length": 0,
+                                 "max_length": 255, "required": True},
+                        "availability_zone": {"type": "string",
+                                              "min_length": 0,
+                                              "max_length": 255,
+                                              "required": True},
+                        "status": {"type": "string", "min_length": 0,
+                                   "max_length": 255,
+                                   "required": True}}
      }]}
 ]
 
