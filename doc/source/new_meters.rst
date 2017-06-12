@@ -92,7 +92,7 @@ If you plan on adding meters, please follow the convention below:
 Meter definitions
 -----------------
 Meters definitions by default, are stored in separate configuration
-file, called :file:`ceilometer/meter/data/meters.yaml`. This is essentially
+file, called :file:`ceilometer/data/meters.d/meters.yaml`. This is essentially
 a replacement for prior approach of writing notification handlers to consume
 specific topics.
 
