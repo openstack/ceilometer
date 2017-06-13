@@ -56,6 +56,13 @@
 
 3. Edit the ``/etc/gnocchi/gnocchi.conf`` file and add Keystone options:
 
+   * In the ``[api]`` section, configure gnocchi to use keystone:
+
+     .. code-block:: ini
+
+        [api]
+        auth_mode = keystone
+
    * In the ``[keystone_authtoken]`` section, configure keystone
      authentication:
 
