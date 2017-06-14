@@ -174,7 +174,7 @@ class LockedDefaultDict(defaultdict):
 
 class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                         dispatcher.EventDispatcherBase):
-    """Dispatcher class for recording metering data into database.
+    """Dispatcher class for recording metering data into the Gnocchi service.
 
     The dispatcher class records each meter into the gnocchi service
     configured in ceilometer configuration file. An example configuration may
