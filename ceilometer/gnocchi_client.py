@@ -120,6 +120,13 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": True, "options": {'fill': ''}}
      }]},
+    {"desc": "add nova_compute resource type",
+     "type": "create_resource_type",
+     "resource_type": "nova_compute",
+     "data": [{
+         "attributes": {"host_name": {"type": "string", "min_length": 0,
+                        "max_length": 255, "required": True}}
+     }]}
 ]
 
 
@@ -142,3 +149,10 @@ def upgrade_resource_types(conf):
             if first_op['op'] == 'remove' and attrib not in rt['attributes']:
                 continue
             gnocchi.resource_type.update(ops['resource_type'], ops['data'])
+        elif ops['type'] == 'create_resource_type':
+            try:
+                gnocchi.resource_type.get(name=ops['resource_type'])
+            except gnocchi_exc.ResourceTypeNotFound:
+                rt = {'name': ops['resource_type'],
+                      'attributes': ops['data'][0]['attributes']}
+                gnocchi.resource_type.create(resource_type=rt)
