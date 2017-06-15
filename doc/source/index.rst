@@ -50,6 +50,7 @@ Developer Documentation
    configuration
    plugins
    new_meters
+   new_resource_types
    testing
    contributing
    gmr
