@@ -14,16 +14,17 @@
 # English translations for ceilometer.
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Linda <duleish@cn.ibm.com>, 2016. #zanata
+# bkb <bakbad2015@gmail.com>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 8.0.2.dev3\n"
+"Project-Id-Version: ceilometer 8.0.2.dev17\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-03-16 21:35+0000\n"
+"POT-Creation-Date: 2017-06-14 22:25+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-12 04:27+0000\n"
-"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
+"PO-Revision-Date: 2017-06-16 08:07+0000\n"
+"Last-Translator: bkb <bakbad2015@gmail.com>\n"
 "Language: zh-CN\n"
 "Language-Team: Chinese (China)\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -39,8 +40,32 @@ msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
 
 #, python-format
+msgid "CPU cache size: %(id)s %(cache_size)d"
+msgstr "CPU缓存大小：%(id)s%(cache_size)d"
+
+#, python-format
+msgid "Could not connect slave host: %s"
+msgstr "无法连接伺服主机：%s "
+
+#, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "无法连接到XenAPI：%s"
+
+#, python-format
+msgid "Could not get CPU Util for %(id)s: %(e)s"
+msgstr "无法为虚拟机%(id)s获取CPU使用率：%(e)s"
+
+#, python-format
+msgid "Could not get Memory Usage for %(id)s: %(e)s"
+msgstr "无法获取 虚拟机%(id)s 的内存使用情况：%(e)s"
+
+#, python-format
+msgid "Could not get VM %s CPU number"
+msgstr "无法获取 VM %s CPU 数量"
+
+#, python-format
+msgid "Could not get cache usage for %(id)s: %(e)s"
+msgstr "无法获取虚拟机 %(id)s 的缓存使用情况：%(e)s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -105,10 +130,18 @@ msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "忽略虚拟机%(name)s (%(instance_id)s) : %(error)s"
 
 #, python-format
+msgid "Ignoring instance %(name)s: %(error)s"
+msgstr "忽略虚拟机%(name)s：%(error)s"
+
+#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
 msgstr "定义文件%(file)s中有非法YAML语法，行：%(line)s，列%(column)s。"
+
+#, python-format
+msgid "Invalid aggregation function: %s"
+msgstr "无效的聚类功能：%s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -200,6 +233,10 @@ msgstr "数据"
 
 msgid "Samples should be included in request body"
 msgstr "样本应包括在请求主体中"
+
+#, python-format
+msgid "String %s is not a valid isotime"
+msgstr "字符串%s不是个合法的标准时间格式"
 
 #, python-format
 msgid ""
@@ -299,6 +336,14 @@ msgstr "读取定义文件%(file)s时遇到YAML错误"
 
 msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
 msgstr "Aodh 被禁用或不可用时，警报 URL 不可用。"
+
+#, python-format
+msgid "checking cache usage for instance %s"
+msgstr "检查虚拟机 %s 的缓存使用率"
+
+#, python-format
+msgid "could not get CPU time for %(id)s: %(e)s"
+msgstr "无法为虚拟机%(id)s获取CPU时间：%(e)s"
 
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "启用 Gnocchi 后，direct 选项不能为 true。"
