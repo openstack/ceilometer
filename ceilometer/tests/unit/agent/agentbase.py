@@ -563,7 +563,10 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                          self.PollsterAnother.resources)
 
     def test_discovery_partitioning(self):
+        discovered_resources = ['discovered_1', 'discovered_2']
+        self.Pollster.discovery = 'testdiscovery'
         self.mgr.discoveries = self.create_discoveries()
+        self.Discovery.resources = discovered_resources
         self.polling_cfg['sources'][0]['discovery'] = [
             'testdiscovery', 'testdiscoveryanother',
             'testdiscoverynonexistent', 'testdiscoveryexception']
@@ -571,9 +574,23 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(polling_tasks.get(60))
-        self.mgr.hashrings.__getitem__.assert_called_with(
-            'central-compute-another_group')
-        self.hashring.belongs_to_self.assert_not_called()
+        self.hashring.belongs_to_self.assert_has_calls(
+            [mock.call('discovered_1'), mock.call('discovered_2')])
+
+    def test_discovery_partitioning_unhashable(self):
+        discovered_resources = [{'unhashable': True}]
+        self.Pollster.discovery = 'testdiscovery'
+        self.mgr.discoveries = self.create_discoveries()
+        self.Discovery.resources = discovered_resources
+        self.polling_cfg['sources'][0]['discovery'] = [
+            'testdiscovery', 'testdiscoveryanother',
+            'testdiscoverynonexistent', 'testdiscoveryexception']
+        self.polling_cfg['sources'][0]['resources'] = []
+        self.setup_polling()
+        polling_tasks = self.mgr.setup_polling_tasks()
+        self.mgr.interval_task(polling_tasks.get(60))
+        self.hashring.belongs_to_self.assert_has_calls(
+            [mock.call('{\'unhashable\': True}')])
 
     def test_static_resources_partitioning(self):
         static_resources = ['static_1', 'static_2']

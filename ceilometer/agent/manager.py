@@ -29,6 +29,7 @@ from oslo_log import log
 import oslo_messaging
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
+import six
 from six import moves
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
@@ -106,10 +107,10 @@ class Resources(object):
         if self._resources:
             static_resources_group = self.agent_manager.construct_group_id(
                 utils.hash_of_set(self._resources))
-            return list(filter(
-                self.agent_manager.hashrings[
-                    static_resources_group].belongs_to_self, self._resources
-            )) + source_discovery
+            return [v for v in self._resources if
+                    self.agent_manager.hashrings[
+                        static_resources_group].belongs_to_self(
+                            six.text_type(v))] + source_discovery
 
         return source_discovery
 
@@ -497,11 +498,10 @@ class AgentManager(cotyledon.Service):
                     discovered = discoverer.discover(self, param)
 
                     if self.partition_coordinator:
-                        discovered = list(filter(
-                            self.hashrings[
+                        discovered = [
+                            v for v in discovered if self.hashrings[
                                 self.construct_group_id(discoverer.group_id)
-                            ].belongs_to_self, discovered
-                        ))
+                            ].belongs_to_self(six.text_type(v))]
 
                     resources.extend(discovered)
                     if discovery_cache is not None:
