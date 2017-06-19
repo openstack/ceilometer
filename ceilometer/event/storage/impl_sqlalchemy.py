@@ -163,15 +163,13 @@ class Connection(base.Connection):
             engine.execute(table.delete())
         engine.dispose()
 
-    def _get_or_create_event_type(self, event_type, session=None):
+    def _get_or_create_event_type(self, event_type, session):
         """Check if an event type with the supplied name is already exists.
 
         If not, we create it and return the record. This may result in a flush.
         """
         try:
-            if session is None:
-                session = self._engine_facade.get_session()
-            with session.begin(subtransactions=True):
+            with session.begin(nested=True):
                 et = session.query(models.EventType).filter(
                     models.EventType.desc == event_type).first()
                 if not et:

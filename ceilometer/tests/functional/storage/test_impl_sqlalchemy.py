@@ -63,21 +63,31 @@ class EventTypeTest(tests_db.TestBase):
     # EventType is a construct specific to sqlalchemy
     # Not applicable to other drivers.
 
+    def setUp(self):
+        super(EventTypeTest, self).setUp()
+        self.session = self.conn._engine_facade.get_session()
+        self.session.begin()
+
     def test_event_type_exists(self):
-        et1 = self.event_conn._get_or_create_event_type("foo")
+        et1 = self.event_conn._get_or_create_event_type("foo", self.session)
         self.assertTrue(et1.id >= 0)
-        et2 = self.event_conn._get_or_create_event_type("foo")
+        et2 = self.event_conn._get_or_create_event_type("foo", self.session)
         self.assertEqual(et2.id, et1.id)
         self.assertEqual(et2.desc, et1.desc)
 
     def test_event_type_unique(self):
-        et1 = self.event_conn._get_or_create_event_type("foo")
+        et1 = self.event_conn._get_or_create_event_type("foo", self.session)
         self.assertTrue(et1.id >= 0)
-        et2 = self.event_conn._get_or_create_event_type("blah")
+        et2 = self.event_conn._get_or_create_event_type("blah", self.session)
         self.assertNotEqual(et1.id, et2.id)
         self.assertNotEqual(et1.desc, et2.desc)
         # Test the method __repr__ returns a string
         self.assertTrue(reprlib.repr(et2))
+
+    def tearDown(self):
+        self.session.rollback()
+        self.session.close()
+        super(EventTypeTest, self).tearDown()
 
 
 @tests_db.run_with('sqlite', 'mysql', 'pgsql')
