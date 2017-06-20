@@ -1,0 +1,6 @@
+---
+sources:
+    - name: all_pollsters
+      interval: 300
+      meters:
+        - "*"

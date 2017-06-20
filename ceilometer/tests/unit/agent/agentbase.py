@@ -250,7 +250,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.CONF.set_override("backend_url", "zake://", "coordination")
         self.CONF.set_override(
             'cfg_file',
-            self.path_get('etc/ceilometer/polling.yaml'), group='polling'
+            self.path_get('etc/ceilometer/polling_all.yaml'), group='polling'
         )
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
