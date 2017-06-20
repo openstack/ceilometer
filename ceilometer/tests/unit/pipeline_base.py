@@ -1097,6 +1097,64 @@ class BasePipelineTestCase(base.BaseTestCase):
         pipe.flush()
         self.assertEqual(0, len(publisher.samples))
 
+    def test_rate_of_change_max(self):
+        s = "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
+        transformer_cfg = [
+            {
+                'name': 'rate_of_change',
+                'parameters': {
+                    'source': {},
+                    'target': {'name': 'cpu_util',
+                               'unit': '%',
+                               'type': sample.TYPE_GAUGE,
+                               'scale': s,
+                               'max': 100}
+                }
+            },
+        ]
+        self._set_pipeline_cfg('transformers', transformer_cfg)
+        self._set_pipeline_cfg('meters', ['cpu'])
+        pipeline_manager = pipeline.PipelineManager(
+            self.CONF,
+            self.cfg2file(self.pipeline_cfg), self.transformer_manager)
+        pipe = pipeline_manager.pipelines[0]
+
+        now = timeutils.utcnow()
+        later = now + datetime.timedelta(seconds=10)
+        rounding = 12345
+
+        counters = [
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=125000000000,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=now.isoformat(),
+                resource_metadata={'cpu_number': 4}
+            ),
+            sample.Sample(
+                name='cpu',
+                type=sample.TYPE_CUMULATIVE,
+                volume=165000000000 + rounding,
+                unit='ns',
+                user_id='test_user',
+                project_id='test_proj',
+                resource_id='test_resource',
+                timestamp=later.isoformat(),
+                resource_metadata={'cpu_number': 4}
+            ),
+        ]
+
+        pipe.publish_data(counters)
+        publisher = pipe.publishers[0]
+        self.assertEqual(1, len(publisher.samples))
+
+        cpu_util_sample = publisher.samples[0]
+        self.assertEqual(100, cpu_util_sample.volume)
+
     @mock.patch('ceilometer.transformer.conversions.LOG')
     def test_rate_of_change_out_of_order(self, the_log):
         s = "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
