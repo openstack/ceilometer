@@ -79,7 +79,7 @@ def get_api_session(conf):
     global vmware_api
     if vmware_api is None:
         vmware_api = __import__('oslo_vmware.api')
-    api_session = vmware_api.VMwareAPISession(
+    api_session = vmware_api.api.VMwareAPISession(
         conf.vmware.host_ip,
         conf.vmware.host_username,
         conf.vmware.host_password,
