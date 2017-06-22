@@ -30,10 +30,9 @@ class ConverterBase(base.BaseTestCase):
     @staticmethod
     def _create_test_notification(event_type, message_id, **kw):
         return dict(event_type=event_type,
-                    message_id=message_id,
-                    priority="INFO",
+                    metadata=dict(message_id=message_id,
+                                  timestamp="2013-08-08 21:06:37.803826"),
                     publisher_id="compute.host-1-2-3",
-                    timestamp="2013-08-08 21:06:37.803826",
                     payload=kw,
                     )
 
@@ -400,7 +399,7 @@ class TestEventDefinition(ConverterBase):
         cfg = dict(event_type='test.thing', traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr, [])
 
-        e = edef.to_event(self.test_notification1)
+        e = edef.to_event('INFO', self.test_notification1)
         self.assertEqual('test.thing', e.event_type)
         self.assertEqual(datetime.datetime(2013, 8, 8, 21, 6, 37, 803826),
                          e.generated)
@@ -416,7 +415,7 @@ class TestEventDefinition(ConverterBase):
         cfg = dict(event_type='test.thing', traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr, [])
 
-        e = edef.to_event(self.test_notification2)
+        e = edef.to_event('INFO', self.test_notification2)
 
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'instance_id',
@@ -429,7 +428,7 @@ class TestEventDefinition(ConverterBase):
         cfg = dict(event_type='test.thing', traits=self.traits_cfg)
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr, [])
 
-        e = edef.to_event(self.test_notification3)
+        e = edef.to_event('INFO', self.test_notification3)
 
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'instance_id',
@@ -613,10 +612,10 @@ class TestNotificationConverter(ConverterBase):
         c = converter.NotificationEventsConverter(
             self.CONF, [], self.fake_plugin_mgr)
         message = {'event_type': "foo",
-                   'message_id': "abc",
-                   'timestamp': str(now),
+                   'metadata': {'message_id': "abc",
+                                'timestamp': str(now)},
                    'publisher_id': "1"}
-        e = c.to_event(message)
+        e = c.to_event('INFO', message)
         self.assertIsValidEvent(e, message)
         self.assertEqual(1, len(e.traits))
         self.assertEqual("foo", e.event_type)
@@ -628,14 +627,14 @@ class TestNotificationConverter(ConverterBase):
         c = converter.NotificationEventsConverter(
             self.CONF, self.valid_event_def1, self.fake_plugin_mgr)
         self.assertEqual(2, len(c.definitions))
-        e = c.to_event(self.test_notification1)
+        e = c.to_event('INFO', self.test_notification1)
         self.assertIsValidEvent(e, self.test_notification1)
         self.assertEqual(3, len(e.traits))
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'instance_id')
         self.assertHasTrait(e, 'host')
 
-        e = c.to_event(self.test_notification2)
+        e = c.to_event('INFO', self.test_notification2)
         self.assertIsValidEvent(e, self.test_notification2)
         self.assertEqual(1, len(e.traits))
         self.assertHasDefaultTraits(e)
@@ -648,14 +647,14 @@ class TestNotificationConverter(ConverterBase):
         c = converter.NotificationEventsConverter(
             self.CONF, self.valid_event_def1, self.fake_plugin_mgr)
         self.assertEqual(1, len(c.definitions))
-        e = c.to_event(self.test_notification1)
+        e = c.to_event('INFO', self.test_notification1)
         self.assertIsValidEvent(e, self.test_notification1)
         self.assertEqual(3, len(e.traits))
         self.assertHasDefaultTraits(e)
         self.assertHasTrait(e, 'instance_id')
         self.assertHasTrait(e, 'host')
 
-        e = c.to_event(self.test_notification2)
+        e = c.to_event('INFO', self.test_notification2)
         self.assertIsNotValidEvent(e, self.test_notification2)
 
     def test_converter_empty_cfg_with_catchall(self):
@@ -664,12 +663,12 @@ class TestNotificationConverter(ConverterBase):
         c = converter.NotificationEventsConverter(
             self.CONF, [], self.fake_plugin_mgr)
         self.assertEqual(1, len(c.definitions))
-        e = c.to_event(self.test_notification1)
+        e = c.to_event('INFO', self.test_notification1)
         self.assertIsValidEvent(e, self.test_notification1)
         self.assertEqual(1, len(e.traits))
         self.assertHasDefaultTraits(e)
 
-        e = c.to_event(self.test_notification2)
+        e = c.to_event('INFO', self.test_notification2)
         self.assertIsValidEvent(e, self.test_notification2)
         self.assertEqual(1, len(e.traits))
         self.assertHasDefaultTraits(e)
@@ -680,18 +679,18 @@ class TestNotificationConverter(ConverterBase):
         c = converter.NotificationEventsConverter(
             self.CONF, [], self.fake_plugin_mgr)
         self.assertEqual(0, len(c.definitions))
-        e = c.to_event(self.test_notification1)
+        e = c.to_event('INFO', self.test_notification1)
         self.assertIsNotValidEvent(e, self.test_notification1)
 
-        e = c.to_event(self.test_notification2)
+        e = c.to_event('INFO', self.test_notification2)
         self.assertIsNotValidEvent(e, self.test_notification2)
 
     @staticmethod
     def _convert_message(convert, level):
-        message = {'priority': level, 'event_type': "foo",
-                   'message_id': "abc", 'publisher_id': "1",
-                   'timestamp': "2013-08-08 21:06:37.803826"}
-        return convert.to_event(message)
+        message = {'priority': level, 'event_type': "foo", 'publisher_id': "1",
+                   'metadata': {'message_id': "abc",
+                                'timestamp': "2013-08-08 21:06:37.803826"}}
+        return convert.to_event(level, message)
 
     def test_store_raw_all(self):
         self.CONF.set_override('store_raw', ['info', 'error'],

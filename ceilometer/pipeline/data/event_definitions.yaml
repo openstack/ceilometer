@@ -171,7 +171,7 @@
     project_id:
       fields: payload.tenant_id
     user_id:
-      fields: ['_context_trustor_user_id', '_context_user_id']
+      fields: ['ctxt.trustor_user_id', 'ctxt.user_id']
     resource_id:
       fields: payload.stack_identity
 - event_type: sahara.cluster.*
@@ -179,7 +179,7 @@
     project_id:
       fields: payload.project_id
     user_id:
-      fields: _context_user_id
+      fields: ctxt.user_id
     resource_id:
       fields: payload.cluster_id
 - event_type: sahara.cluster.health
@@ -293,9 +293,9 @@
 - event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'pool.*', 'vip.*', 'member.*', 'health_monitor.*', 'healthmonitor.*', 'listener.*', 'loadbalancer.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
   traits: &network_traits
     user_id:
-      fields: _context_user_id
+      fields: ctxt.user_id
     project_id:
-      fields: _context_tenant_id
+      fields: ctxt.tenant_id
 - event_type: network.*
   traits:
     <<: *network_traits

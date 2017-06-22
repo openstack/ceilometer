@@ -92,6 +92,9 @@ class SensorNotification(plugin_base.NotificationBase):
     @staticmethod
     def _package_payload(message, payload):
         # NOTE(chdent): How much of the payload should we keep?
+        # FIXME(gordc): ironic adds timestamp and event_type in its payload
+        # which we are using below. we should probably just use oslo.messaging
+        # values instead?
         payload['node'] = message['payload']['node_uuid']
         info = {'publisher_id': message['publisher_id'],
                 'timestamp': message['payload']['timestamp'],
@@ -145,7 +148,8 @@ class SensorNotification(plugin_base.NotificationBase):
                         resource_id=resource_id,
                         message=info,
                         user_id=info['user_id'],
-                        project_id=info['project_id'])
+                        project_id=info['project_id'],
+                        timestamp=info['timestamp'])
 
             except InvalidSensorData as exc:
                 LOG.warning(
