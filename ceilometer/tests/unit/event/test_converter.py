@@ -548,28 +548,6 @@ class TestEventDefinition(ConverterBase):
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr, [])
         self.assertTrue(edef.is_catchall)
 
-    @mock.patch('oslo_utils.timeutils.utcnow')
-    def test_extract_when(self, mock_utcnow):
-        now = datetime.datetime.utcnow()
-        modified = now + datetime.timedelta(minutes=1)
-        mock_utcnow.return_value = now
-
-        body = {"timestamp": str(modified)}
-        when = converter.EventDefinition._extract_when(body)
-        self.assertTimestampEqual(modified, when)
-
-        body = {"_context_timestamp": str(modified)}
-        when = converter.EventDefinition._extract_when(body)
-        self.assertTimestampEqual(modified, when)
-
-        then = now + datetime.timedelta(hours=1)
-        body = {"timestamp": str(modified), "_context_timestamp": str(then)}
-        when = converter.EventDefinition._extract_when(body)
-        self.assertTimestampEqual(modified, when)
-
-        when = converter.EventDefinition._extract_when({})
-        self.assertTimestampEqual(now, when)
-
     def test_default_traits(self):
         cfg = dict(event_type='test.thing', traits={})
         edef = converter.EventDefinition(cfg, self.fake_plugin_mgr, [])
@@ -636,6 +614,7 @@ class TestNotificationConverter(ConverterBase):
             self.CONF, [], self.fake_plugin_mgr)
         message = {'event_type': "foo",
                    'message_id': "abc",
+                   'timestamp': str(now),
                    'publisher_id': "1"}
         e = c.to_event(message)
         self.assertIsValidEvent(e, message)
@@ -710,7 +689,8 @@ class TestNotificationConverter(ConverterBase):
     @staticmethod
     def _convert_message(convert, level):
         message = {'priority': level, 'event_type': "foo",
-                   'message_id': "abc", 'publisher_id': "1"}
+                   'message_id': "abc", 'publisher_id': "1",
+                   'timestamp': "2013-08-08 21:06:37.803826"}
         return convert.to_event(message)
 
     def test_store_raw_all(self):
