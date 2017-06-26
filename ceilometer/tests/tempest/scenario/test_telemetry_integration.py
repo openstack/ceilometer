@@ -17,8 +17,7 @@ from gabbi import runner
 from gabbi import suitemaker
 from gabbi import utils
 from tempest import config
-
-from ceilometer.tests.tempest.scenario import manager
+from tempest.scenario import manager
 
 TEST_DIR = os.path.join(os.path.dirname(__file__), '..', '..',
                         'integration', 'gabbi', 'gabbits-live')
