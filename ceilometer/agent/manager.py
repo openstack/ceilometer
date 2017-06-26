@@ -209,9 +209,10 @@ class PollingTask(object):
                 except plugin_base.PollsterPermanentError as err:
                     LOG.error(
                         'Prevent pollster %(name)s from '
-                        'polling %(res_list)s on source %(source)s anymore!'
-                        % ({'name': pollster.name, 'source': source_name,
-                            'res_list': err.fail_res_list}))
+                        'polling %(res_list)s on source %(source)s anymore!',
+                        dict(name=pollster.name,
+                             res_list=str(err.fail_res_list),
+                             source=source_name))
                     self.resources[key].blacklist.extend(err.fail_res_list)
                 except Exception as err:
                     LOG.error(
