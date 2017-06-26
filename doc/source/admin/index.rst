@@ -8,3 +8,4 @@
    :maxdepth: 2
 
    telemetry-system-architecture
+   telemetry-measurements
