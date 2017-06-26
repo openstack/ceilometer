@@ -11,3 +11,4 @@
    telemetry-measurements
    telemetry-troubleshooting-guide
    telemetry-data-pipelines
+   telemetry-data-collection
