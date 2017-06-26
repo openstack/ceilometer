@@ -10,3 +10,4 @@
    telemetry-system-architecture
    telemetry-measurements
    telemetry-troubleshooting-guide
+   telemetry-data-pipelines
