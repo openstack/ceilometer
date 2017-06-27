@@ -14,3 +14,4 @@
    telemetry-data-collection
    telemetry-data-retrieval
    telemetry-best-practices
+   telemetry-events
