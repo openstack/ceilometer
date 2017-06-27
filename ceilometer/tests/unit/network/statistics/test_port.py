@@ -27,6 +27,13 @@ class TestPortPollsters(statistics._PollsterTestBase):
             sample.TYPE_GAUGE,
             'port')
 
+    def test_port_pollster_uptime(self):
+        self._test_pollster(
+            port.PortPollsterUptime,
+            'switch.port.uptime',
+            sample.TYPE_GAUGE,
+            's')
+
     def test_port_pollster_receive_packets(self):
         self._test_pollster(
             port.PortPollsterReceivePackets,

@@ -20,9 +20,16 @@ from ceilometer.tests.unit.network import statistics
 
 class TestSwitchPollster(statistics._PollsterTestBase):
 
-    def test_table_pollster(self):
+    def test_switch_pollster(self):
         self._test_pollster(
             switch.SWPollster,
             'switch',
             sample.TYPE_GAUGE,
             'switch')
+
+    def test_switch_pollster_ports(self):
+        self._test_pollster(
+            switch.SwitchPollsterPorts,
+            'switch.ports',
+            sample.TYPE_GAUGE,
+            'ports')
