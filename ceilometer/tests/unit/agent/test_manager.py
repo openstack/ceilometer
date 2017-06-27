@@ -389,9 +389,9 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertEqual(2, len(samples))
         LOG.error.assert_called_once_with((
             'Prevent pollster %(name)s from '
-            'polling %(res_list)s on source %(source)s anymore!')
-            % ({'name': pollster.name, 'res_list': res_list,
-                'source': source_name}))
+            'polling %(res_list)s on source %(source)s anymore!'),
+            dict(name=pollster.name, res_list=str(res_list),
+                 source=source_name))
 
     @mock.patch('ceilometer.agent.manager.LOG')
     def test_polling_novalike_exception(self, LOG):
@@ -420,10 +420,10 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 self.mgr.interval_task(polling_task)
         LOG.error.assert_called_once_with((
             'Prevent pollster %(name)s from '
-            'polling %(res_list)s on source %(source)s anymore!')
-            % ({'name': pollster.name,
-                'res_list': '[<NovaLikeServer: unknown-name>]',
-                'source': source_name}))
+            'polling %(res_list)s on source %(source)s anymore!'),
+            dict(name=pollster.name,
+                 res_list="[<NovaLikeServer: unknown-name>]",
+                 source=source_name))
 
     def test_batching_polled_samples_false(self):
         self.CONF.set_override('batch_polled_samples', False)
