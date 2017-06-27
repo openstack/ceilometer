@@ -84,7 +84,7 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
         as metadata.
 
         :param res: URL or dict containing all resource info.
-        :return parsed_url, resource_id, metadata: Returns parsed URL used for
+        :return: parsed_url, resource_id, metadata Returns parsed URL used for
             SNMP query, unique identifier of the resource and metadata
             of the resource.
         """
