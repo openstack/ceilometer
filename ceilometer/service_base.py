@@ -29,6 +29,10 @@ LOG = log.getLogger(__name__)
 
 @six.add_metaclass(abc.ABCMeta)
 class PipelineBasedService(cotyledon.Service):
+    def __init__(self, worker_id):
+        super(PipelineBasedService, self).__init__(worker_id)
+        self.refresh_pipeline_periodic = None
+
     def clear_pipeline_validation_status(self):
         """Clears pipeline validation status flags."""
         self.pipeline_validated = False
@@ -38,7 +42,6 @@ class PipelineBasedService(cotyledon.Service):
         """Initializes pipeline refresh state."""
         self.clear_pipeline_validation_status()
 
-        self.refresh_pipeline_periodic = None
         if (cfg.CONF.refresh_pipeline_cfg or
                 cfg.CONF.refresh_event_pipeline_cfg):
             self.refresh_pipeline_periodic = utils.create_periodic(
