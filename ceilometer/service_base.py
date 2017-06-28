@@ -31,6 +31,7 @@ class PipelineBasedService(cotyledon.Service):
     def __init__(self, worker_id, conf):
         super(PipelineBasedService, self).__init__(worker_id)
         self.conf = conf
+        self.refresh_pipeline_periodic = None
 
     def clear_pipeline_validation_status(self):
         """Clears pipeline validation status flags."""
@@ -41,7 +42,6 @@ class PipelineBasedService(cotyledon.Service):
         """Initializes pipeline refresh state."""
         self.clear_pipeline_validation_status()
 
-        self.refresh_pipeline_periodic = None
         if (self.conf.refresh_pipeline_cfg or
                 self.conf.refresh_event_pipeline_cfg):
             self.refresh_pipeline_periodic = utils.create_periodic(
