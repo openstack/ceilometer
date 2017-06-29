@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Deprecating support for enabling pollsters via command line. Meter and
+    pollster enablement should be configured via polling.yaml file.
