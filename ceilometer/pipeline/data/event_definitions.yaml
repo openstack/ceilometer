@@ -90,6 +90,36 @@
       fields: payload.volume_type
     replication_status:
       fields: payload.replication_status
+- event_type: ['share.create.*', 'share.delete.*', 'share.extend.*', 'share.shrink.*']
+  traits: &share_traits
+    share_id:
+      fields: payload.share_id
+    user_id:
+      fields: payload.user_id
+    project_id:
+      fields: payload.tenant_id
+    snapshot_id:
+      fields: payload.snapshot_id
+    availability_zone:
+      fields: payload.availability_zone
+    status:
+      fields: payload.status
+    created_at:
+      fields: payload.created_at
+    share_group_id:
+      fields: payload.share_group_id
+    size:
+      fields: payload.size
+    name:
+      fields: payload.name
+    proto:
+      fields: payload.proto
+    is_public:
+      fields: payload.is_public
+    description:
+      fields: payload.description
+    host:
+      fields: payload.host
 - event_type: ['snapshot.exists', 'snapshot.create.*', 'snapshot.delete.*', 'snapshot.update.*']
   traits:
     <<: *cinder_traits
