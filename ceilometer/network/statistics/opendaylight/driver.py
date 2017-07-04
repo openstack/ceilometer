@@ -200,7 +200,7 @@ class OpenDayLightDriver(driver.Driver):
                     sample[2]['controller'] = 'OpenDaylight'
                     sample[2]['container'] = name
 
-                    samples.append(sample)
+                    samples.append(sample + (None, ))
 
         return samples
 

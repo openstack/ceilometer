@@ -110,7 +110,7 @@ class OpencontrailDriver(driver.Driver):
             for sample in iter(extractor, value, ports_map,
                                resource, virtual_network):
                 if sample is not None:
-                    yield sample
+                    yield sample + (None, )
 
     def _get_iter(self, meter_name):
         if meter_name.startswith('switch.port'):
