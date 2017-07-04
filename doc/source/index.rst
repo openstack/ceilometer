@@ -54,6 +54,7 @@ Developer Documentation
    testing
    contributing
    gmr
+   admin/index
 
 Appendix
 ========
