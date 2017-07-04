@@ -20,7 +20,6 @@
 
 import copy
 import datetime
-import functools
 import inspect
 
 from oslo_log import log
@@ -315,39 +314,3 @@ def flatten_metadata(metadata):
                                                          separator='.')
                     if type(v) is not set)
     return {}
-
-
-# TODO(fabiog): this decorator should disappear and have a more unified
-# way of controlling access and scope. Before messing with this, though
-# I feel this file should be re-factored in smaller chunks one for each
-# controller (e.g. meters and so on ...). Right now its size is
-# overwhelming.
-def requires_admin(func):
-
-    @functools.wraps(func)
-    def wrapped(*args, **kwargs):
-        usr_limit, proj_limit = rbac.get_limited_to(pecan.request.headers)
-        # If User and Project are None, you have full access.
-        if usr_limit and proj_limit:
-            # since this decorator get's called out of wsme context
-            # raising exception results internal error so call abort
-            # for handling the error
-            ex = base.ProjectNotAuthorized(proj_limit)
-            pecan.core.abort(status_code=ex.code, detail=ex.msg)
-        return func(*args, **kwargs)
-
-    return wrapped
-
-
-def requires_context(func):
-
-    @functools.wraps(func)
-    def wrapped(*args, **kwargs):
-        req_usr = pecan.request.headers.get('X-User-Id')
-        proj_usr = pecan.request.headers.get('X-Project-Id')
-        if ((not req_usr) or (not proj_usr)):
-            pecan.core.abort(status_code=403,
-                             detail='RBAC Authorization Failed')
-        return func(*args, **kwargs)
-
-    return wrapped
