@@ -139,7 +139,8 @@ class ResourcesController(rest.RestController):
         """Retrieve definitions of all of the resources.
 
         :param q: Filter rules for the resources to be returned.
-        :param meter_links: option to include related meter links
+        :param limit: Maximum number of resources to return.
+        :param meter_links: option to include related meter links.
         """
 
         rbac.enforce('get_resources', pecan.request)
