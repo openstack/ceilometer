@@ -23,6 +23,8 @@ from ceilometer import sample
 
 LOG = log.getLogger(__name__)
 
+AGGREGATED_DEPRECATION_DONE = set()
+
 
 class AggregateDiskPollster(pollsters.GenericComputePollster):
     inspector_method = "inspect_disks"
@@ -43,6 +45,14 @@ class AggregateDiskPollster(pollsters.GenericComputePollster):
     @staticmethod
     def get_additional_metadata(instance, stats):
         return {'device': stats.device}
+
+    def get_samples(self, *args, **kwargs):
+        if self.sample_name not in AGGREGATED_DEPRECATION_DONE:
+            AGGREGATED_DEPRECATION_DONE.add(self.sample_name)
+            LOG.warning("The %s metric is deprecated, instead use %s" %
+                        (self.sample_name,
+                         self.sample_name.replace("disk.", "disk.device.")))
+        return super(AggregateDiskPollster, self).get_samples(*args, **kwargs)
 
 
 class PerDeviceDiskPollster(pollsters.GenericComputePollster):

@@ -1,0 +1,6 @@
+---
+deprecations:
+  - |
+    disk.* aggregated metrics for instance are deprecated, in favor of the
+    per disk metrics (disk.device.*). Now, it's up to the backend to provide
+    such aggregation feature. Gnocchi already provides this.
