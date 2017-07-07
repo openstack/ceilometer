@@ -138,7 +138,10 @@ def decimal_to_dt(dec):
 
 
 def sanitize_timestamp(timestamp):
-    """Return a naive utc datetime object."""
+    """Return a naive utc datetime object.
+
+    :returns: a timezone unaware timestamp
+    """
     if not timestamp:
         return timestamp
     if not isinstance(timestamp, datetime.datetime):
