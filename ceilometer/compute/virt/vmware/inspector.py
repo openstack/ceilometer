@@ -110,7 +110,7 @@ class VsphereInspector(virt_inspector.Inspector):
                                                     'runtime.powerState')
         if vm_powerState == "poweredOff":
             raise virt_inspector.InstanceShutOffException(
-                _('VM %s is poweroff in VMware vSphere') % instance.id)
+                _('VM %s is poweredOff in VMware vSphere') % instance.id)
 
         return vm_mobj
 
