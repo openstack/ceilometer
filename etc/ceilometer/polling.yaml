@@ -1,6 +1,26 @@
 ---
 sources:
-    - name: all_pollsters
+    - name: some_pollsters
       interval: 300
       meters:
-          - "*"
+        - cpu
+        - memory.usage
+        - network.incoming.bytes
+        - network.incoming.packets
+        - network.outgoing.bytes
+        - network.outgoing.packets
+        - disk.read.bytes
+        - disk.read.requests
+        - disk.write.bytes
+        - disk.write.requests
+        - hardware.cpu.util
+        - hardware.memory.used
+        - hardware.memory.total
+        - hardware.memory.buffer
+        - hardware.memory.cached
+        - hardware.memory.swap.avail
+        - hardware.memory.swap.total
+        - hardware.system_stats.io.outgoing.blocks
+        - hardware.system_stats.io.incoming.blocks
+        - hardware.network.ip.incoming.datagrams
+        - hardware.network.ip.outgoing.datagrams

@@ -351,9 +351,10 @@ function configure_ceilometer {
     # with rootwrap installation done elsewhere and also clobber
     # ceilometer.conf settings that have already been made.
     # Anyway, explicit is better than implicit.
-    for conffile in policy.json api_paste.ini polling.yaml; do
+    for conffile in policy.json api_paste.ini; do
         cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
     done
+    cp $CEILOMETER_DIR/etc/ceilometer/polling_all.yaml $CEILOMETER_CONF_DIR/polling.yaml
 
     cp $CEILOMETER_DIR/ceilometer/pipeline/data/*.yaml $CEILOMETER_CONF_DIR
 
