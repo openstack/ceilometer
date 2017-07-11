@@ -9,3 +9,4 @@
 
    telemetry-system-architecture
    telemetry-measurements
+   telemetry-troubleshooting-guide
