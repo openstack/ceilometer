@@ -92,11 +92,13 @@ def refresh_libvirt_connection(conf, klass):
     connection = getattr(klass, '_libvirt_connection', None)
     if not connection or not connection.isAlive():
         connection = new_libvirt_connection(conf)
-        setattr(klass,  '_libvirt_connection', connection)
+        setattr(klass, '_libvirt_connection', connection)
     return connection
 
 
 def is_disconnection_exception(e):
+    if not libvirt:
+        return False
     return (isinstance(e, libvirt.libvirtError)
             and e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
                                        libvirt.VIR_ERR_INTERNAL_ERROR)
