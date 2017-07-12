@@ -18,7 +18,7 @@ Release notes are available at
 https://releases.openstack.org/teams/telemetry.html
 
 Developer documentation is available at
-https://docs.openstack.org/developer/ceilometer/
+https://docs.openstack.org/ceilometer/latest/
 
 For information on how to contribute to ceilometer, see the CONTRIBUTING.rst
 file.
