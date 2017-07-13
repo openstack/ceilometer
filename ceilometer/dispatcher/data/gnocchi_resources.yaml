@@ -37,6 +37,8 @@ resources:
       - 'memory'
       - 'memory.usage'
       - 'memory.resident'
+      - 'memory.swap.in'
+      - 'memory.swap.out'
       - 'memory.bandwidth.total'
       - 'memory.bandwidth.local'
       - 'vcpus'

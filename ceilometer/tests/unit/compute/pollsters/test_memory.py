@@ -103,6 +103,52 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
         _verify_resident_memory_metering(0, 0, 0)
 
 
+class TestMemorySwapPollster(base.TestPollsterBase):
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples(self):
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(memory_swap_in=1.0,
+                                         memory_swap_out=2.0),
+            virt_inspector.InstanceStats(memory_swap_in=3.0,
+                                         memory_swap_out=4.0),
+        )
+
+        mgr = manager.AgentManager(0, self.CONF)
+
+        def _check_memory_swap_in(expected_swap_in):
+            pollster = instance_stats.MemorySwapInPollster(self.CONF)
+
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual(set(['memory.swap.in']),
+                             set([s.name for s in samples]))
+            self.assertEqual(expected_swap_in, samples[0].volume)
+
+        def _check_memory_swap_out(expected_swap_out):
+            pollster = instance_stats.MemorySwapOutPollster(self.CONF)
+
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual(set(['memory.swap.out']),
+                             set([s.name for s in samples]))
+            self.assertEqual(expected_swap_out, samples[0].volume)
+
+        _check_memory_swap_in(1.0)
+        _check_memory_swap_out(4.0)
+
+    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
+    def test_get_samples_with_empty_stats(self):
+        self._mock_inspect_instance(virt_inspector.NoDataException())
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.MemorySwapInPollster(self.CONF)
+
+        def all_samples():
+            return list(pollster.get_samples(mgr, {}, [self.instance]))
+
+        self.assertRaises(plugin_base.PollsterPermanentError, all_samples)
+
+
 class TestMemoryBandwidthPollster(base.TestPollsterBase):
 
     @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())

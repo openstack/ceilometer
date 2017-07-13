@@ -55,7 +55,9 @@ class TestLibvirtInspection(base.BaseTestCase):
         domain.info.return_value = (0, 0, 0, 2, 999999)
         domain.memoryStats.return_value = {'available': 51200,
                                            'unused': 25600,
-                                           'rss': 30000}
+                                           'rss': 30000,
+                                           'swap_in': 5120,
+                                           'swap_out': 8192}
         conn = mock.Mock()
         conn.lookupByUUIDString.return_value = domain
         conn.domainListGetStats.return_value = [({}, {
@@ -82,6 +84,8 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(90112, stats.cpu_l3_cache_usage)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)
+            self.assertEqual(5120 / units.Ki, stats.memory_swap_in)
+            self.assertEqual(8192 / units.Ki, stats.memory_swap_out)
             self.assertEqual(1892352, stats.memory_bandwidth_total)
             self.assertEqual(1802240, stats.memory_bandwidth_local)
             self.assertEqual(7259361, stats.cpu_cycles)
@@ -406,6 +410,8 @@ class TestLibvirtInspection(base.BaseTestCase):
             stats = self.inspector.inspect_instance(self.instance, None)
             self.assertIsNone(stats.memory_usage)
             self.assertIsNone(stats.memory_resident)
+            self.assertIsNone(stats.memory_swap_in)
+            self.assertIsNone(stats.memory_swap_out)
 
     def test_inspect_perf_events_libvirt_less_than_2_3_0(self):
         domain = mock.Mock()
