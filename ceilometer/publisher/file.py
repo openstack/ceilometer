@@ -38,10 +38,8 @@ class FilePublisher(publisher.ConfigPublisherBase):
 
         -
             name: meter_file
-            interval: 600
-            counters:
+            meters:
                 - "*"
-            transformers:
             publishers:
                 - file:///var/test?max_bytes=10000000&backup_count=5
 

@@ -53,10 +53,8 @@ class HttpPublisher(publisher.ConfigPublisherBase):
     pipeline::
 
           - name: meter_file
-            interval: 600
-            counters:
+            meters:
                 - "*"
-            transformers:
             publishers:
                 - http://host:80/path?timeout=1&max_retries=2&batch=False
 

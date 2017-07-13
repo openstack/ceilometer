@@ -30,10 +30,8 @@ class ZaqarPublisher(publisher.ConfigPublisherBase):
 
         meter:
             - name: meter_zaqar
-            interval: 600
-            counters:
+            meters:
                 - "*"
-            transformers:
             sinks:
                 - zaqar_sink
         sinks:

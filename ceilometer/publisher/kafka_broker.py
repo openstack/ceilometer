@@ -37,10 +37,8 @@ class KafkaBrokerPublisher(messaging.MessagingPublisher):
 
         meter:
             - name: meter_kafka
-            interval: 600
-            counters:
+            meters:
                 - "*"
-            transformers:
             sinks:
                 - kafka_sink
         sinks:
