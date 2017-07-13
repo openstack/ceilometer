@@ -121,6 +121,10 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             self._connection = libvirt_utils.get_libvirt_connection(self.conf)
         return self._connection
 
+    @connection.setter
+    def connection(self, value):
+        self._connection = value
+
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
         if self.method != "libvirt_metadata":
