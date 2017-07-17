@@ -205,7 +205,7 @@ Meter definitions
 The Telemetry service collects a subset of the meters by filtering
 notifications emitted by other OpenStack services. You can find the meter
 definitions in a separate configuration file, called
-``ceilometer/meter/data/meters.yaml``. This enables
+``ceilometer/data/meters.d/meters.yaml``. This enables
 operators/administrators to add new meters to Telemetry project by updating
 the ``meters.yaml`` file without any need for additional code changes.
 
@@ -215,6 +215,10 @@ the ``meters.yaml`` file without any need for additional code changes.
    do not remove any existing meter definitions from the file. Also, the
    collected meters can differ in some cases from what is referenced in the
    documentation.
+
+It also support loading multiple meter definition files and allow users to add
+their own meter definitions into several files according to different types of
+metrics under the directory of ``/etc/ceilometer/meters.d``.
 
 A standard meter definition looks like:
 
