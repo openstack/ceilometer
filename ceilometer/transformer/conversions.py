@@ -128,6 +128,7 @@ class ScalingTransformer(BaseConversionTransformer):
         super(ScalingTransformer, self).__init__(source=source, target=target,
                                                  **kwargs)
         self.scale = self.target.get('scale')
+        self.max = self.target.get('max')
         LOG.debug('scaling conversion transformer with source:'
                   ' %(source)s target: %(target)s:', {'source': self.source,
                                                       'target': self.target})
@@ -145,11 +146,12 @@ class ScalingTransformer(BaseConversionTransformer):
 
     def _convert(self, s, growth=1):
         """Transform the appropriate sample fields."""
+        volume = self._scale(s) * growth
         return sample.Sample(
             name=self._map(s, 'name'),
             unit=self._map(s, 'unit'),
             type=self.target.get('type', s.type),
-            volume=self._scale(s) * growth,
+            volume=min(volume, self.max) if self.max else volume,
             user_id=s.user_id,
             project_id=s.project_id,
             resource_id=s.resource_id,
