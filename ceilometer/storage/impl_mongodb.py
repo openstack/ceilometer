@@ -346,7 +346,6 @@ class Connection(pymongo_base.Connection):
 
         Sort instructions are used in the query to determine what attributes
         to sort on and what direction to use.
-        :param q: The query dict passed in.
         :param sort_keys: array of attributes by which results be sorted.
         :param sort_dir: direction in which results be sorted (asc, desc).
         :return: sort instructions and paging operator
