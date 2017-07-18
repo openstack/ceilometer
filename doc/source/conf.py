@@ -39,13 +39,12 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
 # They can be extensions coming with Sphinx (named 'sphinx.ext.*')
 # or your custom ones.
 extensions = [
+    'openstackdocstheme',
     'sphinx.ext.autodoc',
-    'sphinxcontrib.autohttp.flask',
     'wsmeext.sphinxext',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinxcontrib.pecanwsme.rest',
-    'oslosphinx',
 ]
 
 wsme_protocols = ['restjson', 'restxml']
@@ -116,13 +115,12 @@ nitpicky = False
 # a list of builtin themes.
 # html_theme_path = ['.']
 # html_theme = '_theme'
+html_theme = 'openstackdocs'
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-html_theme_options = {
-    "nosidebar": "false"
-}
+# openstackdocstheme options
+repository_name = 'openstack/ceilometer'
+bug_project = 'ceilometer'
+bug_tag = ''
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -150,15 +148,8 @@ html_theme_options = {
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
-try:
-    git_cmd = ["git", "log", "--pretty=format:'%ad, commit %h'", "--date=local",
-               "-n1"]
-    html_last_updated_fmt = subprocess.check_output(git_cmd).decode('utf-8')
-except Exception:
-    warnings.warn('Cannot get last updated time from git repository. '
-                  'Not setting "html_last_updated_fmt".')
-
+# Must set this variable to include year, month, day, hours, and minutes.
+html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
