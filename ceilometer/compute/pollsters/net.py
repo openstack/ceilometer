@@ -16,6 +16,7 @@
 
 import copy
 
+import monotonic
 from oslo_log import log
 
 import ceilometer
@@ -34,7 +35,8 @@ class _Base(pollsters.BaseComputePollster):
     NET_USAGE_MESSAGE = ' '.join(["NETWORK USAGE:", "%s %s:", "read-bytes=%d",
                                   "write-bytes=%d"])
 
-    def make_vnic_sample(self, instance, name, type, unit, volume, vnic_data):
+    def make_vnic_sample(self, instance, name, type, unit, volume, vnic_data,
+                         monotonic_time):
         metadata = copy.copy(vnic_data)
         additional_metadata = dict(zip(metadata._fields, metadata))
         if vnic_data.fref is not None:
@@ -53,7 +55,8 @@ class _Base(pollsters.BaseComputePollster):
             unit=unit,
             volume=volume,
             resource_id=rid,
-            additional_metadata=additional_metadata
+            additional_metadata=additional_metadata,
+            monotonic_time=monotonic_time,
         )
 
     CACHE_KEY_VNIC = 'vnics'
@@ -72,9 +75,10 @@ class _Base(pollsters.BaseComputePollster):
     def _get_vnics_for_instance(self, cache, inspector, instance):
         i_cache = cache.setdefault(self.CACHE_KEY_VNIC, {})
         if instance.id not in i_cache:
-            i_cache[instance.id] = list(
-                self._get_vnic_info(inspector, instance)
-            )
+            data = list(self._get_vnic_info(inspector, instance))
+            polled_time = monotonic.monotonic()
+            i_cache[instance.id] = [(vnic, info, polled_time)
+                                    for vnic, info in data]
         return i_cache[instance.id]
 
     def get_samples(self, manager, cache, resources):
@@ -88,11 +92,11 @@ class _Base(pollsters.BaseComputePollster):
                     self.inspector,
                     instance,
                 )
-                for vnic, info in vnics:
+                for vnic, info, polled_time in vnics:
                     LOG.debug(self.NET_USAGE_MESSAGE, instance_name,
                               vnic.name, self._get_rx_info(info),
                               self._get_tx_info(info))
-                    yield self._get_sample(instance, vnic, info)
+                    yield self._get_sample(instance, vnic, info, polled_time)
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.
                 LOG.debug('Exception while getting samples %s', err)
@@ -179,7 +183,7 @@ class _ErrorsBase(_Base):
 
 class IncomingBytesPollster(_Base):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.incoming.bytes',
@@ -187,12 +191,13 @@ class IncomingBytesPollster(_Base):
             unit='B',
             volume=info.rx_bytes,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class IncomingPacketsPollster(_PacketsBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.incoming.packets',
@@ -200,12 +205,13 @@ class IncomingPacketsPollster(_PacketsBase):
             unit='packet',
             volume=info.rx_packets,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class OutgoingBytesPollster(_Base):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.outgoing.bytes',
@@ -213,12 +219,13 @@ class OutgoingBytesPollster(_Base):
             unit='B',
             volume=info.tx_bytes,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class OutgoingPacketsPollster(_PacketsBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.outgoing.packets',
@@ -226,12 +233,13 @@ class OutgoingPacketsPollster(_PacketsBase):
             unit='packet',
             volume=info.tx_packets,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class IncomingBytesRatePollster(_RateBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.incoming.bytes.rate',
@@ -239,12 +247,13 @@ class IncomingBytesRatePollster(_RateBase):
             unit='B/s',
             volume=info.rx_bytes_rate,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class OutgoingBytesRatePollster(_RateBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.outgoing.bytes.rate',
@@ -252,12 +261,13 @@ class OutgoingBytesRatePollster(_RateBase):
             unit='B/s',
             volume=info.tx_bytes_rate,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class IncomingDropPollster(_DropBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.incoming.packets.drop',
@@ -265,12 +275,13 @@ class IncomingDropPollster(_DropBase):
             unit='packet',
             volume=info.rx_drop,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class OutgoingDropPollster(_DropBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.outgoing.packets.drop',
@@ -278,12 +289,13 @@ class OutgoingDropPollster(_DropBase):
             unit='packet',
             volume=info.tx_drop,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class IncomingErrorsPollster(_ErrorsBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.incoming.packets.error',
@@ -291,12 +303,13 @@ class IncomingErrorsPollster(_ErrorsBase):
             unit='packet',
             volume=info.rx_errors,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )
 
 
 class OutgoingErrorsPollster(_ErrorsBase):
 
-    def _get_sample(self, instance, vnic, info):
+    def _get_sample(self, instance, vnic, info, polled_time):
         return self.make_vnic_sample(
             instance,
             name='network.outgoing.packets.error',
@@ -304,4 +317,5 @@ class OutgoingErrorsPollster(_ErrorsBase):
             unit='packet',
             volume=info.tx_errors,
             vnic_data=vnic,
+            monotonic_time=polled_time,
         )

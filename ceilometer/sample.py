@@ -95,7 +95,7 @@ class Sample(object):
 
     def __init__(self, name, type, unit, volume, user_id, project_id,
                  resource_id, timestamp=None, resource_metadata=None,
-                 source=None, id=None):
+                 source=None, id=None, monotonic_time=None):
         self.name = name
         self.type = type
         self.unit = unit
@@ -107,6 +107,7 @@ class Sample(object):
         self.resource_metadata = resource_metadata or {}
         self.source = source or self.SOURCE_DEFAULT
         self.id = id or str(uuid.uuid1())
+        self.monotonic_time = monotonic_time
 
     def as_dict(self):
         return copy.copy(self.__dict__)
