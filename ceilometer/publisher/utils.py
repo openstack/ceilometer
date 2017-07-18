@@ -98,6 +98,7 @@ def meter_message_from_counter(sample, secret):
            'timestamp': sample.timestamp,
            'resource_metadata': sample.resource_metadata,
            'message_id': sample.id,
+           'monotonic_time': sample.monotonic_time,
            }
     msg['message_signature'] = compute_signature(msg, secret)
     return msg
