@@ -34,6 +34,7 @@ Overview
 .. toctree::
    :maxdepth: 2
 
+   install/index
    contributor/index
    admin/index
    webapi/index
