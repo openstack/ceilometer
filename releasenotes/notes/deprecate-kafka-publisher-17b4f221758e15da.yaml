@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Ceilometer supports generic notifier to publish data and allow user to
+    customize parameters such as topic, transport driver and priority. The
+    publisher configuration in pipeline.yaml can be
+    notifer://[notifier_ip]:[notifier_port]?topic=[topic]&driver=driver&max_retry=100
+    Not only rabbit driver, but also other driver like kafka can be used.
+deprecations:
+  - |
+    Kafka publisher is deprecated to use generic notifier instead.
