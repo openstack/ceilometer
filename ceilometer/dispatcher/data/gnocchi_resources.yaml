@@ -244,3 +244,52 @@ resources:
       host: resource_metadata.host
       availability_zone: resource_metadata.availability_zone
       status: resource_metadata.status
+
+  - resource_type: switch
+    metrics:
+      - 'switch'
+      - 'switch.ports'
+    attributes:
+      controller: resource_metadata.controller
+
+  - resource_type: switch_port
+    metrics:
+      - 'switch.port'
+      - 'switch.port.uptime'
+      - 'switch.port.receive.packets'
+      - 'switch.port.transmit.packets'
+      - 'switch.port.receive.bytes'
+      - 'switch.port.transmit.bytes'
+      - 'switch.port.receive.drops'
+      - 'switch.port.transmit.drops'
+      - 'switch.port.receive.errors'
+      - 'switch.port.transmit.errors'
+      - 'switch.port.receive.frame_error'
+      - 'switch.port.receive.overrun_error'
+      - 'switch.port.receive.crc_error'
+      - 'switch.port.collision.count'
+    attributes:
+      switch: resource_metadata.switch
+      port_number_on_switch: resource_metadata.port_number_on_switch
+      neutron_port_id: resource_metadata.neutron_port_id
+      controller: resource_metadata.controller
+
+  - resource_type: port
+    metrics:
+      - 'port'
+      - 'port.uptime'
+      - 'port.receive.packets'
+      - 'port.transmit.packets'
+      - 'port.receive.bytes'
+      - 'port.transmit.bytes'
+      - 'port.receive.drops'
+      - 'port.receive.errors'
+    attributes:
+      controller: resource_metadata.controller
+
+  - resource_type: switch_table
+    metrics:
+      - 'switch.table.active.entries'
+    attributes:
+      controller: resource_metadata.controller
+      switch: resource_metadata.switch
