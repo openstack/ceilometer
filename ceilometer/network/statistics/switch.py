@@ -23,3 +23,10 @@ class SWPollster(statistics._Base):
     meter_name = 'switch'
     meter_type = sample.TYPE_GAUGE
     meter_unit = 'switch'
+
+
+class SwitchPollsterPorts(statistics._Base):
+
+    meter_name = 'switch.ports'
+    meter_type = sample.TYPE_GAUGE
+    meter_unit = 'ports'

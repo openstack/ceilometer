@@ -25,6 +25,13 @@ class PortPollster(statistics._Base):
     meter_unit = 'port'
 
 
+class PortPollsterUptime(statistics._Base):
+
+    meter_name = 'switch.port.uptime'
+    meter_type = sample.TYPE_GAUGE
+    meter_unit = 's'
+
+
 class PortPollsterReceivePackets(statistics._Base):
 
     meter_name = 'switch.port.receive.packets'

@@ -1,0 +1,8 @@
+---
+prelude: >
+    Network Statistics From OpenDaylight.
+features:
+  - Add a ceilometer driver to collect network
+    statistics information using REST APIs exposed by
+    network-statistics module in OpenDaylight.
+  - Add support for network statistics meters with gnocchi
