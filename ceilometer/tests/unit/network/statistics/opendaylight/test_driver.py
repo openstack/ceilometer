@@ -17,7 +17,6 @@ import abc
 import mock
 from oslotest import base
 import six
-from six import moves
 from six.moves.urllib import parse as url_parse
 
 from ceilometer.network.statistics.opendaylight import driver
@@ -119,10 +118,7 @@ class _Base(base.BaseTestCase):
                                                   self.fake_params,
                                                   {})
 
-        for sample, expected in moves.zip(sample_data, expected_data):
-            self.assertEqual(expected[0], sample[0])  # check volume
-            self.assertEqual(expected[1], sample[1])  # check resource id
-            self.assertEqual(expected[2], sample[2])  # check resource metadata
+        self.assertEqual(expected_data, list(sample_data))
 
 
 class TestOpenDayLightDriverSpecial(_Base):
@@ -352,7 +348,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 'container': 'default',
                 "properties_actions": "4095",
                 "properties_timeStamp_connectedSince": "1377291227877"
-            }),
+            }, None),
         ]
 
         self._test_for_meter('switch', expected_data)
@@ -363,7 +359,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 'controller': 'OpenDaylight',
                 'container': 'default',
                 'port': '4',
-            }),
+            }, None),
         ]
         self._test_for_meter('switch.port', expected_data)
 
@@ -372,7 +368,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.packets', expected_data)
 
@@ -381,7 +377,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.transmit.packets', expected_data)
 
@@ -390,7 +386,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.bytes', expected_data)
 
@@ -399,7 +395,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.transmit.bytes', expected_data)
 
@@ -408,7 +404,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.drops', expected_data)
 
@@ -417,7 +413,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.transmit.drops', expected_data)
 
@@ -426,7 +422,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.errors', expected_data)
 
@@ -435,7 +431,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.transmit.errors', expected_data)
 
@@ -444,7 +440,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.frame_error', expected_data)
 
@@ -453,7 +449,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.overrun_error',
                              expected_data)
@@ -463,7 +459,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.receive.crc_error', expected_data)
 
@@ -472,7 +468,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
         ]
         self._test_for_meter('switch.port.collision.count', expected_data)
 
@@ -481,7 +477,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
         ]
         self._test_for_meter('switch.table', expected_data)
 
@@ -490,7 +486,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (11, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
         ]
         self._test_for_meter('switch.table.active.entries', expected_data)
 
@@ -499,7 +495,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (816, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
         ]
         self._test_for_meter('switch.table.lookup.packets', expected_data)
 
@@ -508,7 +504,7 @@ class TestOpenDayLightDriverSimple(_Base):
             (220, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
         ]
         self._test_for_meter('switch.table.matched.packets', expected_data)
 
@@ -532,7 +528,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
                 "flow_priority": "1"
-            }),
+            }, None),
         ]
         self._test_for_meter('switch.flow', expected_data)
 
@@ -555,7 +551,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.duration_seconds', expected_data)
 
@@ -578,7 +574,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.duration_nanoseconds', expected_data)
 
@@ -601,7 +597,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.packets', expected_data)
 
@@ -624,7 +620,7 @@ class TestOpenDayLightDriverSimple(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.bytes', expected_data)
 
@@ -1078,7 +1074,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "properties_macAddress": "00:00:00:00:00:02",
                 "properties_tables": "-1",
                 "properties_timeStamp_connectedSince": "1377291227877"
-            }),
+            }, None),
             (1, "00:00:00:00:00:00:00:03", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1089,7 +1085,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "properties_macAddress": "00:00:00:00:00:03",
                 "properties_tables": "10",
                 "properties_timeStamp_connectedSince": "1377291228000"
-            }),
+            }, None),
         ]
 
         self._test_for_meter('switch', expected_data)
@@ -1100,7 +1096,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 'controller': 'OpenDaylight',
                 'container': 'default',
                 'port': '4',
-            }),
+            }, None),
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1109,7 +1105,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 'user_link_node_port': '5',
                 'user_link_status': 'Success',
                 'user_link_name': 'link1',
-            }),
+            }, None),
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1121,7 +1117,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "topology_name": "s2-eth3",
                 "topology_state": 1,
                 "topology_timeStamp_creation": 1379527162648
-            }),
+            }, None),
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1131,7 +1127,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 'host_networkAddress': '2.2.2.2',
                 'host_staticHost': 'true',
                 'host_vlan': '0',
-            }),
+            }, None),
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1141,7 +1137,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 'host_networkAddress': '2.2.2.4',
                 'host_staticHost': 'false',
                 'host_vlan': '1',
-            }),
+            }, None),
         ]
         self._test_for_meter('switch.port', expected_data)
 
@@ -1150,23 +1146,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (182, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (174, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.packets', expected_data)
 
@@ -1175,23 +1171,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (173, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (181, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.transmit.packets', expected_data)
 
@@ -1200,23 +1196,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (12740, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (12180, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.bytes', expected_data)
 
@@ -1225,23 +1221,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (12110, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (12670, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.transmit.bytes', expected_data)
 
@@ -1250,23 +1246,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.drops', expected_data)
 
@@ -1275,23 +1271,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.transmit.drops', expected_data)
 
@@ -1300,23 +1296,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.errors', expected_data)
 
@@ -1325,23 +1321,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.transmit.errors', expected_data)
 
@@ -1350,23 +1346,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.frame_error', expected_data)
 
@@ -1375,23 +1371,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.overrun_error',
                              expected_data)
@@ -1401,23 +1397,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.receive.crc_error', expected_data)
 
@@ -1426,23 +1422,23 @@ class TestOpenDayLightDriverComplex(_Base):
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '4'}),
+                'port': '4'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '3'}),
+                'port': '3'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '2'}),
+                'port': '2'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '1'}),
+                'port': '1'}, None),
             (0, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'port': '0'}),
+                'port': '0'}, None),
         ]
         self._test_for_meter('switch.port.collision.count', expected_data)
 
@@ -1451,11 +1447,11 @@ class TestOpenDayLightDriverComplex(_Base):
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '1'}),
+                'table_id': '1'}, None),
         ]
         self._test_for_meter('switch.table', expected_data)
 
@@ -1464,11 +1460,11 @@ class TestOpenDayLightDriverComplex(_Base):
             (11, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
             (20, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '1'}),
+                'table_id': '1'}, None),
         ]
         self._test_for_meter('switch.table.active.entries', expected_data)
 
@@ -1477,11 +1473,11 @@ class TestOpenDayLightDriverComplex(_Base):
             (816, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
             (10, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '1'}),
+                'table_id': '1'}, None),
         ]
         self._test_for_meter('switch.table.lookup.packets', expected_data)
 
@@ -1490,11 +1486,11 @@ class TestOpenDayLightDriverComplex(_Base):
             (220, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '0'}),
+                'table_id': '0'}, None),
             (5, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
-                'table_id': '1'}),
+                'table_id': '1'}, None),
         ]
         self._test_for_meter('switch.table.matched.packets', expected_data)
 
@@ -1518,7 +1514,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
                 "flow_priority": "1"
-            }),
+            }, None),
             (1, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1537,7 +1533,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
                 "flow_priority": "1"
-            }),
+            }, None),
         ]
         self._test_for_meter('switch.flow', expected_data)
 
@@ -1560,7 +1556,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
             (5648, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1578,7 +1574,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.duration_seconds', expected_data)
 
@@ -1601,7 +1597,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
             (200000, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1619,7 +1615,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.duration_nanoseconds', expected_data)
 
@@ -1642,7 +1638,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
             (30, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1660,7 +1656,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.packets', expected_data)
 
@@ -1683,7 +1679,7 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
             (89, "00:00:00:00:00:00:00:02", {
                 'controller': 'OpenDaylight',
                 'container': 'default',
@@ -1701,6 +1697,6 @@ class TestOpenDayLightDriverComplex(_Base):
                 "flow_actions_port_type": "OF",
                 "flow_hardTimeout": "0",
                 "flow_idleTimeout": "0",
-                "flow_priority": "1"}),
+                "flow_priority": "1"}, None),
         ]
         self._test_for_meter('switch.flow.bytes', expected_data)
