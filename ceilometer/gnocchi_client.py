@@ -132,13 +132,15 @@ resources_update_operations = [
      "resource_type": "manila_share",
      "data": [{
          "attributes": {"name": {"type": "string", "min_length": 0,
-                                 "max_length": 255, "required": True},
+                                 "max_length": 255, "required": False},
                         "host": {"type": "string", "min_length": 0,
                                  "max_length": 255, "required": True},
+                        "protocol": {"type": "string", "min_length": 0,
+                                     "max_length": 255, "required": False},
                         "availability_zone": {"type": "string",
                                               "min_length": 0,
                                               "max_length": 255,
-                                              "required": True},
+                                              "required": False},
                         "status": {"type": "string", "min_length": 0,
                                    "max_length": 255,
                                    "required": True}}
