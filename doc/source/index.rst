@@ -34,20 +34,9 @@ Overview
 .. toctree::
    :maxdepth: 2
 
-   overview
-   architecture
-   measurements
-   events
-   webapi/index
-   install/index
-   configuration
-   plugins
-   new_meters
-   new_resource_types
-   testing
-   contributing
-   gmr
+   contributor/index
    admin/index
+   webapi/index
 
 Appendix
 ========
