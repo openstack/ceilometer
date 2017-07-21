@@ -143,6 +143,10 @@ class Connection(hbase_base.Connection, base.Connection):
         :param data: a dictionary such as returned by
           ceilometer.publisher.utils.meter_message_from_counter
         """
+
+        # We must not record thing.
+        data.pop("monotonic_time", None)
+
         with self.conn_pool.connection() as conn:
             resource_table = conn.table(self.RESOURCE_TABLE)
             meter_table = conn.table(self.METER_TABLE)

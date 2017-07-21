@@ -187,12 +187,18 @@ class RateOfChangeTransformer(ScalingTransformer):
         key = s.name + s.resource_id
         prev = self.cache.get(key)
         timestamp = timeutils.parse_isotime(s.timestamp)
-        self.cache[key] = (s.volume, timestamp)
+        self.cache[key] = (s.volume, timestamp, s.monotonic_time)
 
         if prev:
             prev_volume = prev[0]
             prev_timestamp = prev[1]
-            time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
+            prev_monotonic_time = prev[2]
+            if (prev_monotonic_time is not None and
+                    s.monotonic_time is not None):
+                # NOTE(sileht): Prefer high precision timer
+                time_delta = s.monotonic_time - prev_monotonic_time
+            else:
+                time_delta = timeutils.delta_seconds(prev_timestamp, timestamp)
             # disallow violations of the arrow of time
             if time_delta < 0:
                 LOG.warning(_('dropping out of time order sample: %s'), (s,))

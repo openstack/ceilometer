@@ -14,6 +14,7 @@
 
 import collections
 
+import monotonic
 from oslo_log import log
 from oslo_utils import timeutils
 
@@ -93,13 +94,16 @@ class GenericComputePollster(plugin_base.PollsterBase):
         if instance.id not in cache[self.inspector_method]:
             result = getattr(self.inspector, self.inspector_method)(
                 instance, duration)
+            polled_time = monotonic.monotonic()
             # Ensure we don't cache an iterator
             if isinstance(result, collections.Iterable):
                 result = list(result)
-            cache[self.inspector_method][instance.id] = result
+            else:
+                result = [result]
+            cache[self.inspector_method][instance.id] = (polled_time, result)
         return cache[self.inspector_method][instance.id]
 
-    def _stats_to_sample(self, instance, stats):
+    def _stats_to_sample(self, instance, stats, polled_time):
         volume = getattr(stats, self.sample_stats_key)
         LOG.debug("%(instance_id)s/%(name)s volume: "
                   "%(volume)s" % {
@@ -121,21 +125,19 @@ class GenericComputePollster(plugin_base.PollsterBase):
             volume=volume,
             additional_metadata=self.get_additional_metadata(
                 instance, stats),
+            monotonic_time=polled_time,
         )
 
     def get_samples(self, manager, cache, resources):
         self._inspection_duration = self._record_poll_time()
         for instance in resources:
             try:
-                result = self._inspect_cached(cache, instance,
-                                              self._inspection_duration)
+                polled_time, result = self._inspect_cached(
+                    cache, instance, self._inspection_duration)
                 if not result:
                     continue
-
-                if not isinstance(result, collections.Iterable):
-                    result = [result]
                 for stats in self.aggregate_method(result):
-                    yield self._stats_to_sample(instance, stats)
+                    yield self._stats_to_sample(instance, stats, polled_time)
             except NoVolumeException:
                 # FIXME(sileht): This should be a removed... but I will
                 # not change the test logic for now

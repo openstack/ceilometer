@@ -76,7 +76,8 @@ def _get_metadata_from_object(conf, instance):
 
 
 def make_sample_from_instance(conf, instance, name, type, unit, volume,
-                              resource_id=None, additional_metadata=None):
+                              resource_id=None, additional_metadata=None,
+                              monotonic_time=None):
     additional_metadata = additional_metadata or {}
     resource_metadata = _get_metadata_from_object(conf, instance)
     resource_metadata.update(additional_metadata)
@@ -89,6 +90,7 @@ def make_sample_from_instance(conf, instance, name, type, unit, volume,
         project_id=instance.tenant_id,
         resource_id=resource_id or instance.id,
         resource_metadata=resource_metadata,
+        monotonic_time=monotonic_time,
     )
 
 
