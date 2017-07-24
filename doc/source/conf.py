@@ -45,6 +45,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinxcontrib.pecanwsme.rest',
+    'sphinxcontrib.httpdomain',
 ]
 
 wsme_protocols = ['restjson', 'restxml']
