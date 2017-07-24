@@ -51,6 +51,18 @@ class MemoryResidentPollster(InstanceStatsPollster):
     sample_stats_key = 'memory_resident'
 
 
+class MemorySwapInPollster(InstanceStatsPollster):
+    sample_name = 'memory.swap.in'
+    sample_unit = 'MB'
+    sample_stats_key = 'memory_swap_in'
+
+
+class MemorySwapOutPollster(InstanceStatsPollster):
+    sample_name = 'memory.swap.out'
+    sample_unit = 'MB'
+    sample_stats_key = 'memory_swap_out'
+
+
 class PerfCPUCyclesPollster(InstanceStatsPollster):
     sample_name = 'perf.cpu.cycles'
     sample_stats_key = 'cpu_cycles'

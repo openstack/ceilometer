@@ -45,6 +45,8 @@ class InstanceStats(object):
         'cpu_l3_cache_usage',      # cachesize: Amount of CPU L3 cache used
         'memory_usage',            # usage: Amount of memory used
         'memory_resident',         #
+        'memory_swap_in',          # memory swap in
+        'memory_swap_out',         # memory swap out
         'memory_bandwidth_total',  # total: total system bandwidth from one
                                    #   level of cache
         'memory_bandwidth_local',  # local: bandwidth of memory traffic for a

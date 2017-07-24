@@ -529,6 +529,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             metric_names=[
                 'disk.root.size', 'disk.ephemeral.size',
                 'memory', 'vcpus', 'memory.usage', 'memory.resident',
+                'memory.swap.in', 'memory.swap.out',
                 'memory.bandwidth.total', 'memory.bandwidth.local',
                 'cpu', 'cpu.delta', 'cpu_util', 'vcpus', 'disk.read.requests',
                 'cpu_l3_cache', 'perf.cpu.cycles', 'perf.instructions',

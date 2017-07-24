@@ -161,6 +161,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
         memory_used = memory_resident = None
+        memory_swap_in = memory_swap_out = None
         memory_stats = domain.memoryStats()
         # Stat provided from libvirt is in KB, converting it to MB.
         if 'available' in memory_stats and 'unused' in memory_stats:
@@ -168,6 +169,9 @@ class LibvirtInspector(virt_inspector.Inspector):
                            memory_stats['unused']) / units.Ki
         if 'rss' in memory_stats:
             memory_resident = memory_stats['rss'] / units.Ki
+        if 'swap_in' in memory_stats and 'swap_out' in memory_stats:
+            memory_swap_in = memory_stats['swap_in'] / units.Ki
+            memory_swap_out = memory_stats['swap_out'] / units.Ki
 
         # TODO(sileht): stats also have the disk/vnic info
         # we could use that instead of the old method for Queen
@@ -198,6 +202,8 @@ class LibvirtInspector(virt_inspector.Inspector):
             cpu_time=cpu_time,
             memory_usage=memory_used,
             memory_resident=memory_resident,
+            memory_swap_in=memory_swap_in,
+            memory_swap_out=memory_swap_out,
             cpu_cycles=stats.get("perf.cpu_cycles"),
             instructions=stats.get("perf.instructions"),
             cache_references=stats.get("perf.cache_references"),
