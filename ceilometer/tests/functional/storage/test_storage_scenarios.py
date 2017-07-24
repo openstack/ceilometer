@@ -435,6 +435,7 @@ class RawSampleTest(DBTestBase):
             d = meter.as_dict()
             self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
+            d['monotonic_time'] = None
             self.assertIn(d, self.msgs[:3])
 
     def test_get_samples_by_user_limit(self):
@@ -455,6 +456,7 @@ class RawSampleTest(DBTestBase):
             d = meter.as_dict()
             self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
+            d['monotonic_time'] = None
             self.assertIn(d, self.msgs[:4])
 
     def test_get_samples_by_resource(self):
@@ -464,6 +466,7 @@ class RawSampleTest(DBTestBase):
         d = results[1].as_dict()
         self.assertEqual(timeutils.utcnow(), d['recorded_at'])
         del d['recorded_at']
+        d['monotonic_time'] = None
         self.assertEqual(self.msgs[0], d)
 
     def test_get_samples_by_metaquery(self):
@@ -475,6 +478,7 @@ class RawSampleTest(DBTestBase):
             d = meter.as_dict()
             self.assertTimestampEqual(timeutils.utcnow(), d['recorded_at'])
             del d['recorded_at']
+            d['monotonic_time'] = None
             self.assertIn(d, self.msgs)
 
     def test_get_samples_by_metaquery_key_with_dot_in_metadata(self):
@@ -726,6 +730,7 @@ class ComplexSampleQueryTest(DBTestBase):
         for sample_item in results:
             d = sample_item.as_dict()
             del d['recorded_at']
+            d['monotonic_time'] = None
             self.assertIn(d, self.msgs)
 
     def test_query_complex_filter_with_regexp(self):
@@ -3224,6 +3229,7 @@ class TestBatchRecordingMetering(tests_db.TestBase):
         for sample_item in results:
             d = sample_item.as_dict()
             del d['recorded_at']
+            d['monotonic_time'] = None
             self.assertIn(d, self.sample_dicts)
 
         resources = list(self.conn.get_resources())
