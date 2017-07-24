@@ -73,7 +73,7 @@ class BaseComputePollster(plugin_base.PollsterBase):
         return duration
 
     def _get_samples_per_devices(self, attribute, instance, _name, _type,
-                                 _unit):
+                                 _unit, monotonic_time=None):
         samples = []
         for disk, value in six.iteritems(attribute):
             samples.append(util.make_sample_from_instance(
@@ -85,5 +85,6 @@ class BaseComputePollster(plugin_base.PollsterBase):
                 volume=value,
                 resource_id="%s-%s" % (instance.id, disk),
                 additional_metadata={'disk_name': disk},
+                monotonic_time=monotonic_time,
             ))
         return samples

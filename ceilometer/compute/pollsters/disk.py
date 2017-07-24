@@ -17,6 +17,7 @@
 import abc
 import collections
 
+import monotonic
 from oslo_log import log
 import six
 
@@ -33,7 +34,7 @@ LOG = log.getLogger(__name__)
 
 DiskIOData = collections.namedtuple(
     'DiskIOData',
-    'r_bytes r_requests w_bytes w_requests per_disk_requests',
+    'r_bytes r_requests w_bytes w_requests per_disk_requests polled_time',
 )
 
 DiskRateData = collections.namedtuple('DiskRateData',
@@ -103,12 +104,14 @@ class _Base(pollsters.BaseComputePollster):
                 'write_bytes': per_device_write_bytes,
                 'write_requests': per_device_write_requests,
             }
+            polled_time = monotonic.monotonic()
             i_cache[instance.id] = DiskIOData(
                 r_bytes=r_bytes,
                 r_requests=r_requests,
                 w_bytes=w_bytes,
                 w_requests=w_requests,
                 per_disk_requests=per_device_requests,
+                polled_time=polled_time
             )
         return i_cache[instance.id]
 
@@ -128,13 +131,15 @@ class _Base(pollsters.BaseComputePollster):
             volume=getattr(c_data, _volume),
             additional_metadata={
                 'device': c_data.per_disk_requests[_metadata].keys()},
+            monotonic_time=c_data.polled_time,
         )]
 
     def _get_samples_per_device(self, c_data, _attr, instance, _name, _unit):
         """Return one or more Samples for meter 'disk.device.*'"""
         return self._get_samples_per_devices(c_data.per_disk_requests[_attr],
                                              instance, _name,
-                                             sample.TYPE_CUMULATIVE, _unit)
+                                             sample.TYPE_CUMULATIVE, _unit,
+                                             c_data.polled_time)
 
     def get_samples(self, manager, cache, resources):
         for instance in resources:

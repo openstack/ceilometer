@@ -234,7 +234,8 @@ class TestNetPollster(base.TestPollsterBase):
                                        type=sample.TYPE_CUMULATIVE,
                                        unit='B',
                                        volume=100,
-                                       vnic_data=self.vnic0)
+                                       vnic_data=self.vnic0,
+                                       monotonic_time=123.123)
 
         user_metadata = sm.resource_metadata['user_metadata']
         expected = self.INSTANCE_PROPERTIES[
@@ -259,7 +260,7 @@ class TestNetPollsterCache(base.TestPollsterBase):
                                                rx_drop=20, rx_errors=21,
                                                tx_bytes=3, tx_packets=4,
                                                tx_drop=22, tx_errors=23)
-        vnics = [(vnic0, stats0)]
+        vnics = [(vnic0, stats0, 123.123)]
 
         mgr = manager.AgentManager(0, self.CONF)
         pollster = factory(self.CONF)

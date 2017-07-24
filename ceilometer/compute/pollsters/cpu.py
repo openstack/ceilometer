@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
+import monotonic
 from oslo_log import log
 
 import ceilometer
@@ -46,6 +48,7 @@ class CPUPollster(pollsters.BaseComputePollster):
                     unit='ns',
                     volume=cpu_info.time,
                     additional_metadata=cpu_num,
+                    monotonic_time=monotonic.monotonic()
                 )
             except virt_inspector.InstanceNotFoundException as err:
                 # Instance was deleted while getting samples. Ignore it.

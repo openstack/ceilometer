@@ -110,7 +110,10 @@ class SamplePipelineEndpoint(PipelineEndpoint):
                                resource_id=s['resource_id'],
                                timestamp=s['timestamp'],
                                resource_metadata=s['resource_metadata'],
-                               source=s.get('source'))
+                               source=s.get('source'),
+                               # NOTE(sileht): May come from an older node,
+                               # Put None in this case.
+                               monotonic_time=s.get('monotonic_time'))
             for s in samples if publisher_utils.verify_signature(
                 s, self.conf.publisher.telemetry_secret)
         ]
