@@ -146,3 +146,57 @@ class TestUtils(base.BaseTestCase):
         self.assertEqual(utils.hash_of_set(x), utils.hash_of_set(y))
         self.assertNotEqual(utils.hash_of_set(x), utils.hash_of_set(z))
         self.assertNotEqual(utils.hash_of_set(y), utils.hash_of_set(z))
+
+    def test_update_nested(self):
+        original_dict = {'a': 'A',
+                         'b': 'B',
+                         'nested': {'a': 'A',
+                                    'b': 'B',
+                                    'nested': {'a': 'A',
+                                               'b': 'B'
+                                               }
+                                    }
+                         }
+        updates = {'a': 'a',
+                   'nested': {'a': 'nested.a',
+                              'nested': {'a': 'nested.twice.a'}
+                              }
+                   }
+        expected_dict = {'a': 'a',
+                         'b': 'B',
+                         'nested': {'a': 'nested.a',
+                                    'b': 'B',
+                                    'nested': {'a': 'nested.twice.a',
+                                               'b': 'B'
+                                               }
+                                    }
+                         }
+        dict_to_update = utils.update_nested(original_dict, updates)
+        self.assertEqual(dict_to_update, expected_dict)
+
+    def test_uniq(self):
+        class DriverA(object):
+            source = 'class_A'
+            func = 'func_A'
+            param = 'param_A'
+
+        class DriverB(object):
+            source = 'class_A'
+            func = 'func_A'
+            param = 'param_B'
+
+        class DriverC(object):
+            source = 'class_A'
+            func = 'func_C'
+            param = 'param_C'
+
+        driver_list = [DriverA(), DriverB(), DriverC()]
+
+        uniq_driver_a = utils.uniq(driver_list, ['source'])
+        self.assertEqual(len(uniq_driver_a), 1)
+
+        uniq_driver_b = utils.uniq(driver_list, ['source', 'func'])
+        self.assertEqual(len(uniq_driver_b), 2)
+
+        uniq_driver_c = utils.uniq(driver_list, ['source', 'func', 'param'])
+        self.assertEqual(len(uniq_driver_c), 3)
