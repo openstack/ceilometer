@@ -140,25 +140,11 @@ class EventDefinition(object):
     def is_catchall(self):
         return '*' in self._included_types and not self._excluded_types
 
-    @staticmethod
-    def _extract_when(body):
-        """Extract the generated datetime from the notification."""
-        # NOTE: I am keeping the logic the same as it was in the collector,
-        # However, *ALL* notifications should have a 'timestamp' field, it's
-        # part of the notification envelope spec. If this was put here because
-        # some openstack project is generating notifications without a
-        # timestamp, then that needs to be filed as a bug with the offending
-        # project (mdragon)
-        when = body.get('timestamp', body.get('_context_timestamp'))
-        if when:
-            return timeutils.normalize_time(timeutils.parse_isotime(when))
-
-        return timeutils.utcnow()
-
     def to_event(self, notification_body):
         event_type = notification_body['event_type']
         message_id = notification_body['message_id']
-        when = self._extract_when(notification_body)
+        when = timeutils.normalize_time(timeutils.parse_isotime(
+            notification_body['timestamp']))
 
         traits = (self.traits[t].to_trait(notification_body)
                   for t in self.traits)
