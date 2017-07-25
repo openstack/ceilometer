@@ -166,12 +166,12 @@ class LibvirtInspector(virt_inspector.Inspector):
             dom_stats = domain.interfaceStats(name)
             stats = virt_inspector.InterfaceStats(rx_bytes=dom_stats[0],
                                                   rx_packets=dom_stats[1],
-                                                  rx_drop=dom_stats[2],
-                                                  rx_errors=dom_stats[3],
+                                                  rx_errors=dom_stats[2],
+                                                  rx_drop=dom_stats[3],
                                                   tx_bytes=dom_stats[4],
                                                   tx_packets=dom_stats[5],
-                                                  tx_drop=dom_stats[6],
-                                                  tx_errors=dom_stats[7])
+                                                  tx_errors=dom_stats[6],
+                                                  tx_drop=dom_stats[7])
             yield (interface, stats)
 
     def inspect_disks(self, instance):

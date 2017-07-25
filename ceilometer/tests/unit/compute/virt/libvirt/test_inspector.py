@@ -173,9 +173,9 @@ class TestLibvirtInspection(base.BaseTestCase):
         """
 
         interface_stats = {
-            'vnet0': (1, 2, 0, 0, 3, 4, 0, 0),
-            'vnet1': (5, 6, 0, 0, 7, 8, 0, 0),
-            'vnet2': (9, 10, 0, 0, 11, 12, 0, 0),
+            'vnet0': (1, 2, 21, 22, 3, 4, 23, 24),
+            'vnet1': (5, 6, 25, 26, 7, 8, 27, 28),
+            'vnet2': (9, 10, 29, 30, 11, 12, 31, 32),
         }
         interfaceStats = interface_stats.__getitem__
 
@@ -207,6 +207,10 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, info0.rx_packets)
             self.assertEqual(3, info0.tx_bytes)
             self.assertEqual(4, info0.tx_packets)
+            self.assertEqual(21, info0.rx_errors)
+            self.assertEqual(22, info0.rx_drop)
+            self.assertEqual(23, info0.tx_errors)
+            self.assertEqual(24, info0.tx_drop)
 
             vnic1, info1 = interfaces[1]
             self.assertEqual('vnet1', vnic1.name)
@@ -220,6 +224,10 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(6, info1.rx_packets)
             self.assertEqual(7, info1.tx_bytes)
             self.assertEqual(8, info1.tx_packets)
+            self.assertEqual(25, info1.rx_errors)
+            self.assertEqual(26, info1.rx_drop)
+            self.assertEqual(27, info1.tx_errors)
+            self.assertEqual(28, info1.tx_drop)
 
             vnic2, info2 = interfaces[2]
             self.assertEqual('vnet2', vnic2.name)
@@ -230,6 +238,10 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(10, info2.rx_packets)
             self.assertEqual(11, info2.tx_bytes)
             self.assertEqual(12, info2.tx_packets)
+            self.assertEqual(29, info2.rx_errors)
+            self.assertEqual(30, info2.rx_drop)
+            self.assertEqual(31, info2.tx_errors)
+            self.assertEqual(32, info2.tx_drop)
 
     def test_inspect_vnics_with_domain_shutoff(self):
         connection = self.inspector.connection
