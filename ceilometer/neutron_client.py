@@ -186,7 +186,11 @@ class Client(object):
         pools = self.client.list_lbaas_pools().get('pools')
         for pool in pools:
             pool_id = pool.get('id')
-            listener_id = pool.get('listeners')[0].get('id')
+            listeners = pool.get('listeners')
+            if not listeners:
+                continue
+            # NOTE(sileht): Can we have more than 1 listener
+            listener_id = listeners[0].get('id')
             lb_id = self._get_loadbalancer_id_with_listener_id(listener_id)
             status = self._get_member_status(lb_id, [listener_id, pool_id])
             resp = self.client.list_lbaas_members(pool_id)
