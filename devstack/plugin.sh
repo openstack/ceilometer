@@ -224,7 +224,7 @@ function install_gnocchi {
 
     rm -f "$GNOCCHI_UWSGI_FILE"
 
-    write_uwsgi_config "$GNOCCHI_UWSGI_FILE" "/usr/local/bin/gnocchi-api" "/metric"
+    write_uwsgi_config "$GNOCCHI_UWSGI_FILE" "$CEILOMETER_BIN_DIR/gnocchi-api" "/metric"
 
     if [ -n "$GNOCCHI_COORDINATOR_URL" ]; then
         iniset $GNOCCHI_CONF storage coordination_url "$GNOCCHI_COORDINATOR_URL"
@@ -462,8 +462,8 @@ function install_ceilometerclient {
 function start_ceilometer {
 
     if [ "$CEILOMETER_BACKEND" = "gnocchi" ] ; then
-        run_process gnocchi-api "/usr/local/bin/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
-        run_process gnocchi-metricd "/usr/local/bin/gnocchi-metricd --config-file $GNOCCHI_CONF"
+        run_process gnocchi-api "$CEILOMETER_BIN_DIR/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
+        run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
         $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
     fi
