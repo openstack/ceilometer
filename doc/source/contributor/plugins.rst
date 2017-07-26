@@ -160,7 +160,7 @@ definitions in the :file:`entry_points.txt` file of your Ceilometer egg.
 
 .. _setuptools entry points: http://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
 
-.. _Stevedore: http://docs.openstack.org/developer/stevedore/
+.. _Stevedore: https://docs.openstack.org/stevedore/latest/
 
 Installing a plugin automatically activates it the next time the
 ceilometer daemon starts. Rather than running and reporting errors or

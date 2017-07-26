@@ -10,7 +10,7 @@ Data retrieval
    Panko_.
 
 .. _Gnocchi: http://gnocchi.xyz/
-.. _Panko: https://docs.openstack.org/developer/panko
+.. _Panko: https://docs.openstack.org/panko/latest/
 
 The Telemetry service offers several mechanisms from which the persisted
 data can be accessed. As described in :ref:`telemetry-system-architecture` and
@@ -67,12 +67,12 @@ be a list of data structures that consist of the following items:
 
 Regardless of the endpoint on which the filter is applied on, it will
 always target the fields of the `Sample type
-<https://docs.openstack.org/developer/ceilometer/webapi/v2.html#Sample>`__.
+<https://docs.openstack.org/ceilometer/latest/webapi/v2.html#Sample>`__.
 
 Several fields of the API endpoints accept shorter names than the ones
 defined in the reference. The API will do the transformation internally
 and return the output with the fields that are listed in the `API reference
-<https://docs.openstack.org/developer/ceilometer/webapi/v2.html>`__.
+<https://docs.openstack.org/ceilometer/latest/webapi/v2.html>`__.
 The fields are the following:
 
 -  ``project_id``: project
@@ -139,7 +139,7 @@ The ``filter``, ``orderby`` and ``limit`` fields are optional.
 
    As opposed to the simple query, complex query is available via a
    separate API endpoint. For more information see the `Telemetry v2 Web API
-   Reference <https://docs.openstack.org/developer/ceilometer/webapi/v2.html#v2-web-api>`__.
+   Reference <https://docs.openstack.org/ceilometer/latest/webapi/v2.html#v2-web-api>`__.
 
 Statistics
 ----------
@@ -489,5 +489,5 @@ The method calls look like the following:
 
 For further details about the python-ceilometerclient package, see the
 `Python bindings to the OpenStack Ceilometer
-API <https://docs.openstack.org/developer/python-ceilometerclient/>`__
+API <https://docs.openstack.org/python-ceilometerclient/latest/>`__
 reference.

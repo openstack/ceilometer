@@ -6,5 +6,5 @@ features:
 other:
   - >
     A dogpile.cache supported backend is required to enable cache. Additional
-    configuration `options <http://docs.openstack.org/developer/oslo.cache/opts.html#cache>`_
+    configuration `options <https://docs.openstack.org/oslo.cache/latest/configuration/index.html#cache>`_
     are also required.
