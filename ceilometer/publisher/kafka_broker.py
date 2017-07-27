@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from debtcollector import removals
 import kafka
 from oslo_log import log
 from oslo_serialization import jsonutils
@@ -24,6 +25,9 @@ from ceilometer.publisher import messaging
 LOG = log.getLogger(__name__)
 
 
+@removals.removed_class("KafkaBrokerPublisher",
+                        message="use NotifierPublisher instead",
+                        removal_version='10.0')
 class KafkaBrokerPublisher(messaging.MessagingPublisher):
     """Publish metering data to kafka broker.
 
