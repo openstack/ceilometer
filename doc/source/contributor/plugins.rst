@@ -62,7 +62,7 @@ Notifications mechanism uses plugins as well, for instance
 :class:`ceilometer.telemetry.notifications.TelemetryApiPost` plugin
 which is defined in the ``ceilometer/telemetry/notifications`` folder, Though
 in most cases, this is not needed. A meter definition can be directly added
-to :file:`ceilometer/meter/data/meter.yaml` to match the event type. For
+to :file:`ceilometer/data/meters.d/meters.yaml` to match the event type. For
 more information, see the :ref:`add_new_meters` page.
 
 We are using these two existing plugins as examples as the first one provides
@@ -119,7 +119,7 @@ Notifications
 .. note::
    This should only be needed for cases where a complex arithmetic or
    non-primitive data types are used. In most cases, adding a meter
-   definition to the :file:`ceilometer/meter/data/meter.yaml` should
+   definition to the :file:`ceilometer/data/meters.d/meters.yaml` should
    suffice.
 
 Notifications are defined as subclass of the
@@ -176,7 +176,7 @@ Tests
 
 Any new plugin or agent contribution will only be accepted into the project if
 provided together with unit tests.  Those are defined for the compute agent
-plugins in the directory ``tests/compute`` and for the agent itself in
-``test/agent``. Unit tests are run in a continuous integration process for
+plugins in the directory ``tests/unit/compute`` and for the agent itself in
+``tests/unit/agent``. Unit tests are run in a continuous integration process for
 each commit made to the project, thus ensuring as best as possible that a given
 patch has no side effect to the rest of the project.
