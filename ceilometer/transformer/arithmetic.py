@@ -14,6 +14,7 @@
 # under the License.
 
 import collections
+import copy
 import keyword
 import math
 import re
@@ -101,14 +102,16 @@ class ArithmeticTransformer(transformer.TransformerBase):
 
     def flush(self):
         new_samples = []
-        cache_clean_list = []
         if not self.misconfigured:
-            for resource_id in self.cache:
+            # When loop self.cache, the dict could not be change by others.
+            # If changed, will raise "RuntimeError: dictionary changed size
+            # during iteration". so we make a tmp copy and just loop it.
+            tmp_cache = copy.copy(self.cache)
+            for resource_id in tmp_cache:
                 if self._check_requirements(resource_id):
                     new_samples.append(self._calculate(resource_id))
-                    cache_clean_list.append(resource_id)
-            for res_id in cache_clean_list:
-                self.cache.pop(res_id)
+                    if resource_id in self.cache:
+                        self.cache.pop(resource_id)
         return new_samples
 
     @classmethod
