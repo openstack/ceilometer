@@ -286,4 +286,4 @@ the event which is often susceptible to change. To make consumption easier,
 the Ceilometer team offers: CADF_, an open, cloud standard which helps model
 cloud events.
 
-.. _CADF: http://docs.openstack.org/developer/pycadf/
+.. _CADF: https://docs.openstack.org/pycadf/latest/

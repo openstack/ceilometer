@@ -7,8 +7,8 @@
    The Ceilometer API is deprecated.  Use the APIs from Aodh_ (alarms),
    Gnocchi_ (metrics), and/or Panko_ (events).
 
-.. _Aodh: http://docs.openstack.org/developer/aodh/
-.. _Panko: http://docs.openstack.org/developer/panko/
+.. _Aodh: https://docs.openstack.org/aodh/latest/
+.. _Panko: https://docs.openstack.org/panko/latest/
 
 
 Resources
@@ -225,7 +225,7 @@ A query to return the list of samples, limited to a specific meter type::
      $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/disk.root.size"
 
-A query using filters (see: `query filter section <http://docs.openstack.org/developer/ceilometer/webapi/v2.html#filtering-queries>`_)::
+A query using filters (see: `query filter section <https://docs.openstack.org/ceilometer/latest/webapi/v2.html#filtering-queries>`_)::
 
      $ curl -H 'X-Auth-Token: <inserttokenhere>' \
        "http://localhost:8777/v2/meters/instance?q.field=metadata.event_type&q.value=compute.instance.delete.start"

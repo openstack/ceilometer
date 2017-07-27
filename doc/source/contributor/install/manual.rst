@@ -95,7 +95,7 @@ Gnocchi
 
 #. Start notification service
 
-.. _oslo.cache: http://docs.openstack.org/developer/oslo.cache/opts.html
+.. _oslo.cache: https://docs.openstack.org/oslo.cache/latest/configuration/index.html
 .. _`Gnocchi installation`: http://gnocchi.xyz/install.html
 
 

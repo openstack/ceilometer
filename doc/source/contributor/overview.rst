@@ -18,7 +18,7 @@ Ceilometer: become a standard way to meter, regardless of the
 purpose of the collection. This data can then be pushed to any set of targets
 using provided publishers mentioned in :ref:`pipeline-publishers` section.
 
-.. _increasing number of meters: http://docs.openstack.org/developer/ceilometer/measurements.html
+.. _increasing number of meters: https://docs.openstack.org/ceilometer/latest/contributor/measurements.html
 
 Metering
 ========

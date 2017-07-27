@@ -22,7 +22,7 @@ below.
    information about configuration requirements see the `Telemetry chapter
    <https://docs.openstack.org/project-install-guide/telemetry/ocata/>`__
    in the Installation Tutorials and Guides. Also check the `Telemetry manual
-   installation <https://docs.openstack.org/developer/ceilometer/install/manual.html>`__
+   installation <https://docs.openstack.org/ceilometer/latest/contributor/install/manual.html>`__
    description.
 
 Telemetry uses the following meter types:
@@ -83,7 +83,7 @@ Telemetry or emit notifications that this service consumes.
    way of using Telemetry is to configure it to use the event store and
    turn off the collection of the event related meters. For further
    information about events see `Events section
-   <https://docs.openstack.org/developer/ceilometer/events.html>`__
+   <https://docs.openstack.org/ceilometer/latest/contributor/events.html>`__
    in the Telemetry documentation. For further information about how to
    turn on and off meters see :ref:`telemetry-pipeline-configuration`. Please
    also note that currently no migration is available to move the already
