@@ -84,6 +84,10 @@ class LibvirtInspector(virt_inspector.Inspector):
 
         return self._connection
 
+    @connection.setter
+    def connection(self, value):
+        self._connection = value
+
     @retry_on_disconnect
     def _lookup_by_uuid(self, instance):
         instance_name = util.instance_name(instance)
