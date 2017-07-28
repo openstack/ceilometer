@@ -491,7 +491,7 @@ The Telemetry service supports sending samples to an external HTTP
 target. The samples are sent without any modification. To set this
 option as the notification agents' target, set ``http://`` as a publisher
 endpoint in the pipeline definition files. The HTTP target should be set along
-with the publisher declaration. For example, addtional configuration options
+with the publisher declaration. For example, additional configuration options
 can be passed in: ``http://localhost:80/?option1=value1&option2=value2``
 
 The following options are availble:

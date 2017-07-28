@@ -65,7 +65,7 @@ LIBVIRT_POWER_STATE = {
 
 # NOTE(sileht): This is a guessing of the nova
 # status, should be true 99.9% on the time,
-# but can be wrong during some transistion state
+# but can be wrong during some transition state
 # like shelving/rescuing
 LIBVIRT_STATUS = {
     VIR_DOMAIN_NOSTATE: 'building',

@@ -5,4 +5,4 @@ deprecations:
     hardcoding exchanges. Now original http_control_exchanges is being deprecated
     and renamed notification_control_exchanges. Besides, the new option is integrated
     with other exchanges in default EXCHANGE_OPTS to make it available to extend
-    addtional exchanges.
+    additional exchanges.
