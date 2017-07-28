@@ -37,4 +37,4 @@ Since Mitaka development cycle, we start to host release notes on
 .. _Juno: https://wiki.openstack.org/wiki/ReleaseNotes/Juno#OpenStack_Telemetry_.28Ceilometer.29
 .. _Kilo: https://wiki.openstack.org/wiki/ReleaseNotes/Kilo#OpenStack_Telemetry_.28Ceilometer.29
 .. _Liberty: https://wiki.openstack.org/wiki/ReleaseNotes/Liberty#OpenStack_Telemetry_.28Ceilometer.29
-.. _Ceilometer Release Notes: http://docs.openstack.org/releasenotes/ceilometer/
+.. _Ceilometer Release Notes: https://docs.openstack.org/releasenotes/ceilometer/

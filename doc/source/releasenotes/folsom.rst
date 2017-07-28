@@ -58,4 +58,4 @@ Volume of data
    Please note that metering can generate lots of data very quickly. Have a look
    at the following spreadsheet to evaluate what you will end up with.
 
-      http://wiki.openstack.org/EfficientMetering#Volume_of_data
+      https://wiki.openstack.org/wiki/EfficientMetering#Volume_of_data
