@@ -114,6 +114,14 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).__init__(worker_id)
         self.startup_delay = worker_id
         self.conf = conf
+
+        self.periodic = None
+        self.shutdown = False
+        self.listeners = []
+        # NOTE(kbespalov): for the pipeline queues used a single amqp host
+        # hence only one listener is required
+        self.pipeline_listener = None
+
         if self.conf.notification.workload_partitioning:
             # XXX uuid4().bytes ought to work, but it requires ascii for now
             coordination_id = (coordination_id or
@@ -173,15 +181,7 @@ class NotificationService(cotyledon.Service):
         time.sleep(self.startup_delay)
 
         super(NotificationService, self).run()
-        self.shutdown = False
-        self.periodic = None
         self.coord_lock = threading.Lock()
-
-        self.listeners = []
-
-        # NOTE(kbespalov): for the pipeline queues used a single amqp host
-        # hence only one listener is required
-        self.pipeline_listener = None
 
         self.pipeline_manager = pipeline.setup_pipeline(self.conf)
 
@@ -329,6 +329,7 @@ class NotificationService(cotyledon.Service):
             if self.pipeline_listener:
                 utils.kill_listeners([self.pipeline_listener])
             utils.kill_listeners(self.listeners)
+
         super(NotificationService, self).terminate()
 
 

@@ -298,16 +298,17 @@ class TestRealNotificationHA(BaseRealNotification):
         self._check_notification_service()
 
     @mock.patch("ceilometer.utils.kill_listeners", mock.MagicMock())
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'stop')
+    @mock.patch.object(oslo_messaging.MessageHandlingServer, 'wait')
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')
-    def test_notification_threads(self, m_listener):
+    def test_notification_threads(self, m_listener, m_wait, m_stop):
         self.CONF.set_override('batch_size', 1, group='notification')
         self.srv.run()
         m_listener.assert_called_with(
             override_pool_size=self.CONF.max_parallel_requests)
         m_listener.reset_mock()
-        self.srv.terminate()
         self.CONF.set_override('batch_size', 2, group='notification')
-        self.srv.run()
+        self.srv._refresh_agent(None)
         m_listener.assert_called_with(override_pool_size=1)
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
