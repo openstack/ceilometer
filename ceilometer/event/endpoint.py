@@ -16,8 +16,7 @@ from oslo_log import log
 import oslo_messaging
 from stevedore import extension
 
-from ceilometer.event import converter as event_converter
-from ceilometer import messaging
+from ceilometer.event import converter
 
 LOG = log.getLogger(__name__)
 
@@ -26,7 +25,7 @@ class EventsNotificationEndpoint(object):
     def __init__(self, manager):
         super(EventsNotificationEndpoint, self).__init__()
         LOG.debug('Loading event definitions')
-        self.event_converter = event_converter.setup_events(
+        self.event_converter = converter.setup_events(
             manager.conf,
             extension.ExtensionManager(
                 namespace='ceilometer.event.trait_plugin'))
@@ -48,14 +47,8 @@ class EventsNotificationEndpoint(object):
 
     def process_notification(self, priority, notifications):
         for notification in notifications:
-            # NOTE: the rpc layer currently rips out the notification
-            # delivery_info, which is critical to determining the
-            # source of the notification. This will have to get added back
-            # later.
-            notification = messaging.convert_to_old_notification_format(
-                priority, notification)
             try:
-                event = self.event_converter.to_event(notification)
+                event = self.event_converter.to_event(priority, notification)
                 if event is not None:
                     with self.manager.publisher() as p:
                         p(event)

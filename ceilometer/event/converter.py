@@ -72,15 +72,15 @@ class EventDefinition(object):
 
     DEFAULT_TRAITS = dict(
         service=dict(type='text', fields='publisher_id'),
-        request_id=dict(type='text', fields='_context_request_id'),
+        request_id=dict(type='text', fields='ctxt.request_id'),
         project_id=dict(type='text', fields=['payload.tenant_id',
-                                             '_context_tenant']),
+                                             'ctxt.tenant']),
         user_id=dict(type='text', fields=['payload.user_id',
-                                          '_context_user_id']),
+                                          'ctxt.user_id']),
         # TODO(dikonoor):tenant_id is old terminology and should
         # be deprecated
         tenant_id=dict(type='text', fields=['payload.tenant_id',
-                                            '_context_tenant']),
+                                            'ctxt.tenant']),
     )
 
     def __init__(self, definition_cfg, trait_plugin_mgr, raw_levels):
@@ -140,18 +140,17 @@ class EventDefinition(object):
     def is_catchall(self):
         return '*' in self._included_types and not self._excluded_types
 
-    def to_event(self, notification_body):
+    def to_event(self, priority, notification_body):
         event_type = notification_body['event_type']
-        message_id = notification_body['message_id']
+        message_id = notification_body['metadata']['message_id']
         when = timeutils.normalize_time(timeutils.parse_isotime(
-            notification_body['timestamp']))
+            notification_body['metadata']['timestamp']))
 
         traits = (self.traits[t].to_trait(notification_body)
                   for t in self.traits)
         # Only accept non-None value traits ...
         traits = [trait for trait in traits if trait is not None]
-        raw = (notification_body
-               if notification_body.get('priority') in self.raw_levels else {})
+        raw = notification_body if priority in self.raw_levels else {}
         event = models.Event(message_id, event_type, when, traits, raw)
         return event
 
@@ -254,9 +253,9 @@ class NotificationEventsConverter(object):
                                                     trait_plugin_mgr,
                                                     raw_levels))
 
-    def to_event(self, notification_body):
+    def to_event(self, priority, notification_body):
         event_type = notification_body['event_type']
-        message_id = notification_body['message_id']
+        message_id = notification_body['metadata']['message_id']
         edef = None
         for d in self.definitions:
             if d.match_type(event_type):
@@ -274,7 +273,7 @@ class NotificationEventsConverter(object):
                 LOG.error(msg)
             return None
 
-        return edef.to_event(notification_body)
+        return edef.to_event(priority, notification_body)
 
 
 def setup_events(conf, trait_plugin_mgr):

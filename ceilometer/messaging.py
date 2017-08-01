@@ -72,17 +72,3 @@ def get_notifier(transport, publisher_id):
     """Return a configured oslo_messaging notifier."""
     notifier = oslo_messaging.Notifier(transport, serializer=_SERIALIZER)
     return notifier.prepare(publisher_id=publisher_id)
-
-
-def convert_to_old_notification_format(priority, notification):
-    # FIXME(sileht): temporary convert notification to old format
-    # to focus on oslo_messaging migration before refactoring the code to
-    # use the new oslo_messaging facilities
-    notification = notification.copy()
-    notification['priority'] = priority
-    notification.update(notification["metadata"])
-    for k in notification['ctxt']:
-        notification['_context_' + k] = notification['ctxt'][k]
-    del notification['ctxt']
-    del notification['metadata']
-    return notification

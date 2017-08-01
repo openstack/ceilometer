@@ -125,7 +125,7 @@ class Sample(object):
                         if isinstance(message['payload'], dict) else {})
             metadata['event_type'] = message['event_type']
             metadata['host'] = message['publisher_id']
-        ts = timestamp if timestamp else message['timestamp']
+        ts = timestamp if timestamp else message['metadata']['timestamp']
         return cls(name=name,
                    type=type,
                    volume=volume,

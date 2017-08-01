@@ -23,8 +23,6 @@ import oslo_messaging
 import six
 from stevedore import extension
 
-from ceilometer import messaging
-
 LOG = log.getLogger(__name__)
 
 ExchangeTopics = collections.namedtuple('ExchangeTopics',
@@ -112,8 +110,6 @@ class NotificationBase(PluginBase):
     def _process_notifications(self, priority, notifications):
         for notification in notifications:
             try:
-                notification = messaging.convert_to_old_notification_format(
-                    priority, notification)
                 self.to_samples_and_publish(notification)
             except Exception:
                 LOG.error('Fail to process notification', exc_info=True)

@@ -315,7 +315,7 @@ metric:
       plugin: 'timedelta'
     project_id: $.payload.tenant_id
     resource_id: $.payload.id
-    user_id: $._context_user
+    user_id: $.ctxt.user
     metadata:
       status: $.payload.status
       pool_id: $.payload.pool_id

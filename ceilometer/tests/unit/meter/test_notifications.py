@@ -28,7 +28,8 @@ from ceilometer.tests import base as test
 
 NOTIFICATION = {
     'event_type': u'test.create',
-    'timestamp': u'2015-06-1909: 19: 35.786893',
+    'metadata': {'timestamp': u'2015-06-1909: 19: 35.786893',
+                 'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
     'payload': {u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
                 u'resource_id': u'bea70e51c7340cb9d555b15cbfcaec23',
                 u'timestamp': u'2015-06-19T09:19:35.785330',
@@ -40,16 +41,16 @@ NOTIFICATION = {
                 u'volume': 1.0,
                 u'project_id': u'30be1fc9a03c4e94ab05c403a8a377f2',
                 },
-    u'_context_tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
-    u'_context_request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
-    u'_context_user': u'e1d870e51c7340cb9d555b15cbfcaec2',
-    'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e',
+    'ctxt': {u'tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
+             u'request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
+             u'user': u'e1d870e51c7340cb9d555b15cbfcaec2'},
     'publisher_id': "foo123"
 }
 
 USER_META = {
     'event_type': u'test.create',
-    'timestamp': u'2015-06-1909: 19: 35.786893',
+    'metadata': {'timestamp': u'2015-06-1909: 19: 35.786893',
+                 'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
     'payload': {u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
                 u'resource_id': u'bea70e51c7340cb9d555b15cbfcaec23',
                 u'timestamp': u'2015-06-19T09:19:35.785330',
@@ -62,36 +63,34 @@ USER_META = {
                 u'project_id': u'30be1fc9a03c4e94ab05c403a8a377f2',
                 u'metadata': {u'metering.xyz': u'abc', u'ignore': u'this'},
                 },
-    u'_context_tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
-    u'_context_request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
-    u'_context_user': u'e1d870e51c7340cb9d555b15cbfcaec2',
-    'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e',
+    'ctxt': {u'tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
+             u'request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
+             u'user': u'e1d870e51c7340cb9d555b15cbfcaec2'},
     'publisher_id': "foo123"
 }
 
 MIDDLEWARE_EVENT = {
-    u'_context_request_id': u'req-a8bfa89b-d28b-4b95-9e4b-7d7875275650',
-    u'_context_quota_class': None,
+    u'ctxt': {u'request_id': u'req-a8bfa89b-d28b-4b95-9e4b-7d7875275650',
+              u'quota_class': None,
+              u'service_catalog': [],
+              u'auth_token': None,
+              u'user_id': None,
+              u'is_admin': True,
+              u'user': None,
+              u'remote_address': None,
+              u'roles': [],
+              u'timestamp': u'2013-07-29T06:51:34.348091',
+              u'project_name': None,
+              u'read_deleted': u'no',
+              u'tenant': None,
+              u'instance_lock_checked': False,
+              u'project_id': None,
+              u'user_name': None},
     u'event_type': u'objectstore.http.request',
-    u'_context_service_catalog': [],
-    u'_context_auth_token': None,
-    u'_context_user_id': None,
-    u'priority': u'INFO',
-    u'_context_is_admin': True,
-    u'_context_user': None,
     u'publisher_id': u'ceilometermiddleware',
-    u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
-    u'_context_remote_address': None,
-    u'_context_roles': [],
-    u'timestamp': u'2013-07-29 06:51:34.474815',
-    u'_context_timestamp': u'2013-07-29T06:51:34.348091',
-    u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2',
-    u'_context_project_name': None,
-    u'_context_read_deleted': u'no',
-    u'_context_tenant': None,
-    u'_context_instance_lock_checked': False,
-    u'_context_project_id': None,
-    u'_context_user_name': None,
+    u'metadata': {u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
+                  u'timestamp': u'2013-07-29 06:51:34.474815',
+                  u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2'},
     u'payload': {
         'typeURI': 'http: //schemas.dmtf.org/cloud/audit/1.0/event',
         'eventTime': '2015-01-30T16: 38: 43.233621',
@@ -140,12 +139,7 @@ MIDDLEWARE_EVENT = {
 }
 
 FULL_MULTI_MSG = {
-    u'_context_domain': None,
-    u'_context_request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
     'event_type': u'full.sample',
-    'timestamp': u'2015-06-1909: 19: 35.786893',
-    u'_context_auth_token': None,
-    u'_context_read_only': False,
     'payload': [{
                 u'counter_name': u'instance1',
                 u'user_id': u'user1',
@@ -164,26 +158,25 @@ FULL_MULTI_MSG = {
                 u'project_id': u'proj2',
                 u'counter_type': u'delta'
                 }],
-    u'_context_resource_uuid': None,
-    u'_context_user_identity': u'fake_user_identity---',
-    u'_context_show_deleted': False,
-    u'_context_tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
-    'priority': 'info',
-    u'_context_is_admin': True,
-    u'_context_project_domain': None,
-    u'_context_user': u'e1d870e51c7340cb9d555b15cbfcaec2',
-    u'_context_user_domain': None,
+    u'ctxt': {u'domain': None,
+              u'request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
+              u'auth_token': None,
+              u'read_only': False,
+              u'resource_uuid': None,
+              u'user_identity': u'fake_user_identity---',
+              u'show_deleted': False,
+              u'tenant': u'30be1fc9a03c4e94ab05c403a8a377f2',
+              u'is_admin': True,
+              u'project_domain': None,
+              u'user': u'e1d870e51c7340cb9d555b15cbfcaec2',
+              u'user_domain': None},
     'publisher_id': u'ceilometer.api',
-    'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'
+    'metadata': {'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e',
+                 'timestamp': u'2015-06-1909: 19: 35.786893'},
 }
 
 METRICS_UPDATE = {
-    u'_context_request_id': u'req-a8bfa89b-d28b-4b95-9e4b-7d7875275650',
-    u'_context_quota_class': None,
     u'event_type': u'compute.metrics.update',
-    u'_context_service_catalog': [],
-    u'_context_auth_token': None,
-    u'_context_user_id': None,
     u'payload': {
         u'metrics': [
             {'timestamp': u'2013-07-29T06:51:34.472416',
@@ -219,22 +212,26 @@ METRICS_UPDATE = {
         u'nodename': u'tianst.sh.intel.com',
         u'host': u'tianst',
         u'host_id': u'10.0.1.1'},
-    u'priority': u'INFO',
-    u'_context_is_admin': True,
-    u'_context_user': None,
     u'publisher_id': u'compute.tianst.sh.intel.com',
-    u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
-    u'_context_remote_address': None,
-    u'_context_roles': [],
-    u'timestamp': u'2013-07-29 06:51:34.474815',
-    u'_context_timestamp': u'2013-07-29T06:51:34.348091',
-    u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2',
-    u'_context_project_name': None,
-    u'_context_read_deleted': u'no',
-    u'_context_tenant': None,
-    u'_context_instance_lock_checked': False,
-    u'_context_project_id': None,
-    u'_context_user_name': None
+    u'metadata': {u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
+                  u'timestamp': u'2013-07-29 06:51:34.474815',
+                  u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2'},
+    u'ctxt': {u'request_id': u'req-a8bfa89b-d28b-4b95-9e4b-7d7875275650',
+              u'quota_class': None,
+              u'service_catalog': [],
+              u'auth_token': None,
+              u'user_id': None,
+              u'is_admin': True,
+              u'user': None,
+              u'remote_address': None,
+              u'roles': [],
+              u'timestamp': u'2013-07-29T06:51:34.348091',
+              u'project_name': None,
+              u'read_deleted': u'no',
+              u'tenant': None,
+              u'instance_lock_checked': False,
+              u'project_id': None,
+              u'user_name': None}
 }
 
 
@@ -413,7 +410,8 @@ class TestMeterProcessing(test.BaseTestCase):
         c = list(self.handler.process_notification(event))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
-        self.assertEqual(MIDDLEWARE_EVENT['timestamp'], s1['timestamp'])
+        self.assertEqual(MIDDLEWARE_EVENT['metadata']['timestamp'],
+                         s1['timestamp'])
 
     def test_custom_timestamp(self):
         event = copy.deepcopy(MIDDLEWARE_EVENT)

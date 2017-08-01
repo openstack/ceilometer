@@ -79,9 +79,9 @@ class MeterDefinition(object):
                 _("Invalid type %s specified") % self.cfg['type'], self.cfg)
 
         self._fallback_user_id = declarative.Definition(
-            'user_id', "_context_user_id|_context_user", plugin_manager)
+            'user_id', "ctxt.user_id|ctxt.user", plugin_manager)
         self._fallback_project_id = declarative.Definition(
-            'project_id', "_context_tenant_id|_context_tenant", plugin_manager)
+            'project_id', "ctxt.tenant_id|ctxt.tenant", plugin_manager)
         self._attributes = {}
         self._metadata_attributes = {}
         self._user_meta = None

@@ -75,7 +75,7 @@ class TraitPluginBase(object):
                                         'payload.thing.*']
             notification body:
                         {
-                         'message_id': '12345',
+                         'metadata': {'message_id': '12345'},
                          'publisher': 'someservice.host',
                          'payload': {
                                      'foobar': 'test',
