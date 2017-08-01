@@ -303,3 +303,11 @@ epub_copyright = u'2012-2015, OpenStack'
 
 # Allow duplicate toc entries.
 #epub_tocdup = True
+
+# NOTE(dhellmann): pbr used to set this option but now that we are
+# using Sphinx>=1.6.2 it does not so we have to set it ourselves.
+suppress_warnings = [
+    'app.add_directive', 'app.add_role',
+    'app.add_generic_role', 'app.add_node',
+    'image.nonlocal_uri',
+]
