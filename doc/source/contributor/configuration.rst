@@ -13,23 +13,9 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-=======================
- Configuration Options
-=======================
-
-For the list and description of configuration options that can be set for
-Ceilometer in order to set up the services please see the
-`Telemetry section <http://docs.openstack.org/trunk/config-reference/content/ch_configuring-openstack-telemetry.html>`_
-in the OpenStack Manuals Configuration Reference.
-
-Sample Configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The sample configuration file for Ceilometer, named
-:file:`etc/ceilometer/ceilometer.conf.sample`, was removed from version
-control after the Icehouse release. You can generate this sample configuration
-file by running ``tox -e genconfig``.
-
+===============
+ Configuration
+===============
 
 Polling
 ~~~~~~~

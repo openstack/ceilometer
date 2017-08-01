@@ -37,6 +37,7 @@ Overview
    install/index
    contributor/index
    admin/index
+   configuration/index
    webapi/index
 
 Appendix
