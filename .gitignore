@@ -11,6 +11,7 @@ cover/*
 dist/*
 doc/build
 doc/source/api/
+doc/source/_static/
 etc/ceilometer/ceilometer.conf
 subunit.log
 
