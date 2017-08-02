@@ -112,7 +112,8 @@ DiskStats = collections.namedtuple('DiskStats',
                                    ['device',
                                     'read_bytes', 'read_requests',
                                     'write_bytes', 'write_requests',
-                                    'errors'])
+                                    'errors', 'wr_total_times',
+                                    'rd_total_times'])
 
 # Named tuple representing disk rate statistics.
 #

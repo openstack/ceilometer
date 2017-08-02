@@ -279,10 +279,19 @@ class TestLibvirtInspection(base.BaseTestCase):
                  </devices>
              </domain>
         """
+        blockStatsFlags = {'wr_total_times': 91752302267,
+                           'rd_operations': 6756,
+                           'flush_total_times': 1310427331,
+                           'rd_total_times': 29142253616,
+                           'rd_bytes': 171460096,
+                           'flush_operations': 746,
+                           'wr_operations': 1437,
+                           'wr_bytes': 13574656}
         domain = mock.Mock()
         domain.XMLDesc.return_value = dom_xml
         domain.info.return_value = (0, 0, 0, 2, 999999)
         domain.blockStats.return_value = (1, 2, 3, 4, -1)
+        domain.blockStatsFlags.return_value = blockStatsFlags
         conn = mock.Mock()
         conn.lookupByUUIDString.return_value = domain
 
@@ -296,6 +305,8 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, disks[0].read_bytes)
             self.assertEqual(3, disks[0].write_requests)
             self.assertEqual(4, disks[0].write_bytes)
+            self.assertEqual(91752302.267, disks[0].wr_total_times)
+            self.assertEqual(29142253.616, disks[0].rd_total_times)
 
     def test_inspect_disks_with_domain_shutoff(self):
         domain = mock.Mock()

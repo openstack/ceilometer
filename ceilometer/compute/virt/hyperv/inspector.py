@@ -132,7 +132,7 @@ class HyperVInspector(virt_inspector.Inspector):
                 read_bytes=disk_metrics['read_mb'] * units.Mi,
                 write_requests=0,
                 write_bytes=disk_metrics['write_mb'] * units.Mi,
-                errors=0)
+                errors=0, wr_total_times=0, rd_total_times=0)
 
     def inspect_disk_latency(self, instance, duration):
         instance_name = util.instance_name(instance)
