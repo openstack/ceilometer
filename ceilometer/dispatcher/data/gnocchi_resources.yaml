@@ -244,8 +244,9 @@ resources:
     attributes:
       name: resource_metadata.name
       host: resource_metadata.host
-      availability_zone: resource_metadata.availability_zone
       status: resource_metadata.status
+      availability_zone: resource_metadata.availability_zone
+      protocol: resource_metadata.protocol
 
   - resource_type: switch
     metrics:

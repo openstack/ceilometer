@@ -355,5 +355,6 @@ metric:
     metadata:
       name: $.payload.name
       host: $.payload.host
-      availability_zone: $.payload.availability_zone
       status: $.payload.status
+      availability_zone: $.payload.availability_zone
+      protocol: $.payload.proto
