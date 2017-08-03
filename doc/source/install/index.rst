@@ -12,7 +12,7 @@ Installation Guide
    next-steps.rst
 
 This chapter assumes a working setup of OpenStack following the
-`OpenStack Installation Tutorials and Guides <http://docs.openstack.org/#install-guides>`_.
+`OpenStack Installation Tutorials and Guides <https://docs.openstack.org/#install-guides>`_.
 
 Ocata
 ~~~~~
