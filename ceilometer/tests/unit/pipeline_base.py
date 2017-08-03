@@ -1157,7 +1157,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual(1, len(publisher.samples))
 
         cpu_util_sample = publisher.samples[0]
-        self.assertEqual(100, cpu_util_sample.volume)
+        self.assertAlmostEqual(100.0, cpu_util_sample.volume)
 
     def test_rate_of_change_max(self):
         s = "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
@@ -1215,7 +1215,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual(1, len(publisher.samples))
 
         cpu_util_sample = publisher.samples[0]
-        self.assertEqual(100, cpu_util_sample.volume)
+        self.assertAlmostEqual(100.0, cpu_util_sample.volume)
 
     @mock.patch('ceilometer.transformer.conversions.LOG')
     def test_rate_of_change_out_of_order(self, the_log):
@@ -1286,7 +1286,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual(1, len(publisher.samples))
 
         cpu_util_sample = publisher.samples[0]
-        self.assertEqual(12.5, cpu_util_sample.volume)
+        self.assertAlmostEqual(12.5, cpu_util_sample.volume)
         the_log.warning.assert_called_with(
             'dropping out of time order sample: %s',
             (counters[1],)
