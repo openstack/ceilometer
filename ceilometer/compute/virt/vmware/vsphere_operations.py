@@ -226,8 +226,9 @@ class VsphereOperations(object):
             if len(sample_infos) > 0:
                 for metric_series in entity_metric.value:
                     # Take the average of all samples to improve the accuracy
-                    # of the stat value
-                    stat_value = float(sum(metric_series.value)) / samples_cnt
+                    # of the stat value and ignore -1 (bug 1639114)
+                    filtered = [i for i in metric_series.value if i != -1]
+                    stat_value = float(sum(filtered)) / len(filtered)
                     device_id = metric_series.id.instance
                     stat_values[device_id] = stat_value
 
