@@ -257,7 +257,7 @@ class DiscoveryBase(object):
     def group_id(self):
         """Return group id of this discovery.
 
-        All running recoveries with the same group_id should return the same
+        All running discoveries with the same group_id should return the same
         set of resources at a given point in time. By default, a discovery is
         put into a global group, meaning that all discoveries of its type
         running anywhere in the cloud, return the same set of resources.
