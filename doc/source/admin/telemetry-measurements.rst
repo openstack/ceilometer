@@ -340,6 +340,17 @@ The following meters are collected for OpenStack Compute.
 | .packets\ |       |      |          |          |         | packets          |
 | .error    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
+| **Meters added in the Pike release**                                        |
++-----------+-------+------+----------+----------+---------+------------------+
+| memory.\  | Cumul\|      |          |          |         |                  |
+|           | ative | MB   | instance | Pollster | Libvirt | Memory swap in   |
+| swap.in   |       |      | ID       |          |         |                  |
++-----------+-------+------+----------+----------+---------+------------------+
+| memory.\  | Cumul\|      |          |          |         |                  |
+|           | ative | MB   | instance | Pollster | Libvirt | Memory swap out  |
+| swap.out  |       |      | ID       |          |         |                  |
++-----------+-------+------+----------+----------+---------+------------------+
+
 
 The Telemetry service supports to create new meters by using
 transformers. For more details about transformers see
@@ -719,6 +730,21 @@ The following meters are collected for OpenStack Block Storage:
 |                    |       |        |          |          | up              |
 +--------------------+-------+--------+----------+----------+-----------------+
 
+
+OpenStack File Share
+~~~~~~~~~~~~~~~~~~~~~~
+
+The following meters are collected for OpenStack File Share:
+
++--------------------+-------+--------+----------+----------+-----------------+
+| Name               | Type  | Unit   | Resource | Origin   | Note            |
++====================+=======+========+==========+==========+=================+
+| **Meters added in the Pike release**                                        |
++--------------------+-------+--------+----------+----------+-----------------+
+| manila.share.size  | Gauge | GB     | share ID | Notifica\| Size of the fil\|
+|                    |       |        |          | tion     | e share         |
++--------------------+-------+--------+----------+----------+-----------------+
+
 .. _telemetry-object-storage-meter:
 
 OpenStack Object Storage
@@ -1028,6 +1054,38 @@ The following meters are collected for SDN:
 +-----------------+---------+--------+-----------+----------+-----------------+
 | switch.flow.by\ | Cumula\ | B      | switch ID | Pollster | Bytes received  |
 | tes             | tive    |        |           |          |                 |
++-----------------+---------+--------+-----------+----------+-----------------+
+| **Meters added in the Pike release**                                        |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port            | Gauge   | port   | port ID   | Pollster | Existence of po\|
+|                 |         |        |           |          | rt              |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.uptime     | Gauge   | s      | port ID   | Pollster | Uptime of port  |
+|                 |         |        |           |          |                 |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.receive.pa\| Cumula\ | packet | port ID   | Pollster | Packets trasmit\|
+| ckets           | tive    |        |           |          | ted on port     |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.transmit.\ | Cumula\ | packet | port ID   | Pollster | Packets transmi\|
+| packets         | tive    |        |           |          | tted on port    |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.receive.\  | Cumula\ | B      | port ID   | Pollster | Bytes received  |
+| bytes           | tive    |        |           |          | on port         |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.transmit.\ | Cumula\ | B      | port ID   | Pollster | Bytes transmitt\|
+| bytes           | tive    |        |           |          | ed on port      |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.receive.\  | Cumula\ | packet | port ID   | Pollster | Drops received  |
+| drops           | tive    |        |           |          | on port         |
++-----------------+---------+--------+-----------+----------+-----------------+
+| port.receive.\  | Cumula\ | packet | port ID   | Pollster | Errors received |
+| errors          | tive    |        |           |          | on port         |
++-----------------+---------+--------+-----------+----------+-----------------+
+| switch.ports    | Gauge   | ports  | switch ID | Pollster | Number of ports\|
+|                 |         |        |           |          | on switch       |
++-----------------+---------+--------+-----------+----------+-----------------+
+| switch.port.upt\| Gauge   | s      | switch ID | Pollster | Uptime of switch|
+| ime             |         |        |           |          |                 |
 +-----------------+---------+--------+-----------+----------+-----------------+
 
 These meters are available for OpenFlow based switches. In order to
@@ -1405,7 +1463,7 @@ The following energy related meters were previously available:
 +---------------+------------+------+----------+----------+-------------------+
 | Name          | Type       | Unit | Resource | Origin   | Note              |
 +===============+============+======+==========+==========+===================+
-| **Meters deprecated as of Newton release**                                  |
+| **Meters removed as of Pike release**                                       |
 +---------------+------------+------+----------+----------+-------------------+
 | energy        | Cumulative | kWh  | probe ID | Pollster | Amount of energy  |
 +---------------+------------+------+----------+----------+-------------------+
