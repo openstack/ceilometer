@@ -55,12 +55,14 @@ class MemorySwapInPollster(InstanceStatsPollster):
     sample_name = 'memory.swap.in'
     sample_unit = 'MB'
     sample_stats_key = 'memory_swap_in'
+    sample_type = sample.TYPE_CUMULATIVE
 
 
 class MemorySwapOutPollster(InstanceStatsPollster):
     sample_name = 'memory.swap.out'
     sample_unit = 'MB'
     sample_stats_key = 'memory_swap_out'
+    sample_type = sample.TYPE_CUMULATIVE
 
 
 class PerfCPUCyclesPollster(InstanceStatsPollster):
