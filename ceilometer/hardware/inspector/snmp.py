@@ -274,8 +274,12 @@ class SNMPInspector(base.Inspector):
         _memory_total_oid = "1.3.6.1.4.1.2021.4.5.0"
         if _memory_total_oid not in cache[self._CACHE_KEY_OID]:
             self._query_oids(host, [_memory_total_oid], cache, False)
-        value = int(cache[self._CACHE_KEY_OID][_memory_total_oid]) - value
-        return value
+
+        total_value = self.get_oid_value(cache[self._CACHE_KEY_OID],
+                                         (_memory_total_oid, int))
+        if total_value is None:
+            return None
+        return total_value - value
 
     def _post_op_net(self, host, cache, meter_def,
                      value, metadata, extra, suffix):
