@@ -10,16 +10,17 @@
 # Sungjin Kang <potopro@gmail.com>, 2013
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
+# bryan tak <neos346@gmail.com>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 8.0.2.dev3\n"
+"Project-Id-Version: ceilometer 8.1.1.dev5\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-03-16 21:35+0000\n"
+"POT-Creation-Date: 2017-08-11 14:39+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-12 04:27+0000\n"
-"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
+"PO-Revision-Date: 2017-07-25 04:52+0000\n"
+"Last-Translator: bryan tak <neos346@gmail.com>\n"
 "Language: ko-KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
@@ -35,8 +36,38 @@ msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "'%s' 표현식에서 산술 변환기는 하나 이상의 미터를 사용해야 함"
 
 #, python-format
+msgid "CPU cache size: %(id)s %(cache_size)d"
+msgstr "CPU 캐쉬 사이즈: %(id)s %(cache_size)d"
+
+#, python-format
+msgid "Cannot create table %(table_name)s, it already exists. Ignoring error"
+msgstr ""
+"%(table_name)s 테이블을 생성할 수 없습니다, 이미 존재합니다. 에러를 무시합니"
+"다."
+
+#, python-format
+msgid "Could not connect slave host: %s"
+msgstr "슬레이브 호스트에 연결할 수 없음: %s"
+
+#, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "XenAPI를 연결할 수 없음: %s"
+
+#, python-format
+msgid "Could not get CPU Util for %(id)s: %(e)s"
+msgstr "%(id)s: %(e)s 에 대하여 CPU Util을 얻을 수 없음"
+
+#, python-format
+msgid "Could not get Memory Usage for %(id)s: %(e)s"
+msgstr "%(id)s: %(e)s 에 대하여 메모리 사용량을 얻을 수 없음"
+
+#, python-format
+msgid "Could not get VM %s CPU number"
+msgstr "VM %s CPU 번호를 가져올 수 없음"
+
+#, python-format
+msgid "Could not get cache usage for %(id)s: %(e)s"
+msgstr "%(id)s: %(e)s 에 대하여 캐쉬 사용량을 얻을 수 없음"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -58,8 +89,24 @@ msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
 msgstr ""
-"인스턴스 <이름=%(name)s, id=%(id)s>의 데이터 검사 실패, 도메인 상태가 SHUTOFF"
-"입니다."
+"인스턴스 <name=%(name)s, id=%(id)s> 의 데이터 검사 실패, 도메인 상태가 "
+"SHUTOFF입니다."
+
+#, python-format
+msgid ""
+"Failed to inspect l3 cache usage of %(instance_uuid)s, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"%(instance_uuid)s 의 l3 캐쉬 사용량을 검사하는데 실패했습니다. libvirt로 부"
+"터 정보를 가져올 수 없습니다: %(error)s"
+
+#, python-format
+msgid ""
+"Failed to inspect memory bandwidth of %(instance_uuid)s, can not get info "
+"from libvirt: %(error)s"
+msgstr ""
+"%(instance_uuid)s 의 메모리 대역폭을 검사하는데 실패했습니다. libvirt로 부터 "
+"정보를 가져올 수 없습니다: %(error)s"
 
 #, python-format
 msgid ""
@@ -74,8 +121,8 @@ msgid ""
 "Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
 "not get info from libvirt."
 msgstr ""
-"인스턴스 <이름=%(name)s, id=%(id)s>의 메모리 사용량 검사 실패, libvirt에서 정"
-"보를 가져올 수 없습니다."
+"인스턴스 <name=%(name)s, id=%(id)s> 의 메모리 사용량 검사 실패, libvirt에서 "
+"정보를 가져올 수 없습니다."
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -102,12 +149,28 @@ msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "인스턴스 %(name)s (%(instance_id)s) 무시 중: %(error)s"
 
 #, python-format
+msgid "Ignoring instance %(name)s: %(error)s"
+msgstr "인스턴스 %(name)s 무시: %(error)s  "
+
+#, python-format
+msgid "Ignoring loadbalancer %(loadbalancer_id)s"
+msgstr "loadbalancer %(loadbalancer_id)s 무시"
+
+#, python-format
+msgid "Ignoring pool %(pool_id)s"
+msgstr "pool %(pool_id)s 무시"
+
+#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
 msgstr ""
 "다음에서 정의 파일 %(file)s의 올바르지 않은 YAML 구문: 행: %(line)s, 열: "
 "%(column)s"
+
+#, python-format
+msgid "Invalid aggregation function: %s"
+msgstr "잘못된 집합 함수: %s"
 
 #, python-format
 msgid "Invalid period %(period)s: %(err)s"
@@ -156,6 +219,25 @@ msgid ""
 msgstr ""
 " %(name)s에 대한 JSONPath 스펙 '%(jsonpath)s'의 구문 분석 오류: %(err)s"
 
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"l3 cache usage of %(instance_uuid)s, can not get info from libvirt: %(error)s"
+msgstr ""
+"Perf는 libvirt의 현재 버전에서 지원되지 않으며, %(instance_uuid)s 의 l3 캐쉬 "
+"사용량을 검사하는데 실패했습니다. libvirt로 부터 정보를 가져올 수 없습니다: "
+"%(error)s"
+
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"memory bandwidth of %(instance_uuid)s, can not get info from libvirt: "
+"%(error)s"
+msgstr ""
+"Perf는 libvirt의 현재 버전에서 지원되지 않으며, %(instance_uuid)s 의 메모리 "
+"대역폭을 검사하는데 실패했습니다. libvirt로 부터 정보를 가져올 수 없습니다: "
+"%(error)s"
+
 msgid "Period must be positive."
 msgstr "기간은 양수여야 합니다. "
 
@@ -188,6 +270,9 @@ msgstr "공개 정책을 알 수 없음(%s). 기본값으로 강제 설정함"
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API가 %(status)s %(reason)s을(를) 리턴함"
 
+msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
+msgstr "NorthBound REST API를 사용하여 OpenDaylight에 요청 연결 실패"
+
 #, python-format
 msgid "Required field %s not specified"
 msgstr "필수 필드 %s이(가) 지정되지 않음"
@@ -200,6 +285,10 @@ msgstr "샘플"
 
 msgid "Samples should be included in request body"
 msgstr "샘플이 요청 본문에 포함되어야 함"
+
+#, python-format
+msgid "String %s is not a valid isotime"
+msgstr "문자열 %s는(은) 유효한 isotime이 아닙니다"
 
 #, python-format
 msgid ""
@@ -290,6 +379,10 @@ msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
 msgstr "vpn%(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플 건너뛰기"
 
 #, python-format
+msgid "VM %s is poweroff in VMware vSphere"
+msgstr "VMware vSphere에서 VM %s는 전원이 꺼져있습니다"
+
+#, python-format
 msgid "VM %s not found in VMware vSphere"
 msgstr "VM %s을(를) VMware vSphere에서 찾을 수 없음"
 
@@ -311,6 +404,14 @@ msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
 msgstr ""
 "Aodh를 사용하지 않게 설정하거나 사용할 수 없는 경우 경보 URL을 사용할 수 없습"
 "니다."
+
+#, python-format
+msgid "checking cache usage for instance %s"
+msgstr "인스턴스 %s 의 캐쉬 사용량 확인 중"
+
+#, python-format
+msgid "could not get CPU time for %(id)s: %(e)s"
+msgstr "%(id)s: %(e)s 에 대하여 CPU 시간을 얻을 수 없음"
 
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "Gnocchi를 사용할 때 직접 옵션은 true일 수 없습니다."
