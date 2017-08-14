@@ -34,7 +34,9 @@ def get_session(requests_session=None):
 def get_client(trust_id=None, requests_session=None):
     """Return a client for keystone v3 endpoint, optionally using a trust."""
     session = get_session(requests_session=requests_session)
-    return ks_client_v3.Client(session=session, trust_id=trust_id)
+    return ks_client_v3.Client(
+        session=session, trust_id=trust_id,
+        region_name=cfg.CONF.service_credentials.region_name)
 
 
 def get_service_catalog(client):
