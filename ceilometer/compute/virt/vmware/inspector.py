@@ -191,8 +191,8 @@ class VsphereInspector(virt_inspector.Inspector):
         # For this counter vSphere returns values scaled-up by 100, since the
         # corresponding API can't return decimals, but only longs.
         # For e.g. if the utilization is 12.34%, the value returned is 1234.
-        # Hence, dividing by 100.
-        cpu_util = cpu_util / 100
+        # Hence, dividing by 100.0.
+        cpu_util = cpu_util / 100.0
 
         mem_counter_id = self._ops.get_perf_counter_id(
             VC_AVERAGE_MEMORY_CONSUMED_CNTR)
