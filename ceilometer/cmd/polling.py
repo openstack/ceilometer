@@ -68,9 +68,11 @@ CLI_OPTS = [
                          'resource polling'),
     MultiChoicesOpt('pollster-list',
                     default=[],
+                    deprecated_for_removal=True,
                     dest='pollster_list',
                     help='List of pollsters (or wildcard templates) to be '
-                         'used while polling'),
+                         'used while polling. This option is deprecated. '
+                         'Configure pollsters via polling.yaml'),
 ]
 
 
