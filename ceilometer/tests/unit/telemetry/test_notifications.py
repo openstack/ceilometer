@@ -18,7 +18,7 @@ NOTIFICATION = {
     u'_context_domain': None,
     u'_context_request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
     'event_type': u'telemetry.api',
-    'timestamp': u'2015-06-1909: 19: 35.786893',
+    'timestamp': u'2015-06-19T09:19:35.786893',
     u'_context_auth_token': None,
     u'_context_read_only': False,
     'payload': {'samples':

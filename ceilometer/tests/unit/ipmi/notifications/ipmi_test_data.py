@@ -654,7 +654,7 @@ SENSOR_DATA = {
     'publisher_id': 'f23188ca-c068-47ce-a3e5-0e27ffe234c6',
     'payload': {
         'instance_uuid': 'f11251ax-c568-25ca-4582-0x27add644c6',
-        'timestamp': '20140223134852',
+        'timestamp': '2017-07-07 15:54:12.169510',
         'node_uuid': 'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad',
         'event_type': 'hardware.ipmi.metrics.update',
         'payload': {
@@ -673,7 +673,7 @@ EMPTY_PAYLOAD = {
     'publisher_id': 'f23188ca-c068-47ce-a3e5-0e27ffe234c6',
     'payload': {
         'instance_uuid': 'f11251ax-c568-25ca-4582-0x27add644c6',
-        'timestamp': '20140223134852',
+        'timestamp': '2017-07-07 15:54:12.169510',
         'node_uuid': 'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad',
         'event_type': 'hardware.ipmi.metrics.update',
         'payload': {
@@ -688,7 +688,7 @@ MISSING_SENSOR = {
     'publisher_id': 'f23188ca-c068-47ce-a3e5-0e27ffe234c6',
     'payload': {
         'instance_uuid': 'f11251ax-c568-25ca-4582-0x27add644c6',
-        'timestamp': '20140223134852',
+        'timestamp': '2017-07-07 15:54:12.169510',
         'node_uuid': 'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad',
         'event_type': 'hardware.ipmi.metrics.update',
         'payload': {
@@ -727,7 +727,7 @@ BAD_SENSOR = {
     'publisher_id': 'f23188ca-c068-47ce-a3e5-0e27ffe234c6',
     'payload': {
         'instance_uuid': 'f11251ax-c568-25ca-4582-0x27add644c6',
-        'timestamp': '20140223134852',
+        'timestamp': '2017-07-07 15:54:12.169510',
         'node_uuid': 'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad',
         'event_type': 'hardware.ipmi.metrics.update',
         'payload': {
@@ -768,7 +768,7 @@ NO_SENSOR_ID = {
     'publisher_id': 'f23188ca-c068-47ce-a3e5-0e27ffe234c6',
     'payload': {
         'instance_uuid': 'f11251ax-c568-25ca-4582-0x27add644c6',
-        'timestamp': '20140223134852',
+        'timestamp': '2017-07-07 15:54:12.169510',
         'node_uuid': 'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad',
         'event_type': 'hardware.ipmi.metrics.update',
         'payload': {
@@ -788,7 +788,7 @@ NO_NODE_ID = {
     'publisher_id': 'f23188ca-c068-47ce-a3e5-0e27ffe234c6',
     'payload': {
         'instance_uuid': 'f11251ax-c568-25ca-4582-0x27add644c6',
-        'timestamp': '20140223134852',
+        'timestamp': '2017-07-07 15:54:12.169510',
         'event_type': 'hardware.ipmi.metrics.update',
         'payload': {
             'Temperature': {

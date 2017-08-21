@@ -126,6 +126,7 @@ class Sample(object):
             metadata['event_type'] = message['event_type']
             metadata['host'] = message['publisher_id']
         ts = timestamp if timestamp else message['metadata']['timestamp']
+        ts = timeutils.parse_isotime(ts).isoformat()  # add UTC if necessary
         return cls(name=name,
                    type=type,
                    volume=volume,

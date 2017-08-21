@@ -28,7 +28,7 @@ from ceilometer.tests import base as test
 
 NOTIFICATION = {
     'event_type': u'test.create',
-    'metadata': {'timestamp': u'2015-06-1909: 19: 35.786893',
+    'metadata': {'timestamp': u'2015-06-19T09:19:35.786893',
                  'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
     'payload': {u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
                 u'resource_id': u'bea70e51c7340cb9d555b15cbfcaec23',
@@ -49,7 +49,7 @@ NOTIFICATION = {
 
 USER_META = {
     'event_type': u'test.create',
-    'metadata': {'timestamp': u'2015-06-1909: 19: 35.786893',
+    'metadata': {'timestamp': u'2015-06-19T09:19:35.786893',
                  'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
     'payload': {u'user_id': u'e1d870e51c7340cb9d555b15cbfcaec2',
                 u'resource_id': u'bea70e51c7340cb9d555b15cbfcaec23',
@@ -89,11 +89,11 @@ MIDDLEWARE_EVENT = {
     u'event_type': u'objectstore.http.request',
     u'publisher_id': u'ceilometermiddleware',
     u'metadata': {u'message_id': u'6eccedba-120e-4db8-9735-2ad5f061e5ee',
-                  u'timestamp': u'2013-07-29 06:51:34.474815',
+                  u'timestamp': u'2013-07-29T06:51:34.474815+00:00',
                   u'_unique_id': u'0ee26117077648e18d88ac76e28a72e2'},
     u'payload': {
         'typeURI': 'http: //schemas.dmtf.org/cloud/audit/1.0/event',
-        'eventTime': '2015-01-30T16: 38: 43.233621',
+        'eventTime': '2013-07-29T06:51:34.474815+00:00',
         'target': {
             'action': 'get',
             'typeURI': 'service/storage/object',
@@ -172,7 +172,7 @@ FULL_MULTI_MSG = {
               u'user_domain': None},
     'publisher_id': u'ceilometer.api',
     'metadata': {'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e',
-                 'timestamp': u'2015-06-1909: 19: 35.786893'},
+                 'timestamp': u'2015-06-19T09:19:35.786893'},
 }
 
 METRICS_UPDATE = {
@@ -449,7 +449,7 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('compute.node.cpu.frequency', s1['name'])
-        self.assertEqual("2013-07-29T06:51:34.472416", s1['timestamp'])
+        self.assertEqual("2013-07-29T06:51:34.472416+00:00", s1['timestamp'])
 
     def test_default_metadata(self):
         cfg = yaml.dump(

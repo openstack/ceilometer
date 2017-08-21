@@ -41,7 +41,7 @@ class TestSample(base.BaseTestCase):
         msg = {
             'event_type': u'sample.create',
             'metadata': {
-                'timestamp': u'2015-06-1909: 19: 35.786893',
+                'timestamp': u'2015-06-19T09:19:35.786893',
                 'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
             'payload': [{u'counter_name': u'instance100'}],
             'priority': 'info',
@@ -57,7 +57,7 @@ class TestSample(base.BaseTestCase):
         msg = {
             'event_type': u'sample.create',
             'metadata': {
-                'timestamp': u'2015-06-1909: 19: 35.786893',
+                'timestamp': u'2015-06-19T09:19:35.786893',
                 'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
             'payload': {u'counter_name': u'instance100'},
             'priority': 'info',
@@ -68,3 +68,31 @@ class TestSample(base.BaseTestCase):
         msg['payload']['event_type'] = msg['event_type']
         msg['payload']['host'] = msg['publisher_id']
         self.assertEqual(msg['payload'], s.resource_metadata)
+
+    def test_sample_from_notifications_assume_utc(self):
+        msg = {
+            'event_type': u'sample.create',
+            'metadata': {
+                'timestamp': u'2015-06-19T09:19:35.786893',
+                'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
+            'payload': {u'counter_name': u'instance100'},
+            'priority': 'info',
+            'publisher_id': u'ceilometer.api',
+        }
+        s = sample.Sample.from_notification(
+            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+        self.assertEqual('2015-06-19T09:19:35.786893+00:00', s.timestamp)
+
+    def test_sample_from_notifications_keep_tz(self):
+        msg = {
+            'event_type': u'sample.create',
+            'metadata': {
+                'timestamp': u'2015-06-19T09:19:35.786893+01:00',
+                'message_id': u'939823de-c242-45a2-a399-083f4d6a8c3e'},
+            'payload': {u'counter_name': u'instance100'},
+            'priority': 'info',
+            'publisher_id': u'ceilometer.api',
+        }
+        s = sample.Sample.from_notification(
+            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+        self.assertEqual('2015-06-19T09:19:35.786893+01:00', s.timestamp)
