@@ -77,10 +77,6 @@ class ResourcesDefinition(object):
             self._event_attributes[name] = declarative.Definition(
                 name, attr_cfg, plugin_manager)
 
-        if self.cfg.get('archive_policy'):
-            LOG.warning("archive_policy in gnocchi resource definition is "
-                        "deprecated. Archive Policy Rule must be setup on "
-                        "Gnocchi side instead")
         self.metrics = {}
         for t in self.cfg['metrics']:
             archive_policy = self.cfg.get('archive_policy',

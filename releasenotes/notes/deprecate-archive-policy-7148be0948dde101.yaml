@@ -1,5 +1,0 @@
----
-deprecations:
-  - |
-    Any Archive Policy configuration in Ceilometer is deprecated. Archive
-    Policy Rules system of Gnocchi must be used instead.
