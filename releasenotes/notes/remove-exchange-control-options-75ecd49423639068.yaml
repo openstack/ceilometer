@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated control exchange options have been removed.

@@ -86,9 +86,12 @@ class _FakeNotificationPlugin(plugin_base.NotificationBase):
     event_types = ['fake.event']
 
     def get_targets(self, conf):
-        return [oslo_messaging.Target(
-            topic=topic, exchange=conf.nova_control_exchange)
-            for topic in self.get_notification_topics(conf)]
+        return [
+            oslo_messaging.Target(
+                topic=topic,
+                exchange=conf.notification.notification_control_exchanges[0])
+            for topic in self.get_notification_topics(conf)
+        ]
 
     def process_notification(self, message):
         return []

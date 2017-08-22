@@ -31,7 +31,6 @@ import ceilometer.dispatcher.file
 import ceilometer.dispatcher.gnocchi_opts
 import ceilometer.dispatcher.http
 import ceilometer.event.converter
-import ceilometer.exchange_control
 import ceilometer.hardware.discovery
 import ceilometer.hardware.pollsters.generic
 import ceilometer.image.discovery
@@ -91,7 +90,6 @@ def list_opts():
                          ceilometer.pipeline.OPTS,
                          ceilometer.sample.OPTS,
                          ceilometer.utils.OPTS,
-                         ceilometer.exchange_control.EXCHANGE_OPTS,
                          OPTS)),
         ('api', itertools.chain(ceilometer.api.app.API_OPTS,
                                 ceilometer.api.controllers.v2.root.API_OPTS)),
