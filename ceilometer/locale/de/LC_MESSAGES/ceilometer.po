@@ -10,9 +10,9 @@
 # Frank Kloeker <eumel@arcor.de>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 6.0.1.dev170\n"
+"Project-Id-Version: ceilometer 9.0.1.dev1\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-06-07 17:37+0000\n"
+"POT-Creation-Date: 2017-08-21 21:19+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,7 +21,7 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.7.3\n"
+"X-Generator: Zanata 3.9.6\n"
 "Language-Team: German\n"
 
 #, python-format
@@ -35,39 +35,8 @@ msgstr ""
 "verwenden"
 
 #, python-format
-msgid "Cannot create table %(table_name)s   it already exists. Ignoring error"
-msgstr ""
-"Tabelle %(table_name)s kann nicht erstellt werden, da sie bereits vorhanden "
-"ist. Fehler wird ignoriert"
-
-#, python-format
-msgid "Continue after error from %(name)s: %(error)s"
-msgstr "Fortfahren nach Fehler von %(name)s: %(error)s"
-
-#, python-format
-msgid "Could not connect slave host: %s "
-msgstr ""
-"Es konnte keine Verbindung zum untergeordneten Host hergestellt werden: %s "
-
-#, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "Es konnte keine Verbindung zu XenAPI hergestellt werden: %s"
-
-#, python-format
-msgid "Could not get CPU Util for %(id)s: %(e)s"
-msgstr "Abruf von CPU-Auslastung nicht möglich für %(id)s: %(e)s"
-
-#, python-format
-msgid "Could not get Memory Usage for %(id)s: %(e)s"
-msgstr "Abruf von Speicherbelegung nicht möglich für %(id)s: %(e)s"
-
-#, python-format
-msgid "Could not get VM %s CPU Utilization"
-msgstr "CPU-Auslastung für VM %s konnte nicht abgerufen werden"
-
-#, python-format
-msgid "Couldn't obtain IP address of instance %s"
-msgstr "IP-Adresse von Instanz %s konnte nicht abgerufen werden"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -81,22 +50,8 @@ msgstr ""
 "Fehler von libvirt während Suche nach Instanz <name=%(name)s, id=%(id)s>: "
 "[Fehlercode %(error_code)s] %(ex)s"
 
-#, python-format
-msgid "Error parsing HTTP response: %s"
-msgstr "Fehler bei Auswertung der HTTP-Antwort %s"
-
-msgid "Error stopping pollster."
-msgstr "Fehler beim Stoppen des Pollster."
-
-msgid "Event"
-msgstr "Ereignis"
-
 msgid "Expression evaluated to a NaN value!"
 msgstr "Ausdruck ergab einen NaN-Wert!"
-
-#, python-format
-msgid "Failed to import extension for %(name)s: %(error)s"
-msgstr "Fehler beim Importieren der Erweiterung für %(name)s: %(error)s"
 
 #, python-format
 msgid ""
@@ -105,22 +60,6 @@ msgid ""
 msgstr ""
 "Fehler beim Überprüfen von Daten der Instanz <name=%(name)s, id=%(id)s>, "
 "Domänenstatus ist ABGESCHALTET."
-
-#, python-format
-msgid ""
-"Failed to inspect memory usage of %(instance_uuid)s, can not get info from "
-"libvirt: %(error)s"
-msgstr ""
-"Fehler beim Überprüfen der Speicherbelegung von %(instance_uuid)s, "
-"Informationen können nicht von libvirt abgerufen werden: %(error)s"
-
-#, python-format
-msgid ""
-"Failed to inspect memory usage of instance <name=%(name)s, id=%(id)s>, can "
-"not get info from libvirt."
-msgstr ""
-"Fehler beim Überprüfen der Speicherbelegung von Instanz <name=%(name)s, id="
-"%(id)s>, Informationen können nicht von libvirt abgerufen werden."
 
 #, python-format
 msgid "Failed to load any notification handlers for %s"
@@ -143,22 +82,6 @@ msgstr ""
 #, python-format
 msgid "Filter expression not valid: %s"
 msgstr "Filterausdruck nicht gültig: %s"
-
-#, python-format
-msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
-msgstr "Instanz %(name)s (%(instance_id)s) wird ignoriert: %(error)s"
-
-#, python-format
-msgid "Ignoring instance %(name)s: %(error)s"
-msgstr "Instanz %(name)s wird ignoriert: %(error)s"
-
-#, python-format
-msgid "Ignoring loadbalancer %(loadbalancer_id)s"
-msgstr "Loadbalancer %(loadbalancer_id)s wird ignoriert."
-
-#, python-format
-msgid "Ignoring pool %(pool_id)s"
-msgstr "Pool %(pool_id)s wird ignoriert."
 
 #, python-format
 msgid ""
@@ -184,10 +107,6 @@ msgid "Limit must be positive"
 msgstr "Grenzwert muss positiv sein"
 
 #, python-format
-msgid "More than one event with id %s returned from storage driver"
-msgstr "Mehr als ein Ereignis mit der ID %s vom Speichertreiber zurückgegeben"
-
-#, python-format
 msgid "Multiple VM %s found in XenServer"
 msgstr "Mehrere VMs %s in XenServer gefunden"
 
@@ -208,28 +127,8 @@ msgid "Not Authorized to access %(aspect)s %(id)s"
 msgstr "Nicht berechtigt für den Zugriff auf %(aspect)s %(id)s"
 
 #, python-format
-msgid "OpenDaylitght API returned %(status)s %(reason)s"
-msgstr "OpenDaylight-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
-
-#, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
-
-#, python-format
-msgid ""
-"Operator %(operator)s is not supported. Only equality operator is available "
-"for field %(field)s"
-msgstr ""
-"Operator %(operator)s wird nicht unterstützt.  Für das Feld %(field)s ist "
-"nur der Gleichheitsoperator verfügbar."
-
-#, python-format
-msgid ""
-"Operator %(operator)s is not supported. The supported operators are: "
-"%(supported)s"
-msgstr ""
-"Operator %(operator)s wird nicht unterstützt. Unterstützte Operatoren: "
-"%(supported)s"
 
 #, python-format
 msgid "Order-by expression not valid: %s"
@@ -243,27 +142,6 @@ msgstr ""
 
 msgid "Period must be positive."
 msgstr "Zeitraum muss positiv sein."
-
-#, python-format
-msgid "Pipeline %(pipeline)s: %(status)s after error from publisher %(pub)s"
-msgstr "Pipeline %(pipeline)s: %(status)s nach Fehler von Publisher %(pub)s"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Continue after error from publisher %(pub)s"
-msgstr "Pipeline %(pipeline)s: Fortsetzen nach Fehler von Publisher %(pub)s"
-
-#, python-format
-msgid "Pipeline %(pipeline)s: Error flushing transformer %(trans)s"
-msgstr ""
-"Pipeline %(pipeline)s: Fehler bei Flushoperation für Transformer %(trans)s"
-
-#, python-format
-msgid ""
-"Pipeline %(pipeline)s: Exit after error from transformer %(trans)s for "
-"%(smp)s"
-msgstr ""
-"Pipeline %(pipeline)s: Beendigung nach Fehler von Transformer %(trans)s für "
-"%(smp)s"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -282,11 +160,6 @@ msgid "Pollster for %s is disabled!"
 msgstr "Pollster für %s ist inaktiviert!"
 
 #, python-format
-msgid "Prevent pollster %(name)s for polling source %(source)s anymore!"
-msgstr ""
-"Verhindern Sie, dass Pollster %(name)s Quelle %(source)s weiterhin abfragt!"
-
-#, python-format
 msgid ""
 "Publisher max local_queue length is exceeded, dropping %d oldest samples"
 msgstr ""
@@ -303,11 +176,6 @@ msgstr ""
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW-AdminOps-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
 
-msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
-msgstr ""
-"Anforderung konnte keine Verbindung mit OpenDaylight über NorthBound REST-"
-"API herstellen"
-
 #, python-format
 msgid "Required field %s not specified"
 msgstr "Erforderliches Feld %s nicht angegeben"
@@ -322,21 +190,6 @@ msgid "Samples should be included in request body"
 msgstr "Beispiele sollten in Anforderungshauptteil enthalten sein"
 
 #, python-format
-msgid "Skip loading extension for %s"
-msgstr "Laden der Ausnahme für %s überspringen"
-
-#, python-format
-msgid "String %s is not a valid isotime"
-msgstr "Zeichenfolge %s ist kein gültiger Wert für 'isotime'"
-
-msgid ""
-"The Yaml file that defines mapping between samples and gnocchi resources/"
-"metrics"
-msgstr ""
-"Die YAML-Datei mit der Definition der Zuordnung zwischen Beispielen und "
-"gnocchi-Ressourcen/Metriken"
-
-#, python-format
 msgid ""
 "The data type %(type)s is not supported. The supported data type list is: "
 "%(supported)s"
@@ -347,9 +200,6 @@ msgstr ""
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Das Feld 'fields' ist erforderlich für %s"
-
-msgid "The path for the file publisher is required"
-msgstr "Der Pfad für den Datei-Publisher ist erforderlich"
 
 #, python-format
 msgid "UDP: Cannot decode data sent by %s"
@@ -371,28 +221,8 @@ msgstr ""
 "werden."
 
 #, python-format
-msgid "Unable to discover resources: %s"
-msgstr "Ressourcen können nicht gefunden werden: %s"
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Auswertung nicht möglich für Ausdruck %(expr)s: %(exc)s"
-
-#, python-format
-msgid "Unable to load publisher %s"
-msgstr "Publisher %s kann nicht geladen werden"
-
-#, python-format
-msgid "Unable to load the hypervisor inspector: %s"
-msgstr "Hypervisorinspector %s kann nicht geladen werden"
-
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb after %(retries)d retries. Giving "
-"up."
-msgstr ""
-"Es kann keine erneute Verbindung zur primären mongodb nach %(retries)d "
-"Versuchen hergestellt werden. Abbruch."
 
 #, python-format
 msgid ""
@@ -411,10 +241,6 @@ msgid ""
 msgstr ""
 "Unerwartete Ausnahme beim Konvertieren von %(value)s in den erwarteten "
 "Datentyp %(type)s."
-
-#, python-format
-msgid "Unknown discovery extension: %s"
-msgstr "Unbekannte Erkennungserweiterung: %s"
 
 #, python-format
 msgid "Unknown metadata type. Key (%s) will not be queryable."
@@ -474,9 +300,6 @@ msgstr "VM %s in XenServer nicht gefunden"
 msgid "Wrong sensor type"
 msgstr "Falscher Sensortyp"
 
-msgid "XenAPI not installed"
-msgstr "XenAPI nicht installiert"
-
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "YAML-Fehler beim Lesen von Definitionsdatei %(file)s."
@@ -485,10 +308,6 @@ msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
 msgstr ""
 "Alarm-URLs sind nicht verfügbar, wenn Aodh inaktiviert oder nicht verfügbar "
 "ist."
-
-#, python-format
-msgid "could not get CPU time for %(id)s: %(e)s"
-msgstr "Abruf von CPU-Zeit nicht möglich für %(id)s: %(e)s"
 
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr ""
@@ -506,9 +325,6 @@ msgstr "Beispiel ohne Vorgänger wird gelöscht: %s"
 
 msgid "ipmitool output length mismatch"
 msgstr "Abweichung bei ipmitool-Ausgabelänge"
-
-msgid "max_bytes and backup_count should be numbers."
-msgstr "max_bytes und backup_count sollten Zahlen sein."
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""
