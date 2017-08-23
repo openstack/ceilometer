@@ -6,17 +6,18 @@
 # Gabriel Wainer, 2013
 # Gabriel Wainer, 2013
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
+# André Franciosi <andre@franciosi.org>, 2017. #zanata
 # Marcio <marciofoz@gmail.com>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 8.0.2.dev3\n"
+"Project-Id-Version: ceilometer 8.1.1.dev6\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-03-16 21:35+0000\n"
+"POT-Creation-Date: 2017-08-15 12:19+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-03-15 07:51+0000\n"
-"Last-Translator: Marcio <marciofoz@gmail.com>\n"
+"PO-Revision-Date: 2017-08-22 02:33+0000\n"
+"Last-Translator: André Franciosi <andre@franciosi.org>\n"
 "Language: pt-BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -31,6 +32,10 @@ msgstr "%(entity)s %(id)s Não Encontrada"
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr ""
 "O transformador aritmético deve usar pelo menos um medidor na expressão '%s'"
+
+#, python-format
+msgid "CPU cache size: %(id)s %(cache_size)d"
+msgstr "Tamanho do cache de CPU: %(id)s %(cache_size)d"
 
 #, python-format
 msgid "Could not connect slave host: %s"
@@ -112,8 +117,16 @@ msgid "Ignoring instance %(name)s (%(instance_id)s) : %(error)s"
 msgstr "Ignorando a instância %(name)s (%(instance_id)s): %(error)s"
 
 #, python-format
+msgid "Ignoring instance %(name)s: %(error)s"
+msgstr "Ignorando instância %(name)s: %(error)s"
+
+#, python-format
 msgid "Ignoring loadbalancer %(loadbalancer_id)s"
 msgstr "Ignorando balanceador de carga %(loadbalancer_id)s"
+
+#, python-format
+msgid "Ignoring pool %(pool_id)s"
+msgstr "Ignorando pool %(pool_id)s"
 
 #, python-format
 msgid ""
@@ -338,6 +351,11 @@ msgstr "XenAPI não instalado"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "Erro YAML ao ler o arquivo de definições %(file)s"
+
+msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
+msgstr ""
+"URLs de alarme não estão disponíveis quando o Aodh está desativado ou "
+"indisponível."
 
 #, python-format
 msgid "checking cache usage for instance %s"
