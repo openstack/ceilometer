@@ -183,7 +183,7 @@ function ceilometer_create_accounts {
         get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
     fi
 
-    if [ "$CEILOMETER_BACKEND" == "gnocchi" ]; then
+    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" == "gnocchi" ]; then
         create_service_user "gnocchi"
         local gnocchi_service=$(get_or_create_service "gnocchi" \
             "metric" "OpenStack Metric Service")
@@ -432,7 +432,7 @@ function install_ceilometer {
         _ceilometer_prepare_coordination
     fi
 
-    [ "$CEILOMETER_BACKEND" = 'gnocchi' ] && install_gnocchi
+    ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" = 'gnocchi' ] && install_gnocchi
 
     if is_service_enabled ceilometer-api; then
         _ceilometer_prepare_storage_backend
@@ -461,7 +461,7 @@ function install_ceilometerclient {
 # start_ceilometer() - Start running processes, including screen
 function start_ceilometer {
 
-    if [ "$CEILOMETER_BACKEND" = "gnocchi" ] ; then
+    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" = "gnocchi" ] ; then
         run_process gnocchi-api "$CEILOMETER_BIN_DIR/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
         run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
