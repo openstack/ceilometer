@@ -305,8 +305,8 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, disks[0].read_bytes)
             self.assertEqual(3, disks[0].write_requests)
             self.assertEqual(4, disks[0].write_bytes)
-            self.assertEqual(91752302.267, disks[0].wr_total_times)
-            self.assertEqual(29142253.616, disks[0].rd_total_times)
+            self.assertEqual(91752302267, disks[0].wr_total_times)
+            self.assertEqual(29142253616, disks[0].rd_total_times)
 
     def test_inspect_disks_with_domain_shutoff(self):
         domain = mock.Mock()
