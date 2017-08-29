@@ -99,11 +99,15 @@ class TestDiskPollsters(TestBaseDiskIO):
         virt_inspector.DiskStats(device='vda1',
                                  read_bytes=1, read_requests=2,
                                  write_bytes=3, write_requests=4,
-                                 errors=-1),
+                                 errors=-1,
+                                 rd_total_times=100,
+                                 wr_total_times=200,),
         virt_inspector.DiskStats(device='vda2',
                                  read_bytes=2, read_requests=3,
                                  write_bytes=5, write_requests=7,
-                                 errors=-1),
+                                 errors=-1,
+                                 rd_total_times=300,
+                                 wr_total_times=400,),
     ]
 
     def setUp(self):
@@ -161,6 +165,24 @@ class TestDiskPollsters(TestBaseDiskIO):
         self._check_per_device_samples(disk.PerDeviceWriteBytesPollster,
                                        'disk.device.write.bytes', 5,
                                        'vda2')
+
+    def test_per_device_read_latency(self):
+        self._check_per_device_samples(
+            disk.PerDeviceDiskReadLatencyPollster,
+            'disk.device.read.latency', 100, 'vda1')
+
+        self._check_per_device_samples(
+            disk.PerDeviceDiskReadLatencyPollster,
+            'disk.device.read.latency', 300, 'vda2')
+
+    def test_per_device_write_latency(self):
+        self._check_per_device_samples(
+            disk.PerDeviceDiskWriteLatencyPollster,
+            'disk.device.write.latency', 200, 'vda1')
+
+        self._check_per_device_samples(
+            disk.PerDeviceDiskWriteLatencyPollster,
+            'disk.device.write.latency', 400, 'vda2')
 
 
 class TestDiskRatePollsters(TestBaseDiskIO):

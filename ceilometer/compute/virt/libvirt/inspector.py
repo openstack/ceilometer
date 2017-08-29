@@ -121,12 +121,17 @@ class LibvirtInspector(virt_inspector.Inspector):
                 [target.get("dev")
                  for target in tree.findall('devices/disk/target')]):
             block_stats = domain.blockStats(device)
+            block_stats_flags = domain.blockStatsFlags(device, 0)
+            wr_times = block_stats_flags['wr_total_times']*1.0/1000
+            rd_times = block_stats_flags['rd_total_times']*1.0/1000
             yield virt_inspector.DiskStats(device=device,
                                            read_requests=block_stats[0],
                                            read_bytes=block_stats[1],
                                            write_requests=block_stats[2],
                                            write_bytes=block_stats[3],
-                                           errors=block_stats[4])
+                                           errors=block_stats[4],
+                                           wr_total_times=wr_times,
+                                           rd_total_times=rd_times)
 
     @libvirt_utils.retry_on_disconnect
     def inspect_disk_info(self, instance, duration):
