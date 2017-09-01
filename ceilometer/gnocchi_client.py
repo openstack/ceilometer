@@ -31,10 +31,10 @@ def get_gnocchiclient(conf, timeout_override=False):
         pool_maxsize=conf.max_parallel_requests)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    return client.Client('1', session,
-                         interface=conf[group].interface,
-                         region_name=conf[group].region_name,
-                         adapter_options={'connect_retries': 3})
+    return client.Client(
+        '1', session, adapter_options={'connect_retries': 3,
+                                       'interface': conf[group].interface,
+                                       'region_name': conf[group].region_name})
 
 
 # NOTE(sileht): This is the initial resource types created in Gnocchi
