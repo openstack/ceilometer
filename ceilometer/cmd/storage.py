@@ -19,6 +19,7 @@ from oslo_log import log
 from six import moves
 import six.moves.urllib.parse as urlparse
 import sqlalchemy as sa
+import tenacity
 
 from ceilometer import service
 from ceilometer import storage
@@ -35,6 +36,10 @@ def upgrade():
         cfg.BoolOpt('skip-gnocchi-resource-types',
                     help='Skip gnocchi resource-types upgrade.',
                     default=False),
+        cfg.IntOpt('retry',
+                   min=0,
+                   help='Number of times to retry on failure. '
+                   'Default is to retry forever.'),
     ])
 
     service.prepare_service(conf=conf)
@@ -56,7 +61,20 @@ def upgrade():
     else:
         LOG.debug("Upgrading Gnocchi resource types")
         from ceilometer import gnocchi_client
-        gnocchi_client.upgrade_resource_types(conf)
+        from gnocchiclient import exceptions
+        if conf.retry is None:
+            stop = tenacity.stop_never
+        else:
+            stop = tenacity.stop_after_attempt(conf.retry)
+        tenacity.Retrying(
+            stop=stop,
+            retry=tenacity.retry_if_exception_type((
+                exceptions.ConnectionFailure,
+                exceptions.UnknownConnectionError,
+                exceptions.ConnectionTimeout,
+                exceptions.SSLError,
+            ))
+        )(gnocchi_client.upgrade_resource_types, conf)
 
 
 def expirer():
