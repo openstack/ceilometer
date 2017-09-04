@@ -23,22 +23,24 @@ import mock
 from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
 from oslo_utils import fixture as utils_fixture
+from oslo_utils import netutils
 from oslo_utils import timeutils
 import requests
 import six
 from stevedore import extension
 import testscenarios
 
-from ceilometer.dispatcher import gnocchi
-from ceilometer.publisher import utils
+from ceilometer.event.storage import models
+from ceilometer.publisher import gnocchi
+from ceilometer import sample
 from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
-INSTANCE_DELETE_START = {
-    'event_type': u'compute.instance.delete.start',
-    'traits': [
+INSTANCE_DELETE_START = models.Event(
+    event_type=u'compute.instance.delete.start',
+    traits=[
         [
             'state',
             1,
@@ -120,16 +122,14 @@ INSTANCE_DELETE_START = {
             '2012-05-08T20:23:47'
         ]
     ],
-    'message_signature':
-        '831719d54059734f82e7d6498c6d7a8fd637568732e79c1fd375e128f142373a',
-    'raw': {},
-    'generated': '2012-05-08T20:24:14.824743',
-    'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
-}
+    raw={},
+    generated='2012-05-08T20:24:14.824743',
+    message_id=u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4',
+)
 
-IMAGE_DELETE_START = {
-    u'event_type': u'image.delete',
-    u'traits': [
+IMAGE_DELETE_START = models.Event(
+    event_type=u'image.delete',
+    traits=[
         [
             u'status',
             1,
@@ -176,17 +176,15 @@ IMAGE_DELETE_START = {
             u'13287936'
         ]
     ],
-    u'message_signature':
-        u'46fb4958e911f45007a3bb5934c5de7610892a6d742a4900695fd5929cd4c9b3',
-    u'raw': {},
-    u'generated': u'2016-11-04T04:25:56.493820',
-    u'message_id': u'7f5280f7-1d10-46a5-ba58-4d5508e49f99'
-}
+    raw={},
+    generated=u'2016-11-04T04:25:56.493820',
+    message_id=u'7f5280f7-1d10-46a5-ba58-4d5508e49f99'
+)
 
 
-VOLUME_DELETE_START = {
-    'event_type': u'volume.delete.start',
-    'traits': [
+VOLUME_DELETE_START = models.Event(
+    event_type=u'volume.delete.start',
+    traits=[
         [
             u'availability_zone',
             1,
@@ -258,16 +256,14 @@ VOLUME_DELETE_START = {
             u'819bbd28f5374506b8502521c89430b5'
         ]
     ],
-    'message_signature':
-        '831719d54059734f82e7d6498c6d7a8fd637568732e79c1fd375e128f142373a',
-    'raw': {},
-    'generated': '2016-11-28T13:42:15.484674',
-    'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
-}
+    raw={},
+    generated='2016-11-28T13:42:15.484674',
+    message_id=u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4',
+)
 
-FLOATINGIP_DELETE_END = {
-    'event_type': u'floatingip.delete.end',
-    'traits': [
+FLOATINGIP_DELETE_END = models.Event(
+    event_type=u'floatingip.delete.end',
+    traits=[
         [
             u'project_id',
             1,
@@ -299,63 +295,54 @@ FLOATINGIP_DELETE_END = {
             u'819bbd28f5374506b8502521c89430b5'
         ]
     ],
-    'message_signature':
-        '831719d54059734f82e7d6498c6d7a8fd637568732e79c1fd375e128f142373a',
-    'raw': {},
-    'generated': '2016-11-29T09:25:55.474710',
-    'message_id': u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
-}
+    raw={},
+    generated='2016-11-29T09:25:55.474710',
+    message_id=u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
+)
 
 
-class DispatcherTest(base.BaseTestCase):
+class PublisherTest(base.BaseTestCase):
 
     def setUp(self):
-        super(DispatcherTest, self).setUp()
+        super(PublisherTest, self).setUp()
         conf = ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf = self.useFixture(config_fixture.Config(conf))
-        self.conf.config(
-            resources_definition_file=self.path_get(
-                'etc/ceilometer/gnocchi_resources.yaml'),
-            group="dispatcher_gnocchi"
-        )
         self.resource_id = str(uuid.uuid4())
-        self.samples = [{
-            'counter_name': 'disk.root.size',
-            'counter_unit': 'GB',
-            'counter_type': 'gauge',
-            'counter_volume': '2',
-            'user_id': 'test_user',
-            'project_id': 'test_project',
-            'source': 'openstack',
-            'timestamp': '2012-05-08 20:23:48.028195',
-            'resource_id': self.resource_id,
-            'resource_metadata': {
+        self.samples = [sample.Sample(
+            name='disk.root.size',
+            unit='GB',
+            type=sample.TYPE_GAUGE,
+            volume=2,
+            user_id='test_user',
+            project_id='test_project',
+            source='openstack',
+            timestamp='2012-05-08 20:23:48.028195',
+            resource_id=self.resource_id,
+            resource_metadata={
                 'host': 'foo',
                 'image_ref': 'imageref!',
                 'instance_flavor_id': 1234,
                 'display_name': 'myinstance',
                 }
-            },
-            {
-                'counter_name': 'disk.root.size',
-                'counter_unit': 'GB',
-                'counter_type': 'gauge',
-                'counter_volume': '2',
-                'user_id': 'test_user',
-                'project_id': 'test_project',
-                'source': 'openstack',
-                'timestamp': '2014-05-08 20:23:48.028195',
-                'resource_id': self.resource_id,
-                'resource_metadata': {
+            ),
+            sample.Sample(
+                name='disk.root.size',
+                unit='GB',
+                type=sample.TYPE_GAUGE,
+                volume=2,
+                user_id='test_user',
+                project_id='test_project',
+                source='openstack',
+                timestamp='2014-05-08 20:23:48.028195',
+                resource_id=self.resource_id,
+                resource_metadata={
                     'host': 'foo',
                     'image_ref': 'imageref!',
                     'instance_flavor_id': 1234,
                     'display_name': 'myinstance',
-                }
-            }]
-        for sample in self.samples:
-            sample['message_signature'] = utils.compute_signature(
-                sample, self.conf.conf.publisher.telemetry_secret)
+                },
+            ),
+        ]
 
         ks_client = mock.Mock(auth_token='fake_token')
         ks_client.projects.find.return_value = mock.Mock(
@@ -364,12 +351,10 @@ class DispatcherTest(base.BaseTestCase):
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
         self.ks_client = ks_client
-        self.conf.conf.dispatcher_gnocchi.filter_service_activity = True
 
     def test_config_load(self):
-        self.conf.config(filter_service_activity=False,
-                         group='dispatcher_gnocchi')
-        d = gnocchi.GnocchiDispatcher(self.conf.conf)
+        url = netutils.urlsplit("gnocchi://")
+        d = gnocchi.GnocchiPublisher(self.conf.conf, url)
         names = [rd.cfg['resource_type'] for rd in d.resources_definition]
         self.assertIn('instance', names)
         self.assertIn('volume', names)
@@ -388,13 +373,12 @@ class DispatcherTest(base.BaseTestCase):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait.trait_plugin')
         rd = gnocchi.ResourcesDefinition(
-            resource, self.conf.conf.dispatcher_gnocchi.archive_policy,
-            plugin_manager)
+            resource, "low", plugin_manager)
         operation = rd.event_match("image.delete")
         self.assertEqual('delete', operation)
         self.assertEqual(True, rd.metric_match('image'))
 
-    @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
     def test_broken_config_load(self, mylog):
         contents = [("---\n"
                      "resources:\n"
@@ -419,63 +403,63 @@ class DispatcherTest(base.BaseTestCase):
                                                prefix='gnocchi_resources',
                                                suffix='.yaml')
             self.addCleanup(os.remove, temp)
-            self.conf.config(filter_service_activity=False,
-                             resources_definition_file=temp,
-                             group='dispatcher_gnocchi')
-            d = gnocchi.GnocchiDispatcher(self.conf.conf)
+            url = netutils.urlsplit(
+                "gnocchi://?resources_definition_file=" + temp)
+            d = gnocchi.GnocchiPublisher(self.conf.conf, url)
             self.assertTrue(mylog.error.called)
             self.assertEqual(0, len(d.resources_definition))
 
-    @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
+    @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '._if_not_cached')
-    @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
+    @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '.batch_measures')
     def _do_test_activity_filter(self, expected_measures, fake_batch, __):
-
-        d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        d.record_metering_data(self.samples)
+        url = netutils.urlsplit("gnocchi://")
+        d = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        d.publish_samples(self.samples)
         fake_batch.assert_called_with(
             mock.ANY, mock.ANY,
             {'metrics': 1, 'resources': 1, 'measures': expected_measures})
 
     def test_activity_filter_match_project_id(self):
-        self.samples[0]['project_id'] = (
+        self.samples[0].project_id = (
             'a2d42c23-d518-46b6-96ab-3fba2e146859')
         self._do_test_activity_filter(1)
 
-    @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
     def test_activity_gnocchi_project_not_found(self, logger):
         self.ks_client.projects.find.side_effect = ka_exceptions.NotFound
         self._do_test_activity_filter(2)
-        logger.warning.assert_called_with('gnocchi project not found in '
+        logger.warning.assert_called_with('filtered project not found in '
                                           'keystone, ignoring the '
-                                          'filter_service_activity option')
+                                          'filter_project option')
 
     def test_activity_filter_match_swift_event(self):
-        self.samples[0]['counter_name'] = 'storage.api.request'
-        self.samples[0]['resource_id'] = 'a2d42c23-d518-46b6-96ab-3fba2e146859'
+        self.samples[0].name = 'storage.api.request'
+        self.samples[0].resource_id = 'a2d42c23-d518-46b6-96ab-3fba2e146859'
         self._do_test_activity_filter(1)
 
     def test_activity_filter_nomatch(self):
         self._do_test_activity_filter(2)
 
-    @mock.patch('ceilometer.dispatcher.gnocchi.GnocchiDispatcher'
+    @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '.batch_measures')
     def test_unhandled_meter(self, fake_batch):
-        samples = [{
-            'counter_name': 'unknown.meter',
-            'counter_unit': 'GB',
-            'counter_type': 'gauge',
-            'counter_volume': '2',
-            'user_id': 'test_user',
-            'project_id': 'test_project',
-            'source': 'openstack',
-            'timestamp': '2014-05-08 20:23:48.028195',
-            'resource_id': 'randomid',
-            'resource_metadata': {}
-        }]
-        d = gnocchi.GnocchiDispatcher(self.conf.conf)
-        d.record_metering_data(samples)
+        samples = [sample.Sample(
+            name='unknown.meter',
+            unit='GB',
+            type=sample.TYPE_GAUGE,
+            volume=2,
+            user_id='test_user',
+            project_id='test_project',
+            source='openstack',
+            timestamp='2014-05-08 20:23:48.028195',
+            resource_id='randomid',
+            resource_metadata={}
+        )]
+        url = netutils.urlsplit("gnocchi://")
+        d = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        d.publish_samples(samples)
         self.assertEqual(0, len(fake_batch.call_args[0][1]))
 
 
@@ -491,30 +475,31 @@ class MockResponse(mock.NonCallableMock):
                                            text=text)
 
 
-class DispatcherWorkflowTest(base.BaseTestCase,
-                             testscenarios.TestWithScenarios):
+class PublisherWorkflowTest(base.BaseTestCase,
+                            testscenarios.TestWithScenarios):
 
     sample_scenarios = [
         ('disk.root.size', dict(
-            sample={
-                'counter_name': 'disk.root.size',
-                'counter_unit': 'GB',
-                'counter_type': 'gauge',
-                'counter_volume': '2',
-                'user_id': 'test_user',
-                'project_id': 'test_project',
-                'source': 'openstack',
-                'timestamp': '2012-05-08 20:23:48.028195',
-                'resource_metadata': {
+            sample=sample.Sample(
+                resource_id=str(uuid.uuid4()) + "_foobar",
+                name='disk.root.size',
+                unit='GB',
+                type=sample.TYPE_GAUGE,
+                volume=2,
+                user_id='test_user',
+                project_id='test_project',
+                source='openstack',
+                timestamp='2012-05-08 20:23:48.028195',
+                resource_metadata={
                     'host': 'foo',
                     'image_ref': 'imageref!',
                     'instance_flavor_id': 1234,
                     'display_name': 'myinstance',
-                }
-            },
+                },
+            ),
             measures_attributes=[{
                 'timestamp': '2012-05-08 20:23:48.028195',
-                'value': '2'
+                'value': 2
             }],
             postable_attributes={
                 'user_id': 'test_user',
@@ -542,22 +527,23 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 'compute.instance.booting.time'],
             resource_type='instance')),
         ('hardware.ipmi.node.power', dict(
-            sample={
-                'counter_name': 'hardware.ipmi.node.power',
-                'counter_unit': 'W',
-                'counter_type': 'gauge',
-                'counter_volume': '2',
-                'user_id': 'test_user',
-                'project_id': 'test_project',
-                'source': 'openstack',
-                'timestamp': '2012-05-08 20:23:48.028195',
-                'resource_metadata': {
+            sample=sample.Sample(
+                resource_id=str(uuid.uuid4()) + "_foobar",
+                name='hardware.ipmi.node.power',
+                unit='W',
+                type=sample.TYPE_GAUGE,
+                volume=2,
+                user_id='test_user',
+                project_id='test_project',
+                source='openstack',
+                timestamp='2012-05-08 20:23:48.028195',
+                resource_metadata={
                     'useless': 'not_used',
-                }
-            },
+                },
+            ),
             measures_attributes=[{
                 'timestamp': '2012-05-08 20:23:48.028195',
-                'value': '2'
+                'value': 2
             }],
             postable_attributes={
                 'user_id': 'test_user',
@@ -608,7 +594,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                                                          workflow_scenarios)
 
     def setUp(self):
-        super(DispatcherWorkflowTest, self).setUp()
+        super(PublisherWorkflowTest, self).setUp()
         conf = ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf = self.useFixture(config_fixture.Config(conf))
         ks_client = mock.Mock()
@@ -619,19 +605,10 @@ class DispatcherWorkflowTest(base.BaseTestCase,
             return_value=ks_client))
         self.ks_client = ks_client
 
-        self.conf.config(
-            resources_definition_file=self.path_get(
-                'etc/ceilometer/gnocchi_resources.yaml'),
-            group="dispatcher_gnocchi"
-        )
-
-        self.sample['resource_id'] = str(uuid.uuid4()) + "_foobar"
-        self.sample['message_signature'] = utils.compute_signature(
-            self.sample, self.conf.conf.publisher.telemetry_secret)
-
     @mock.patch('gnocchiclient.v1.client.Client')
     def test_event_workflow(self, fakeclient_cls):
-        self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
+        url = netutils.urlsplit("gnocchi://")
+        self.publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
 
         fakeclient = fakeclient_cls.return_value
 
@@ -677,23 +654,24 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 {'ended_at': now.isoformat()})
         ]
 
-        self.dispatcher.record_events([INSTANCE_DELETE_START,
-                                      IMAGE_DELETE_START,
-                                      VOLUME_DELETE_START,
-                                      FLOATINGIP_DELETE_END])
+        self.publisher.publish_events([INSTANCE_DELETE_START,
+                                       IMAGE_DELETE_START,
+                                       VOLUME_DELETE_START,
+                                       FLOATINGIP_DELETE_END])
         self.assertEqual(8, len(fakeclient.mock_calls))
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 
-    @mock.patch('ceilometer.dispatcher.gnocchi.LOG')
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
     @mock.patch('gnocchiclient.v1.client.Client')
     def test_workflow(self, fakeclient_cls, logger):
-        self.dispatcher = gnocchi.GnocchiDispatcher(self.conf.conf)
+        url = netutils.urlsplit("gnocchi://")
+        self.publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
 
         fakeclient = fakeclient_cls.return_value
 
-        resource_id = self.sample['resource_id'].replace("/", "_")
-        metric_name = self.sample['counter_name']
+        resource_id = self.sample.resource_id.replace("/", "_")
+        metric_name = self.sample.name
         gnocchi_id = uuid.uuid4()
 
         expected_calls = [
@@ -702,7 +680,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 create_metrics=True)
         ]
         expected_debug = [
-            mock.call('gnocchi project found: %s',
+            mock.call('filtered project found: %s',
                       'a2d42c23-d518-46b6-96ab-3fba2e146859'),
         ]
 
@@ -720,7 +698,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
 
             attributes = self.postable_attributes.copy()
             attributes.update(self.patchable_attributes)
-            attributes['id'] = self.sample['resource_id']
+            attributes['id'] = self.sample.resource_id
             attributes['metrics'] = dict((metric_name, {})
                                          for metric_name in self.metric_names)
             for k, v in six.iteritems(attributes['metrics']):
@@ -740,7 +718,7 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                     gnocchi_exc.ResourceAlreadyExists(409)]
             else:  # not resource_exists
                 expected_debug.append(mock.call(
-                    'Resource %s created', self.sample['resource_id']))
+                    'Resource %s created', self.sample.resource_id))
 
             if not self.create_resource_fail:
                 expected_calls.append(
@@ -774,12 +752,12 @@ class DispatcherWorkflowTest(base.BaseTestCase,
                 fakeclient.resource.update.side_effect = [Exception('boom!')]
             else:
                 expected_debug.append(mock.call(
-                    'Resource %s updated', self.sample['resource_id']))
+                    'Resource %s updated', self.sample.resource_id))
 
         batch = fakeclient.metric.batch_resources_metrics_measures
         batch.side_effect = batch_side_effect
 
-        self.dispatcher.record_metering_data([self.sample])
+        self.publisher.publish_samples([self.sample])
 
         # Check that the last log message is the expected one
         if (self.post_measure_fail
@@ -792,4 +770,4 @@ class DispatcherWorkflowTest(base.BaseTestCase,
         self.assertEqual(expected_calls, fakeclient.mock_calls)
         self.assertEqual(expected_debug, logger.debug.mock_calls)
 
-DispatcherWorkflowTest.generate_scenarios()
+PublisherWorkflowTest.generate_scenarios()

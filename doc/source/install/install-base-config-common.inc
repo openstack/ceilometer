@@ -1,15 +1,15 @@
-2. Edit the ``/etc/ceilometer/ceilometer.conf`` file and complete
+2. Edit the ``/etc/ceilometer/pipeline.yaml`` file and complete
    the following actions:
 
    * Configure Gnocchi connection:
 
-     .. code-block:: ini
+     .. code-block:: yaml
 
-        [dispatcher_gnocchi]
-        # filter out Gnocchi-related activity meters (Swift driver)
-        filter_service_activity = False
-        # default metric storage archival policy
-        archive_policy = low
+        publishers:
+            # set address of Gnocchi
+            # + filter out Gnocchi-related activity meters (Swift driver)
+            # + set default archive policy
+            - gnocchi://?filter_project=service&archive_policy=low
 
    * In the ``[DEFAULT]`` section,
      configure ``RabbitMQ`` message queue access:

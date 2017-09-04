@@ -39,10 +39,6 @@ Gnocchi
 
    * With Keystone authentication enabled::
 
-       [dispatcher_gnocchi]
-       filter_service_activity = False # Enable if using swift backend
-       filter_project = <project name associated with gnocchi user> # if using swift backend
-
        [service_credentials]
        auth_url = <auth_url>:5000
        region_name = RegionOne
@@ -58,9 +54,7 @@ Gnocchi
      authentication doesn't matter. This will increase the performance of
      Gnocchi::
 
-       [dispatcher_gnocchi]
-       filter_service_activity = False # Enable if using swift backend
-       filter_project = <project name associated with gnocchi user> # if using swift backend
+       [gnocchi]
        auth_section=service_credentials_gnocchi
 
        [service_credentials_gnocchi]

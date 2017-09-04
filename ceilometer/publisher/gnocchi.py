@@ -27,13 +27,14 @@ from oslo_serialization import jsonutils
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import six
+import six.moves.urllib.parse as urlparse
 from stevedore import extension
 
 from ceilometer import declarative
-from ceilometer import dispatcher
 from ceilometer import gnocchi_client
 from ceilometer.i18n import _
 from ceilometer import keystone_client
+from ceilometer import publisher
 
 NAME_ENCODED = __name__.encode('utf-8')
 CACHE_NAMESPACE = uuid.UUID(bytes=hashlib.md5(NAME_ENCODED).digest())
@@ -129,14 +130,14 @@ class ResourcesDefinition(object):
     def sample_attributes(self, sample):
         attrs = {}
         for name, definition in self._attributes.items():
-            value = definition.parse(sample)
+            value = definition.parse(sample.as_dict())
             if value is not None:
                 attrs[name] = value
         return attrs
 
     def event_attributes(self, event):
         attrs = {'type': self.cfg['resource_type']}
-        traits = dict([(trait[0], trait[2]) for trait in event['traits']])
+        traits = dict([(trait[0], trait[2]) for trait in event.traits])
         for attr, field in self.cfg.get('event_attributes', {}).items():
             value = traits.get(field)
             if value is not None:
@@ -168,44 +169,49 @@ class LockedDefaultDict(defaultdict):
                     key_lock.release()
 
 
-class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
-                        dispatcher.EventDispatcherBase):
-    """Dispatcher class for recording metering data into the Gnocchi service.
+class GnocchiPublisher(publisher.ConfigPublisherBase):
+    """Publisher class for recording metering data into the Gnocchi service.
 
-    The dispatcher class records each meter into the gnocchi service
-    configured in ceilometer configuration file. An example configuration may
+    The publisher class records each meter into the gnocchi service
+    configured in Ceilometer pipeline file. An example target may
     look like the following:
 
-    [dispatcher_gnocchi]
-    archive_policy = low
-
-    To enable this dispatcher, the following section needs to be present in
-    ceilometer.conf file
-
-    [DEFAULT]
-    meter_dispatchers = gnocchi
-    event_dispatchers = gnocchi
+      gnocchi://?archive_policy=low&filter_project=gnocchi
     """
-    def __init__(self, conf):
-        super(GnocchiDispatcher, self).__init__(conf)
-        self.conf = conf
-        self.filter_service_activity = (
-            conf.dispatcher_gnocchi.filter_service_activity)
+    def __init__(self, conf, parsed_url):
+        super(GnocchiPublisher, self).__init__(conf, parsed_url)
+        # TODO(jd) allow to override Gnocchi endpoint via the host in the URL
+        options = urlparse.parse_qs(parsed_url.query)
+
+        self.filter_project = options.get(
+            'filter_project',
+            [conf.dispatcher_gnocchi.filter_project])[-1]
+
+        resources_definition_file = options.get(
+            'resources_definition_file',
+            [conf.dispatcher_gnocchi.resources_definition_file])[-1]
+        archive_policy = options.get(
+            'archive_policy',
+            [conf.dispatcher_gnocchi.archive_policy])[-1]
+        self.resources_definition = self._load_resources_definitions(
+            conf, archive_policy, resources_definition_file)
+
+        timeout = options.get('timeout',
+                              [conf.dispatcher_gnocchi.request_timeout])[-1]
         self._ks_client = keystone_client.get_client(conf)
-        self.resources_definition = self._load_resources_definitions(conf)
 
         self.cache = None
         try:
             import oslo_cache
-            oslo_cache.configure(self.conf)
+            oslo_cache.configure(conf)
             # NOTE(cdent): The default cache backend is a real but
             # noop backend. We don't want to use that here because
             # we want to avoid the cache pathways entirely if the
             # cache has not been configured explicitly.
-            if self.conf.cache.enabled:
+            if conf.cache.enabled:
                 cache_region = oslo_cache.create_region()
                 self.cache = oslo_cache.configure_cache_region(
-                    self.conf, cache_region)
+                    conf, cache_region)
                 self.cache.key_mangler = cache_key_mangler
         except ImportError:
             pass
@@ -216,16 +222,18 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         self._gnocchi_project_id_lock = threading.Lock()
         self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
-        self._gnocchi = gnocchi_client.get_gnocchiclient(conf)
+        self._gnocchi = gnocchi_client.get_gnocchiclient(
+            conf, request_timeout=timeout)
         self._already_logged_event_types = set()
         self._already_logged_metric_names = set()
 
-    @classmethod
-    def _load_resources_definitions(cls, conf):
+    @staticmethod
+    def _load_resources_definitions(conf, archive_policy,
+                                    resources_definition_file):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
         data = declarative.load_definitions(
-            conf, {}, conf.dispatcher_gnocchi.resources_definition_file,
+            conf, {}, resources_definition_file,
             pkg_resources.resource_filename(__name__,
                                             "data/gnocchi_resources.yaml"))
         resource_defs = []
@@ -233,7 +241,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             try:
                 resource_defs.append(ResourcesDefinition(
                     resource,
-                    conf.dispatcher_gnocchi.archive_policy, plugin_manager))
+                    archive_policy, plugin_manager))
             except Exception as exc:
                 LOG.error("Failed to load resource due to error %s" %
                           exc)
@@ -247,32 +255,32 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             if self._gnocchi_project_id is None:
                 try:
                     project = self._ks_client.projects.find(
-                        name=self.conf.dispatcher_gnocchi.filter_project)
+                        name=self.filter_project)
                 except ka_exceptions.NotFound:
-                    LOG.warning('gnocchi project not found in keystone,'
-                                ' ignoring the filter_service_activity '
+                    LOG.warning('filtered project not found in keystone,'
+                                ' ignoring the filter_project '
                                 'option')
-                    self.filter_service_activity = False
+                    self.filter_project = None
                     return None
                 except Exception:
-                    LOG.exception('fail to retrieve user of Gnocchi '
-                                  'service')
+                    LOG.exception('fail to retrieve filtered project ')
                     raise
                 self._gnocchi_project_id = project.id
-                LOG.debug("gnocchi project found: %s", self.gnocchi_project_id)
+                LOG.debug("filtered project found: %s",
+                          self.gnocchi_project_id)
             return self._gnocchi_project_id
 
     def _is_swift_account_sample(self, sample):
         return bool([rd for rd in self.resources_definition
                      if rd.cfg['resource_type'] == 'swift_account'
-                     and rd.metric_match(sample['counter_name'])])
+                     and rd.metric_match(sample.name)])
 
     def _is_gnocchi_activity(self, sample):
-        return (self.filter_service_activity and self.gnocchi_project_id and (
+        return (self.filter_project and self.gnocchi_project_id and (
             # avoid anything from the user used by gnocchi
-            sample['project_id'] == self.gnocchi_project_id or
+            sample.project_id == self.gnocchi_project_id or
             # avoid anything in the swift account used by gnocchi
-            (sample['resource_id'] == self.gnocchi_project_id and
+            (sample.resource_id == self.gnocchi_project_id and
              self._is_swift_account_sample(sample))
         ))
 
@@ -287,16 +295,13 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             if operation:
                 return rd, operation
 
-    def record_metering_data(self, data):
-        # We may have receive only one counter on the wire
-        if not isinstance(data, list):
-            data = [data]
+    def publish_samples(self, data):
         # NOTE(sileht): skip sample generated by gnocchi itself
         data = [s for s in data if not self._is_gnocchi_activity(s)]
 
-        data.sort(key=lambda s: (s['resource_id'], s['counter_name']))
+        data.sort(key=lambda s: (s.resource_id, s.name))
         resource_grouped_samples = itertools.groupby(
-            data, key=operator.itemgetter('resource_id'))
+            data, key=operator.attrgetter('resource_id'))
 
         gnocchi_data = {}
         measures = {}
@@ -308,7 +313,7 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
             stats['resources'] += 1
             metric_grouped_samples = itertools.groupby(
                 list(samples_of_resource),
-                key=operator.itemgetter('counter_name'))
+                key=operator.attrgetter('name'))
 
             res_info = {}
             for metric_name, samples in metric_grouped_samples:
@@ -328,8 +333,8 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                 res_info['resource_type'] = rd.cfg['resource_type']
                 res_info.setdefault("resource", {}).update({
                     "id": resource_id,
-                    "user_id": samples[0]['user_id'],
-                    "project_id": samples[0]['project_id'],
+                    "user_id": samples[0].user_id,
+                    "project_id": samples[0].project_id,
                     "metrics": rd.metrics,
                 })
 
@@ -338,10 +343,10 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
                         rd.sample_attributes(sample))
                     m = measures.setdefault(resource_id, {}).setdefault(
                         metric_name, [])
-                    m.append({'timestamp': sample['timestamp'],
-                              'value': sample['counter_volume']})
-                    unit = sample['counter_unit']
-                    metric = sample['counter_name']
+                    m.append({'timestamp': sample.timestamp,
+                              'value': sample.volume})
+                    unit = sample.unit
+                    metric = sample.name
                     res_info['resource']['metrics'][metric]['unit'] = unit
 
                 stats['measures'] += len(measures[resource_id][metric_name])
@@ -463,14 +468,14 @@ class GnocchiDispatcher(dispatcher.MeterDispatcherBase,
         else:
             return None
 
-    def record_events(self, events):
+    def publish_events(self, events):
         for event in events:
-            rd = self._get_resource_definition_from_event(event['event_type'])
+            rd = self._get_resource_definition_from_event(event.event_type)
             if not rd:
-                if event['event_type'] not in self._already_logged_event_types:
+                if event.event_type not in self._already_logged_event_types:
                     LOG.debug("No gnocchi definition for event type: %s",
-                              event['event_type'])
-                    self._already_logged_event_types.add(event['event_type'])
+                              event.event_type)
+                    self._already_logged_event_types.add(event.event_type)
                 continue
 
             rd, operation = rd

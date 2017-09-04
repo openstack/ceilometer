@@ -92,6 +92,10 @@ configuration file ``pipeline.yaml`` and/or ``event_pipeline.yaml`` which is
 normally located at /etc/ceilometer directory and make changes accordingly.
 Your configuration file can be in a different directory.
 
+For the Gnocchi publisher, the archive policy can be defined as a configuration
+settings. The value specified for ``archive_policy`` should correspond to the
+name of an ``archive_policy`` configured within Gnocchi.
+
 To use multiple publishers, add multiple publisher lines in ``pipeline.yaml`` and/or
 ``event_pipeline.yaml`` file like the following::
 
@@ -107,17 +111,9 @@ To use multiple publishers, add multiple publisher lines in ``pipeline.yaml`` an
          transformers:
          publishers:
             - database://
-            - gnocchi://
+            - gnocchi://?archive_policy=low
             - file://
 
-For the Gnocchi publisher, the following configuration settings should be added
-into /etc/ceilometer/ceilometer.conf::
-
-    [dispatcher_gnocchi]
-    archive_policy = low
-
-The value specified for ``archive_policy`` should correspond to the name of an
-``archive_policy`` configured within Gnocchi.
 
 For the Gnocchi publisher backed by Swift storage, the following additional
 configuration settings should be added::
