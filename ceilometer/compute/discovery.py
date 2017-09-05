@@ -62,7 +62,9 @@ OPTS = [
                     "the instance list to poll will be updated based "
                     "on this option's interval. Measurements relating "
                     "to the instances will match intervals "
-                    "defined in pipeline. "),
+                    "defined in pipeline. This option is only used "
+                    "for agent polling to Nova API, so it will work only "
+                    "when 'instance_discovery_method' is set to 'naive'."),
     cfg.IntOpt('resource_cache_expiry',
                default=3600,
                min=0,
@@ -72,8 +74,8 @@ OPTS = [
                     "local cache by totally refreshing the local cache. "
                     "The minimum should be the value of the config option "
                     "of resource_update_interval. This option is only used "
-                    "for agent polling to Nova API, so it will works only "
-                    "when 'instance_discovery_method' was set to 'naive'.")
+                    "for agent polling to Nova API, so it will work only "
+                    "when 'instance_discovery_method' is set to 'naive'.")
 ]
 
 LOG = log.getLogger(__name__)
