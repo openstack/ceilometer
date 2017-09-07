@@ -27,7 +27,6 @@ import ceilometer.compute.virt.libvirt.utils
 import ceilometer.compute.virt.vmware.inspector
 import ceilometer.compute.virt.xenapi.inspector
 import ceilometer.dispatcher
-import ceilometer.dispatcher.file
 import ceilometer.dispatcher.gnocchi_opts
 import ceilometer.dispatcher.http
 import ceilometer.event.converter
@@ -112,7 +111,6 @@ def list_opts():
                 'membership has changed'),
         ]),
         ('database', ceilometer.storage.OPTS),
-        ('dispatcher_file', ceilometer.dispatcher.file.OPTS),
         ('dispatcher_http', ceilometer.dispatcher.http.http_dispatcher_opts),
         ('dispatcher_gnocchi',
          ceilometer.dispatcher.gnocchi_opts.dispatcher_opts),
