@@ -16,7 +16,6 @@
 
 import abc
 
-from debtcollector import removals
 from oslo_utils import netutils
 import six
 from stevedore import driver
@@ -34,30 +33,6 @@ def get_publisher(conf, url, namespace):
         return loaded_driver.driver(conf, parse_result)
     else:
         return loaded_driver.driver(parse_result)
-
-
-@removals.removed_class("PublisherBase",
-                        message="Use ConfigPublisherBase instead",
-                        removal_version="9.0.0")
-@six.add_metaclass(abc.ABCMeta)
-class PublisherBase(object):
-    """Legacy base class for plugins that publish data.
-
-    This base class is for backward compatibility purpose. It doesn't take
-    oslo.config object as argument. We assume old publisher does not depend
-    on cfg.CONF.
-    """
-
-    def __init__(self, parsed_url):
-        pass
-
-    @abc.abstractmethod
-    def publish_samples(self, samples):
-        """Publish samples into final conduit."""
-
-    @abc.abstractmethod
-    def publish_events(self, events):
-        """Publish events into final conduit."""
 
 
 @six.add_metaclass(abc.ABCMeta)
