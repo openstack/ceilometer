@@ -167,7 +167,7 @@ same as the names of the related extensions in :file:`setup.cfg`. For a more
 detailed description, please see the `transformers`_ section of the
 Administrator Guide of Ceilometer.
 
-.. _transformers: https://docs.openstack.org/admin-guide/telemetry-data-collection.html#transformers
+.. _transformers: https://docs.openstack.org/ceilometer/latest/admin/telemetry-data-pipelines.html#transformers
 
 The *publishers* section contains the list of publishers, where the samples
 data should be sent after the possible transformations. The names of the
@@ -212,4 +212,4 @@ Publishers
 For more information about publishers see the `publishers`_ section of the
 Administrator Guide of Ceilometer.
 
-.. _publishers: https://docs.openstack.org/admin-guide/telemetry-data-pipelines.html#publishers
+.. _publishers: https://docs.openstack.org/ceilometer/latest/admin/telemetry-data-pipelines.html#publishers
