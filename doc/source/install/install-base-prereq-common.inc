@@ -83,6 +83,16 @@
         | type        | metric                           |
         +-------------+----------------------------------+
 
+   * Add the ``admin`` role to the ``gnocchi`` user.
+
+     .. code-block:: console
+
+        $ openstack role add --project service --user gnocchi admin
+
+     .. note::
+
+        This command provides no output.
+
    * Create the Metric service API endpoints:
 
      .. code-block:: console
