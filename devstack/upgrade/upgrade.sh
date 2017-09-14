@@ -80,8 +80,7 @@ start_ceilometer
 ensure_services_started "ceilometer-polling --polling-namespaces compute" \
                         "ceilometer-polling --polling-namespaces central" \
                         ceilometer-agent-notification \
-                        ceilometer-api \
-                        ceilometer-collector
+                        ceilometer-api
 
 # Save mongodb state (replace with snapshot)
 if grep -q 'connection *= *mongo' /etc/ceilometer/ceilometer.conf; then

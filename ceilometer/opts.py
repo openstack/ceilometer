@@ -20,7 +20,6 @@ from oslo_config import cfg
 import ceilometer.agent.manager
 import ceilometer.api.app
 import ceilometer.api.controllers.v2.root
-import ceilometer.collector
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
@@ -87,7 +86,6 @@ def list_opts():
                          OPTS)),
         ('api', itertools.chain(ceilometer.api.app.API_OPTS,
                                 ceilometer.api.controllers.v2.root.API_OPTS)),
-        ('collector', ceilometer.collector.OPTS),
         ('compute', ceilometer.compute.discovery.OPTS),
         ('coordination', [
             cfg.StrOpt(

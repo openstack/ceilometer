@@ -440,7 +440,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 with self._gnocchi_resource_lock[cache_key]:
                     # NOTE(luogangyi): there is a possibility that the
                     # resource was already built in cache by another
-                    # ceilometer-collector when we get the lock here.
+                    # ceilometer-notification-agent when we get the lock here.
                     attribute_hash = self._check_resource_cache(cache_key,
                                                                 resource)
                     if attribute_hash:

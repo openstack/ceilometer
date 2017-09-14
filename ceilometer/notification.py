@@ -50,7 +50,6 @@ OPTS = [
                     'Once set, lowering this value may result in lost data.'),
     cfg.BoolOpt('ack_on_event_error',
                 default=True,
-                deprecated_group='collector',
                 help='Acknowledge message when event persistence fails.'),
     cfg.BoolOpt('workload_partitioning',
                 default=False,
