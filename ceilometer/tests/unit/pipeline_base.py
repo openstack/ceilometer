@@ -949,7 +949,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
         self._set_pipeline_cfg('meters', ['cpu'])
-        now = timeutils.utcnow()
+        now = datetime.datetime.utcnow()
         later = now + datetime.timedelta(minutes=offset)
         um = {'autoscaling_weight': weight} if weight else {}
         counters = [
@@ -1073,7 +1073,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         ]
         self._set_pipeline_cfg('transformers', transformer_cfg)
         self._set_pipeline_cfg('meters', ['cpu'])
-        now = timeutils.utcnow()
+        now = datetime.datetime.utcnow()
         counters = [
             sample.Sample(
                 name='cpu',
@@ -1119,7 +1119,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
 
-        now = timeutils.utcnow()
+        now = datetime.datetime.utcnow()
         now_time = monotonic.monotonic()
         # Simulate a laggy poller
         later = now + datetime.timedelta(seconds=12345)
@@ -1181,7 +1181,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
 
-        now = timeutils.utcnow()
+        now = datetime.datetime.utcnow()
         later = now + datetime.timedelta(seconds=10)
         rounding = 12345
 
@@ -1239,7 +1239,7 @@ class BasePipelineTestCase(base.BaseTestCase):
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         pipe = pipeline_manager.pipelines[0]
 
-        now = timeutils.utcnow()
+        now = datetime.datetime.utcnow()
         earlier = now - datetime.timedelta(seconds=10)
         later = now + datetime.timedelta(seconds=10)
 
@@ -1293,7 +1293,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         )
 
     def _do_test_rate_of_change_mapping(self, pipe, meters, units):
-        now = timeutils.utcnow()
+        now = datetime.datetime.utcnow()
         base = 1000
         offset = 7
         rate = 42
@@ -1689,8 +1689,10 @@ class BasePipelineTestCase(base.BaseTestCase):
         publisher = pipe.publishers[0]
         self.assertEqual(2, len(publisher.samples))
 
-    def test_aggregator_timed_flush(self):
-        timeutils.set_time_override()
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_aggregator_timed_flush(self, mock_utcnow):
+        now = datetime.datetime.utcnow()
+        mock_utcnow.return_value = now
         transformer_cfg = [
             {
                 'name': 'aggregator',
@@ -1722,7 +1724,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(0, len(publisher.samples))
 
-        timeutils.advance_time_seconds(120)
+        mock_utcnow.return_value = now + datetime.timedelta(seconds=120)
         pipe.flush()
         publisher = pipeline_manager.pipelines[0].publishers[0]
         self.assertEqual(1, len(publisher.samples))
@@ -2048,8 +2050,10 @@ class BasePipelineTestCase(base.BaseTestCase):
         self.assertEqual(2, len(publisher.samples))
         self.assertEqual(2050.0, publisher.samples[1].volume)
 
-    def test_aggregator_timed_flush_no_matching_samples(self):
-        timeutils.set_time_override()
+    @mock.patch.object(timeutils, 'utcnow')
+    def test_aggregator_timed_flush_no_matching_samples(self, mock_utcnow):
+        now = datetime.datetime.utcnow()
+        mock_utcnow.return_value = now
         transformer_cfg = [
             {
                 'name': 'aggregator',
@@ -2061,7 +2065,7 @@ class BasePipelineTestCase(base.BaseTestCase):
         pipeline_manager = pipeline.PipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
-        timeutils.advance_time_seconds(200)
+        mock_utcnow.return_value = now + datetime.timedelta(seconds=200)
         pipe = pipeline_manager.pipelines[0]
         pipe.flush()
         publisher = pipeline_manager.pipelines[0].publishers[0]
