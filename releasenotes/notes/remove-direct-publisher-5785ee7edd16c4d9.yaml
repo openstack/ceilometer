@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Remove direct publisher and use the explicit publisher instead.
