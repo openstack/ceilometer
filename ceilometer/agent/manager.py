@@ -107,10 +107,11 @@ class Resources(object):
         if self._resources:
             static_resources_group = self.agent_manager.construct_group_id(
                 utils.hash_of_set(self._resources))
-            return [v for v in self._resources if
-                    self.agent_manager.hashrings[
-                        static_resources_group].belongs_to_self(
-                            six.text_type(v))] + source_discovery
+            if self.agent_manager.hashrings:
+                return [v for v in self._resources if
+                        self.agent_manager.hashrings[
+                            static_resources_group].belongs_to_self(
+                                six.text_type(v))] + source_discovery
 
         return source_discovery
 
@@ -284,6 +285,7 @@ class AgentManager(cotyledon.Service):
             coordination_id = str(uuid.uuid4()).encode('ascii')
             self.partition_coordinator = coordination.get_coordinator(
                 self.conf.coordination.backend_url, coordination_id)
+            self.hashrings = None
         else:
             self.partition_coordinator = None
 
