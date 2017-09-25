@@ -27,10 +27,8 @@ from keystoneauth1 import exceptions as ka_exceptions
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
-from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import six
-from six import moves
 from six.moves.urllib import parse as urlparse
 from stevedore import extension
 from tooz import coordination
@@ -72,19 +70,10 @@ POLLING_OPTS = [
 ]
 
 
-class PollsterListForbidden(Exception):
-    def __init__(self):
-        msg = ('It is forbidden to use pollster-list option of polling agent '
-               'in case of using coordination between multiple agents. Please '
-               'use either multiple agents being coordinated or polling list '
-               'option for one polling agent.')
-        super(PollsterListForbidden, self).__init__(msg)
-
-
 class EmptyPollstersList(Exception):
     def __init__(self):
-        msg = ('No valid pollsters can be loaded with the startup parameters'
-               ' polling-namespaces and pollster-list.')
+        msg = ('No valid pollsters can be loaded with the startup parameter'
+               ' polling-namespaces.')
         super(EmptyPollstersList, self).__init__(msg)
 
 
@@ -232,25 +221,13 @@ class PollingTask(object):
 
 class AgentManager(cotyledon.Service):
 
-    def __init__(self, worker_id, conf, namespaces=None, pollster_list=None):
+    def __init__(self, worker_id, conf, namespaces=None):
         namespaces = namespaces or ['compute', 'central']
-        pollster_list = pollster_list or []
         group_prefix = conf.polling.partitioning_group_prefix
-
-        # features of using coordination and pollster-list are exclusive, and
-        # cannot be used at one moment to avoid both samples duplication and
-        # samples being lost
-        if pollster_list and conf.coordination.backend_url:
-            raise PollsterListForbidden()
 
         super(AgentManager, self).__init__(worker_id)
 
         self.conf = conf
-
-        def _match(pollster):
-            """Find out if pollster name matches to one of the list."""
-            return any(fnmatch.fnmatch(pollster.name, pattern) for
-                       pattern in pollster_list)
 
         if type(namespaces) is not list:
             namespaces = [namespaces]
@@ -262,11 +239,6 @@ class AgentManager(cotyledon.Service):
         # get the extensions from pollster builder
         extensions_fb = (self._extensions_from_builder('poll', namespace)
                          for namespace in namespaces)
-        if pollster_list:
-            extensions = (moves.filter(_match, exts)
-                          for exts in extensions)
-            extensions_fb = (moves.filter(_match, exts)
-                             for exts in extensions_fb)
 
         self.extensions = list(itertools.chain(*list(extensions))) + list(
             itertools.chain(*list(extensions_fb)))

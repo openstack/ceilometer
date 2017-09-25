@@ -54,45 +54,16 @@ class TestManager(base.BaseTestCase):
         mgr = manager.AgentManager(0, self.conf)
         self.assertIsNotNone(list(mgr.extensions))
 
-    def test_load_plugins_pollster_list(self):
-        mgr = manager.AgentManager(0, self.conf, pollster_list=['disk.*'])
-        # currently we do have 28 disk-related pollsters
-        self.assertEqual(28, len(list(mgr.extensions)))
-
-    def test_load_invalid_plugins_pollster_list(self):
-        # if no valid pollsters have been loaded, the ceilometer
-        # polling program should exit
-        self.assertRaisesRegex(
-            manager.EmptyPollstersList,
-            'No valid pollsters can be loaded with the startup parameters'
-            ' polling-namespaces and pollster-list.',
-            manager.AgentManager, 0, self.conf,
-            pollster_list=['aaa'])
-
-    def test_load_plugins_no_intersection(self):
-        # Let's test nothing will be polled if namespace and pollsters
-        # list have no intersection.
-        parameters = dict(namespaces=['compute'],
-                          pollster_list=['storage.*'])
-        self.assertRaisesRegex(
-            manager.EmptyPollstersList,
-            'No valid pollsters can be loaded with the startup parameters'
-            ' polling-namespaces and pollster-list.',
-            manager.AgentManager, 0, self.conf, parameters)
-
     # Test plugin load behavior based on Node Manager pollsters.
-    # pollster_list is just a filter, so sensor pollsters under 'ipmi'
-    # namespace would be also instanced. Still need mock __init__ for it.
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
                 mock.Mock(return_value=None))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
     def test_load_normal_plugins(self):
         mgr = manager.AgentManager(0, self.conf,
-                                   namespaces=['ipmi'],
-                                   pollster_list=['hardware.ipmi.node.*'])
+                                   namespaces=['ipmi'])
         # 8 pollsters for Node Manager
-        self.assertEqual(8, len(mgr.extensions))
+        self.assertEqual(12, len(mgr.extensions))
 
     # Skip loading pollster upon ExtensionLoadError
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
@@ -105,8 +76,7 @@ class TestManager(base.BaseTestCase):
         # list if param was not set as a list.
         try:
             manager.AgentManager(0, self.conf,
-                                 namespaces='ipmi',
-                                 pollster_list=['hardware.ipmi.node.*'])
+                                 namespaces='ipmi')
         except manager.EmptyPollstersList:
             err_msg = 'Skip loading extension for %s'
             pollster_names = [
@@ -122,13 +92,11 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
     def test_import_error_in_plugin(self):
-        parameters = dict(namespaces=['ipmi'],
-                          pollster_list=['hardware.ipmi.node.*'])
         self.assertRaisesRegex(
             manager.EmptyPollstersList,
-            'No valid pollsters can be loaded with the startup parameters'
-            ' polling-namespaces and pollster-list.',
-            manager.AgentManager, 0, self.conf, parameters)
+            'No valid pollsters can be loaded with the startup parameter'
+            ' polling-namespaces.',
+            manager.AgentManager, 0, self.conf, {"namespaces": ['ipmi']})
 
     # Exceptions other than ExtensionLoadError are propagated
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
@@ -139,16 +107,7 @@ class TestManager(base.BaseTestCase):
         self.assertRaises(PollingException,
                           manager.AgentManager,
                           0, self.conf,
-                          ['ipmi'],
-                          ['hardware.ipmi.node.*'])
-
-    def test_load_plugins_pollster_list_forbidden(self):
-        self.conf.set_override('backend_url', 'http://',
-                               group='coordination')
-        self.assertRaises(manager.PollsterListForbidden,
-                          manager.AgentManager,
-                          0, self.conf,
-                          pollster_list=['disk.*'])
+                          ['ipmi'])
 
     def test_builder(self):
         @staticmethod

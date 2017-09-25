@@ -344,20 +344,6 @@ Running :command:`ceilometer-agent-ipmi` is exactly the same as:
 
    $ ceilometer-polling --polling-namespaces ipmi
 
-In addition to loading all the polling plug-ins registered in the
-specified namespaces, the ``ceilometer-polling`` agent can also specify the
-polling plug-ins to be loaded by using the ``pollster-list`` option:
-
-.. code-block:: console
-
-   $ ceilometer-polling --polling-namespaces central \
-           --pollster-list image image.size storage.*
-
-.. note::
-
-   HA deployment is NOT supported if the ``pollster-list`` option is
-   used.
-
 Compute agent
 -------------
 
