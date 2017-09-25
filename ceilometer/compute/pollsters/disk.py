@@ -242,12 +242,12 @@ class PerDevicePhysicalPollster(PerDeviceDiskPollster):
 class PerDeviceDiskReadLatencyPollster(PerDeviceDiskPollster):
     sample_name = 'disk.device.read.latency'
     sample_type = sample.TYPE_CUMULATIVE
-    sample_unit = 'ms'
+    sample_unit = 'ns'
     sample_stats_key = 'rd_total_times'
 
 
 class PerDeviceDiskWriteLatencyPollster(PerDeviceDiskPollster):
     sample_name = 'disk.device.write.latency'
     sample_type = sample.TYPE_CUMULATIVE
-    sample_unit = 'ms'
+    sample_unit = 'ns'
     sample_stats_key = 'wr_total_times'
