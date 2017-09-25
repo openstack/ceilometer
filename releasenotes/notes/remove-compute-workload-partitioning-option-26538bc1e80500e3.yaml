@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The deprecated `compute.workload_partitioning` option has been removed in
+    favor of `compute.instance_discovery_method`.
