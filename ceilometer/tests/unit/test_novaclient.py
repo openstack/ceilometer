@@ -242,8 +242,3 @@ class TestNovaClient(base.BaseTestCase):
         self.assertIsNone(instance.kernel_id)
         self.assertIsNone(instance.image)
         self.assertIsNone(instance.ramdisk_id)
-
-    def test_with_nova_http_log_debug(self):
-        self.CONF.set_override("nova_http_log_debug", True)
-        self.nv = nova_client.Client(self.CONF)
-        self.assertIsNotNone(self.nv.nova_client.client.logger)
