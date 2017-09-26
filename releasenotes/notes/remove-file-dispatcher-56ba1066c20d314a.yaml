@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated file dispatcher has been removed.
