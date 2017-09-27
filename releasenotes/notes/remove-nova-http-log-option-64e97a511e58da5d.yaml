@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated `nova_http_log_debug` option has been removed.

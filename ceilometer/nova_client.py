@@ -22,15 +22,6 @@ from oslo_log import log
 
 from ceilometer import keystone_client
 
-OPTS = [
-    cfg.BoolOpt('nova_http_log_debug',
-                default=False,
-                # Added in Mitaka
-                deprecated_for_removal=True,
-                help=('Allow novaclient\'s debug log output. '
-                      '(Use default_log_levels instead)')),
-]
-
 SERVICE_OPTS = [
     cfg.StrOpt('nova',
                default='compute',
@@ -60,10 +51,6 @@ class Client(object):
         """Initialize a nova client object."""
         creds = conf.service_credentials
 
-        logger = None
-        if conf.nova_http_log_debug:
-            logger = log.getLogger("novaclient-debug")
-            logger.logger.setLevel(log.DEBUG)
         ks_session = keystone_client.get_session(conf)
 
         self.nova_client = nova_client.Client(
@@ -73,8 +60,7 @@ class Client(object):
             # nova adapter options
             region_name=creds.region_name,
             endpoint_type=creds.interface,
-            service_type=conf.service_types.nova,
-            logger=logger)
+            service_type=conf.service_types.nova)
 
         self.glance_client = glanceclient.Client(
             version='2',

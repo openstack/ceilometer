@@ -83,7 +83,6 @@ def list_opts():
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.dispatcher.OPTS,
                          ceilometer.ipmi.notifications.ironic.OPTS,
-                         ceilometer.nova_client.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.sample.OPTS,
