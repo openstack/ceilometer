@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated kafka publisher has been removed, use NotifierPublisher instead.
