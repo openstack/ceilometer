@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The deprecated support of configure polling in the `pipeline.yaml` file has
+    been removed. Ceilometer now only uses the `polling.yaml` file for polling
+    configuration.
