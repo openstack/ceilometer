@@ -391,7 +391,14 @@ function install_ceilometer {
     fi
 
     install_ceilometerclient
-    setup_develop $CEILOMETER_DIR
+
+    case $CEILOMETER_BACKEND in
+        mongodb) extra=mongo;;
+        gnocchi) extra=gnocchi;;
+        mysql) extra=mysql;;
+        postgresql) extra=postgresql;;
+    esac
+    setup_develop $CEILOMETER_DIR $extra
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
 }
 
