@@ -206,7 +206,7 @@ class NotificationService(cotyledon.Service):
             # NOTE(gordc): ignore batching as we want pull
             # to maintain sequencing as much as possible.
             listener = messaging.get_batch_notification_listener(
-                transport, targets, endpoints)
+                transport, targets, endpoints, allow_requeue=True)
             listener.start(
                 override_pool_size=self.conf.max_parallel_requests
             )
@@ -239,7 +239,7 @@ class NotificationService(cotyledon.Service):
             self.pipeline_listener.wait()
 
         self.pipeline_listener = messaging.get_batch_notification_listener(
-            self.transport, targets, endpoints,
+            self.transport, targets, endpoints, allow_requeue=True,
             batch_size=self.conf.notification.batch_size,
             batch_timeout=self.conf.notification.batch_timeout)
         # NOTE(gordc): set single thread to process data sequentially
