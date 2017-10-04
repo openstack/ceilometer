@@ -142,4 +142,4 @@ class BaseTelemetryAdminTest(BaseTelemetryTest):
     @classmethod
     def setup_clients(cls):
         super(BaseTelemetryAdminTest, cls).setup_clients()
-        cls.telemetry_admin_client = cls.os_adm.telemetry_client
+        cls.telemetry_admin_client = cls.os_admin.telemetry_client
