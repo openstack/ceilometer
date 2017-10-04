@@ -37,10 +37,10 @@ class SampleEndpoint(pipeline.NotificationEndpoint):
         for message in notifications:
             try:
                 with self.manager.publisher() as p:
-                    p(list(self.process_notification(message)))
+                    p(list(self.build_sample(message)))
             except Exception:
                 LOG.error('Fail to process notification', exc_info=True)
 
-    def process_notification(notification):
+    def build_sample(notification):
         """Build sample from provided notification."""
         pass

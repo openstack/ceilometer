@@ -90,7 +90,7 @@ class SensorNotification(endpoint.SampleEndpoint):
                 'payload': payload}
         return info
 
-    def process_notification(self, message):
+    def build_sample(self, message):
         """Read and process a notification.
 
         The guts of a message are in dict value of a 'payload' key

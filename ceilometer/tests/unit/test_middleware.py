@@ -73,7 +73,7 @@ class TestNotifications(base.BaseTestCase):
         self.setup_messaging(self.CONF)
 
     def test_process_request_notification(self):
-        sample = list(middleware.HTTPRequest(mock.Mock()).process_notification(
+        sample = list(middleware.HTTPRequest(mock.Mock()).build_sample(
             HTTP_REQUEST
         ))[0]
         self.assertEqual(HTTP_REQUEST['payload']['request']['HTTP_X_USER_ID'],
@@ -86,7 +86,7 @@ class TestNotifications(base.BaseTestCase):
 
     def test_process_response_notification(self):
         sample = list(middleware.HTTPResponse(
-            mock.Mock()).process_notification(HTTP_RESPONSE))[0]
+            mock.Mock()).build_sample(HTTP_RESPONSE))[0]
         self.assertEqual(HTTP_RESPONSE['payload']['request']['HTTP_X_USER_ID'],
                          sample.user_id)
         self.assertEqual(HTTP_RESPONSE['payload']['request']

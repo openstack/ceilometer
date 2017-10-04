@@ -224,7 +224,7 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
                     definitions[meter_cfg['name']] = md
         return definitions.values()
 
-    def process_notification(self, notification):
+    def build_sample(self, notification):
         for d in self.definitions:
             if d.match_type(notification['event_type']):
                 for s in d.to_samples(notification):

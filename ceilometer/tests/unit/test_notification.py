@@ -93,7 +93,7 @@ class _FakeNotificationPlugin(pipeline.NotificationEndpoint):
             for topic in self.get_notification_topics(conf)
         ]
 
-    def process_notification(self, message):
+    def build_sample(self, message):
         return []
 
 
@@ -133,7 +133,7 @@ class TestNotification(tests_base.BaseTestCase):
         self._do_process_notification_manager_start()
         self.assertEqual(2, len(self.srv.listeners))
 
-    def test_process_notification(self):
+    def test_build_sample(self):
         self._do_process_notification_manager_start()
         self.srv.pipeline_manager.pipelines[0] = mock.MagicMock()
 

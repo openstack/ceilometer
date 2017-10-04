@@ -20,7 +20,7 @@ from ceilometer import sample
 class HTTPRequest(endpoint.SampleEndpoint):
     event_types = ['http.request']
 
-    def process_notification(self, message):
+    def build_sample(self, message):
         yield sample.Sample.from_notification(
             name=message['event_type'],
             type=sample.TYPE_DELTA,
