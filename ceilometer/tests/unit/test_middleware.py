@@ -94,7 +94,3 @@ class TestNotifications(base.BaseTestCase):
         self.assertEqual(HTTP_RESPONSE['payload']['request']
                          ['HTTP_X_SERVICE_NAME'], sample.resource_id)
         self.assertEqual(1, sample.volume)
-
-    def test_targets(self):
-        targets = middleware.HTTPRequest(mock.Mock()).get_targets(self.CONF)
-        self.assertEqual(15, len(targets))

@@ -920,23 +920,6 @@ class NotificationEndpoint(object):
                 event_type='|'.join(self.event_types))
         self.manager = manager
 
-    @staticmethod
-    def get_notification_topics(conf):
-        if 'notification_topics' in conf:
-            return conf.notification_topics
-        return conf.oslo_messaging_notifications.topics
-
-    def get_targets(self, conf):
-        """Return a sequence of oslo_messaging.Target
-
-        This sequence is defining the exchange and topics to be connected for
-        this plugin.
-        """
-        return [oslo_messaging.Target(topic=topic, exchange=exchange)
-                for topic in self.get_notification_topics(conf)
-                for exchange in
-                conf.notification.notification_control_exchanges]
-
     @abc.abstractproperty
     def event_types(self):
         """Return a sequence of strings to filter on.
