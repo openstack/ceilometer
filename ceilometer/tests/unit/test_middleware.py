@@ -97,4 +97,4 @@ class TestNotifications(base.BaseTestCase):
 
     def test_targets(self):
         targets = middleware.HTTPRequest(mock.Mock()).get_targets(self.CONF)
-        self.assertEqual(13, len(targets))
+        self.assertEqual(14, len(targets))

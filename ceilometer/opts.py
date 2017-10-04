@@ -32,7 +32,6 @@ import ceilometer.event.converter
 import ceilometer.hardware.discovery
 import ceilometer.hardware.pollsters.generic
 import ceilometer.image.discovery
-import ceilometer.ipmi.notifications.ironic
 import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
 import ceilometer.keystone_client
@@ -82,7 +81,6 @@ def list_opts():
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.dispatcher.OPTS,
-                         ceilometer.ipmi.notifications.ironic.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.sample.OPTS,

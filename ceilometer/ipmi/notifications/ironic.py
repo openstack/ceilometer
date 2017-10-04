@@ -16,20 +16,12 @@
 notification events.
 """
 
-from oslo_config import cfg
 from oslo_log import log
-import oslo_messaging as messaging
 
-from ceilometer.agent import plugin_base
+from ceilometer import notification
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
-
-OPTS = [
-    cfg.StrOpt('ironic_exchange',
-               default='ironic',
-               help='Exchange name for Ironic notifications.'),
-]
 
 
 # Map unit name to SI
@@ -62,7 +54,7 @@ class InvalidSensorData(ValueError):
     pass
 
 
-class SensorNotification(plugin_base.NotificationBase):
+class SensorNotification(notification.NotificationProcessBase):
     """A generic class for extracting samples from sensor data notifications.
 
     A notification message can contain multiple samples from multiple
@@ -75,12 +67,6 @@ class SensorNotification(plugin_base.NotificationBase):
 
     event_types = ['hardware.ipmi.*']
     metric = None
-
-    def get_targets(self, conf):
-        """oslo.messaging.TargetS for this plugin."""
-        return [messaging.Target(topic=topic,
-                                 exchange=conf.ironic_exchange)
-                for topic in self.get_notification_topics(conf)]
 
     def _get_sample(self, message):
         try:
