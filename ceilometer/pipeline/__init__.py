@@ -651,7 +651,7 @@ class ConfigManagerBase(object):
         self.conf = conf
         self.cfg_loc = None
 
-    def load_config(self, cfg_file, fallback_cfg_prefix='pipeline/data/'):
+    def load_config(self, cfg_file, fallback_cfg_prefix='data/'):
         """Load a configuration file and set its refresh values."""
         if os.path.exists(cfg_file):
             self.cfg_loc = cfg_file
@@ -906,3 +906,103 @@ def get_pipeline_grouping_key(pipe):
     for transformer in pipe.sink.transformers:
         keys += transformer.grouping_keys
     return list(set(keys))
+
+
+class NotificationEndpoint(object):
+    """Base Endpoint for plugins that support the notification API."""
+
+    def __init__(self, manager):
+        super(NotificationEndpoint, self).__init__()
+        # NOTE(gordc): this is filter rule used by oslo.messaging to dispatch
+        # messages to an endpoint.
+        if self.event_types:
+            self.filter_rule = oslo_messaging.NotificationFilter(
+                event_type='|'.join(self.event_types))
+        self.manager = manager
+
+    @staticmethod
+    def get_notification_topics(conf):
+        if 'notification_topics' in conf:
+            return conf.notification_topics
+        return conf.oslo_messaging_notifications.topics
+
+    def get_targets(self, conf):
+        """Return a sequence of oslo_messaging.Target
+
+        This sequence is defining the exchange and topics to be connected for
+        this plugin.
+        """
+        return [oslo_messaging.Target(topic=topic, exchange=exchange)
+                for topic in self.get_notification_topics(conf)
+                for exchange in
+                conf.notification.notification_control_exchanges]
+
+    @abc.abstractproperty
+    def event_types(self):
+        """Return a sequence of strings to filter on.
+
+        Strings are defining the event types to be given to this plugin.
+        """
+
+    @abc.abstractmethod
+    def process_notifications(self, priority, notifications):
+        """Return a sequence of Counter instances for the given message.
+
+        :param message: Message to process.
+        """
+
+    @staticmethod
+    def _consume_and_drop(notifications):
+        """RPC endpoint for useless notification level"""
+        # NOTE(sileht): nothing special todo here, but because we listen
+        # for the generic notification exchange we have to consume all its
+        # queues
+
+    def audit(self, notifications):
+        """endpoint for notification messages at audit level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)
+
+    def critical(self, notifications):
+        """endpoint for notification messages at critical level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)
+
+    def debug(self, notifications):
+        """endpoint for notification messages at debug level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)
+
+    def error(self, notifications):
+        """endpoint for notification messages at error level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)
+
+    def info(self, notifications):
+        """endpoint for notification messages at info level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)
+
+    def sample(self, notifications):
+        """endpoint for notification messages at sample level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)
+
+    def warn(self, notifications):
+        """endpoint for notification messages at warn level
+
+        :param notifications: list of notifications
+        """
+        self._consume_and_drop(notifications)

@@ -113,16 +113,16 @@ Notifications
    suffice.
 
 Notifications are defined as subclass of the
-:class:`ceilometer.agent.plugin_base.NotificationBase` meta class.
+:class:`ceilometer.notification.NotificationEndpoint` meta class.
 Notifications must implement:
 
 ``event_types``
    A sequence of strings defining the event types to be given to the plugin
 
-``process_notification(self, message)`` 
+``process_notifications(self, priority, message)``
    Receives an event message from the list provided to ``event_types`` and
-   returns a sequence of ``Sample`` objects as defined in the
-   :file:`ceilometer/sample.py` file.
+   returns a sequence of objects. Using the SampleEndpoint, it should yield
+   ``Sample`` objects as defined in the :file:`ceilometer/sample.py` file.
 
 In the ``InstanceNotifications`` plugin, it listens to three events:
 

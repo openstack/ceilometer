@@ -17,38 +17,41 @@ import oslo_messaging
 from stevedore import extension
 
 from ceilometer.event import converter
+from ceilometer import pipeline
 
 LOG = log.getLogger(__name__)
 
 
-class EventsNotificationEndpoint(object):
+class EventEndpoint(pipeline.NotificationEndpoint):
+
+    event_types = []
+
     def __init__(self, manager):
-        super(EventsNotificationEndpoint, self).__init__()
+        super(EventEndpoint, self).__init__(manager)
         LOG.debug('Loading event definitions')
         self.event_converter = converter.setup_events(
             manager.conf,
             extension.ExtensionManager(
                 namespace='ceilometer.event.trait_plugin'))
-        self.manager = manager
 
     def info(self, notifications):
         """Convert message at info level to Ceilometer Event.
 
         :param notifications: list of notifications
         """
-        return self.process_notification('info', notifications)
+        return self.process_notifications('info', notifications)
 
     def error(self, notifications):
         """Convert message at error level to Ceilometer Event.
 
         :param notifications: list of notifications
         """
-        return self.process_notification('error', notifications)
+        return self.process_notifications('error', notifications)
 
-    def process_notification(self, priority, notifications):
-        for notification in notifications:
+    def process_notifications(self, priority, notifications):
+        for message in notifications:
             try:
-                event = self.event_converter.to_event(priority, notification)
+                event = self.event_converter.to_event(priority, message)
                 if event is not None:
                     with self.manager.publisher() as p:
                         p(event)

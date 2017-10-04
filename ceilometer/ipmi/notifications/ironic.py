@@ -18,7 +18,7 @@ notification events.
 
 from oslo_log import log
 
-from ceilometer import notification
+from ceilometer.pipeline import sample as endpoint
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)
@@ -54,7 +54,7 @@ class InvalidSensorData(ValueError):
     pass
 
 
-class SensorNotification(notification.NotificationProcessBase):
+class SensorNotification(endpoint.SampleEndpoint):
     """A generic class for extracting samples from sensor data notifications.
 
     A notification message can contain multiple samples from multiple

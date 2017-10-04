@@ -17,108 +17,12 @@
 
 import abc
 
-from oslo_log import log
-import oslo_messaging
 import six
 from stevedore import extension
-
-LOG = log.getLogger(__name__)
 
 
 class PluginBase(object):
     """Base class for all plugins."""
-
-
-@six.add_metaclass(abc.ABCMeta)
-class NotificationBase(PluginBase):
-    """Base class for plugins that support the notification API."""
-    def __init__(self, manager):
-        super(NotificationBase, self).__init__()
-        # NOTE(gordc): this is filter rule used by oslo.messaging to dispatch
-        # messages to an endpoint.
-        if self.event_types:
-            self.filter_rule = oslo_messaging.NotificationFilter(
-                event_type='|'.join(self.event_types))
-        self.manager = manager
-
-    @staticmethod
-    def get_notification_topics(conf):
-        if 'notification_topics' in conf:
-            return conf.notification_topics
-        return conf.oslo_messaging_notifications.topics
-
-    @abc.abstractproperty
-    def event_types(self):
-        """Return a sequence of strings.
-
-        Strings are defining the event types to be given to this plugin.
-        """
-
-    @abc.abstractmethod
-    def get_targets(self, conf):
-        """Return a sequence of oslo.messaging.Target.
-
-        Sequence is defining the exchange and topics to be connected for this
-        plugin.
-        :param conf: Configuration.
-        """
-
-    @abc.abstractmethod
-    def process_notification(self, message):
-        """Return a sequence of Counter instances for the given message.
-
-        :param message: Message to process.
-        """
-
-    @staticmethod
-    def _consume_and_drop(notifications):
-        """RPC endpoint for useless notification level"""
-        # NOTE(sileht): nothing special todo here, but because we listen
-        # for the generic notification exchange we have to consume all its
-        # queues
-
-    audit = _consume_and_drop
-    debug = _consume_and_drop
-    warn = _consume_and_drop
-    error = _consume_and_drop
-    critical = _consume_and_drop
-
-    def info(self, notifications):
-        """RPC endpoint for notification messages at info level
-
-        When another service sends a notification over the message
-        bus, this method receives it.
-
-        :param notifications: list of notifications
-        """
-        self._process_notifications('info', notifications)
-
-    def sample(self, notifications):
-        """RPC endpoint for notification messages at sample level
-
-        When another service sends a notification over the message
-        bus at sample priority, this method receives it.
-
-        :param notifications: list of notifications
-        """
-        self._process_notifications('sample', notifications)
-
-    def _process_notifications(self, priority, notifications):
-        for notification in notifications:
-            try:
-                self.to_samples_and_publish(notification)
-            except Exception:
-                LOG.error('Fail to process notification', exc_info=True)
-
-    def to_samples_and_publish(self, notification):
-        """Return samples produced by *process_notification*.
-
-        Samples produced for the given notification.
-        :param context: Execution context from the service or RPC call
-        :param notification: The notification to process.
-        """
-        with self.manager.publisher() as p:
-            p(list(self.process_notification(notification)))
 
 
 class ExtensionLoadError(Exception):

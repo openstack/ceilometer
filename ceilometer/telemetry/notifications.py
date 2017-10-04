@@ -10,31 +10,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-import oslo_messaging
-
-from ceilometer.agent import plugin_base
+from ceilometer.pipeline import sample as endpoint
 from ceilometer import sample
 
 
-class TelemetryBase(plugin_base.NotificationBase):
-    """Convert telemetry notification into Samples."""
-
-    def get_targets(self, conf):
-        """Return a sequence of oslo_messaging.Target
-
-        Sequence defining the exchange and topics to be connected for this
-        plugin.
-        """
-        return [
-            oslo_messaging.Target(
-                topic=topic,
-                exchange=conf.notification.notification_control_exchanges[0])
-            for topic in self.get_notification_topics(conf)
-        ]
-
-
-class TelemetryIpc(TelemetryBase):
+class TelemetryIpc(endpoint.SampleEndpoint):
     """Handle sample from notification bus
 
      Telemetry samples polled by polling agent.

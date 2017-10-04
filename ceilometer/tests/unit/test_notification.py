@@ -23,9 +23,9 @@ import six
 from stevedore import extension
 import yaml
 
-from ceilometer.agent import plugin_base
 from ceilometer import messaging
 from ceilometer import notification
+from ceilometer import pipeline
 from ceilometer.publisher import test as test_publisher
 from ceilometer import service
 from ceilometer.tests import base as tests_base
@@ -82,7 +82,7 @@ TEST_NOTICE_PAYLOAD = {
 }
 
 
-class _FakeNotificationPlugin(plugin_base.NotificationBase):
+class _FakeNotificationPlugin(pipeline.NotificationEndpoint):
     event_types = ['fake.event']
 
     def get_targets(self, conf):
@@ -117,7 +117,7 @@ class TestNotification(tests_base.BaseTestCase):
             ]
         )
 
-    @mock.patch('ceilometer.event.endpoint.EventsNotificationEndpoint')
+    @mock.patch('ceilometer.pipeline.event.EventEndpoint')
     def _do_process_notification_manager_start(self,
                                                fake_event_endpoint_class):
         with mock.patch.object(self.srv,

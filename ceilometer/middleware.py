@@ -13,11 +13,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer import notification
+from ceilometer.pipeline import sample as endpoint
 from ceilometer import sample
 
 
-class HTTPRequest(notification.NotificationProcessBase):
+class HTTPRequest(endpoint.SampleEndpoint):
     event_types = ['http.request']
 
     def process_notification(self, message):
