@@ -16,7 +16,6 @@
 """
 
 import abc
-import collections
 
 from oslo_log import log
 import oslo_messaging
@@ -24,9 +23,6 @@ import six
 from stevedore import extension
 
 LOG = log.getLogger(__name__)
-
-ExchangeTopics = collections.namedtuple('ExchangeTopics',
-                                        ['exchange', 'topics'])
 
 
 class PluginBase(object):
