@@ -14,8 +14,8 @@
 import glanceclient
 from oslo_config import cfg
 
-from ceilometer.agent import plugin_base
 from ceilometer import keystone_client
+from ceilometer.polling import plugin_base
 
 SERVICE_OPTS = [
     cfg.StrOpt('glance',

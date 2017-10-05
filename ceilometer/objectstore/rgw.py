@@ -20,8 +20,8 @@ from oslo_config import cfg
 from oslo_log import log
 import six.moves.urllib.parse as urlparse
 
-from ceilometer.agent import plugin_base
 from ceilometer import keystone_client
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

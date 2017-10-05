@@ -30,9 +30,9 @@ try:
 except ImportError:
     libvirt = None
 
-from ceilometer.agent import plugin_base
 from ceilometer.compute.virt.libvirt import utils as libvirt_utils
 from ceilometer import nova_client
+from ceilometer.polling import plugin_base
 
 OPTS = [
     cfg.StrOpt('instance_discovery_method',

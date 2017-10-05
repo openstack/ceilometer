@@ -18,7 +18,7 @@ import fixtures
 import mock
 import six
 
-from ceilometer.agent import manager
+from ceilometer.polling import manager
 from ceilometer import service
 from ceilometer.tests import base
 

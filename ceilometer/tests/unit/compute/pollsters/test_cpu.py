@@ -18,9 +18,9 @@ import time
 
 import mock
 
-from ceilometer.agent import manager
 from ceilometer.compute.pollsters import instance_stats
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.polling import manager
 from ceilometer.tests.unit.compute.pollsters import base
 
 

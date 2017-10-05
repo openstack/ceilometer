@@ -18,10 +18,10 @@
 import mock
 from oslotest import base
 
-from ceilometer.agent.discovery import endpoint
-from ceilometer.agent.discovery import localnode
-from ceilometer.agent.discovery import tenant as project
 from ceilometer.hardware import discovery as hardware
+from ceilometer.polling.discovery import endpoint
+from ceilometer.polling.discovery import localnode
+from ceilometer.polling.discovery import tenant as project
 from ceilometer import service
 
 

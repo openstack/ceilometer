@@ -19,7 +19,7 @@ from cotyledon import oslo_config_glue
 from oslo_config import cfg
 from oslo_log import log
 
-from ceilometer.agent import manager
+from ceilometer.polling import manager
 from ceilometer import service
 
 LOG = log.getLogger(__name__)

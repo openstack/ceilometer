@@ -33,10 +33,10 @@ from six.moves.urllib import parse as urlparse
 from stevedore import extension
 from tooz import coordination
 
-from ceilometer.agent import plugin_base
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import pipeline
+from ceilometer.polling import plugin_base
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
 

@@ -24,8 +24,8 @@ import mock
 import six
 from stevedore import extension
 
-from ceilometer.agent import plugin_base
 from ceilometer import pipeline
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 from ceilometer import service
 from ceilometer.tests import base
@@ -589,7 +589,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             mock.call('static_4'),
         ], any_order=True)
 
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_polling_and_notify_with_resources(self, LOG):
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
@@ -598,7 +598,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'Polling pollster %(poll)s in the context of %(src)s',
             {'poll': 'test', 'src': 'test_polling'})
 
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_skip_polling_and_notify_with_no_resources(self, LOG):
         self.polling_cfg['sources'][0]['resources'] = []
         self.setup_polling()
@@ -609,7 +609,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
             'Skip pollster %(name)s, no %(p_context)sresources found this '
             'cycle', {'name': pollster.name, 'p_context': ''})
 
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_skip_polling_polled_resources(self, LOG):
         self.polling_cfg['sources'].append({
             'name': 'test_polling_1',

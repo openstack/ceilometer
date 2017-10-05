@@ -13,7 +13,7 @@
 
 import mock
 
-from ceilometer.agent import manager
+from ceilometer.polling import manager
 from ceilometer import service
 import ceilometer.tests.base as base
 from ceilometer.volume import cinder

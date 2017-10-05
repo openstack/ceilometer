@@ -24,8 +24,8 @@ import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 from swiftclient.exceptions import ClientException
 
-from ceilometer.agent import plugin_base
 from ceilometer import keystone_client
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 
 

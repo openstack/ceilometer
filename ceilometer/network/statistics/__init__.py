@@ -20,7 +20,7 @@ import six
 from six.moves.urllib import parse as urlparse
 from stevedore import driver as _driver
 
-from ceilometer.agent import plugin_base
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 
 

@@ -15,7 +15,7 @@
 
 from __future__ import absolute_import
 
-from ceilometer.agent import plugin_base
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 
 

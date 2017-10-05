@@ -19,9 +19,9 @@ from oslo_log import log
 from oslo_utils import timeutils
 
 import ceilometer
-from ceilometer.agent import plugin_base
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 
 LOG = log.getLogger(__name__)

@@ -21,8 +21,8 @@ from oslotest import base
 from swiftclient import client as swift_client
 import testscenarios.testcase
 
-from ceilometer.agent import manager
 from ceilometer.objectstore import swift
+from ceilometer.polling import manager
 from ceilometer import service
 
 HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,

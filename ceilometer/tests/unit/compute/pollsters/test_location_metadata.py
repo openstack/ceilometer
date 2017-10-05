@@ -20,8 +20,8 @@ import mock
 from oslotest import base
 import six
 
-from ceilometer.agent import manager
 from ceilometer.compute.pollsters import util
+from ceilometer.polling import manager
 from ceilometer import service
 
 

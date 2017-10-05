@@ -14,7 +14,7 @@
 
 from oslo_log import log
 
-from ceilometer.agent import plugin_base as plugin
+from ceilometer.polling import plugin_base as plugin
 
 LOG = log.getLogger(__name__)
 

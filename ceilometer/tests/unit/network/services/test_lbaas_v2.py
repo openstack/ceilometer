@@ -16,10 +16,10 @@ import fixtures
 import mock
 from oslotest import base
 
-from ceilometer.agent import manager
-from ceilometer.agent import plugin_base
 from ceilometer.network.services import discovery
 from ceilometer.network.services import lbaas
+from ceilometer.polling import manager
+from ceilometer.polling import plugin_base
 from ceilometer import service
 
 

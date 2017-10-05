@@ -21,13 +21,13 @@ from oslotest import base
 import six
 from stevedore import extension
 
-from ceilometer.agent import manager
-from ceilometer.agent import plugin_base
 from ceilometer.compute import discovery as nova_discover
 from ceilometer.hardware import discovery
 from ceilometer import pipeline
+from ceilometer.polling import manager
+from ceilometer.polling import plugin_base
 from ceilometer import service
-from ceilometer.tests.unit.agent import agentbase
+from ceilometer.tests.unit.polling import agentbase
 
 
 def fakedelayed(delay, target, *args, **kwargs):
@@ -70,7 +70,7 @@ class TestManager(base.BaseTestCase):
                 mock.Mock(side_effect=plugin_base.ExtensionLoadError))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_load_failed_plugins(self, LOG):
         # Here we additionally check that namespaces will be converted to the
         # list if param was not set as a list.
@@ -274,7 +274,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
 
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     @mock.patch('ceilometer.nova_client.LOG')
     def test_hardware_discover_fail_minimize_logs(self, novalog, baselog):
         class PollsterHardware(agentbase.TestPollster):
@@ -319,7 +319,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.assertEqual(1, novalog.exception.call_count)
         self.assertFalse(baselog.exception.called)
 
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_polling_exception(self, LOG):
         source_name = 'test_pollingexception'
         res_list = ['test://']
@@ -352,7 +352,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
             dict(name=pollster.name, res_list=str(res_list),
                  source=source_name))
 
-    @mock.patch('ceilometer.agent.manager.LOG')
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_polling_novalike_exception(self, LOG):
         source_name = 'test_pollingexception'
         self.polling_cfg = {

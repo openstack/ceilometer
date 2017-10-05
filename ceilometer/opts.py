@@ -17,7 +17,6 @@ import socket
 from keystoneauth1 import loading
 from oslo_config import cfg
 
-import ceilometer.agent.manager
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
@@ -38,6 +37,7 @@ import ceilometer.nova_client
 import ceilometer.objectstore.rgw
 import ceilometer.objectstore.swift
 import ceilometer.pipeline
+import ceilometer.polling.manager
 import ceilometer.publisher.messaging
 import ceilometer.publisher.utils
 import ceilometer.sample
@@ -70,7 +70,7 @@ def list_opts():
     # This have been removed due to a recursive import issue
     return [
         ('DEFAULT',
-         itertools.chain(ceilometer.agent.manager.OPTS,
+         itertools.chain(ceilometer.polling.manager.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.objectstore.swift.OPTS,
@@ -126,7 +126,7 @@ def list_opts():
         ('notification',
          itertools.chain(ceilometer.notification.OPTS,
                          ceilometer.notification.EXCHANGES_OPTS)),
-        ('polling', ceilometer.agent.manager.POLLING_OPTS),
+        ('polling', ceilometer.polling.manager.POLLING_OPTS),
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),

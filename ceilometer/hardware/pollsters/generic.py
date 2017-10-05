@@ -21,11 +21,11 @@ from oslo_log import log
 from oslo_utils import netutils
 import six
 
-from ceilometer.agent import plugin_base
 from ceilometer import declarative
 from ceilometer.hardware import inspector as insloader
 from ceilometer.hardware.pollsters import util
 from ceilometer.i18n import _
+from ceilometer.polling import plugin_base
 from ceilometer import sample
 
 OPTS = [

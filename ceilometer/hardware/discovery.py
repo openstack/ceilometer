@@ -16,9 +16,8 @@ from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 
-from ceilometer.agent import plugin_base
 from ceilometer import nova_client
-
+from ceilometer.polling import plugin_base
 
 LOG = log.getLogger(__name__)
 

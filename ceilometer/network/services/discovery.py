@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ceilometer.agent import plugin_base
 from ceilometer import neutron_client
+from ceilometer.polling import plugin_base
 
 
 class _BaseServicesDiscovery(plugin_base.DiscoveryBase):

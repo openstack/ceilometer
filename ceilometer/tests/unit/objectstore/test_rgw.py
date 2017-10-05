@@ -20,9 +20,9 @@ import mock
 from oslotest import base
 import testscenarios.testcase
 
-from ceilometer.agent import manager
 from ceilometer.objectstore import rgw
 from ceilometer.objectstore import rgw_client
+from ceilometer.polling import manager
 from ceilometer import service
 
 bucket_list1 = [rgw_client.RGWAdminClient.Bucket('somefoo1', 10, 7)]
