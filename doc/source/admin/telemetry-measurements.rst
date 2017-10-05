@@ -123,8 +123,9 @@ The following meters are collected for OpenStack Compute.
 |           |       |      | ID       |          | Hyper-V | ince previous d\ |
 |           |       |      |          |          |         | atapoint         |
 +-----------+-------+------+----------+----------+---------+------------------+
-| cpu_util  | Gauge | %    | instance | Pollster | vSphere,| Average CPU      |
-|           |       |      | ID       |          | XenAPI  | utilization      |
+| cpu_util  | Gauge | %    | instance | Pollster | LibVirt,| Average CPU      |
+|           |       |      | ID       |          | vSphere,| utilization      |
+|           |       |      |          |          | XenAPI  |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | vcpus     | Gauge | vcpu | instance | Notific\ | Libvirt,| Number of virtual|
 |           |       |      | ID       | ation    | Hyper-V | CPUs allocated to|
@@ -400,6 +401,13 @@ above table is the following:
 
     To enable libvirt ``disk.*`` support when running on RBD-backed shared
     storage, you need to install libvirt version 1.2.16+.
+
+.. note::
+
+    If storing data in Gnocchi v4.1+, derived rate_of_change metrics can be
+    computed using Gnocchi rather than Ceilometer transformers. This will
+    minimize Ceilometer memory requirements and avoid missing data when
+    Ceilometer services restart.
 
 OpenStack Compute is capable of collecting ``CPU`` related meters from
 the compute host machines. In order to use that you need to set the
