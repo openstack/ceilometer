@@ -635,7 +635,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches['test_polling'])[0]
         polling_task.poll_and_notify()
-        LOG.info.assert_called_with(
+        LOG.debug.assert_called_with(
             'Skip pollster %(name)s, no %(p_context)sresources found this '
             'cycle', {'name': pollster.name, 'p_context': ''})
 
@@ -650,7 +650,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         polling_task.poll_and_notify()
-        LOG.info.assert_called_with(
+        LOG.debug.assert_called_with(
             'Skip pollster %(name)s, no %(p_context)sresources found this '
             'cycle', {'name': 'test', 'p_context': 'new '})
 
