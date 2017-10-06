@@ -33,9 +33,9 @@ from six.moves.urllib import parse as urlparse
 from stevedore import extension
 from tooz import coordination
 
+from ceilometer import agent
 from ceilometer import keystone_client
 from ceilometer import messaging
-from ceilometer import pipeline
 from ceilometer.polling import plugin_base
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
@@ -58,7 +58,7 @@ OPTS = [
 POLLING_OPTS = [
     cfg.StrOpt('cfg_file',
                default="polling.yaml",
-               help="Configuration file for pipeline definition."
+               help="Configuration file for polling definition."
                ),
     cfg.StrOpt('partitioning_group_prefix',
                deprecated_group='central',
@@ -75,6 +75,11 @@ class EmptyPollstersList(Exception):
         msg = ('No valid pollsters can be loaded with the startup parameter'
                ' polling-namespaces.')
         super(EmptyPollstersList, self).__init__(msg)
+
+
+class PollingException(agent.ConfigException):
+    def __init__(self, message, cfg):
+        super(PollingException, self).__init__('Polling', message, cfg)
 
 
 class Resources(object):
@@ -387,7 +392,7 @@ class AgentManager(cotyledon.Service):
 
     def run(self):
         super(AgentManager, self).run()
-        self.polling_manager = pipeline.setup_polling(self.conf)
+        self.polling_manager = setup_polling(self.conf)
         if self.partition_coordinator:
             self.partition_coordinator.start()
             self.join_partitioning_groups()
@@ -495,3 +500,103 @@ class AgentManager(cotyledon.Service):
             self.polling_periodics.stop()
             self.polling_periodics.wait()
         self.polling_periodics = None
+
+
+class PollingManager(agent.ConfigManagerBase):
+    """Polling Manager
+
+    Polling manager sets up polling according to config file.
+    """
+
+    def __init__(self, conf, cfg_file):
+        """Setup the polling according to config.
+
+        The configuration is supported as follows:
+
+        {"sources": [{"name": source_1,
+                      "interval": interval_time,
+                      "meters" : ["meter_1", "meter_2"],
+                      "resources": ["resource_uri1", "resource_uri2"],
+                     },
+                     {"name": source_2,
+                      "interval": interval_time,
+                      "meters" : ["meter_3"],
+                     },
+                    ]}
+        }
+
+        The interval determines the cadence of sample polling
+
+        Valid meter format is '*', '!meter_name', or 'meter_name'.
+        '*' is wildcard symbol means any meters; '!meter_name' means
+        "meter_name" will be excluded; 'meter_name' means 'meter_name'
+        will be included.
+
+        Valid meters definition is all "included meter names", all
+        "excluded meter names", wildcard and "excluded meter names", or
+        only wildcard.
+
+        The resources is list of URI indicating the resources from where
+        the meters should be polled. It's optional and it's up to the
+        specific pollster to decide how to use it.
+
+        """
+        super(PollingManager, self).__init__(conf)
+        cfg = self.load_config(cfg_file)
+        self.sources = []
+        if 'sources' not in cfg:
+            raise PollingException("sources required", cfg)
+        for s in cfg.get('sources'):
+            self.sources.append(PollingSource(s))
+
+
+class PollingSource(agent.Source):
+    """Represents a source of pollsters
+
+    In effect it is a set of pollsters emitting
+    samples for a set of matching meters. Each source encapsulates meter name
+    matching, polling interval determination, optional resource enumeration or
+    discovery.
+    """
+
+    def __init__(self, cfg):
+        try:
+            super(PollingSource, self).__init__(cfg)
+        except agent.SourceException as err:
+            raise PollingException(err.msg, cfg)
+        try:
+            self.meters = cfg['meters']
+        except KeyError:
+            raise PollingException("Missing meters value", cfg)
+        try:
+            self.interval = int(cfg['interval'])
+        except ValueError:
+            raise PollingException("Invalid interval value", cfg)
+        except KeyError:
+            raise PollingException("Missing interval value", cfg)
+        if self.interval <= 0:
+            raise PollingException("Interval value should > 0", cfg)
+
+        self.resources = cfg.get('resources') or []
+        if not isinstance(self.resources, list):
+            raise PollingException("Resources should be a list", cfg)
+
+        self.discovery = cfg.get('discovery') or []
+        if not isinstance(self.discovery, list):
+            raise PollingException("Discovery should be a list", cfg)
+        try:
+            self.check_source_filtering(self.meters, 'meters')
+        except agent.SourceException as err:
+            raise PollingException(err.msg, cfg)
+
+    def get_interval(self):
+        return self.interval
+
+    def support_meter(self, meter_name):
+        return self.is_supported(self.meters, meter_name)
+
+
+def setup_polling(conf):
+    """Setup polling manager according to yaml config file."""
+    cfg_file = conf.polling.cfg_file
+    return PollingManager(conf, cfg_file)

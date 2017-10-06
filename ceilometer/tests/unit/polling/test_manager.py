@@ -23,7 +23,6 @@ from stevedore import extension
 
 from ceilometer.compute import discovery as nova_discover
 from ceilometer.hardware import discovery
-from ceilometer import pipeline
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
 from ceilometer import service
@@ -49,7 +48,7 @@ class TestManager(base.BaseTestCase):
         super(TestManager, self).setUp()
         self.conf = service.prepare_service([], [])
 
-    @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
+    @mock.patch('ceilometer.polling.manager.setup_polling', mock.MagicMock())
     def test_load_plugins(self):
         mgr = manager.AgentManager(0, self.conf)
         self.assertIsNotNone(list(mgr.extensions))
@@ -266,7 +265,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(
+        self.mgr.polling_manager = manager.PollingManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg))
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -311,7 +310,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(
+        self.mgr.polling_manager = manager.PollingManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg))
         polling_tasks = self.mgr.setup_polling_tasks()
@@ -335,7 +334,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(
+        self.mgr.polling_manager = manager.PollingManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg))
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
@@ -366,7 +365,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self.mgr.polling_manager = pipeline.PollingManager(
+        self.mgr.polling_manager = manager.PollingManager(
             self.CONF, self.cfg2file(self.polling_cfg))
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches[source_name])[0]
@@ -411,7 +410,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         }
 
-        self.mgr.polling_manager = pipeline.PollingManager(
+        self.mgr.polling_manager = manager.PollingManager(
             self.CONF,
             self.cfg2file(pipeline_cfg))
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]

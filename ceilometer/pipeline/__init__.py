@@ -46,11 +46,6 @@ OPTS = [
 LOG = log.getLogger(__name__)
 
 
-class PollingException(agent.ConfigException):
-    def __init__(self, message, cfg):
-        super(PollingException, self).__init__('Polling', message, cfg)
-
-
 class PipelineException(agent.ConfigException):
     def __init__(self, message, cfg):
         super(PipelineException, self).__init__('Pipeline', message, cfg)
@@ -268,52 +263,6 @@ class SampleSource(PipelineSource):
             self.check_source_filtering(self.meters, 'meters')
         except agent.SourceException as err:
             raise PipelineException(err.msg, cfg)
-
-    def support_meter(self, meter_name):
-        return self.is_supported(self.meters, meter_name)
-
-
-class PollingSource(agent.Source):
-    """Represents a source of pollsters
-
-    In effect it is a set of pollsters emitting
-    samples for a set of matching meters. Each source encapsulates meter name
-    matching, polling interval determination, optional resource enumeration or
-    discovery.
-    """
-
-    def __init__(self, cfg):
-        try:
-            super(PollingSource, self).__init__(cfg)
-        except agent.SourceException as err:
-            raise PipelineException(err.msg, cfg)
-        try:
-            self.meters = cfg['meters']
-        except KeyError:
-            raise PipelineException("Missing meters value", cfg)
-        try:
-            self.interval = int(cfg['interval'])
-        except ValueError:
-            raise PipelineException("Invalid interval value", cfg)
-        except KeyError:
-            raise PipelineException("Missing interval value", cfg)
-        if self.interval <= 0:
-            raise PipelineException("Interval value should > 0", cfg)
-
-        self.resources = cfg.get('resources') or []
-        if not isinstance(self.resources, list):
-            raise PipelineException("Resources should be a list", cfg)
-
-        self.discovery = cfg.get('discovery') or []
-        if not isinstance(self.discovery, list):
-            raise PipelineException("Discovery should be a list", cfg)
-        try:
-            self.check_source_filtering(self.meters, 'meters')
-        except agent.SourceException as err:
-            raise PipelineException(err.msg, cfg)
-
-    def get_interval(self):
-        return self.interval
 
     def support_meter(self, meter_name):
         return self.is_supported(self.meters, meter_name)
@@ -725,54 +674,6 @@ class PipelineManager(agent.ConfigManagerBase):
         return PublishContext(self.pipelines)
 
 
-class PollingManager(agent.ConfigManagerBase):
-    """Polling Manager
-
-    Polling manager sets up polling according to config file.
-    """
-
-    def __init__(self, conf, cfg_file):
-        """Setup the polling according to config.
-
-        The configuration is supported as follows:
-
-        {"sources": [{"name": source_1,
-                      "interval": interval_time,
-                      "meters" : ["meter_1", "meter_2"],
-                      "resources": ["resource_uri1", "resource_uri2"],
-                     },
-                     {"name": source_2,
-                      "interval": interval_time,
-                      "meters" : ["meter_3"],
-                     },
-                    ]}
-        }
-
-        The interval determines the cadence of sample polling
-
-        Valid meter format is '*', '!meter_name', or 'meter_name'.
-        '*' is wildcard symbol means any meters; '!meter_name' means
-        "meter_name" will be excluded; 'meter_name' means 'meter_name'
-        will be included.
-
-        Valid meters definition is all "included meter names", all
-        "excluded meter names", wildcard and "excluded meter names", or
-        only wildcard.
-
-        The resources is list of URI indicating the resources from where
-        the meters should be polled. It's optional and it's up to the
-        specific pollster to decide how to use it.
-
-        """
-        super(PollingManager, self).__init__(conf)
-        cfg = self.load_config(cfg_file)
-        self.sources = []
-        if 'sources' not in cfg:
-            raise PollingException("sources required", cfg)
-        for s in cfg.get('sources'):
-            self.sources.append(PollingSource(s))
-
-
 def setup_event_pipeline(conf, transformer_manager=None):
     """Setup event pipeline manager according to yaml config file."""
     default = extension.ExtensionManager('ceilometer.transformer')
@@ -787,12 +688,6 @@ def setup_pipeline(conf, transformer_manager=None):
     cfg_file = conf.pipeline_cfg_file
     return PipelineManager(conf, cfg_file, transformer_manager or default,
                            SAMPLE_TYPE)
-
-
-def setup_polling(conf):
-    """Setup polling manager according to yaml config file."""
-    cfg_file = conf.polling.cfg_file
-    return PollingManager(conf, cfg_file)
 
 
 def get_pipeline_grouping_key(pipe):

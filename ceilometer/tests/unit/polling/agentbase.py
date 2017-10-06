@@ -24,7 +24,7 @@ import mock
 import six
 from stevedore import extension
 
-from ceilometer import pipeline
+from ceilometer.polling import manager as poll_manager
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 from ceilometer import service
@@ -189,7 +189,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         params = []
 
     def setup_polling(self):
-        self.mgr.polling_manager = pipeline.PollingManager(
+        self.mgr.polling_manager = poll_manager.PollingManager(
             self.CONF, self.cfg2file(self.polling_cfg))
 
     def create_extension_list(self):
@@ -240,7 +240,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def create_manager(self):
         """Return subclass specific manager."""
 
-    @mock.patch('ceilometer.pipeline.setup_polling', mock.MagicMock())
+    @mock.patch('ceilometer.polling.manager.setup_polling', mock.MagicMock())
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
         self.CONF = service.prepare_service([], [])
@@ -288,7 +288,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.DiscoveryAnother.resources = []
         super(BaseAgentManagerTestCase, self).tearDown()
 
-    @mock.patch('ceilometer.pipeline.setup_polling')
+    @mock.patch('ceilometer.polling.manager.setup_polling')
     def test_start(self, setup_polling):
         self.mgr.setup_polling_tasks = mock.MagicMock()
         self.mgr.run()

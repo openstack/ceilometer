@@ -17,7 +17,7 @@ import tempfile
 from oslotest import base
 import yaml
 
-from ceilometer import pipeline
+from ceilometer.polling import manager
 from ceilometer import service
 
 
@@ -43,60 +43,60 @@ class PollingTestCase(base.BaseTestCase):
 
     def test_no_name(self):
         del self.poll_cfg['sources'][0]['name']
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
 
     def test_no_interval(self):
         del self.poll_cfg['sources'][0]['interval']
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
 
     def test_invalid_string_interval(self):
         self.poll_cfg['sources'][0]['interval'] = 'string'
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
 
     def test_get_interval(self):
-        poll_manager = pipeline.PollingManager(
+        poll_manager = manager.PollingManager(
             self.CONF, self.cfg2file(self.poll_cfg))
         source = poll_manager.sources[0]
         self.assertEqual(600, source.get_interval())
 
     def test_invalid_resources(self):
         self.poll_cfg['sources'][0]['resources'] = {'invalid': 1}
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
 
     def test_resources(self):
         resources = ['test1://', 'test2://']
         self.poll_cfg['sources'][0]['resources'] = resources
-        poll_manager = pipeline.PollingManager(
+        poll_manager = manager.PollingManager(
             self.CONF, self.cfg2file(self.poll_cfg))
         self.assertEqual(resources, poll_manager.sources[0].resources)
 
     def test_no_resources(self):
-        poll_manager = pipeline.PollingManager(
+        poll_manager = manager.PollingManager(
             self.CONF, self.cfg2file(self.poll_cfg))
         self.assertEqual(0, len(poll_manager.sources[0].resources))
 
     def test_check_meters_include_exclude_same(self):
         self.poll_cfg['sources'][0]['meters'] = ['a', '!a']
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
 
     def test_check_meters_include_exclude(self):
         self.poll_cfg['sources'][0]['meters'] = ['a', '!b']
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
 
     def test_check_meters_wildcard_included(self):
         self.poll_cfg['sources'][0]['meters'] = ['a', '*']
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PollingManager,
+        self.assertRaises(manager.PollingException,
+                          manager.PollingManager,
                           self.CONF, self.cfg2file(self.poll_cfg))
