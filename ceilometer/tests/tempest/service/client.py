@@ -23,8 +23,9 @@ from tempest.lib.services.compute import floating_ips_client as floatingip_cli
 from tempest.lib.services.compute import networks_client as network_cli
 from tempest.lib.services.compute import servers_client as server_cli
 from tempest.lib.services.image.v2 import images_client as img_cli_v2
+from tempest.lib.services.object_storage import \
+    container_client as container_cli
 from tempest import manager
-from tempest.services.object_storage import container_client as container_cli
 from tempest.services.object_storage import object_client as obj_cli
 
 
