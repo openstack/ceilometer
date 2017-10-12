@@ -161,11 +161,15 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
                         parsed_url,
                         i_cache[identifier]))
             except Exception as err:
-                LOG.exception(_LE('inspector call failed for %(ident)s '
-                                  'host %(host)s: %(err)s'),
-                              dict(ident=identifier,
-                                   host=parsed_url.hostname,
-                                   err=err))
+                msg = ('inspector call failed for %(ident)s '
+                       'host %(host)s: %(err)s' %
+                       dict(ident=identifier,
+                            host=parsed_url.hostname,
+                            err=err))
+                if "timeout" in str(err):
+                    LOG.warning(msg)
+                else:
+                    LOG.exception(msg)
         return itertools.chain(*sample_iters)
 
     def generate_samples(self, host_url, data):
