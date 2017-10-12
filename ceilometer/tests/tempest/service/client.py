@@ -16,17 +16,9 @@
 from oslo_serialization import jsonutils as json
 from six.moves.urllib import parse as urllib
 
+from tempest import clients
 from tempest import config
 from tempest.lib.common import rest_client
-from tempest.lib.services.compute import flavors_client as flavor_cli
-from tempest.lib.services.compute import floating_ips_client as floatingip_cli
-from tempest.lib.services.compute import networks_client as network_cli
-from tempest.lib.services.compute import servers_client as server_cli
-from tempest.lib.services.image.v2 import images_client as img_cli_v2
-from tempest.lib.services.object_storage import \
-    container_client as container_cli
-from tempest import manager
-from tempest.services.object_storage import object_client as obj_cli
 
 
 CONF = config.CONF
@@ -90,43 +82,9 @@ class TelemetryClient(rest_client.RestClient):
         return rest_client.ResponseBody(resp, body)
 
 
-class Manager(manager.Manager):
+class Manager(clients.Manager):
 
-    load_clients = [
-        'servers_client',
-        'compute_networks_client',
-        'compute_floating_ips_client',
-        'flavors_client',
-        'image_client_v2',
-        'telemetry_client',
-        'container_client',
-        'object_client',
-    ]
-
-    default_params = {
-        'disable_ssl_certificate_validation':
-            CONF.identity.disable_ssl_certificate_validation,
-        'ca_certs': CONF.identity.ca_certificates_file,
-        'trace_requests': CONF.debug.trace_requests
-    }
-
-    compute_params = {
-        'service': CONF.compute.catalog_type,
-        'region': CONF.compute.region or CONF.identity.region,
-        'endpoint_type': CONF.compute.endpoint_type,
-        'build_interval': CONF.compute.build_interval,
-        'build_timeout': CONF.compute.build_timeout,
-    }
-    compute_params.update(default_params)
-
-    image_params = {
-        'service': CONF.image.catalog_type,
-        'region': CONF.image.region or CONF.identity.region,
-        'endpoint_type': CONF.image.endpoint_type,
-        'build_interval': CONF.image.build_interval,
-        'build_timeout': CONF.image.build_timeout,
-    }
-    image_params.update(default_params)
+    default_params = config.service_client_config()
 
     telemetry_params = {
         'service': CONF.telemetry.catalog_type,
@@ -135,53 +93,18 @@ class Manager(manager.Manager):
     }
     telemetry_params.update(default_params)
 
-    object_storage_params = {
-        'service': CONF.object_storage.catalog_type,
-        'region': CONF.object_storage.region or CONF.identity.region,
-        'endpoint_type': CONF.object_storage.endpoint_type
-    }
-    object_storage_params.update(default_params)
-
-    def __init__(self, credentials=None, service=None):
-        super(Manager, self).__init__(credentials)
-        for client in self.load_clients:
-            getattr(self, 'set_%s' % client)()
-
-    def set_servers_client(self):
-        self.servers_client = server_cli.ServersClient(
-            self.auth_provider,
-            **self.compute_params)
-
-    def set_compute_networks_client(self):
-        self.compute_networks_client = network_cli.NetworksClient(
-            self.auth_provider,
-            **self.compute_params)
-
-    def set_compute_floating_ips_client(self):
-        self.compute_floating_ips_client = floatingip_cli.FloatingIPsClient(
-            self.auth_provider,
-            **self.compute_params)
-
-    def set_flavors_client(self):
-        self.flavors_client = flavor_cli.FlavorsClient(
-            self.auth_provider,
-            **self.compute_params)
-
-    def set_image_client_v2(self):
-        self.image_client_v2 = img_cli_v2.ImagesClient(
-            self.auth_provider,
-            **self.image_params)
+    def __init__(self, credentials):
+        # TODO(andreaf) Overriding Manager is a workaround. The "proper" way
+        # would it to expose the ceilometer service client via the plugin
+        # interface, use tempest.lib.clients and tempest master.
+        # Then ceilometer service client would be loaded and configured
+        # automatically into ServiceClients.
+        # In any case we're about to declare clients.Manager a stable
+        # interface for plugins and we won't change it, so this code won't
+        # break.
+        super(Manager, self).__init__(credentials=credentials)
+        self.set_telemetry_client()
 
     def set_telemetry_client(self):
         self.telemetry_client = TelemetryClient(self.auth_provider,
                                                 **self.telemetry_params)
-
-    def set_container_client(self):
-        self.container_client = container_cli.ContainerClient(
-            self.auth_provider,
-            **self.object_storage_params)
-
-    def set_object_client(self):
-        self.object_client = obj_cli.ObjectClient(
-            self.auth_provider,
-            **self.object_storage_params)
