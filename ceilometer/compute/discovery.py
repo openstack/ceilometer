@@ -35,12 +35,6 @@ from ceilometer.compute.virt.libvirt import utils as libvirt_utils
 from ceilometer import nova_client
 
 OPTS = [
-    cfg.BoolOpt('workload_partitioning',
-                default=False,
-                deprecated_for_removal=True,
-                help='Enable work-load partitioning, allowing multiple '
-                     'compute agents to be run simultaneously. '
-                     '(replaced by instance_discovery_method)'),
     cfg.StrOpt('instance_discovery_method',
                default='libvirt_metadata',
                choices=['naive', 'workload_partitioning', 'libvirt_metadata'],
@@ -101,10 +95,6 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
         super(InstanceDiscovery, self).__init__(conf)
         if not self.method:
             self.method = conf.compute.instance_discovery_method
-
-            # For backward compatibility
-            if self.method == "naive" and conf.compute.workload_partitioning:
-                self.method = "workload_partitioning"
 
         self.nova_cli = nova_client.Client(conf)
         self.expiration_time = conf.compute.resource_update_interval
