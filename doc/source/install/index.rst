@@ -17,7 +17,7 @@ This chapter assumes a working setup of OpenStack following the
 Ocata
 ~~~~~
 
-To install Ceilometer, see the Ocata Telmetry Data Collection service
+To install Ceilometer, see the Ocata Telemetry Data Collection service
 `install guide <https://docs.openstack.org/project-install-guide/telemetry/ocata/>`__
 
 Newton
