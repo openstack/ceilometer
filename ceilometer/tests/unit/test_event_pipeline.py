@@ -19,7 +19,7 @@ import fixtures
 import mock
 import oslo_messaging
 
-from ceilometer.event.storage import models
+from ceilometer.event import models
 from ceilometer import pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher

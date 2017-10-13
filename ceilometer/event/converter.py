@@ -21,7 +21,7 @@ import pkg_resources
 import six
 
 from ceilometer import declarative
-from ceilometer.event.storage import models
+from ceilometer.event import models
 from ceilometer.i18n import _
 
 OPTS = [

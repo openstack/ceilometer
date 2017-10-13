@@ -30,7 +30,7 @@ import six
 from stevedore import extension
 import yaml
 
-from ceilometer.event.storage import models
+from ceilometer.event import models
 from ceilometer import publisher
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util

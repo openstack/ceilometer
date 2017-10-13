@@ -30,7 +30,7 @@ import six
 from stevedore import extension
 import testscenarios
 
-from ceilometer.event.storage import models
+from ceilometer.event import models
 from ceilometer.publisher import gnocchi
 from ceilometer import sample
 from ceilometer import service as ceilometer_service

@@ -17,7 +17,7 @@ from oslotest import base
 from six.moves.urllib import parse as urlparse
 import uuid
 
-from ceilometer.event.storage import models as event
+from ceilometer.event import models as event
 from ceilometer.publisher import zaqar
 from ceilometer import sample
 from ceilometer import service
