@@ -79,8 +79,7 @@ start_ceilometer
 # the impi is not ready. The ceilometer-polling should fail.
 ensure_services_started "ceilometer-polling --polling-namespaces compute" \
                         "ceilometer-polling --polling-namespaces central" \
-                        ceilometer-agent-notification \
-                        ceilometer-api
+                        ceilometer-agent-notification
 
 # Save mongodb state (replace with snapshot)
 if grep -q 'connection *= *mongo' /etc/ceilometer/ceilometer.conf; then

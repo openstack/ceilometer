@@ -11,9 +11,6 @@ Ceilometer is distributed under the terms of the Apache
 License, Version 2.0. The full terms and conditions of this
 license are detailed in the LICENSE file.
 
-For more information about Ceilometer APIs, see
-https://developer.openstack.org/api-ref-telemetry-v2.html
-
 Release notes are available at
 https://releases.openstack.org/teams/telemetry.html
 

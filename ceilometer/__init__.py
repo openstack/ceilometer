@@ -14,7 +14,4 @@
 
 
 class NotImplementedError(NotImplementedError):
-    # FIXME(jd) This is used by WSME to return a correct HTTP code. We should
-    # not expose it here but wrap our methods in the API to convert it to a
-    # proper HTTP error.
-    code = 501
+    pass

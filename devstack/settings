@@ -11,11 +11,8 @@ CEILOMETER_CONF=$CEILOMETER_CONF_DIR/ceilometer.conf
 CEILOMETER_AUTH_CACHE_DIR=${CEILOMETER_AUTH_CACHE_DIR:-/var/cache/ceilometer}
 CEILOMETER_WSGI_DIR=${CEILOMETER_WSGI_DIR:-/var/www/ceilometer}
 
-# Set up no backend
 CEILOMETER_BACKEND=${CEILOMETER_BACKEND:-gnocchi}
-if [ "$CEILOMETER_BACKEND" = "es" ] || [ "$CEILOMETER_BACKEND" = "mysql" ] || [ "$CEILOMETER_BACKEND" = "postgresql" ] || [ "$CEILOMETER_BACKEND" = "mongodb" ]; then
-    enable_service ceilometer-api
-elif [ "$CEILOMETER_BACKEND" = "gnocchi" ]; then
+if [ "$CEILOMETER_BACKEND" = "gnocchi" ]; then
     enable_service gnocchi-api gnocchi-metricd
 fi
 
@@ -37,12 +34,6 @@ GNOCCHI_WSGI_DIR=${GNOCCHI_WSGI_DIR:-/var/www/gnocchi}
 # FIXME(sileht): put 300 by default to match the archive policy
 # when the gate job have overrided this.
 CEILOMETER_ALARM_GRANULARITY=${CEILOMETER_ALARM_GRANULARITY:-60}
-
-# Ceilometer connection info.
-CEILOMETER_SERVICE_PROTOCOL=http
-CEILOMETER_SERVICE_HOST=${CEILOMETER_SERVICE_HOST:-${SERVICE_HOST}}
-CEILOMETER_SERVICE_PORT=${CEILOMETER_SERVICE_PORT:-8777}
-CEILOMETER_USE_MOD_WSGI=${CEILOMETER_USE_MOD_WSGI:-${ENABLE_HTTPD_MOD_WSGI_SERVICES}}
 
 # To enable OSprofiler change value of this variable to "notifications,profiler"
 CEILOMETER_NOTIFICATION_TOPICS=${CEILOMETER_NOTIFICATION_TOPICS:-notifications}

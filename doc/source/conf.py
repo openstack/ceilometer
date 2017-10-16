@@ -41,19 +41,14 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
 extensions = [
     'openstackdocstheme',
     'sphinx.ext.autodoc',
-    'wsmeext.sphinxext',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.pecanwsme.rest',
-    'sphinxcontrib.httpdomain',
     'oslo_config.sphinxconfiggen',
 ]
 
 config_generator_config_file = os.path.join(ROOT,
                                             'etc/ceilometer/ceilometer-config-generator.conf')
 sample_config_basename = '_static/ceilometer'
-
-wsme_protocols = ['restjson', 'restxml']
 
 todo_include_todos = True
 

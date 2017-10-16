@@ -25,20 +25,6 @@ telemetry_group = cfg.OptGroup(name='telemetry',
                                title='Telemetry Service Options')
 
 TelemetryGroup = [
-    cfg.StrOpt('catalog_type',
-               default='metering',
-               help="Catalog type of the Telemetry service."),
-    cfg.StrOpt('endpoint_type',
-               default='publicURL',
-               choices=['public', 'admin', 'internal',
-                        'publicURL', 'adminURL', 'internalURL'],
-               help="The endpoint type to use for the telemetry service."),
-    cfg.BoolOpt('event_enabled',
-                default=True,
-                help="Runs Ceilometer event-related tests"),
-    cfg.BoolOpt('deprecated_api_enabled',
-                default=True,
-                help="Runs Ceilometer deprecated API tests"),
     cfg.IntOpt('notification_wait',
                default=120,
                help="The seconds to wait for notifications which "

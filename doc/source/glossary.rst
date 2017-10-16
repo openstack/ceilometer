@@ -25,9 +25,6 @@
      measuring usage and sending the results to any number of
      target using the :term:`publisher`.
 
-   API server
-     HTTP REST API service for ceilometer.
-
    billing
      Billing is the process to assemble bill line items into a single
      per customer bill, emitting the bill to start the payment collection.
