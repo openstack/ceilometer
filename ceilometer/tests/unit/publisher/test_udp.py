@@ -167,8 +167,7 @@ class TestUDPPublisher(base.BaseTestCase):
             sent_counters.append(counter)
 
             # Check destination
-            self.assertEqual(('somehost',
-                              self.CONF.collector.udp_port), dest)
+            self.assertEqual(('somehost', 4952), dest)
 
         # Check that counters are equal
         def sort_func(counter):

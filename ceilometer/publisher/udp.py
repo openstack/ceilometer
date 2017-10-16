@@ -33,8 +33,7 @@ class UDPPublisher(publisher.ConfigPublisherBase):
     def __init__(self, conf, parsed_url):
         super(UDPPublisher, self).__init__(conf, parsed_url)
         self.host, self.port = netutils.parse_host_port(
-            parsed_url.netloc,
-            default_port=self.conf.collector.udp_port)
+            parsed_url.netloc, default_port=4952)
         addrinfo = None
         try:
             addrinfo = socket.getaddrinfo(self.host, None, socket.AF_INET6,

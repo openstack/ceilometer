@@ -296,9 +296,6 @@ function _ceilometer_configure_storage_backend {
     elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
         iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        # NOTE(gordc): set batching to better handle recording on a slow machine
-        iniset $CEILOMETER_CONF collector batch_size 50
-        iniset $CEILOMETER_CONF collector batch_timeout 5
         sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=gnocchi_swift/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
@@ -377,10 +374,6 @@ function configure_ceilometer {
     # Configure storage
     if is_service_enabled ceilometer-api; then
         _ceilometer_configure_storage_backend
-    fi
-
-    if is_service_enabled ceilometer-collector; then
-        iniset $CEILOMETER_CONF collector workers $API_WORKERS
     fi
 
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
@@ -481,12 +474,11 @@ function start_ceilometer {
         tail_log ceilometer-api /var/log/$APACHE_NAME/ceilometer_access.log
     fi
 
-    # run the notification agent/collector after restarting apache as it needs
+    # run the notification agent after restarting apache as it needs
     # operational keystone if using gnocchi
     run_process ceilometer-anotification "$CEILOMETER_BIN_DIR/ceilometer-agent-notification --config-file $CEILOMETER_CONF"
-    run_process ceilometer-collector "$CEILOMETER_BIN_DIR/ceilometer-collector --config-file $CEILOMETER_CONF"
 
-    # Start the compute agent late to allow time for the collector to
+    # Start the compute agent late to allow time for the notification agent to
     # fully wake up and connect to the message bus. See bug #1355809
     if [[ "$VIRT_DRIVER" = 'libvirt' ]]; then
         run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF" $LIBVIRT_GROUP
@@ -508,7 +500,7 @@ function stop_ceilometer {
     fi
 
     # Kill the ceilometer screen windows
-    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification ceilometer-collector; do
+    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification; do
         stop_process $serv
     done
 }

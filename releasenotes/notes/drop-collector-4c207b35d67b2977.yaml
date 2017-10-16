@@ -1,0 +1,8 @@
+---
+upgrade:
+  - |
+    The collector service is removed. From Ocata, it's possible to edit the
+    pipeline.yaml and event_pipeline.yaml files and modify the publisher to
+    provide the same functionality as collector dispatcher. You may change
+    publisher to 'gnocchi', 'http', 'panko', or any combination of available
+    publishers listed in documentation.
