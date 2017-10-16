@@ -37,7 +37,7 @@ from oslo_config import cfg
 from oslo_db import options as db_options
 from oslo_log import log
 
-from ceilometer.dispatcher import gnocchi
+from ceilometer.publisher import gnocchi
 from ceilometer import service
 from ceilometer import storage
 from ceilometer.storage import impl_mongodb
@@ -60,7 +60,7 @@ def get_parser():
     parser.add_argument(
         '--ceilometer-config-file',
         help="The config file of ceilometer, it is main used for gnocchi "
-             "dispatcher to init gnocchiclient with the service credentials "
+             "publisher to init gnocchiclient with the service credentials "
              "defined in the ceilometer config file. Default as "
              "/etc/ceilometer/ceilometer.conf",
     )
@@ -144,7 +144,7 @@ def main():
     if args.end_timestamp:
         time_filters.append({"<": {'timestamp': args.end_timestamp}})
 
-    gnocchi_dispatcher = gnocchi.GnocchiDispatcher(gnocchi_conf)
+    gnocchi_publisher = gnocchi.GnocchiPublisher(gnocchi_conf, "gnocchi://")
 
     batch_size = args.batch_migration_size
     if total_amount == 'Unknown':
@@ -181,7 +181,7 @@ def main():
                                              sample.counter_name,
                                              sample.resource_id))
         samples_dict = [sample.as_dict() for sample in samples]
-        gnocchi_dispatcher.record_metering_data(samples_dict)
+        gnocchi_publisher.publish_samples(samples_dict)
         length = len(samples)
         migrated_amount += length
         if pbar:

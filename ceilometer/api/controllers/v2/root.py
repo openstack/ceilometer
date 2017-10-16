@@ -110,10 +110,6 @@ class V2Controller(object):
             if pecan.request.cfg.api.gnocchi_is_enabled is not None:
                 self._gnocchi_is_enabled = (
                     pecan.request.cfg.api.gnocchi_is_enabled)
-
-            elif ("gnocchi" not in pecan.request.cfg.meter_dispatchers
-                  or "database" in pecan.request.cfg.meter_dispatchers):
-                self._gnocchi_is_enabled = False
             else:
                 try:
                     catalog = keystone_client.get_service_catalog(

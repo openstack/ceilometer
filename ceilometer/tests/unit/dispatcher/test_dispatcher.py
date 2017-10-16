@@ -30,16 +30,13 @@ class TestDispatchManager(base.BaseTestCase):
         super(TestDispatchManager, self).setUp()
         conf = service.prepare_service([], [])
         self.conf = self.useFixture(fixture.Config(conf))
-        self.conf.config(meter_dispatchers=['database', 'gnocchi'],
+        self.conf.config(meter_dispatchers=['database'],
                          event_dispatchers=['database'])
         self.CONF = self.conf.conf
-        self.useFixture(fixtures.MockPatch(
-            'ceilometer.dispatcher.gnocchi.GnocchiDispatcher',
-            new=FakeMeterDispatcher))
         self.useFixture(fixtures.MockPatch(
             'ceilometer.dispatcher.database.MeterDatabaseDispatcher',
             new=FakeMeterDispatcher))
 
     def test_load(self):
         sample_mg, event_mg = dispatcher.load_dispatcher_manager(self.CONF)
-        self.assertEqual(2, len(list(sample_mg)))
+        self.assertEqual(1, len(list(sample_mg)))

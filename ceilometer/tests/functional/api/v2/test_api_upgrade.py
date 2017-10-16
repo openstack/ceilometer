@@ -64,7 +64,6 @@ class TestAPIUpgradePath(v2.FunctionalTest):
             return 'http://event-endpoint:8009/'
 
     def _do_test_gnocchi_enabled_without_database_backend(self):
-        self.CONF.set_override('meter_dispatchers', ['gnocchi'])
         for endpoint in ['meters', 'samples', 'resources']:
             response = self.app.get(self.PATH_PREFIX + '/' + endpoint,
                                     status=410)

@@ -1,0 +1,8 @@
+---
+upgrade:
+  - |
+    The Gnocchi dispatcher has been removed and replaced by a native Gnocchi
+    publisher. The configuration options from the `[dispatcher_gnocchi]` has
+    been removed and should be passed via the URL in `pipeline.yaml`. The
+    service authentication override can be done by adding specific credentials
+    to a `[gnocchi]` section instead.

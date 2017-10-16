@@ -31,14 +31,14 @@ class DirectPublisher(publisher.ConfigPublisherBase):
     are required.
 
     By default, the database dispatcher is used to select another one we
-    can use direct://?dispatcher=gnocchi, ...
+    can use direct://?dispatcher=name_of_dispatcher, ...
     """
     def __init__(self, conf, parsed_url):
         super(DirectPublisher, self).__init__(conf, parsed_url)
         default_dispatcher = parsed_url.scheme
         if default_dispatcher == 'direct':
             LOG.warning('Direct publisher is deprecated for removal. Use '
-                        'an explicit publisher instead, e.g. "gnocchi", '
+                        'an explicit publisher instead, e.g. '
                         '"database", "file", ...')
             default_dispatcher = 'database'
         options = urlparse.parse_qs(parsed_url.query)

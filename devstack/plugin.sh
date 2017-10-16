@@ -299,13 +299,7 @@ function _ceilometer_configure_storage_backend {
         # NOTE(gordc): set batching to better handle recording on a slow machine
         iniset $CEILOMETER_CONF collector batch_size 50
         iniset $CEILOMETER_CONF collector batch_timeout 5
-        iniset $CEILOMETER_CONF dispatcher_gnocchi archive_policy ${GNOCCHI_ARCHIVE_POLICY}
-        if is_service_enabled swift && [[ "$GNOCCHI_STORAGE_BACKEND" = 'swift' ]] ; then
-            iniset $CEILOMETER_CONF dispatcher_gnocchi filter_service_activity "True"
-            iniset $CEILOMETER_CONF dispatcher_gnocchi filter_project "gnocchi_swift"
-        else
-            iniset $CEILOMETER_CONF dispatcher_gnocchi filter_service_activity "False"
-        fi
+        sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=gnocchi_swift/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
