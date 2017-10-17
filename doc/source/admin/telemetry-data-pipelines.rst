@@ -415,11 +415,6 @@ The notifier publisher can be specified in the form of
 oslo.messaging. Any consumer can then subscribe to the published topic
 for additional processing.
 
-.. note::
-
-   Prior to Ocata, the collector would consume this publisher but has since
-   been deprecated and therefore not required.
-
 The following customization options are available:
 
 ``per_meter_topic``

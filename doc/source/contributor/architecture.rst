@@ -52,9 +52,9 @@ How is data collected?
 .. figure:: ./1-agents.png
    :width: 100%
    :align: center
-   :alt: Collectors and agents
+   :alt: agents
 
-   This is a representation of how the collectors and agents gather data from
+   This is a representation of how the agents gather data from
    multiple sources.
 
 The Ceilometer project created 2 methods to collect data:

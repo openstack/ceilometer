@@ -48,11 +48,6 @@ such as transformations and publishing. After processing, the data is sent
 to any supported publisher target such as gnocchi or panko. These services
 persist the data in configured databases.
 
-.. note::
-
-   Prior to Ocata, the data was sent via AMQP to the collector service or any
-   external service.
-
 The different OpenStack services emit several notifications about the
 various types of events that happen in the system during normal
 operation. Not all these notifications are consumed by the Telemetry
