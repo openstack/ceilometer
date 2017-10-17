@@ -110,7 +110,6 @@ To use multiple publishers, add multiple publisher lines in ``pipeline.yaml`` an
       - name: sink_name
          transformers:
          publishers:
-            - database://
             - gnocchi://?archive_policy=low
             - file://
 

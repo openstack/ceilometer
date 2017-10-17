@@ -33,13 +33,6 @@ source $GRENADE_DIR/functions
 # only the first error that occurred.
 set -o errexit
 
-# Save mongodb state (replace with snapshot)
-# TODO(chdent): There used to be a 'register_db_to_save ceilometer'
-# which may wish to consider putting back in.
-if grep -q 'connection *= *mongo' /etc/ceilometer/ceilometer.conf; then
-    mongodump --db ceilometer --out $SAVE_DIR/ceilometer-dump.$BASE_RELEASE
-fi
-
 # Upgrade Ceilometer
 # ==================
 # Locate ceilometer devstack plugin, the directory above the
@@ -80,12 +73,6 @@ start_ceilometer
 ensure_services_started "ceilometer-polling --polling-namespaces compute" \
                         "ceilometer-polling --polling-namespaces central" \
                         ceilometer-agent-notification
-
-# Save mongodb state (replace with snapshot)
-if grep -q 'connection *= *mongo' /etc/ceilometer/ceilometer.conf; then
-    mongodump --db ceilometer --out $SAVE_DIR/ceilometer-dump.$TARGET_RELEASE
-fi
-
 
 set +o xtrace
 echo "*********************************************************************"

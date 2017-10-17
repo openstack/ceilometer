@@ -15,7 +15,6 @@
 import sys
 
 from oslo_config import cfg
-from oslo_db import options as db_options
 import oslo_i18n
 from oslo_log import log
 from oslo_reports import guru_meditation_report as gmr
@@ -45,7 +44,6 @@ def prepare_service(argv=None, config_files=None, conf=None):
                   ['futurist=INFO', 'neutronclient=INFO',
                    'keystoneclient=INFO'])
     log.set_defaults(default_log_levels=log_levels)
-    db_options.set_defaults(conf)
 
     conf(argv[1:], project='ceilometer', validate_default_values=True,
          version=version.version_info.version_string(),

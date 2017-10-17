@@ -102,7 +102,6 @@ class TestNotification(tests_base.BaseTestCase):
     def setUp(self):
         super(TestNotification, self).setUp()
         self.CONF = service.prepare_service([], [])
-        self.CONF.set_override("connection", "log://", group='database')
         self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.CONF.set_override("workload_partitioning", True,
                                group='notification')

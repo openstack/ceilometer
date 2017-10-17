@@ -124,7 +124,6 @@ class TestEventEndpoint(tests_base.BaseTestCase):
     def setUp(self):
         super(TestEventEndpoint, self).setUp()
         self.CONF = service.prepare_service([], [])
-        self.CONF.set_override("connection", "log://", group='database')
         self.setup_messaging(self.CONF)
 
         self.useFixture(fixtures.MockPatchObject(

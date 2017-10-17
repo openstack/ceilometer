@@ -82,7 +82,7 @@ The following operations are supported:
 .. note::
 
     Do not modify the existing change steps when making changes. Each modification
-    requires a new step to be added and for `ceilometer-upgrade --skip-metering-database`
+    requires a new step to be added and for `ceilometer-upgrade`
     to be run to apply the change to Gnocchi.
 
 With accomplishing sections above, don't forget to add a new resource type or attributes of

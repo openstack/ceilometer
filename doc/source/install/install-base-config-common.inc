@@ -76,4 +76,4 @@
 
    .. code-block:: console
 
-      # ceilometer-upgrade --skip-metering-database
+      # ceilometer-upgrade

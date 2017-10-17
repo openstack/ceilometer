@@ -34,7 +34,7 @@
 # of Ceilometer (see within for additional settings):
 #
 #   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 600.
-#   CEILOMETER_BACKEND:            Database backend (e.g. 'mysql', 'mongodb', 'gnocchi', 'none')
+#   CEILOMETER_BACKEND:            Database backend (e.g. 'gnocchi', 'none')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
 
@@ -62,27 +62,6 @@ function gnocchi_service_url {
     echo "$GNOCCHI_SERVICE_PROTOCOL://$GNOCCHI_SERVICE_HOST/metric"
 }
 
-# _ceilometer_install_mongdb - Install mongodb and python lib.
-function _ceilometer_install_mongodb {
-    # Server package is the same on all
-    local packages=mongodb-server
-
-    if is_fedora; then
-        # mongodb client
-        packages="${packages} mongodb"
-    fi
-
-    install_package ${packages}
-
-    if is_fedora; then
-        restart_service mongod
-    else
-        restart_service mongodb
-    fi
-
-    # give time for service to restart
-    sleep 5
-}
 
 # _ceilometer_install_redis() - Install the redis server and python lib.
 function _ceilometer_install_redis {
@@ -128,15 +107,6 @@ function _ceilometer_prepare_coordination {
         _ceilometer_install_redis
     fi
 }
-
-# Install required services for storage backends
-function _ceilometer_prepare_storage_backend {
-    if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-        pip_install_gr pymongo
-        _ceilometer_install_mongodb
-    fi
-}
-
 
 # Install the python modules for inspecting nova virt instances
 function _ceilometer_prepare_virt_drivers {
@@ -246,9 +216,6 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
-
-    inidelete $CEILOMETER_CONF database metering_connection
-
     if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
         # It's ok for the backend to be 'none', if panko is enabled. We do not
         # combine this condition with the outer if statement, so that the else
@@ -256,18 +223,10 @@ function _ceilometer_configure_storage_backend {
         if ! is_service_enabled panko-api; then
             echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
         fi
-    elif [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] ; then
-        iniset $CEILOMETER_CONF database metering_connection $(database_connection_url ceilometer)
-    elif [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-        iniset $CEILOMETER_CONF database metering_connection mongodb://localhost:27017/ceilometer
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=gnocchi_swift/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
-    fi
-
-    if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'mongodb' ]; then
-        sed -i 's/gnocchi:\/\//database:\/\//g' $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
     fi
 
     # configure panko
@@ -372,10 +331,7 @@ function install_ceilometer {
     install_ceilometerclient
 
     case $CEILOMETER_BACKEND in
-        mongodb) extra=mongo;;
         gnocchi) extra=gnocchi;;
-        mysql) extra=mysql;;
-        postgresql) extra=postgresql;;
     esac
     setup_develop $CEILOMETER_DIR $extra
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
@@ -399,7 +355,7 @@ function start_ceilometer {
         run_process gnocchi-api "$CEILOMETER_BIN_DIR/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
         run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
-        $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-metering-database
+        $CEILOMETER_BIN_DIR/ceilometer-upgrade
     fi
 
     run_process ceilometer-acentral "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces central --config-file $CEILOMETER_CONF"

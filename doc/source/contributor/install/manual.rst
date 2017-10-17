@@ -20,12 +20,6 @@
  Installing Manually
 =====================
 
-.. note::
-
-   Ceilometer collector service is deprecated. Configure dispatchers under publisher
-   in pipeline to push data instead. For more details about how to configure
-   publishers in the :ref:`publisher-configuration`.
-
 Storage Backend Installation
 ============================
 
@@ -68,7 +62,7 @@ Gnocchi
 
 #. Initialize Gnocchi database by creating ceilometer resources::
 
-   ceilometer-upgrade --skip-metering-database
+   ceilometer-upgrade
 
 #. To minimize data requests, caching and batch processing should be enabled:
 

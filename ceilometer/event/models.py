@@ -15,15 +15,39 @@
 from oslo_utils import timeutils
 import six
 
-from ceilometer.storage import base
-
 
 def serialize_dt(value):
     """Serializes parameter if it is datetime."""
     return value.isoformat() if hasattr(value, 'isoformat') else value
 
 
-class Event(base.Model):
+class Model(object):
+    """Base class for storage API models."""
+
+    def __init__(self, **kwds):
+        self.fields = list(kwds)
+        for k, v in six.iteritems(kwds):
+            setattr(self, k, v)
+
+    def as_dict(self):
+        d = {}
+        for f in self.fields:
+            v = getattr(self, f)
+            if isinstance(v, Model):
+                v = v.as_dict()
+            elif isinstance(v, list) and v and isinstance(v[0], Model):
+                v = [sub.as_dict() for sub in v]
+            d[f] = v
+        return d
+
+    def __eq__(self, other):
+        return self.as_dict() == other.as_dict()
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class Event(Model):
     """A raw event from the source system. Events have Traits.
 
        Metrics will be derived from one or more Events.
@@ -45,8 +69,8 @@ class Event(base.Model):
         :param traits:      list of Traits on this Event.
         :param raw:         Unindexed raw notification details.
         """
-        base.Model.__init__(self, message_id=message_id, event_type=event_type,
-                            generated=generated, traits=traits, raw=raw)
+        Model.__init__(self, message_id=message_id, event_type=event_type,
+                       generated=generated, traits=traits, raw=raw)
 
     def append_trait(self, trait_model):
         self.traits.append(trait_model)
@@ -67,7 +91,7 @@ class Event(base.Model):
                 'raw': self.raw}
 
 
-class Trait(base.Model):
+class Trait(Model):
     """A Trait is a key/value pair of data on an Event.
 
     The value is variant record of basic data types (int, date, float, etc).
@@ -90,7 +114,7 @@ class Trait(base.Model):
     def __init__(self, name, dtype, value):
         if not dtype:
             dtype = Trait.NONE_TYPE
-        base.Model.__init__(self, name=name, dtype=dtype, value=value)
+        Model.__init__(self, name=name, dtype=dtype, value=value)
 
     def __repr__(self):
         return "<Trait: %s %d %s>" % (self.name, self.dtype, self.value)

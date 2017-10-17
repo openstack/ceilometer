@@ -405,8 +405,7 @@ panko
 
 Event data in Ceilometer can be stored in panko which provides an HTTP REST
 interface to query system events in OpenStack. To push data to panko,
-set the publisher to ``direct://?dispatcher=panko``. Beginning in panko's
-Pike release, the publisher can be set as ``panko://``
+set the publisher to ``panko://``.
 
 notifier
 ````````
@@ -531,16 +530,6 @@ Deprecated publishers
 The following publishers are deprecated as of Ocata and may be removed in
 subsequent releases.
 
-direct
-``````
-
-This publisher can be specified in the form of ``direct://?dispatcher=http``.
-The dispatcher's options include: ``database``, ``file``, ``http``, and
-``gnocchi``. It emits data in the configured dispatcher directly, default
-configuration (the form is ``direct://``) is database dispatcher.
-In the Mitaka release, this method can only emit data to the database
-dispatcher, and the form is ``direct://``.
-
 kafka
 `````
 
@@ -562,57 +551,3 @@ offers similar options as ``notifier`` publisher.
    metering data under a topic name, ``ceilometer``. When the port
    number is not specified, this publisher uses 9092 as the
    broker's port.
-
-
-.. _telemetry-expiry:
-
-database
-````````
-
-.. note::
-
-  This functionality was replaced by ``gnocchi`` and ``panko`` publishers.
-
-When the database dispatcher is configured as a data store, you have the
-option to set a ``time_to_live`` option (ttl) for samples. By default
-the ttl value for samples is set to -1, which means that they
-are kept in the database forever.
-
-The time to live value is specified in seconds. Each sample has a time
-stamp, and the ``ttl`` value indicates that a sample will be deleted
-from the database when the number of seconds has elapsed since that
-sample reading was stamped. For example, if the time to live is set to
-600, all samples older than 600 seconds will be purged from the
-database.
-
-Certain databases support native TTL expiration. In cases where this is
-not possible, a command-line script, which you can use for this purpose
-is ``ceilometer-expirer``. You can run it in a cron job, which helps to keep
-your database in a consistent state.
-
-The level of support differs in case of the configured back end:
-
-.. list-table::
-   :widths: 33 33 33
-   :header-rows: 1
-
-   * - Database
-     - TTL value support
-     - Note
-   * - MongoDB
-     - Yes
-     - MongoDB has native TTL support for deleting samples
-       that are older than the configured ttl value.
-   * - SQL-based back ends
-     - Yes
-     - ``ceilometer-expirer`` has to be used for deleting
-       samples and its related data from the database.
-   * - HBase
-     - No
-     - Telemetry's HBase support does not include native TTL
-       nor ``ceilometer-expirer`` support.
-   * - DB2 NoSQL
-     - No
-     - DB2 NoSQL does not have native TTL
-       nor ``ceilometer-expirer`` support.
-
