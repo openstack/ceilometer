@@ -137,7 +137,7 @@ class ResourcesDefinition(object):
 
     def event_attributes(self, event):
         attrs = {'type': self.cfg['resource_type']}
-        traits = dict([(trait[0], trait[2]) for trait in event.traits])
+        traits = dict([(trait.name, trait.value) for trait in event.traits])
         for attr, field in self.cfg.get('event_attributes', {}).items():
             value = traits.get(field)
             if value is not None:
