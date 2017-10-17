@@ -19,17 +19,6 @@
       - openstack/ceilometer
 
 - job:
-    name: ceilometer-dsvm-tempest-plugin-es
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-es/run
-    post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-es/post
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/ceilometer
-      - openstack/tempest
-
-- job:
     name: ceilometer-dsvm-tempest-plugin-mongodb
     parent: legacy-dsvm-base
     run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb/run
@@ -160,6 +149,3 @@
               - ^setup.cfg$
         - telemetry-dsvm-integration-ceilometer
         - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only
-    experimental:
-      jobs:
-        - ceilometer-dsvm-tempest-plugin-es
