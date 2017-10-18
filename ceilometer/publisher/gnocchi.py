@@ -23,12 +23,12 @@ import uuid
 from gnocchiclient import exceptions as gnocchi_exc
 from keystoneauth1 import exceptions as ka_exceptions
 from oslo_log import log
-from oslo_serialization import jsonutils
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import six
 import six.moves.urllib.parse as urlparse
 from stevedore import extension
+import ujson
 
 from ceilometer import declarative
 from ceilometer import gnocchi_client
@@ -502,7 +502,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
     def _search_resource(self, resource_type, query):
         try:
             return self._gnocchi.resource.search(
-                resource_type, jsonutils.loads(query))
+                resource_type, ujson.loads(query))
         except Exception:
             LOG.error("Fail to search resource type %{resource_type}s "
                       "with '%{query}s'",

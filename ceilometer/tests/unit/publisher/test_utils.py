@@ -14,8 +14,8 @@
 # under the License.
 """Tests for ceilometer/publisher/utils.py
 """
-from oslo_serialization import jsonutils
 from oslotest import base
+import ujson
 
 from ceilometer.publisher import utils
 
@@ -104,7 +104,7 @@ class TestSignature(base.BaseTestCase):
         data['message_signature'] = utils.compute_signature(
             data,
             'not-so-secret')
-        jsondata = jsonutils.loads(jsonutils.dumps(data))
+        jsondata = ujson.loads(ujson.dumps(data))
         self.assertTrue(utils.verify_signature(jsondata, 'not-so-secret'))
 
     def test_verify_unicode_symbols(self):
@@ -114,7 +114,7 @@ class TestSignature(base.BaseTestCase):
         data['message_signature'] = utils.compute_signature(
             data,
             'not-so-secret')
-        jsondata = jsonutils.loads(jsonutils.dumps(data))
+        jsondata = ujson.loads(ujson.dumps(data))
         self.assertTrue(utils.verify_signature(jsondata, 'not-so-secret'))
 
     def test_verify_no_secret(self):
