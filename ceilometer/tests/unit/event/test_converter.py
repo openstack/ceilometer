@@ -21,7 +21,7 @@ import six
 
 from ceilometer import declarative
 from ceilometer.event import converter
-from ceilometer.event.storage import models
+from ceilometer.event import models
 from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
 

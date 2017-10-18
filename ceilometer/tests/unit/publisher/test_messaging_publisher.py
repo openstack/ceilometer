@@ -23,7 +23,7 @@ from oslo_messaging._drivers import impl_kafka as kafka_driver
 from oslo_utils import netutils
 import testscenarios.testcase
 
-from ceilometer.event.storage import models as event
+from ceilometer.event import models as event
 from ceilometer.publisher import messaging as msg_publisher
 from ceilometer import sample
 from ceilometer import service
