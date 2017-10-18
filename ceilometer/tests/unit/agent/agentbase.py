@@ -19,13 +19,10 @@
 import abc
 import copy
 import datetime
-import os
-import tempfile
 
 import mock
 import six
 from stevedore import extension
-import yaml
 
 from ceilometer.agent import plugin_base
 from ceilometer import pipeline
@@ -360,33 +357,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         mgr.create_polling_task = mock.MagicMock()
         mgr.run()
         self.addCleanup(mgr.terminate)
-        mgr.create_polling_task.assert_called_once_with()
-
-    def test_agent_manager_start_fallback(self):
-        pipeline_cfg = {
-            'sources': [{
-                'name': 'test_pipeline',
-                'interval': 60,
-                'meters': ['test'],
-                'resources': ['test://'],
-                'sinks': ['test_sink']}],
-            'sinks': [{
-                'name': 'test_sink',
-                'transformers': [],
-                'publishers': ["test"]}]
-        }
-        tmp_cfg = tempfile.NamedTemporaryFile(mode='w', delete=False)
-        tmp_cfg.write(yaml.safe_dump(pipeline_cfg))
-        tmp_cfg.close()
-        self.CONF.set_override('pipeline_cfg_file', tmp_cfg.name)
-        self.CONF.set_override('cfg_file', None, group='polling')
-
-        mgr = self.create_manager()
-        mgr.extensions = self.mgr.extensions
-        mgr.create_polling_task = mock.MagicMock()
-        mgr.run()
-        self.addCleanup(mgr.terminate)
-        self.addCleanup(os.unlink, tmp_cfg.name)
         mgr.create_polling_task.assert_called_once_with()
 
     def test_manager_exception_persistency(self):
