@@ -40,88 +40,25 @@ load_tests = testscenarios.load_tests_apply_scenarios
 
 INSTANCE_DELETE_START = models.Event(
     event_type=u'compute.instance.delete.start',
-    traits=[
-        [
-            'state',
-            1,
-            u'active'
-        ],
-        [
-            'user_id',
-            1,
-            u'1e3ce043029547f1a61c1996d1a531a2'
-        ],
-        [
-            'service',
-            1,
-            u'compute'
-        ],
-        [
-            'disk_gb',
-            2,
-            0
-        ],
-        [
-            'instance_type',
-            1,
-            u'm1.tiny'
-        ],
-        [
-            'tenant_id',
-            1,
-            u'7c150a59fe714e6f9263774af9688f0e'
-        ],
-        [
-            'root_gb',
-            2,
-            0
-        ],
-        [
-            'ephemeral_gb',
-            2,
-            0
-        ],
-        [
-            'instance_type_id',
-            2,
-            2
-        ],
-        [
-            'vcpus',
-            2,
-            1
-        ],
-        [
-            'memory_mb',
-            2,
-            512
-        ],
-        [
-            'instance_id',
-            1,
-            u'9f9d01b9-4a58-4271-9e27-398b21ab20d1'
-        ],
-        [
-            'host',
-            1,
-            u'vagrant-precise'
-        ],
-        [
-            'request_id',
-            1,
-            u'req-fb3c4546-a2e5-49b7-9fd2-a63bd658bc39'
-        ],
-        [
-            'project_id',
-            1,
-            u'7c150a59fe714e6f9263774af9688f0e'
-        ],
-        [
-            'launched_at',
-            4,
-            '2012-05-08T20:23:47'
-        ]
-    ],
+    traits=[models.Trait('state', 1, u'active'),
+            models.Trait(
+                'user_id', 1, u'1e3ce043029547f1a61c1996d1a531a2'),
+            models.Trait('service', 1, u'compute'),
+            models.Trait('disk_gb', 2, 0),
+            models.Trait('instance_type', 1, u'm1.tiny'),
+            models.Trait('tenant_id', 1, u'7c150a59fe714e6f9263774af9688f0e'),
+            models.Trait('root_gb', 2, 0),
+            models.Trait('ephemeral_gb', 2, 0),
+            models.Trait('instance_type_id', 2, 2),
+            models.Trait('vcpus', 2, 1),
+            models.Trait('memory_mb', 2, 512),
+            models.Trait(
+                'instance_id', 1, u'9f9d01b9-4a58-4271-9e27-398b21ab20d1'),
+            models.Trait('host', 1, u'vagrant-precise'),
+            models.Trait(
+                'request_id', 1, u'req-fb3c4546-a2e5-49b7-9fd2-a63bd658bc39'),
+            models.Trait('project_id', 1, u'7c150a59fe714e6f9263774af9688f0e'),
+            models.Trait('launched_at', 4, '2012-05-08T20:23:47')],
     raw={},
     generated='2012-05-08T20:24:14.824743',
     message_id=u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4',
@@ -129,53 +66,17 @@ INSTANCE_DELETE_START = models.Event(
 
 IMAGE_DELETE_START = models.Event(
     event_type=u'image.delete',
-    traits=[
-        [
-            u'status',
-            1,
-            u'deleted'
-        ],
-        [
-            u'deleted_at',
-            1,
-            u'2016-11-04T04:25:56Z'
-        ],
-        [
-            u'user_id',
-            1,
-            u'e97ef33a20ed4843b520d223f3cc33d4'
-        ],
-        [
-            u'name',
-            1,
-            u'cirros'
-        ],
-        [
-            u'service',
-            1,
-            u'image.localhost'
-        ],
-        [
-            u'resource_id',
-            1,
-            u'dc337359-de70-4044-8e2c-80573ba6e577'
-        ],
-        [
-            u'created_at',
-            1,
-            u'2016-11-04T04:24:36Z'
-        ],
-        [
-            u'project_id',
-            1,
-            u'e97ef33a20ed4843b520d223f3cc33d4'
-        ],
-        [
-            u'size',
-            1,
-            u'13287936'
-        ]
-    ],
+    traits=[models.Trait(u'status', 1, u'deleted'),
+            models.Trait(u'deleted_at', 1, u'2016-11-04T04:25:56Z'),
+            models.Trait(u'user_id', 1, u'e97ef33a20ed4843b520d223f3cc33d4'),
+            models.Trait(u'name', 1, u'cirros'),
+            models.Trait(u'service', 1, u'image.localhost'),
+            models.Trait(
+                u'resource_id', 1, u'dc337359-de70-4044-8e2c-80573ba6e577'),
+            models.Trait(u'created_at', 1, u'2016-11-04T04:24:36Z'),
+            models.Trait(
+                u'project_id', 1, u'e97ef33a20ed4843b520d223f3cc33d4'),
+            models.Trait(u'size', 1, u'13287936')],
     raw={},
     generated=u'2016-11-04T04:25:56.493820',
     message_id=u'7f5280f7-1d10-46a5-ba58-4d5508e49f99'
@@ -184,78 +85,25 @@ IMAGE_DELETE_START = models.Event(
 
 VOLUME_DELETE_START = models.Event(
     event_type=u'volume.delete.start',
-    traits=[
-        [
-            u'availability_zone',
-            1,
-            u'nova'
-        ],
-        [
-            u'created_at',
-            1,
-            u'2016-11-28T13:19:53+00:00'
-        ],
-        [
-            u'display_name',
-            1,
-            u'vol-001'
-        ],
-        [
-            u'host',
-            1,
-            u'zhangguoqing-dev@lvmdriver-1#lvmdriver-1'
-        ],
-        [
-            u'project_id',
-            1,
-            u'd53fcc7dc53c4662ad77822c36a21f00'
-        ],
-        [
-            u'replication_status',
-            1,
-            u'disabled'
-        ],
-        [
-            u'request_id',
-            1,
-            u'req-f44df096-50d4-4211-95ea-64be6f5e4f60'
-        ],
-        [
-            u'resource_id',
-            1,
-            u'6cc6e7dd-d17d-460f-ae79-7e08a216ce96'
-        ],
-        [
-            u'service',
-            1,
-            u'volume.zhangguoqing-dev@lvmdriver-1'
-        ],
-        [
-            u'size',
-            1,
-            u'1'
-        ],
-        [
-            u'status',
-            1,
-            u'deleting'
-        ],
-        [
-            u'tenant_id',
-            1,
-            u'd53fcc7dc53c4662ad77822c36a21f00'
-        ],
-        [
-            u'type',
-            1,
-            u'af6271fa-13c4-44e6-9246-754ce9dc7df8'
-        ],
-        [
-            u'user_id',
-            1,
-            u'819bbd28f5374506b8502521c89430b5'
-        ]
-    ],
+    traits=[models.Trait(u'availability_zone', 1, u'nova'),
+            models.Trait(u'created_at', 1, u'2016-11-28T13:19:53+00:00'),
+            models.Trait(u'display_name', 1, u'vol-001'),
+            models.Trait(
+                u'host', 1, u'zhangguoqing-dev@lvmdriver-1#lvmdriver-1'),
+            models.Trait(
+                u'project_id', 1, u'd53fcc7dc53c4662ad77822c36a21f00'),
+            models.Trait(u'replication_status', 1, u'disabled'),
+            models.Trait(
+                u'request_id', 1, u'req-f44df096-50d4-4211-95ea-64be6f5e4f60'),
+            models.Trait(
+                u'resource_id', 1, u'6cc6e7dd-d17d-460f-ae79-7e08a216ce96'),
+            models.Trait(
+                u'service', 1, u'volume.zhangguoqing-dev@lvmdriver-1'),
+            models.Trait(u'size', 1, u'1'),
+            models.Trait(u'status', 1, u'deleting'),
+            models.Trait(u'tenant_id', 1, u'd53fcc7dc53c4662ad77822c36a21f00'),
+            models.Trait(u'type', 1, u'af6271fa-13c4-44e6-9246-754ce9dc7df8'),
+            models.Trait(u'user_id', 1, u'819bbd28f5374506b8502521c89430b5')],
     raw={},
     generated='2016-11-28T13:42:15.484674',
     message_id=u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4',
@@ -263,38 +111,15 @@ VOLUME_DELETE_START = models.Event(
 
 FLOATINGIP_DELETE_END = models.Event(
     event_type=u'floatingip.delete.end',
-    traits=[
-        [
-            u'project_id',
-            1,
-            u'd53fcc7dc53c4662ad77822c36a21f00'
-        ],
-        [
-            u'request_id',
-            1,
-            'req-443ddb77-31f7-41fe-abbf-921107dd9f00'
-        ],
-        [
-            u'resource_id',
-            1,
-            u'705e2c08-08e8-45cb-8673-5c5be955569b'
-        ],
-        [
-            u'service',
-            1,
-            u'network.zhangguoqing-dev'
-        ],
-        [
-            u'tenant_id',
-            1,
-            u'd53fcc7dc53c4662ad77822c36a21f00'
-        ],
-        [
-            u'user_id',
-            1,
-            u'819bbd28f5374506b8502521c89430b5'
-        ]
-    ],
+    traits=[models.Trait(u'service', 1, u'network.zhangguoqing-dev'),
+            models.Trait(
+                u'project_id', 1, u'd53fcc7dc53c4662ad77822c36a21f00'),
+            models.Trait(
+                u'request_id', 1, 'req-443ddb77-31f7-41fe-abbf-921107dd9f00'),
+            models.Trait(
+                u'resource_id', 1, u'705e2c08-08e8-45cb-8673-5c5be955569b'),
+            models.Trait(u'tenant_id', 1, u'd53fcc7dc53c4662ad77822c36a21f00'),
+            models.Trait(u'user_id', 1, u'819bbd28f5374506b8502521c89430b5')],
     raw={},
     generated='2016-11-29T09:25:55.474710',
     message_id=u'a15b94ee-cb8e-4c71-9abe-14aa80055fb4'
