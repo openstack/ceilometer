@@ -62,7 +62,7 @@ function generate_telemetry_report(){
     gnocchi status
 
     echo "* Unprocessed measures:"
-    for key in $(redis-cli --scan --pattern 'incoming*'); do echo -n $key && redis-cli llen $key; done
+    for key in $(redis-cli --scan --pattern 'incoming*'); do echo -n "$key length = " && redis-cli llen $key; done
 
     set -e
     set -x
