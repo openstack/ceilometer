@@ -133,27 +133,19 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         tree = etree.fromstring(domain.XMLDesc(0))
         for disk in tree.findall('devices/disk'):
-            disk_type = disk.get('type')
-            if disk_type:
-                if disk_type == 'network':
-                    LOG.warning(
-                        'Inspection disk usage of network disk '
-                        '%(instance_uuid)s unsupported by libvirt' % {
-                            'instance_uuid': instance.id})
-                    continue
-                # NOTE(lhx): "cdrom" device associated to the configdrive
-                # no longer has a "source" element. Releated bug:
-                # https://bugs.launchpad.net/ceilometer/+bug/1622718
-                if disk.find('source') is None:
-                    continue
-                target = disk.find('target')
-                device = target.get('dev')
-                if device:
-                    block_info = domain.blockInfo(device)
-                    yield virt_inspector.DiskInfo(device=device,
-                                                  capacity=block_info[0],
-                                                  allocation=block_info[1],
-                                                  physical=block_info[2])
+            # NOTE(lhx): "cdrom" device associated to the configdrive
+            # no longer has a "source" element. Releated bug:
+            # https://bugs.launchpad.net/ceilometer/+bug/1622718
+            if disk.find('source') is None:
+                continue
+            target = disk.find('target')
+            device = target.get('dev')
+            if device:
+                block_info = domain.blockInfo(device)
+                yield virt_inspector.DiskInfo(device=device,
+                                              capacity=block_info[0],
+                                              allocation=block_info[1],
+                                              physical=block_info[2])
 
     @libvirt_utils.raise_nodata_if_unsupported
     @libvirt_utils.retry_on_disconnect
