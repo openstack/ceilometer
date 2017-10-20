@@ -613,3 +613,19 @@
       fields: payload.observer.id
     observer_typeURI:
       fields: payload.observer.typeURI
+- event_type: 'alarm.*'
+  traits:
+    id:
+      fields: payload.alarm_id
+    user_id:
+      fields: payload.user_id
+    project_id:
+      fields: payload.project_id
+    on_behalf_of:
+      fields: payload.on_behalf_of
+    severity:
+      fields: payload.severity
+    detail:
+      fields: payload.detail
+    type:
+      fields: payload.type
