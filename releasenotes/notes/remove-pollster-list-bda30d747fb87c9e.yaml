@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated `pollster-list` option has been removed.

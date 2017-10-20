@@ -66,21 +66,13 @@ CLI_OPTS = [
                     dest='polling_namespaces',
                     help='Polling namespace(s) to be used while '
                          'resource polling'),
-    MultiChoicesOpt('pollster-list',
-                    default=[],
-                    deprecated_for_removal=True,
-                    dest='pollster_list',
-                    help='List of pollsters (or wildcard templates) to be '
-                         'used while polling. This option is deprecated. '
-                         'Configure pollsters via polling.yaml'),
 ]
 
 
 def create_polling_service(worker_id, conf):
     return manager.AgentManager(worker_id,
                                 conf,
-                                conf.polling_namespaces,
-                                conf.pollster_list)
+                                conf.polling_namespaces)
 
 
 def main():

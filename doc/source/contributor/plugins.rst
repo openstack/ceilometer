@@ -99,19 +99,11 @@ polling agent start via CLI parameter::
     ceilometer-polling --polling-namespaces central compute
 
 This command will basically make polling agent to load all plugins from the
-central and compute namespaces and poll everything it can. If you need to load
-only some of the pollsters, you can use ``pollster-list`` option::
-
-    ceilometer-polling --pollster-list image image.size storage.*
+central and compute namespaces and poll everything it can.
 
 If both of these options are passed, the polling agent will load only those
 pollsters specified in the pollster list, that can be loaded from the selected
 namespaces.
-
-.. note::
-
-   Agents coordination cannot be used in case of pollster-list option usage.
-   This allows to avoid both samples duplication and their lost.
 
 Notifications
 -------------
