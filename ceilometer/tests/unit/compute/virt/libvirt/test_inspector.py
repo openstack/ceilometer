@@ -378,7 +378,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             disks = list(self.inspector.inspect_disk_info(self.instance, None))
-            self.assertEqual(0, len(disks))
+            self.assertEqual(1, len(disks))
 
     def test_inspect_disk_info_without_source_element(self):
         dom_xml = """
