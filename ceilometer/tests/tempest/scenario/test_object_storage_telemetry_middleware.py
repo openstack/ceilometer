@@ -123,7 +123,7 @@ class TestObjectStorageTelemetry(test.BaseTestCase):
         name = data_utils.rand_name('swift-scenario-container')
         self.container_client.create_container(name)
         # look for the container to assure it is created
-        self.container_client.list_container_contents(name)
+        self.container_client.list_container_objects(name)
         LOG.debug('Container %s created' % (name))
         self.addCleanup(self.container_client.delete_container,
                         name)
