@@ -581,8 +581,8 @@
       fields: payload.info.db.statement
     db.params:
       fields: payload.info.db.params
-- event_type: 'magnum.bay.*'
-  traits: &magnum_bay_crud
+- event_type: 'magnum.cluster.*'
+  traits: &magnum_cluster_crud
     id:
       fields: payload.id
     typeURI:
