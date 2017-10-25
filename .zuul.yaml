@@ -122,7 +122,6 @@
         - ceilometer-tox-py27-postgresql:
             branches: ^(?!stable/newton)
         - grenade-dsvm-ceilometer:
-            branches: ^(?!stable/newton).*$
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
@@ -143,7 +142,6 @@
         - ceilometer-tox-py27-postgresql:
             branches: ^(?!stable/newton)
         - grenade-dsvm-ceilometer:
-            branches: ^(?!stable/newton).*$
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
