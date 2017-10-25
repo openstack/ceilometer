@@ -27,7 +27,7 @@ except ImportError:
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import utils as libvirt_utils
-from ceilometer.i18n import _LW, _LE, _
+from ceilometer.i18n import _LE, _
 
 LOG = logging.getLogger(__name__)
 
@@ -223,28 +223,20 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         tree = etree.fromstring(domain.XMLDesc(0))
         for disk in tree.findall('devices/disk'):
-            disk_type = disk.get('type')
-            if disk_type:
-                if disk_type == 'network':
-                    LOG.warning(
-                        _LW('Inspection disk usage of network disk '
-                            '%(instance_uuid)s unsupported by libvirt') % {
-                            'instance_uuid': instance.id})
-                    continue
-                # NOTE(lhx): "cdrom" device associated to the configdrive
-                # no longer has a "source" element. Releated bug:
-                # https://bugs.launchpad.net/ceilometer/+bug/1622718
-                if disk.find('source') is None:
-                    continue
-                target = disk.find('target')
-                device = target.get('dev')
-                if device:
-                    dsk = virt_inspector.Disk(device=device)
-                    block_info = domain.blockInfo(device)
-                    info = virt_inspector.DiskInfo(capacity=block_info[0],
-                                                   allocation=block_info[1],
-                                                   physical=block_info[2])
-                    yield (dsk, info)
+            # NOTE(lhx): "cdrom" device associated to the configdrive
+            # no longer has a "source" element. Releated bug:
+            # https://bugs.launchpad.net/ceilometer/+bug/1622718
+            if disk.find('source') is None:
+                continue
+            target = disk.find('target')
+            device = target.get('dev')
+            if device:
+                dsk = virt_inspector.Disk(device=device)
+                block_info = domain.blockInfo(device)
+                info = virt_inspector.DiskInfo(capacity=block_info[0],
+                                               allocation=block_info[1],
+                                               physical=block_info[2])
+                yield (dsk, info)
 
     def inspect_memory_resident(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)

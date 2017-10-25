@@ -388,7 +388,7 @@ class TestLibvirtInspection(base.BaseTestCase):
                                                                 2, 999999)))
             disks = list(self.inspector.inspect_disk_info(self.instance))
 
-            self.assertEqual(0, len(disks))
+            self.assertEqual(1, len(disks))
 
     def test_inspect_disk_info_without_source_element(self):
         dom_xml = """
