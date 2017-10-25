@@ -56,11 +56,6 @@ one pass.
    After starting the first agent, you should verify that data is again being
    polled. Additional agents can be added to support coordination if enabled.
 
-.. note::
-
-   The API service can be taken offline and upgraded at any point in the
-   process (if applicable).
-
 
 Partial upgrades
 ================
@@ -94,17 +89,12 @@ version in time.
    are upgraded, the polling agents can be changed to poll both new pollsters
    AND the old ones.
 
-5. Upgrade the API service(s)
-
-   API management is handled by WSGI so there is only ever one version of API
-   service running
-
 .. note::
 
    Upgrade ordering does not matter in partial upgrade path. The only
    requirement is that the database be upgraded first. It is advisable to
    upgrade following the same ordering as currently described: database,
-   collector, notification agent, polling agent, api.
+   collector, notification agent, polling agent.
 
 
 Developer notes

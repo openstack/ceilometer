@@ -57,10 +57,6 @@ function is_ceilometer_enabled {
     return 1
 }
 
-function ceilometer_service_url {
-    echo "$CEILOMETER_SERVICE_PROTOCOL://$CEILOMETER_SERVICE_HOST:$CEILOMETER_SERVICE_PORT"
-}
-
 
 function gnocchi_service_url {
     echo "$GNOCCHI_SERVICE_PROTOCOL://$GNOCCHI_SERVICE_HOST/metric"
@@ -109,9 +105,6 @@ function _ceilometer_config_apache_wsgi {
     local ceilometer_apache_conf=$(apache_site_config_for ceilometer)
     local apache_version=$(get_apache_version)
     local venv_path=""
-
-    # Copy proxy vhost and wsgi file
-    sudo cp $CEILOMETER_DIR/ceilometer/api/app.wsgi $CEILOMETER_WSGI_DIR/app
 
     if [[ ${USE_VENV} = True ]]; then
         venv_path="python-path=${PROJECT_VENV["ceilometer"]}/lib/$(python_version)/site-packages"
@@ -168,15 +161,6 @@ function ceilometer_create_accounts {
     export OS_CLOUD='devstack-admin'
 
     create_service_user "ceilometer" "admin"
-
-    if is_service_enabled ceilometer-api; then
-        get_or_create_service "ceilometer" "metering" "OpenStack Telemetry Service"
-        get_or_create_endpoint "metering" \
-            "$REGION_NAME" \
-            "$(ceilometer_service_url)" \
-            "$(ceilometer_service_url)" \
-            "$(ceilometer_service_url)"
-    fi
 
     if is_service_enabled swift; then
         # Ceilometer needs ResellerAdmin role to access Swift account stats.
@@ -236,28 +220,9 @@ function preinstall_ceilometer {
     echo_summary "Preinstall not in virtualenv context. Skipping."
 }
 
-# Remove WSGI files, disable and remove Apache vhost file
-function _ceilometer_cleanup_apache_wsgi {
-    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-        sudo rm -f "$CEILOMETER_WSGI_DIR"/*
-        sudo rmdir "$CEILOMETER_WSGI_DIR"
-        sudo rm -f $(apache_site_config_for ceilometer)
-    fi
-}
-
-function _ceilometer_drop_database {
-    if is_service_enabled ceilometer-api ; then
-        if [ "$CEILOMETER_BACKEND" = 'mongodb' ] ; then
-            mongo ceilometer --eval "db.dropDatabase();"
-        fi
-    fi
-}
-
 # cleanup_ceilometer() - Remove residual data files, anything left over
 # from previous runs that a clean run would need to clean up
 function cleanup_ceilometer {
-    _ceilometer_cleanup_apache_wsgi
-    _ceilometer_drop_database
     sudo rm -f "$CEILOMETER_CONF_DIR"/*
     sudo rmdir "$CEILOMETER_CONF_DIR"
 }
@@ -311,8 +276,6 @@ function _ceilometer_configure_storage_backend {
             echo '          - panko://' >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
         fi
     fi
-
-    _ceilometer_drop_database
 }
 
 # Configure Ceilometer
@@ -342,9 +305,6 @@ function configure_ceilometer {
     # with rootwrap installation done elsewhere and also clobber
     # ceilometer.conf settings that have already been made.
     # Anyway, explicit is better than implicit.
-    for conffile in policy.json api_paste.ini; do
-        cp $CEILOMETER_DIR/etc/ceilometer/$conffile $CEILOMETER_CONF_DIR
-    done
     cp $CEILOMETER_DIR/etc/ceilometer/polling_all.yaml $CEILOMETER_CONF_DIR/polling.yaml
 
     cp $CEILOMETER_DIR/ceilometer/pipeline/data/*.yaml $CEILOMETER_CONF_DIR
@@ -371,11 +331,6 @@ function configure_ceilometer {
 
     configure_auth_token_middleware $CEILOMETER_CONF ceilometer $CEILOMETER_AUTH_CACHE_DIR
 
-    # Configure storage
-    if is_service_enabled ceilometer-api; then
-        _ceilometer_configure_storage_backend
-    fi
-
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
         iniset $CEILOMETER_CONF DEFAULT hypervisor_inspector vsphere
         iniset $CEILOMETER_CONF vmware host_ip "$VMWAREAPI_IP"
@@ -383,9 +338,7 @@ function configure_ceilometer {
         iniset $CEILOMETER_CONF vmware host_password "$VMWAREAPI_PASSWORD"
     fi
 
-    if is_service_enabled ceilometer-api && [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-        _ceilometer_config_apache_wsgi
-    fi
+    _ceilometer_configure_storage_backend
 
     if is_service_enabled ceilometer-aipmi; then
         # Configure rootwrap for the ipmi agent
@@ -398,15 +351,6 @@ function init_ceilometer {
     # Create cache dir
     sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
     rm -f $CEILOMETER_AUTH_CACHE_DIR/*
-
-    if is_service_enabled ceilometer-api; then
-        if is_service_enabled mysql postgresql ; then
-            if [ "$CEILOMETER_BACKEND" = 'mysql' ] || [ "$CEILOMETER_BACKEND" = 'postgresql' ] || [ "$CEILOMETER_BACKEND" = 'es' ] ; then
-                recreate_database ceilometer
-                $CEILOMETER_BIN_DIR/ceilometer-upgrade --skip-gnocchi-resource-types
-            fi
-        fi
-    fi
 }
 
 # Install Ceilometer.
@@ -420,10 +364,6 @@ function install_ceilometer {
     fi
 
     ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" = 'gnocchi' ] && install_gnocchi
-
-    if is_service_enabled ceilometer-api; then
-        _ceilometer_prepare_storage_backend
-    fi
 
     if is_service_enabled ceilometer-acompute ; then
         _ceilometer_prepare_virt_drivers
@@ -465,15 +405,6 @@ function start_ceilometer {
     run_process ceilometer-acentral "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces central --config-file $CEILOMETER_CONF"
     run_process ceilometer-aipmi "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces ipmi --config-file $CEILOMETER_CONF"
 
-    if [[ "$CEILOMETER_USE_MOD_WSGI" == "False" ]]; then
-        run_process ceilometer-api "$CEILOMETER_BIN_DIR/ceilometer-api --port $CEILOMETER_SERVICE_PORT"
-    elif is_service_enabled ceilometer-api; then
-        enable_apache_site ceilometer
-        restart_apache_server
-        tail_log ceilometer /var/log/$APACHE_NAME/ceilometer.log
-        tail_log ceilometer-api /var/log/$APACHE_NAME/ceilometer_access.log
-    fi
-
     # run the notification agent after restarting apache as it needs
     # operational keystone if using gnocchi
     run_process ceilometer-anotification "$CEILOMETER_BIN_DIR/ceilometer-agent-notification --config-file $CEILOMETER_CONF"
@@ -490,14 +421,6 @@ function start_ceilometer {
 
 # stop_ceilometer() - Stop running processes
 function stop_ceilometer {
-    if is_service_enabled ceilometer-api ; then
-        if [ "$CEILOMETER_USE_MOD_WSGI" == "True" ]; then
-            disable_apache_site ceilometer
-            restart_apache_server
-        else
-            stop_process ceilometer-api
-        fi
-    fi
 
     # Kill the ceilometer screen windows
     for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification; do

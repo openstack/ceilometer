@@ -19,39 +19,6 @@
       - openstack/ceilometer
 
 - job:
-    name: ceilometer-dsvm-tempest-plugin-mongodb
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb/run
-    post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb/post
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/ceilometer
-      - openstack/tempest
-
-- job:
-    name: ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only/run
-    post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only/post
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/ceilometer
-      - openstack/tempest
-
-- job:
-    name: ceilometer-dsvm-tempest-plugin-mysql
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mysql/run
-    post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mysql/post
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/ceilometer
-      - openstack/tempest
-
-- job:
     name: ceilometer-tox-py27-mongodb
     parent: legacy-base
     run: playbooks/legacy/ceilometer-tox-py27-mongodb/run
@@ -113,8 +80,6 @@
             branches: ^stable/newton$
         - ceilometer-dsvm-functional-mysql:
             branches: ^stable/newton$
-        - ceilometer-dsvm-tempest-plugin-mongodb
-        - ceilometer-dsvm-tempest-plugin-mysql
         - ceilometer-tox-py27-mongodb:
             branches: ^(?!stable/newton)
         - ceilometer-tox-py27-mysql:
@@ -127,15 +92,12 @@
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
         - telemetry-dsvm-integration-ceilometer
-        - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only
     gate:
       jobs:
         - ceilometer-dsvm-functional-mongodb:
             branches: ^stable/newton$
         - ceilometer-dsvm-functional-mysql:
             branches: ^stable/newton$
-        - ceilometer-dsvm-tempest-plugin-mongodb
-        - ceilometer-dsvm-tempest-plugin-mysql
         - ceilometer-tox-py27-mongodb:
             branches: ^(?!stable/newton)
         - ceilometer-tox-py27-mysql:
@@ -148,4 +110,3 @@
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
         - telemetry-dsvm-integration-ceilometer
-        - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only

@@ -37,10 +37,10 @@ class TelemetryBase(plugin_base.NotificationBase):
 class TelemetryIpc(TelemetryBase):
     """Handle sample from notification bus
 
-     Telemetry samples can be posted via API or polled by Polling agent.
+     Telemetry samples polled by polling agent.
      """
 
-    event_types = ['telemetry.api', 'telemetry.polling']
+    event_types = ['telemetry.polling']
 
     def process_notification(self, message):
         samples = message['payload']['samples']

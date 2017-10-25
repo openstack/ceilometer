@@ -10,11 +10,6 @@ database, or provide an API service for handling incoming requests.
 
 The Telemetry service is built from the following agents and services:
 
-ceilometer-api (deprecated in Ocata)
-    Presents aggregated metering data to consumers (such as billing
-    engines and analytics tools). Alarm, Meter and Event APIs are now handled
-    by aodh, gnocchi, and panko services respectively.
-
 ceilometer-polling
     Polls for different kinds of meter data by using the polling
     plug-ins (pollsters) registered in different namespaces. It provides a
@@ -40,9 +35,8 @@ ceilometer-collector (deprecated in Ocata)
           agents: ``ceilometer-agent-central``, ``ceilometer-agent-compute``,
           and ``ceilometer-agent-ipmi``.
 
-       2. The ``ceilometer-api`` and ``ceilometer-collector`` are no longer
-          supported since the Ocata release. Storage and API are provided by
-          gnocchi, aodh, and panko services.
+       2. The ``ceilometer-collector`` is no longer supported since the Ocata
+          release. Storage is provided by gnocchi, aodh, and panko services.
 
 Except for the ``ceilometer-polling`` agents polling the ``compute`` or
 ``ipmi`` namespaces, all the other services are placed on one or more

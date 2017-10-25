@@ -49,9 +49,9 @@ run through tox_.
 
 .. _testr documentation: https://testrepository.readthedocs.org/en/latest/MANUAL.html
 
-   Use a double hyphen to pass options to testr. For example, to run only tests under tests/api/v2::
+   Use a double hyphen to pass options to testr. For example, to run only tests under tests/unit/image::
 
-      $ tox -e py27 -- api.v2
+      $ tox -e py27 -- image
 
    To debug tests (ie. break into pdb debugger), you can use ''debug'' tox
    environment. Here's an example, passing the name of a test since you'll
@@ -61,19 +61,6 @@ run through tox_.
 
    For reference, the ``debug`` tox environment implements the instructions
    here: https://wiki.openstack.org/wiki/Testr#Debugging_.28pdb.29_Tests
-
-5. There is a growing suite of tests which use a tool called `gabbi`_ to
-   test and validate the behavior of the Ceilometer API. These tests are run
-   when using the usual ``py27`` tox target but if desired they can be run by
-   themselves::
-
-   $ tox -e gabbi
-
-   The YAML files used to drive the gabbi tests can be found in
-   ``ceilometer/tests/gabbi/gabbits``. If you are adding to or adjusting the
-   API you should consider adding tests here.
-
-.. _gabbi: https://gabbi.readthedocs.org/
 
 .. seealso::
 

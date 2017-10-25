@@ -98,19 +98,6 @@ def recursive_keypairs(d, separator=':'):
             yield name, value
 
 
-def restore_nesting(d, separator=':'):
-    """Unwinds a flattened dict to restore nesting."""
-    d = copy.copy(d) if any([separator in k for k in d.keys()]) else d
-    for k, v in d.copy().items():
-        if separator in k:
-            top, rem = k.split(separator, 1)
-            nest = d[top] if isinstance(d.get(top), dict) else {}
-            nest[rem] = v
-            d[top] = restore_nesting(nest, separator)
-            del d[k]
-    return d
-
-
 def dt_to_decimal(utc):
     """Datetime to Decimal.
 
@@ -173,21 +160,6 @@ def dict_to_keyval(value, key_base=None):
                 yield key_gen, v
 
 
-def lowercase_keys(mapping):
-    """Converts the values of the keys in mapping to lowercase."""
-    items = mapping.items()
-    for key, value in items:
-        del mapping[key]
-        mapping[key.lower()] = value
-
-
-def lowercase_values(mapping):
-    """Converts the values in the mapping dict to lowercase."""
-    items = mapping.items()
-    for key, value in items:
-        mapping[key] = value.lower()
-
-
 def update_nested(original_dict, updates):
     """Updates the leaf nodes in a nest dict.
 
@@ -201,18 +173,6 @@ def update_nested(original_dict, updates):
         else:
             dict_to_update[key] = updates[key]
     return dict_to_update
-
-
-def uniq(dupes, attrs):
-    """Exclude elements of dupes with a duplicated set of attribute values."""
-    key = lambda d: '/'.join([getattr(d, a) or '' for a in attrs])
-    keys = []
-    deduped = []
-    for d in dupes:
-        if key(d) not in keys:
-            deduped.append(d)
-            keys.append(key(d))
-    return deduped
 
 
 def hash_of_set(s):

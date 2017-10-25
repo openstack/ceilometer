@@ -18,8 +18,6 @@ from keystoneauth1 import loading
 from oslo_config import cfg
 
 import ceilometer.agent.manager
-import ceilometer.api.app
-import ceilometer.api.controllers.v2.root
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
@@ -75,7 +73,6 @@ def list_opts():
     return [
         ('DEFAULT',
          itertools.chain(ceilometer.agent.manager.OPTS,
-                         ceilometer.api.app.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.dispatcher.OPTS,
@@ -84,8 +81,6 @@ def list_opts():
                          ceilometer.sample.OPTS,
                          ceilometer.utils.OPTS,
                          OPTS)),
-        ('api', itertools.chain(ceilometer.api.app.API_OPTS,
-                                ceilometer.api.controllers.v2.root.API_OPTS)),
         ('compute', ceilometer.compute.discovery.OPTS),
         ('coordination', [
             cfg.StrOpt(

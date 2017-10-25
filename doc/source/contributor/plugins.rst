@@ -58,12 +58,10 @@ on where is polling agent running.  This will load, among others, the
 :class:`ceilometer.compute.pollsters.cpu.CPUPollster`, which is defined in
 the folder ``ceilometer/compute/pollsters``.
 
-Notifications mechanism uses plugins as well, for instance
-:class:`ceilometer.telemetry.notifications.TelemetryApiPost` plugin
-which is defined in the ``ceilometer/telemetry/notifications`` folder, Though
-in most cases, this is not needed. A meter definition can be directly added
-to :file:`ceilometer/data/meters.d/meters.yaml` to match the event type. For
-more information, see the :ref:`add_new_meters` page.
+Notifications mechanism uses plugins as well, though in most cases, this is not
+needed. A meter definition can be directly added to
+:file:`ceilometer/data/meters.d/meters.yaml` to match the event type. For more
+information, see the :ref:`add_new_meters` page.
 
 We are using these two existing plugins as examples as the first one provides
 an example of how to interact when you need to retrieve information from an

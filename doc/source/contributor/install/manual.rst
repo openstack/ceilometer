@@ -234,18 +234,6 @@ Installing the Polling Agent
      $ ceilometer-polling --polling-namespaces central,ipmi
 
 
-Installing the API Server
-=========================
-
-.. index::
-   double: installing; API
-
-.. note::
-
-   The Ceilometer's API service is no longer supported. Data storage should be
-   handled by a separate service such as Gnocchi.
-
-
 Enabling Service Notifications
 ==============================
 

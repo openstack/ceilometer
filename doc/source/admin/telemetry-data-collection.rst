@@ -26,15 +26,6 @@ Polling
     machine using SNMP, or by using the APIs of other OpenStack
     services.
 
-RESTful API (deprecated in Ocata)
-    Pushing samples via the RESTful API of Telemetry.
-
-.. note::
-
-   Rather than pushing data through Ceilometer's API, it is advised to push
-   directly into gnocchi. Ceilometer's API is officially deprecated as of
-   Ocata.
-
 
 Notifications
 ~~~~~~~~~~~~~
@@ -435,71 +426,3 @@ The list of collected meters can be found in
    Do not deploy both the IPMI agent and the Bare metal service on one
    compute node. If ``conductor.send_sensor_data`` is set, this
    misconfiguration causes duplicated IPMI sensor samples.
-
-Send samples to Telemetry
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. note::
-
-   Sample pushing via the API is deprecated in Ocata. Measurement data should
-   be pushed directly into `gnocchi's API <http://gnocchi.xyz/rest.html>`__.
-
-While most parts of the data collection in the Telemetry service are
-automated, Telemetry provides the possibility to submit samples via the
-REST API to allow users to send custom samples into this service.
-
-This option makes it possible to send any kind of samples without the
-need of writing extra code lines or making configuration changes.
-
-The samples that can be sent to Telemetry are not limited to the actual
-existing meters. There is a possibility to provide data for any new,
-customer defined counter by filling out all the required fields of the
-POST request.
-
-If the sample corresponds to an existing meter, then the fields like
-``meter-type`` and meter name should be matched accordingly.
-
-The required fields for sending a sample using the command-line client
-are:
-
--  ID of the corresponding resource. (``--resource-id``)
-
--  Name of meter. (``--meter-name``)
-
--  Type of meter. (``--meter-type``)
-
-   Predefined meter types:
-
-   -  Gauge
-
-   -  Delta
-
-   -  Cumulative
-
--  Unit of meter. (``--meter-unit``)
-
--  Volume of sample.  (``--sample-volume``)
-
-To send samples to Telemetry using the command-line client, the
-following command should be invoked:
-
-.. code-block:: console
-
-   $ ceilometer sample-create -r 37128ad6-daaa-4d22-9509-b7e1c6b08697 \
-     -m memory.usage --meter-type gauge --meter-unit MB --sample-volume 48
-   +-------------------+--------------------------------------------+
-   | Property          | Value                                      |
-   +-------------------+--------------------------------------------+
-   | message_id        | 6118820c-2137-11e4-a429-08002715c7fb       |
-   | name              | memory.usage                               |
-   | project_id        | e34eaa91d52a4402b4cb8bc9bbd308c1           |
-   | resource_id       | 37128ad6-daaa-4d22-9509-b7e1c6b08697       |
-   | resource_metadata | {}                                         |
-   | source            | e34eaa91d52a4402b4cb8bc9bbd308c1:openstack |
-   | timestamp         | 2014-08-11T09:10:46.358926                 |
-   | type              | gauge                                      |
-   | unit              | MB                                         |
-   | user_id           | 679b0499e7a34ccb9d90b64208401f8e           |
-   | volume            | 48.0                                       |
-   +-------------------+--------------------------------------------+
-

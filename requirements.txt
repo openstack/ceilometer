@@ -8,7 +8,6 @@ futures>=3.0;python_version=='2.7' or python_version=='2.6' # BSD
 futurist>=0.11.0 # Apache-2.0
 debtcollector>=1.2.0 # Apache-2.0
 jsonpath-rw-ext>=0.1.9 # Apache-2.0
-jsonschema!=2.5.0,<3.0.0,>=2.0.0 # MIT
 kafka-python>=1.3.2 # Apache-2.0
 keystonemiddleware!=4.1.0,>=4.0.0 # Apache-2.0
 lxml>=2.3 # BSD
@@ -19,14 +18,10 @@ oslo.config>=3.22.0 # Apache-2.0
 oslo.db>=4.1.0 # Apache-2.0
 oslo.i18n>=2.1.0 # Apache-2.0
 oslo.log>=1.14.0 # Apache-2.0
-oslo.policy>=0.5.0 # Apache-2.0
 oslo.reports>=0.6.0 # Apache-2.0
 oslo.rootwrap>=2.0.0 # Apache-2.0
-PasteDeploy>=1.5.0 # MIT
 pbr>=1.6 # Apache-2.0
-pecan>=1.0.0 # BSD
 oslo.messaging>=5.12.0 # Apache-2.0
-oslo.middleware>=3.0.0 # Apache-2.0
 oslo.serialization>=1.10.0 # Apache-2.0
 oslo.utils>=3.5.0 # Apache-2.0
 pysnmp<5.0.0,>=4.2.3 # BSD
@@ -45,9 +40,4 @@ sqlalchemy-migrate>=0.9.6 # Apache-2.0
 stevedore>=1.9.0 # Apache-2.0
 tenacity>=3.2.1  # Apache-2.0
 tooz[zake]>=1.47.0 # Apache-2.0
-WebOb>=1.5.0 # MIT
-WSME>=0.8 # MIT
-# NOTE(jd) We do not import it directly, but WSME datetime string parsing
-# behaviour changes when this library is installed
-python-dateutil>=2.4.2 # BSD
 os-xenapi>=0.1.1 # Apache-2.0

@@ -10,13 +10,9 @@ ChangeLog
 cover/*
 dist/*
 doc/build
-doc/source/api/
 doc/source/_static/
 etc/ceilometer/ceilometer.conf
 subunit.log
 
 # Files created by releasenotes build
 releasenotes/build
-
-# Files created by api-ref build
-api-ref/build

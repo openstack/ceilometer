@@ -84,41 +84,6 @@ class TestUtils(base.BaseTestCase):
             else:
                 self.assertIn((k, v), expected)
 
-    def test_restore_nesting_unested(self):
-        metadata = {'a': 'A', 'b': 'B'}
-        unwound = utils.restore_nesting(metadata)
-        self.assertIs(metadata, unwound)
-
-    def test_restore_nesting(self):
-        metadata = {'a': 'A', 'b': 'B',
-                    'nested:a': 'A',
-                    'nested:b': 'B',
-                    'nested:twice:c': 'C',
-                    'nested:twice:d': 'D',
-                    'embedded:e': 'E'}
-        unwound = utils.restore_nesting(metadata)
-        expected = {'a': 'A', 'b': 'B',
-                    'nested': {'a': 'A', 'b': 'B',
-                               'twice': {'c': 'C', 'd': 'D'}},
-                    'embedded': {'e': 'E'}}
-        self.assertEqual(expected, unwound)
-        self.assertIsNot(metadata, unwound)
-
-    def test_restore_nesting_with_separator(self):
-        metadata = {'a': 'A', 'b': 'B',
-                    'nested.a': 'A',
-                    'nested.b': 'B',
-                    'nested.twice.c': 'C',
-                    'nested.twice.d': 'D',
-                    'embedded.e': 'E'}
-        unwound = utils.restore_nesting(metadata, separator='.')
-        expected = {'a': 'A', 'b': 'B',
-                    'nested': {'a': 'A', 'b': 'B',
-                               'twice': {'c': 'C', 'd': 'D'}},
-                    'embedded': {'e': 'E'}}
-        self.assertEqual(expected, unwound)
-        self.assertIsNot(metadata, unwound)
-
     def test_decimal_to_dt_with_none_parameter(self):
         self.assertIsNone(utils.decimal_to_dt(None))
 
@@ -173,30 +138,3 @@ class TestUtils(base.BaseTestCase):
                          }
         dict_to_update = utils.update_nested(original_dict, updates)
         self.assertEqual(dict_to_update, expected_dict)
-
-    def test_uniq(self):
-        class DriverA(object):
-            source = 'class_A'
-            func = 'func_A'
-            param = 'param_A'
-
-        class DriverB(object):
-            source = 'class_A'
-            func = 'func_A'
-            param = 'param_B'
-
-        class DriverC(object):
-            source = 'class_A'
-            func = 'func_C'
-            param = 'param_C'
-
-        driver_list = [DriverA(), DriverB(), DriverC()]
-
-        uniq_driver_a = utils.uniq(driver_list, ['source'])
-        self.assertEqual(len(uniq_driver_a), 1)
-
-        uniq_driver_b = utils.uniq(driver_list, ['source', 'func'])
-        self.assertEqual(len(uniq_driver_b), 2)
-
-        uniq_driver_c = utils.uniq(driver_list, ['source', 'func', 'param'])
-        self.assertEqual(len(uniq_driver_c), 3)

@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated Ceilometer API has been removed.

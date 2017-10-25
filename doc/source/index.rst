@@ -38,7 +38,6 @@ Overview
    contributor/index
    admin/index
    configuration/index
-   webapi/index
 
 Appendix
 ========
