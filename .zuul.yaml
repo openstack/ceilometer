@@ -91,14 +91,10 @@
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
         - ceilometer-dsvm-tempest-plugin-mysql
-        - ceilometer-tox-py27-mongodb:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-mysql:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-postgresql:
-            branches: ^(?!stable/newton)
+        - ceilometer-tox-py27-mongodb
+        - ceilometer-tox-py27-mysql
+        - ceilometer-tox-py27-postgresql
         - grenade-dsvm-ceilometer:
-            branches: ^(?!stable/newton).*$
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
@@ -108,14 +104,10 @@
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
         - ceilometer-dsvm-tempest-plugin-mysql
-        - ceilometer-tox-py27-mongodb:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-mysql:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-postgresql:
-            branches: ^(?!stable/newton)
+        - ceilometer-tox-py27-mongodb
+        - ceilometer-tox-py27-mysql
+        - ceilometer-tox-py27-postgresql
         - grenade-dsvm-ceilometer:
-            branches: ^(?!stable/newton).*$
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
