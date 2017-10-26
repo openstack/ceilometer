@@ -167,6 +167,5 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
             ["ceilometer-polling", "--config-file=%s" % self.tempfile],
             stderr=subprocess.PIPE)
         __, err = self.subp.communicate()
-        expected = ("Exception: Valid values are ['compute', 'central', "
-                    "'ipmi'], but found [\"['central']\"]")
-        self.assertIn(expected, err)
+        self.assertIn(b"Exception: Valid values are ['compute', 'central', "
+                      b"'ipmi'], but found [\"['central']\"]", err)
