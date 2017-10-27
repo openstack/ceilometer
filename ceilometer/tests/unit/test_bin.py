@@ -26,9 +26,7 @@ class BinTestCase(base.BaseTestCase):
     def setUp(self):
         super(BinTestCase, self).setUp()
         content = ("[DEFAULT]\n"
-                   "transport_url = fake://\n"
-                   "[database]\n"
-                   "connection=log://localhost\n")
+                   "transport_url = fake://\n")
         if six.PY3:
             content = content.encode('utf-8')
         self.tempfile = fileutils.write_to_tempfile(content=content,
@@ -44,43 +42,6 @@ class BinTestCase(base.BaseTestCase):
                                  '--skip-gnocchi-resource-types',
                                  "--config-file=%s" % self.tempfile])
         self.assertEqual(0, subp.wait())
-
-    def test_run_expirer_ttl_disabled(self):
-        subp = subprocess.Popen(['ceilometer-expirer',
-                                 '-d',
-                                 "--config-file=%s" % self.tempfile],
-                                stdout=subprocess.PIPE)
-        stdout, __ = subp.communicate()
-        self.assertEqual(0, subp.poll())
-        self.assertIn(b"Nothing to clean, database metering "
-                      b"time to live is disabled", stdout)
-
-    def _test_run_expirer_ttl_enabled(self, ttl_name, data_name):
-        content = ("[DEFAULT]\n"
-                   "transport_url = fake://\n"
-                   "[database]\n"
-                   "%s=1\n"
-                   "connection=log://localhost\n" % ttl_name)
-        if six.PY3:
-            content = content.encode('utf-8')
-        self.tempfile = fileutils.write_to_tempfile(content=content,
-                                                    prefix='ceilometer',
-                                                    suffix='.conf')
-        subp = subprocess.Popen(['ceilometer-expirer',
-                                 '-d',
-                                 "--config-file=%s" % self.tempfile],
-                                stdout=subprocess.PIPE)
-        stdout, __ = subp.communicate()
-        self.assertEqual(0, subp.poll())
-        msg = "Dropping %s data with TTL 1" % data_name
-        if six.PY3:
-            msg = msg.encode('utf-8')
-        self.assertIn(msg, stdout)
-
-    def test_run_expirer_ttl_enabled(self):
-        self._test_run_expirer_ttl_enabled('metering_time_to_live',
-                                           'metering')
-        self._test_run_expirer_ttl_enabled('time_to_live', 'metering')
 
 
 class BinSendSampleTestCase(base.BaseTestCase):
@@ -127,9 +88,7 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
 
     def test_starting_with_duplication_namespaces(self):
         content = ("[DEFAULT]\n"
-                   "transport_url = fake://\n"
-                   "[database]\n"
-                   "connection=log://localhost\n")
+                   "transport_url = fake://\n")
         if six.PY3:
             content = content.encode('utf-8')
         self.tempfile = fileutils.write_to_tempfile(content=content,
@@ -155,9 +114,7 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
     def test_polling_namespaces_invalid_value_in_config(self):
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n"
-                   "polling_namespaces = ['central']\n"
-                   "[database]\n"
-                   "connection=log://localhost\n")
+                   "polling_namespaces = ['central']\n")
         if six.PY3:
             content = content.encode('utf-8')
         self.tempfile = fileutils.write_to_tempfile(content=content,

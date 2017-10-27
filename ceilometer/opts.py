@@ -23,7 +23,6 @@ import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
 import ceilometer.compute.virt.vmware.inspector
 import ceilometer.compute.virt.xenapi.inspector
-import ceilometer.dispatcher
 import ceilometer.event.converter
 import ceilometer.hardware.discovery
 import ceilometer.hardware.pollsters.generic
@@ -42,7 +41,6 @@ import ceilometer.pipeline
 import ceilometer.publisher.messaging
 import ceilometer.publisher.utils
 import ceilometer.sample
-import ceilometer.storage
 import ceilometer.utils
 import ceilometer.volume.discovery
 
@@ -75,7 +73,6 @@ def list_opts():
          itertools.chain(ceilometer.agent.manager.OPTS,
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.utils.OPTS,
-                         ceilometer.dispatcher.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.OPTS,
                          ceilometer.sample.OPTS,
@@ -96,7 +93,6 @@ def list_opts():
                 help='Number of seconds between checks to see if group '
                 'membership has changed'),
         ]),
-        ('database', ceilometer.storage.OPTS),
         ('dispatcher_gnocchi', (
          cfg.StrOpt(
              'filter_project',

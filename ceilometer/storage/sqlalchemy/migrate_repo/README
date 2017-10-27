@@ -1,4 +1,0 @@
-sqlalchemy-migrate is DEPRECATED.
-
-All new migrations should be written using alembic.
-Please see ceilometer/storage/sqlalchemy/alembic/README

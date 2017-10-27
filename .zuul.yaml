@@ -1,51 +1,4 @@
 - job:
-    name: ceilometer-dsvm-functional-mongodb
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/ceilometer-dsvm-functional-mongodb/run
-    post-run: playbooks/legacy/ceilometer-dsvm-functional-mongodb/post
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/ceilometer
-
-- job:
-    name: ceilometer-dsvm-functional-mysql
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/ceilometer-dsvm-functional-mysql/run
-    post-run: playbooks/legacy/ceilometer-dsvm-functional-mysql/post
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/ceilometer
-
-- job:
-    name: ceilometer-tox-py27-mongodb
-    parent: legacy-base
-    run: playbooks/legacy/ceilometer-tox-py27-mongodb/run
-    post-run: playbooks/legacy/ceilometer-tox-py27-mongodb/post
-    timeout: 2400
-    required-projects:
-      - openstack/requirements
-
-- job:
-    name: ceilometer-tox-py27-mysql
-    parent: legacy-base
-    run: playbooks/legacy/ceilometer-tox-py27-mysql/run
-    post-run: playbooks/legacy/ceilometer-tox-py27-mysql/post
-    timeout: 2400
-    required-projects:
-      - openstack/requirements
-
-- job:
-    name: ceilometer-tox-py27-postgresql
-    parent: legacy-base
-    run: playbooks/legacy/ceilometer-tox-py27-postgresql/run
-    post-run: playbooks/legacy/ceilometer-tox-py27-postgresql/post
-    timeout: 2400
-    required-projects:
-      - openstack/requirements
-
-- job:
     name: grenade-dsvm-ceilometer
     parent: legacy-dsvm-base
     run: playbooks/legacy/grenade-dsvm-ceilometer/run
@@ -76,16 +29,6 @@
     name: openstack/ceilometer
     check:
       jobs:
-        - ceilometer-dsvm-functional-mongodb:
-            branches: ^stable/newton$
-        - ceilometer-dsvm-functional-mysql:
-            branches: ^stable/newton$
-        - ceilometer-tox-py27-mongodb:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-mysql:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-postgresql:
-            branches: ^(?!stable/newton)
         - grenade-dsvm-ceilometer:
             branches: ^(?!stable/newton).*$
             irrelevant-files:
@@ -94,16 +37,6 @@
         - telemetry-dsvm-integration-ceilometer
     gate:
       jobs:
-        - ceilometer-dsvm-functional-mongodb:
-            branches: ^stable/newton$
-        - ceilometer-dsvm-functional-mysql:
-            branches: ^stable/newton$
-        - ceilometer-tox-py27-mongodb:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-mysql:
-            branches: ^(?!stable/newton)
-        - ceilometer-tox-py27-postgresql:
-            branches: ^(?!stable/newton)
         - grenade-dsvm-ceilometer:
             branches: ^(?!stable/newton).*$
             irrelevant-files:
