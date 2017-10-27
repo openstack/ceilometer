@@ -81,7 +81,7 @@ version in time.
 3. Upgrade the notification agent(s)
 
    The new notification agent can be started alongside the old agent if no
-   workload_partioning is enabled OR if it has the same pipeline configuration.
+   workload_partitioning is enabled OR if it has the same pipeline configuration.
    If the pipeline configuration is changed, the old agents must be loaded with
    the same pipeline configuration first to ensure the notification agents all
    work against same pipeline sets.
