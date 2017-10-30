@@ -94,10 +94,6 @@
         - ceilometer-tox-py27-mongodb
         - ceilometer-tox-py27-mysql
         - ceilometer-tox-py27-postgresql
-        - grenade-dsvm-ceilometer:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
         - telemetry-dsvm-integration-ceilometer
         - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only
     gate:
@@ -107,9 +103,5 @@
         - ceilometer-tox-py27-mongodb
         - ceilometer-tox-py27-mysql
         - ceilometer-tox-py27-postgresql
-        - grenade-dsvm-ceilometer:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
         - telemetry-dsvm-integration-ceilometer
         - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only

@@ -36,6 +36,8 @@
               export OVERRIDE_ZUUL_BRANCH=$BRANCH_OVERRIDE
           fi
           export GRENADE_PLUGINRC="enable_grenade_plugin ceilometer https://git.openstack.org/openstack/ceilometer"
+          export DEVSTACK_LOCAL_CONFIG+=$'\n'"CEILOMETER_BACKEND=mysql"
+
           cp devstack-gate/devstack-vm-gate-wrap.sh ./safe-devstack-vm-gate-wrap.sh
           ./safe-devstack-vm-gate-wrap.sh
         executable: /bin/bash
