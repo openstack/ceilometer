@@ -126,13 +126,13 @@ Notifications are defined as subclass of the
 :class:`ceilometer.agent.plugin_base.NotificationBase` meta class.
 Notifications must implement:
 
-   ``event_types``
-      A sequence of strings defining the event types to be given to the plugin
+``event_types``
+   A sequence of strings defining the event types to be given to the plugin
 
-   ``process_notification(self, message)`` 
-      Receives an event message from the list provided to ``event_types`` and
-      returns a sequence of ``Sample`` objects as defined in the
-      :file:`ceilometer/sample.py` file.
+``process_notification(self, message)`` 
+   Receives an event message from the list provided to ``event_types`` and
+   returns a sequence of ``Sample`` objects as defined in the
+   :file:`ceilometer/sample.py` file.
 
 In the ``InstanceNotifications`` plugin, it listens to three events:
 
