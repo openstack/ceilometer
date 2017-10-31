@@ -85,7 +85,6 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
             if i[0] in tenant_ids:
                 yield i
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestRgwPollster, self).setUp()
         conf = service.prepare_service([], [])

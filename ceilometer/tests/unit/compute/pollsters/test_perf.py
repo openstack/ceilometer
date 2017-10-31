@@ -12,8 +12,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import mock
-
 from ceilometer.compute.pollsters import instance_stats
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.polling import manager
@@ -23,7 +21,6 @@ from ceilometer.tests.unit.compute.pollsters import base
 
 class TestPerfPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(cpu_cycles=7259361,
@@ -76,7 +73,6 @@ class TestPerfPollster(base.TestPollsterBase):
         _check_perf_events_cache_references(74184)
         _check_perf_events_cache_misses(16737)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
         self._mock_inspect_instance(virt_inspector.NoDataException())
         mgr = manager.AgentManager(0, self.CONF)

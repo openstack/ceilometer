@@ -16,6 +16,7 @@ from oslo_log import log
 import oslo_messaging
 from stevedore import extension
 
+from ceilometer import agent
 from ceilometer.event import converter
 from ceilometer import pipeline
 
@@ -60,3 +61,77 @@ class EventEndpoint(pipeline.NotificationEndpoint):
                     return oslo_messaging.NotificationResult.REQUEUE
                 LOG.error('Fail to process a notification', exc_info=True)
         return oslo_messaging.NotificationResult.HANDLED
+
+
+class EventSource(pipeline.PipelineSource):
+    """Represents a source of events.
+
+    In effect it is a set of notification handlers capturing events for a set
+    of matching notifications.
+    """
+
+    def __init__(self, cfg):
+        super(EventSource, self).__init__(cfg)
+        self.events = cfg.get('events')
+        try:
+            self.check_source_filtering(self.events, 'events')
+        except agent.SourceException as err:
+            raise pipeline.PipelineException(err.msg, cfg)
+
+    def support_event(self, event_name):
+        return self.is_supported(self.events, event_name)
+
+
+class EventSink(pipeline.Sink):
+
+    def publish_events(self, events):
+        if events:
+            for p in self.publishers:
+                try:
+                    p.publish_events(events)
+                except Exception:
+                    LOG.error("Pipeline %(pipeline)s: %(status)s "
+                              "after error from publisher %(pub)s" %
+                              {'pipeline': self,
+                               'status': 'Continue' if
+                               self.multi_publish else 'Exit', 'pub': p},
+                              exc_info=True)
+                    if not self.multi_publish:
+                        raise
+
+
+class EventPipeline(pipeline.Pipeline):
+    """Represents a pipeline for Events."""
+
+    def __str__(self):
+        # NOTE(gordc): prepend a namespace so we ensure event and sample
+        #              pipelines do not have the same name.
+        return 'event:%s' % super(EventPipeline, self).__str__()
+
+    def support_event(self, event_type):
+        return self.source.support_event(event_type)
+
+    def publish_data(self, events):
+        if not isinstance(events, list):
+            events = [events]
+        supported = [e for e in events
+                     if self.source.support_event(e.event_type)]
+        self.sink.publish_events(supported)
+
+
+class EventPipelineManager(pipeline.PipelineManager):
+
+    def __init__(self, conf, cfg_file, transformer_manager):
+        # FIXME(gordc): improve how we set pipeline specific models
+        pipeline_types = {'name': 'event', 'pipeline': EventPipeline,
+                          'source': EventSource, 'sink': EventSink}
+        super(EventPipelineManager, self).__init__(
+            conf, cfg_file, transformer_manager, pipeline_types)
+
+
+def setup_pipeline(conf, transformer_manager=None):
+    """Setup event pipeline manager according to yaml config file."""
+    default = extension.ExtensionManager('ceilometer.transformer')
+    cfg_file = conf.event_pipeline_cfg_file
+    return EventPipelineManager(
+        conf, cfg_file, transformer_manager or default)

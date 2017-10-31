@@ -102,7 +102,6 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
             if i[0] in tenant_ids:
                 yield i
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestSwiftPollster, self).setUp()
         self.CONF = service.prepare_service([], [])

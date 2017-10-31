@@ -13,8 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
-
 from ceilometer.image import glance
 from ceilometer.polling import manager
 from ceilometer import service
@@ -84,7 +82,6 @@ IMAGE_LIST = [
 
 
 class TestImagePollsterPageSize(base.BaseTestCase):
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(TestImagePollsterPageSize, self).setUp()
         conf = service.prepare_service([], [])

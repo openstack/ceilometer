@@ -45,7 +45,6 @@ class TestBaseDiskIO(base.TestPollsterBase):
             instances.append(instance)
         return instances
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, name, expected_count=2):
         pollster = factory(self.CONF)
 

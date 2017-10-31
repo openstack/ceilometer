@@ -15,7 +15,8 @@
 
 import yaml
 
-from ceilometer import pipeline
+from ceilometer import pipeline as pipe_base
+from ceilometer.pipeline import sample as pipeline
 from ceilometer import sample
 from ceilometer.tests.unit import pipeline_base
 
@@ -122,7 +123,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'publishers': ['new'],
         })
         self.pipeline_cfg['sources'][0]['sinks'].append('second_sink')
-        pipeline_manager = pipeline.PipelineManager(
+        pipeline_manager = pipeline.SamplePipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         with pipeline_manager.publisher() as p:
@@ -163,7 +164,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'meters': ['b'],
             'sinks': ['test_sink']
         })
-        pipeline_manager = pipeline.PipelineManager(
+        pipeline_manager = pipeline.SamplePipelineManager(
             self.CONF,
             self.cfg2file(self.pipeline_cfg), self.transformer_manager)
         with pipeline_manager.publisher() as p:
@@ -209,7 +210,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         pipeline_cfg = yaml.safe_load(data)
         for s in pipeline_cfg['sinks']:
             s['publishers'] = ['test://']
-        pipeline_manager = pipeline.PipelineManager(
+        pipeline_manager = pipeline.SamplePipelineManager(
             self.CONF,
             self.cfg2file(pipeline_cfg), self.transformer_manager)
         pipe = pipeline_manager.pipelines[index]
@@ -262,8 +263,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'name': 'test_sink',
             'publishers': ['except'],
         })
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PipelineManager,
+        self.assertRaises(pipe_base.PipelineException,
+                          pipeline.SamplePipelineManager,
                           self.CONF,
                           self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)
@@ -274,8 +275,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'meters': ['a'],
             'sinks': ['test_sink']
         })
-        self.assertRaises(pipeline.PipelineException,
-                          pipeline.PipelineManager,
+        self.assertRaises(pipe_base.PipelineException,
+                          pipeline.SamplePipelineManager,
                           self.CONF,
                           self.cfg2file(self.pipeline_cfg),
                           self.transformer_manager)

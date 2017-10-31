@@ -27,7 +27,6 @@ from ceilometer import service
 
 class _BaseTestFloatingIPPollster(base.BaseTestCase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestFloatingIPPollster, self).setUp()
         self.CONF = service.prepare_service([], [])

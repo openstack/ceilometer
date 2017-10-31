@@ -12,8 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
-
 from ceilometer.ipmi.pollsters import node
 from ceilometer.tests.unit.ipmi.pollsters import base
 
@@ -27,7 +25,6 @@ class TestPowerPollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.PowerPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -44,7 +41,6 @@ class TestInletTemperaturePollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.InletTemperaturePollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -61,7 +57,6 @@ class TestOutletTemperaturePollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.OutletTemperaturePollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -78,7 +73,6 @@ class TestAirflowPollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.AirflowPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -95,7 +89,6 @@ class TestCUPSIndexPollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.CUPSIndexPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -113,7 +106,6 @@ class CPUUtilPollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.CPUUtilPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -131,7 +123,6 @@ class MemUtilPollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.MemUtilPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -149,7 +140,6 @@ class IOUtilPollster(base.TestPollsterBase):
     def make_pollster(self):
         return node.IOUtilPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 

@@ -16,8 +16,6 @@
 
 import time
 
-import mock
-
 from ceilometer.compute.pollsters import instance_stats
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.polling import manager
@@ -26,7 +24,6 @@ from ceilometer.tests.unit.compute.pollsters import base
 
 class TestCPUPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(cpu_time=1 * (10 ** 6), cpu_number=2),
@@ -55,7 +52,6 @@ class TestCPUPollster(base.TestPollsterBase):
     # the following apply to all instance resource pollsters but are tested
     # here alone.
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_metadata(self):
         mgr = manager.AgentManager(0, self.CONF)
         pollster = instance_stats.CPUPollster(self.CONF)
@@ -70,7 +66,6 @@ class TestCPUPollster(base.TestPollsterBase):
         self.assertEqual('active', samples[0].resource_metadata['state'])
         self.assertIsNone(samples[0].resource_metadata['task_state'])
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_keys(self):
         self.CONF.set_override('reserved_metadata_keys', ['fqdn'])
 
@@ -81,7 +76,6 @@ class TestCPUPollster(base.TestPollsterBase):
                           'stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128'},
                          samples[0].resource_metadata['user_metadata'])
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_reserved_metadata_with_namespace(self):
         mgr = manager.AgentManager(0, self.CONF)
         pollster = instance_stats.CPUPollster(self.CONF)
@@ -95,7 +89,6 @@ class TestCPUPollster(base.TestPollsterBase):
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertNotIn('user_metadata', samples[0].resource_metadata)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_flavor_name_as_metadata_instance_type(self):
         mgr = manager.AgentManager(0, self.CONF)
         pollster = instance_stats.CPUPollster(self.CONF)
@@ -107,7 +100,6 @@ class TestCPUPollster(base.TestPollsterBase):
 
 class TestCPUUtilPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(cpu_util=40),
@@ -131,7 +123,6 @@ class TestCPUUtilPollster(base.TestPollsterBase):
 
 class TestCPUL3CachePollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(cpu_l3_cache_usage=90112),

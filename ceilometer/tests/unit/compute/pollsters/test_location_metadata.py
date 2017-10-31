@@ -16,7 +16,6 @@
 """Tests for the compute pollsters.
 """
 
-import mock
 from oslotest import base
 import six
 
@@ -43,7 +42,6 @@ class FauxInstance(object):
 
 class TestLocationMetadata(base.BaseTestCase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)

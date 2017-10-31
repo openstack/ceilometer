@@ -24,7 +24,6 @@ from ceilometer.tests.unit.compute.pollsters import base
 
 class TestMemoryPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(memory_usage=1.0),
@@ -54,7 +53,6 @@ class TestMemoryPollster(base.TestPollsterBase):
         _verify_memory_metering(0, 0, 1)
         _verify_memory_metering(0, 0, 0)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
 
         self._mock_inspect_instance(virt_inspector.NoDataException())
@@ -70,7 +68,6 @@ class TestMemoryPollster(base.TestPollsterBase):
 
 class TestResidentMemoryPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(memory_resident=1.0),
@@ -105,7 +102,6 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
 
 class TestMemorySwapPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(memory_swap_in=1.0,
@@ -137,7 +133,6 @@ class TestMemorySwapPollster(base.TestPollsterBase):
         _check_memory_swap_in(1.0)
         _check_memory_swap_out(4.0)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
         self._mock_inspect_instance(virt_inspector.NoDataException())
         mgr = manager.AgentManager(0, self.CONF)
@@ -151,7 +146,6 @@ class TestMemorySwapPollster(base.TestPollsterBase):
 
 class TestMemoryBandwidthPollster(base.TestPollsterBase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._mock_inspect_instance(
             virt_inspector.InstanceStats(memory_bandwidth_total=1892352,
@@ -183,7 +177,6 @@ class TestMemoryBandwidthPollster(base.TestPollsterBase):
         _check_memory_bandwidth_total(1892352)
         _check_memory_bandwidth_local(90112)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples_with_empty_stats(self):
         self._mock_inspect_instance(virt_inspector.NoDataException())
         mgr = manager.AgentManager(0, self.CONF)

@@ -12,8 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
-
 from ceilometer.ipmi.pollsters import sensor
 from ceilometer.tests.unit.ipmi.notifications import ipmi_test_data
 from ceilometer.tests.unit.ipmi.pollsters import base
@@ -47,7 +45,6 @@ class TestTemperatureSensorPollster(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.TemperatureSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -62,7 +59,6 @@ class TestMissingSensorData(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.TemperatureSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
         self._verify_metering(0)
@@ -76,7 +72,6 @@ class TestMalformedSensorData(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.TemperatureSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
         self._verify_metering(0)
@@ -90,7 +85,6 @@ class TestMissingSensorId(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.TemperatureSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
         self._verify_metering(0)
@@ -104,7 +98,6 @@ class TestFanSensorPollster(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.FanSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -119,7 +112,6 @@ class TestCurrentSensorPollster(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.CurrentSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 
@@ -134,7 +126,6 @@ class TestVoltageSensorPollster(base.TestPollsterBase):
     def make_pollster(self):
         return sensor.VoltageSensorPollster(self.CONF)
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def test_get_samples(self):
         self._test_get_samples()
 

@@ -26,7 +26,6 @@ from ceilometer import service
 
 class _BaseTestFWPollster(base.BaseTestCase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestFWPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)

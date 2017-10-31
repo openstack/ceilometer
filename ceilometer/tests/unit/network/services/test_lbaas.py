@@ -26,7 +26,6 @@ from ceilometer import service
 
 class _BaseTestLBPollster(base.BaseTestCase):
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def setUp(self):
         super(_BaseTestLBPollster, self).setUp()
         self.addCleanup(mock.patch.stopall)
@@ -470,7 +469,6 @@ class TestLBStatsPollster(_BaseTestLBPollster):
                           }
                 }
 
-    @mock.patch('ceilometer.pipeline.setup_pipeline', mock.MagicMock())
     def _check_get_samples(self, factory, sample_name, expected_volume,
                            expected_type):
         pollster = factory(self.CONF)

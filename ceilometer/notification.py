@@ -30,7 +30,8 @@ from tooz import coordination
 from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer import pipeline
-from ceilometer.pipeline import event as event_endpoint
+from ceilometer.pipeline import event as event_pipe
+from ceilometer.pipeline import sample as sample_pipe
 from ceilometer import utils
 
 
@@ -153,9 +154,9 @@ class NotificationService(cotyledon.Service):
         if self.conf.notification.workload_partitioning:
             pipe_manager = pipeline.SamplePipelineTransportManager(self.conf)
             for pipe in pipeline_manager.pipelines:
-                key = pipeline.get_pipeline_grouping_key(pipe)
+                key = pipe.get_grouping_key() or ['resource_id']
                 pipe_manager.add_transporter(
-                    (pipe.source.support_meter, key or ['resource_id'],
+                    (pipe.source.support_meter, key,
                      self._get_notifiers(transport, pipe)))
         else:
             pipe_manager = pipeline_manager
@@ -195,9 +196,8 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).run()
         self.coord_lock = threading.Lock()
 
-        self.pipeline_manager = pipeline.setup_pipeline(self.conf)
-
-        self.event_pipeline_manager = pipeline.setup_event_pipeline(self.conf)
+        self.pipeline_manager = sample_pipe.setup_pipeline(self.conf)
+        self.event_pipeline_manager = event_pipe.setup_pipeline(self.conf)
 
         self.transport = messaging.get_transport(self.conf)
 
@@ -247,7 +247,7 @@ class NotificationService(cotyledon.Service):
 
         endpoints = []
         endpoints.append(
-            event_endpoint.EventEndpoint(event_pipe_manager))
+            event_pipe.EventEndpoint(event_pipe_manager))
 
         targets = self.get_targets()
         for ext in notification_manager:
@@ -290,7 +290,7 @@ class NotificationService(cotyledon.Service):
         targets = []
 
         for pipe in pipelines:
-            if isinstance(pipe, pipeline.EventPipeline):
+            if isinstance(pipe, event_pipe.EventPipeline):
                 endpoints.append(pipeline.EventPipelineEndpoint(pipe))
             else:
                 endpoints.append(pipeline.SamplePipelineEndpoint(pipe))
