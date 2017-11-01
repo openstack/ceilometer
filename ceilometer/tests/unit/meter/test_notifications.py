@@ -282,7 +282,7 @@ class TestMeterProcessing(test.BaseTestCase):
         self.CONF = ceilometer_service.prepare_service([], [])
         self.path = self.useFixture(fixtures.TempDir()).path
         self.handler = notifications.ProcessMeterNotifications(
-            mock.Mock(conf=self.CONF))
+            self.CONF, mock.Mock())
 
     def _load_meter_def_file(self, cfgs=None):
         self.CONF.set_override('meter_definitions_dirs',

@@ -357,7 +357,6 @@ class EventPipelineTestCase(base.BaseTestCase):
         self._exception_create_pipelinemanager()
 
     def test_event_pipeline_endpoint_requeue_on_failure(self):
-
         self.CONF.set_override("ack_on_event_error", False,
                                group="notification")
         self.CONF.set_override("telemetry_secret", "not-so-secret",
@@ -384,8 +383,9 @@ class EventPipelineTestCase(base.BaseTestCase):
 
         self._build_and_set_new_pipeline()
         pipeline_manager = event.EventPipelineManager(self.CONF)
-        event_pipeline_endpoint = pipeline.EventPipelineEndpoint(
-            pipeline_manager.pipelines[0])
+        pipe = pipeline_manager.pipelines[0]
+        event_pipeline_endpoint = event.InterimEventEndpoint(
+            self.CONF, pipeline.PublishContext([pipe]), pipe.name)
 
         fake_publisher.publish_events.side_effect = Exception
         ret = event_pipeline_endpoint.sample([

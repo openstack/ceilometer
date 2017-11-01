@@ -20,12 +20,10 @@ import mock
 import oslo_messaging
 from oslo_utils import fileutils
 import six
-from stevedore import extension
 import yaml
 
 from ceilometer import messaging
 from ceilometer import notification
-from ceilometer import pipeline
 from ceilometer.publisher import test as test_publisher
 from ceilometer import service
 from ceilometer.tests import base as tests_base
@@ -96,68 +94,23 @@ class BaseNotificationTest(tests_base.BaseTestCase):
                 self.fail('Did not start pipeline queues')
 
 
-class _FakeNotificationPlugin(pipeline.NotificationEndpoint):
-    event_types = ['fake.event']
-
-    def build_sample(self, message):
-        return []
-
-
 class TestNotification(BaseNotificationTest):
 
     def setUp(self):
         super(TestNotification, self).setUp()
         self.CONF = service.prepare_service([], [])
-        self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.setup_messaging(self.CONF)
         self.srv = notification.NotificationService(0, self.CONF)
 
     def test_targets(self):
         self.assertEqual(15, len(self.srv.get_targets()))
 
-    def fake_get_notifications_manager(self, pm):
-        self.plugin = _FakeNotificationPlugin(pm)
-        return extension.ExtensionManager.make_test_instance(
-            [
-                extension.Extension('test',
-                                    None,
-                                    None,
-                                    self.plugin)
-            ]
-        )
-
-    @mock.patch('ceilometer.pipeline.event.EventEndpoint')
-    def _do_process_notification_manager_start(self,
-                                               fake_event_endpoint_class):
-        with mock.patch.object(self.srv,
-                               '_get_notifications_manager') as get_nm:
-            get_nm.side_effect = self.fake_get_notifications_manager
-            self.run_service(self.srv)
-        self.fake_event_endpoint = fake_event_endpoint_class.return_value
-
     def test_start_multiple_listeners(self):
         urls = ["fake://vhost1", "fake://vhost2"]
         self.CONF.set_override("messaging_urls", urls, group="notification")
-        self._do_process_notification_manager_start()
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
         self.assertEqual(2, len(self.srv.listeners))
-
-    def test_build_sample(self):
-        self._do_process_notification_manager_start()
-        self.srv.pipeline_manager.pipelines[0] = mock.MagicMock()
-
-        self.plugin.info([{'ctxt': TEST_NOTICE_CTXT,
-                           'publisher_id': 'compute.vagrant-precise',
-                           'event_type': 'compute.instance.create.end',
-                           'payload': TEST_NOTICE_PAYLOAD,
-                           'metadata': TEST_NOTICE_METADATA}])
-
-        self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
-
-    def test_process_notification_with_events(self):
-        self._do_process_notification_manager_start()
-        self.assertEqual(2, len(self.srv.listeners[0].dispatcher.endpoints))
-        self.assertEqual(self.fake_event_endpoint,
-                         self.srv.listeners[0].dispatcher.endpoints[0])
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_unique_consumers(self, mock_listener):
@@ -343,24 +296,18 @@ class TestRealNotificationHA(BaseRealNotification):
         targets = mock_listener.call_args[0][1]
         self.assertIsNotEmpty(targets)
 
-        endpoints = {}
-        for endpoint in mock_listener.call_args[0][2]:
-            self.assertEqual(1, len(endpoint.publish_context.pipelines))
-            pipe = list(endpoint.publish_context.pipelines)[0]
-            endpoints[pipe.name] = endpoint
+        pipe_list = []
+        for mgr in self.srv.managers:
+            for pipe in mgr.pipelines:
+                pipe_list.append(pipe.name)
 
-        notifiers = []
-        pipe_manager = self.srv._get_pipe_manager(
-            self.srv.transport, self.srv.pipeline_manager)
-        notifiers.extend(pipe_manager.transporters[0][2])
-        event_pipe_manager = self.srv._get_event_pipeline_manager(
-            self.srv.transport)
-        notifiers.extend(event_pipe_manager.transporters[0][2])
-        for notifier in notifiers:
-            filter_rule = endpoints[notifier.publisher_id].filter_rule
-            self.assertEqual(True, filter_rule.match(None,
-                                                     notifier.publisher_id,
-                                                     None, None, None))
+        for pipe in pipe_list:
+            for endpoint in mock_listener.call_args[0][2]:
+                self.assertTrue(hasattr(endpoint, 'filter_rule'))
+                if endpoint.filter_rule.match(None, None, pipe, None, None):
+                    break
+            else:
+                self.fail('%s not handled by any endpoint' % pipe)
 
     @mock.patch('oslo_messaging.Notifier.sample')
     def test_broadcast_to_relevant_pipes_only(self, mock_notifier):
@@ -392,12 +339,10 @@ class TestRealNotificationHA(BaseRealNotification):
 
         self.assertTrue(mock_notifier.called)
         self.assertEqual(3, mock_notifier.call_count)
-        self.assertEqual('pipeline.event',
-                         mock_notifier.call_args_list[0][1]['event_type'])
-        self.assertEqual('ceilometer.pipeline',
-                         mock_notifier.call_args_list[1][1]['event_type'])
-        self.assertEqual('ceilometer.pipeline',
-                         mock_notifier.call_args_list[2][1]['event_type'])
+        self.assertEqual(1, len([i for i in mock_notifier.call_args_list
+                                 if 'event_type' in i[1]['payload'][0]]))
+        self.assertEqual(2, len([i for i in mock_notifier.call_args_list
+                                 if 'counter_name' in i[1]['payload'][0]]))
 
 
 class TestRealNotificationMultipleAgents(BaseNotificationTest):

@@ -38,7 +38,7 @@ class TestNotifications(base.BaseTestCase):
         * some readings are skipped if the value is 'Disabled'
         * metatata with the node id
         """
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
         counters = dict([(counter.resource_id, counter) for counter in
                          processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
@@ -64,7 +64,7 @@ class TestNotifications(base.BaseTestCase):
         A single current reading is effectively the same as temperature,
         modulo "current".
         """
-        processor = ipmi.CurrentSensorNotification(None)
+        processor = ipmi.CurrentSensorNotification(None, None)
         counters = dict([(counter.resource_id, counter) for counter in
                          processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
@@ -85,7 +85,7 @@ class TestNotifications(base.BaseTestCase):
         A single fan reading is effectively the same as temperature,
         modulo "fan".
         """
-        processor = ipmi.FanSensorNotification(None)
+        processor = ipmi.FanSensorNotification(None, None)
         counters = dict([(counter.resource_id, counter) for counter in
                          processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
@@ -106,7 +106,7 @@ class TestNotifications(base.BaseTestCase):
         A single voltage reading is effectively the same as temperature,
         modulo "voltage".
         """
-        processor = ipmi.VoltageSensorNotification(None)
+        processor = ipmi.VoltageSensorNotification(None, None)
         counters = dict([(counter.resource_id, counter) for counter in
                          processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
@@ -123,7 +123,7 @@ class TestNotifications(base.BaseTestCase):
 
     def test_disabed_skips_metric(self):
         """Test that a meter which a disabled volume is skipped."""
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
         counters = dict([(counter.resource_id, counter) for counter in
                          processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
@@ -138,7 +138,7 @@ class TestNotifications(base.BaseTestCase):
         self.assertNotIn(resource_id, counters)
 
     def test_empty_payload_no_metrics_success(self):
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
         counters = dict([(counter.resource_id, counter) for counter in
                          processor.build_sample(
                              ipmi_test_data.EMPTY_PAYLOAD)])
@@ -147,7 +147,7 @@ class TestNotifications(base.BaseTestCase):
 
     @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_missing_sensor_data(self, mylog):
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
 
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
@@ -163,7 +163,7 @@ class TestNotifications(base.BaseTestCase):
 
     @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_sensor_data_malformed(self, mylog):
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
 
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
@@ -184,7 +184,7 @@ class TestNotifications(base.BaseTestCase):
         Presumably this will never happen given the way the data
         is created, but better defensive than dead.
         """
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
 
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
@@ -200,7 +200,7 @@ class TestNotifications(base.BaseTestCase):
     @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
     def test_missing_sensor_id(self, mylog):
         """Test for desired error message when 'Sensor ID' missing."""
-        processor = ipmi.TemperatureSensorNotification(None)
+        processor = ipmi.TemperatureSensorNotification(None, None)
 
         messages = []
         mylog.warning = lambda *args: messages.extend(args)

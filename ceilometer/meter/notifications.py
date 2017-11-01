@@ -186,8 +186,8 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
 
     event_types = []
 
-    def __init__(self, manager):
-        super(ProcessMeterNotifications, self).__init__(manager)
+    def __init__(self, conf, publisher):
+        super(ProcessMeterNotifications, self).__init__(conf, publisher)
         self.definitions = self._load_definitions()
 
     def _load_definitions(self):
@@ -195,18 +195,18 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
             namespace='ceilometer.event.trait_plugin')
         definitions = {}
         mfs = []
-        for dir in self.manager.conf.meter.meter_definitions_dirs:
+        for dir in self.conf.meter.meter_definitions_dirs:
             for filepath in sorted(glob.glob(os.path.join(dir, "*.yaml"))):
                 if filepath is not None:
                     mfs.append(filepath)
-        if self.manager.conf.meter.meter_definitions_cfg_file is not None:
+        if self.conf.meter.meter_definitions_cfg_file is not None:
             mfs.append(
                 pkg_resources.resource_filename(
-                    self.manager.conf.meter.meter_definitions_cfg_file)
+                    self.conf.meter.meter_definitions_cfg_file)
             )
         for mf in mfs:
             meters_cfg = declarative.load_definitions(
-                self.manager.conf, {}, mf)
+                self.conf, {}, mf)
 
             for meter_cfg in reversed(meters_cfg['metric']):
                 if meter_cfg.get('name') in definitions:
@@ -215,8 +215,7 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
                                 % meter_cfg)
                     continue
                 try:
-                    md = MeterDefinition(meter_cfg, self.manager.conf,
-                                         plugin_manager)
+                    md = MeterDefinition(meter_cfg, self.conf, plugin_manager)
                 except declarative.DefinitionException as e:
                     errmsg = "Error loading meter definition: %s"
                     LOG.error(errmsg, six.text_type(e))

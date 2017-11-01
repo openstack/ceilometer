@@ -113,7 +113,8 @@ class TestEventEndpoint(tests_base.BaseTestCase):
 
     def _setup_endpoint(self, publishers):
         ev_pipeline_mgr = self._setup_pipeline(publishers)
-        self.endpoint = event_pipe.EventEndpoint(ev_pipeline_mgr)
+        self.endpoint = event_pipe.EventEndpoint(
+            ev_pipeline_mgr.conf, ev_pipeline_mgr.publisher())
 
         self.endpoint.event_converter = mock.MagicMock()
         self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
