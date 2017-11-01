@@ -31,37 +31,12 @@
           export PYTHONUNBUFFERED=true
           export DEVSTACK_GATE_HEAT=1
           export DEVSTACK_GATE_NEUTRON=1
-          if [ "$ZUUL_BRANCH" == "stable/newton" ] ; then
-              export DEVSTACK_GATE_TEMPEST=0
-          else
-              export DEVSTACK_GATE_TEMPEST=1
-          fi
+          export DEVSTACK_GATE_TEMPEST=1
           export DEVSTACK_GATE_EXERCISES=0
           export DEVSTACK_GATE_INSTALL_TESTONLY=1
           export DEVSTACK_GATE_TEMPEST_NOTESTS=1
-          export PROJECTS="openstack/ceilometer openstack/aodh"
-          # NOTE(sileht): This job runs on Aodh and Ceilometer.
-          # Gnocchi uses an independent release cycle. So we map here
-          # which Gnocchi version can be used with other OpenStack
-          # components and the reverse.
-          case "$ZUUL_BRANCH" in
-              "stable/newton")
-                  export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin gnocchi git://git.openstack.org/openstack/gnocchi"
-                  export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin panko git://git.openstack.org/openstack/panko"
-                  export OVERRIDE_GNOCCHI_PROJECT_BRANCH="stable/3.0"
-                  export PROJECTS="openstack/panko $PROJECTS openstack/gnocchi"
-                  ;;
-              "stable/ocata")
-                  export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin gnocchi git://git.openstack.org/openstack/gnocchi"
-                  export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin panko git://git.openstack.org/openstack/panko"
-                  export OVERRIDE_GNOCCHI_PROJECT_BRANCH="stable/3.1"
-                  export PROJECTS="openstack/panko $PROJECTS openstack/gnocchi"
-                  ;;
-              *)
-                export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin panko git://git.openstack.org/openstack/panko"
-                export PROJECTS="openstack/panko $PROJECTS"
-                ;;
-          esac
+          export PROJECTS="openstack/ceilometer openstack/aodh openstack/panko"
+          export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin panko git://git.openstack.org/openstack/panko"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin ceilometer git://git.openstack.org/openstack/ceilometer"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin aodh git://git.openstack.org/openstack/aodh"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin heat git://git.openstack.org/openstack/heat"

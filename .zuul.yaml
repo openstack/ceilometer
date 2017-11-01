@@ -30,7 +30,6 @@
     check:
       jobs:
         - grenade-dsvm-ceilometer:
-            branches: ^(?!stable/newton).*$
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
@@ -38,7 +37,6 @@
     gate:
       jobs:
         - grenade-dsvm-ceilometer:
-            branches: ^(?!stable/newton).*$
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
