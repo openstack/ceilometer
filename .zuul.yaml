@@ -1,8 +1,8 @@
 - job:
     name: grenade-dsvm-ceilometer
     parent: legacy-dsvm-base
-    run: playbooks/legacy/grenade-dsvm-ceilometer/run
-    post-run: playbooks/legacy/grenade-dsvm-ceilometer/post
+    run: playbooks/legacy/grenade-dsvm-ceilometer/run.yaml
+    post-run: playbooks/legacy/grenade-dsvm-ceilometer/post.yaml
     timeout: 10800
     required-projects:
       - openstack-dev/grenade
@@ -12,8 +12,8 @@
 - job:
     name: telemetry-dsvm-integration-ceilometer
     parent: legacy-dsvm-base
-    run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/run
-    post-run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/post
+    run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/run.yaml
+    post-run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/post.yaml
     timeout: 7800
     required-projects:
       - openstack-infra/devstack-gate
