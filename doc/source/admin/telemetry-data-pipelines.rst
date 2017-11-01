@@ -521,7 +521,6 @@ specified. A sample ``publishers`` section in the
        - panko://
        - udp://10.0.0.2:1234
        - notifier://?policy=drop&max_queue_length=512&topic=custom_target
-       - direct://?dispatcher=http
 
 
 Deprecated publishers
