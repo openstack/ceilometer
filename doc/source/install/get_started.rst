@@ -16,12 +16,15 @@ The Telemetry service consists of the following components:
 
 A compute agent (``ceilometer-agent-compute``)
   Runs on each compute node and polls for resource utilization
-  statistics.
+  statistics. This is actually the polling agent ``ceilometer-polling``
+  running with parameter ``--polling-namespace compute``.
 
 A central agent (``ceilometer-agent-central``)
   Runs on a central management server to poll for resource utilization
   statistics for resources not tied to instances or compute nodes.
-  Multiple agents can be started to scale service horizontally.
+  Multiple agents can be started to scale service horizontally. This is
+  actually the polling agent ``ceilometer-polling`` running with
+  parameter ``--polling-namespace central``.
 
 A notification agent (``ceilometer-agent-notification``)
   Runs on a central management server(s) and consumes messages from
