@@ -392,7 +392,7 @@ class AgentManager(cotyledon.Service):
 
     def run(self):
         super(AgentManager, self).run()
-        self.polling_manager = setup_polling(self.conf)
+        self.polling_manager = PollingManager(self.conf)
         if self.partition_coordinator:
             self.partition_coordinator.start()
             self.join_partitioning_groups()
@@ -503,12 +503,9 @@ class AgentManager(cotyledon.Service):
 
 
 class PollingManager(agent.ConfigManagerBase):
-    """Polling Manager
+    """Polling Manager to handle polling definition"""
 
-    Polling manager sets up polling according to config file.
-    """
-
-    def __init__(self, conf, cfg_file):
+    def __init__(self, conf):
         """Setup the polling according to config.
 
         The configuration is supported as follows:
@@ -542,7 +539,7 @@ class PollingManager(agent.ConfigManagerBase):
 
         """
         super(PollingManager, self).__init__(conf)
-        cfg = self.load_config(cfg_file)
+        cfg = self.load_config(conf.polling.cfg_file)
         self.sources = []
         if 'sources' not in cfg:
             raise PollingException("sources required", cfg)
@@ -594,9 +591,3 @@ class PollingSource(agent.Source):
 
     def support_meter(self, meter_name):
         return self.is_supported(self.meters, meter_name)
-
-
-def setup_polling(conf):
-    """Setup polling manager according to yaml config file."""
-    cfg_file = conf.polling.cfg_file
-    return PollingManager(conf, cfg_file)

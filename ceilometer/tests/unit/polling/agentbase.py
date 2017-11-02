@@ -189,8 +189,9 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         params = []
 
     def setup_polling(self):
-        self.mgr.polling_manager = poll_manager.PollingManager(
-            self.CONF, self.cfg2file(self.polling_cfg))
+        name = self.cfg2file(self.polling_cfg)
+        self.CONF.set_override('cfg_file', name, group='polling')
+        self.mgr.polling_manager = poll_manager.PollingManager(self.CONF)
 
     def create_extension_list(self):
         return [extension.Extension('test',
@@ -240,7 +241,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     def create_manager(self):
         """Return subclass specific manager."""
 
-    @mock.patch('ceilometer.polling.manager.setup_polling', mock.MagicMock())
     def setUp(self):
         super(BaseAgentManagerTestCase, self).setUp()
         self.CONF = service.prepare_service([], [])
@@ -288,11 +288,11 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.DiscoveryAnother.resources = []
         super(BaseAgentManagerTestCase, self).tearDown()
 
-    @mock.patch('ceilometer.polling.manager.setup_polling')
-    def test_start(self, setup_polling):
+    @mock.patch('ceilometer.polling.manager.PollingManager')
+    def test_start(self, manager):
         self.mgr.setup_polling_tasks = mock.MagicMock()
         self.mgr.run()
-        setup_polling.assert_called_once_with(self.CONF)
+        manager.assert_called_once_with(self.CONF)
         self.mgr.setup_polling_tasks.assert_called_once_with()
         self.mgr.terminate()
 

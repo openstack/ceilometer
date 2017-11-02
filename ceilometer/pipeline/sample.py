@@ -188,17 +188,14 @@ class SamplePipeline(pipeline.Pipeline):
 
 class SamplePipelineManager(pipeline.PipelineManager):
 
-    def __init__(self, conf, cfg_file, transformer_manager):
+    def __init__(self, conf):
         # FIXME(gordc): improve how we set pipeline specific models
         pipeline_types = {'name': 'sample', 'pipeline': SamplePipeline,
                           'source': SampleSource, 'sink': SampleSink}
         super(SamplePipelineManager, self).__init__(
-            conf, cfg_file, transformer_manager, pipeline_types)
+            conf, conf.pipeline_cfg_file, self.get_transform_manager(),
+            pipeline_types)
 
-
-def setup_pipeline(conf, transformer_manager=None):
-    """Setup pipeline manager according to yaml config file."""
-    default = extension.ExtensionManager('ceilometer.transformer')
-    cfg_file = conf.pipeline_cfg_file
-    return SamplePipelineManager(
-        conf, cfg_file, transformer_manager or default)
+    @staticmethod
+    def get_transform_manager():
+        return extension.ExtensionManager('ceilometer.transformer')

@@ -196,8 +196,9 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).run()
         self.coord_lock = threading.Lock()
 
-        self.pipeline_manager = sample_pipe.setup_pipeline(self.conf)
-        self.event_pipeline_manager = event_pipe.setup_pipeline(self.conf)
+        self.pipeline_manager = sample_pipe.SamplePipelineManager(self.conf)
+        self.event_pipeline_manager = (
+            event_pipe.EventPipelineManager(self.conf))
 
         self.transport = messaging.get_transport(self.conf)
 

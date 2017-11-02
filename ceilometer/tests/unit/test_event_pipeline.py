@@ -48,8 +48,6 @@ class EventPipelineTestCase(base.BaseTestCase):
         super(EventPipelineTestCase, self).setUp()
         self.CONF = service.prepare_service([], [])
 
-        self.transformer_manager = None
-
         self.test_event = models.Event(
             message_id=uuid.uuid4(),
             event_type='a',
@@ -149,12 +147,14 @@ class EventPipelineTestCase(base.BaseTestCase):
         else:
             del self.pipeline_cfg['sinks'][0][field]
 
+    def _build_and_set_new_pipeline(self):
+        name = self.cfg2file(self.pipeline_cfg)
+        self.CONF.set_override('event_pipeline_cfg_file', name)
+
     def _exception_create_pipelinemanager(self):
+        self._build_and_set_new_pipeline()
         self.assertRaises(pipeline.PipelineException,
-                          event.EventPipelineManager,
-                          self.CONF,
-                          self.cfg2file(self.pipeline_cfg),
-                          self.transformer_manager)
+                          event.EventPipelineManager, self.CONF)
 
     def test_no_events(self):
         self._unset_pipeline_cfg('events')
@@ -165,10 +165,8 @@ class EventPipelineTestCase(base.BaseTestCase):
         self._exception_create_pipelinemanager()
 
     def test_name(self):
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         for pipe in pipeline_manager.pipelines:
             self.assertTrue(pipe.name.startswith('event:'))
 
@@ -198,10 +196,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_multiple_included_events(self):
         event_cfg = ['a', 'b']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
 
         with pipeline_manager.publisher() as p:
             p([self.test_event])
@@ -219,10 +215,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_event_non_match(self):
         event_cfg = ['nomatch']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         with pipeline_manager.publisher() as p:
             p([self.test_event])
 
@@ -233,10 +227,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_wildcard_event(self):
         event_cfg = ['*']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         with pipeline_manager.publisher() as p:
             p([self.test_event])
 
@@ -247,19 +239,15 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_wildcard_excluded_events(self):
         event_cfg = ['*', '!a']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         self.assertFalse(pipeline_manager.pipelines[0].support_event('a'))
 
     def test_wildcard_excluded_events_not_excluded(self):
         event_cfg = ['*', '!b']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         with pipeline_manager.publisher() as p:
             p([self.test_event])
         publisher = pipeline_manager.pipelines[0].publishers[0]
@@ -269,10 +257,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_all_excluded_events_not_excluded(self):
         event_cfg = ['!b', '!c']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         with pipeline_manager.publisher() as p:
             p([self.test_event])
 
@@ -283,10 +269,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_all_excluded_events_excluded(self):
         event_cfg = ['!a', '!c']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         self.assertFalse(pipeline_manager.pipelines[0].support_event('a'))
         self.assertTrue(pipeline_manager.pipelines[0].support_event('b'))
         self.assertFalse(pipeline_manager.pipelines[0].support_event('c'))
@@ -294,10 +278,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_wildcard_and_excluded_wildcard_events(self):
         event_cfg = ['*', '!compute.*']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         self.assertFalse(pipeline_manager.pipelines[0].
                          support_event('compute.instance.create.start'))
         self.assertTrue(pipeline_manager.pipelines[0].
@@ -306,10 +288,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_included_event_and_wildcard_events(self):
         event_cfg = ['compute.instance.create.start', 'identity.*']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         self.assertTrue(pipeline_manager.pipelines[0].
                         support_event('identity.user.create'))
         self.assertTrue(pipeline_manager.pipelines[0].
@@ -320,10 +300,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_excluded_event_and_excluded_wildcard_events(self):
         event_cfg = ['!compute.instance.create.start', '!identity.*']
         self._set_pipeline_cfg('events', event_cfg)
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         self.assertFalse(pipeline_manager.pipelines[0].
                          support_event('identity.user.create'))
         self.assertFalse(pipeline_manager.pipelines[0].
@@ -333,11 +311,8 @@ class EventPipelineTestCase(base.BaseTestCase):
 
     def test_multiple_pipeline(self):
         self._augment_pipeline_cfg()
-
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         with pipeline_manager.publisher() as p:
             p([self.test_event, self.test_event2])
 
@@ -352,10 +327,8 @@ class EventPipelineTestCase(base.BaseTestCase):
 
     def test_multiple_publisher(self):
         self._set_pipeline_cfg('publishers', ['test://', 'new://'])
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
 
         with pipeline_manager.publisher() as p:
             p([self.test_event])
@@ -370,10 +343,8 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_multiple_publisher_isolation(self):
         self._reraise_exception = False
         self._set_pipeline_cfg('publishers', ['except://', 'new://'])
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         with pipeline_manager.publisher() as p:
             p([self.test_event])
 
@@ -411,10 +382,8 @@ class EventPipelineTestCase(base.BaseTestCase):
             'ceilometer.publisher.test.TestPublisher',
             return_value=fake_publisher))
 
-        pipeline_manager = event.EventPipelineManager(
-            self.CONF,
-            self.cfg2file(self.pipeline_cfg),
-            self.transformer_manager)
+        self._build_and_set_new_pipeline()
+        pipeline_manager = event.EventPipelineManager(self.CONF)
         event_pipeline_endpoint = pipeline.EventPipelineEndpoint(
             pipeline_manager.pipelines[0])
 

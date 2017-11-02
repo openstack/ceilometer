@@ -21,7 +21,6 @@ import sys
 
 from oslo_config import cfg
 from oslo_utils import timeutils
-from stevedore import extension
 
 from ceilometer.pipeline import sample as sample_pipe
 from ceilometer import sample
@@ -77,8 +76,7 @@ def send_sample():
     root_logger.addHandler(console)
     root_logger.setLevel(logging.DEBUG)
 
-    pipeline_manager = sample_pipe.setup_pipeline(
-        conf, extension.ExtensionManager('ceilometer.transformer'))
+    pipeline_manager = sample_pipe.SamplePipelineManager(conf)
 
     with pipeline_manager.publisher() as p:
         p([sample.Sample(

@@ -121,17 +121,9 @@ class EventPipeline(pipeline.Pipeline):
 
 class EventPipelineManager(pipeline.PipelineManager):
 
-    def __init__(self, conf, cfg_file, transformer_manager):
+    def __init__(self, conf):
         # FIXME(gordc): improve how we set pipeline specific models
         pipeline_types = {'name': 'event', 'pipeline': EventPipeline,
                           'source': EventSource, 'sink': EventSink}
         super(EventPipelineManager, self).__init__(
-            conf, cfg_file, transformer_manager, pipeline_types)
-
-
-def setup_pipeline(conf, transformer_manager=None):
-    """Setup event pipeline manager according to yaml config file."""
-    default = extension.ExtensionManager('ceilometer.transformer')
-    cfg_file = conf.event_pipeline_cfg_file
-    return EventPipelineManager(
-        conf, cfg_file, transformer_manager or default)
+            conf, conf.event_pipeline_cfg_file, {}, pipeline_types)
