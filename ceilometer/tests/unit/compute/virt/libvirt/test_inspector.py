@@ -423,6 +423,44 @@ class TestLibvirtInspection(base.BaseTestCase):
 
             self.assertEqual(0, len(disks))
 
+    def test_inspect_disks_without_source_element(self):
+        dom_xml = """
+             <domain type='kvm'>
+                 <devices>
+                    <disk type='file' device='cdrom'>
+                        <driver name='qemu' type='raw' cache='none'/>
+                        <backingStore/>
+                        <target dev='hdd' bus='ide' tray='open'/>
+                        <readonly/>
+                        <alias name='ide0-1-1'/>
+                        <address type='drive' controller='0' bus='1'
+                                 target='0' unit='1'/>
+                     </disk>
+                 </devices>
+             </domain>
+        """
+        blockStatsFlags = {'wr_total_times': 91752302267,
+                           'rd_operations': 6756,
+                           'flush_total_times': 1310427331,
+                           'rd_total_times': 29142253616,
+                           'rd_bytes': 171460096,
+                           'flush_operations': 746,
+                           'wr_operations': 1437,
+                           'wr_bytes': 13574656}
+        domain = mock.Mock()
+        domain.XMLDesc.return_value = dom_xml
+        domain.info.return_value = (0, 0, 0, 2, 999999)
+        domain.blockStats.return_value = (1, 2, 3, 4, -1)
+        domain.blockStatsFlags.return_value = blockStatsFlags
+        conn = mock.Mock()
+        conn.lookupByUUIDString.return_value = domain
+
+        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
+                        'get_libvirt_connection', return_value=conn):
+            disks = list(self.inspector.inspect_disks(self.instance))
+
+            self.assertEqual(0, len(disks))
+
     def test_inspect_memory_usage_with_domain_shutoff(self):
         connection = self.inspector.connection
         with mock.patch.object(connection, 'lookupByUUIDString',
