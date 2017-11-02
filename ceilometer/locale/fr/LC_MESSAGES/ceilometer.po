@@ -22,12 +22,11 @@
 # Corinne Verheyde <cverheyd@hotmail.com>, 2013
 # Corinne Verheyde <cverheyd@hotmail.com>, 2013
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
-# Angelique Pillal <pillal@fr.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev86\n"
+"Project-Id-Version: ceilometer 9.0.1.dev111\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-10-24 09:55+0000\n"
+"POT-Creation-Date: 2017-11-01 22:34+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -38,10 +37,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 3.9.6\n"
 "Language-Team: French\n"
-
-#, python-format
-msgid "%(entity)s %(id)s Not Found"
-msgstr "%(entity)s %(id)s n'a pas été trouvé"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -81,10 +76,6 @@ msgid "Failed to load any notification handlers for %s"
 msgstr "Échec du chargement de tous les gestionnaires de notification pour %s"
 
 #, python-format
-msgid "Failed to parse the timestamp value %s"
-msgstr "Echec de l'analyse syntaxique de la valeur d'horodatage %s"
-
-#, python-format
 msgid "Failed to publish %d datapoints, dropping them"
 msgstr "Echec de la publication des points de données %d. Suppression en cours"
 
@@ -95,10 +86,6 @@ msgstr ""
 "d'attente"
 
 #, python-format
-msgid "Filter expression not valid: %s"
-msgstr "Filtre de l'expression n'est pas valide: %s"
-
-#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -107,15 +94,8 @@ msgstr ""
 "%(line)s, colonne : %(column)s."
 
 #, python-format
-msgid "Invalid period %(period)s: %(err)s"
-msgstr "Période %(period)s non valide : %(err)s"
-
-#, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "Type de trait non valide '%(type)s' pour le trait %(trait)s"
-
-msgid "Limit must be positive"
-msgstr "La limite doit être positive"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -132,16 +112,8 @@ msgid "Node Manager init failed"
 msgstr "Echec de l'initialisation du gestionnaire de noeud"
 
 #, python-format
-msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "Non autorisé à accéder %(aspect)s %(id)s "
-
-#, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "L'API Opencontrail a renvoyé %(status)s %(reason)s"
-
-#, python-format
-msgid "Order-by expression not valid: %s"
-msgstr "L'expression de tri n'est pas valide : %s"
 
 #, python-format
 msgid ""
@@ -149,9 +121,6 @@ msgid ""
 msgstr ""
 "Erreur d'analyse dans la spécification JSONPath '%(jsonpath)s' pour "
 "%(name)s : %(err)s"
-
-msgid "Period must be positive."
-msgstr "La période doit être positive."
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -188,63 +157,16 @@ msgstr "L'API AdminOps RGW a renvoyé %(status)s %(reason)s"
 msgid "Required field %s not specified"
 msgstr "Champ requis %s non spécifiée"
 
-msgid "Resource"
-msgstr "Ressource"
-
-msgid "Sample"
-msgstr "Echantillon"
-
-msgid "Samples should be included in request body"
-msgstr "Des exemples doivent être inclus dans le corps de demande"
-
-#, python-format
-msgid ""
-"The data type %(type)s is not supported. The supported data type list is: "
-"%(supported)s"
-msgstr ""
-"Le type de données %(type)s n'est pas supporté. Les types de données "
-"supportés sont: %(supported)s"
-
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Le champ 'fields' est requis pour  %s"
 
 #, python-format
-msgid "Unable to connect to the database server: %(errmsg)s."
-msgstr "Impossible de se connecter au serveur de base de données : %(errmsg)s."
-
-#, python-format
-msgid ""
-"Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr ""
-"Impossible de convertir la valeur %(value)s vers le type de données attendu "
-"%(type)s."
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Impossible d'évaluer l'expression %(expr)s : %(exc)s"
 
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
-"%(retry_interval)d seconds."
-msgstr ""
-"Impossible de se reconnecter au serveur mongodb principal : %(errmsg)s. "
-"Nouvelle tentative dans %(retry_interval)d secondes."
-
 msgid "Unable to send sample over UDP"
 msgstr "Impossible d'envoyer l'échantillon en UDP"
-
-#, python-format
-msgid ""
-"Unexpected exception converting %(value)s to the expected data type %(type)s."
-msgstr ""
-"Exception inattendue lors de la conversion de %(value)s dans le type de "
-"donnée attendue %(type)s."
-
-#, python-format
-msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr "Type de métadonnées inconnu, la clé (%s) n'est pas requêtable"
 
 #, python-format
 msgid ""
@@ -291,14 +213,6 @@ msgstr "Type de détecteur incorrect"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "Erreur YAML lors de la lecture du fichier de définitions %(file)s"
-
-msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
-msgstr ""
-"Les URL d'alarmes ne sont pas disponibles lorsque Aodh est désactivé ou non "
-"disponible."
-
-msgid "direct option cannot be true when Gnocchi is enabled."
-msgstr "L'option directe ne peut pas être à vrai si Gnocchi est activé."
 
 #, python-format
 msgid "dropping out of time order sample: %s"

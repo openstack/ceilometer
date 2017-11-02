@@ -8,9 +8,9 @@
 # Andi Chandler <andi@gowling.com>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev86\n"
+"Project-Id-Version: ceilometer 9.0.1.dev111\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-10-24 09:55+0000\n"
+"POT-Creation-Date: 2017-11-01 22:34+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,16 +23,8 @@ msgstr ""
 "Language-Team: English (United Kingdom)\n"
 
 #, python-format
-msgid "%(entity)s %(id)s Not Found"
-msgstr "%(entity)s %(id)s Not Found"
-
-#, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
 msgstr "Arithmetic transformer must use at least one meter in expression '%s'"
-
-#, python-format
-msgid "Cannot create table %(table_name)s, it already exists. Ignoring error"
-msgstr "Cannot create table %(table_name)s, it already exists. Ignoring error"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -78,20 +70,12 @@ msgid "Failed to load any notification handlers for %s"
 msgstr "Failed to load any notification handlers for %s"
 
 #, python-format
-msgid "Failed to parse the timestamp value %s"
-msgstr "Failed to parse the timestamp value %s"
-
-#, python-format
 msgid "Failed to publish %d datapoints, dropping them"
 msgstr "Failed to publish %d datapoints, dropping them"
 
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr "Failed to publish %d datapoints, queue them"
-
-#, python-format
-msgid "Filter expression not valid: %s"
-msgstr "Filter expression not valid: %s"
 
 #, python-format
 msgid ""
@@ -102,23 +86,12 @@ msgstr ""
 "%(column)s."
 
 #, python-format
-msgid "Invalid aggregation function: %s"
-msgstr "Invalid aggregation function: %s"
-
-#, python-format
-msgid "Invalid period %(period)s: %(err)s"
-msgstr "Invalid period %(period)s: %(err)s"
-
-#, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "Invalid trait type '%(type)s' for trait %(trait)s"
 
 #, python-format
 msgid "Invalid type %s specified"
 msgstr "Invalid type %s specified"
-
-msgid "Limit must be positive"
-msgstr "Limit must be positive"
 
 #, python-format
 msgid "Missing field %s"
@@ -139,10 +112,6 @@ msgid "Node Manager init failed"
 msgstr "Node Manager init failed"
 
 #, python-format
-msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "Not Authorised to access %(aspect)s %(id)s"
-
-#, python-format
 msgid "OpenDaylight API returned %(status)s %(reason)s"
 msgstr "OpenDaylight API returned %(status)s %(reason)s"
 
@@ -151,17 +120,10 @@ msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail API returned %(status)s %(reason)s"
 
 #, python-format
-msgid "Order-by expression not valid: %s"
-msgstr "Order-by expression not valid: %s"
-
-#, python-format
 msgid ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
 msgstr ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
-
-msgid "Period must be positive."
-msgstr "Period must be positive."
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -205,61 +167,16 @@ msgstr "Required field %s not specified"
 msgid "Required fields %s not specified"
 msgstr "Required fields %s not specified"
 
-msgid "Resource"
-msgstr "Resource"
-
-msgid "Sample"
-msgstr "Sample"
-
-msgid "Samples should be included in request body"
-msgstr "Samples should be included in request body"
-
-#, python-format
-msgid ""
-"The data type %(type)s is not supported. The supported data type list is: "
-"%(supported)s"
-msgstr ""
-"The data type %(type)s is not supported. The supported data type list is: "
-"%(supported)s"
-
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "The field 'fields' is required for %s"
 
 #, python-format
-msgid "Unable to connect to the database server: %(errmsg)s."
-msgstr "Unable to connect to the database server: %(errmsg)s."
-
-#, python-format
-msgid ""
-"Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr ""
-"Unable to convert the value %(value)s to the expected data type %(type)s."
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Unable to evaluate expression %(expr)s: %(exc)s"
 
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
-"%(retry_interval)d seconds."
-msgstr ""
-"Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
-"%(retry_interval)d seconds."
-
 msgid "Unable to send sample over UDP"
 msgstr "Unable to send sample over UDP"
-
-#, python-format
-msgid ""
-"Unexpected exception converting %(value)s to the expected data type %(type)s."
-msgstr ""
-"Unexpected exception converting %(value)s to the expected data type %(type)s."
-
-#, python-format
-msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr "Unknown metadata type. Key (%s) will not be queryable."
 
 #, python-format
 msgid ""
@@ -313,12 +230,6 @@ msgstr "Wrong sensor type"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "YAML error reading Definitions file %(file)s"
-
-msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
-msgstr "alarms URLs is unavailable when Aodh is disabled or unavailable."
-
-msgid "direct option cannot be true when Gnocchi is enabled."
-msgstr "direct option cannot be true when Gnocchi is enabled."
 
 #, python-format
 msgid "dropping out of time order sample: %s"

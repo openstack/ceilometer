@@ -7,9 +7,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev86\n"
+"Project-Id-Version: ceilometer 9.0.1.dev111\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-10-24 09:55+0000\n"
+"POT-Creation-Date: 2017-11-01 22:34+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 3.9.6\n"
 "Language-Team: Italian\n"
-
-#, python-format
-msgid "%(entity)s %(id)s Not Found"
-msgstr "%(entity)s %(id)s non trovato"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -63,20 +59,12 @@ msgid "Failed to load any notification handlers for %s"
 msgstr "Impossibile caricare eventuali gestori di notifica per %s"
 
 #, python-format
-msgid "Failed to parse the timestamp value %s"
-msgstr "Impossibile analizzare il valore data/ora %s"
-
-#, python-format
 msgid "Failed to publish %d datapoints, dropping them"
 msgstr "Impossibile pubblicare %d datapoint, eliminati"
 
 #, python-format
 msgid "Failed to publish %d datapoints, queue them"
 msgstr "Impossibile pubblicare %d datapoint, inseriti in coda"
-
-#, python-format
-msgid "Filter expression not valid: %s"
-msgstr "Espressione del filtro non valida: %s"
 
 #, python-format
 msgid ""
@@ -87,16 +75,9 @@ msgstr ""
 "%(line)s, colonna: %(column)s."
 
 #, python-format
-msgid "Invalid period %(period)s: %(err)s"
-msgstr "Periodo non valido %(period)s: %(err)s"
-
-#, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr ""
 "Tipo di caratteristica non valido '%(type)s' per la caratteristica %(trait)s"
-
-msgid "Limit must be positive"
-msgstr "Il limite deve essere un positivo"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -114,16 +95,8 @@ msgid "Node Manager init failed"
 msgstr "Inizializzazione gestore nodi non riuscita"
 
 #, python-format
-msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "Non autorizzato ad accedere %(aspect)s %(id)s"
-
-#, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "L'API Opencontrail ha restituito %(status)s %(reason)s"
-
-#, python-format
-msgid "Order-by expression not valid: %s"
-msgstr "L'espressione ordina per non è valida: %s"
 
 #, python-format
 msgid ""
@@ -131,9 +104,6 @@ msgid ""
 msgstr ""
 "Errore di analisi nella specifica JSONPath '%(jsonpath)s' per %(name)s: "
 "%(err)s"
-
-msgid "Period must be positive."
-msgstr "Il periodo deve essere positivo"
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -172,65 +142,16 @@ msgstr "L'API RGW AdminOps ha restituito %(status)s %(reason)s"
 msgid "Required field %s not specified"
 msgstr "Campo richiesto %s non specificato"
 
-msgid "Resource"
-msgstr "Risorsa"
-
-msgid "Sample"
-msgstr "Esempio"
-
-msgid "Samples should be included in request body"
-msgstr "I campioni devono essere inclusi nel corpo della richiesta "
-
-#, python-format
-msgid ""
-"The data type %(type)s is not supported. The supported data type list is: "
-"%(supported)s"
-msgstr ""
-"Il tipo di dati %(type)s non è supportato. L'elenco dei tipi di dati "
-"supportati è: %(supported)s"
-
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Il campo 'fields' è obbligatorio per %s"
 
 #, python-format
-msgid "Unable to connect to the database server: %(errmsg)s."
-msgstr "Impossibile connettersi al server di database: %(errmsg)s."
-
-#, python-format
-msgid ""
-"Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr ""
-"Impossibile convertire il valore %(value)s nel tipo di dati previsto "
-"%(type)s."
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Impossibile valutare l'espressione %(expr)s: %(exc)s"
 
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
-"%(retry_interval)d seconds."
-msgstr ""
-"Impossibile connettersi al mongodb primario: %(errmsg)s. Prossimo tentativo "
-"tra %(retry_interval)d secondi."
-
 msgid "Unable to send sample over UDP"
 msgstr "Impossibile inviare l'esempio su UDP"
-
-#, python-format
-msgid ""
-"Unexpected exception converting %(value)s to the expected data type %(type)s."
-msgstr ""
-"Eccezione non prevista durante la conversione di %(value)s per il tipo di "
-"dati previsto %(type)s."
-
-#, python-format
-msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr ""
-"Tipo di metadati sconosciuto. La chiave (%s) non potrà essere sottoposta a "
-"query."
 
 #, python-format
 msgid ""
@@ -282,14 +203,6 @@ msgstr "Tipo di sensore errato"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "Errore YAML durante la lettura del file definizioni %(file)s"
-
-msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
-msgstr ""
-"alarm URLs non è disponibile con Aodh perché disabilitato oppure non "
-"disponibile "
-
-msgid "direct option cannot be true when Gnocchi is enabled."
-msgstr "L'opzione direct non può essere true quando Gnocchi è abilitato."
 
 #, python-format
 msgid "dropping out of time order sample: %s"

@@ -7,26 +7,21 @@
 # Christian Berendt <berendt@b1-systems.de>, 2014
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
-# Frank Kloeker <eumel@arcor.de>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev86\n"
+"Project-Id-Version: ceilometer 9.0.1.dev111\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-10-24 09:55+0000\n"
+"POT-Creation-Date: 2017-11-01 22:34+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-06-06 06:19+0000\n"
-"Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
+"PO-Revision-Date: 2016-04-12 04:26+0000\n"
+"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 3.9.6\n"
 "Language-Team: German\n"
-
-#, python-format
-msgid "%(entity)s %(id)s Not Found"
-msgstr "%(entity)s %(id)s nicht gefunden"
 
 #, python-format
 msgid "Arithmetic transformer must use at least one meter in expression '%s'"
@@ -66,10 +61,6 @@ msgid "Failed to load any notification handlers for %s"
 msgstr "Es konnten keine Benachrichtigungshandler für %s geladen werden"
 
 #, python-format
-msgid "Failed to parse the timestamp value %s"
-msgstr "Zeitmarkenwert %s konnte nicht analysiert werden"
-
-#, python-format
 msgid "Failed to publish %d datapoints, dropping them"
 msgstr "%d Datenpunkte konnten nicht veröffentlicht werden; werden gelöscht"
 
@@ -80,10 +71,6 @@ msgstr ""
 "einreihen"
 
 #, python-format
-msgid "Filter expression not valid: %s"
-msgstr "Filterausdruck nicht gültig: %s"
-
-#, python-format
 msgid ""
 "Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
 "%(column)s."
@@ -92,19 +79,8 @@ msgstr ""
 "Spalte: %(column)s."
 
 #, python-format
-msgid "Invalid aggregation function: %s"
-msgstr "Ungültige Aggreation Funktion: %s"
-
-#, python-format
-msgid "Invalid period %(period)s: %(err)s"
-msgstr "Ungültiger Zeitraum %(period)s: %(err)s"
-
-#, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "Ungültiger Traittyp '%(type)s' für Trait %(trait)s"
-
-msgid "Limit must be positive"
-msgstr "Grenzwert muss positiv sein"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -123,25 +99,14 @@ msgid "Node Manager init failed"
 msgstr "Initialisierung von Knoten-Manager fehlgeschlagen"
 
 #, python-format
-msgid "Not Authorized to access %(aspect)s %(id)s"
-msgstr "Nicht berechtigt für den Zugriff auf %(aspect)s %(id)s"
-
-#, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
 msgstr "Opencontrail-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
-
-#, python-format
-msgid "Order-by expression not valid: %s"
-msgstr "Ausdruck für 'Sortieren nach' nicht gültig: %s"
 
 #, python-format
 msgid ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
 msgstr ""
 "Analysefehler in JSONPath-Spezifikation '%(jsonpath)s' für %(name)s: %(err)s"
-
-msgid "Period must be positive."
-msgstr "Zeitraum muss positiv sein."
 
 #, python-format
 msgid "Plugin specified, but no plugin name supplied for %s"
@@ -180,64 +145,16 @@ msgstr "RGW-AdminOps-API hat Folgendes zurückgegeben: %(status)s %(reason)s"
 msgid "Required field %s not specified"
 msgstr "Erforderliches Feld %s nicht angegeben"
 
-msgid "Resource"
-msgstr "Resource"
-
-msgid "Sample"
-msgstr "Beispiel"
-
-msgid "Samples should be included in request body"
-msgstr "Beispiele sollten in Anforderungshauptteil enthalten sein"
-
-#, python-format
-msgid ""
-"The data type %(type)s is not supported. The supported data type list is: "
-"%(supported)s"
-msgstr ""
-"Der Datentyp %(type)s wird nicht unterstützt. Die Liste der unterstützten "
-"Datentypen lautet: %(supported)s"
-
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Das Feld 'fields' ist erforderlich für %s"
 
 #, python-format
-msgid "Unable to connect to the database server: %(errmsg)s."
-msgstr ""
-"Es kann keine Verbindung zum Datenbankserver hergestellt werden: %(errmsg)s."
-
-#, python-format
-msgid ""
-"Unable to convert the value %(value)s to the expected data type %(type)s."
-msgstr ""
-"Wert %(value)s kann nicht in den erwarteten Datentyp %(type)s umgewandelt "
-"werden."
-
-#, python-format
 msgid "Unable to evaluate expression %(expr)s: %(exc)s"
 msgstr "Auswertung nicht möglich für Ausdruck %(expr)s: %(exc)s"
 
-#, python-format
-msgid ""
-"Unable to reconnect to the primary mongodb: %(errmsg)s. Trying again in "
-"%(retry_interval)d seconds."
-msgstr ""
-"Es kann keine erneute Verbindung zur primären mongodb hergestellt werden: "
-"%(errmsg)s. Erneuter Versuch in %(retry_interval)d Sekunden."
-
 msgid "Unable to send sample over UDP"
 msgstr "Beispiel kann nicht über UDP gesendet werden"
-
-#, python-format
-msgid ""
-"Unexpected exception converting %(value)s to the expected data type %(type)s."
-msgstr ""
-"Unerwartete Ausnahme beim Konvertieren von %(value)s in den erwarteten "
-"Datentyp %(type)s."
-
-#, python-format
-msgid "Unknown metadata type. Key (%s) will not be queryable."
-msgstr "Unbekannter Metadatentyp. Schlüssel (%s) wird nicht abfragbar sein."
 
 #, python-format
 msgid ""
@@ -296,16 +213,6 @@ msgstr "Falscher Sensortyp"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "YAML-Fehler beim Lesen von Definitionsdatei %(file)s."
-
-msgid "alarms URLs is unavailable when Aodh is disabled or unavailable."
-msgstr ""
-"Alarm-URLs sind nicht verfügbar, wenn Aodh inaktiviert oder nicht verfügbar "
-"ist."
-
-msgid "direct option cannot be true when Gnocchi is enabled."
-msgstr ""
-"Wenn Gnocci aktiviert ist, kann die Option 'direct' nicht den Wert 'true' "
-"haben. "
 
 #, python-format
 msgid "dropping out of time order sample: %s"
