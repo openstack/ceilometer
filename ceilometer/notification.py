@@ -26,7 +26,6 @@ from futurist import periodics
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
-import six
 from stevedore import extension
 from tooz import coordination
 
@@ -128,6 +127,9 @@ class NotificationService(cotyledon.Service):
                                str(uuid.uuid4()).encode('ascii'))
             self.partition_coordinator = coordination.get_coordinator(
                 self.conf.coordination.backend_url, coordination_id)
+            self.partition_set = list(range(
+                self.conf.notification.pipeline_processing_queues))
+            self.group_state = None
         else:
             self.partition_coordinator = None
 
@@ -190,7 +192,7 @@ class NotificationService(cotyledon.Service):
         self.transport = messaging.get_transport(self.conf)
 
         if self.conf.notification.workload_partitioning:
-            self.partition_coordinator.start()
+            self.partition_coordinator.start(start_heart=True)
         else:
             # FIXME(sileht): endpoint uses the notification_topics option
             # and it should not because this is an oslo_messaging option
@@ -210,20 +212,19 @@ class NotificationService(cotyledon.Service):
             self.hashring = self.partition_coordinator.join_partitioned_group(
                 self.NOTIFICATION_NAMESPACE)
 
-            @periodics.periodic(spacing=self.conf.coordination.check_watchers,
-                                run_immediately=True)
+            @periodics.periodic(spacing=self.conf.coordination.check_watchers)
             def run_watchers():
                 self.partition_coordinator.run_watchers()
+                if self.group_state != self.hashring.ring.nodes:
+                    self.group_state = self.hashring.ring.nodes.copy()
+                    self._refresh_agent()
 
             self.periodic = periodics.PeriodicWorker.create(
                 [], executor_factory=lambda:
                 futures.ThreadPoolExecutor(max_workers=10))
             self.periodic.add(run_watchers)
-
             utils.spawn_thread(self.periodic.start)
-            # configure pipelines after all coordination is configured.
-            with self.coord_lock:
-                self._configure_pipeline_listener()
+            self._refresh_agent()
 
     def _configure_main_queue_listeners(self, pipe_manager,
                                         event_pipe_manager):
@@ -266,7 +267,7 @@ class NotificationService(cotyledon.Service):
             )
             self.listeners.append(listener)
 
-    def _refresh_agent(self, event):
+    def _refresh_agent(self):
         with self.coord_lock:
             if self.shutdown:
                 # NOTE(sileht): We are going to shutdown we everything will be
@@ -278,13 +279,8 @@ class NotificationService(cotyledon.Service):
         ev_pipes = self.event_pipeline_manager.pipelines
         pipelines = self.pipeline_manager.pipelines + ev_pipes
         transport = messaging.get_transport(self.conf)
-        partitioned = six.moves.range(
-            self.conf.notification.pipeline_processing_queues
-        )
-
-        if self.partition_coordinator:
-            partitioned = list(filter(
-                self.hashring.belongs_to_self, partitioned))
+        partitioned = list(filter(
+            self.hashring.belongs_to_self, self.partition_set))
 
         endpoints = []
         targets = []
