@@ -360,7 +360,7 @@ class PipelineManager(agent.ConfigManagerBase):
     Pipeline manager sets up pipelines according to config file
     """
 
-    def __init__(self, conf, cfg_file, transformer_manager, p_type):
+    def __init__(self, conf, cfg_file, transformer_manager):
         """Setup the pipelines according to config.
 
         The configuration is supported as follows:
@@ -420,7 +420,7 @@ class PipelineManager(agent.ConfigManagerBase):
             raise PipelineException("Both sources & sinks are required",
                                     cfg)
         LOG.info('detected decoupled pipeline config format')
-        publisher_manager = PublisherManager(self.conf, p_type['name'])
+        publisher_manager = PublisherManager(self.conf, self.pm_type)
 
         unique_names = set()
         sources = []
@@ -431,7 +431,7 @@ class PipelineManager(agent.ConfigManagerBase):
                                         name, self)
             else:
                 unique_names.add(name)
-                sources.append(p_type['source'](s))
+                sources.append(self.pm_source(s))
         unique_names.clear()
 
         sinks = {}
@@ -442,15 +442,15 @@ class PipelineManager(agent.ConfigManagerBase):
                                         name, self)
             else:
                 unique_names.add(name)
-                sinks[s['name']] = p_type['sink'](self.conf, s,
-                                                  transformer_manager,
-                                                  publisher_manager)
+                sinks[s['name']] = self.pm_sink(self.conf, s,
+                                                transformer_manager,
+                                                publisher_manager)
         unique_names.clear()
 
         for source in sources:
             source.check_sinks(sinks)
             for target in source.sinks:
-                pipe = p_type['pipeline'](self.conf, source, sinks[target])
+                pipe = self.pm_pipeline(self.conf, source, sinks[target])
                 if pipe.name in unique_names:
                     raise PipelineException(
                         "Duplicate pipeline name: %s. Ensure pipeline"
@@ -460,6 +460,22 @@ class PipelineManager(agent.ConfigManagerBase):
                     unique_names.add(pipe.name)
                     self.pipelines.append(pipe)
         unique_names.clear()
+
+    @abc.abstractproperty
+    def pm_type(self):
+        """Pipeline manager type."""
+
+    @abc.abstractproperty
+    def pm_pipeline(self):
+        """Pipeline class"""
+
+    @abc.abstractproperty
+    def pm_source(self):
+        """Pipeline source class"""
+
+    @abc.abstractproperty
+    def pm_sink(self):
+        """Pipeline sink class"""
 
     def publisher(self):
         """Build a new Publisher for these manager pipelines.

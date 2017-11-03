@@ -188,13 +188,14 @@ class SamplePipeline(pipeline.Pipeline):
 
 class SamplePipelineManager(pipeline.PipelineManager):
 
+    pm_type = 'sample'
+    pm_pipeline = SamplePipeline
+    pm_source = SampleSource
+    pm_sink = SampleSink
+
     def __init__(self, conf):
-        # FIXME(gordc): improve how we set pipeline specific models
-        pipeline_types = {'name': 'sample', 'pipeline': SamplePipeline,
-                          'source': SampleSource, 'sink': SampleSink}
         super(SamplePipelineManager, self).__init__(
-            conf, conf.pipeline_cfg_file, self.get_transform_manager(),
-            pipeline_types)
+            conf, conf.pipeline_cfg_file, self.get_transform_manager())
 
     @staticmethod
     def get_transform_manager():

@@ -121,9 +121,11 @@ class EventPipeline(pipeline.Pipeline):
 
 class EventPipelineManager(pipeline.PipelineManager):
 
+    pm_type = 'event'
+    pm_pipeline = EventPipeline
+    pm_source = EventSource
+    pm_sink = EventSink
+
     def __init__(self, conf):
-        # FIXME(gordc): improve how we set pipeline specific models
-        pipeline_types = {'name': 'event', 'pipeline': EventPipeline,
-                          'source': EventSource, 'sink': EventSink}
         super(EventPipelineManager, self).__init__(
-            conf, conf.event_pipeline_cfg_file, {}, pipeline_types)
+            conf, conf.event_pipeline_cfg_file, {})
