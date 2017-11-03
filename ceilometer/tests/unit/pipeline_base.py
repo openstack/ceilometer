@@ -371,7 +371,8 @@ class BasePipelineTestCase(base.BaseTestCase):
         self._set_pipeline_cfg('meters', counter_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].support_meter('a'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_meter('a'))
 
     def test_wildcard_excluded_counters_not_excluded(self):
         counter_cfg = ['*', '!b']
@@ -405,40 +406,39 @@ class BasePipelineTestCase(base.BaseTestCase):
         self._set_pipeline_cfg('meters', counter_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].support_meter('a'))
-        self.assertTrue(pipeline_manager.pipelines[0].support_meter('b'))
-        self.assertFalse(pipeline_manager.pipelines[0].support_meter('c'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_meter('a'))
+        self.assertTrue(pipe.source.support_meter('b'))
+        self.assertFalse(pipe.source.support_meter('c'))
 
     def test_wildcard_and_excluded_wildcard_counters(self):
         counter_cfg = ['*', '!disk.*']
         self._set_pipeline_cfg('meters', counter_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].
-                         support_meter('disk.read.bytes'))
-        self.assertTrue(pipeline_manager.pipelines[0].support_meter('cpu'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_meter('disk.read.bytes'))
+        self.assertTrue(pipe.source.support_meter('cpu'))
 
     def test_included_counter_and_wildcard_counters(self):
         counter_cfg = ['cpu', 'disk.*']
         self._set_pipeline_cfg('meters', counter_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertTrue(pipeline_manager.pipelines[0].
-                        support_meter('disk.read.bytes'))
-        self.assertTrue(pipeline_manager.pipelines[0].support_meter('cpu'))
-        self.assertFalse(pipeline_manager.pipelines[0].
-                         support_meter('instance'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertTrue(pipe.source.support_meter('disk.read.bytes'))
+        self.assertTrue(pipe.source.support_meter('cpu'))
+        self.assertFalse(pipe.source.support_meter('instance'))
 
     def test_excluded_counter_and_excluded_wildcard_counters(self):
         counter_cfg = ['!cpu', '!disk.*']
         self._set_pipeline_cfg('meters', counter_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].
-                         support_meter('disk.read.bytes'))
-        self.assertFalse(pipeline_manager.pipelines[0].support_meter('cpu'))
-        self.assertTrue(pipeline_manager.pipelines[0].
-                        support_meter('instance'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_meter('disk.read.bytes'))
+        self.assertFalse(pipe.source.support_meter('cpu'))
+        self.assertTrue(pipe.source.support_meter('instance'))
 
     def test_multiple_pipeline(self):
         self._augment_pipeline_cfg()

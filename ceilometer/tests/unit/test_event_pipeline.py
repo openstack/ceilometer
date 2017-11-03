@@ -241,7 +241,8 @@ class EventPipelineTestCase(base.BaseTestCase):
         self._set_pipeline_cfg('events', event_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = event.EventPipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].support_event('a'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_event('a'))
 
     def test_wildcard_excluded_events_not_excluded(self):
         event_cfg = ['*', '!b']
@@ -271,30 +272,31 @@ class EventPipelineTestCase(base.BaseTestCase):
         self._set_pipeline_cfg('events', event_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = event.EventPipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].support_event('a'))
-        self.assertTrue(pipeline_manager.pipelines[0].support_event('b'))
-        self.assertFalse(pipeline_manager.pipelines[0].support_event('c'))
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_event('a'))
+        self.assertTrue(pipe.source.support_event('b'))
+        self.assertFalse(pipe.source.support_event('c'))
 
     def test_wildcard_and_excluded_wildcard_events(self):
         event_cfg = ['*', '!compute.*']
         self._set_pipeline_cfg('events', event_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = event.EventPipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.
                          support_event('compute.instance.create.start'))
-        self.assertTrue(pipeline_manager.pipelines[0].
-                        support_event('identity.user.create'))
+        self.assertTrue(pipe.source.support_event('identity.user.create'))
 
     def test_included_event_and_wildcard_events(self):
         event_cfg = ['compute.instance.create.start', 'identity.*']
         self._set_pipeline_cfg('events', event_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = event.EventPipelineManager(self.CONF)
-        self.assertTrue(pipeline_manager.pipelines[0].
-                        support_event('identity.user.create'))
-        self.assertTrue(pipeline_manager.pipelines[0].
+        pipe = pipeline_manager.pipelines[0]
+        self.assertTrue(pipe.source.support_event('identity.user.create'))
+        self.assertTrue(pipe.source.
                         support_event('compute.instance.create.start'))
-        self.assertFalse(pipeline_manager.pipelines[0].
+        self.assertFalse(pipe.source.
                          support_event('compute.instance.create.stop'))
 
     def test_excluded_event_and_excluded_wildcard_events(self):
@@ -302,11 +304,11 @@ class EventPipelineTestCase(base.BaseTestCase):
         self._set_pipeline_cfg('events', event_cfg)
         self._build_and_set_new_pipeline()
         pipeline_manager = event.EventPipelineManager(self.CONF)
-        self.assertFalse(pipeline_manager.pipelines[0].
-                         support_event('identity.user.create'))
-        self.assertFalse(pipeline_manager.pipelines[0].
+        pipe = pipeline_manager.pipelines[0]
+        self.assertFalse(pipe.source.support_event('identity.user.create'))
+        self.assertFalse(pipe.source.
                          support_event('compute.instance.create.start'))
-        self.assertTrue(pipeline_manager.pipelines[0].
+        self.assertTrue(pipe.source.
                         support_event('compute.instance.create.stop'))
 
     def test_multiple_pipeline(self):

@@ -147,10 +147,6 @@ class EventPipeline(base.Pipeline):
         #              pipelines do not have the same name.
         return 'event:%s' % super(EventPipeline, self).__str__()
 
-    def support_event(self, event_type):
-        # FIXME(gordc): this is only used in tests
-        return self.source.support_event(event_type)
-
     def publish_data(self, events):
         if not isinstance(events, list):
             events = [events]

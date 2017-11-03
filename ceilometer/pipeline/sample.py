@@ -184,10 +184,6 @@ class SamplePipeline(base.Pipeline):
 
     default_grouping_key = ['resource_id']
 
-    def support_meter(self, meter_name):
-        # FIXME(gordc): this is only used in tests
-        return self.source.support_meter(meter_name)
-
     def _validate_volume(self, s):
         volume = s.volume
         if volume is None:
