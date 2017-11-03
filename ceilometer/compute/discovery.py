@@ -137,12 +137,21 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
     def discover_libvirt_polling(self, manager, param=None):
         instances = []
         for domain in self.connection.listAllDomains():
+            try:
+                xml_string = domain.metadata(
+                    libvirt.VIR_DOMAIN_METADATA_ELEMENT,
+                    "http://openstack.org/xmlns/libvirt/nova/1.0")
+            except libvirt.libvirtError as e:
+                if libvirt_utils.is_disconnection_exception(e):
+                    # Re-raise the exception so it's handled and retries
+                    raise
+                LOG.error(
+                    "Fail to get domain uuid %s metadata, libvirtError: %s",
+                    domain.UUIDString(), e.message)
+                continue
+
             full_xml = etree.fromstring(domain.XMLDesc())
             os_type_xml = full_xml.find("./os/type")
-
-            xml_string = domain.metadata(
-                libvirt.VIR_DOMAIN_METADATA_ELEMENT,
-                "http://openstack.org/xmlns/libvirt/nova/1.0")
             metadata_xml = etree.fromstring(xml_string)
 
             # TODO(sileht): We don't have the flavor ID here So the Gnocchi
