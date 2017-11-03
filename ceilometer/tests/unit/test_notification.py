@@ -121,6 +121,23 @@ class TestNotification(BaseNotificationTest):
         self.assertEqual(1, len(mock_listener.call_args_list[0][0][1]))
         self.assertEqual(1, len(self.srv.listeners))
 
+    def test_select_pipelines(self):
+        self.CONF.set_override('pipelines', ['event'], group='notification')
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
+        self.assertEqual(1, len(self.srv.managers))
+        self.assertEqual(1, len(self.srv.listeners[0].dispatcher.endpoints))
+
+    @mock.patch('ceilometer.notification.LOG')
+    def test_select_pipelines_missing(self, logger):
+        self.CONF.set_override('pipelines', ['meter', 'event', 'bad'],
+                               group='notification')
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
+        self.assertEqual(2, len(self.srv.managers))
+        logger.error.assert_called_with(
+            'Could not load the following pipelines: %s', set(['bad']))
+
 
 class BaseRealNotification(BaseNotificationTest):
     def setup_pipeline(self, counter_names):

@@ -39,6 +39,10 @@ The notification agent is responsible for consuming notifications. This
 component is responsible for consuming from the message bus and transforming
 notifications into events and measurement samples.
 
+By default, the notification agent is configured to build both events and
+samples. To enable selective data models, set the required pipelines using
+`pipelines` option under the `[notification]` section.
+
 Additionally, the notification agent is responsible for all data processing
 such as transformations and publishing. After processing, the data is sent
 to any supported publisher target such as gnocchi or panko. These services
