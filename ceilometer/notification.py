@@ -105,7 +105,7 @@ class NotificationService(cotyledon.Service):
     proper active/active HA.
     """
 
-    NOTIFICATION_NAMESPACE = 'ceilometer.notification'
+    NOTIFICATION_NAMESPACE = 'ceilometer.notification.v2'
 
     def __init__(self, worker_id, conf, coordination_id=None):
         super(NotificationService, self).__init__(worker_id)
@@ -229,14 +229,10 @@ class NotificationService(cotyledon.Service):
             endpoints.extend(pipe_mgr.get_interim_endpoints())
 
         targets = []
-        for mgr in self.managers:
-            for pipe_set, pipe in itertools.product(partitioned,
-                                                    mgr.pipelines):
-                LOG.debug('Pipeline endpoint: %s from set: %s',
-                          pipe.name, pipe_set)
-                topic = '%s-%s-%s' % (pipe.NOTIFICATION_IPC,
-                                      pipe.name, pipe_set)
-                targets.append(oslo_messaging.Target(topic=topic))
+        for mgr, hash_id in itertools.product(self.managers, partitioned):
+            topic = '-'.join([mgr.NOTIFICATION_IPC, mgr.pm_type, str(hash_id)])
+            LOG.debug('Listening to queue: %s', topic)
+            targets.append(oslo_messaging.Target(topic=topic))
 
         if self.pipeline_listener:
             self.pipeline_listener.stop()

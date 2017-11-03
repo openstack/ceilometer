@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    Workload partitioning of notification agent is now split into queues
+    based on pipeline type (sample, event, etc...) rather than per individual
+    pipeline. This will save some memory usage specifically for pipeline
+    definitions with many source/sink combinations.
+upgrade:
+  - |
+    If workload partitioning of the notification agent is enabled, the
+    notification agent should not run alongside pre-Queens agents. Doing so
+    may result in missed samples when leveraging transformations. To upgrade
+    without loss of data, set `notification_control_exchanges` option to
+    empty so only existing `ceilometer-pipe-*` queues are processed. Once
+    cleared, reset `notification_control_exchanges` option and launch the new
+    notification agent(s). If `workload_partitioning` is not enabled, no
+    special steps are required.

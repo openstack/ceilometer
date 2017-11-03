@@ -300,10 +300,8 @@ class TestRealNotificationHA(BaseRealNotification):
         topics = [target.topic for target in mock_listener.call_args[0][1]]
         self.assertEqual(4, len(topics))
         self.assertEqual(
-            {'ceilometer-pipe-test_pipeline:test_sink-4',
-             'ceilometer-pipe-event:test_event:test_sink-4',
-             'ceilometer-pipe-event:test_event:test_sink-9',
-             'ceilometer-pipe-test_pipeline:test_sink-9'},
+            {'ceilometer_ipc-sample-4', 'ceilometer_ipc-sample-9',
+             'ceilometer_ipc-event-4', 'ceilometer_ipc-event-9'},
             set(topics))
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
