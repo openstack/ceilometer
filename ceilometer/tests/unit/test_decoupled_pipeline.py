@@ -15,7 +15,7 @@
 
 import yaml
 
-from ceilometer import pipeline as pipe_base
+from ceilometer.pipeline import base
 from ceilometer.pipeline import sample as pipeline
 from ceilometer import sample
 from ceilometer.tests.unit import pipeline_base
@@ -262,7 +262,7 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'publishers': ['except'],
         })
         self._build_and_set_new_pipeline()
-        self.assertRaises(pipe_base.PipelineException,
+        self.assertRaises(base.PipelineException,
                           pipeline.SamplePipelineManager, self.CONF)
 
     def test_duplicated_source_names(self):
@@ -272,5 +272,5 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
             'sinks': ['test_sink']
         })
         self._build_and_set_new_pipeline()
-        self.assertRaises(pipe_base.PipelineException,
+        self.assertRaises(base.PipelineException,
                           pipeline.SamplePipelineManager, self.CONF)

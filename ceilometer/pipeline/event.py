@@ -21,13 +21,13 @@ from stevedore import extension
 from ceilometer import agent
 from ceilometer.event import converter
 from ceilometer.event import models
-from ceilometer import pipeline
+from ceilometer.pipeline import base
 from ceilometer.publisher import utils as publisher_utils
 
 LOG = log.getLogger(__name__)
 
 
-class EventEndpoint(pipeline.MainNotificationEndpoint):
+class EventEndpoint(base.MainNotificationEndpoint):
 
     event_types = []
 
@@ -67,7 +67,7 @@ class EventEndpoint(pipeline.MainNotificationEndpoint):
         return oslo_messaging.NotificationResult.HANDLED
 
 
-class InterimEventEndpoint(pipeline.NotificationEndpoint):
+class InterimEventEndpoint(base.NotificationEndpoint):
     def __init__(self, conf, publisher, pipe_name):
         self.event_types = [pipe_name]
         super(InterimEventEndpoint, self).__init__(conf, publisher)
@@ -100,7 +100,7 @@ class InterimEventEndpoint(pipeline.NotificationEndpoint):
         return oslo_messaging.NotificationResult.HANDLED
 
 
-class EventSource(pipeline.PipelineSource):
+class EventSource(base.PipelineSource):
     """Represents a source of events.
 
     In effect it is a set of notification handlers capturing events for a set
@@ -113,13 +113,13 @@ class EventSource(pipeline.PipelineSource):
         try:
             self.check_source_filtering(self.events, 'events')
         except agent.SourceException as err:
-            raise pipeline.PipelineException(err.msg, cfg)
+            raise base.PipelineException(err.msg, cfg)
 
     def support_event(self, event_name):
         return self.is_supported(self.events, event_name)
 
 
-class EventSink(pipeline.Sink):
+class EventSink(base.Sink):
 
     def publish_events(self, events):
         if events:
@@ -137,7 +137,7 @@ class EventSink(pipeline.Sink):
                         raise
 
 
-class EventPipeline(pipeline.Pipeline):
+class EventPipeline(base.Pipeline):
     """Represents a pipeline for Events."""
 
     default_grouping_key = ['event_type']
@@ -165,7 +165,7 @@ class EventPipeline(pipeline.Pipeline):
         return self.source.support_event(event.event_type)
 
 
-class EventPipelineManager(pipeline.PipelineManager):
+class EventPipelineManager(base.PipelineManager):
 
     pm_type = 'event'
     pm_pipeline = EventPipeline
@@ -184,5 +184,5 @@ class EventPipelineManager(pipeline.PipelineManager):
         # pipeline. this will allow us to use self.publisher and less
         # queues.
         return [InterimEventEndpoint(
-            self.conf, pipeline.PublishContext([pipe]), pipe.name)
+            self.conf, base.PublishContext([pipe]), pipe.name)
             for pipe in self.pipelines]

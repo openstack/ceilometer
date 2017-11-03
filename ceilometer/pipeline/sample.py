@@ -17,14 +17,14 @@ from oslo_log import log
 from stevedore import extension
 
 from ceilometer import agent
-from ceilometer import pipeline
+from ceilometer.pipeline import base
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import sample as sample_util
 
 LOG = log.getLogger(__name__)
 
 
-class SampleEndpoint(pipeline.MainNotificationEndpoint):
+class SampleEndpoint(base.MainNotificationEndpoint):
 
     def info(self, notifications):
         """Convert message at info level to Ceilometer sample.
@@ -53,7 +53,7 @@ class SampleEndpoint(pipeline.MainNotificationEndpoint):
         pass
 
 
-class InterimSampleEndpoint(pipeline.NotificationEndpoint):
+class InterimSampleEndpoint(base.NotificationEndpoint):
     def __init__(self, conf, publisher, pipe_name):
         self.event_types = [pipe_name]
         super(InterimSampleEndpoint, self).__init__(conf, publisher)
@@ -84,7 +84,7 @@ class InterimSampleEndpoint(pipeline.NotificationEndpoint):
             p(sorted(samples, key=methodcaller('get_iso_timestamp')))
 
 
-class SampleSource(pipeline.PipelineSource):
+class SampleSource(base.PipelineSource):
     """Represents a source of samples.
 
     In effect it is a set of notification handlers processing
@@ -97,17 +97,17 @@ class SampleSource(pipeline.PipelineSource):
         try:
             self.meters = cfg['meters']
         except KeyError:
-            raise pipeline.PipelineException("Missing meters value", cfg)
+            raise base.PipelineException("Missing meters value", cfg)
         try:
             self.check_source_filtering(self.meters, 'meters')
         except agent.SourceException as err:
-            raise pipeline.PipelineException(err.msg, cfg)
+            raise base.PipelineException(err.msg, cfg)
 
     def support_meter(self, meter_name):
         return self.is_supported(self.meters, meter_name)
 
 
-class SampleSink(pipeline.Sink):
+class SampleSink(base.Sink):
 
     def _transform_sample(self, start, sample):
         try:
@@ -179,7 +179,7 @@ class SampleSink(pipeline.Sink):
                           exc_info=True)
 
 
-class SamplePipeline(pipeline.Pipeline):
+class SamplePipeline(base.Pipeline):
     """Represents a pipeline for Samples."""
 
     default_grouping_key = ['resource_id']
@@ -232,7 +232,7 @@ class SamplePipeline(pipeline.Pipeline):
         return self.source.support_meter(sample.name)
 
 
-class SamplePipelineManager(pipeline.PipelineManager):
+class SamplePipelineManager(base.PipelineManager):
 
     pm_type = 'sample'
     pm_pipeline = SamplePipeline
@@ -260,5 +260,5 @@ class SamplePipelineManager(pipeline.PipelineManager):
         # pipeline. this will allow us to use self.publisher and less
         # queues.
         return [InterimSampleEndpoint(
-            self.conf, pipeline.PublishContext([pipe]), pipe.name)
+            self.conf, base.PublishContext([pipe]), pipe.name)
             for pipe in self.pipelines]

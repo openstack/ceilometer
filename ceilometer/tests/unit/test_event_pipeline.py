@@ -20,7 +20,7 @@ import mock
 import oslo_messaging
 
 from ceilometer.event import models
-from ceilometer import pipeline
+from ceilometer.pipeline import base as pipeline
 from ceilometer.pipeline import event
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
@@ -81,7 +81,7 @@ class EventPipelineTestCase(base.BaseTestCase):
 
         self._reraise_exception = True
         self.useFixture(fixtures.MockPatch(
-            'ceilometer.pipeline.LOG.exception',
+            'ceilometer.pipeline.base.LOG.exception',
             side_effect=self._handle_reraise_exception))
 
     def _handle_reraise_exception(self, *args, **kwargs):

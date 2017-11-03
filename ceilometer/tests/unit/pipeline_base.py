@@ -27,7 +27,7 @@ from oslo_utils import timeutils
 import six
 from stevedore import extension
 
-from ceilometer import pipeline as pipe_base
+from ceilometer.pipeline import base as pipe_base
 from ceilometer.pipeline import sample as pipeline
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
@@ -143,7 +143,7 @@ class BasePipelineTestCase(base.BaseTestCase):
 
         self._reraise_exception = True
         self.useFixture(fixtures.MockPatch(
-            'ceilometer.pipeline.LOG.exception',
+            'ceilometer.pipeline.base.LOG.exception',
             side_effect=self._handle_reraise_exception))
 
     def _handle_reraise_exception(self, *args, **kwargs):

@@ -36,7 +36,7 @@ import ceilometer.notification
 import ceilometer.nova_client
 import ceilometer.objectstore.rgw
 import ceilometer.objectstore.swift
-import ceilometer.pipeline
+import ceilometer.pipeline.base
 import ceilometer.polling.manager
 import ceilometer.publisher.messaging
 import ceilometer.publisher.utils
@@ -74,7 +74,7 @@ def list_opts():
                          ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.objectstore.swift.OPTS,
-                         ceilometer.pipeline.OPTS,
+                         ceilometer.pipeline.base.OPTS,
                          ceilometer.sample.OPTS,
                          ceilometer.utils.OPTS,
                          OPTS)),
