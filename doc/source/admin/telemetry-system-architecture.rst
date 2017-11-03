@@ -145,7 +145,7 @@ Users, roles, and projects
 This service of OpenStack uses OpenStack Identity for authenticating and
 authorizing users. The required configuration options are listed in the
 `Telemetry section
-<https://docs.openstack.org/ocata/config-reference/telemetry.html>`__ in the
+<https://docs.openstack.org/ceilometer/latest/configuration/index.html>`__ in the
 OpenStack Configuration Reference. Alternatively, gnocchi can be configured
 without authentication to minimize overhead.
 
