@@ -119,7 +119,8 @@ class LibvirtInspector(virt_inspector.Inspector):
         for device in filter(
                 bool,
                 [target.get("dev")
-                 for target in tree.findall('devices/disk/target')]):
+                 for target in tree.findall('devices/disk/target')
+                 if target.getparent().find('source') is not None]):
             block_stats = domain.blockStats(device)
             block_stats_flags = domain.blockStatsFlags(device, 0)
             yield virt_inspector.DiskStats(
