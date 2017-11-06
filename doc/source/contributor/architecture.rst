@@ -65,7 +65,7 @@ The Ceilometer project created 2 methods to collect data:
    OpenStack related project and are using the Oslo library, you are kindly
    invited to come and talk to one of the project members to learn how you
    could quickly add instrumentation for your project.
-2. :term:`Polling agents`, which is the less preferred method, will poll
+2. :term:`Polling agent`, which is the less preferred method, will poll
    some API or other tool to collect information at a regular interval.
    The polling approach is less preferred due to the load it can impose
    on the API services.
@@ -75,7 +75,7 @@ monitors the message queues for notifications. Polling agents can be configured
 either to poll the local hypervisor or remote APIs (public REST APIs exposed by
 services and host-level SNMP/IPMI daemons).
 
-Notification Agents: Listening for data
+Notification Agent: Listening for data
 ---------------------------------------
 
 .. index::
@@ -84,9 +84,9 @@ Notification Agents: Listening for data
 .. figure:: ./2-1-collection-notification.png
    :width: 100%
    :align: center
-   :alt: Notification agents
+   :alt: Notification agent
 
-   Notification agents consuming messages from services.
+   Notification agent consuming messages from services.
 
 The heart of the system is the notification daemon (agent-notification)
 which monitors the message queue for data sent by other OpenStack
@@ -109,7 +109,7 @@ expressed an interest in seeing.
 
 .. _polling:
 
-Polling Agents: Asking for data
+Polling Agent: Asking for data
 -------------------------------
 
 .. index::
@@ -118,9 +118,9 @@ Polling Agents: Asking for data
 .. figure:: ./2-2-collection-poll.png
    :width: 100%
    :align: center
-   :alt: Polling agents
+   :alt: Polling agent
 
-   Polling agents querying services for data.
+   Polling agent querying services for data.
 
 Polling for compute resources is handled by a polling agent running
 on the compute node (where communication with the hypervisor is more
