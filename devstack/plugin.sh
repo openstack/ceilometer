@@ -338,7 +338,6 @@ function configure_ceilometer {
         iniset $CEILOMETER_CONF coordination backend_url $CEILOMETER_COORDINATION_URL
         iniset $CEILOMETER_CONF notification workload_partitioning True
         iniset $CEILOMETER_CONF notification workers $API_WORKERS
-        iniset $CEILOMETER_CONF notification pipeline_processing_queues $API_WORKERS
     fi
 
     if [[ -n "$CEILOMETER_CACHE_BACKEND" ]]; then
