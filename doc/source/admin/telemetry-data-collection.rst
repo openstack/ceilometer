@@ -88,7 +88,7 @@ types by each OpenStack service that Telemetry transforms into samples.
        image.send
 
      - The required configuration for Image service can be found in the
-       `Configure the Image service for Telemetry <https://docs.openstack.org/project-install-guide/telemetry/ocata>`__
+       `Configure the Image service for Telemetry <https://docs.openstack.org/ceilometer/latest/install/index.html>`__
        section in the Installation Tutorials and Guides.
    * - OpenStack Networking
      - floatingip.create.end
@@ -172,7 +172,7 @@ types by each OpenStack service that Telemetry transforms into samples.
        \*
      - The required configuration for Block Storage service can be found in the
        `Add the Block Storage service agent for Telemetry
-       <https://docs.openstack.org/project-install-guide/telemetry/ocata/cinder/install-cinder-ubuntu.html>`__
+       <https://docs.openstack.org/ceilometer/latest/install/cinder/install-cinder-ubuntu.html>`__
        section in the Installation Tutorials and Guides.
 
 .. note::
@@ -187,8 +187,8 @@ administrators and users. Configuring ``nova_notifications`` in the
 ``nova.conf`` file allows administrators to respond to events
 rapidly. For more information on configuring notifications for the
 compute service, see `Telemetry services
-<https://docs.openstack.org/project-install-guide/telemetry/ocata/install-compute-ubuntu.html>`__ in the
-Installation Tutorials and Guides.
+<https://docs.openstack.org/ceilometer/latest/install/install-compute-ubuntu.html>`__
+in the Installation Tutorials and Guides.
 
 Meter definitions
 -----------------
@@ -348,7 +348,7 @@ information locally.
 A Compute agent instance has to be installed on each and every compute
 node, installation instructions can be found in the `Install the Compute
 agent for Telemetry
-<https://docs.openstack.org/project-install-guide/telemetry/ocata/install-compute-ubuntu.html>`__
+<https://docs.openstack.org/ceilometer/latest/install/install-compute-ubuntu.html>`__
 section in the Installation Tutorials and Guides.
 
 The compute agent does not need direct database connection. The samples
@@ -390,7 +390,7 @@ The following services can be polled with this agent:
    framework (deprecated in Newton)
 
 To install and configure this service use the `Add the Telemetry service
-<https://docs.openstack.org/project-install-guide/telemetry/ocata/install-base-ubuntu.html>`__
+<https://docs.openstack.org/ceilometer/latest/install/install-base-ubuntu.html>`__
 section in the Installation Tutorials and Guides.
 
 Just like the compute agent, this component also does not need a direct
