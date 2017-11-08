@@ -11,22 +11,53 @@ Prerequisites
 
 Before you install and configure the Telemetry service, you must
 configure a target to send metering data to. The recommended endpoint
-is Gnocchi_. To enable Gnocchi, please see its install guide.
+is Gnocchi_.
 
 .. _Gnocchi: http://gnocchi.xyz
 .. include:: install-base-prereq-common.inc
 
+Install Gnocchi
+---------------
+
+#. Install the Gnocchi packages. Alternatively, Gnocchi can be install using
+   pip:
+
+   .. code-block:: console
+
+      # zypper install openstack-gnocchi-api openstack-gnocchi-metricd \
+        python-gnocchiclient
+
+   .. note::
+
+      Depending on your environment size, consider installing Gnocchi
+      separately as it makes extensive use of the cpu.
+
+.. include:: install-gnocchi.inc
+
+Finalize Gnocchi installation
+-----------------------------
+
+#. Start the Gnocchi services and configure them to start when the
+   system boots:
+
+   .. code-block:: console
+
+      # systemctl enable openstack-gnocchi-api.service \
+        openstack-gnocchi-metricd.service
+      # systemctl start openstack-gnocchi-api.service \
+        openstack-gnocchi-metricd.service
+
 Install and configure components
 --------------------------------
 
-1. Install the packages:
+#. Install the packages:
 
    .. code-block:: console
 
       # zypper install
         openstack-ceilometer-collector \
         openstack-ceilometer-agent-notification \
-        openstack-ceilometer-agent-central python-ceilometerclient
+        openstack-ceilometer-agent-central
 
 .. include:: install-base-config-common.inc
 

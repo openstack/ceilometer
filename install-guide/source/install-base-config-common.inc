@@ -54,36 +54,7 @@
      Replace ``CEILOMETER_PASS`` with the password you chose for
      the ``ceilometer`` user in the Identity service.
 
-3. Edit the ``/etc/gnocchi/gnocchi.conf`` file and add Keystone options:
-
-   * In the ``[api]`` section, configure gnocchi to use keystone:
-
-     .. code-block:: ini
-
-        [api]
-        auth_mode = keystone
-
-   * In the ``[keystone_authtoken]`` section, configure keystone
-     authentication:
-
-     .. code-block:: ini
-
-        [keystone_authtoken]
-        ...
-        auth_type = password
-        auth_url = http://controller:5000/v3
-        project_domain_name = Default
-        user_domain_name = Default
-        project_name = service
-        username = gnocchi
-        password = GNOCCHI_PASS
-        interface = internalURL
-        region_name = RegionOne
-
-     Replace ``GNOCCHI_PASS`` with the password you chose for
-     the ``gnocchi`` user in the Identity service.
-
-4. Create Ceilometer resources in Gnocchi. Gnocchi should be running by this
+3. Create Ceilometer resources in Gnocchi. Gnocchi should be running by this
    stage:
 
    .. code-block:: console
