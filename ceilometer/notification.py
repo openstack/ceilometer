@@ -13,13 +13,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import itertools
 import threading
 import time
 import uuid
 
-from ceilometer.agent import plugin_base
 from concurrent import futures
 import cotyledon
 from futurist import periodics
@@ -29,10 +27,10 @@ import oslo_messaging
 from stevedore import extension
 from tooz import coordination
 
-from ceilometer.event import endpoint as event_endpoint
 from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer import pipeline
+from ceilometer.pipeline import event as event_endpoint
 from ceilometer import utils
 
 
@@ -236,7 +234,7 @@ class NotificationService(cotyledon.Service):
 
         endpoints = []
         endpoints.append(
-            event_endpoint.EventsNotificationEndpoint(event_pipe_manager))
+            event_endpoint.EventEndpoint(event_pipe_manager))
 
         targets = []
         for ext in notification_manager:
@@ -326,17 +324,3 @@ class NotificationService(cotyledon.Service):
             utils.kill_listeners(self.listeners)
 
         super(NotificationService, self).terminate()
-
-
-class NotificationProcessBase(plugin_base.NotificationBase):
-
-    def get_targets(self, conf):
-        """Return a sequence of oslo_messaging.Target
-
-        This sequence is defining the exchange and topics to be connected for
-        this plugin.
-        """
-        return [oslo_messaging.Target(topic=topic, exchange=exchange)
-                for topic in self.get_notification_topics(conf)
-                for exchange in
-                conf.notification.notification_control_exchanges]

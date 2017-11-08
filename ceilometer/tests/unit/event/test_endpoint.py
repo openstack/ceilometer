@@ -21,8 +21,8 @@ from oslo_utils import fileutils
 import six
 import yaml
 
-from ceilometer.event import endpoint as event_endpoint
 from ceilometer import pipeline
+from ceilometer.pipeline import event as event_endpoint
 from ceilometer import publisher
 from ceilometer.publisher import test
 from ceilometer import service
@@ -114,8 +114,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
 
     def _setup_endpoint(self, publishers):
         ev_pipeline_mgr = self._setup_pipeline(publishers)
-        self.endpoint = event_endpoint.EventsNotificationEndpoint(
-            ev_pipeline_mgr)
+        self.endpoint = event_endpoint.EventEndpoint(ev_pipeline_mgr)
 
         self.endpoint.event_converter = mock.MagicMock()
         self.endpoint.event_converter.to_event.return_value = mock.MagicMock(
@@ -167,7 +166,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
             'ctxt': {}
         }
         with mock.patch("ceilometer.pipeline.LOG") as mock_logger:
-            ret = self.endpoint.process_notification('info', [message])
+            ret = self.endpoint.process_notifications('info', [message])
             self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
             exception_mock = mock_logger.error
             self.assertIn('Exit after error from publisher',
@@ -187,7 +186,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
             'ctxt': {}
         }
         with mock.patch("ceilometer.pipeline.LOG") as mock_logger:
-            ret = self.endpoint.process_notification('info', [message])
+            ret = self.endpoint.process_notifications('info', [message])
             self.assertEqual(oslo_messaging.NotificationResult.HANDLED, ret)
             exception_mock = mock_logger.error
             self.assertIn('Continue after error from publisher',

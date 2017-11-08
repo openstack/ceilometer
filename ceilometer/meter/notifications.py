@@ -24,7 +24,7 @@ from stevedore import extension
 
 from ceilometer import declarative
 from ceilometer.i18n import _
-from ceilometer import notification
+from ceilometer.pipeline import sample as endpoint
 from ceilometer import sample as sample_util
 
 OPTS = [
@@ -182,7 +182,7 @@ class MeterDefinition(object):
             yield sample
 
 
-class ProcessMeterNotifications(notification.NotificationProcessBase):
+class ProcessMeterNotifications(endpoint.SampleEndpoint):
 
     event_types = []
 
@@ -224,8 +224,8 @@ class ProcessMeterNotifications(notification.NotificationProcessBase):
                     definitions[meter_cfg['name']] = md
         return definitions.values()
 
-    def process_notification(self, notification_body):
+    def process_notification(self, notification):
         for d in self.definitions:
-            if d.match_type(notification_body['event_type']):
-                for s in d.to_samples(notification_body):
+            if d.match_type(notification['event_type']):
+                for s in d.to_samples(notification):
                     yield sample_util.Sample.from_notification(**s)
