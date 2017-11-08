@@ -1,0 +1,15 @@
+---
+upgrade:
+  - |
+    Use `radosgw.*` to enable/disable radosgw meters explicitly rather than
+    `rgw.*`
+deprecations:
+  - |
+    Previously, to enable/disable radosgw.* meters, you must define entry_point
+    name rather than meter name. This is corrected so you do not need to be
+    aware of entry_point naming. Use `radosgw.*` to enable/disable radosgw
+    meters explicitly rather than `rgw.*`. `rgw.*` support is deprecated
+    and will be removed in Rocky.
+fixes:
+  - |
+    Fix ability to enable/disable radosgw.* meters explicitly
