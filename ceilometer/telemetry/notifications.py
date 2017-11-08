@@ -22,7 +22,7 @@ class TelemetryIpc(endpoint.SampleEndpoint):
 
     event_types = ['telemetry.polling']
 
-    def process_notification(self, message):
+    def build_sample(self, message):
         samples = message['payload']['samples']
         for sample_dict in samples:
             yield sample.Sample(

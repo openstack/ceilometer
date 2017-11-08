@@ -337,7 +337,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('test1', s1['name'])
@@ -362,7 +362,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        data = list(self.handler.process_notification(NOTIFICATION))
+        data = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(2, len(data))
         expected_names = ['test1', 'test2']
         for s in data:
@@ -378,7 +378,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.resource_id",
                         project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(0, len(c))
 
     def test_regex_match_meter(self):
@@ -391,7 +391,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.resource_id",
                         project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(c))
 
     def test_default_timestamp(self):
@@ -407,7 +407,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.initiator.project_id",
                         multi="name")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(event))
+        c = list(self.handler.build_sample(event))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual(MIDDLEWARE_EVENT['metadata']['timestamp'],
@@ -427,7 +427,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         multi="name",
                         timestamp='$.payload.eventTime')]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(event))
+        c = list(self.handler.build_sample(event))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual(MIDDLEWARE_EVENT['payload']['eventTime'],
@@ -445,7 +445,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         timestamp="$.payload.metrics"
                                   "[?(@.name='cpu.frequency')].timestamp")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(METRICS_UPDATE))
+        c = list(self.handler.build_sample(METRICS_UPDATE))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('compute.node.cpu.frequency', s1['name'])
@@ -461,7 +461,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.resource_id",
                         project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         meta = NOTIFICATION['payload'].copy()
@@ -481,7 +481,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.resource_id",
                         project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual(5.0, s1['volume'])
@@ -498,7 +498,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         metadata={'proj': '$.payload.project_id',
                                   'dict': '$.payload.resource_metadata'})]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         meta = {'proj': s1['project_id'],
@@ -516,7 +516,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.project_id",
                         user_metadata="$.payload.metadata",)]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(USER_META))
+        c = list(self.handler.build_sample(USER_META))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         meta = {'user_metadata': {'xyz': 'abc'}}
@@ -534,7 +534,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         user_metadata="$.payload.metadata",
                         metadata={'proj': '$.payload.project_id'})]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(USER_META))
+        c = list(self.handler.build_sample(USER_META))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         meta = {'user_metadata': {'xyz': 'abc'}, 'proj': s1['project_id']}
@@ -557,7 +557,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(2, len(c))
 
     def test_multi_meter_payload(self):
@@ -571,7 +571,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "volume", "unit"])]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(MIDDLEWARE_EVENT))
+        c = list(self.handler.build_sample(MIDDLEWARE_EVENT))
         self.assertEqual(2, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('storage.objects.outgoing.bytes', s1['name'])
@@ -595,7 +595,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "unit"])]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(event))
+        c = list(self.handler.build_sample(event))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('storage.objects.outgoing.bytes', s1['name'])
@@ -615,7 +615,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.initiator.project_id",
                         lookup="name")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(event))
+        c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
 
     def test_multi_meter_payload_all_multi(self):
@@ -631,7 +631,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         lookup=['name', 'type', 'unit', 'volume',
                                 'resource_id', 'project_id', 'user_id'])]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(FULL_MULTI_MSG))
+        c = list(self.handler.build_sample(FULL_MULTI_MSG))
         self.assertEqual(2, len(c))
         msg = FULL_MULTI_MSG['payload']
         for idx, val in enumerate(c):
@@ -659,7 +659,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "unit", "volume"])]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(event))
+        c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
         LOG.warning.assert_called_with('Only 0 fetched meters contain '
                                        '"volume" field instead of 2.')
@@ -678,7 +678,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "unit", "volume"])]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(event))
+        c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
         LOG.warning.assert_called_with('Only 1 fetched meters contain '
                                        '"volume" field instead of 2.')
@@ -695,7 +695,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.host + '_'"
                                     " + $.payload.nodename")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(METRICS_UPDATE))
+        c = list(self.handler.build_sample(METRICS_UPDATE))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('compute.node.cpu.percent', s1['name'])
@@ -714,7 +714,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.host + '_'"
                                     " + $.payload.nodename")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(METRICS_UPDATE))
+        c = list(self.handler.build_sample(METRICS_UPDATE))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('compute.node.cpu.frequency', s1['name'])
@@ -732,7 +732,7 @@ class TestMeterProcessing(test.BaseTestCase):
                                ".value",
                         resource_id="'prefix-' + $.payload.nodename")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(METRICS_UPDATE))
+        c = list(self.handler.build_sample(METRICS_UPDATE))
         self.assertEqual(1, len(c))
         s1 = c[0].as_dict()
         self.assertEqual('compute.node.cpu.frequency', s1['name'])
@@ -757,7 +757,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file(cfg)
-        c = list(self.handler.process_notification(NOTIFICATION))
+        c = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(c))
 
     def test_multi_files_multi_meters(self):
@@ -778,7 +778,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file([cfg1, cfg2])
-        data = list(self.handler.process_notification(NOTIFICATION))
+        data = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(2, len(data))
         expected_names = ['test1', 'test2']
         for s in data:
@@ -802,7 +802,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file([cfg1, cfg2])
-        data = list(self.handler.process_notification(NOTIFICATION))
+        data = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(data))
         self.assertEqual(data[0].as_dict()['name'], 'test')
 
@@ -828,7 +828,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              project_id="$.payload.initiator.project_id",
                              lookup="name")]})
         self._load_meter_def_file([cfg1, cfg2])
-        data = list(self.handler.process_notification(event))
+        data = list(self.handler.build_sample(event))
         self.assertEqual(0, len(data))
 
     def test_multi_files_unmatched_meter(self):
@@ -849,7 +849,7 @@ class TestMeterProcessing(test.BaseTestCase):
                         resource_id="$.payload.resource_id",
                         project_id="$.payload.project_id")]})
         self._load_meter_def_file([cfg1, cfg2])
-        data = list(self.handler.process_notification(NOTIFICATION))
+        data = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(1, len(data))
         self.assertEqual(data[0].as_dict()['name'], 'test1')
 
@@ -877,7 +877,7 @@ class TestMeterProcessing(test.BaseTestCase):
                              resource_id="$.payload.resource_id",
                              project_id="$.payload.project_id")]})
         self._load_meter_def_file([cfg1, cfg2])
-        data = list(self.handler.process_notification(NOTIFICATION))
+        data = list(self.handler.build_sample(NOTIFICATION))
         self.assertEqual(2, len(data))
         expected_names = ['test1', 'test2']
         for s in data:

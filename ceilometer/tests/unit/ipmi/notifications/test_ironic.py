@@ -40,7 +40,7 @@ class TestNotifications(base.BaseTestCase):
         """
         processor = ipmi.TemperatureSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
-                         processor.process_notification(
+                         processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
 
         self.assertEqual(10, len(counters),
@@ -66,7 +66,7 @@ class TestNotifications(base.BaseTestCase):
         """
         processor = ipmi.CurrentSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
-                         processor.process_notification(
+                         processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
 
         self.assertEqual(1, len(counters), 'expected 1 current reading')
@@ -87,7 +87,7 @@ class TestNotifications(base.BaseTestCase):
         """
         processor = ipmi.FanSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
-                         processor.process_notification(
+                         processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
 
         self.assertEqual(12, len(counters), 'expected 12 fan readings')
@@ -108,7 +108,7 @@ class TestNotifications(base.BaseTestCase):
         """
         processor = ipmi.VoltageSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
-                         processor.process_notification(
+                         processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
 
         self.assertEqual(4, len(counters), 'expected 4 volate readings')
@@ -125,7 +125,7 @@ class TestNotifications(base.BaseTestCase):
         """Test that a meter which a disabled volume is skipped."""
         processor = ipmi.TemperatureSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
-                         processor.process_notification(
+                         processor.build_sample(
                              ipmi_test_data.SENSOR_DATA)])
 
         self.assertEqual(10, len(counters),
@@ -140,7 +140,7 @@ class TestNotifications(base.BaseTestCase):
     def test_empty_payload_no_metrics_success(self):
         processor = ipmi.TemperatureSensorNotification(None)
         counters = dict([(counter.resource_id, counter) for counter in
-                         processor.process_notification(
+                         processor.build_sample(
                              ipmi_test_data.EMPTY_PAYLOAD)])
 
         self.assertEqual(0, len(counters), 'expected 0 readings')
@@ -152,7 +152,7 @@ class TestNotifications(base.BaseTestCase):
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
 
-        list(processor.process_notification(ipmi_test_data.MISSING_SENSOR))
+        list(processor.build_sample(ipmi_test_data.MISSING_SENSOR))
 
         self.assertEqual(
             'invalid sensor data for '
@@ -168,7 +168,7 @@ class TestNotifications(base.BaseTestCase):
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
 
-        list(processor.process_notification(ipmi_test_data.BAD_SENSOR))
+        list(processor.build_sample(ipmi_test_data.BAD_SENSOR))
 
         self.assertEqual(
             'invalid sensor data for '
@@ -189,7 +189,7 @@ class TestNotifications(base.BaseTestCase):
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
 
-        list(processor.process_notification(ipmi_test_data.NO_NODE_ID))
+        list(processor.build_sample(ipmi_test_data.NO_NODE_ID))
 
         self.assertEqual(
             'invalid sensor data for missing id: missing key in payload: '
@@ -205,7 +205,7 @@ class TestNotifications(base.BaseTestCase):
         messages = []
         mylog.warning = lambda *args: messages.extend(args)
 
-        list(processor.process_notification(ipmi_test_data.NO_SENSOR_ID))
+        list(processor.build_sample(ipmi_test_data.NO_SENSOR_ID))
 
         self.assertEqual(
             'invalid sensor data for missing id: missing key in payload: '
