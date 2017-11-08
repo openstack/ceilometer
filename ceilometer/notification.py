@@ -175,6 +175,19 @@ class NotificationService(cotyledon.Service):
 
         return event_pipe_manager
 
+    def get_targets(self):
+        """Return a sequence of oslo_messaging.Target
+
+        This sequence is defining the exchange and topics to be connected.
+        """
+        topics = (self.conf.notification_topics
+                  if 'notification_topics' in self.conf
+                  else self.conf.oslo_messaging_notifications.topics)
+        return [oslo_messaging.Target(topic=topic, exchange=exchange)
+                for topic in set(topics)
+                for exchange in
+                set(self.conf.notification.notification_control_exchanges)]
+
     def run(self):
         # Delay startup so workers are jittered
         time.sleep(self.startup_delay)
@@ -236,7 +249,7 @@ class NotificationService(cotyledon.Service):
         endpoints.append(
             event_endpoint.EventEndpoint(event_pipe_manager))
 
-        targets = []
+        targets = self.get_targets()
         for ext in notification_manager:
             handler = ext.obj
             LOG.debug('Event types from %(name)s: %(type)s'
@@ -244,12 +257,6 @@ class NotificationService(cotyledon.Service):
                       {'name': ext.name,
                        'type': ', '.join(handler.event_types),
                        'error': ack_on_error})
-            # NOTE(gordc): this could be a set check but oslo_messaging issue
-            # https://bugs.launchpad.net/oslo.messaging/+bug/1398511
-            # This ensures we don't create multiple duplicate consumers.
-            for new_tar in handler.get_targets(self.conf):
-                if new_tar not in targets:
-                    targets.append(new_tar)
             endpoints.append(handler)
 
         urls = self.conf.notification.messaging_urls or [None]

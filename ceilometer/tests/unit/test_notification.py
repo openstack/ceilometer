@@ -85,14 +85,6 @@ TEST_NOTICE_PAYLOAD = {
 class _FakeNotificationPlugin(pipeline.NotificationEndpoint):
     event_types = ['fake.event']
 
-    def get_targets(self, conf):
-        return [
-            oslo_messaging.Target(
-                topic=topic,
-                exchange=conf.notification.notification_control_exchanges[0])
-            for topic in self.get_notification_topics(conf)
-        ]
-
     def build_sample(self, message):
         return []
 
@@ -105,6 +97,9 @@ class TestNotification(tests_base.BaseTestCase):
         self.CONF.set_override("backend_url", "zake://", group="coordination")
         self.setup_messaging(self.CONF)
         self.srv = notification.NotificationService(0, self.CONF)
+
+    def test_targets(self):
+        self.assertEqual(15, len(self.srv.get_targets()))
 
     def fake_get_notifications_manager(self, pm):
         self.plugin = _FakeNotificationPlugin(pm)
@@ -153,21 +148,13 @@ class TestNotification(tests_base.BaseTestCase):
 
     @mock.patch('oslo_messaging.get_batch_notification_listener')
     def test_unique_consumers(self, mock_listener):
-
-        def fake_get_notifications_manager_dup_targets(pm):
-            plugin = _FakeNotificationPlugin(pm)
-            return extension.ExtensionManager.make_test_instance(
-                [extension.Extension('test', None, None, plugin),
-                 extension.Extension('test', None, None, plugin)])
-
-        with mock.patch.object(self.srv,
-                               '_get_notifications_manager') as get_nm:
-            get_nm.side_effect = fake_get_notifications_manager_dup_targets
-            self.srv.run()
-            self.addCleanup(self.srv.terminate)
-            # 1 target, 1 listener
-            self.assertEqual(1, len(mock_listener.call_args_list[0][0][1]))
-            self.assertEqual(1, len(self.srv.listeners))
+        self.CONF.set_override('notification_control_exchanges', ['dup'] * 2,
+                               group='notification')
+        self.srv.run()
+        self.addCleanup(self.srv.terminate)
+        # 1 target, 1 listener
+        self.assertEqual(1, len(mock_listener.call_args_list[0][0][1]))
+        self.assertEqual(1, len(self.srv.listeners))
 
 
 class BaseRealNotification(tests_base.BaseTestCase):
