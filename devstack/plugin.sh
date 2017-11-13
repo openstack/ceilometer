@@ -199,7 +199,13 @@ function ceilometer_create_accounts {
 
 function install_gnocchi {
     echo_summary "Installing Gnocchi"
-    pip_install "gnocchi[file,${DATABASE_TYPE},keystone]>=3.1,<4.0"
+    if python3_enabled; then
+        PY_VERS=${PYTHON3_VERSION}
+    else
+        PY_VERS=${PYTHON2_VERSION}
+    fi
+    # workaround for upper-constraints. pandas is uncapped but and numpy is.
+    sudo -H python${PY_VERS} -m pip install -U "gnocchi[file,${DATABASE_TYPE},keystone]>=3.1,<4.0"
     recreate_database gnocchi
     sudo install -d -o $STACK_USER -m 755 $GNOCCHI_CONF_DIR
 
