@@ -222,7 +222,8 @@ class NotificationService(cotyledon.Service):
             self.hashring = self.partition_coordinator.join_partitioned_group(
                 self.NOTIFICATION_NAMESPACE)
 
-            @periodics.periodic(spacing=self.conf.coordination.check_watchers)
+            @periodics.periodic(spacing=self.conf.coordination.check_watchers,
+                                run_immediately=True)
             def run_watchers():
                 self.partition_coordinator.run_watchers()
                 if self.group_state != self.hashring.ring.nodes:
@@ -234,7 +235,6 @@ class NotificationService(cotyledon.Service):
                 futures.ThreadPoolExecutor(max_workers=10))
             self.periodic.add(run_watchers)
             utils.spawn_thread(self.periodic.start)
-            self._refresh_agent()
 
     def _configure_main_queue_listeners(self, pipe_manager,
                                         event_pipe_manager):
