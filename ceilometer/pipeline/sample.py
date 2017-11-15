@@ -11,7 +11,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 from itertools import chain
-from operator import methodcaller
 
 from oslo_log import log
 from stevedore import extension
@@ -81,7 +80,7 @@ class InterimSampleEndpoint(base.NotificationEndpoint):
                 s, self.conf.publisher.telemetry_secret)
         ]
         with self.publisher as p:
-            p(sorted(samples, key=methodcaller('get_iso_timestamp')))
+            p(samples)
 
 
 class SampleSource(base.PipelineSource):
