@@ -13,7 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_config import cfg
 import oslo_messaging
+from oslo_messaging._drivers import impl_rabbit
 from oslo_messaging import serializer as oslo_serializer
 
 DEFAULT_URL = "__default__"
@@ -22,6 +24,19 @@ TRANSPORTS = {}
 
 def setup():
     oslo_messaging.set_transport_defaults('ceilometer')
+    # NOTE(sileht): When batch is not enabled, oslo.messaging read all messages
+    # in the queue and can consume a lot of memory, that works for rpc because
+    # you never have a lot of message, but sucks for notification. The
+    # default is not changeable on oslo.messaging side. And we can't expose
+    # this option to set set_transport_defaults because it a driver option.
+    # 100 allow to prefetch a lot of messages but limit memory to 1G per
+    # workers in worst case (~ 1M Nova notification)
+    # And even driver options are located in private module, this is not going
+    # to break soon.
+    cfg.set_defaults(
+        impl_rabbit.rabbit_opts,
+        rabbit_qos_prefetch_count=100,
+    )
 
 
 def get_transport(conf, url=None, optional=False, cache=True):
