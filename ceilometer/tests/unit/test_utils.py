@@ -111,30 +111,3 @@ class TestUtils(base.BaseTestCase):
         self.assertEqual(utils.hash_of_set(x), utils.hash_of_set(y))
         self.assertNotEqual(utils.hash_of_set(x), utils.hash_of_set(z))
         self.assertNotEqual(utils.hash_of_set(y), utils.hash_of_set(z))
-
-    def test_update_nested(self):
-        original_dict = {'a': 'A',
-                         'b': 'B',
-                         'nested': {'a': 'A',
-                                    'b': 'B',
-                                    'nested': {'a': 'A',
-                                               'b': 'B'
-                                               }
-                                    }
-                         }
-        updates = {'a': 'a',
-                   'nested': {'a': 'nested.a',
-                              'nested': {'a': 'nested.twice.a'}
-                              }
-                   }
-        expected_dict = {'a': 'a',
-                         'b': 'B',
-                         'nested': {'a': 'nested.a',
-                                    'b': 'B',
-                                    'nested': {'a': 'nested.twice.a',
-                                               'b': 'B'
-                                               }
-                                    }
-                         }
-        dict_to_update = utils.update_nested(original_dict, updates)
-        self.assertEqual(dict_to_update, expected_dict)

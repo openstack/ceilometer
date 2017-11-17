@@ -19,7 +19,6 @@
 """Utilities and helper functions."""
 
 import calendar
-import copy
 import datetime
 import decimal
 import threading
@@ -158,21 +157,6 @@ def dict_to_keyval(value, key_base=None):
                     yield key_gen, v
             else:
                 yield key_gen, v
-
-
-def update_nested(original_dict, updates):
-    """Updates the leaf nodes in a nest dict.
-
-     Updates occur without replacing entire sub-dicts.
-    """
-    dict_to_update = copy.deepcopy(original_dict)
-    for key, value in six.iteritems(updates):
-        if isinstance(value, dict):
-            sub_dict = update_nested(dict_to_update.get(key, {}), value)
-            dict_to_update[key] = sub_dict
-        else:
-            dict_to_update[key] = updates[key]
-    return dict_to_update
 
 
 def hash_of_set(s):
