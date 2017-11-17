@@ -22,7 +22,6 @@ from oslo_config import cfg
 from oslo_utils import secretutils
 import six
 
-from ceilometer import utils
 
 OPTS = [
     cfg.StrOpt('telemetry_secret',
@@ -40,6 +39,42 @@ OPTS = [
 ]
 
 
+def decode_unicode(input):
+    """Decode the unicode of the message, and encode it into utf-8."""
+    if isinstance(input, dict):
+        temp = {}
+        # If the input data is a dict, create an equivalent dict with a
+        # predictable insertion order to avoid inconsistencies in the
+        # message signature computation for equivalent payloads modulo
+        # ordering
+        for key, value in sorted(six.iteritems(input)):
+            temp[decode_unicode(key)] = decode_unicode(value)
+        return temp
+    elif isinstance(input, (tuple, list)):
+        # When doing a pair of JSON encode/decode operations to the tuple,
+        # the tuple would become list. So we have to generate the value as
+        # list here.
+        return [decode_unicode(element) for element in input]
+    elif isinstance(input, six.text_type):
+        return input.encode('utf-8')
+    elif six.PY3 and isinstance(input, six.binary_type):
+        return input.decode('utf-8')
+    else:
+        return input
+
+
+def recursive_keypairs(d, separator=':'):
+    """Generator that produces sequence of keypairs for nested dictionaries."""
+    for name, value in sorted(six.iteritems(d)):
+        if isinstance(value, dict):
+            for subname, subvalue in recursive_keypairs(value, separator):
+                yield ('%s%s%s' % (name, separator, subname), subvalue)
+        elif isinstance(value, (tuple, list)):
+            yield name, decode_unicode(value)
+        else:
+            yield name, value
+
+
 def compute_signature(message, secret):
     """Return the signature for a message dictionary."""
     if not secret:
@@ -48,7 +83,7 @@ def compute_signature(message, secret):
     if isinstance(secret, six.text_type):
         secret = secret.encode('utf-8')
     digest_maker = hmac.new(secret, b'', hashlib.sha256)
-    for name, value in utils.recursive_keypairs(message):
+    for name, value in recursive_keypairs(message):
         if name == 'message_signature':
             # Skip any existing signature value, which would not have
             # been part of the original message.

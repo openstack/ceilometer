@@ -22,7 +22,6 @@ import threading
 
 from oslo_concurrency import processutils
 from oslo_config import cfg
-import six
 
 ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
 
@@ -49,42 +48,6 @@ def execute(*cmd, **kwargs):
     if 'run_as_root' in kwargs and 'root_helper' not in kwargs:
         kwargs['root_helper'] = _get_root_helper()
     return processutils.execute(*cmd, **kwargs)
-
-
-def decode_unicode(input):
-    """Decode the unicode of the message, and encode it into utf-8."""
-    if isinstance(input, dict):
-        temp = {}
-        # If the input data is a dict, create an equivalent dict with a
-        # predictable insertion order to avoid inconsistencies in the
-        # message signature computation for equivalent payloads modulo
-        # ordering
-        for key, value in sorted(six.iteritems(input)):
-            temp[decode_unicode(key)] = decode_unicode(value)
-        return temp
-    elif isinstance(input, (tuple, list)):
-        # When doing a pair of JSON encode/decode operations to the tuple,
-        # the tuple would become list. So we have to generate the value as
-        # list here.
-        return [decode_unicode(element) for element in input]
-    elif isinstance(input, six.text_type):
-        return input.encode('utf-8')
-    elif six.PY3 and isinstance(input, six.binary_type):
-        return input.decode('utf-8')
-    else:
-        return input
-
-
-def recursive_keypairs(d, separator=':'):
-    """Generator that produces sequence of keypairs for nested dictionaries."""
-    for name, value in sorted(six.iteritems(d)):
-        if isinstance(value, dict):
-            for subname, subvalue in recursive_keypairs(value, separator):
-                yield ('%s%s%s' % (name, separator, subname), subvalue)
-        elif isinstance(value, (tuple, list)):
-            yield name, decode_unicode(value)
-        else:
-            yield name, value
 
 
 def hash_of_set(s):

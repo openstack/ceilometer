@@ -22,49 +22,6 @@ from ceilometer import utils
 
 class TestUtils(base.BaseTestCase):
 
-    def test_recursive_keypairs(self):
-        data = {'a': 'A', 'b': 'B',
-                'nested': {'a': 'A', 'b': 'B'}}
-        pairs = list(utils.recursive_keypairs(data))
-        self.assertEqual([('a', 'A'), ('b', 'B'),
-                          ('nested:a', 'A'), ('nested:b', 'B')],
-                         pairs)
-
-    def test_recursive_keypairs_with_separator(self):
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'a': 'A',
-                           'b': 'B',
-                           },
-                }
-        separator = '.'
-        pairs = list(utils.recursive_keypairs(data, separator))
-        self.assertEqual([('a', 'A'),
-                          ('b', 'B'),
-                          ('nested.a', 'A'),
-                          ('nested.b', 'B')],
-                         pairs)
-
-    def test_recursive_keypairs_with_list_of_dict(self):
-        small = 1
-        big = 1 << 64
-        expected = [('a', 'A'),
-                    ('b', 'B'),
-                    ('nested:list', [{small: 99, big: 42}])]
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'list': [{small: 99, big: 42}]}}
-        pairs = list(utils.recursive_keypairs(data))
-        self.assertEqual(len(expected), len(pairs))
-        for k, v in pairs:
-            # the keys 1 and 1<<64 cause a hash collision on 64bit platforms
-            if k == 'nested:list':
-                self.assertIn(v,
-                              [[{small: 99, big: 42}],
-                               [{big: 42, small: 99}]])
-            else:
-                self.assertIn((k, v), expected)
-
     def test_hash_of_set(self):
         x = ['a', 'b']
         y = ['a', 'b', 'a']
