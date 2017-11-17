@@ -96,6 +96,22 @@
         - ceilometer-tox-py27-postgresql
         - telemetry-dsvm-integration-ceilometer
         - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only
+        # TripleO jobs that deploy Telemetry.
+        # Note we don't use a project-template here, so it's easier
+        # to disable voting on one specific job if things go wrong.
+        # tripleo-ci-centos-7-scenario00(1|2)-multinode-oooq will only
+        # run on stable/pike while the -container will run in Queens
+        # and beyond.
+        # If you need any support to debug these jobs in case of
+        # failures, please reach us on #tripleo IRC channel.
+        - tripleo-ci-centos-7-scenario001-multinode-oooq:
+            voting: false
+        - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
+            voting: false
+        - tripleo-ci-centos-7-scenario002-multinode-oooq:
+            voting: false
+        - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
+            voting: false
     gate:
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
