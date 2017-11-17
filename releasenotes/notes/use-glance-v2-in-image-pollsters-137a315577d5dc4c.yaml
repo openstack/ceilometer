@@ -5,4 +5,4 @@ features:
 
 upgrade:
   - >
-    The option `glance_page_size' has been removed because it's not actually needed.
+    The option ``glance_page_size`` has been removed because it's not actually needed.
