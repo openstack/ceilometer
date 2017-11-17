@@ -20,7 +20,6 @@ from six.moves.urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opendaylight import client
-from ceilometer import utils
 
 
 LOG = log.getLogger(__name__)
@@ -406,14 +405,36 @@ class OpenDayLightDriver(driver.Driver):
         return _get_int_sample('matchedCount', statistic, resource_id,
                                resource_meta)
 
-    @staticmethod
-    def _iter_flow(extractor, data):
+    def dict_to_keyval(self, value, key_base=None):
+        """Expand a given dict to its corresponding key-value pairs.
+
+        Generated keys are fully qualified, delimited using dot notation.
+        ie. key = 'key.child_key.grandchild_key[0]'
+        """
+        val_iter, key_func = None, None
+        if isinstance(value, dict):
+            val_iter = six.iteritems(value)
+            key_func = lambda k: key_base + '.' + k if key_base else k
+        elif isinstance(value, (tuple, list)):
+            val_iter = enumerate(value)
+            key_func = lambda k: key_base + '[%d]' % k
+
+        if val_iter:
+            for k, v in val_iter:
+                key_gen = key_func(k)
+                if isinstance(v, dict) or isinstance(v, (tuple, list)):
+                    for key_gen, v in self.dict_to_keyval(v, key_gen):
+                        yield key_gen, v
+                else:
+                    yield key_gen, v
+
+    def _iter_flow(self, extractor, data):
         for flow_statistic in data['flow']['flowStatistics']:
             for statistic in flow_statistic['flowStatistic']:
                 resource_meta = {'flow_id': statistic['flow']['id'],
                                  'table_id': statistic['tableId']}
-                for key, value in utils.dict_to_keyval(statistic['flow'],
-                                                       'flow'):
+                for key, value in self.dict_to_keyval(statistic['flow'],
+                                                      'flow'):
                     resource_meta[key.replace('.', '_')] = value
                 yield extractor(statistic,
                                 flow_statistic['node']['id'],
