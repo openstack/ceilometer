@@ -357,8 +357,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self._batching_samples(4, 1)
 
     def _batching_samples(self, expected_samples, call_count):
-        self.useFixture(fixtures.MockPatchObject(manager.utils, 'delayed',
-                                                 side_effect=fakedelayed))
         poll_cfg = {
             'sources': [{
                 'name': 'test_pipeline',
@@ -372,6 +370,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'publishers': ["test"]}]
         }
         self.setup_polling(poll_cfg)
+        self.mgr._delayed = fakedelayed
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
 
         self.mgr.interval_task(polling_task)

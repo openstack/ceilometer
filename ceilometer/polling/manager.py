@@ -18,6 +18,7 @@ import collections
 import itertools
 import logging
 import random
+import time
 import uuid
 
 from concurrent import futures
@@ -362,6 +363,11 @@ class AgentManager(cotyledon.Service):
     def construct_group_id(self, discovery_group_id):
         return '%s-%s' % (self.group_prefix, discovery_group_id)
 
+    @staticmethod
+    def _delayed(delay, target, *args, **kwargs):
+        time.sleep(delay)
+        return target(*args, **kwargs)
+
     def start_polling_tasks(self):
         # set shuffle time before polling task if necessary
         delay_polling_time = random.randint(
@@ -384,7 +390,7 @@ class AgentManager(cotyledon.Service):
             def task(running_task):
                 self.interval_task(running_task)
 
-            utils.spawn_thread(utils.delayed, delay_polling_time,
+            utils.spawn_thread(self._delayed, delay_polling_time,
                                self.polling_periodics.add, task, polling_task)
 
         utils.spawn_thread(self.polling_periodics.start, allow_empty=True)
