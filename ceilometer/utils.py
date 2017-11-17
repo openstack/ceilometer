@@ -18,14 +18,10 @@
 
 """Utilities and helper functions."""
 
-import calendar
-import datetime
-import decimal
 import threading
 
 from oslo_concurrency import processutils
 from oslo_config import cfg
-from oslo_utils import units
 import six
 
 ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
@@ -89,32 +85,6 @@ def recursive_keypairs(d, separator=':'):
             yield name, decode_unicode(value)
         else:
             yield name, value
-
-
-def dt_to_decimal(utc):
-    """Datetime to Decimal.
-
-    Some databases don't store microseconds in datetime
-    so we always store as Decimal unixtime.
-    """
-    if utc is None:
-        return None
-
-    decimal.getcontext().prec = 30
-    return (decimal.Decimal(str(calendar.timegm(utc.utctimetuple()))) +
-            (decimal.Decimal(str(utc.microsecond)) /
-            decimal.Decimal("1000000.0")))
-
-
-def decimal_to_dt(dec):
-    """Return a datetime from Decimal unixtime format."""
-    if dec is None:
-        return None
-
-    integer = int(dec)
-    micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(units.M)
-    date_time = datetime.datetime.utcfromtimestamp(integer)
-    return date_time.replace(microsecond=int(round(micro)))
 
 
 def hash_of_set(s):
