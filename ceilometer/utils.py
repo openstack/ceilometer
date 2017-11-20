@@ -29,7 +29,6 @@ from concurrent import futures
 from futurist import periodics
 from oslo_concurrency import processutils
 from oslo_config import cfg
-from oslo_utils import timeutils
 from oslo_utils import units
 import six
 
@@ -122,18 +121,6 @@ def decimal_to_dt(dec):
     micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(units.M)
     daittyme = datetime.datetime.utcfromtimestamp(integer)
     return daittyme.replace(microsecond=int(round(micro)))
-
-
-def sanitize_timestamp(timestamp):
-    """Return a naive utc datetime object.
-
-    :returns: a timezone unaware timestamp
-    """
-    if not timestamp:
-        return timestamp
-    if not isinstance(timestamp, datetime.datetime):
-        timestamp = timeutils.parse_isotime(timestamp)
-    return timeutils.normalize_time(timestamp)
 
 
 def dict_to_keyval(value, key_base=None):
