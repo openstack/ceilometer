@@ -41,8 +41,6 @@ OPTS = [
                     'use for running commands as root'),
 ]
 
-EPOCH_TIME = datetime.datetime(1970, 1, 1)
-
 
 def _get_root_helper():
     global ROOTWRAP_CONF
