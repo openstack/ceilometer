@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    The notification-agent can now be configured to either build meters or
+    events. By default, the notification agent will continue to load both
+    pipelines and build both data models. To selectively enable a pipeline,
+    configure the `pipelines` option under the `[notification]` section.
+
+    Addition pipelines can be created following the format used by existing
+    pipelines.

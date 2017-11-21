@@ -24,9 +24,10 @@ from futurist import periodics
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
-from stevedore import extension
+from stevedore import named
 from tooz import coordination
 
+from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer import utils
 
@@ -75,7 +76,11 @@ OPTS = [
                deprecated_group='DEFAULT',
                deprecated_name='notification_workers',
                help='Number of workers for notification service, '
-               'default value is 1.')
+               'default value is 1.'),
+    cfg.MultiStrOpt('pipelines',
+                    default=['meter', 'event'],
+                    help="Select which pipeline managers to enable to "
+                    " generate data"),
 ]
 
 
@@ -139,6 +144,9 @@ class NotificationService(cotyledon.Service):
                 for exchange in
                 set(self.conf.notification.notification_control_exchanges)]
 
+    def _log_missing_pipeline(self, names):
+        LOG.error(_('Could not load the following pipelines: %s'), names)
+
     def run(self):
         # Delay startup so workers are jittered
         time.sleep(self.startup_delay)
@@ -146,8 +154,10 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).run()
         self.coord_lock = threading.Lock()
 
-        self.managers = [ext.obj for ext in extension.ExtensionManager(
-            namespace='ceilometer.notification.pipeline', invoke_on_load=True,
+        self.managers = [ext.obj for ext in named.NamedExtensionManager(
+            namespace='ceilometer.notification.pipeline',
+            names=self.conf.notification.pipelines, invoke_on_load=True,
+            on_missing_entrypoints_callback=self._log_missing_pipeline,
             invoke_args=(self.conf,
                          self.conf.notification.workload_partitioning))]
 
