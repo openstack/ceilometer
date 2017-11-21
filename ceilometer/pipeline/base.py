@@ -48,21 +48,19 @@ class PipelineException(agent.ConfigException):
 class InterimPublishContext(object):
     """Publisher to hash/shard data to pipelines"""
 
-    def __init__(self, conf, pipelines):
+    def __init__(self, conf, mgr):
         self.conf = conf
-        self.pipe_notifiers = []
-        transport = messaging.get_transport(conf)
-        for pipe in pipelines:
-            self.pipe_notifiers.append(
-                (pipe, self._get_notifiers(transport, pipe)))
+        self.mgr = mgr
+        self.notifiers = self._get_notifiers(messaging.get_transport(conf))
 
-    def _get_notifiers(self, transport, pipe):
+    def _get_notifiers(self, transport):
         notifiers = []
         for x in range(self.conf.notification.pipeline_processing_queues):
             notifiers.append(oslo_messaging.Notifier(
                 transport,
                 driver=self.conf.publisher_notifier.telemetry_driver,
-                topics=['%s-%s-%s' % (pipe.NOTIFICATION_IPC, pipe.name, x)]))
+                topics=['-'.join(
+                    [self.mgr.NOTIFICATION_IPC, self.mgr.pm_type, str(x)])]))
         return notifiers
 
     @staticmethod
@@ -79,15 +77,14 @@ class InterimPublishContext(object):
         def p(data):
             data = [data] if not isinstance(data, list) else data
             for datapoint in data:
-                for pipe, notifiers in self.pipe_notifiers:
+                for pipe in self.mgr.pipelines:
                     if pipe.supported(datapoint):
                         serialized_data = pipe.serializer(datapoint)
                         key = (self.hash_grouping(serialized_data,
                                                   pipe.get_grouping_key())
-                               % len(notifiers))
-                        notifier = notifiers[key]
-                        notifier.sample({}, event_type=pipe.name,
-                                        payload=[serialized_data])
+                               % len(self.notifiers))
+                        self.notifiers[key].sample({}, event_type=pipe.name,
+                                                   payload=[serialized_data])
         return p
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -221,8 +218,6 @@ class Sink(object):
 class Pipeline(object):
     """Represents a coupling between a sink and a corresponding source."""
 
-    NOTIFICATION_IPC = 'ceilometer-pipe'
-
     def __init__(self, conf, source, sink):
         self.conf = conf
         self.source = source
@@ -283,6 +278,8 @@ class PipelineManager(agent.ConfigManagerBase):
 
     Pipeline manager sets up pipelines according to config file
     """
+
+    NOTIFICATION_IPC = 'ceilometer_ipc'
 
     def __init__(self, conf, cfg_file, transformer_manager, partition):
         """Setup the pipelines according to config.
@@ -408,7 +405,7 @@ class PipelineManager(agent.ConfigManagerBase):
 
     def interim_publisher(self):
         """Build publishing context for IPC."""
-        return InterimPublishContext(self.conf, self.pipelines)
+        return InterimPublishContext(self.conf, self)
 
     def get_main_publisher(self):
         """Return the publishing context to use"""
