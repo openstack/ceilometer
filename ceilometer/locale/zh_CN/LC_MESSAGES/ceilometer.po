@@ -15,9 +15,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev111\n"
+"Project-Id-Version: ceilometer 9.0.1.dev161\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-11-01 22:34+0000\n"
+"POT-Creation-Date: 2017-11-21 04:18+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -58,10 +58,6 @@ msgid ""
 "is SHUTOFF."
 msgstr ""
 "为虚拟机<name=%(name)s, id=%(id)s>获取监控数据失败了，虚拟机状态为SHUTOFF"
-
-#, python-format
-msgid "Failed to load any notification handlers for %s"
-msgstr "无法为%s加载任何通知处理器"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"

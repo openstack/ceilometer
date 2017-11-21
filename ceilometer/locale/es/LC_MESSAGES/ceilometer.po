@@ -7,9 +7,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev111\n"
+"Project-Id-Version: ceilometer 9.0.1.dev161\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-11-01 22:34+0000\n"
+"POT-Creation-Date: 2017-11-21 04:18+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -53,10 +53,6 @@ msgid ""
 msgstr ""
 "No se han podido analizar los datos de la instancia <name=%(name)s, id="
 "%(id)s>, el estado del dominio es SHUTOFF."
-
-#, python-format
-msgid "Failed to load any notification handlers for %s"
-msgstr "No se ha podido cargar ningún manejador de notificación para %s"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
