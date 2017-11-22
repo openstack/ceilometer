@@ -107,7 +107,7 @@ class Resources(object):
         if self._resources:
             static_resources_group = self.agent_manager.construct_group_id(
                 utils.hash_of_set(self._resources))
-            if self.agent_manager.hashrings:
+            if self.agent_manager.partition_coordinator:
                 return [v for v in self._resources if
                         self.agent_manager.hashrings[
                             static_resources_group].belongs_to_self(
@@ -280,14 +280,13 @@ class AgentManager(cotyledon.Service):
         self.discoveries = list(itertools.chain(*list(discoveries)))
         self.polling_periodics = None
 
+        self.hashrings = None
+        self.partition_coordinator = None
         if self.conf.coordination.backend_url:
             # XXX uuid4().bytes ought to work, but it requires ascii for now
             coordination_id = str(uuid.uuid4()).encode('ascii')
             self.partition_coordinator = coordination.get_coordinator(
                 self.conf.coordination.backend_url, coordination_id)
-            self.hashrings = None
-        else:
-            self.partition_coordinator = None
 
         # Compose coordination group prefix.
         # We'll use namespaces as the basement for this partitioning.
