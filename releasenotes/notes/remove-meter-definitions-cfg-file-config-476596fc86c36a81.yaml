@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Remove deprecated option meter_definitions_cfg_file, use
+    meter_definitions_dirs to configure meter notification file.
