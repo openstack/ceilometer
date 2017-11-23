@@ -201,7 +201,11 @@ class PublisherTest(base.BaseTestCase):
             resource, "low", plugin_manager)
         operation = rd.event_match("image.delete")
         self.assertEqual('delete', operation)
-        self.assertEqual(True, rd.metric_match('image'))
+
+    def test_metric_match(self):
+        pub = gnocchi.GnocchiPublisher(self.conf.conf,
+                                       netutils.urlsplit("gnocchi://"))
+        self.assertIn('image.size', pub.metric_map['image.size'].metrics)
 
     @mock.patch('ceilometer.publisher.gnocchi.LOG')
     def test_broken_config_load(self, mylog):
