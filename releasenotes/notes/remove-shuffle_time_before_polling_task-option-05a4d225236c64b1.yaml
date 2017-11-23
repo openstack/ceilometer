@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    The `shuffle_time_before_polling_task` option has been removed. This option
+    never worked in the way it was originally intended too.
