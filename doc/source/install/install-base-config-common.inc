@@ -1,5 +1,5 @@
 2. Edit the ``/etc/ceilometer/pipeline.yaml`` file and complete
-   the following actions:
+   the following section:
 
    * Configure Gnocchi connection:
 
@@ -10,6 +10,9 @@
             # + filter out Gnocchi-related activity meters (Swift driver)
             # + set default archive policy
             - gnocchi://?filter_project=service&archive_policy=low
+
+3. Edit the ``/etc/ceilometer/ceilometer.conf`` file and complete
+   the following actions:
 
    * In the ``[DEFAULT]`` section,
      configure ``RabbitMQ`` message queue access:
@@ -42,7 +45,7 @@
      Replace ``CEILOMETER_PASS`` with the password you chose for
      the ``ceilometer`` user in the Identity service.
 
-3. Create Ceilometer resources in Gnocchi. Gnocchi should be running by this
+4. Create Ceilometer resources in Gnocchi. Gnocchi should be running by this
    stage:
 
    .. code-block:: console
