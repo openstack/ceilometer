@@ -48,11 +48,12 @@ OPTS = [
                 help='To reduce polling agent load, samples are sent to the '
                      'notification agent in a batch. To gain higher '
                      'throughput at the cost of load set this to False.'),
-    cfg.IntOpt('shuffle_time_before_polling_task',
-               default=0,
-               help='To reduce large requests at same time to Nova or other '
-                    'components from different compute agents, shuffle '
-                    'start time of polling task.'),
+    cfg.FloatOpt('shuffle_time_before_polling_task',
+                 min=0,
+                 default=0,
+                 help='To reduce large requests at same time to Nova or other '
+                 'components from different compute agents, shuffle '
+                 'start time of polling task.'),
 ]
 
 POLLING_OPTS = [
