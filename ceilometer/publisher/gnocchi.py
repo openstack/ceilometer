@@ -123,8 +123,9 @@ class ResourcesDefinition(object):
 
     def sample_attributes(self, sample):
         attrs = {}
+        sample_dict = sample.as_dict()
         for name, definition in self._attributes.items():
-            value = definition.parse(sample.as_dict())
+            value = definition.parse(sample_dict)
             if value is not None:
                 attrs[name] = value
         return attrs
