@@ -50,7 +50,7 @@ OPTS = [
                      'throughput at the cost of load set this to False.'),
     cfg.FloatOpt('shuffle_time_before_polling_task',
                  min=0,
-                 default=0,
+                 default=10,
                  help='To reduce large requests at same time to Nova or other '
                  'components from different compute agents, shuffle '
                  'start time of polling task.'),
@@ -379,13 +379,12 @@ class AgentManager(cotyledon.Service):
             futures.ThreadPoolExecutor(max_workers=len(data)))
 
         for interval, polling_task in data.items():
-            delay_time = interval + delay_polling_time
 
-            @periodics.periodic(spacing=interval, run_immediately=False)
+            @periodics.periodic(spacing=interval, run_immediately=True)
             def task(running_task):
                 self.interval_task(running_task)
 
-            utils.spawn_thread(utils.delayed, delay_time,
+            utils.spawn_thread(utils.delayed, delay_polling_time,
                                self.polling_periodics.add, task, polling_task)
 
         utils.spawn_thread(self.polling_periodics.start, allow_empty=True)
