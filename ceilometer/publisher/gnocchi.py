@@ -311,8 +311,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                                     metric_name)
                         self._already_logged_metric_names.add(metric_name)
                     continue
-                if rd.cfg.get("ignore"):
-                    continue
 
                 if resource_id not in gnocchi_data:
                     gnocchi_data[resource_id] = {
