@@ -25,8 +25,6 @@ import decimal
 import threading
 import time
 
-from concurrent import futures
-from futurist import periodics
 from oslo_concurrency import processutils
 from oslo_config import cfg
 from oslo_utils import units
@@ -183,12 +181,3 @@ def spawn_thread(target, *args, **kwargs):
     t.daemon = True
     t.start()
     return t
-
-
-def create_periodic(target, spacing, run_immediately=True, *args, **kwargs):
-    p = periodics.PeriodicWorker.create(
-        [], executor_factory=lambda: futures.ThreadPoolExecutor(max_workers=1))
-    p.add(periodics.periodic(
-        spacing=spacing, run_immediately=run_immediately)(
-            lambda: target(*args, **kwargs)))
-    return p
