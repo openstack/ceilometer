@@ -17,6 +17,7 @@
 import collections
 import itertools
 import logging
+import random
 import uuid
 
 from concurrent import futures
@@ -108,6 +109,13 @@ class Resources(object):
         return '%s-%s' % (source_name, pollster.name)
 
 
+def iter_random(iterable):
+    """Iter over iterable in a random fashion."""
+    lst = list(iterable)
+    random.shuffle(lst)
+    return iter(lst)
+
+
 class PollingTask(object):
     """Polling task for polling samples and notifying.
 
@@ -139,8 +147,9 @@ class PollingTask(object):
         cache = {}
         discovery_cache = {}
         poll_history = {}
-        for source_name in self.pollster_matches:
-            for pollster in self.pollster_matches[source_name]:
+        for source_name, pollsters in iter_random(
+                self.pollster_matches.items()):
+            for pollster in iter_random(pollsters):
                 key = Resources.key(source_name, pollster)
                 candidate_res = list(
                     self.resources[key].get(discovery_cache))
