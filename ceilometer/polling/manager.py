@@ -335,10 +335,6 @@ class AgentManager(cotyledon.Service):
             (group, self.partition_coordinator.join_partitioned_group(group))
             for group in groups)
 
-    def create_polling_task(self):
-        """Create an initially empty polling task."""
-        return PollingTask(self)
-
     def setup_polling_tasks(self):
         polling_tasks = {}
         for source in self.polling_manager.sources:
@@ -347,7 +343,7 @@ class AgentManager(cotyledon.Service):
                 if source.support_meter(pollster.name):
                     polling_task = polling_tasks.get(source.get_interval())
                     if not polling_task:
-                        polling_task = self.create_polling_task()
+                        polling_task = PollingTask(self)
                         polling_tasks[source.get_interval()] = polling_task
                     polling_task.add(pollster, source)
         return polling_tasks
