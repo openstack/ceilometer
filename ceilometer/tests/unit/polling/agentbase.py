@@ -341,14 +341,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.addCleanup(mgr.terminate)
         mgr.create_polling_task.assert_called_once_with()
 
-    def test_manager_exception_persistency(self):
-        self.polling_cfg['sources'].append({
-            'name': 'test_polling_1',
-            'interval': 60,
-            'meters': ['testanother'],
-        })
-        self.setup_polling()
-
     def _verify_discovery_params(self, expected):
         self.assertEqual(expected, self.Discovery.params)
         self.assertEqual(expected, self.DiscoveryAnother.params)
