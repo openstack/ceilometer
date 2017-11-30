@@ -231,10 +231,6 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                                              self.CONF), )])
         return exts
 
-    def _build_and_set_new_polling(self):
-        name = self.cfg2file(self.poll_cfg)
-        self.CONF.set_override('cfg_file', name, group='polling')
-
     def test_get_sample_resources(self):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
@@ -245,7 +241,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.useFixture(fixtures.MockPatch(
             'keystoneclient.v2_0.client.Client',
             side_effect=ka_exceptions.ClientException))
-        self.poll_cfg = {
+        poll_cfg = {
             'sources': [{
                 'name': "test_keystone",
                 'interval': 10,
@@ -257,8 +253,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self._build_and_set_new_polling()
-        self.mgr.polling_manager = manager.PollingManager(self.CONF)
+        self.setup_polling(poll_cfg)
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
@@ -290,7 +285,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
         self.mgr.discoveries = (extension.ExtensionManager
                                 .make_test_instance([ext]))
 
-        self.poll_cfg = {
+        poll_cfg = {
             'sources': [{
                 'name': "test_hardware",
                 'interval': 10,
@@ -301,8 +296,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self._build_and_set_new_polling()
-        self.mgr.polling_manager = manager.PollingManager(self.CONF)
+        self.setup_polling(poll_cfg)
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertEqual(1, novalog.exception.call_count)
@@ -312,7 +306,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def test_polling_exception(self, LOG):
         source_name = 'test_pollingexception'
         res_list = ['test://']
-        self.poll_cfg = {
+        poll_cfg = {
             'sources': [{
                 'name': source_name,
                 'interval': 10,
@@ -324,8 +318,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self._build_and_set_new_polling()
-        self.mgr.polling_manager = manager.PollingManager(self.CONF)
+        self.setup_polling(poll_cfg)
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches[source_name])[0]
 
@@ -343,7 +336,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     @mock.patch('ceilometer.polling.manager.LOG')
     def test_polling_novalike_exception(self, LOG):
         source_name = 'test_pollingexception'
-        self.poll_cfg = {
+        poll_cfg = {
             'sources': [{
                 'name': source_name,
                 'interval': 10,
@@ -354,8 +347,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self._build_and_set_new_polling()
-        self.mgr.polling_manager = manager.PollingManager(self.CONF)
+        self.setup_polling(poll_cfg)
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches[source_name])[0]
 
@@ -386,7 +378,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     def _batching_samples(self, expected_samples, call_count):
         self.useFixture(fixtures.MockPatchObject(manager.utils, 'delayed',
                                                  side_effect=fakedelayed))
-        self.poll_cfg = {
+        poll_cfg = {
             'sources': [{
                 'name': 'test_pipeline',
                 'interval': 1,
@@ -398,8 +390,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
                 'transformers': [],
                 'publishers': ["test"]}]
         }
-        self._build_and_set_new_polling()
-        self.mgr.polling_manager = manager.PollingManager(self.CONF)
+        self.setup_polling(poll_cfg)
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
 
         self.mgr.interval_task(polling_task)
