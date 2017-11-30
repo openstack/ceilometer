@@ -144,6 +144,14 @@ class Sample(object):
     def get_iso_timestamp(self):
         return timeutils.parse_isotime(self.timestamp)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 def setup(conf):
     # NOTE(sileht): Instead of passing the cfg.CONF everywhere in ceilometer

@@ -23,6 +23,7 @@ from ceilometer.compute import discovery as nova_discover
 from ceilometer.hardware import discovery
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
+from ceilometer import sample
 from ceilometer import service
 from ceilometer.tests.unit.polling import agentbase
 
@@ -166,7 +167,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     class PollsterKeystone(TestPollsterKeystone):
         samples = []
         resources = []
-        test_data = agentbase.TestSample(
+        test_data = sample.Sample(
             name='testkeystone',
             type=agentbase.default_test_data.type,
             unit=agentbase.default_test_data.unit,
@@ -180,7 +181,7 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     class PollsterPollingException(TestPollsterPollingException):
         samples = []
         resources = []
-        test_data = agentbase.TestSample(
+        test_data = sample.Sample(
             name='testpollingexception',
             type=agentbase.default_test_data.type,
             unit=agentbase.default_test_data.unit,
