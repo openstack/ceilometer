@@ -23,7 +23,6 @@ from ceilometer.compute import discovery as nova_discover
 from ceilometer.hardware import discovery
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
-from ceilometer import sample
 from ceilometer import service
 from ceilometer.tests.unit.polling import agentbase
 
@@ -167,30 +166,12 @@ class TestRunTasks(agentbase.BaseAgentManagerTestCase):
     class PollsterKeystone(TestPollsterKeystone):
         samples = []
         resources = []
-        test_data = sample.Sample(
-            name='testkeystone',
-            type=agentbase.default_test_data.type,
-            unit=agentbase.default_test_data.unit,
-            volume=agentbase.default_test_data.volume,
-            user_id=agentbase.default_test_data.user_id,
-            project_id=agentbase.default_test_data.project_id,
-            resource_id=agentbase.default_test_data.resource_id,
-            timestamp=agentbase.default_test_data.timestamp,
-            resource_metadata=agentbase.default_test_data.resource_metadata)
+        test_data = agentbase.default_test_data('testkeystone')
 
     class PollsterPollingException(TestPollsterPollingException):
         samples = []
         resources = []
-        test_data = sample.Sample(
-            name='testpollingexception',
-            type=agentbase.default_test_data.type,
-            unit=agentbase.default_test_data.unit,
-            volume=agentbase.default_test_data.volume,
-            user_id=agentbase.default_test_data.user_id,
-            project_id=agentbase.default_test_data.project_id,
-            resource_id=agentbase.default_test_data.resource_id,
-            timestamp=agentbase.default_test_data.timestamp,
-            resource_metadata=agentbase.default_test_data.resource_metadata)
+        test_data = agentbase.default_test_data('testpollingexception')
 
     def create_manager(self):
         return manager.AgentManager(0, self.CONF)

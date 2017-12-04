@@ -31,21 +31,21 @@ from ceilometer import service
 from ceilometer.tests import base
 
 
-default_test_data = sample.Sample(
-    name='test',
-    type=sample.TYPE_CUMULATIVE,
-    unit='',
-    volume=1,
-    user_id='test',
-    project_id='test',
-    resource_id='test_run_tasks',
-    timestamp=datetime.datetime.utcnow().isoformat(),
-    resource_metadata={'name': 'Pollster'},
-)
+def default_test_data(name='test'):
+    return sample.Sample(
+        name=name,
+        type=sample.TYPE_CUMULATIVE,
+        unit='',
+        volume=1,
+        user_id='test',
+        project_id='test',
+        resource_id='test_run_tasks',
+        timestamp=datetime.datetime.utcnow().isoformat(),
+        resource_metadata={'name': 'Pollster'})
 
 
 class TestPollster(plugin_base.PollsterBase):
-    test_data = default_test_data
+    test_data = default_test_data()
     discovery = None
 
     @property
@@ -62,7 +62,7 @@ class TestPollster(plugin_base.PollsterBase):
 
 
 class BatchTestPollster(TestPollster):
-    test_data = default_test_data
+    test_data = default_test_data()
     discovery = None
 
     @property
@@ -107,54 +107,27 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     class Pollster(TestPollster):
         samples = []
         resources = []
-        test_data = default_test_data
+        test_data = default_test_data()
 
     class BatchPollster(BatchTestPollster):
         samples = []
         resources = []
-        test_data = default_test_data
+        test_data = default_test_data()
 
     class PollsterAnother(TestPollster):
         samples = []
         resources = []
-        test_data = sample.Sample(
-            name='testanother',
-            type=default_test_data.type,
-            unit=default_test_data.unit,
-            volume=default_test_data.volume,
-            user_id=default_test_data.user_id,
-            project_id=default_test_data.project_id,
-            resource_id=default_test_data.resource_id,
-            timestamp=default_test_data.timestamp,
-            resource_metadata=default_test_data.resource_metadata)
+        test_data = default_test_data('testanother')
 
     class PollsterException(TestPollsterException):
         samples = []
         resources = []
-        test_data = sample.Sample(
-            name='testexception',
-            type=default_test_data.type,
-            unit=default_test_data.unit,
-            volume=default_test_data.volume,
-            user_id=default_test_data.user_id,
-            project_id=default_test_data.project_id,
-            resource_id=default_test_data.resource_id,
-            timestamp=default_test_data.timestamp,
-            resource_metadata=default_test_data.resource_metadata)
+        test_data = default_test_data('testexception')
 
     class PollsterExceptionAnother(TestPollsterException):
         samples = []
         resources = []
-        test_data = sample.Sample(
-            name='testexceptionanother',
-            type=default_test_data.type,
-            unit=default_test_data.unit,
-            volume=default_test_data.volume,
-            user_id=default_test_data.user_id,
-            project_id=default_test_data.project_id,
-            resource_id=default_test_data.resource_id,
-            timestamp=default_test_data.timestamp,
-            resource_metadata=default_test_data.resource_metadata)
+        test_data = default_test_data('testexceptionanother')
 
     class Discovery(TestDiscovery):
         params = []
