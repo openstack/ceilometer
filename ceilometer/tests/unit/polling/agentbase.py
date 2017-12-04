@@ -81,14 +81,6 @@ class BatchTestPollster(TestPollster):
             yield c
 
 
-class TestPollsterException(TestPollster):
-    def get_samples(self, manager, cache, resources):
-        resources = resources or []
-        self.samples.append((manager, resources))
-        self.resources.extend(resources)
-        raise Exception()
-
-
 class TestDiscovery(plugin_base.DiscoveryBase):
     def discover(self, manager, param=None):
         self.params.append(param)
@@ -118,16 +110,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         samples = []
         resources = []
         test_data = default_test_data('testanother')
-
-    class PollsterException(TestPollsterException):
-        samples = []
-        resources = []
-        test_data = default_test_data('testexception')
-
-    class PollsterExceptionAnother(TestPollsterException):
-        samples = []
-        resources = []
-        test_data = default_test_data('testexceptionanother')
 
     class Discovery(TestDiscovery):
         params = []
@@ -162,14 +144,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
                                     None,
                                     None,
                                     self.PollsterAnother(self.CONF), ),
-                extension.Extension('testexception',
-                                    None,
-                                    None,
-                                    self.PollsterException(self.CONF), ),
-                extension.Extension('testexceptionanother',
-                                    None,
-                                    None,
-                                    self.PollsterExceptionAnother(self.CONF), )
                 ]
 
     def create_discoveries(self):
@@ -228,14 +202,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
         self.Pollster.discovery = []
         self.PollsterAnother.samples = []
         self.PollsterAnother.discovery = []
-        self.PollsterException.samples = []
-        self.PollsterException.discovery = []
-        self.PollsterExceptionAnother.samples = []
-        self.PollsterExceptionAnother.discovery = []
         self.Pollster.resources = []
         self.PollsterAnother.resources = []
-        self.PollsterException.resources = []
-        self.PollsterExceptionAnother.resources = []
         self.Discovery.params = []
         self.DiscoveryAnother.params = []
         self.DiscoveryException.params = []
