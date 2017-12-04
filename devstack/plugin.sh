@@ -327,24 +327,11 @@ function install_ceilometer {
         _ceilometer_prepare_virt_drivers
     fi
 
-    install_ceilometerclient
-
     case $CEILOMETER_BACKEND in
         gnocchi) extra=gnocchi;;
     esac
     setup_develop $CEILOMETER_DIR $extra
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
-}
-
-# install_ceilometerclient() - Collect source and prepare
-function install_ceilometerclient {
-    if use_library_from_git "python-ceilometerclient"; then
-        git_clone_by_name "python-ceilometerclient"
-        setup_dev_lib "python-ceilometerclient"
-        sudo install -D -m 0644 -o $STACK_USER {${GITDIR["python-ceilometerclient"]}/tools/,/etc/bash_completion.d/}ceilometer.bash_completion
-    else
-        pip_install_gr python-ceilometerclient
-    fi
 }
 
 # start_ceilometer() - Start running processes, including screen
