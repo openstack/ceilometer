@@ -171,8 +171,8 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     class DiscoveryException(TestDiscoveryException):
         params = []
 
-    def setup_polling(self):
-        name = self.cfg2file(self.polling_cfg)
+    def setup_polling(self, poll_cfg=None):
+        name = self.cfg2file(poll_cfg or self.polling_cfg)
         self.CONF.set_override('cfg_file', name, group='polling')
         self.mgr.polling_manager = poll_manager.PollingManager(self.CONF)
 
