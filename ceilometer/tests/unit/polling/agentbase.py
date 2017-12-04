@@ -31,24 +31,7 @@ from ceilometer import service
 from ceilometer.tests import base
 
 
-class TestSample(sample.Sample):
-    def __init__(self, name, type, unit, volume, user_id, project_id,
-                 resource_id, timestamp=None, resource_metadata=None,
-                 source=None):
-        super(TestSample, self).__init__(name, type, unit, volume, user_id,
-                                         project_id, resource_id, timestamp,
-                                         resource_metadata, source)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.__dict__ == other.__dict__
-        return False
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-
-default_test_data = TestSample(
+default_test_data = sample.Sample(
     name='test',
     type=sample.TYPE_CUMULATIVE,
     unit='',
@@ -134,7 +117,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     class PollsterAnother(TestPollster):
         samples = []
         resources = []
-        test_data = TestSample(
+        test_data = sample.Sample(
             name='testanother',
             type=default_test_data.type,
             unit=default_test_data.unit,
@@ -148,7 +131,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     class PollsterException(TestPollsterException):
         samples = []
         resources = []
-        test_data = TestSample(
+        test_data = sample.Sample(
             name='testexception',
             type=default_test_data.type,
             unit=default_test_data.unit,
@@ -162,7 +145,7 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
     class PollsterExceptionAnother(TestPollsterException):
         samples = []
         resources = []
-        test_data = TestSample(
+        test_data = sample.Sample(
             name='testexceptionanother',
             type=default_test_data.type,
             unit=default_test_data.unit,
@@ -258,7 +241,6 @@ class BaseAgentManagerTestCase(base.BaseTestCase):
 
         self.mgr.hashrings = mock.MagicMock()
         self.mgr.hashrings.__getitem__.return_value = self.hashring
-        self.mgr.tg = mock.MagicMock()
         self.polling_cfg = {
             'sources': [{
                 'name': 'test_polling',
