@@ -16,13 +16,20 @@
 from oslo_config import cfg
 
 
-service_option = cfg.BoolOpt('ceilometer',
-                             default=True,
-                             help="Whether or not Ceilometer is expected to be"
-                                  "available")
+service_option = [cfg.BoolOpt('ceilometer',
+                              default=True,
+                              help="Whether or not Ceilometer is expected to"
+                                   "be available"),
+                  cfg.BoolOpt('panko',
+                              default=True,
+                              help="Whether or not Panko is expected to be"
+                                   "available")]
 
 telemetry_group = cfg.OptGroup(name='telemetry',
                                title='Telemetry Service Options')
+
+event_group = cfg.OptGroup(name='event',
+                           title='Event Service Options')
 
 TelemetryGroup = [
     cfg.IntOpt('notification_wait',
@@ -38,4 +45,15 @@ TelemetryGroup = [
                help="Granularity to use for aodh alarms. This must match the "
                     "configured Gnocchi archive policy")
 
+]
+
+event_opts = [
+    cfg.StrOpt('catalog_type',
+               default='event',
+               help="Catalog type of the Event service."),
+    cfg.StrOpt('endpoint_type',
+               default='publicURL',
+               choices=['public', 'admin', 'internal',
+                        'publicURL', 'adminURL', 'internalURL'],
+               help="The endpoint type to use for the event service."),
 ]
