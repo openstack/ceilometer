@@ -13,8 +13,6 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-.. _plugins-and-containers:
-
 =======================
  Writing Agent Plugins
 =======================
@@ -23,122 +21,8 @@ This documentation gives you some clues on how to write a new agent or
 plugin for Ceilometer if you wish to instrument a measurement which
 has not yet been covered by an existing plugin.
 
-Agents
-~~~~~~
-
-Polling agent might be run either on central cloud management nodes or on the
-compute nodes (where direct hypervisor polling is quite logical).
-
-The agent running on each compute node polls for compute resources
-usage. Each meter collected is tagged with the resource ID (such as
-an instance) and the owner, including tenant and user IDs. The meters
-are then reported to the notification agent via the message bus. More detailed
-information follows.
-
-The agent running on the cloud central management node polls other types of
-resources from a management server (usually using OpenStack services API to
-collect this data).
-
-The polling agent is implemented in :file:`ceilometer/agent/manager.py`. As
-you will see in the manager, the agent loads all plugins defined in
-the namespace ``ceilometer.poll.agent``, then periodically calls their
-:func:`get_samples` method.
-
-Plugins
-~~~~~~~
-
-A polling agent can support multiple plugins to retrieve different
-information and send them to the notification agent. As stated above, an agent
-will automatically activate all possible plugins if no additional information
-about what to poll was passed. Previously we had separated compute and
-central agents with different namespaces with plugins (pollsters) defined
-within. Currently we keep separated namespaces - ``ceilometer.poll.compute``
-and ``ceilometer.poll.central`` for quick separation of what to poll depending
-on where is polling agent running.  This will load, among others, the
-:class:`ceilometer.compute.pollsters.cpu.CPUPollster`, which is defined in
-the folder ``ceilometer/compute/pollsters``.
-
-Notifications mechanism uses plugins as well, though in most cases, this is not
-needed. A meter definition can be directly added to
-:file:`ceilometer/data/meters.d/meters.yaml` to match the event type. For more
-information, see the :ref:`meter_definitions` page.
-
-We are using these two existing plugins as examples as the first one provides
-an example of how to interact when you need to retrieve information from an
-external system (pollster) and the second one is an example of how to forward
-an existing event notification on the standard OpenStack queue to ceilometer.
-
-Pollster
---------
-
-Compute plugins are defined as subclasses of the
-:class:`ceilometer.compute.pollsters.BaseComputePollster` class as defined in
-the :file:`ceilometer/compute/pollsters/__init__.py` file. Pollsters must
-implement one method: ``get_samples(self, manager, cache, resources)``, which
-returns a sequence of ``Sample`` objects as defined in the
-:file:`ceilometer/sample.py` file.
-
-In the ``CPUPollster`` plugin, the ``get_samples`` method is implemented as a
-loop which, for each instances running on the local host, retrieves the
-cpu_time from the hypervisor and sends back two ``Sample`` objects.  The first
-one, named ``cpu``, is of type "cumulative", meaning that between two polls,
-its value is not reset while the instance remains active, or in other words
-that the CPU value is always provided as a duration that continuously increases
-since the creation of the instance. The second one, named ``cpu_util``, is of
-type "gauge", meaning that its value is the percentage of cpu utilization.
-
-Note that the ``LOG`` method is only used as a debugging tool and does not
-participate in the actual metering activity.
-
-There is the way to specify either namespace(s) with pollsters or just
-list of concrete pollsters to use, or even both of these parameters on the
-polling agent start via CLI parameter::
-
-    ceilometer-polling --polling-namespaces central compute
-
-This command will basically make polling agent to load all plugins from the
-central and compute namespaces and poll everything it can.
-
-If both of these options are passed, the polling agent will load only those
-pollsters specified in the pollster list, that can be loaded from the selected
-namespaces.
-
-Notifications
--------------
-
-.. note::
-   This should only be needed for cases where a complex arithmetic or
-   non-primitive data types are used. In most cases, adding a meter
-   definition to the :file:`ceilometer/data/meters.d/meters.yaml` should
-   suffice.
-
-Notifications are defined as subclass of the
-:class:`ceilometer.notification.NotificationEndpoint` meta class.
-Notifications must implement:
-
-``event_types``
-   A sequence of strings defining the event types to be given to the plugin
-
-``process_notifications(self, priority, message)``
-   Receives an event message from the list provided to ``event_types`` and
-   returns a sequence of objects. Using the SampleEndpoint, it should yield
-   ``Sample`` objects as defined in the :file:`ceilometer/sample.py` file.
-
-In the ``InstanceNotifications`` plugin, it listens to three events:
-
-* compute.instance.create.end
-
-* compute.instance.exists
-
-* compute.instance.delete.start
-
-Using the ``get_event_type`` method and subsequently the method
-``process_notification`` will be invoked each time such events are happening
-which generates the appropriate sample objects to be sent to the publisher
-targets.
-
-Adding new plugins
-------------------
+Plugin Framework
+================
 
 Although we have described a list of the meters Ceilometer should
 collect, we cannot predict all of the ways deployers will want to
@@ -161,13 +45,77 @@ example, the plugin for polling libvirt does not run if it sees that the system
 is configured using some other virtualization tool). Additionally, if no
 valid resources can be discovered the plugin will be disabled.
 
+Polling Agents
+==============
 
-Tests
-~~~~~
+The polling agent is implemented in :file:`ceilometer/polling/manager.py`. As
+you will see in the manager, the agent loads all plugins defined in
+the ``ceilometer.poll.*`` and ``ceilometer.builder.poll.*`` namespaces, then
+periodically calls their :func:`get_samples` method.
 
-Any new plugin or agent contribution will only be accepted into the project if
-provided together with unit tests.  Those are defined for the compute agent
-plugins in the directory ``tests/unit/compute`` and for the agent itself in
-``tests/unit/agent``. Unit tests are run in a continuous integration process
-for each commit made to the project, thus ensuring as best as possible that
-a given patch has no side effect to the rest of the project.
+Currently we keep separate namespaces - ``ceilometer.poll.compute``
+and ``ceilometer.poll.central`` for quick separation of what to poll depending
+on where is polling agent running. For example, this will load, among others,
+the :class:`ceilometer.compute.pollsters.cpu.CPUPollster`
+
+Pollster
+--------
+
+All pollsters are subclasses of
+:class:`ceilometer.polling.plugin_base.PollsterBase` class. Pollsters must
+implement one method: ``get_samples(self, manager, cache, resources)``, which
+returns a sequence of ``Sample`` objects as defined in the
+:file:`ceilometer/sample.py` file.
+
+Compute plugins are defined as subclasses of the
+:class:`ceilometer.compute.pollsters.BaseComputePollster` class as defined in
+the :file:`ceilometer/compute/pollsters/__init__.py` file.
+
+For example, in the ``CPUPollster`` plugin, the ``get_samples`` method takes
+in a given list of resources representating instances on the local host, loops
+through them and retrieves the `cputime` details from resource. Similarly,
+other metrics are built by pulling the appropriate value from the given list
+of resources.
+
+Notifications
+=============
+
+Notifications in OpenStack are consumed by the notification agent and passed
+through `pipelines` to be normalised and re-published to specified targets.
+
+The existing normalisation pipelines are defined in the namespace
+``ceilometer.notification.pipeline``.
+
+Each normalisation pipeline are defined as subclass of
+:class:`ceilometer.pipeline.base.PipelineManager` which interprets and builds
+pipelines based on a given configuration file. Pipelines are required to define
+`Source` and `Sink` permutations to describe how to process notification.
+Additionally, it must set ``get_main_endpoints`` which provides endpoints to be
+added to the main queue listener in the notification agent. This main queue
+endpoint inherits :class:`ceilometer.pipeline.base.MainNotificationEndpoint`
+and is defines which notification priorites to listen, normalises the data,
+and redirects the data for pipeline processing or requeuing depending on
+`workload_partitioning` configuration.
+
+If a pipeline is configured to support `workload_partitioning`, data from the
+main queue endpoints are sharded and requeued in internal queues. The
+notification agent configures a second notification consumer to handle these
+internal queues and pushes data to endpoints defined by
+``get_interim_endpoints`` in the pipeline manager. These interim endpoints
+define how to handle the sharded, normalised data models for pipeline
+processing
+
+Both main queue and interim queue notification endpoints should implement:
+
+``event_types``
+   A sequence of strings defining the event types the endpoint should handle
+
+``process_notifications(self, priority, message)``
+   Receives an event message from the list provided to ``event_types`` and
+   returns a sequence of objects. Using the SampleEndpoint, it should yield
+   ``Sample`` objects as defined in the :file:`ceilometer/sample.py` file.
+
+Two pipeline configurations exist and can be found under
+``ceilometer.pipeline.*``. The `sample` pipeline loads in multiple endpoints
+defined in ``ceilometer.sample.endpoint`` namespace. Each of the endpoints
+normalises a given notification into different samples.
