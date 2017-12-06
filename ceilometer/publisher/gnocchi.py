@@ -461,8 +461,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
     def _check_resource_cache(self, key, resource_data):
         cached_hash = self.cache.get(key)
-        attribute_hash = hash(frozenset(filter(lambda x: x[0] != "metrics",
-                                               resource_data.items())))
+        attribute_hash = hash(tuple(i for i in resource_data.items()
+                                    if i[0] != 'metrics'))
         if not cached_hash or cached_hash != attribute_hash:
             return attribute_hash
         else:
