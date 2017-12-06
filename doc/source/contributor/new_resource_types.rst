@@ -86,4 +86,4 @@ The following operations are supported:
     to be run to apply the change to Gnocchi.
 
 With accomplishing sections above, don't forget to add a new resource type or attributes of
-a resource type into :the file:`ceilometer/dispatcher/data/gnocchi_resources.yaml`.
+a resource type into the :file:`ceilometer/publisher/data/gnocchi_resources.yaml`.
