@@ -32,5 +32,6 @@ Developer reference
    configuration
    plugins
    new_resource_types
+   devstack
    testing
    gmr
