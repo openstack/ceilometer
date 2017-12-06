@@ -60,15 +60,11 @@ How is data collected?
 The Ceilometer project created 2 methods to collect data:
 
 1. :term:`Notification agent` which takes messages generated on the
-   notification bus and transforms them into Ceilometer samples or events. This
-   is **the preferred method** of data collection. If you are working on some
-   OpenStack related project and are using the Oslo library, you are kindly
-   invited to come and talk to one of the project members to learn how you
-   could quickly add instrumentation for your project.
-2. :term:`Polling agent`, which is the less preferred method, will poll
-   some API or other tool to collect information at a regular interval.
-   The polling approach is less preferred due to the load it can impose
-   on the API services.
+   notification bus and transforms them into Ceilometer samples or events.
+2. :term:`Polling agent`, will poll some API or other tool to collect
+   information at a regular interval. The polling approach may impose
+   significant on the API services so should only be used on optimised
+   endpoints.
 
 The first method is supported by the ceilometer-notification agent, which
 monitors the message queues for notifications. Polling agents can be configured
@@ -174,6 +170,11 @@ of data and if combined with historical or temporal context, can be used to
 derive even more data. Ceilometer offers various transformers which can be used
 to manipulate data in the pipeline.
 
+.. note::
+
+   The equivalent functionality can be handled more stably by storage
+   drivers such as Gnocchi.
+
 Publishing the data
 -------------------
 
@@ -191,10 +192,7 @@ Currently, processed data can be published using 7 different transports:
    which can be consumed by an external system;
 3. udp, which publishes samples using UDP packets;
 4. http, which targets a REST interface;
-5. kafka, which publishes data to a Kafka message queue to be consumed by any system
-   that supports Kafka.
-6. file, which publishes samples to a file with specified name and location;
-7. database, which stores samples to the legacy ceilometer database system.
+5. file, which publishes samples to a file with specified name and location;
 
 
 Storing/Accessing the data
