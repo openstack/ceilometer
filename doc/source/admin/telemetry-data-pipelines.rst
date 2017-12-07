@@ -523,7 +523,6 @@ specified. A sample ``publishers`` section in the
        - udp://10.0.0.2:1234
        - notifier://?policy=drop&max_queue_length=512&topic=custom_target
 
-
 Deprecated publishers
 ---------------------
 
@@ -615,3 +614,32 @@ The level of support differs in case of the configured back end:
      - DB2 NoSQL does not have native TTL
        nor ``ceilometer-expirer`` support.
 
+Pipeline Partitioning
+~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   Partitioning is only required if pipelines contain transformations. It has
+   secondary benefit of supporting batching in certain publishers.
+
+On large workloads, multiple notification agents can be deployed to handle the
+flood of incoming messages from monitored services. If transformations are
+enabled in the pipeline, the notification agents must be coordinated to ensure
+related messages are routed to the same agent. To enable coordination, set the
+``workload_partitioning`` value in ``notification`` section.
+
+To distribute messages across agents, ``pipeline_processing_queues`` option
+should be set. This value defines how many pipeline queues to create which will
+then be distributed to the active notification agents. It is recommended that
+the number of processing queues, at the very least, match the number of agents.
+
+Increasing the number of processing queues will improve the distribution of
+messages across the agents. It will also help batching which minimises the
+requests to Gnocchi storage backend. It will also increase the load the on
+message queue as it uses the queue to shard data.
+
+.. warning::
+
+   Decreasing the number of processing queues may result in lost data as any
+   previously created queues may no longer be assigned to active agents. It
+   is only recommended that you **increase** processing queues.
