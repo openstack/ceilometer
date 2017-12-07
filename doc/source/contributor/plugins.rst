@@ -32,7 +32,7 @@ compute nodes (where direct hypervisor polling is quite logical).
 The agent running on each compute node polls for compute resources
 usage. Each meter collected is tagged with the resource ID (such as
 an instance) and the owner, including tenant and user IDs. The meters
-are then reported to the collector via the message bus. More detailed
+are then reported to the notification agent via the message bus. More detailed
 information follows.
 
 The agent running on the cloud central management node polls other types of
@@ -48,7 +48,7 @@ Plugins
 ~~~~~~~
 
 A polling agent can support multiple plugins to retrieve different
-information and send them to the collector. As stated above, an agent
+information and send them to the notification agent. As stated above, an agent
 will automatically activate all possible plugins if no additional information
 about what to poll was passed. Previously we had separated compute and
 central agents with different namespaces with plugins (pollsters) defined
@@ -134,7 +134,7 @@ In the ``InstanceNotifications`` plugin, it listens to three events:
 
 Using the ``get_event_type`` method and subsequently the method
 ``process_notification`` will be invoked each time such events are happening which
-generates the appropriate sample objects to be sent to the collector.
+generates the appropriate sample objects to be sent to the publisher targets.
 
 Adding new plugins
 ------------------

@@ -24,19 +24,12 @@ ceilometer-agent-notification
     Consumes AMQP messages from other OpenStack services, normalizes messages,
     and publishes them to configured targets.
 
-ceilometer-collector (deprecated in Ocata)
-    Consumes AMQP notifications from the agents, then dispatches these
-    data to the appropriate data store.
-
     .. note::
 
-       1. The ``ceilometer-polling`` service provides polling support on any
-          namespace but many distributions continue to provide namespace-scoped
-          agents: ``ceilometer-agent-central``, ``ceilometer-agent-compute``,
-          and ``ceilometer-agent-ipmi``.
-
-       2. The ``ceilometer-collector`` is no longer supported since the Ocata
-          release. Storage is provided by gnocchi, aodh, and panko services.
+       The ``ceilometer-polling`` service provides polling support on any
+       namespace but many distributions continue to provide namespace-scoped
+       agents: ``ceilometer-agent-central``, ``ceilometer-agent-compute``,
+       and ``ceilometer-agent-ipmi``.
 
 Except for the ``ceilometer-polling`` agents polling the ``compute`` or
 ``ipmi`` namespaces, all the other services are placed on one or more
