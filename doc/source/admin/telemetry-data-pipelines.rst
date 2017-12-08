@@ -34,11 +34,7 @@ The pipeline configuration is, by default stored in separate configuration
 files called ``pipeline.yaml`` and ``event_pipeline.yaml`` next to
 the ``ceilometer.conf`` file. The meter pipeline and event pipeline
 configuration files can be set by the ``pipeline_cfg_file`` and
-``event_pipeline_cfg_file`` options listed in the `Description of
-configuration options for api table
-<https://docs.openstack.org/ocata/config-reference/telemetry/telemetry-config-options.html>`__
-section in the OpenStack Configuration Reference respectively. Multiple
-pipelines can be defined in one pipeline configuration file.
+``event_pipeline_cfg_file`` options listed in :ref:`configuring`.
 
 The meter pipeline definition looks like:
 
@@ -145,6 +141,12 @@ The event filter uses the same filtering logic as the meter pipeline.
 
 Transformers
 ------------
+
+.. note::
+
+   Transformers maintain data in memory and therefore do not guarantee
+   durability in certain scenarios. A more durable and efficient solution
+   may be achieved post-storage using solutions like Gnocchi.
 
 The definition of transformers can contain the following fields:
 
@@ -379,13 +381,6 @@ To solve this problem, the multi-publisher can
 be configured for each data point within the Telemetry service, allowing
 the same technical meter or event to be published multiple times to
 multiple destinations, each potentially using a different transport.
-
-Publishers are specified in the ``publishers`` section for each
-pipeline that is defined in the `pipeline.yaml
-<https://git.openstack.org/cgit/openstack/ceilometer/plain/ceilometer/pipeline/data/pipeline.yaml>`__
-and the `event_pipeline.yaml
-<https://git.openstack.org/cgit/openstack/ceilometer/plain/ceilometer/pipeline/data/event_pipeline.yaml>`__
-files.
 
 The following publisher types are supported:
 
