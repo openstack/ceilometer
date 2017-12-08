@@ -41,6 +41,9 @@ class CeilometerTempestPlugin(plugins.TempestPlugin):
         config.register_opt_group(
             conf, tempest_config.event_group,
             tempest_config.event_opts)
+        config.register_opt_group(
+            conf, tempest_config.alarming_group,
+            tempest_config.AlarmingGroup)
 
     def get_opt_lists(self):
         return [(tempest_config.telemetry_group.name,
@@ -48,4 +51,6 @@ class CeilometerTempestPlugin(plugins.TempestPlugin):
                 (tempest_config.event_group.name,
                  tempest_config.event_opts),
                 (config.service_available_group.name,
-                 tempest_config.service_option)]
+                 tempest_config.service_option),
+                (tempest_config.alarming_group.name,
+                 tempest_config.AlarmingGroup)]

@@ -23,6 +23,10 @@ service_option = [cfg.BoolOpt('ceilometer',
                   cfg.BoolOpt('panko',
                               default=True,
                               help="Whether or not Panko is expected to be"
+                                   "available"),
+                  cfg.BoolOpt("aodh_plugin",
+                              default=True,
+                              help="Whether or not Aodh is expected to be"
                                    "available")]
 
 telemetry_group = cfg.OptGroup(name='telemetry',
@@ -30,6 +34,9 @@ telemetry_group = cfg.OptGroup(name='telemetry',
 
 event_group = cfg.OptGroup(name='event',
                            title='Event Service Options')
+
+alarming_group = cfg.OptGroup(name='alarming_plugin',
+                              title='Alarming Service Options')
 
 TelemetryGroup = [
     cfg.IntOpt('notification_wait',
@@ -56,4 +63,15 @@ event_opts = [
                choices=['public', 'admin', 'internal',
                         'publicURL', 'adminURL', 'internalURL'],
                help="The endpoint type to use for the event service."),
+]
+
+AlarmingGroup = [
+    cfg.StrOpt('catalog_type',
+               default='alarming',
+               help="Catalog type of the Alarming service."),
+    cfg.StrOpt('endpoint_type',
+               default='publicURL',
+               choices=['public', 'admin', 'internal',
+                        'publicURL', 'adminURL', 'internalURL'],
+               help="The endpoint type to use for the alarming service."),
 ]
