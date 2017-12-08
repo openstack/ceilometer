@@ -199,11 +199,13 @@ function ceilometer_create_accounts {
 
 function install_gnocchi {
     echo_summary "Installing Gnocchi"
-    if [ $GNOCCHI_GIT_PATH ]; then
-        pip_install -e $GNOCCHI_GIT_PATH[redis,${DATABASE_TYPE},keystone] uwsgi
+    if python3_enabled; then
+        PY_VERS=${PYTHON3_VERSION}
     else
-        pip_install gnocchi[redis,${DATABASE_TYPE},keystone] uwsgi
+        PY_VERS=${PYTHON2_VERSION}
     fi
+    # workaround for upper-constraints.
+    sudo -H python${PY_VERS} -m pip install -U gnocchi[redis,${DATABASE_TYPE},keystone]
     recreate_database gnocchi
     sudo install -d -o $STACK_USER -m 755 $GNOCCHI_CONF_DIR
 
