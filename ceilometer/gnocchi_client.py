@@ -197,11 +197,22 @@ resources_update_operations = [
          "attributes": {"provider": {"type": "string", "min_length": 0,
                                      "max_length": 255, "required": True}}
      }]},
+    {"desc": "add launched_at to instance",
+     "type": "update_attribute_type",
+     "resource_type": "instance",
+     "data": [
+         {"op": "add", "path": "/attributes/launched_at",
+          "value": {"type": "datetime", "required": False}},
+         {"op": "add", "path": "/attributes/created_at",
+          "value": {"type": "datetime", "required": False}},
+         {"op": "add", "path": "/attributes/deleted_at",
+          "value": {"type": "datetime", "required": False}},
+     ]},
 ]
 
 # NOTE(sileht): We use LooseVersion because pbr can generate invalid
 # StrictVersion like 9.0.1.dev226
-REQUIRED_VERSION = version.LooseVersion("4.0.0")
+REQUIRED_VERSION = version.LooseVersion("4.2.0")
 
 
 def upgrade_resource_types(conf):
