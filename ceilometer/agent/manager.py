@@ -107,11 +107,11 @@ class Resources(object):
         if self._resources:
             static_resources_group = self.agent_manager.construct_group_id(
                 utils.hash_of_set(self._resources))
-            if self.agent_manager.partition_coordinator:
-                return [v for v in self._resources if
-                        self.agent_manager.hashrings[
-                            static_resources_group].belongs_to_self(
-                                six.text_type(v))] + source_discovery
+            return [v for v in self._resources if
+                    not self.agent_manager.partition_coordinator or
+                    self.agent_manager.hashrings[
+                        static_resources_group].belongs_to_self(
+                            six.text_type(v))] + source_discovery
 
         return source_discovery
 
