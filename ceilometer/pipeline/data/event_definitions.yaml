@@ -81,6 +81,10 @@
       fields: payload.status
     created_at:
       fields: payload.created_at
+    image_id:
+      fields: payload.glance_metadata[?key=image_id][0].value
+    instance_id:
+      fields: payload.volume_attachment[0].server_id
 - event_type: ['volume.exists', 'volume.create.*', 'volume.delete.*', 'volume.resize.*', 'volume.attach.*', 'volume.detach.*', 'volume.update.*']
   traits:
     <<: *cinder_traits
