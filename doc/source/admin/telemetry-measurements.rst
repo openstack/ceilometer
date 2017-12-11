@@ -75,20 +75,6 @@ external and internal users.
 Measurements are grouped by services which are polled by
 Telemetry or emit notifications that this service consumes.
 
-.. note::
-
-   The Telemetry service supports storing notifications as events. This
-   functionality was added later, therefore the list of meters still
-   contains existence type and other event related items. The proper
-   way of using Telemetry is to configure it to use the event store and
-   turn off the collection of the event related meters. For further
-   information about events see `Events section
-   <https://docs.openstack.org/ceilometer/latest/contributor/events.html>`__
-   in the Telemetry documentation. For further information about how to
-   turn on and off meters see :ref:`telemetry-pipeline-configuration`. Please
-   also note that currently no migration is available to move the already
-   existing event type samples to the event store.
-
 .. _telemetry-compute-meters:
 
 OpenStack Compute
@@ -313,12 +299,6 @@ The following meters are collected for OpenStack Compute.
 | perf.cac\ | Gauge | cou\ | instance | Pollster | Libvirt | the count of ca\ |
 | he.misses |       | nt   | ID       |          |         | che misses       |
 +-----------+-------+------+----------+----------+---------+------------------+
-| **Meters removed as of Ocata release**                                      |
-+-----------+-------+------+----------+----------+---------+------------------+
-| instance  | Gauge | inst\| instance | Notific\ | Libvirt,| Existence of     |
-|           |       | ance | ID       | ation,   | Hyper-V,| instance         |
-|           |       |      |          | Pollster | vSphere |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | **Meters added in the Ocata release**                                       |
 +-----------+-------+------+----------+----------+---------+------------------+
 | network.\ | Cumul\| pack\| interface| Pollster | Libvirt | Number of        |
@@ -352,11 +332,24 @@ The following meters are collected for OpenStack Compute.
 | swap.out  |       |      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 
+.. note::
 
-The Telemetry service supports to create new meters by using
+    To enable the libvirt ``memory.usage`` support, you need to install
+    libvirt version 1.1.1+, QEMU version 1.5+, and you also need to
+    prepare suitable balloon driver in the image. It is applicable
+    particularly for Windows guests, most modern Linux distributions
+    already have it built in. Telemetry is not able to fetch the
+    ``memory.usage`` samples without the image balloon driver.
+
+.. note::
+
+    To enable libvirt ``disk.*`` support when running on RBD-backed shared
+    storage, you need to install libvirt version 1.2.16+.
+
+The Telemetry service supports creating new meters by using
 transformers. For more details about transformers see
 :ref:`telemetry-transformers`. Among the meters gathered from libvirt and
-Hyper-V there are a few ones which are generated from other meters. The list of
+Hyper-V, there are a few which are derived from other meters. The list of
 meters that are created by using the ``rate_of_change`` transformer from the
 above table is the following:
 
@@ -387,20 +380,6 @@ above table is the following:
 -  network.incoming.packets.rate
 
 -  network.outgoing.packets.rate
-
-.. note::
-
-    To enable the libvirt ``memory.usage`` support, you need to install
-    libvirt version 1.1.1+, QEMU version 1.5+, and you also need to
-    prepare suitable balloon driver in the image. It is applicable
-    particularly for Windows guests, most modern Linux distributions
-    already have it built in. Telemetry is not able to fetch the
-    ``memory.usage`` samples without the image balloon driver.
-
-.. note::
-
-    To enable libvirt ``disk.*`` support when running on RBD-backed shared
-    storage, you need to install libvirt version 1.2.16+.
 
 .. note::
 
@@ -497,8 +476,8 @@ The following meters are recorded for the Bare metal service:
 IPMI based meters
 ~~~~~~~~~~~~~~~~~
 Another way of gathering IPMI based data is to use IPMI sensors
-independently from the Bare metal service's components. Same meters as
-:ref:`telemetry-bare-metal-service` could be fetched except that origin is
+independently from the Bare metal service's components. The same meters as
+:ref:`telemetry-bare-metal-service` can be fetched except that origin is
 ``Pollster`` instead of ``Notification``.
 
 You need to deploy the ceilometer-agent-ipmi on each IPMI-capable node
@@ -650,30 +629,15 @@ The following meters are collected for OpenStack Image service:
 +====================+========+======+==========+==========+==================+
 | **Meters added in the Mitaka release or earlier**                           |
 +--------------------+--------+------+----------+----------+------------------+
-| image.size         | Gauge  | image| image ID | Notifica\| Size of the upl\ |
+| image.size         | Gauge  | B    | image ID | Notifica\| Size of the upl\ |
 |                    |        |      |          | tion, Po\| oaded image      |
 |                    |        |      |          | llster   |                  |
-+--------------------+--------+------+----------+----------+------------------+
-| image.update       | Delta  | image| image ID | Notifica\| Number of updat\ |
-|                    |        |      |          | tion     | es on the image  |
-+--------------------+--------+------+----------+----------+------------------+
-| image.upload       | Delta  | image| image ID | Notifica\| Number of uploa\ |
-|                    |        |      |          | tion     | ds on the image  |
-+--------------------+--------+------+----------+----------+------------------+
-| image.delete       | Delta  | image| image ID | Notifica\| Number of delet\ |
-|                    |        |      |          | tion     | es on the image  |
 +--------------------+--------+------+----------+----------+------------------+
 | image.download     | Delta  | B    | image ID | Notifica\| Image is downlo\ |
 |                    |        |      |          | tion     | aded             |
 +--------------------+--------+------+----------+----------+------------------+
 | image.serve        | Delta  | B    | image ID | Notifica\| Image is served  |
 |                    |        |      |          | tion     | out              |
-+--------------------+--------+------+----------+----------+------------------+
-| **Meters removed as of Ocata release**                                      |
-+--------------------+--------+------+----------+----------+------------------+
-| image              | Gauge  | image| image ID | Notifica\| Existence of the |
-|                    |        |      |          | tion, Po\| image            |
-|                    |        |      |          | llster   |                  |
 +--------------------+--------+------+----------+----------+------------------+
 
 OpenStack Block Storage
@@ -691,51 +655,6 @@ The following meters are collected for OpenStack Block Storage:
 +--------------------+-------+--------+----------+----------+-----------------+
 | snapshot.size      | Gauge | GB     | snapshot | Notifica\| Size of the sna\|
 |                    |       |        | ID       | tion     | pshot           |
-+--------------------+-------+--------+----------+----------+-----------------+
-| **Meters removed as of Ocata release**                                      |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume             | Gauge | volume | volume ID| Notifica\| Existence of the|
-|                    |       |        |          | tion     | volume          |
-+--------------------+-------+--------+----------+----------+-----------------+
-| snapshot           | Gauge | snapsh\| snapshot | Notifica\| Existence of the|
-|                    |       | ot     | ID       | tion     | snapshot        |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.create.(sta\| Delta | volume | volume ID| Notifica\| Creation of the |
-| rt|end)            |       |        |          | tion     | volume          |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.delete.(sta\| Delta | volume | volume ID| Notifica\| Deletion of the |
-| rt|end)            |       |        |          | tion     | volume          |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.update.(sta\| Delta | volume | volume ID| Notifica\| Update the name |
-| rt|end)            |       |        |          | tion     | or description  |
-|                    |       |        |          |          | of the volume   |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.resize.(sta\| Delta | volume | volume ID| Notifica\| Update the size |
-| rt|end)            |       |        |          | tion     | of the volume   |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.attach.(sta\| Delta | volume | volume ID| Notifica\| Attaching the v\|
-| rt|end)            |       |        |          | tion     | olume to an ins\|
-|                    |       |        |          |          | tance           |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.detach.(sta\| Delta | volume | volume ID| Notifica\| Detaching the v\|
-| rt|end)            |       |        |          | tion     | olume from an i\|
-|                    |       |        |          |          | nstance         |
-+--------------------+-------+--------+----------+----------+-----------------+
-| snapshot.create.(s\| Delta | snapsh\| snapshot | Notifica\| Creation of the |
-| tart|end)          |       | ot     | ID       | tion     | snapshot        |
-+--------------------+-------+--------+----------+----------+-----------------+
-| snapshot.delete.(s\| Delta | snapsh\| snapshot | Notifica\| Deletion of the |
-| tart|end)          |       | ot     | ID       | tion     | snapshot        |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.backup.crea\| Delta | volume | backup ID| Notifica\| Creation of the |
-| te.(start|end)     |       |        |          | tion     | volume backup   |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.backup.dele\| Delta | volume | backup ID| Notifica\| Deletion of the |
-| te.(start|end)     |       |        |          | tion     | volume backup   |
-+--------------------+-------+--------+----------+----------+-----------------+
-| volume.backup.rest\| Delta | volume | backup ID| Notifica\| Restoration of  |
-| ore.(start|end)    |       |        |          | tion     | the volume back\|
-|                    |       |        |          |          | up              |
 +--------------------+-------+--------+----------+----------+-----------------+
 
 
@@ -798,9 +717,9 @@ Ceph Object Storage
 ~~~~~~~~~~~~~~~~~~~
 In order to gather meters from Ceph, you have to install and configure
 the Ceph Object Gateway (radosgw) as it is described in the `Installation
-Manual <http://docs.ceph.com/docs/master/radosgw/>`__. You have to enable
+Manual <http://docs.ceph.com/docs/master/radosgw/>`__. You also have to enable
 `usage logging <http://ceph.com/docs/master/man/8/radosgw/#usage-logging>`__ in
-order to get the related meters from Ceph. You will also need an
+order to get the related meters from Ceph. You will need an
 ``admin`` user with ``users``, ``buckets``, ``metadata`` and ``usage``
 ``caps`` configured.
 
@@ -863,58 +782,6 @@ The following meters are collected for OpenStack Identity:
 | identity.authent\ | Delta| user   | user ID   | Notifica\ | User failed to  |
 | icate.failure     |      |        |           | tion      | authenticate    |
 +-------------------+------+--------+-----------+-----------+-----------------+
-| **Meters removed as of Ocata release**                                      |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.user.cr\ | Delta| user   | user ID   | Notifica\ | User is created |
-| eated             |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.user.de\ | Delta| user   | user ID   | Notifica\ | User is deleted |
-| leted             |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.user.up\ | Delta| user   | user ID   | Notifica\ | User is updated |
-| dated             |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.group.c\ | Delta| group  | group ID  | Notifica\ | Group is created|
-| reated            |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.group.d\ | Delta| group  | group ID  | Notifica\ | Group is deleted|
-| eleted            |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.group.u\ | Delta| group  | group ID  | Notifica\ | Group is updated|
-| pdated            |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.role.cr\ | Delta| role   | role ID   | Notifica\ | Role is created |
-| eated             |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.role.de\ | Delta| role   | role ID   | Notifica\ | Role is deleted |
-| leted             |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.role.up\ | Delta| role   | role ID   | Notifica\ | Role is updated |
-| dated             |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.project\ | Delta| project| project ID| Notifica\ | Project is crea\|
-| .created          |      |        |           | tion      | ted             |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.project\ | Delta| project| project ID| Notifica\ | Project is dele\|
-| .deleted          |      |        |           | tion      | ted             |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.project\ | Delta| project| project ID| Notifica\ | Project is upda\|
-| .updated          |      |        |           | tion      | ted             |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.trust.c\ | Delta| trust  | trust ID  | Notifica\ | Trust is created|
-| reated            |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.trust.d\ | Delta| trust  | trust ID  | Notifica\ | Trust is deleted|
-| eleted            |      |        |           | tion      |                 |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.role_as\ | Delta| role_a\| role ID   | Notifica\ | Role is added to|
-| signment.created  |      | ssignm\|           | tion      | an actor on a   |
-|                   |      | ent    |           |           | target          |
-+-------------------+------+--------+-----------+-----------+-----------------+
-| identity.role_as\ | Delta| role_a\| role ID   | Notifica\ | Role is removed |
-| signment.deleted  |      | ssignm\|           | tion      | from an actor   |
-|                   |      | ent    |           |           | on a target     |
-+-------------------+------+--------+-----------+-----------+-----------------+
 
 OpenStack Networking
 ~~~~~~~~~~~~~~~~~~~~
@@ -929,57 +796,6 @@ The following meters are collected for OpenStack Networking:
 | bandwidth       | Delta | B      | label ID  | Notifica\ | Bytes through t\ |
 |                 |       |        |           | tion      | his l3 metering  |
 |                 |       |        |           |           | label            |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| **Meters removed as of Ocata release**                                      |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| network         | Gauge | networ\| network ID| Notifica\ | Existence of ne\ |
-|                 |       | k      |           | tion      | twork            |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| network.create  | Delta | networ\| network ID| Notifica\ | Creation reques\ |
-|                 |       | k      |           | tion      | ts for this net\ |
-|                 |       |        |           |           | work             |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| network.update  | Delta | networ\| network ID| Notifica\ | Update requests  |
-|                 |       | k      |           | tion      | for this network |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| subnet          | Gauge | subnet | subnet ID | Notifica\ | Existence of su\ |
-|                 |       |        |           | tion      | bnet             |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| subnet.create   | Delta | subnet | subnet ID | Notifica\ | Creation reques\ |
-|                 |       |        |           | tion      | ts for this sub\ |
-|                 |       |        |           |           | net              |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| subnet.update   | Delta | subnet | subnet ID | Notifica\ | Update requests  |
-|                 |       |        |           | tion      | for this subnet  |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| port            | Gauge | port   | port ID   | Notifica\ | Existence of po\ |
-|                 |       |        |           | tion      | rt               |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| port.create     | Delta | port   | port ID   | Notifica\ | Creation reques\ |
-|                 |       |        |           | tion      | ts for this port |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| port.update     | Delta | port   | port ID   | Notifica\ | Update requests  |
-|                 |       |        |           | tion      | for this port    |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| router          | Gauge | router | router ID | Notifica\ | Existence of ro\ |
-|                 |       |        |           | tion      | uter             |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| router.create   | Delta | router | router ID | Notifica\ | Creation reques\ |
-|                 |       |        |           | tion      | ts for this rou\ |
-|                 |       |        |           |           | ter              |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| router.update   | Delta | router | router ID | Notifica\ | Update requests  |
-|                 |       |        |           | tion      | for this router  |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| ip.floating     | Gauge | ip     | ip ID     | Notifica\ | Existence of IP  |
-|                 |       |        |           | tion, Po\ |                  |
-|                 |       |        |           | llster    |                  |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| ip.floating.cr\ | Delta | ip     | ip ID     | Notifica\ | Creation reques\ |
-| eate            |       |        |           | tion      | ts for this IP   |
-+-----------------+-------+--------+-----------+-----------+------------------+
-| ip.floating.up\ | Delta | ip     | ip ID     | Notifica\ | Update requests  |
-| date            |       |        |           | tion      | for this IP      |
 +-----------------+-------+--------+-----------+-----------+------------------+
 
 SDN controllers
@@ -1139,42 +955,6 @@ The following meters are collected for LBaaS v1:
 | ices.lb.outg\ |         |         |           |           | ing Bytes       |
 | oing.bytes    |         |         |           |           |                 |
 +---------------+---------+---------+-----------+-----------+-----------------+
-| **Meters removed as of Ocata release**                                      |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | pool    | pool ID   | Notifica\ | LB pool was cre\|
-| ices.lb.pool\ |         |         |           | tion      | ated            |
-| .create       |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | pool    | pool ID   | Notifica\ | LB pool was upd\|
-| ices.lb.pool\ |         |         |           | tion      | ated            |
-| .update       |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | vip     | vip ID    | Notifica\ | LB VIP was crea\|
-| ices.lb.vip.\ |         |         |           | tion      | ted             |
-| create        |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | vip     | vip ID    | Notifica\ | LB VIP was upda\|
-| ices.lb.vip.\ |         |         |           | tion      | ted             |
-| update        |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | member  | member ID | Notifica\ | LB member was c\|
-| ices.lb.memb\ |         |         |           | tion      | reated          |
-| er.create     |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | member  | member ID | Notifica\ | LB member was u\|
-| ices.lb.memb\ |         |         |           | tion      | pdated          |
-| er.update     |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | health\ | monitor ID| Notifica\ | LB health probe |
-| ices.lb.heal\ |         | _monit\ |           | tion      | was created     |
-| th_monitor.c\ |         | or      |           |           |                 |
-| reate         |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | health\ | monitor ID| Notifica\ | LB health probe |
-| ices.lb.heal\ |         | _monit\ |           | tion      | was updated     |
-| th_monitor.u\ |         | or      |           |           |                 |
-| pdate         |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
 
 Load-Balancer-as-a-Service (LBaaS v2)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1221,52 +1001,6 @@ The following meters are collected for LBaaS v2.
 | ices.lb.outg\ |         |         |           |           | ing Bytes       |
 | oing.bytes    |         |         |           |           |                 |
 +---------------+---------+---------+-----------+-----------+-----------------+
-| **Meters removed as of Ocata release**                                      |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | pool    | pool ID   | Notifica\ | LB pool was cre\|
-| ices.lb.pool\ |         |         |           | tion      | ated            |
-| .create       |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | pool    | pool ID   | Notifica\ | LB pool was upd\|
-| ices.lb.pool\ |         |         |           | tion      | ated            |
-| .update       |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | listen\ | listener  | Notifica\ | LB listener was |
-| ices.lb.list\ |         | er      | ID        | tion      | created         |
-| ener.create   |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | listen\ | listener  | Notifica\ | LB listener was |
-| ices.lb.list\ |         | er      | ID        | tion      | updated         |
-| ener.update   |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | member  | member ID | Notifica\ | LB member was c\|
-| ices.lb.memb\ |         |         |           | tion      | reated          |
-| er.create     |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | member  | member ID | Notifica\ | LB member was u\|
-| ices.lb.memb\ |         |         |           | tion      | pdated          |
-| er.update     |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | health\ | monitor ID| Notifica\ | LB health probe |
-| ices.lb.heal\ |         | _monit\ |           | tion      | was created     |
-| thmonitor.cr\ |         | or      |           |           |                 |
-| eate          |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | health\ | monitor ID| Notifica\ | LB health probe |
-| ices.lb.heal\ |         | _monit\ |           | tion      | was updated     |
-| thmonitor.up\ |         | or      |           |           |                 |
-| date          |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | loadba\ | loadbala\ | Notifica\ | LB loadbalancer |
-| ices.lb.load\ |         | lancer\ | ncer ID   | tion      | was created     |
-| balancer.cre\ |         |         |           |           |                 |
-| ate           |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
-| network.serv\ | Delta   | loadba\ | loadbala\ | Notifica\ | LB loadbalancer |
-| ices.lb.load\ |         | lancer\ | ncer ID   | tion      | was updated     |
-| balancer.upd\ |         |         |           |           |                 |
-| ate           |         |         |           |           |                 |
-+---------------+---------+---------+-----------+-----------+-----------------+
 
 .. note::
 
@@ -1292,52 +1026,6 @@ The following meters are collected for VPNaaS:
 | nections      |       | onnect\ |            |           |                  |
 |               |       | ion     |            |           |                  |
 +---------------+-------+---------+------------+-----------+------------------+
-| **Meters removed as of Ocata release**                                      |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | vpnser\ | vpn ID     | Notifica\ | VPN was created  |
-| ices.vpn.cre\ |       | vice    |            | tion      |                  |
-| ate           |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | vpnser\ | vpn ID     | Notifica\ | VPN was updated  |
-| ices.vpn.upd\ |       | vice    |            | tion      |                  |
-| ate           |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | ipsec\_\| connection | Notifica\ | IPSec connection |
-| ices.vpn.con\ |       | site\_c\| ID         | tion      | was created      |
-| nections.cre\ |       | onnect\ |            |           |                  |
-| ate           |       | ion     |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | ipsec\_\| connection | Notifica\ | IPSec connection |
-| ices.vpn.con\ |       | site\_c\| ID         | tion      | was updated      |
-| nections.upd\ |       | onnect\ |            |           |                  |
-| ate           |       | ion     |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Gauge | ipsecp\ | ipsecpolicy| Notifica\ | Existence of an  |
-| ices.vpn.ips\ |       | olicy   | ID         | tion, Po\ | IPSec policy     |
-| ecpolicy      |       |         |            | llster    |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | ipsecp\ | ipsecpolicy| Notifica\ | IPSec policy was |
-| ices.vpn.ips\ |       | olicy   | ID         | tion      | created          |
-| ecpolicy.cre\ |       |         |            |           |                  |
-| ate           |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | ipsecp\ | ipsecpolicy| Notifica\ | IPSec policy was |
-| ices.vpn.ips\ |       | olicy   | ID         | tion      | updated          |
-| ecpolicy.upd\ |       |         |            |           |                  |
-| ate           |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Gauge | ikepol\ | ikepolicy  | Notifica\ | Existence of an  |
-| ices.vpn.ike\ |       | icy     | ID         | tion, Po\ | Ike policy       |
-| policy        |       |         |            | llster    |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | ikepol\ | ikepolicy  | Notifica\ | Ike policy was   |
-| ices.vpn.ike\ |       | icy     | ID         | tion      | created          |
-| policy.create |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | ikepol\ | ikepolicy  | Notifica\ | Ike policy was   |
-| ices.vpn.ike\ |       | icy     | ID         | tion      | updated          |
-| policy.update |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
 
 Firewall-as-a-Service (FWaaS)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1356,124 +1044,3 @@ The following meters are collected for FWaaS:
 | ices.firewal\ |       | ll_pol\ |            |           | firewall policy  |
 | l.policy      |       | icy     |            |           |                  |
 +---------------+-------+---------+------------+-----------+------------------+
-| **Meters removed as of Ocata release**                                      |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | firewall| firewall ID| Notifica\ | Firewall was cr\ |
-| ices.firewal\ |       |         |            | tion      | eated            |
-| l.create      |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | firewall| firewall ID| Notifica\ | Firewall was up\ |
-| ices.firewal\ |       |         |            | tion      | dated            |
-| l.update      |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | firewa\ | policy ID  | Notifica\ | Firewall policy  |
-| ices.firewal\ |       | ll_pol\ |            | tion      | was created      |
-| l.policy.cre\ |       | icy     |            |           |                  |
-| ate           |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | firewa\ | policy ID  | Notifica\ | Firewall policy  |
-| ices.firewal\ |       | ll_pol\ |            | tion      | was updated      |
-| l.policy.upd\ |       | icy     |            |           |                  |
-| ate           |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Gauge | firewa\ | rule ID    | Notifica\ | Existence of a   |
-| ices.firewal\ |       | ll_rule |            | tion      | firewall rule    |
-| l.rule        |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | firewa\ | rule ID    | Notifica\ | Firewall rule w\ |
-| ices.firewal\ |       | ll_rule |            | tion      | as created       |
-| l.rule.create |       |         |            |           |                  |
-|               |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-| network.serv\ | Delta | firewa\ | rule ID    | Notifica\ | Firewall rule w\ |
-| ices.firewal\ |       | ll_rule |            | tion      | as updated       |
-| l.rule.update |       |         |            |           |                  |
-+---------------+-------+---------+------------+-----------+------------------+
-
-Orchestration service
-~~~~~~~~~~~~~~~~~~~~~
-
-The following meters were previously collected for the Orchestration service:
-
-+----------------+-------+------+----------+--------------+-------------------+
-| Name           | Type  | Unit | Resource | Origin       | Note              |
-+================+=======+======+==========+==============+===================+
-| **Meters removed as of Ocata release**                                      |
-+----------------+-------+------+----------+--------------+-------------------+
-| stack.create   | Delta | stack| stack ID | Notification | Stack was success\|
-|                |       |      |          |              | fully created     |
-+----------------+-------+------+----------+--------------+-------------------+
-| stack.update   | Delta | stack| stack ID | Notification | Stack was success\|
-|                |       |      |          |              | fully updated     |
-+----------------+-------+------+----------+--------------+-------------------+
-| stack.delete   | Delta | stack| stack ID | Notification | Stack was success\|
-|                |       |      |          |              | fully deleted     |
-+----------------+-------+------+----------+--------------+-------------------+
-| stack.resume   | Delta | stack| stack ID | Notification | Stack was success\|
-|                |       |      |          |              | fully resumed     |
-+----------------+-------+------+----------+--------------+-------------------+
-| stack.suspend  | Delta | stack| stack ID | Notification | Stack was success\|
-|                |       |      |          |              | fully suspended   |
-+----------------+-------+------+----------+--------------+-------------------+
-
-Data processing service for OpenStack
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The following meters were previously collected for the Data processing service
-for OpenStack:
-
-+----------------+-------+---------+-----------+-------------+----------------+
-| Name           | Type  | Unit    | Resource  | Origin      | Note           |
-+================+=======+=========+===========+=============+================+
-| **Meters removed as of Ocata release**                                      |
-+----------------+-------+---------+-----------+-------------+----------------+
-| cluster.create | Delta | cluster | cluster ID| Notification| Cluster was    |
-|                |       |         |           |             | successfully   |
-|                |       |         |           |             | created        |
-|                |       |         |           |             |                |
-+----------------+-------+---------+-----------+-------------+----------------+
-| cluster.update | Delta | cluster | cluster ID| Notification| Cluster was    |
-|                |       |         |           |             | successfully   |
-|                |       |         |           |             | updated        |
-+----------------+-------+---------+-----------+-------------+----------------+
-| cluster.delete | Delta | cluster | cluster ID| Notification| Cluster was    |
-|                |       |         |           |             | successfully   |
-|                |       |         |           |             | deleted        |
-+----------------+-------+---------+-----------+-------------+----------------+
-
-Key Value Store module
-~~~~~~~~~~~~~~~~~~~~~~
-
-The following meters were previously collected for the Key Value Store module:
-
-+------------------+-------+------+----------+-------------+------------------+
-| Name             | Type  | Unit | Resource | Origin      | Note             |
-+==================+=======+======+==========+=============+==================+
-| **Meters removed as of Newton release**                                     |
-+------------------+-------+------+----------+-------------+------------------+
-| magnetodb.table.\| Gauge | table| table ID | Notification| Table was succe\ |
-| create           |       |      |          |             | ssfully created  |
-+------------------+-------+------+----------+-------------+------------------+
-| magnetodb.table\ | Gauge | table| table ID | Notification| Table was succe\ |
-| .delete          |       |      |          |             | ssfully deleted  |
-+------------------+-------+------+----------+-------------+------------------+
-| magnetodb.table\ | Gauge | index| table ID | Notification| Number of indices|
-| .index.count     |       |      |          |             | created in a     |
-|                  |       |      |          |             | table            |
-+------------------+-------+------+----------+-------------+------------------+
-
-
-Energy
-~~~~~~
-
-The following energy related meters were previously available:
-
-+---------------+------------+------+----------+----------+-------------------+
-| Name          | Type       | Unit | Resource | Origin   | Note              |
-+===============+============+======+==========+==========+===================+
-| **Meters removed as of Pike release**                                       |
-+---------------+------------+------+----------+----------+-------------------+
-| energy        | Cumulative | kWh  | probe ID | Pollster | Amount of energy  |
-+---------------+------------+------+----------+----------+-------------------+
-| power         | Gauge      | W    | probe ID | Pollster | Power consumption |
-+---------------+------------+------+----------+----------+-------------------+
