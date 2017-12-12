@@ -62,7 +62,7 @@ Gnocchi
 
 #. Initialize Gnocchi database by creating ceilometer resources::
 
-   ceilometer-upgrade
+        ceilometer-upgrade
 
 #. To minimize data requests, caching and batch processing should be enabled:
 

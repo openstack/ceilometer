@@ -76,10 +76,10 @@ version in time.
 3. Upgrade the notification agent(s)
 
    The new notification agent can be started alongside the old agent if no
-   workload_partitioning is enabled OR if it has the same pipeline configuration.
-   If the pipeline configuration is changed, the old agents must be loaded with
-   the same pipeline configuration first to ensure the notification agents all
-   work against same pipeline sets.
+   workload_partitioning is enabled OR if it has the same pipeline
+   configuration. If the pipeline configuration is changed, the old agents
+   must be loaded with the same pipeline configuration first to ensure the
+   notification agents all work against same pipeline sets.
 
 4. Upgrade the polling agent(s)
 
@@ -100,5 +100,5 @@ version in time.
 Developer notes
 ===============
 
-When updating data models in the database or IPC, we need to adhere to a single
-mantra: 'always add, never delete or modify.'
+When updating data models in the database or IPC, we need to adhere to
+a single mantra: 'always add, never delete or modify.'

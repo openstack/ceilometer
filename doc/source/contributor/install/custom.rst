@@ -30,9 +30,9 @@ this queue. If you want to also consume the topic notifications with a system
 other than Ceilometer, you should configure a separate queue that listens for
 the same messages.
 
-Ceilometer allows multiple topics to be configured so that the polling agent can
-send the same messages of notifications to other queues. Notification agents
-also use **topics** to configure which queue to listen for. If
+Ceilometer allows multiple topics to be configured so that the polling agent
+can send the same messages of notifications to other queues. Notification
+agents also use **topics** to configure which queue to listen for. If
 you use multiple topics, you should configure notification agent and polling
 agent separately, otherwise Ceilometer collects duplicate samples.
 
@@ -45,7 +45,7 @@ To use multiple topics, you should give ceilometer-agent-notification and
 ceilometer-polling services different ceilometer.conf files. The Ceilometer
 configuration file ceilometer.conf is normally locate in the /etc/ceilometer
 directory. Make changes according to your requirements which may look like
-the following::
+the following:
 
 For notification agent using ceilometer-notification.conf, settings like::
 
@@ -62,7 +62,8 @@ For polling agent using ceilometer-polling.conf, settings like::
    notification_topics in ceilometer-notification.conf should only have one same
    topic in ceilometer-polling.conf
 
-Doing this, it's easy to listen/receive data from multiple internal and external services.
+Doing this, it's easy to listen/receive data from multiple internal and
+external services.
 
 ..  _publisher-configuration:
 
@@ -96,8 +97,8 @@ For the Gnocchi publisher, the archive policy can be defined as a configuration
 settings. The value specified for ``archive_policy`` should correspond to the
 name of an ``archive_policy`` configured within Gnocchi.
 
-To use multiple publishers, add multiple publisher lines in ``pipeline.yaml`` and/or
-``event_pipeline.yaml`` file like the following::
+To use multiple publishers, add multiple publisher lines in ``pipeline.yaml``
+and/or ``event_pipeline.yaml`` file like the following::
 
    ---
    sources:
@@ -124,12 +125,13 @@ configuration settings should be added::
 Custom pipeline
 ===============
 
-The paths of all pipeline files including ``pipeline.yaml`` and ``event_pipeline.yaml``
-are located to ceilometer/pipeline/data by default. And it's possible to set the
-path through ``pipeline_cfg_file`` being assigned to another one in ``ceilometer.conf``.
+The paths of all pipeline files including ``pipeline.yaml`` and
+``event_pipeline.yaml`` are located to ceilometer/pipeline/data by default.
+And it's possible to set the path through
+``pipeline_cfg_file`` being assigned to another one in ``ceilometer.conf``.
 
-Ceilometer allow users to customize pipeline files. Before that, copy the following
-yaml files::
+Ceilometer allow users to customize pipeline files. Before that, copy the
+following yaml files::
 
     $ cp ceilometer/pipeline/data/*.yaml /etc/ceilometer
 

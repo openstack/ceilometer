@@ -47,13 +47,14 @@ Three type of meters are defined in Ceilometer:
    double: meter; gauge
    double: meter; delta
 
-==========  ==============================================================================
+==========  ===================================================================
 Type        Definition
-==========  ==============================================================================
+==========  ===================================================================
 Cumulative  Increasing over time (instance hours)
-Gauge       Discrete items (floating IPs, image uploads) and fluctuating values (disk I/O)
+Gauge       Discrete items (floating IPs, image uploads) and fluctuating values
+            (disk I/O)
 Delta       Changing over time (bandwidth)
-==========  ==============================================================================
+==========  ===================================================================
 
 When you're about to add a new meter choose one type from the above list, which
 is applicable.
@@ -90,8 +91,9 @@ If you plan on adding meters, please follow the convention below:
 1. Always use '.' as separator and go from least to most discriminant word.
    For example, do not use ephemeral_disk_size but disk.ephemeral.size
 
-2. When a part of the name is a variable, it should always be at the end and start with a ':'.
-   For example, do not use <type>.image but image:<type>, where type is your variable name.
+2. When a part of the name is a variable, it should always be at the end and
+   start with a ':'. For example, do not use <type>.image but image:<type>,
+   where type is your variable name.
 
 3. If you have any hesitation, come and ask in #openstack-telemetry
 
