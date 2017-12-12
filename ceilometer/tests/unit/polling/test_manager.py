@@ -228,7 +228,7 @@ class TestDiscoveryException(plugin_base.DiscoveryBase):
         raise Exception()
 
 
-class TestPollingAgent(base.BaseTestCase):
+class BaseAgent(base.BaseTestCase):
 
     class Pollster(TestPollster):
         samples = []
@@ -284,7 +284,7 @@ class TestPollingAgent(base.BaseTestCase):
             self.notified_samples.append(m)
 
     def setUp(self):
-        super(TestPollingAgent, self).setUp()
+        super(BaseAgent, self).setUp()
         self.notified_samples = []
         self.notifier = mock.Mock()
         self.notifier.sample.side_effect = self.fake_notifier_sample
@@ -293,20 +293,10 @@ class TestPollingAgent(base.BaseTestCase):
         self.useFixture(fixtures.MockPatch('keystoneclient.v2_0.client.Client',
                                            return_value=mock.Mock()))
         self.CONF = service.prepare_service([], [])
-        self.CONF.set_override("backend_url", "zake://", "coordination")
         self.CONF.set_override(
             'cfg_file',
             self.path_get('etc/ceilometer/polling_all.yaml'), group='polling'
         )
-        self.mgr = self.create_manager()
-        self.mgr.extensions = self.create_extension_list()
-
-        self.hashring = mock.MagicMock()
-        self.hashring.belongs_to_self = mock.MagicMock()
-        self.hashring.belongs_to_self.return_value = True
-
-        self.mgr.hashrings = mock.MagicMock()
-        self.mgr.hashrings.__getitem__.return_value = self.hashring
         self.polling_cfg = {
             'sources': [{
                 'name': 'test_polling',
@@ -314,7 +304,6 @@ class TestPollingAgent(base.BaseTestCase):
                 'meters': ['test'],
                 'resources': ['test://']}]
         }
-        self.setup_polling()
 
     def tearDown(self):
         self.PollsterKeystone.samples = []
@@ -332,7 +321,7 @@ class TestPollingAgent(base.BaseTestCase):
         self.DiscoveryException.params = []
         self.Discovery.resources = []
         self.DiscoveryAnother.resources = []
-        super(TestPollingAgent, self).tearDown()
+        super(BaseAgent, self).tearDown()
 
     def create_extension_list(self):
         return [extension.Extension('test',
@@ -377,6 +366,15 @@ class TestPollingAgent(base.BaseTestCase):
                     self.DiscoveryException(self.CONF), ),
             ],
         )
+
+
+class TestPollingAgent(BaseAgent):
+
+    def setUp(self):
+        super(TestPollingAgent, self).setUp()
+        self.mgr = self.create_manager()
+        self.mgr.extensions = self.create_extension_list()
+        self.setup_polling()
 
     @mock.patch('ceilometer.polling.manager.PollingManager')
     def test_start(self, poll_manager):
@@ -832,6 +830,22 @@ class TestPollingAgent(base.BaseTestCase):
         samples = self.notified_samples
         self.assertEqual(expected_samples, len(samples))
         self.assertEqual(call_count, self.notifier.sample.call_count)
+
+
+class TestPollingAgentPartitioned(BaseAgent):
+
+    def setUp(self):
+        super(TestPollingAgentPartitioned, self).setUp()
+        self.CONF.set_override("backend_url", "zake://", "coordination")
+        self.hashring = mock.MagicMock()
+        self.hashring.belongs_to_self = mock.MagicMock()
+        self.hashring.belongs_to_self.return_value = True
+
+        self.mgr = self.create_manager()
+        self.mgr.extensions = self.create_extension_list()
+        self.mgr.hashrings = mock.MagicMock()
+        self.mgr.hashrings.__getitem__.return_value = self.hashring
+        self.setup_polling()
 
     def test_discovery_partitioning(self):
         discovered_resources = ['discovered_1', 'discovered_2']
