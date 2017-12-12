@@ -22,7 +22,6 @@ import calendar
 import datetime
 import decimal
 import threading
-import time
 
 from oslo_concurrency import processutils
 from oslo_config import cfg
@@ -153,11 +152,6 @@ def kill_listeners(listeners):
     for listener in listeners:
         listener.stop()
         listener.wait()
-
-
-def delayed(delay, target, *args, **kwargs):
-    time.sleep(delay)
-    return target(*args, **kwargs)
 
 
 def spawn_thread(target, *args, **kwargs):
