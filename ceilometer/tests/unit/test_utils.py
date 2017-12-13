@@ -87,23 +87,6 @@ class TestUtils(base.BaseTestCase):
     def test_decimal_to_dt_with_none_parameter(self):
         self.assertIsNone(utils.decimal_to_dt(None))
 
-    def test_dict_to_kv(self):
-        data = {'a': 'A',
-                'b': 'B',
-                'nested': {'a': 'A',
-                           'b': 'B',
-                           },
-                'nested2': [{'c': 'A'}, {'c': 'B'}]
-                }
-        pairs = list(utils.dict_to_keyval(data))
-        self.assertEqual([('a', 'A'),
-                          ('b', 'B'),
-                         ('nested.a', 'A'),
-                         ('nested.b', 'B'),
-                         ('nested2[0].c', 'A'),
-                         ('nested2[1].c', 'B')],
-                         sorted(pairs, key=lambda x: x[0]))
-
     def test_hash_of_set(self):
         x = ['a', 'b']
         y = ['a', 'b', 'a']

@@ -132,6 +132,23 @@ class TestOpenDayLightDriverSpecial(_Base):
     active_hosts_data = {"hostConfig": []}
     inactive_hosts_data = {"hostConfig": []}
 
+    def test_dict_to_kv(self):
+        data = {'a': 'A',
+                'b': 'B',
+                'nested': {'a': 'A',
+                           'b': 'B',
+                           },
+                'nested2': [{'c': 'A'}, {'c': 'B'}]
+                }
+        pairs = list(self.driver.dict_to_keyval(data))
+        self.assertEqual([('a', 'A'),
+                          ('b', 'B'),
+                         ('nested.a', 'A'),
+                         ('nested.b', 'B'),
+                         ('nested2[0].c', 'A'),
+                         ('nested2[1].c', 'B')],
+                         sorted(pairs, key=lambda x: x[0]))
+
     def test_not_implemented_meter(self):
         sample_data = self.driver.get_sample_data('egg',
                                                   self.fake_odl_url,
