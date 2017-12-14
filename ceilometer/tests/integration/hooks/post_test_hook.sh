@@ -84,7 +84,7 @@ sudo chown -R tempest:stack $BASE/new/tempest
 sudo chown -R tempest:stack $BASE/data/tempest
 cd $BASE/new/tempest
 set +e
-sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest.scenario.test_telemetry_integration --concurrency=$TEMPEST_CONCURRENCY
+sudo -H -u tempest OS_TEST_TIMEOUT=$TEMPEST_OS_TEST_TIMEOUT tox -eall-plugin -- ceilometer.tests.tempest --concurrency=$TEMPEST_CONCURRENCY
 EXIT_CODE=$?
 set -e
 export_subunit_data "all-plugin"
