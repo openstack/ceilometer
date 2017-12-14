@@ -113,8 +113,8 @@ def decimal_to_dt(dec):
 
     integer = int(dec)
     micro = (dec - decimal.Decimal(integer)) * decimal.Decimal(units.M)
-    daittyme = datetime.datetime.utcfromtimestamp(integer)
-    return daittyme.replace(microsecond=int(round(micro)))
+    date_time = datetime.datetime.utcfromtimestamp(integer)
+    return date_time.replace(microsecond=int(round(micro)))
 
 
 def hash_of_set(s):
