@@ -187,13 +187,13 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
 
 
 class NotifierPublisher(MessagingPublisher):
-    """Publish metering data from notifer publisher.
+    """Publish metering data from notifier publisher.
 
-    The ip address and port number of notifer can be configured in
+    The ip address and port number of notifier can be configured in
     ceilometer pipeline configuration file.
 
     User can customize the transport driver such as rabbit, kafka and
-    so on. The Notifer uses `sample` method as default method to send
+    so on. The Notifier uses `sample` method as default method to send
     notifications.
 
     This publisher has transmit options such as queue, drop, and
@@ -218,7 +218,7 @@ class NotifierPublisher(MessagingPublisher):
             - name: notifier_sink
               transformers:
               publishers:
-                - notifer://[notifier_ip]:[notifier_port]?topic=[topic]&
+                - notifier://[notifier_ip]:[notifier_port]?topic=[topic]&
                   driver=driver&max_retry=100
 
     """
