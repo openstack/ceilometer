@@ -49,7 +49,7 @@ The meter pipeline definition looks like:
      - name: 'source name'
        meters:
          - 'meter filter'
-       sinks
+       sinks:
          - 'sink name'
    sinks:
      - name: 'sink name'
@@ -132,7 +132,7 @@ Similarly, the event pipeline definition looks like:
      - name: 'source name'
        events:
          - 'event filter'
-       sinks
+       sinks:
          - 'sink name'
    sinks:
      - name: 'sink name'
