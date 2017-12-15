@@ -292,6 +292,8 @@ between two ``datetime`` fields from one notification.
     project_id: $.payload.tenant_id
     resource_id: $.payload.instance_id
 
+.. _Polling-Configuration:
+
 Polling
 ~~~~~~~
 
