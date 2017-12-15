@@ -500,10 +500,8 @@ The following options are availble:
     If false, the publisher will send each sample and event individually,
     whether or not the notification agent is configured to process in batches.
 
-``poolsize``
-    The maximum number of open connections the publisher will maintain.
-    Increasing value may improve performance but will also increase memory and
-    socket consumption requirements.
+``verify_ssl``
+    If false, the ssl certificate verification is disabled.
 
 The default publisher is ``gnocchi``, without any additional options
 specified. A sample ``publishers`` section in the
