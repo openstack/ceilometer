@@ -134,8 +134,8 @@ daemon is configured to run one or more *pollster* plugins using any
 combination of ``ceilometer.poll.compute``, ``ceilometer.poll.central``, and
 ``ceilometer.poll.ipmi`` namespaces
 
-The frequency of polling is controlled via the pipeline configuration. See
-:ref:`Pipeline-Configuration` for details. The agent framework then passes the
+The frequency of polling is controlled via the polling configuration. See
+:ref:`Polling-Configuration` for details. The agent framework then passes the
 generated samples to the notification agent for processing.
 
 
