@@ -61,7 +61,7 @@ the folder ``ceilometer/compute/pollsters``.
 Notifications mechanism uses plugins as well, though in most cases, this is not
 needed. A meter definition can be directly added to
 :file:`ceilometer/data/meters.d/meters.yaml` to match the event type. For more
-information, see the :ref:`add_new_meters` page.
+information, see the :ref:`meter_definitions` page.
 
 We are using these two existing plugins as examples as the first one provides
 an example of how to interact when you need to retrieve information from an

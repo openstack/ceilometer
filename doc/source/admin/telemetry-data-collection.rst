@@ -189,6 +189,8 @@ compute service, see `Telemetry services
 <https://docs.openstack.org/ceilometer/latest/install/install-compute-ubuntu.html>`__
 in the Installation Tutorials and Guides.
 
+.. _meter_definitions:
+
 Meter definitions
 -----------------
 
