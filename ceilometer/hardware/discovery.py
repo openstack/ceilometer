@@ -48,8 +48,6 @@ OPTS = [
     cfg.StrOpt('tripleo_network_name',
                default='ctlplane',
                help='Name of the control plane Tripleo network')
-
-
 ]
 
 
