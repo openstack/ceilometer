@@ -73,7 +73,7 @@ class VolumeSnapshotSize(_Base):
                 type=sample.TYPE_GAUGE,
                 unit='GB',
                 volume=snapshot.size,
-                user_id=None,
+                user_id=snapshot.user_id,
                 project_id=getattr(
                     snapshot,
                     'os-extended-snapshot-attributes:project_id'),
