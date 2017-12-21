@@ -141,17 +141,11 @@ class TestProjectDiscovery(base.BaseTestCase):
         self.manager = mock.MagicMock()
         self.manager.keystone.projects.list.side_effect = self.side_effect
 
-    def test_project_discovery_with_domains(self):
+    def test_project_discovery(self):
         self.manager.keystone.domains.list.return_value = self.domains
         result = self.discovery.discover(self.manager)
         self.assertEqual(len(result), 3)
         self.assertEqual(self.manager.keystone.projects.list.call_count, 2)
-
-    def test_project_discovery_no_domain(self):
-        self.manager.keystone.domains.list.return_value = []
-        result = self.discovery.discover(self.manager)
-        self.assertEqual(len(result), 2)
-        self.assertEqual(self.manager.keystone.projects.list.call_count, 1)
 
 
 class TestHardwareDiscovery(base.BaseTestCase):
