@@ -57,7 +57,7 @@ GITBRANCH["python-ceilometerclient"]=${CEILOMETERCLIENT_BRANCH:-master}
 GITDIR["python-ceilometerclient"]=$DEST/python-ceilometerclient
 GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
 
-# Make sure gnocchi and panko plugin is enabled before ceilometer
+# Make sure panko plugin is enabled before ceilometer
 function _ceilometer_check_for_storage  {
     local plugins="${DEVSTACK_PLUGINS}"
     local plugin
