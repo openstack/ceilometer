@@ -30,15 +30,12 @@ class TenantDiscovery(plugin.DiscoveryBase):
     def discover(self, manager, param=None):
         domains = manager.keystone.domains.list()
         LOG.debug('Found %s keystone domains', len(domains))
-        if domains:
-            tenants = []
-            for domain in domains:
-                domain_tenants = manager.keystone.projects.list(domain)
-                LOG.debug("Found %s tenants in domain %s", len(domain_tenants),
-                          domain.name)
-                tenants = tenants + domain_tenants
-        else:
-            tenants = manager.keystone.projects.list()
-            LOG.debug("No domains - found %s tenants in default domain",
-                      len(tenants))
+
+        tenants = []
+        for domain in domains:
+            domain_tenants = manager.keystone.projects.list(domain)
+            LOG.debug("Found %s tenants in domain %s", len(domain_tenants),
+                      domain.name)
+            tenants = tenants + domain_tenants
+
         return tenants or []
