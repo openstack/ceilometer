@@ -30,16 +30,17 @@
 Managing Resource Types
 =======================
 
-Resource types in Gnocchi are managed by Ceilometer. The following describes how to add/remove
-or update Gnocchi resource types to support new Ceilometer data.
+Resource types in Gnocchi are managed by Ceilometer. The following describes
+how to add/remove or update Gnocchi resource types to support new Ceilometer
+data.
 
 The modification or creation of Gnocchi resource type definitions are managed
 :section:`resources_update_operations` of :file:`ceilometer/gnocchi_client.py`.
 
 The following operations are supported:
 
-1. Adding a new attribute to a resource type. The following adds `flavor_name` attribute
-   to an existing `instance` resource:
+1. Adding a new attribute to a resource type. The following adds `flavor_name`
+   attribute to an existing `instance` resource:
 
 .. code::
 
@@ -53,8 +54,8 @@ The following operations are supported:
                    "required": True, "options": {'fill': ''}}
      }]}
 
-2. Remove an existing attribute from a resource type. The following removes `server_group`
-   attribute from `instance` resource:
+2. Remove an existing attribute from a resource type. The following removes
+   `server_group` attribute from `instance` resource:
 
 .. code::
 
@@ -66,8 +67,8 @@ The following operations are supported:
          "path": "/attributes/server_group"
      }]}
 
-3. Creating a new resource type. The following creates a new resource type named
-   `nova_compute` with a required attribute `host_name`:
+3. Creating a new resource type. The following creates a new resource type
+   named `nova_compute` with a required attribute `host_name`:
 
 .. code::
 
@@ -81,9 +82,10 @@ The following operations are supported:
 
 .. note::
 
-    Do not modify the existing change steps when making changes. Each modification
-    requires a new step to be added and for `ceilometer-upgrade`
-    to be run to apply the change to Gnocchi.
+    Do not modify the existing change steps when making changes.
+    Each modification requires a new step to be added and for
+    `ceilometer-upgrade` to be run to apply the change to Gnocchi.
 
-With accomplishing sections above, don't forget to add a new resource type or attributes of
-a resource type into the :file:`ceilometer/publisher/data/gnocchi_resources.yaml`.
+With accomplishing sections above, don't forget to add a new resource type or
+attributes of a resource type into
+the :file:`ceilometer/publisher/data/gnocchi_resources.yaml`.

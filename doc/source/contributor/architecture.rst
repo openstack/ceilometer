@@ -27,8 +27,8 @@ workers and nodes can be added depending on the expected load. Ceilometer
 offers two core services:
 
 1. polling agent - daemon designed to poll OpenStack services and build Meters.
-2. notification agent - daemon designed to listen to notifications on message queue,
-   convert them to Events and Samples, and apply pipeline actions.
+2. notification agent - daemon designed to listen to notifications on message
+   queue, convert them to Events and Samples, and apply pipeline actions.
 
 Data normalised and collected by Ceilometer can be sent to various targets.
 Gnocchi_ was developed to capture measurement data in a time series format to
@@ -96,12 +96,12 @@ but by default, will listen to ``notifications.info``,
 messages off the configured topics and redistributes them to the appropriate
 plugins(endpoints) to be processed into Events and Samples.
 
-Sample-oriented plugins provide a method to list the event types they're interested
-in and a callback for processing messages accordingly. The registered name of the
-callback is used to enable or disable it using the pipeline of the notification
-daemon. The incoming messages are filtered based on their event type value before
-being passed to the callback so the plugin only receives events it has
-expressed an interest in seeing.
+Sample-oriented plugins provide a method to list the event types they're
+interested in and a callback for processing messages accordingly.
+The registered name of the callback is used to enable or disable it using
+the pipeline of the notification daemon. The incoming messages are filtered
+based on their event type value before being passed to the callback so the
+plugin only receives events it has expressed an interest in seeing.
 
 .. _polling:
 
@@ -188,8 +188,8 @@ Publishing the data
 Currently, processed data can be published using 7 different transports:
 
 1. gnocchi, which publishes samples/events to Gnocchi API;
-2. notifier, a notification based publisher which pushes samples to a message queue
-   which can be consumed by an external system;
+2. notifier, a notification based publisher which pushes samples to a message
+   queue which can be consumed by an external system;
 3. udp, which publishes samples using UDP packets;
 4. http, which targets a REST interface;
 5. file, which publishes samples to a file with specified name and location;

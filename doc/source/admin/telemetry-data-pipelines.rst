@@ -296,9 +296,7 @@ Multi meter arithmetic transformer
 ``````````````````````````````````
 
 This transformer enables us to perform arithmetic calculations over one
-or more meters and/or their metadata, for example:
-
-.. code-block:: none
+or more meters and/or their metadata, for example::
 
    memory_util = 100 * memory.usage / memory
 

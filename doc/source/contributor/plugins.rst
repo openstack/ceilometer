@@ -133,8 +133,9 @@ In the ``InstanceNotifications`` plugin, it listens to three events:
 * compute.instance.delete.start
 
 Using the ``get_event_type`` method and subsequently the method
-``process_notification`` will be invoked each time such events are happening which
-generates the appropriate sample objects to be sent to the publisher targets.
+``process_notification`` will be invoked each time such events are happening
+which generates the appropriate sample objects to be sent to the publisher
+targets.
 
 Adding new plugins
 ------------------
@@ -167,6 +168,6 @@ Tests
 Any new plugin or agent contribution will only be accepted into the project if
 provided together with unit tests.  Those are defined for the compute agent
 plugins in the directory ``tests/unit/compute`` and for the agent itself in
-``tests/unit/agent``. Unit tests are run in a continuous integration process for
-each commit made to the project, thus ensuring as best as possible that a given
-patch has no side effect to the rest of the project.
+``tests/unit/agent``. Unit tests are run in a continuous integration process
+for each commit made to the project, thus ensuring as best as possible that
+a given patch has no side effect to the rest of the project.

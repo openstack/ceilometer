@@ -19,14 +19,14 @@
 Folsom
 ====================
 
-This is the first release (Version 0.1) of Ceilometer. Please take all appropriate
-caution in using it, as it is a technology preview at this time.
+This is the first release (Version 0.1) of Ceilometer. Please take all
+appropriate caution in using it, as it is a technology preview at this time.
 
 Version of OpenStack
-   It is currently tested to work with OpenStack 2012.2 Folsom. Due to its use of
-   openstack-common, and the modification that were made in term of notification
-   to many other components (glance, cinder, quantum), it will not easily work
-   with any prior version of OpenStack.
+   It is currently tested to work with OpenStack 2012.2 Folsom. Due to its use
+   of openstack-common, and the modification that were made in term of
+   notification to many other components (glance, cinder, quantum), it will not
+   easily work with any prior version of OpenStack.
 
 Components
    Currently covered components are: Nova, Nova-network, Glance, Cinder and
@@ -35,27 +35,27 @@ Components
    per component can be found at in :ref:`measurements`.
 
 Nova with libvirt only
-   Most of the Nova meters will only work with libvirt fronted hypervisors at the
-   moment, and our test coverage was mostly done on KVM. Contributors are welcome
-   to implement other virtualization backends' meters.
+   Most of the Nova meters will only work with libvirt fronted hypervisors at
+   the moment, and our test coverage was mostly done on KVM. Contributors are
+   welcome to implement other virtualization backends' meters.
 
 Quantum delete events
    Quantum delete notifications do not include the same metadata as the other
    messages, so we ignore them for now. This isn't ideal, since it may mean we
-   miss charging for some amount of time, but it is better than throwing away the
-   existing metadata for a resource when it is deleted.
+   miss charging for some amount of time, but it is better than throwing away
+   the existing metadata for a resource when it is deleted.
 
 Database backend
    The only tested and complete database backend is currently MongoDB, the
    SQLAlchemy one is still work in progress.
 
 Installation
-   The current best source of information on how to deploy this project is found
-   as the devstack implementation but feel free to come to #openstack-metering on
-   freenode for more info.
+   The current best source of information on how to deploy this project is
+   found as the devstack implementation but feel free to come to
+   #openstack-metering on freenode for more info.
 
 Volume of data
-   Please note that metering can generate lots of data very quickly. Have a look
-   at the following spreadsheet to evaluate what you will end up with.
+   Please note that metering can generate lots of data very quickly. Have a
+   look at the following spreadsheet to evaluate what you will end up with.
 
       https://wiki.openstack.org/wiki/EfficientMetering#Volume_of_data
