@@ -127,7 +127,7 @@ class XenapiInspector(virt_inspector.Inspector):
         LOG.debug("inspect_vnics, all bandwidth: %s", bw_all,
                   instance=instance)
 
-        for vif_ref in vif_refs or []:
+        for vif_ref in vif_refs:
             vif_rec = self.session.VIF.get_record(vif_ref)
 
             bw_vif = bw_all[dom_id][vif_rec['device']]
@@ -147,38 +147,36 @@ class XenapiInspector(virt_inspector.Inspector):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         vif_refs = self.session.VM.get_VIFs(vm_ref)
-        if vif_refs:
-            for vif_ref in vif_refs:
-                vif_rec = self.session.VIF.get_record(vif_ref)
+        for vif_ref in vif_refs:
+            vif_rec = self.session.VIF.get_record(vif_ref)
 
-                rx_rate = float(self.session.VM.query_data_source(
-                    vm_ref, "vif_%s_rx" % vif_rec['device']))
-                tx_rate = float(self.session.VM.query_data_source(
-                    vm_ref, "vif_%s_tx" % vif_rec['device']))
+            rx_rate = float(self.session.VM.query_data_source(
+                vm_ref, "vif_%s_rx" % vif_rec['device']))
+            tx_rate = float(self.session.VM.query_data_source(
+                vm_ref, "vif_%s_tx" % vif_rec['device']))
 
-                yield virt_inspector.InterfaceRateStats(
-                    name=vif_rec['uuid'],
-                    mac=vif_rec['MAC'],
-                    fref=None,
-                    parameters=None,
-                    rx_bytes_rate=rx_rate,
-                    tx_bytes_rate=tx_rate)
+            yield virt_inspector.InterfaceRateStats(
+                name=vif_rec['uuid'],
+                mac=vif_rec['MAC'],
+                fref=None,
+                parameters=None,
+                rx_bytes_rate=rx_rate,
+                tx_bytes_rate=tx_rate)
 
     def inspect_disk_rates(self, instance, duration):
         instance_name = util.instance_name(instance)
         vm_ref = self._lookup_by_name(instance_name)
         vbd_refs = self.session.VM.get_VBDs(vm_ref)
-        if vbd_refs:
-            for vbd_ref in vbd_refs:
-                vbd_rec = self.session.VBD.get_record(vbd_ref)
+        for vbd_ref in vbd_refs:
+            vbd_rec = self.session.VBD.get_record(vbd_ref)
 
-                read_rate = float(self.session.VM.query_data_source(
-                    vm_ref, "vbd_%s_read" % vbd_rec['device']))
-                write_rate = float(self.session.VM.query_data_source(
-                    vm_ref, "vbd_%s_write" % vbd_rec['device']))
-                yield virt_inspector.DiskRateStats(
-                    device=vbd_rec['device'],
-                    read_bytes_rate=read_rate,
-                    read_requests_rate=0,
-                    write_bytes_rate=write_rate,
-                    write_requests_rate=0)
+            read_rate = float(self.session.VM.query_data_source(
+                vm_ref, "vbd_%s_read" % vbd_rec['device']))
+            write_rate = float(self.session.VM.query_data_source(
+                vm_ref, "vbd_%s_write" % vbd_rec['device']))
+            yield virt_inspector.DiskRateStats(
+                device=vbd_rec['device'],
+                read_bytes_rate=read_rate,
+                read_requests_rate=0,
+                write_bytes_rate=write_rate,
+                write_requests_rate=0)
