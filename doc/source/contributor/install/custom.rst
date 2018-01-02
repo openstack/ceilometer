@@ -120,7 +120,6 @@ configuration settings should be added::
 
     [dispatcher_gnocchi]
     filter_project = gnocchi_swift
-    filter_service_activity = True
 
 Custom pipeline
 ===============
