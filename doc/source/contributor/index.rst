@@ -28,7 +28,6 @@ Developer reference
    architecture
    measurements
    events
-   configuration
    plugins
    new_resource_types
    devstack
