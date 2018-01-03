@@ -13,12 +13,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
+
 from oslo_log import log
 from oslo_utils import strutils
 import requests
 from requests import adapters
 from six.moves.urllib import parse as urlparse
-import ujson
 
 from ceilometer import publisher
 
@@ -154,7 +155,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         if not data:
             LOG.debug('Data set is empty!')
             return
-        data = ujson.dumps(data)
+        data = json.dumps(data)
         LOG.trace('Message: %s', data)
         try:
             res = self.session.post(self.target, data=data,
