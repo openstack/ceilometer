@@ -1,7 +1,8 @@
-Contribution Guidelines
-=======================
+=================
+Contributor Guide
+=================
 
-In the Contributions Guide, you will find documented policies for
+In the Contributor Guide, you will find documented policies for
 developing with Ceilometer. This includes the processes we use for
 bugs, contributor onboarding, core reviewer memberships, and other
 procedural items.
@@ -17,19 +18,36 @@ contributing to Ceilometer, please follow the workflow found here_.
 :Code Hosting: https://git.openstack.org/cgit/openstack/ceilometer/
 :Code Review: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
 
-
-Developer reference
--------------------
-
+Overview
+========
 .. toctree::
    :maxdepth: 2
 
    overview
    architecture
+
+Data Types
+==========
+.. toctree::
+   :maxdepth: 2
+
    measurements
    events
-   plugins
-   new_resource_types
+
+Getting Started
+===============
+.. toctree::
+   :maxdepth: 2
+
    devstack
    testing
    gmr
+
+
+Development
+===========
+.. toctree::
+   :maxdepth: 2
+
+   plugins
+   new_resource_types
