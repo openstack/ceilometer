@@ -267,7 +267,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     raise
                 self._gnocchi_project_id = project.id
                 LOG.debug("filtered project found: %s",
-                          self.gnocchi_project_id)
+                          self._gnocchi_project_id)
             return self._gnocchi_project_id
 
     def _is_swift_account_sample(self, sample):
