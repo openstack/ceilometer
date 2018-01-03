@@ -393,10 +393,13 @@ above table is the following:
 
 .. note::
 
-    If storing data in Gnocchi v4.1+, derived rate_of_change metrics can be
-    computed using Gnocchi rather than Ceilometer transformers. This will
-    minimize Ceilometer memory requirements and avoid missing data when
-    Ceilometer services restart.
+    If storing data in Gnocchi, derived rate_of_change metrics are also
+    computed using Gnocchi in addition to Ceilometer transformers. It avoids
+    missing data when Ceilometer services restart.
+    To minimize Ceilometer memory requirements transformers can be disabled.
+    These ``rate_of_change`` meters are deprecated and will be removed in
+    default Ceilometer configuration in future release.
+
 
 OpenStack Compute is capable of collecting ``CPU`` related meters from
 the compute host machines. In order to use that you need to set the

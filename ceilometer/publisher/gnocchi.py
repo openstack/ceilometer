@@ -54,12 +54,12 @@ EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE = ("create", "update", "delete")
 class ResourcesDefinition(object):
 
     MANDATORY_FIELDS = {'resource_type': six.string_types,
-                        'metrics': list}
+                        'metrics': (dict, list)}
 
     MANDATORY_EVENT_FIELDS = {'id': six.string_types}
 
-    def __init__(self, definition_cfg, default_archive_policy, plugin_manager):
-        self._default_archive_policy = default_archive_policy
+    def __init__(self, definition_cfg, archive_policy_default,
+                 archive_policy_override, plugin_manager):
         self.cfg = definition_cfg
 
         self._check_required_and_types(self.MANDATORY_FIELDS, self.cfg)
@@ -79,24 +79,44 @@ class ResourcesDefinition(object):
                 name, attr_cfg, plugin_manager)
 
         self.metrics = {}
-        for t in self.cfg['metrics']:
-            archive_policy = self.cfg.get('archive_policy',
-                                          self._default_archive_policy)
-            if archive_policy is None:
-                self.metrics[t] = {}
-            else:
-                self.metrics[t] = dict(archive_policy_name=archive_policy)
+
+        # NOTE(sileht): Convert old list to new dict format
+        if isinstance(self.cfg['metrics'], list):
+            values = [None] * len(self.cfg['metrics'])
+            self.cfg['metrics'] = dict(zip(self.cfg['metrics'], values))
+
+        for m, extra in self.cfg['metrics'].items():
+            if not extra:
+                extra = {}
+
+            if not extra.get("archive_policy_name"):
+                extra["archive_policy_name"] = archive_policy_default
+
+            if archive_policy_override:
+                extra["archive_policy_name"] = archive_policy_override
+
+            # NOTE(sileht): For backward compat, this is after the override to
+            # preserve the wierd previous behavior. We don't really care as we
+            # deprecate it.
+            if 'archive_policy' in self.cfg:
+                LOG.warning("archive_policy '%s' for a resource-type (%s) is "
+                            "deprecated, set it for each metric instead.",
+                            self.cfg["archive_policy"],
+                            self.cfg["resource_type"])
+                extra["archive_policy_name"] = self.cfg['archive_policy']
+
+            self.metrics[m] = extra
 
     @staticmethod
     def _check_required_and_types(expected, definition):
-        for field, field_type in expected.items():
+        for field, field_types in expected.items():
             if field not in definition:
                 raise declarative.ResourceDefinitionException(
                     _("Required field %s not specified") % field, definition)
-            if not isinstance(definition[field], field_type):
+            if not isinstance(definition[field], field_types):
                 raise declarative.ResourceDefinitionException(
                     _("Required field %(field)s should be a %(type)s") %
-                    {'field': field, 'type': field_type}, definition)
+                    {'field': field, 'type': field_types}, definition)
 
     @staticmethod
     def _ensure_list(value):
@@ -185,11 +205,13 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         resources_definition_file = options.get(
             'resources_definition_file',
             [conf.dispatcher_gnocchi.resources_definition_file])[-1]
-        archive_policy = options.get(
+
+        archive_policy_override = options.get(
             'archive_policy',
             [conf.dispatcher_gnocchi.archive_policy])[-1]
-        self.resources_definition = self._load_resources_definitions(
-            conf, archive_policy, resources_definition_file)
+        self.resources_definition, self.archive_policies_definition = (
+            self._load_definitions(conf, archive_policy_override,
+                                   resources_definition_file))
         self.metric_map = dict((metric, rd) for rd in self.resources_definition
                                for metric in rd.metrics)
 
@@ -224,25 +246,38 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         self._already_logged_event_types = set()
         self._already_logged_metric_names = set()
 
+        self.ensures_archives_policies()
+
     @staticmethod
-    def _load_resources_definitions(conf, archive_policy,
-                                    resources_definition_file):
+    def _load_definitions(conf, archive_policy_override,
+                          resources_definition_file):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait_plugin')
         data = declarative.load_definitions(
             conf, {}, resources_definition_file,
             pkg_resources.resource_filename(__name__,
                                             "data/gnocchi_resources.yaml"))
+
+        archive_policy_default = data.get("archive_policy_default", "low")
         resource_defs = []
         for resource in data.get('resources', []):
             try:
                 resource_defs.append(ResourcesDefinition(
                     resource,
-                    archive_policy, plugin_manager))
+                    archive_policy_default,
+                    archive_policy_override,
+                    plugin_manager))
             except Exception as exc:
                 LOG.error("Failed to load resource due to error %s" %
                           exc)
-        return resource_defs
+        return resource_defs, data.get("archive_policies", [])
+
+    def ensures_archives_policies(self):
+        for ap in self.archive_policies_definition:
+            try:
+                self._gnocchi.archive_policy.get(ap["name"])
+            except gnocchi_exc.ArchivePolicyNotFound:
+                self._gnocchi.archive_policy.create(ap)
 
     @property
     def gnocchi_project_id(self):
@@ -323,8 +358,15 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 gnocchi_data[resource_id].setdefault(
                     "resource_extra", {}).update(rd.sample_attributes(sample))
                 measures.setdefault(resource_id, {}).setdefault(
-                    metric_name, []).append({'timestamp': sample.timestamp,
-                                             'value': sample.volume})
+                    metric_name,
+                    {"measures": [],
+                     "archive_policy_name":
+                     rd.metrics[metric_name]["archive_policy_name"],
+                     "unit": sample.unit}
+                )["measures"].append(
+                    {'timestamp': sample.timestamp,
+                     'value': sample.volume}
+                )
                 # TODO(gordc): unit should really be part of metric definition
                 gnocchi_data[resource_id]['resource']['metrics'][
                     metric_name]['unit'] = sample.unit
@@ -395,7 +437,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
         LOG.debug(
             "%d measures posted against %d metrics through %d resources",
-            sum(len(m) for rid in measures for m in measures[rid].values()),
+            sum(len(m["measures"])
+                for rid in measures
+                for m in measures[rid].values()),
             sum(len(m) for m in measures.values()), len(resource_infos))
 
     def _create_resource(self, resource_type, resource):

@@ -175,6 +175,9 @@ class PublisherTest(base.BaseTestCase):
         self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_client',
             return_value=ks_client))
+        self.useFixture(fixtures.MockPatch(
+            'gnocchiclient.v1.client.Client',
+            return_value=mock.Mock()))
         self.ks_client = ks_client
 
     def test_config_load(self):
@@ -198,7 +201,7 @@ class PublisherTest(base.BaseTestCase):
         plugin_manager = extension.ExtensionManager(
             namespace='ceilometer.event.trait.trait_plugin')
         rd = gnocchi.ResourcesDefinition(
-            resource, "low", plugin_manager)
+            resource, "high", "low", plugin_manager)
         operation = rd.event_match("image.delete")
         self.assertEqual('delete', operation)
 
@@ -245,12 +248,14 @@ class PublisherTest(base.BaseTestCase):
     def _do_test_activity_filter(self, expected_measures, fake_batch):
         url = netutils.urlsplit("gnocchi://")
         d = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        d._already_checked_archive_policies = True
         d.publish_samples(self.samples)
         self.assertEqual(1, len(fake_batch.mock_calls))
         measures = fake_batch.mock_calls[0][1][0]
         self.assertEqual(
             expected_measures,
-            sum(len(m) for rid in measures for m in measures[rid].values()))
+            sum(len(m["measures"]) for rid in measures
+                for m in measures[rid].values()))
 
     def test_activity_filter_match_project_id(self):
         self.samples[0].project_id = (
@@ -290,6 +295,7 @@ class PublisherTest(base.BaseTestCase):
         )]
         url = netutils.urlsplit("gnocchi://")
         d = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        d._already_checked_archive_policies = True
         d.publish_samples(samples)
         self.assertEqual(0, len(fake_batch.call_args[0][1]))
 
@@ -328,10 +334,14 @@ class PublisherWorkflowTest(base.BaseTestCase,
                     'display_name': 'myinstance',
                 },
             ),
-            measures_attributes=[{
-                'timestamp': '2012-05-08 20:23:48.028195',
-                'value': 2
-            }],
+            metric_attributes={
+                "archive_policy_name": "ceilometer-low",
+                "unit": "GB",
+                "measures": [{
+                    'timestamp': '2012-05-08 20:23:48.028195',
+                    'value': 2
+                }]
+            },
             postable_attributes={
                 'user_id': 'test_user',
                 'project_id': 'test_project',
@@ -372,10 +382,14 @@ class PublisherWorkflowTest(base.BaseTestCase,
                     'useless': 'not_used',
                 },
             ),
-            measures_attributes=[{
-                'timestamp': '2012-05-08 20:23:48.028195',
-                'value': 2
-            }],
+            metric_attributes={
+                "archive_policy_name": "ceilometer-low",
+                "unit": "W",
+                "measures": [{
+                    'timestamp': '2012-05-08 20:23:48.028195',
+                    'value': 2
+                }]
+            },
             postable_attributes={
                 'user_id': 'test_user',
                 'project_id': 'test_project',
@@ -460,9 +474,11 @@ class PublisherWorkflowTest(base.BaseTestCase,
         self.useFixture(utils_fixture.TimeFixture(now))
 
         expected_calls = [
-            mock.call.resource.search('instance_disk', search_params),
+            mock.call.archive_policy.get("ceilometer-low"),
+            mock.call.archive_policy.get("ceilometer-low-rate"),
             mock.call.resource.search('instance_network_interface',
                                       search_params),
+            mock.call.resource.search('instance_disk', search_params),
             mock.call.resource.update(
                 'instance', '9f9d01b9-4a58-4271-9e27-398b21ab20d1',
                 {'ended_at': now.isoformat()}),
@@ -489,15 +505,13 @@ class PublisherWorkflowTest(base.BaseTestCase,
                                        IMAGE_DELETE_START,
                                        VOLUME_DELETE_START,
                                        FLOATINGIP_DELETE_END])
-        self.assertEqual(8, len(fakeclient.mock_calls))
+        self.assertEqual(10, len(fakeclient.mock_calls))
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 
     @mock.patch('ceilometer.publisher.gnocchi.LOG')
     @mock.patch('gnocchiclient.v1.client.Client')
     def test_workflow(self, fakeclient_cls, logger):
-        url = netutils.urlsplit("gnocchi://")
-        self.publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
 
         fakeclient = fakeclient_cls.return_value
 
@@ -506,8 +520,10 @@ class PublisherWorkflowTest(base.BaseTestCase,
         gnocchi_id = uuid.uuid4()
 
         expected_calls = [
+            mock.call.archive_policy.get("ceilometer-low"),
+            mock.call.archive_policy.get("ceilometer-low-rate"),
             mock.call.metric.batch_resources_metrics_measures(
-                {resource_id: {metric_name: self.measures_attributes}},
+                {resource_id: {metric_name: self.metric_attributes}},
                 create_metrics=True)
         ]
         expected_debug = [
@@ -533,12 +549,16 @@ class PublisherWorkflowTest(base.BaseTestCase,
             attributes['metrics'] = dict((metric_name, {})
                                          for metric_name in self.metric_names)
             for k, v in six.iteritems(attributes['metrics']):
+                if k in ["cpu", "disk.read.requests", "disk.write.requests",
+                         "disk.read.bytes", "disk.write.bytes"]:
+                    v["archive_policy_name"] = "ceilometer-low-rate"
+                else:
+                    v["archive_policy_name"] = "ceilometer-low"
+
                 if k == 'disk.root.size':
                     v['unit'] = 'GB'
-                    continue
-                if k == 'hardware.ipmi.node.power':
+                elif k == 'hardware.ipmi.node.power':
                     v['unit'] = 'W'
-                    continue
             expected_calls.append(mock.call.resource.create(
                 self.resource_type, attributes))
 
@@ -554,7 +574,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
             if not self.create_resource_fail:
                 expected_calls.append(
                     mock.call.metric.batch_resources_metrics_measures(
-                        {resource_id: {metric_name: self.measures_attributes}},
+                        {resource_id: {metric_name: self.metric_attributes}},
                         create_metrics=True)
                 )
 
@@ -570,7 +590,8 @@ class PublisherWorkflowTest(base.BaseTestCase,
             batch_side_effect += [None]
             expected_debug.append(
                 mock.call("%d measures posted against %d metrics through %d "
-                          "resources", len(self.measures_attributes), 1, 1)
+                          "resources", len(self.metric_attributes["measures"]),
+                          1, 1)
             )
 
         if self.patchable_attributes:
@@ -586,7 +607,9 @@ class PublisherWorkflowTest(base.BaseTestCase,
         batch = fakeclient.metric.batch_resources_metrics_measures
         batch.side_effect = batch_side_effect
 
-        self.publisher.publish_samples([self.sample])
+        url = netutils.urlsplit("gnocchi://")
+        publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        publisher.publish_samples([self.sample])
 
         # Check that the last log message is the expected one
         if (self.post_measure_fail
@@ -598,5 +621,6 @@ class PublisherWorkflowTest(base.BaseTestCase,
             self.assertEqual(0, logger.error.call_count)
         self.assertEqual(expected_calls, fakeclient.mock_calls)
         self.assertEqual(expected_debug, logger.debug.mock_calls)
+
 
 PublisherWorkflowTest.generate_scenarios()
