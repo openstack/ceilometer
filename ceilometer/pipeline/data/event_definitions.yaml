@@ -7,6 +7,8 @@
       fields: payload.user_id
     instance_id:
       fields: payload.instance_id
+    display_name:
+      fields: payload.display_name
     resource_id:
       fields: payload.instance_id
     host:
@@ -174,6 +176,8 @@
       fields: ['ctxt.trustor_user_id', 'ctxt.user_id']
     resource_id:
       fields: payload.stack_identity
+    name:
+      fields: payload.name
 - event_type: sahara.cluster.*
   traits: &sahara_crud
     project_id:
@@ -182,6 +186,8 @@
       fields: ctxt.user_id
     resource_id:
       fields: payload.cluster_id
+    name:
+      fields: payload.name
 - event_type: sahara.cluster.health
   traits: &sahara_health
     <<: *sahara_crud
@@ -299,21 +305,29 @@
 - event_type: network.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.network.name
     resource_id:
       fields: ['payload.network.id', 'payload.id']
 - event_type: subnet.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.subnet.name
     resource_id:
       fields: ['payload.subnet.id', 'payload.id']
 - event_type: port.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.port.name
     resource_id:
       fields: ['payload.port.id', 'payload.id']
 - event_type: router.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.router.name
     resource_id:
       fields: ['payload.router.id', 'payload.id']
 - event_type: floatingip.*
@@ -324,6 +338,8 @@
 - event_type: pool.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.pool.name
     resource_id:
       fields: ['payload.pool.id', 'payload.id']
 - event_type: vip.*
@@ -339,51 +355,71 @@
 - event_type: health_monitor.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.health_monitor.name
     resource_id:
       fields: ['payload.health_monitor.id', 'payload.id']
 - event_type: healthmonitor.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.healthmonitor.name
     resource_id:
       fields: ['payload.healthmonitor.id', 'payload.id']
 - event_type: listener.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.listener.name
     resource_id:
       fields: ['payload.listener.id', 'payload.id']
 - event_type: loadbalancer.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.loadbalancer.name
     resource_id:
       fields: ['payload.loadbalancer.id', 'payload.id']
 - event_type: firewall.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.firewall.name
     resource_id:
       fields: ['payload.firewall.id', 'payload.id']
 - event_type: firewall_policy.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.firewall_policy.name
     resource_id:
       fields: ['payload.firewall_policy.id', 'payload.id']
 - event_type: firewall_rule.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.firewall_rule.name
     resource_id:
       fields: ['payload.firewall_rule.id', 'payload.id']
 - event_type: vpnservice.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.vpnservice.name
     resource_id:
       fields: ['payload.vpnservice.id', 'payload.id']
 - event_type: ipsecpolicy.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.ipsecpolicy.name
     resource_id:
       fields: ['payload.ipsecpolicy.id', 'payload.id']
 - event_type: ikepolicy.*
   traits:
     <<: *network_traits
+    name:
+      fields: payload.ikepolicy.name
     resource_id:
       fields: ['payload.ikepolicy.id', 'payload.id']
 - event_type: ipsec_site_connection.*
