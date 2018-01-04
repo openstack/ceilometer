@@ -260,5 +260,5 @@ class TestHttpPublisher(base.BaseTestCase):
         with mock.patch.object(requests.Session, 'post') as post:
             publisher.publish_events(self.event_data)
             self.assertEqual(
-                '[{"some":"aa"},{"some":"aa"},{"some":"aa"}]',
+                '[{"some": "aa"}, {"some": "aa"}, {"some": "aa"}]',
                 post.call_args[1]['data'])
