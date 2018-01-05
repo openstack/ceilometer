@@ -65,6 +65,7 @@ SNAPSHOT_LIST = [
           u'os-extended-snapshot-attributes:project_id':
               u'6824974c08974d4db864bbaa6bc08303',
           u'size': 1,
+          u'user_id': u'be255bd31eb944578000fc762fde6dcf',
           u'updated_at': u'2016-10-19T07:56:55.000000',
           u'id': u'b1ea6783-f952-491e-a4ed-23a6a562e1cf',
           u'volume_id': u'6f27bc42-c834-49ea-ae75-8d1073b37806',
@@ -135,6 +136,8 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
         self.assertEqual('volume.snapshot.size',
                          volume_snapshot_size_samples[0].name)
         self.assertEqual(1, volume_snapshot_size_samples[0].volume)
+        self.assertEqual('be255bd31eb944578000fc762fde6dcf',
+                         volume_snapshot_size_samples[0].user_id)
         self.assertEqual('6824974c08974d4db864bbaa6bc08303',
                          volume_snapshot_size_samples[0].project_id)
         self.assertEqual('b1ea6783-f952-491e-a4ed-23a6a562e1cf',
