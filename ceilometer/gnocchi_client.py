@@ -11,6 +11,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from distutils import version
+
 from gnocchiclient import client
 from gnocchiclient import exceptions as gnocchi_exc
 import keystoneauth1.session
@@ -184,9 +186,19 @@ resources_update_operations = [
      }]},
 ]
 
+# NOTE(sileht): We use LooseVersion because pbr can generate invalid
+# StrictVersion like 9.0.1.dev226
+REQUIRED_VERSION = version.LooseVersion("4.0.0")
+
 
 def upgrade_resource_types(conf):
     gnocchi = get_gnocchiclient(conf)
+
+    gnocchi_version = version.LooseVersion(gnocchi.build.get())
+    if gnocchi_version < REQUIRED_VERSION:
+        raise Exception("required gnocchi version is %s, got %s",
+                        REQUIRED_VERSION, gnocchi_version)
+
     for name, attributes in resources_initial.items():
         try:
             gnocchi.resource_type.get(name=name)
