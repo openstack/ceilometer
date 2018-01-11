@@ -11,7 +11,7 @@ contributing to Ceilometer, please follow the workflow found here_.
 
 .. _here: https://wiki.openstack.org/wiki/Gerrit_Workflow
 
-:Bug tracker: https://launchpad.net/ceilometer
+:Bug tracker: https://bugs.launchpad.net/ceilometer
 :Mailing list: http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev (prefix subjects with ``[Ceilometer]`` for faster responses)
 :Wiki: https://wiki.openstack.org/wiki/Ceilometer
 :Code Hosting: https://git.openstack.org/cgit/openstack/ceilometer/
