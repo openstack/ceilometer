@@ -101,7 +101,7 @@ metric:
     lookup: ['name', 'unit', 'volume']
 
   - name: 'memory'
-    event_type: 'compute.instance.*'
+    event_type: &instance_events compute.instance.(?!create.start).*
     type: 'gauge'
     unit: 'MB'
     volume: $.payload.memory_mb
@@ -118,7 +118,7 @@ metric:
       image_ref: $.payload.image_meta.base_image_ref
 
   - name: 'vcpus'
-    event_type: 'compute.instance.*'
+    event_type: *instance_events
     type: 'gauge'
     unit: 'vcpu'
     volume: $.payload.vcpus
@@ -143,7 +143,7 @@ metric:
       <<: *instance_meta
 
   - name: 'disk.root.size'
-    event_type: 'compute.instance.*'
+    event_type: *instance_events
     type: 'gauge'
     unit: 'GB'
     volume: $.payload.root_gb
@@ -155,7 +155,7 @@ metric:
        <<: *instance_meta
 
   - name: 'disk.ephemeral.size'
-    event_type: 'compute.instance.*'
+    event_type: *instance_events
     type: 'gauge'
     unit: 'GB'
     volume: $.payload.ephemeral_gb
