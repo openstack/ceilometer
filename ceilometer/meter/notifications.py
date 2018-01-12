@@ -13,13 +13,13 @@
 import glob
 import itertools
 import os
+import re
 
 import pkg_resources
 import six
 
 from oslo_config import cfg
 from oslo_log import log
-from oslo_utils import fnmatch
 from stevedore import extension
 
 from ceilometer import declarative
@@ -72,6 +72,7 @@ class MeterDefinition(object):
         self._event_type = self.cfg.get('event_type')
         if isinstance(self._event_type, six.string_types):
             self._event_type = [self._event_type]
+        self._event_type = [re.compile(etype) for etype in self._event_type]
 
         if ('type' not in self.cfg.get('lookup', []) and
                 self.cfg['type'] not in sample_util.TYPES):
@@ -107,7 +108,7 @@ class MeterDefinition(object):
 
     def match_type(self, meter_name):
         for t in self._event_type:
-            if fnmatch.fnmatch(meter_name, t):
+            if t.match(meter_name):
                 return True
 
     def to_samples(self, message, all_values=False):
