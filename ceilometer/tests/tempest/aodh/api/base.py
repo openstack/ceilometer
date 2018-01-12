@@ -46,7 +46,7 @@ class BaseAlarmingTest(tempest.test.BaseTestCase):
     def create_alarm(cls, **kwargs):
         body = cls.alarming_client.create_alarm(
             name=data_utils.rand_name('telemetry_alarm'),
-            type='threshold', **kwargs)
+            type='gnocchi_aggregation_by_metrics_threshold', **kwargs)
         cls.alarm_ids.append(body['alarm_id'])
         return body
 
