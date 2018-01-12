@@ -144,7 +144,7 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     @libvirt_utils.raise_nodata_if_unsupported
     @libvirt_utils.retry_on_disconnect
-    def inspect_instance(self, instance,  duration=None):
+    def inspect_instance(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
         memory_used = memory_resident = None
