@@ -298,20 +298,16 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
         gnocchi_data = {}
         measures = {}
-        stats = dict(measures=0, resources=0, metrics=0)
         for resource_id, samples_of_resource in resource_grouped_samples:
             # NOTE(sileht): / is forbidden by Gnocchi
             resource_id = resource_id.replace('/', '_')
 
-            stats['resources'] += 1
             metric_grouped_samples = itertools.groupby(
                 list(samples_of_resource),
                 key=operator.attrgetter('name'))
 
             res_info = {}
             for metric_name, samples in metric_grouped_samples:
-                stats['metrics'] += 1
-
                 samples = list(samples)
                 rd = self.metric_map.get(metric_name)
                 if rd is None:
@@ -342,13 +338,12 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     metric = sample.name
                     res_info['resource']['metrics'][metric]['unit'] = unit
 
-                stats['measures'] += len(measures[resource_id][metric_name])
                 res_info["resource"].update(res_info["resource_extra"])
                 if res_info:
                     gnocchi_data[resource_id] = res_info
 
         try:
-            self.batch_measures(measures, gnocchi_data, stats)
+            self.batch_measures(measures, gnocchi_data)
         except gnocchi_exc.ClientException as e:
             LOG.error(six.text_type(e))
         except Exception as e:
@@ -376,7 +371,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                  resource_infos[rid]['resource'])
                 for rid in resource_ids]
 
-    def batch_measures(self, measures, resource_infos, stats):
+    def batch_measures(self, measures, resource_infos):
         # NOTE(sileht): We don't care about error here, we want
         # resources metadata always been updated
         try:
@@ -409,9 +404,10 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             self._gnocchi.metric.batch_resources_metrics_measures(
                 measures, create_metrics=True)
 
-        # FIXME(sileht): take care of measures removed in stats
-        LOG.debug("%(measures)d measures posted against %(metrics)d "
-                  "metrics through %(resources)d resources", stats)
+        LOG.debug(
+            "%d measures posted against %d metrics through %d resources",
+            sum(len(m) for rid in measures for m in measures[rid].values()),
+            sum(len(m) for m in measures.values()), len(resource_infos))
 
     def _create_resource(self, resource_type, resource):
         self._gnocchi.resource.create(resource_type, resource)

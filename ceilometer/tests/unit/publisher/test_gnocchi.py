@@ -239,16 +239,18 @@ class PublisherTest(base.BaseTestCase):
             self.assertEqual(0, len(d.resources_definition))
 
     @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
-                '._if_not_cached')
+                '._if_not_cached', mock.Mock())
     @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '.batch_measures')
-    def _do_test_activity_filter(self, expected_measures, fake_batch, __):
+    def _do_test_activity_filter(self, expected_measures, fake_batch):
         url = netutils.urlsplit("gnocchi://")
         d = gnocchi.GnocchiPublisher(self.conf.conf, url)
         d.publish_samples(self.samples)
-        fake_batch.assert_called_with(
-            mock.ANY, mock.ANY,
-            {'metrics': 1, 'resources': 1, 'measures': expected_measures})
+        self.assertEqual(1, len(fake_batch.mock_calls))
+        measures = fake_batch.mock_calls[0][1][0]
+        self.assertEqual(
+            expected_measures,
+            sum(len(m) for rid in measures for m in measures[rid].values()))
 
     def test_activity_filter_match_project_id(self):
         self.samples[0].project_id = (
@@ -567,10 +569,8 @@ class PublisherWorkflowTest(base.BaseTestCase,
         if measures_posted:
             batch_side_effect += [None]
             expected_debug.append(
-                mock.call("%(measures)d measures posted against %(metrics)d "
-                          "metrics through %(resources)d resources", dict(
-                              measures=len(self.measures_attributes),
-                              metrics=1, resources=1))
+                mock.call("%d measures posted against %d metrics through %d "
+                          "resources", len(self.measures_attributes), 1, 1)
             )
 
         if self.patchable_attributes:
