@@ -184,6 +184,19 @@ resources_update_operations = [
                         "controller": {"type": "string", "min_length": 0,
                                        "max_length": 255, "required": True}}
      }]},
+    {"desc": "add volume provider resource type",
+     "type": "create_resource_type",
+     "resource_type": "volume_provider",
+     "data": [{
+         "attributes": {}
+     }]},
+    {"desc": "add volume provider pool resource type",
+     "type": "create_resource_type",
+     "resource_type": "volume_provider_pool",
+     "data": [{
+         "attributes": {"provider": {"type": "string", "min_length": 0,
+                                     "max_length": 255, "required": True}}
+     }]},
 ]
 
 # NOTE(sileht): We use LooseVersion because pbr can generate invalid
