@@ -9,23 +9,6 @@
       - openstack-infra/devstack-gate
       - openstack/ceilometer
 
-- job:
-    name: telemetry-dsvm-integration-ceilometer
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/run.yaml
-    post-run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/post.yaml
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/aodh
-      - openstack/ceilometer
-      - openstack/panko
-      - openstack/telemetry-tempest-plugin
-      # following are required when DEVSTACK_GATE_HEAT, which this
-      # job turns on
-      - openstack/dib-utils
-      - openstack/diskimage-builder
-
 - project:
     name: openstack/ceilometer
     check:
@@ -34,7 +17,7 @@
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
-        - telemetry-dsvm-integration-ceilometer
+        - telemetry-dsvm-integration
         # TripleO jobs that deploy Telemetry.
         # Note we don't use a project-template here, so it's easier
         # to disable voting on one specific job if things go wrong.
@@ -57,4 +40,4 @@
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
-        - telemetry-dsvm-integration-ceilometer
+        - telemetry-dsvm-integration
