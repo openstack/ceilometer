@@ -101,7 +101,7 @@ metric:
     lookup: ['name', 'unit', 'volume']
 
   - name: 'memory'
-    event_type: &instance_events compute.instance.(?!create.start).*
+    event_type: &instance_events compute.instance.(?!create.start|update).*
     type: 'gauge'
     unit: 'MB'
     volume: $.payload.memory_mb
