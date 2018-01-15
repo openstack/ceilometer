@@ -104,12 +104,6 @@ class ResourcesDefinition(object):
             return value
         return [value]
 
-    def metric_match(self, metric_name):
-        for t in self.cfg['metrics']:
-            if fnmatch.fnmatch(metric_name, t):
-                return True
-        return False
-
     def support_events(self):
         for e in ["event_create", "event_delete", "event_update"]:
             if e in self.cfg:
@@ -195,6 +189,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             [conf.dispatcher_gnocchi.archive_policy])[-1]
         self.resources_definition = self._load_resources_definitions(
             conf, archive_policy, resources_definition_file)
+        self.metric_map = dict((metric, rd) for rd in self.resources_definition
+                               for metric in rd.metrics)
 
         timeout = options.get('timeout',
                               [conf.dispatcher_gnocchi.request_timeout])[-1]
@@ -271,9 +267,11 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             return self._gnocchi_project_id
 
     def _is_swift_account_sample(self, sample):
-        return bool([rd for rd in self.resources_definition
-                     if rd.cfg['resource_type'] == 'swift_account'
-                     and rd.metric_match(sample.name)])
+        try:
+            return (self.metric_map[sample.name].cfg['resource_type']
+                    == 'swift_account')
+        except KeyError:
+            return False
 
     def _is_gnocchi_activity(self, sample):
         return (self.filter_project and self.gnocchi_project_id and (
@@ -283,11 +281,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             (sample.resource_id == self.gnocchi_project_id and
              self._is_swift_account_sample(sample))
         ))
-
-    def _get_resource_definition_from_metric(self, metric_name):
-        for rd in self.resources_definition:
-            if rd.metric_match(metric_name):
-                return rd
 
     def _get_resource_definition_from_event(self, event_type):
         for rd in self.resources_definition:
@@ -320,7 +313,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 stats['metrics'] += 1
 
                 samples = list(samples)
-                rd = self._get_resource_definition_from_metric(metric_name)
+                rd = self.metric_map.get(metric_name)
                 if rd is None:
                     if metric_name not in self._already_logged_metric_names:
                         LOG.warning("metric %s is not handled by Gnocchi" %
