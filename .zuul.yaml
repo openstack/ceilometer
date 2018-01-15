@@ -20,6 +20,7 @@
       - openstack/aodh
       - openstack/ceilometer
       - openstack/panko
+      - openstack/telemetry-tempest-plugin
       # following are required when DEVSTACK_GATE_HEAT, which this
       # job turns on
       - openstack/dib-utils
