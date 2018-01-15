@@ -42,14 +42,15 @@ class TelemetryAlarmingNegativeTest(base.BaseAlarmingTest):
     def test_get_update_show_history_delete_deleted_alarm(self):
         # get, update and delete the deleted alarm
         alarm_name = data_utils.rand_name('telemetry_alarm')
-        rule = {'meter_name': 'cpu',
+        rule = {'metrics': ["c0d457b6-957e-41de-a384-d5eb0957de3b"],
+                'aggregation_method': 'mean',
                 'comparison_operator': 'eq',
                 'threshold': 100.0,
-                'period': 90}
+                'granularity': 90}
         body = self.alarming_client.create_alarm(
             name=alarm_name,
-            type='threshold',
-            threshold_rule=rule)
+            type='gnocchi_aggregation_by_metrics_threshold',
+            gnocchi_aggregation_by_metrics_threshold_rule=rule)
         alarm_id = body['alarm_id']
         self.alarming_client.delete_alarm(alarm_id)
         # get the deleted alarm
@@ -58,14 +59,17 @@ class TelemetryAlarmingNegativeTest(base.BaseAlarmingTest):
 
         # update the deleted alarm
         updated_alarm_name = data_utils.rand_name('telemetry_alarm_updated')
-        updated_rule = {'meter_name': 'cpu_new',
+        updated_rule = {'metrics': ["c0d457b6-957e-41de-a384-d5eb0957de3b"],
                         'comparison_operator': 'eq',
+                        'aggregation_method': 'mean',
                         'threshold': 70,
-                        'period': 50}
-        self.assertRaises(lib_exc.NotFound, self.alarming_client.update_alarm,
-                          alarm_id, threshold_rule=updated_rule,
-                          name=updated_alarm_name,
-                          type='threshold')
+                        'granularity': 50}
+        self.assertRaises(
+            lib_exc.NotFound, self.alarming_client.update_alarm,
+            alarm_id,
+            gnocchi_aggregation_by_metrics_threshold_rule=updated_rule,
+            name=updated_alarm_name,
+            type='gnocchi_aggregation_by_metrics_threshold')
         # delete the deleted alarm
         self.assertRaises(lib_exc.NotFound, self.alarming_client.delete_alarm,
                           alarm_id)

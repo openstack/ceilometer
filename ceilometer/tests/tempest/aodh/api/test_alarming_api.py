@@ -22,12 +22,14 @@ class TelemetryAlarmingAPITest(base.BaseAlarmingTest):
     @classmethod
     def resource_setup(cls):
         super(TelemetryAlarmingAPITest, cls).resource_setup()
-        cls.rule = {'meter_name': 'cpu_util',
+        cls.rule = {'metrics': ['c0d457b6-957e-41de-a384-d5eb0957de3b'],
                     'comparison_operator': 'gt',
+                    'aggregation_method': 'mean',
                     'threshold': 80.0,
-                    'period': 70}
+                    'granularity': 70}
         for i in range(2):
-            cls.create_alarm(threshold_rule=cls.rule)
+            cls.create_alarm(
+                gnocchi_aggregation_by_metrics_threshold_rule=cls.rule)
 
     @decorators.idempotent_id('1c918e06-210b-41eb-bd45-14676dd77cd7')
     def test_alarm_list(self):
@@ -47,27 +49,32 @@ class TelemetryAlarmingAPITest(base.BaseAlarmingTest):
         # Create an alarm
         alarm_name = data_utils.rand_name('telemetry_alarm')
         body = self.alarming_client.create_alarm(
-            name=alarm_name, type='threshold', threshold_rule=self.rule)
+            name=alarm_name, type='gnocchi_aggregation_by_metrics_threshold',
+            gnocchi_aggregation_by_metrics_threshold_rule=self.rule)
         self.assertEqual(alarm_name, body['name'])
         alarm_id = body['alarm_id']
-        self.assertDictContainsSubset(self.rule, body['threshold_rule'])
+        self.assertDictContainsSubset(self.rule, body[
+            'gnocchi_aggregation_by_metrics_threshold_rule'])
         # Update alarm with new rule and new name
-        new_rule = {'meter_name': 'cpu',
+        new_rule = {'metrics': ['c0d457b6-957e-41de-a384-d5eb0957de3b'],
                     'comparison_operator': 'eq',
+                    'aggregation_method': 'mean',
                     'threshold': 70.0,
-                    'period': 60}
+                    'granularity': 60}
         alarm_name_updated = data_utils.rand_name('telemetry-alarm-update')
         body = self.alarming_client.update_alarm(
             alarm_id,
-            threshold_rule=new_rule,
+            gnocchi_aggregation_by_metrics_threshold_rule=new_rule,
             name=alarm_name_updated,
-            type='threshold')
+            type='gnocchi_aggregation_by_metrics_threshold')
         self.assertEqual(alarm_name_updated, body['name'])
-        self.assertDictContainsSubset(new_rule, body['threshold_rule'])
+        self.assertDictContainsSubset(
+            new_rule, body['gnocchi_aggregation_by_metrics_threshold_rule'])
         # Get and verify details of an alarm after update
         body = self.alarming_client.show_alarm(alarm_id)
         self.assertEqual(alarm_name_updated, body['name'])
-        self.assertDictContainsSubset(new_rule, body['threshold_rule'])
+        self.assertDictContainsSubset(
+            new_rule, body['gnocchi_aggregation_by_metrics_threshold_rule'])
         # Get history for the alarm and verify the same
         body = self.alarming_client.show_alarm_history(alarm_id)
         self.assertEqual("rule change", body[0]['type'])
@@ -82,7 +89,8 @@ class TelemetryAlarmingAPITest(base.BaseAlarmingTest):
     @decorators.idempotent_id('aca49486-70bb-4016-87e0-f6131374f742')
     def test_set_get_alarm_state(self):
         alarm_states = ['ok', 'alarm', 'insufficient data']
-        alarm = self.create_alarm(threshold_rule=self.rule)
+        alarm = self.create_alarm(
+            gnocchi_aggregation_by_metrics_threshold_rule=self.rule)
         # Set alarm state and verify
         new_state =\
             [elem for elem in alarm_states if elem != alarm['state']][0]
