@@ -35,17 +35,18 @@
           export DEVSTACK_GATE_EXERCISES=0
           export DEVSTACK_GATE_INSTALL_TESTONLY=1
           export DEVSTACK_GATE_TEMPEST_NOTESTS=1
-          export PROJECTS="openstack/ceilometer openstack/aodh openstack/panko"
+          export PROJECTS="openstack/ceilometer openstack/aodh openstack/panko openstack/telemetry-tempest-plugin"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin panko git://git.openstack.org/openstack/panko"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin ceilometer git://git.openstack.org/openstack/ceilometer"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin aodh git://git.openstack.org/openstack/aodh"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin heat git://git.openstack.org/openstack/heat"
+          export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin telemetry-tempest-plugin git://git.openstack.org/openstack/telemetry-tempest-plugin"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"CEILOMETER_BACKEND=gnocchi"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"GNOCCHI_ARCHIVE_POLICY=high"
           export DEVSTACK_LOCAL_CONFIG+=$'\n'"CEILOMETER_PIPELINE_INTERVAL=15"
           export DEVSTACK_PROJECT_FROM_GIT=$ZUUL_SHORT_PROJECT_NAME
           function post_test_hook {
-              cd /opt/stack/new/ceilometer/ceilometer/tests/integration/hooks/
+              cd /opt/stack/new/telemetry-tempest-plugin/telemetry_tempest_plugin/integration/hooks/
               ./post_test_hook.sh
           }
           export -f post_test_hook
