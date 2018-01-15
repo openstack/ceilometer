@@ -89,8 +89,8 @@ class BaseNotificationTest(tests_base.BaseTestCase):
         if srv.conf.notification.workload_partitioning:
             start = time.time()
             while time.time() - start < 10:
-                if srv.group_state:  # ensure pipeline is set if HA
-                    break
+                if srv.group_state and srv.pipeline_listener:
+                    break   # ensure pipeline is set if HA
                 time.sleep(0.1)
             else:
                 self.fail('Did not start pipeline queues')
@@ -325,8 +325,7 @@ class TestRealNotificationHA(BaseRealNotification):
         self.srv._refresh_agent()
         self.assertIsNot(listener, self.srv.pipeline_listener)
 
-    @mock.patch('oslo_messaging.get_batch_notification_listener')
-    def test_hashring_targets(self, mock_listener):
+    def test_hashring_targets(self):
         maybe = {"maybe": 0}
 
         def _once_over_five(item):
@@ -338,7 +337,8 @@ class TestRealNotificationHA(BaseRealNotification):
         self.srv.partition_coordinator = pc = mock.MagicMock()
         pc.join_partitioned_group.return_value = hashring
         self.run_service(self.srv)
-        topics = [target.topic for target in mock_listener.call_args[0][1]]
+        topics = [target.topic for target in
+                  self.srv.pipeline_listener.targets]
         self.assertEqual(4, len(topics))
         self.assertEqual(
             {'ceilometer-pipe-test_pipeline:test_sink-4',
