@@ -165,6 +165,11 @@ function install_gnocchi {
     else
         pip_install gnocchi[redis,${DATABASE_TYPE},keystone] uwsgi
     fi
+}
+
+function configure_gnocchi {
+    echo_summary "Configure Gnocchi"
+
     recreate_database gnocchi
     sudo install -d -o $STACK_USER -m 755 $GNOCCHI_CONF_DIR
 
@@ -232,6 +237,7 @@ function _ceilometer_configure_storage_backend {
         fi
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=gnocchi_swift/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
+        ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
