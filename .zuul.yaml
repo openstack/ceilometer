@@ -18,6 +18,15 @@
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
         - telemetry-dsvm-integration
+    gate:
+      jobs:
+        - grenade-dsvm-ceilometer:
+            irrelevant-files:
+              - ^(test-|)requirements.txt$
+              - ^setup.cfg$
+        - telemetry-dsvm-integration
+    experimental:
+      jobs:
         # TripleO jobs that deploy Telemetry.
         # Note we don't use a project-template here, so it's easier
         # to disable voting on one specific job if things go wrong.
@@ -26,18 +35,10 @@
         # and beyond.
         # If you need any support to debug these jobs in case of
         # failures, please reach us on #tripleo IRC channel.
-        - tripleo-ci-centos-7-scenario001-multinode-oooq:
-            voting: false
-        - tripleo-ci-centos-7-scenario001-multinode-oooq-container:
-            voting: false
-        - tripleo-ci-centos-7-scenario002-multinode-oooq:
-            voting: false
-        - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
-            voting: false
-    gate:
-      jobs:
-        - grenade-dsvm-ceilometer:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
-        - telemetry-dsvm-integration
+        # NOTE(sileht): These job takes 3 hours and fail most of the times.
+        # While other jobs take 20-30 minutes
+        # We can reenable it when they take less times.
+        - tripleo-ci-centos-7-scenario001-multinode-oooq
+        - tripleo-ci-centos-7-scenario001-multinode-oooq-container
+        - tripleo-ci-centos-7-scenario002-multinode-oooq
+        - tripleo-ci-centos-7-scenario002-multinode-oooq-container
