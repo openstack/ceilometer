@@ -17,8 +17,6 @@
 import collections
 import itertools
 import logging
-import random
-import time
 import uuid
 
 from concurrent import futures
@@ -49,12 +47,6 @@ OPTS = [
                 help='To reduce polling agent load, samples are sent to the '
                      'notification agent in a batch. To gain higher '
                      'throughput at the cost of load set this to False.'),
-    cfg.FloatOpt('shuffle_time_before_polling_task',
-                 min=0,
-                 default=10,
-                 help='To reduce large requests at same time to Nova or other '
-                 'components from different compute agents, shuffle '
-                 'start time of polling task.'),
 ]
 
 POLLING_OPTS = [
@@ -363,16 +355,7 @@ class AgentManager(cotyledon.Service):
     def construct_group_id(self, discovery_group_id):
         return '%s-%s' % (self.group_prefix, discovery_group_id)
 
-    @staticmethod
-    def _delayed(delay, target, *args, **kwargs):
-        time.sleep(delay)
-        return target(*args, **kwargs)
-
     def start_polling_tasks(self):
-        # set shuffle time before polling task if necessary
-        delay_polling_time = random.randint(
-            0, self.conf.shuffle_time_before_polling_task)
-
         data = self.setup_polling_tasks()
 
         # Don't start useless threads if no task will run
@@ -390,8 +373,7 @@ class AgentManager(cotyledon.Service):
             def task(running_task):
                 self.interval_task(running_task)
 
-            utils.spawn_thread(self._delayed, delay_polling_time,
-                               self.polling_periodics.add, task, polling_task)
+            self.polling_periodics.add(task, polling_task)
 
         utils.spawn_thread(self.polling_periodics.start, allow_empty=True)
 

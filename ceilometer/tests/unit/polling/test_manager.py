@@ -33,10 +33,6 @@ from ceilometer import service
 from ceilometer.tests import base
 
 
-def fakedelayed(delay, target, *args, **kwargs):
-    return target(*args, **kwargs)
-
-
 def default_test_data(name='test'):
     return sample.Sample(
         name=name,
@@ -823,7 +819,6 @@ class TestPollingAgent(BaseAgent):
                 'publishers': ["test"]}]
         }
         self.setup_polling(poll_cfg)
-        self.mgr._delayed = fakedelayed
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
 
         self.mgr.interval_task(polling_task)
