@@ -15,31 +15,12 @@
 # under the License.
 """Tests for ceilometer/utils.py
 """
-import datetime
-import decimal
-
 from oslotest import base
 
 from ceilometer import utils
 
 
 class TestUtils(base.BaseTestCase):
-
-    def test_datetime_to_decimal(self):
-        expected = 1356093296.12
-        utc_datetime = datetime.datetime.utcfromtimestamp(expected)
-        actual = utils.dt_to_decimal(utc_datetime)
-        self.assertAlmostEqual(expected, float(actual), places=5)
-
-    def test_decimal_to_datetime(self):
-        expected = 1356093296.12
-        dexpected = decimal.Decimal(str(expected))  # Python 2.6 wants str()
-        expected_datetime = datetime.datetime.utcfromtimestamp(expected)
-        actual_datetime = utils.decimal_to_dt(dexpected)
-        # Python 3 have rounding issue on this, so use float
-        self.assertAlmostEqual(utils.dt_to_decimal(expected_datetime),
-                               utils.dt_to_decimal(actual_datetime),
-                               places=5)
 
     def test_recursive_keypairs(self):
         data = {'a': 'A', 'b': 'B',
@@ -83,9 +64,6 @@ class TestUtils(base.BaseTestCase):
                                [{big: 42, small: 99}]])
             else:
                 self.assertIn((k, v), expected)
-
-    def test_decimal_to_dt_with_none_parameter(self):
-        self.assertIsNone(utils.decimal_to_dt(None))
 
     def test_hash_of_set(self):
         x = ['a', 'b']
