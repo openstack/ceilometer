@@ -435,14 +435,6 @@ class TestPollingAgent(BaseAgent):
         self.assertEqual(set(self.polling_cfg['sources'][1]['resources']),
                          set(per_task_resources[key].get({})))
 
-    def test_agent_manager_start(self):
-        mgr = self.create_manager()
-        mgr.extensions = self.mgr.extensions
-        mgr.create_polling_task = mock.MagicMock()
-        mgr.run()
-        self.addCleanup(mgr.terminate)
-        mgr.create_polling_task.assert_called_once_with()
-
     def _verify_discovery_params(self, expected):
         self.assertEqual(expected, self.Discovery.params)
         self.assertEqual(expected, self.DiscoveryAnother.params)
