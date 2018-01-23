@@ -509,8 +509,6 @@
       fields: payload.audit_period_ending
 - event_type: trove.*
   traits: &trove_base_traits
-    state:
-      fields: payload.state_description
     instance_type:
       fields: payload.instance_type
     user_id:
