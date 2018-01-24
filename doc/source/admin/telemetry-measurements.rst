@@ -618,6 +618,20 @@ SNMP:
 | hardware.system_st\ | Gauge | %    | host ID  | Pollster | CPU idle percen\ |
 | ats.cpu.idle        |       |      |          |          | tage             |
 +---------------------+-------+------+----------+----------+------------------+
+| **Meters added in the Queens release**                                      |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.disk.read.\| Gauge | B    | disk ID  | Pollster | Bytes read from  |
+| bytes               |       |      |          |          | device since boot|
++---------------------+-------+------+----------+----------+------------------+
+| hardware.disk.write\| Gauge | B    | disk ID  | Pollster | Bytes written to |
+| .bytes              |       |      |          |          | device since boot|
++---------------------+-------+------+----------+----------+------------------+
+| hardware.disk.read.\| Gauge | requ\| disk ID  | Pollster | Read requests to |
+| requests            |       | ests |          |          | device since boot|
++---------------------+-------+------+----------+----------+------------------+
+| hardware.disk.write\| Gauge | requ\| disk ID  | Pollster | Write requests to|
+| .requests           |       | ests |          |          | device since boot|
++---------------------+-------+------+----------+----------+------------------+
 
 OpenStack Image service
 ~~~~~~~~~~~~~~~~~~~~~~~

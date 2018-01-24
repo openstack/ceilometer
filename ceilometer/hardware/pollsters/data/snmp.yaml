@@ -1,4 +1,6 @@
 ---
+# see http://www.circitor.fr/Mibs/Html/U/UCD-SNMP-MIB.php for reference.
+# http://www.circitor.fr/Mibs/Html/U/UCD-DISKIO-MIB.php for disk metrics
 
 metric:
 # cpu
@@ -59,6 +61,49 @@ metric:
           type: "int"
           metadata: *disk_metadata
           post_op: "_post_op_disk"
+
+    - name: hardware.disk.read.bytes
+      unit: B
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.4.1.2021.13.15.1.1.3"
+          type: "int"
+          metadata: &diskio_metadata
+              device:
+                  oid: "1.3.6.1.4.1.2021.13.15.1.1.2"
+          post_op: "_post_op_disk"
+
+    - name: hardware.disk.write.bytes
+      unit: B
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.4.1.2021.13.15.1.1.4"
+          type: "int"
+          <<: *diskio_metadata
+          post_op: "_post_op_disk"
+
+    - name: hardware.disk.read.requests
+      unit: requests
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.4.1.2021.13.15.1.1.5"
+          type: "int"
+          <<: *diskio_metadata
+          post_op: "_post_op_disk"
+
+    - name: hardware.disk.write.requests
+      unit: requests
+      type: gauge
+      snmp_inspector:
+          matching_type: "type_prefix"
+          oid:  "1.3.6.1.4.1.2021.13.15.1.1.6"
+          type: "int"
+          <<: *diskio_metadata
+          post_op: "_post_op_disk"
+
 # memory
     - name: hardware.memory.total
       unit: KB
