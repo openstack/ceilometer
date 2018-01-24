@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add support to capture volume capacity usage details from cinder. This
+    data is extracted from notifications sent by Cinder starting in Ocata.
