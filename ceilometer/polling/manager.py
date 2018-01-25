@@ -347,7 +347,6 @@ class AgentManager(cotyledon.Service):
     def setup_polling_tasks(self):
         polling_tasks = {}
         for source in self.polling_manager.sources:
-            polling_task = None
             for pollster in self.extensions:
                 if source.support_meter(pollster.name):
                     polling_task = polling_tasks.get(source.get_interval())
