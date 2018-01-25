@@ -86,7 +86,6 @@
       - openstack/diskimage-builder
 
 - project:
-    name: openstack/ceilometer
     check:
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
