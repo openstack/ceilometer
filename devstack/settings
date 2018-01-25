@@ -48,9 +48,6 @@ CEILOMETER_CACHE_URL=${CEILOMETER_CACHE_URL:-redis://localhost:6379}
 
 CEILOMETER_EVENT_ALARM=${CEILOMETER_EVENT_ALARM:-False}
 
-# Tell Tempest this project is present
-TEMPEST_SERVICES+=,ceilometer
-
 # Set up default directories for client and middleware
 GITREPO["python-ceilometerclient"]=${CEILOMETERCLIENT_REPO:-${GIT_BASE}/openstack/python-ceilometerclient.git}
 GITBRANCH["python-ceilometerclient"]=${CEILOMETERCLIENT_BRANCH:-master}
