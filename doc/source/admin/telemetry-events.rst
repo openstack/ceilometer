@@ -142,7 +142,7 @@ fields
     also supported. In either case, if the key for the field you are
     looking for contains special characters, like ``.``, it will need to
     be quoted (with double or single quotes):
-    ``payload.image_meta.’org.openstack__1__architecture’``. The syntax
+    ``payload.image_meta.`org.openstack__1__architecture```. The syntax
     used for the field specification is a variant of
     `JSONPath <https://github.com/kennknowles/python-jsonpath-rw>`__
 
