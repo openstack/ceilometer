@@ -114,7 +114,6 @@ metric:
       flavor_id: $.payload.instance_flavor_id
       flavor_name: $.payload.instance_type
       display_name: $.payload.display_name
-      host: $.payload.host
       image_ref: $.payload.image_meta.base_image_ref
 
   - name: 'vcpus'
