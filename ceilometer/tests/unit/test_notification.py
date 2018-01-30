@@ -258,7 +258,6 @@ class TestRealNotificationHA(BaseRealNotification):
         fake_publisher_cls.return_value = self.publisher
         self._check_notification_service()
 
-    @mock.patch("ceilometer.utils.kill_listeners", mock.MagicMock())
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'stop')
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'wait')
     @mock.patch.object(oslo_messaging.MessageHandlingServer, 'start')

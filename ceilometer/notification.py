@@ -235,8 +235,7 @@ class NotificationService(cotyledon.Service):
             targets.append(oslo_messaging.Target(topic=topic))
 
         if self.pipeline_listener:
-            self.pipeline_listener.stop()
-            self.pipeline_listener.wait()
+            self.kill_listeners([self.pipeline_listener])
 
         self.pipeline_listener = messaging.get_batch_notification_listener(
             self.transport, targets, endpoints,
@@ -248,6 +247,15 @@ class NotificationService(cotyledon.Service):
                  else self.conf.max_parallel_requests)
         self.pipeline_listener.start(override_pool_size=batch)
 
+    @staticmethod
+    def kill_listeners(listeners):
+        # NOTE(gordc): correct usage of oslo.messaging listener is to stop(),
+        # which stops new messages, and wait(), which processes remaining
+        # messages and closes connection
+        for listener in listeners:
+            listener.stop()
+            listener.wait()
+
     def terminate(self):
         self.shutdown = True
         if self.periodic:
@@ -257,7 +265,7 @@ class NotificationService(cotyledon.Service):
             self.partition_coordinator.stop()
         with self.coord_lock:
             if self.pipeline_listener:
-                utils.kill_listeners([self.pipeline_listener])
-            utils.kill_listeners(self.listeners)
+                self.kill_listeners([self.pipeline_listener])
+            self.kill_listeners(self.listeners)
 
         super(NotificationService, self).terminate()

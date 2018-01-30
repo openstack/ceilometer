@@ -54,15 +54,6 @@ def hash_of_set(s):
     return str(hash(frozenset(s)))
 
 
-def kill_listeners(listeners):
-    # NOTE(gordc): correct usage of oslo.messaging listener is to stop(),
-    # which stops new messages, and wait(), which processes remaining
-    # messages and closes connection
-    for listener in listeners:
-        listener.stop()
-        listener.wait()
-
-
 def spawn_thread(target, *args, **kwargs):
     t = threading.Thread(target=target, args=args, kwargs=kwargs)
     t.daemon = True
