@@ -343,7 +343,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             if not resource_extra:
                 continue
             try:
-                self._if_not_cached(resource_type, resource, resource_extra)
+                self._if_not_cached(resource_type, resource['id'],
+                                    resource_extra)
             except gnocchi_exc.ClientException as e:
                 LOG.error(six.text_type(e))
             except Exception as e:
@@ -386,9 +387,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     del measures[resource['id']]
                     del resource_infos[resource['id']]
                 else:
-                    if self.cache:
+                    if self.cache and resource_extra:
                         self.cache.set(resource['id'],
-                                       self._hash_resource(resource))
+                                       self._hash_resource(resource_extra))
 
             # NOTE(sileht): we have created missing resources/metrics,
             # now retry to post measures
@@ -404,47 +405,37 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         self._gnocchi.resource.create(resource_type, resource)
         LOG.debug('Resource %s created', resource["id"])
 
-    def _update_resource(self, resource_type, resource, resource_extra):
-        self._gnocchi.resource.update(resource_type,
-                                      resource["id"],
-                                      resource_extra)
-        LOG.debug('Resource %s updated', resource["id"])
+    def _update_resource(self, resource_type, res_id, resource_extra):
+        self._gnocchi.resource.update(resource_type, res_id, resource_extra)
+        LOG.debug('Resource %s updated', res_id)
 
-    def _if_not_cached(self, resource_type, resource, resource_extra):
+    def _if_not_cached(self, resource_type, res_id, resource_extra):
         if self.cache:
-            cache_key = resource['id']
-            attribute_hash = self._check_resource_cache(cache_key, resource)
-            if attribute_hash:
-                with self._gnocchi_resource_lock[cache_key]:
+            attribute_hash = self._hash_resource(resource_extra)
+            if self._resource_cache_diff(res_id, attribute_hash):
+                with self._gnocchi_resource_lock[res_id]:
                     # NOTE(luogangyi): there is a possibility that the
                     # resource was already built in cache by another
                     # ceilometer-notification-agent when we get the lock here.
-                    attribute_hash = self._check_resource_cache(cache_key,
-                                                                resource)
-                    if attribute_hash:
-                        self._update_resource(resource_type, resource,
+                    if self._resource_cache_diff(res_id, attribute_hash):
+                        self._update_resource(resource_type, res_id,
                                               resource_extra)
-                        self.cache.set(cache_key, attribute_hash)
+                        self.cache.set(res_id, attribute_hash)
                     else:
-                        LOG.debug('resource cache recheck hit for '
-                                  '%s', cache_key)
-                self._gnocchi_resource_lock.pop(cache_key, None)
+                        LOG.debug('Resource cache hit for %s', res_id)
+                self._gnocchi_resource_lock.pop(res_id, None)
             else:
-                LOG.debug('Resource cache hit for %s', cache_key)
+                LOG.debug('Resource cache hit for %s', res_id)
         else:
-            self._update_resource(resource_type, resource, resource_extra)
+            self._update_resource(resource_type, res_id, resource_extra)
 
     @staticmethod
     def _hash_resource(resource):
         return hash(tuple(i for i in resource.items() if i[0] != 'metrics'))
 
-    def _check_resource_cache(self, key, resource_data):
+    def _resource_cache_diff(self, key, attribute_hash):
         cached_hash = self.cache.get(key)
-        attribute_hash = self._hash_resource(resource_data)
-        if not cached_hash or cached_hash != attribute_hash:
-            return attribute_hash
-        else:
-            return None
+        return not cached_hash or cached_hash != attribute_hash
 
     def publish_events(self, events):
         for event in events:
