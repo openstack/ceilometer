@@ -78,6 +78,14 @@ class TestManager(base.BaseTestCase):
         super(TestManager, self).setUp()
         self.conf = service.prepare_service([], [])
 
+    def test_hash_of_set(self):
+        x = ['a', 'b']
+        y = ['a', 'b', 'a']
+        z = ['a', 'c']
+        self.assertEqual(manager.hash_of_set(x), manager.hash_of_set(y))
+        self.assertNotEqual(manager.hash_of_set(x), manager.hash_of_set(z))
+        self.assertNotEqual(manager.hash_of_set(y), manager.hash_of_set(z))
+
     def test_load_plugins(self):
         mgr = manager.AgentManager(0, self.conf)
         self.assertIsNotNone(list(mgr.extensions))
