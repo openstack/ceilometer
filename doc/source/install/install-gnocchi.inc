@@ -72,6 +72,8 @@
      .. code-block:: ini
 
         [storage]
+	# coordination_url is not required but specifying one will improve
+	# performance with better workload division across workers.
         coordination_url = redis://controller:6379
         file_basepath = /var/lib/gnocchi
         driver = file
