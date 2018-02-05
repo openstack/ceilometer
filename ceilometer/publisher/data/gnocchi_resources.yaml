@@ -186,6 +186,24 @@ resources:
     event_attributes:
       id: resource_id
 
+  - resource_type: volume_provider
+    metrics:
+      - 'volume.provider.capacity.total'
+      - 'volume.provider.capacity.free'
+      - 'volume.provider.capacity.allocated'
+      - 'volume.provider.capacity.provisioned'
+      - 'volume.provider.capacity.virtual_free'
+
+  - resource_type: volume_provider_pool
+    metrics:
+      - 'volume.provider.pool.capacity.total'
+      - 'volume.provider.pool.capacity.free'
+      - 'volume.provider.pool.capacity.allocated'
+      - 'volume.provider.pool.capacity.provisioned'
+      - 'volume.provider.pool.capacity.virtual_free'
+    attributes:
+      provider: resource_metadata.provider
+
   - resource_type: host
     metrics:
       - 'hardware.cpu.load.1min'
