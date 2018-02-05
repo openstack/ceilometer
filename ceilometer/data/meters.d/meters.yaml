@@ -30,6 +30,86 @@ metric:
     resource_id: $.payload.image_id
     project_id: $.payload.owner_id
 
+  - name: 'volume.provider.capacity.total'
+    event_type: 'capacity.backend.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.total
+    resource_id: $.payload.name_to_id
+
+  - name: 'volume.provider.capacity.free'
+    event_type: 'capacity.backend.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.free
+    resource_id: $.payload.name_to_id
+
+  - name: 'volume.provider.capacity.allocated'
+    event_type: 'capacity.backend.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.allocated
+    resource_id: $.payload.name_to_id
+
+  - name: 'volume.provider.capacity.provisioned'
+    event_type: 'capacity.backend.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.provisioned
+    resource_id: $.payload.name_to_id
+
+  - name: 'volume.provider.capacity.virtual_free'
+    event_type: 'capacity.backend.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.virtual_free
+    resource_id: $.payload.name_to_id
+
+  - name: 'volume.provider.pool.capacity.total'
+    event_type: 'capacity.pool.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.total
+    resource_id: $.payload.name_to_id
+    metadata: &provider_pool_meta
+      provider: $.payload.name_to_id.`split(#, 0, 1)`
+
+  - name: 'volume.provider.pool.capacity.free'
+    event_type: 'capacity.pool.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.free
+    resource_id: $.payload.name_to_id
+    metadata:
+       <<: *provider_pool_meta
+
+  - name: 'volume.provider.pool.capacity.allocated'
+    event_type: 'capacity.pool.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.allocated
+    resource_id: $.payload.name_to_id
+    metadata:
+       <<: *provider_pool_meta
+
+  - name: 'volume.provider.pool.capacity.provisioned'
+    event_type: 'capacity.pool.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.provisioned
+    resource_id: $.payload.name_to_id
+    metadata:
+       <<: *provider_pool_meta
+
+  - name: 'volume.provider.pool.capacity.virtual_free'
+    event_type: 'capacity.pool.*'
+    type: 'gauge'
+    unit: 'GB'
+    volume: $.payload.virtual_free
+    resource_id: $.payload.name_to_id
+    metadata:
+       <<: *provider_pool_meta
+
   - name: 'volume.size'
     event_type:
       - 'volume.exists'
