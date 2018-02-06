@@ -19,5 +19,4 @@ testtools>=1.4.0 # MIT
 gabbi>=1.30.0 # Apache-2.0
 requests-aws>=0.1.4 # BSD License (3 clause)
 os-testr>=0.4.1 # Apache-2.0
-tempest>=14.0.0  # Apache-2.0
 kafka-python>=1.3.2 # Apache-2.0
