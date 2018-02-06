@@ -656,7 +656,43 @@ The following meters are collected for OpenStack Block Storage:
 | snapshot.size      | Gauge | GB     | snapshot | Notifica\| Size of the sna\|
 |                    |       |        | ID       | tion     | pshot           |
 +--------------------+-------+--------+----------+----------+-----------------+
-
+| **Meters added in the Queens release**                                      |
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Total volume    |
+| pacity.total       |       |        |          | tion     | capacity on host|
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Free volume     |
+| pacity.free        |       |        |          | tion     | capacity on host|
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Assigned volume |
+| pacity.allocated   |       |        |          | tion     | capacity on host|
+|                    |       |        |          |          | by Cinder       |
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Assigned volume |
+| pacity.provisioned |       |        |          | tion     | capacity on host|
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Virtual free    |
+| pacity.virtual_free|       |        |          | tion     | volume capacity |
+|                    |       |        |          |          | on host         |
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Total volume    |
+| ol.capacity.total  |       |        | #pool    | tion     | capacity in pool|
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Free volume     |
+| ol.capacity.free   |       |        | #pool    | tion     | capacity in pool|
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Assigned volume |
+| ol.capacity.alloca\|       |        | #pool    | tion     | capacity in pool|
+| ted                |       |        |          |          | by Cinder       |
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Assigned volume |
+| ol.capacity.provis\|       |        | #pool    | tion     | capacity in pool|
+| ioned              |       |        |          |          |                 |
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Virtual free    |
+| ol.capacity.virtua\|       |        | #pool    | tion     | volume capacity |
+| l_free             |       |        |          |          | in pool         |
++--------------------+-------+--------+----------+----------+-----------------+
 
 OpenStack File Share
 ~~~~~~~~~~~~~~~~~~~~~~
