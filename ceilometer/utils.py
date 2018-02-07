@@ -50,10 +50,6 @@ def execute(*cmd, **kwargs):
     return processutils.execute(*cmd, **kwargs)
 
 
-def hash_of_set(s):
-    return str(hash(frozenset(s)))
-
-
 def spawn_thread(target, *args, **kwargs):
     t = threading.Thread(target=target, args=args, kwargs=kwargs)
     t.daemon = True

@@ -65,6 +65,10 @@ POLLING_OPTS = [
 ]
 
 
+def hash_of_set(s):
+    return str(hash(frozenset(s)))
+
+
 class EmptyPollstersList(Exception):
     def __init__(self):
         msg = ('No valid pollsters can be loaded with the startup parameter'
@@ -95,7 +99,7 @@ class Resources(object):
 
         if self._resources:
             static_resources_group = self.agent_manager.construct_group_id(
-                utils.hash_of_set(self._resources))
+                hash_of_set(self._resources))
             return [v for v in self._resources if
                     not self.agent_manager.partition_coordinator or
                     self.agent_manager.hashrings[
@@ -334,7 +338,7 @@ class AgentManager(cotyledon.Service):
                       for d in self.discoveries])
         # let each set of statically-defined resources have its own group
         static_resource_groups = set([
-            self.construct_group_id(utils.hash_of_set(p.resources))
+            self.construct_group_id(hash_of_set(p.resources))
             for p in self.polling_manager.sources
             if p.resources
         ])
