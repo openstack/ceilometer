@@ -228,6 +228,10 @@ resources:
     metrics:
       - 'hardware.disk.size.total'
       - 'hardware.disk.size.used'
+      - 'hardware.disk.read.bytes'
+      - 'hardware.disk.write.bytes'
+      - 'hardware.disk.read.requests'
+      - 'hardware.disk.write.requests'
     attributes:
       host_name: resource_metadata.resource_url
       device_name: resource_metadata.device

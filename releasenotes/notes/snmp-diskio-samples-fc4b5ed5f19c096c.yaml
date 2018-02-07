@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add hardware.disk.read.* and hardware.disk.write.* metrics to capture
+    diskio details.
