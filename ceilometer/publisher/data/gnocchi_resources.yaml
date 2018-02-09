@@ -145,6 +145,15 @@ resources:
       - 'hardware.ipmi.node.mem_util'
       - 'hardware.ipmi.node.io_util'
 
+  - resource_type: ipmi_sensor
+    metrics:
+      - 'hardware.ipmi.power'
+      - 'hardware.ipmi.temperature'
+      - 'hardware.ipmi.current'
+      - 'hardware.ipmi.voltage'
+    attributes:
+      node: resource_metadata.node
+
   - resource_type: network
     metrics:
       - 'bandwidth'

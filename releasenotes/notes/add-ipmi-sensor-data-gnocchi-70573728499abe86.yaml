@@ -1,0 +1,8 @@
+---
+upgrade:
+  - |
+    `ceilometer-upgrade` must be run to build IPMI sensor resource in Gnocchi.
+fixes:
+  - |
+    Ceilometer previously did not create IPMI sensor data from IPMI agent or
+    Ironic in Gnocchi. This data is now pushed to Gnocchi.

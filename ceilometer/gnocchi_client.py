@@ -197,6 +197,13 @@ resources_update_operations = [
          "attributes": {"provider": {"type": "string", "min_length": 0,
                                      "max_length": 255, "required": True}}
      }]},
+    {"desc": "add ipmi sensor resource type",
+     "type": "create_resource_type",
+     "resource_type": "ipmi_sensor",
+     "data": [{
+         "attributes": {"node": {"type": "string", "min_length": 0,
+                                 "max_length": 255, "required": True}}
+     }]},
 ]
 
 # NOTE(sileht): We use LooseVersion because pbr can generate invalid
