@@ -12,6 +12,7 @@ Install and configure components
    .. code-block:: console
 
       # yum install openstack-ceilometer-compute
+      # yum install openstack-ceilometer-ipmi (optional)
 
 .. include:: install-compute-common.inc
 
@@ -24,6 +25,8 @@ Finalize installation
 
       # systemctl enable openstack-ceilometer-compute.service
       # systemctl start openstack-ceilometer-compute.service
+      # systemctl enable openstack-ceilometer-ipmi.service (optional)
+      # systemctl start openstack-ceilometer-ipmi.service (optional)
 
 #. Restart the Compute service:
 

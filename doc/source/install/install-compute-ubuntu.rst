@@ -12,6 +12,7 @@ Install and configure components
    .. code-block:: console
 
       # apt-get install ceilometer-agent-compute
+      # apt-get install ceilometer-agent-ipmi (optional)
 
 .. include:: install-compute-common.inc
 
@@ -23,6 +24,7 @@ Finalize installation
    .. code-block:: console
 
       # service ceilometer-agent-compute restart
+      # service ceilometer-agent-ipmi restart (optional)
 
 #. Restart the Compute service:
 
