@@ -12,6 +12,7 @@ Install and configure components
    .. code-block:: console
 
       # zypper install openstack-ceilometer-agent-compute
+      # zypper install openstack-ceilometer-agent-ipmi (optional)
 
 .. include:: install-compute-common.inc
 
@@ -24,6 +25,8 @@ Finalize installation
 
       # systemctl enable openstack-ceilometer-agent-compute.service
       # systemctl start openstack-ceilometer-agent-compute.service
+      # systemctl enable openstack-ceilometer-agent-ipmi.service (optional)
+      # systemctl start openstack-ceilometer-agent-ipmi.service (optional)
 
 #. Restart the Compute service:
 
