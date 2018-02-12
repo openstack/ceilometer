@@ -69,13 +69,6 @@ def hash_of_set(s):
     return str(hash(frozenset(s)))
 
 
-class EmptyPollstersList(Exception):
-    def __init__(self):
-        msg = ('No valid pollsters can be loaded with the startup parameter'
-               ' polling-namespaces.')
-        super(EmptyPollstersList, self).__init__(msg)
-
-
 class PollingException(agent.ConfigException):
     def __init__(self, message, cfg):
         super(PollingException, self).__init__('Polling', message, cfg)
@@ -256,7 +249,8 @@ class AgentManager(cotyledon.Service):
             itertools.chain(*list(extensions_fb)))
 
         if self.extensions == []:
-            raise EmptyPollstersList()
+            LOG.warning('No valid pollsters can be loaded from %s '
+                        'namespaces', namespaces)
 
         discoveries = (self._extensions('discover', namespace,
                                         self.conf).extensions
@@ -292,7 +286,8 @@ class AgentManager(cotyledon.Service):
             # Extension raising ExtensionLoadError can be ignored,
             # and ignore anything we can't import as a safety measure.
             if isinstance(exc, plugin_base.ExtensionLoadError):
-                LOG.exception("Skip loading extension for %s", ep.name)
+                LOG.debug("Skip loading extension for %s: %s",
+                          ep.name, exc.msg)
                 return
 
             show_exception = (LOG.isEnabledFor(logging.DEBUG)

@@ -38,7 +38,8 @@ class SensorPollster(plugin_base.PollsterBase):
 
         # Do not load this extension if no IPMI support
         if not self.ipmi.ipmi_support:
-            raise plugin_base.ExtensionLoadError()
+            raise plugin_base.ExtensionLoadError(
+                "IPMITool not supported on host")
 
     @property
     def default_discovery(self):

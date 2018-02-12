@@ -36,7 +36,8 @@ class _Base(plugin_base.PollsterBase):
 
         # Do not load this extension if no NM support
         if self.nodemanager.nm_version == 0:
-            raise plugin_base.ExtensionLoadError()
+            raise plugin_base.ExtensionLoadError(
+                "NodeManager not supported on host")
 
     @property
     def default_discovery(self):
