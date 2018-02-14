@@ -33,30 +33,21 @@
 
 - job:
     name: ceilometer-tox-py27-mongodb
-    parent: legacy-base
-    run: playbooks/legacy/ceilometer-tox-py27-mongodb/run.yaml
-    post-run: playbooks/legacy/ceilometer-tox-py27-mongodb/post.yaml
-    timeout: 2400
-    required-projects:
-      - openstack/requirements
+    parent: openstack-tox
+    vars:
+      tox_envlist: py27-mongodb
 
 - job:
     name: ceilometer-tox-py27-mysql
-    parent: legacy-base
-    run: playbooks/legacy/ceilometer-tox-py27-mysql/run.yaml
-    post-run: playbooks/legacy/ceilometer-tox-py27-mysql/post.yaml
-    timeout: 2400
-    required-projects:
-      - openstack/requirements
+    parent: openstack-tox
+    vars:
+      tox_envlist: py27-mysql
 
 - job:
     name: ceilometer-tox-py27-postgresql
-    parent: legacy-base
-    run: playbooks/legacy/ceilometer-tox-py27-postgresql/run.yaml
-    post-run: playbooks/legacy/ceilometer-tox-py27-postgresql/post.yaml
-    timeout: 2400
-    required-projects:
-      - openstack/requirements
+    parent: openstack-tox
+    vars:
+      tox_envlist: py27-postgresql
 
 - job:
     name: grenade-dsvm-ceilometer
@@ -68,22 +59,6 @@
       - openstack-dev/grenade
       - openstack-infra/devstack-gate
       - openstack/ceilometer
-
-- job:
-    name: telemetry-dsvm-integration-ceilometer
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/run.yaml
-    post-run: playbooks/legacy/telemetry-dsvm-integration-ceilometer/post.yaml
-    timeout: 7800
-    required-projects:
-      - openstack-infra/devstack-gate
-      - openstack/aodh
-      - openstack/ceilometer
-      - openstack/panko
-      # following are required when DEVSTACK_GATE_HEAT, which this
-      # job turns on
-      - openstack/dib-utils
-      - openstack/diskimage-builder
 
 - project:
     name: openstack/ceilometer
@@ -98,7 +73,7 @@
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
-        - telemetry-dsvm-integration-ceilometer
+        - telemetry-dsvm-integration
         - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only
         # TripleO jobs that deploy Telemetry.
         # Note we don't use a project-template here, so it's easier
@@ -127,5 +102,5 @@
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
-        - telemetry-dsvm-integration-ceilometer
+        - telemetry-dsvm-integration
         - ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only

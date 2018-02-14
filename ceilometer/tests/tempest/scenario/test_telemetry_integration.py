@@ -31,7 +31,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
     @classmethod
     def skip_checks(cls):
         super(TestTelemetryIntegration, cls).skip_checks()
-        for name in ["aodh_plugin", "gnocchi", "nova", "heat", "panko",
+        for name in ["aodh_plugin", "gnocchi", "nova", "heat_plugin", "panko",
                      "ceilometer", "glance"]:
             cls._check_service(name)
 
@@ -88,7 +88,7 @@ class TestTelemetryIntegration(manager.ScenarioTest):
             "AODH_SERVICE_URL": self._get_endpoint(auth, "alarming_plugin"),
             "GNOCCHI_SERVICE_URL": self._get_endpoint(auth, "metric"),
             "PANKO_SERVICE_URL": self._get_endpoint(auth, "event"),
-            "HEAT_SERVICE_URL": self._get_endpoint(auth, "orchestration"),
+            "HEAT_SERVICE_URL": self._get_endpoint(auth, "heat_plugin"),
             "NOVA_SERVICE_URL": self._get_endpoint(auth, "compute"),
             "GLANCE_SERVICE_URL": self._get_endpoint(auth, "image"),
             "GLANCE_IMAGE_NAME": self.glance_image_create(),

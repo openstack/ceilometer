@@ -205,7 +205,7 @@ function install_gnocchi {
         PY_VERS=${PYTHON2_VERSION}
     fi
     # workaround for upper-constraints.
-    sudo -H python${PY_VERS} -m pip install -U gnocchi[redis,${DATABASE_TYPE},keystone]
+    sudo -H python${PY_VERS} -m pip install -U "gnocchi[redis,${DATABASE_TYPE},keystone]>=4.0,<4.2"
     recreate_database gnocchi
     sudo install -d -o $STACK_USER -m 755 $GNOCCHI_CONF_DIR
 
