@@ -569,6 +569,8 @@ if is_service_enabled ceilometer; then
         init_ceilometer
         # Start the services
         start_ceilometer
+    elif [[ "$1" == "stack" && "$2" == "test-config" ]]; then
+        iniset $TEMPEST_CONFIG telemetry alarm_granularity $CEILOMETER_ALARM_GRANULARITY
     fi
 
     if [[ "$1" == "unstack" ]]; then
