@@ -193,6 +193,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                     "Fail to get domain uuid %s metadata: "
                     "metadata was missing expected attributes",
                     domain.UUIDString())
+                continue
 
             dom_state = domain.state()[0]
             vm_state = libvirt_utils.LIBVIRT_POWER_STATE.get(dom_state)
