@@ -324,12 +324,12 @@ The following meters are collected for OpenStack Compute.
 | **Meters added in the Pike release**                                        |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Cumul\|      |          |          |         |                  |
-|           | ative | MB   | instance | Pollster | Libvirt | Memory swap in   |
-| swap.in   |       |      | ID       |          |         |                  |
+| swap.in   | ative | MB   | instance | Pollster | Libvirt | Memory swap in   |
+|           |       |      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Cumul\|      |          |          |         |                  |
-|           | ative | MB   | instance | Pollster | Libvirt | Memory swap out  |
-| swap.out  |       |      | ID       |          |         |                  |
+| swap.out  | ative | MB   | instance | Pollster | Libvirt | Memory swap out  |
+|           |       |      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 
 .. note::
