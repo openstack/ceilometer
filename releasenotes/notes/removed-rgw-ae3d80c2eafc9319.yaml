@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Deprecated `rgw.*` meters have been removed. Use `radosgw.*` instead.
