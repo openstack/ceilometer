@@ -61,7 +61,6 @@
       - openstack/ceilometer
 
 - project:
-    name: openstack/ceilometer
     check:
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
