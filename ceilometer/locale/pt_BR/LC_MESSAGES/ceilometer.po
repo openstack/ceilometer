@@ -8,16 +8,17 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # André Franciosi <andre@franciosi.org>, 2017. #zanata
 # Marcio <marciofoz@gmail.com>, 2017. #zanata
+# Rodrigo Loures <rmoraesloures@gmail.com>, 2018. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 8.1.1.dev6\n"
+"Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-08-15 12:19+0000\n"
+"POT-Creation-Date: 2018-02-22 18:37+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-08-22 02:33+0000\n"
-"Last-Translator: André Franciosi <andre@franciosi.org>\n"
+"PO-Revision-Date: 2018-01-18 08:26+0000\n"
+"Last-Translator: Rodrigo Loures <rmoraesloures@gmail.com>\n"
 "Language: pt-BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
@@ -38,6 +39,11 @@ msgid "CPU cache size: %(id)s %(cache_size)d"
 msgstr "Tamanho do cache de CPU: %(id)s %(cache_size)d"
 
 #, python-format
+msgid "Cannot create table %(table_name)s, it already exists. Ignoring error"
+msgstr ""
+"Não foi possível criar a tabela %(table_name)s, ela já existe. Erro ignorado."
+
+#, python-format
 msgid "Could not connect slave host: %s"
 msgstr "Não foi possível conectar ao host escravo: %s"
 
@@ -46,12 +52,20 @@ msgid "Could not connect to XenAPI: %s"
 msgstr "Não foi possível conectar-se ao XenAPI: %s"
 
 #, python-format
+msgid "Could not get CPU Util for %(id)s: %(e)s"
+msgstr "Não foi possível obter o Uso de CPU para %(id)s: %(e)s"
+
+#, python-format
 msgid "Could not get Memory Usage for %(id)s: %(e)s"
 msgstr "Não foi possível obter o Uso de Memória para %(id)s: %(e)s"
 
 #, python-format
 msgid "Could not get VM %s CPU number"
 msgstr "Não foi possível obter o número de CPU da máquina virtual %s"
+
+#, python-format
+msgid "Could not get cache usage for %(id)s: %(e)s"
+msgstr "Não foi possível obter o uso de cache para %(id)s: %(e)s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -75,6 +89,22 @@ msgid ""
 msgstr ""
 "Falha ao inspecionar os dados da instância <name=%(name)s, id=%(id)s>, "
 "estado do domínio é SHUTOFF."
+
+#, python-format
+msgid ""
+"Failed to inspect l3 cache usage of %(instance_uuid)s, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"Falha ao inspecionar o uso de cache l3 de %(instance_uuid)s, não foi "
+"possível obter informação sobre libvirt: %(error)s"
+
+#, python-format
+msgid ""
+"Failed to inspect memory bandwidth of %(instance_uuid)s, can not get info "
+"from libvirt: %(error)s"
+msgstr ""
+"Falha ao inspecionar a largura de banda de memória de %(instance_uuid)s, não "
+"foi possível obter informações sobre libvirt: %(error)s"
 
 #, python-format
 msgid ""
@@ -188,6 +218,25 @@ msgstr ""
 "Erro de análise na especificação JSONPath '%(jsonpath)s' para %(name)s: "
 "%(err)s"
 
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"l3 cache usage of %(instance_uuid)s, can not get info from libvirt: %(error)s"
+msgstr ""
+"Perf não é suportado pela versão atual de libvirt e falhou ao inspecionar o "
+"uso de cache l3 de %(instance_uuid)s, não foi possível obter informações "
+"sobre libvirt: %(error)s"
+
+#, python-format
+msgid ""
+"Perf is not supported by current version of libvirt, and failed to inspect "
+"memory bandwidth of %(instance_uuid)s, can not get info from libvirt: "
+"%(error)s"
+msgstr ""
+"Perf não é suportado pela versão atual de libvirt e falhou ao inspecionar a "
+"largura de banda de memória de %(instance_uuid)s, não foi possível obter "
+"informações sobre libvirt: %(error)s"
+
 msgid "Period must be positive."
 msgstr "Período deve ser positivo."
 
@@ -222,6 +271,11 @@ msgstr "Publicando política desconhecida (%s) força para o padrão"
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "A API AdminOps RGW retornou %(status)s %(reason)s"
 
+msgid "Request failed to connect to OpenDaylight with NorthBound REST API"
+msgstr ""
+"A solicitação para conectar-se ao OpenDaylight com a API REST NorthBound "
+"falhou."
+
 #, python-format
 msgid "Required field %s not specified"
 msgstr "Campo obrigatório %s não especificado"
@@ -234,6 +288,10 @@ msgstr "Amostra"
 
 msgid "Samples should be included in request body"
 msgstr "As amostras devem ser incluídas no corpo da solicitação"
+
+#, python-format
+msgid "String %s is not a valid isotime"
+msgstr "String %s não é um isotime válido"
 
 #, python-format
 msgid ""
@@ -360,6 +418,10 @@ msgstr ""
 #, python-format
 msgid "checking cache usage for instance %s"
 msgstr "verificando o uso do cache para a instância %s"
+
+#, python-format
+msgid "could not get CPU time for %(id)s: %(e)s"
+msgstr "Não foi possível obter o tempo de CPU para %(id)s: %(e)s"
 
 msgid "direct option cannot be true when Gnocchi is enabled."
 msgstr "A opção direta não pode ser true quando o Gnocchi está ativado. "
