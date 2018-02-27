@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    `launched_at`/`created_at`/`deleted_at` of Nova instances are now tracked.
