@@ -11,6 +11,8 @@
       fields: payload.display_name
     resource_id:
       fields: payload.instance_id
+    cell_name:
+      fields: payload.cell_name
     host:
       fields: publisher_id.`split(., 1, 1)`
     service:
