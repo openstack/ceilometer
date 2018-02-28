@@ -1,0 +1,18 @@
+---
+features:
+  - |
+    Archive policies can now be configured per metrics in gnocchi_resources.yaml.
+    A default list of archive policies is now created by Ceilometer.
+    They are called "ceilometer-low-rate" for all IOs metrics and "ceilometer-low"
+    for others.
+upgrade:
+  - |
+    Ceilometer now creates it own archive policies in Gnocchi and use them to
+    create metrics in Gnocchi. Old metrics kept their current archive policies
+    and will not be updated with ceilometer-upgrade. Only newly created metrics
+    will be impacted. Archive policy can still be overriden with the publisher url
+    (e.g: gnocchi://archive_policy=high).
+deprecations:
+  - |
+    cpu_util and \*.rate meters are deprecated and will be removed in future
+    release in favor of the Gnocchi rate calculation equivalent.
