@@ -215,6 +215,15 @@ resources_update_operations = [
          {"op": "add", "path": "/attributes/deleted_at",
           "value": {"type": "datetime", "required": False}},
      ]},
+    {"desc": "add instance_id/image_id to volume",
+     "type": "update_attribute_type",
+     "resource_type": "volume",
+     "data": [
+         {"op": "add", "path": "/attributes/image_id",
+          "value": {"type": "uuid", "required": False}},
+         {"op": "add", "path": "/attributes/instance_id",
+          "value": {"type": "uuid", "required": False}},
+     ]},
 ]
 
 # NOTE(sileht): We use LooseVersion because pbr can generate invalid

@@ -50,6 +50,18 @@ VOLUME_LIST = [
           u'multiattach': False,
           u'source_volid': None,
           u'consistencygroup_id': None,
+          u"volume_image_metadata": {
+              u"checksum": u"17d9daa4fb8e20b0f6b7dec0d46fdddf",
+              u"container_format": u"bare",
+              u"disk_format": u"raw",
+              u"hw_disk_bus": u"scsi",
+              u"hw_scsi_model": u"virtio-scsi",
+              u"image_id": u"f0019ee3-523c-45ab-b0b6-3adc529673e7",
+              u"image_name": u"debian-jessie-scsi",
+              u"min_disk": u"0",
+              u"min_ram": u"0",
+              u"size": u"1572864000"
+          },
           u'os-vol-mig-status-attr:name_id': None,
           u'name': None,
           u'bootable': u'false',
@@ -71,6 +83,18 @@ SNAPSHOT_LIST = [
           u'volume_id': u'6f27bc42-c834-49ea-ae75-8d1073b37806',
           u'metadata': {},
           u'created_at': u'2016-10-19T07:56:55.000000',
+          u"volume_image_metadata": {
+              u"checksum": u"17d9daa4fb8e20b0f6b7dec0d46fdddf",
+              u"container_format": u"bare",
+              u"disk_format": u"raw",
+              u"hw_disk_bus": u"scsi",
+              u"hw_scsi_model": u"virtio-scsi",
+              u"image_id": u"f0019ee3-523c-45ab-b0b6-3adc529673e7",
+              u"image_name": u"debian-jessie-scsi",
+              u"min_disk": u"0",
+              u"min_ram": u"0",
+              u"size": u"1572864000"
+          },
           u'name': None})
 ]
 
@@ -119,6 +143,11 @@ class TestVolumeSizePollster(base.BaseTestCase):
                          volume_size_samples[0].project_id)
         self.assertEqual('d94c18fb-b680-4912-9741-da69ee83c94f',
                          volume_size_samples[0].resource_id)
+        self.assertEqual('f0019ee3-523c-45ab-b0b6-3adc529673e7',
+                         volume_size_samples[0].resource_metadata["image_id"])
+        self.assertEqual('1ae69721-d071-4156-a2bd-b11bb43ec2e3',
+                         volume_size_samples[0].resource_metadata
+                         ["instance_id"])
 
 
 class TestVolumeSnapshotSizePollster(base.BaseTestCase):
@@ -142,6 +171,9 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
                          volume_snapshot_size_samples[0].project_id)
         self.assertEqual('b1ea6783-f952-491e-a4ed-23a6a562e1cf',
                          volume_snapshot_size_samples[0].resource_id)
+        self.assertEqual('f0019ee3-523c-45ab-b0b6-3adc529673e7',
+                         volume_snapshot_size_samples[0].resource_metadata
+                         ["image_id"])
 
 
 class TestVolumeBackupSizePollster(base.BaseTestCase):
