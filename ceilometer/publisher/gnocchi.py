@@ -385,8 +385,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             if not resource_extra:
                 continue
             try:
-                self._if_not_cached("update", resource_type, resource,
-                                    self._update_resource, resource_extra)
+                self._if_not_cached(resource_type, resource, resource_extra)
             except gnocchi_exc.ClientException as e:
                 LOG.error(six.text_type(e))
             except Exception as e:
@@ -417,8 +416,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             for resource_type, resource, resource_extra in resources:
                 try:
                     resource.update(resource_extra)
-                    self._if_not_cached("create", resource_type, resource,
-                                        self._create_resource)
+                    self._create_resource(resource_type, resource)
                 except gnocchi_exc.ResourceAlreadyExists:
                     # NOTE(sileht): resource created in the meantime
                     pass
@@ -429,6 +427,10 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     # and we can't patch it later
                     del measures[resource['id']]
                     del resource_infos[resource['id']]
+                else:
+                    if self.cache:
+                        self.cache.set(resource['id'],
+                                       self._hash_resource(resource))
 
             # NOTE(sileht): we have created missing resources/metrics,
             # now retry to post measures
@@ -452,12 +454,10 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                                       resource_extra)
         LOG.debug('Resource %s updated', resource["id"])
 
-    def _if_not_cached(self, operation, resource_type, resource, method,
-                       *args, **kwargs):
+    def _if_not_cached(self, resource_type, resource, resource_extra):
         if self.cache:
             cache_key = resource['id']
             attribute_hash = self._check_resource_cache(cache_key, resource)
-            hit = False
             if attribute_hash:
                 with self._gnocchi_resource_lock[cache_key]:
                     # NOTE(luogangyi): there is a possibility that the
@@ -466,25 +466,25 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     attribute_hash = self._check_resource_cache(cache_key,
                                                                 resource)
                     if attribute_hash:
-                        method(resource_type, resource, *args, **kwargs)
+                        self._update_resource(resource_type, resource,
+                                              resource_extra)
                         self.cache.set(cache_key, attribute_hash)
                     else:
-                        hit = True
                         LOG.debug('resource cache recheck hit for '
-                                  '%s %s', operation, cache_key)
+                                  '%s', cache_key)
                 self._gnocchi_resource_lock.pop(cache_key, None)
             else:
-                hit = True
-                LOG.debug('Resource cache hit for %s %s', operation, cache_key)
-            if hit and operation == "create":
-                raise gnocchi_exc.ResourceAlreadyExists()
+                LOG.debug('Resource cache hit for %s', cache_key)
         else:
-            method(resource_type, resource, *args, **kwargs)
+            self._update_resource(resource_type, resource, resource_extra)
+
+    @staticmethod
+    def _hash_resource(resource):
+        return hash(tuple(i for i in resource.items() if i[0] != 'metrics'))
 
     def _check_resource_cache(self, key, resource_data):
         cached_hash = self.cache.get(key)
-        attribute_hash = hash(tuple(i for i in resource_data.items()
-                                    if i[0] != 'metrics'))
+        attribute_hash = self._hash_resource(resource_data)
         if not cached_hash or cached_hash != attribute_hash:
             return attribute_hash
         else:
