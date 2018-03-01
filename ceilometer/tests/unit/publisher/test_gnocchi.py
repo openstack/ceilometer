@@ -474,8 +474,6 @@ class PublisherWorkflowTest(base.BaseTestCase,
         self.useFixture(utils_fixture.TimeFixture(now))
 
         expected_calls = [
-            mock.call.archive_policy.get("ceilometer-low"),
-            mock.call.archive_policy.get("ceilometer-low-rate"),
             mock.call.resource.search('instance_network_interface',
                                       search_params),
             mock.call.resource.search('instance_disk', search_params),
@@ -505,7 +503,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
                                        IMAGE_DELETE_START,
                                        VOLUME_DELETE_START,
                                        FLOATINGIP_DELETE_END])
-        self.assertEqual(10, len(fakeclient.mock_calls))
+        self.assertEqual(8, len(fakeclient.mock_calls))
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 
