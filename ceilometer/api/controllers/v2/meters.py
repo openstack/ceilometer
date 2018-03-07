@@ -487,6 +487,7 @@ class MetersController(rest.RestController):
         """Return all known meters, based on the data recorded so far.
 
         :param q: Filter rules for the meters to be returned.
+        :param limit: Maximum number of meters to be returned.
         :param unique: flag to indicate unique meters to be returned.
         """
 
