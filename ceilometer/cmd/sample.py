@@ -15,6 +15,7 @@
 
 """Command line tool for creating meter for Ceilometer.
 """
+import ast
 import logging
 import sys
 
@@ -87,5 +88,5 @@ def send_sample():
             project_id=conf.sample_project,
             resource_id=conf.sample_resource,
             timestamp=conf.sample_timestamp,
-            resource_metadata=conf.sample_metadata and eval(
+            resource_metadata=conf.sample_metadata and ast.literal_eval(
                 conf.sample_metadata))])
