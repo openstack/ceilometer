@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add `disk.device.read.latency` and `disk.device.write.latency` meters to
+    capture total time used by read or write operations.

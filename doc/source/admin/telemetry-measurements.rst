@@ -331,6 +331,16 @@ The following meters are collected for OpenStack Compute.
 |           | ative | MB   | instance | Pollster | Libvirt | Memory swap out  |
 | swap.out  |       |      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
+| **Meters added in the Queens release**                                      |
++-----------+-------+------+----------+----------+---------+------------------+
+| disk.devi\| Cumul\|      |          |          |         | Total time read  |
+| ce.read.l\| ative | ns   | Disk ID  | Pollster | Libvirt | operations have  |
+| atency    |       |      |          |          |         | taken            |
++-----------+-------+------+----------+----------+---------+------------------+
+| disk.devi\| Cumul\|      |          |          |         | Total time write |
+| ce.write.\| ative | ns   | Disk ID  | Pollster | Libvirt | operations have  |
+| latency   |       |      |          |          |         | taken            |
++-----------+-------+------+----------+----------+---------+------------------+
 
 .. note::
 

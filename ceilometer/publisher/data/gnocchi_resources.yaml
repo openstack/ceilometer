@@ -109,6 +109,8 @@ resources:
       - 'disk.device.write.bytes'
       - 'disk.device.write.bytes.rate'
       - 'disk.device.latency'
+      - 'disk.device.read.latency'
+      - 'disk.device.write.latency'
       - 'disk.device.iops'
       - 'disk.device.capacity'
       - 'disk.device.allocation'
