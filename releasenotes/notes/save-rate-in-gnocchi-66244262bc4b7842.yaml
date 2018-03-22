@@ -10,7 +10,7 @@ upgrade:
     Ceilometer now creates it own archive policies in Gnocchi and use them to
     create metrics in Gnocchi. Old metrics kept their current archive policies
     and will not be updated with ceilometer-upgrade. Only newly created metrics
-    will be impacted. Archive policy can still be overriden with the publisher url
+    will be impacted. Archive policy can still be overridden with the publisher url
     (e.g: gnocchi://archive_policy=high).
 deprecations:
   - |
