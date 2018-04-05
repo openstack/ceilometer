@@ -185,7 +185,7 @@ Publishing the data
 
    This figure shows how a sample can be published to multiple destinations.
 
-Currently, processed data can be published using 7 different transports:
+Currently, processed data can be published using 8 different transports:
 
 1. gnocchi, which publishes samples/events to Gnocchi API;
 2. notifier, a notification based publisher which pushes samples to a message
@@ -196,6 +196,7 @@ Currently, processed data can be published using 7 different transports:
 6. zaqar, a multi-tenant cloud messaging and notification service for web and
    mobile developers;
 7. https, which is http over SSL and targets a REST interface.
+8. prometheus, which publishes samples to Prometheus Pushgateway
 
 
 Storing/Accessing the data

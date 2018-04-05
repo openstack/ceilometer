@@ -396,6 +396,29 @@ service.
 More details on how to enable and configure gnocchi can be found on its
 `official documentation page <http://gnocchi.xyz>`__.
 
+prometheus
+``````````
+
+Metering data can be send to the `pushgateway
+<https://github.com/prometheus/pushgateway>`__ of Prometheus by using:
+
+``prometheus://pushgateway-host:9091/metrics/job/openstack-telemetry``
+
+With this publisher, timestamp are not sent to Prometheus due to Prometheus
+Pushgateway design. All timestamps are set at the time it scrapes the metrics
+from the Pushgateway and not when the metric was polled on the OpenStack
+services.
+
+In order to get timeseries in Prometheus that looks like the reality (but with
+the lag added by the Prometheus scrapping mechanism). The `scrape_interval` for
+the pushgateway must be lower and a multiple of the Ceilometer polling
+interval.
+
+You can read more `here <https://github.com/prometheus/pushgateway#about-timestamps>`__
+
+Due to this, this is not recommended to use this publisher for billing purpose
+as timestamps in Prometheus will not be exact.
+
 panko
 `````
 

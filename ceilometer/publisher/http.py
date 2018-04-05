@@ -69,6 +69,8 @@ class HttpPublisher(publisher.ConfigPublisherBase):
 
     """
 
+    HEADERS = {'Content-type': 'application/json'}
+
     def __init__(self, conf, parsed_url):
         super(HttpPublisher, self).__init__(conf, parsed_url)
 
@@ -81,14 +83,12 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         # is valid, if not, ValueError will be thrown.
         parsed_url.port
 
-        self.headers = {'Content-type': 'application/json'}
-
         # Handling other configuration options in the query string
         params = urlparse.parse_qs(parsed_url.query)
         self.timeout = self._get_param(params, 'timeout', 5, int)
         self.max_retries = self._get_param(params, 'max_retries', 2, int)
         self.poster = (
-            self._do_post if strutils.bool_from_string(self._get_param(
+            self._batch_post if strutils.bool_from_string(self._get_param(
                 params, 'batch', True)) else self._individual_post)
         verify_ssl = self._get_param(params, 'verify_ssl', True)
         try:
@@ -124,10 +124,20 @@ class HttpPublisher(publisher.ConfigPublisherBase):
                   'pool_maxsize': conf.max_parallel_requests}
         self.session = requests.Session()
 
+        if parsed_url.scheme in ["http", "https"]:
+            scheme = parsed_url.scheme
+        else:
+            ssl = self._get_param(params, 'ssl', False)
+            try:
+                ssl = strutils.bool_from_string(ssl, strict=True)
+            except ValueError:
+                ssl = (ssl or False)
+            scheme = "https" if ssl else "http"
+
         # authentication & config params have been removed, so use URL with
         # updated query string
         self.target = urlparse.urlunsplit([
-            parsed_url.scheme,
+            scheme,
             netloc,
             parsed_url.path,
             urlparse.urlencode(params),
@@ -149,17 +159,19 @@ class HttpPublisher(publisher.ConfigPublisherBase):
 
     def _individual_post(self, data):
         for d in data:
-            self._do_post(d)
+            self._do_post(json.dumps(data))
 
-    def _do_post(self, data):
+    def _batch_post(self, data):
         if not data:
             LOG.debug('Data set is empty!')
             return
-        data = json.dumps(data)
+        self._do_post(json.dumps(data))
+
+    def _do_post(self, data):
         LOG.trace('Message: %s', data)
         try:
             res = self.session.post(self.target, data=data,
-                                    headers=self.headers, timeout=self.timeout,
+                                    headers=self.HEADERS, timeout=self.timeout,
                                     auth=self.client_auth,
                                     cert=self.client_cert,
                                     verify=self.verify_ssl)
