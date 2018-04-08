@@ -248,7 +248,7 @@ class AgentManager(cotyledon.Service):
         self.extensions = list(itertools.chain(*list(extensions))) + list(
             itertools.chain(*list(extensions_fb)))
 
-        if self.extensions == []:
+        if not self.extensions:
             LOG.warning('No valid pollsters can be loaded from %s '
                         'namespaces', namespaces)
 
