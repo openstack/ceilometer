@@ -5,7 +5,7 @@ Telemetry uses notifications to collect Networking service meters. Perform
 these steps on the controller node.
 
 Configure the Networking service to use Telemetry
-----------------------------------------------------
+-------------------------------------------------
 
 * Edit the ``/etc/neutron/neutron.conf`` and complete the following actions:
 

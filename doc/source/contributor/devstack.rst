@@ -1,6 +1,6 @@
-===============================
- Installing development sandbox
-===============================
+==============================
+Installing development sandbox
+==============================
 
 In a development environment created by devstack_, Ceilometer can be tested
 alongside other OpenStack services.

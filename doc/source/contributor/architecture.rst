@@ -1,8 +1,8 @@
 .. _architecture:
 
-=====================
- System Architecture
-=====================
+===================
+System Architecture
+===================
 
 .. index::
    single: agent; architecture
