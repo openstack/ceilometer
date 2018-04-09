@@ -15,9 +15,9 @@
 
 .. _events:
 
-=============================
- Events and Event Processing
-=============================
+===========================
+Events and Event Processing
+===========================
 
 Events vs. Samples
 ~~~~~~~~~~~~~~~~~~

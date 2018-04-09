@@ -1,8 +1,8 @@
 .. _admin:
 
-=====================
- Administrator Guide
-=====================
+===================
+Administrator Guide
+===================
 
 
 Overview

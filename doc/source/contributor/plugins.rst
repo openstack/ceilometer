@@ -13,9 +13,9 @@
       License for the specific language governing permissions and limitations
       under the License.
 
-=======================
- Writing Agent Plugins
-=======================
+=====================
+Writing Agent Plugins
+=====================
 
 This documentation gives you some clues on how to write a new agent or
 plugin for Ceilometer if you wish to instrument a measurement which

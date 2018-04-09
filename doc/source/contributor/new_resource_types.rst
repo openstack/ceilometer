@@ -15,9 +15,9 @@
 
 .. _add_new_resource_types:
 
-=================================
- Ceilometer + Gnocchi Integration
-=================================
+================================
+Ceilometer + Gnocchi Integration
+================================
 
 .. warning::
 

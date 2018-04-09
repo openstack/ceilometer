@@ -15,9 +15,9 @@
 
 .. _measurements:
 
-==============
- Measurements
-==============
+============
+Measurements
+============
 
 Existing meters
 ===============
