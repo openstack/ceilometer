@@ -56,7 +56,7 @@ periodically calls their :func:`get_samples` method.
 Currently we keep separate namespaces - ``ceilometer.poll.compute``
 and ``ceilometer.poll.central`` for quick separation of what to poll depending
 on where is polling agent running. For example, this will load, among others,
-the :class:`ceilometer.compute.pollsters.cpu.CPUPollster`
+the :class:`ceilometer.compute.pollsters.instance_stats.CPUPollster`
 
 Pollster
 --------
@@ -68,12 +68,12 @@ returns a sequence of ``Sample`` objects as defined in the
 :file:`ceilometer/sample.py` file.
 
 Compute plugins are defined as subclasses of the
-:class:`ceilometer.compute.pollsters.BaseComputePollster` class as defined in
-the :file:`ceilometer/compute/pollsters/__init__.py` file.
+:class:`ceilometer.compute.pollsters.GenericComputePollster` class as defined
+in the :file:`ceilometer/compute/pollsters/__init__.py` file.
 
 For example, in the ``CPUPollster`` plugin, the ``get_samples`` method takes
-in a given list of resources representating instances on the local host, loops
-through them and retrieves the `cputime` details from resource. Similarly,
+in a given list of resources representing instances on the local host, loops
+through them and retrieves the `cpu time` details from resource. Similarly,
 other metrics are built by pulling the appropriate value from the given list
 of resources.
 
@@ -93,16 +93,16 @@ pipelines based on a given configuration file. Pipelines are required to define
 Additionally, it must set ``get_main_endpoints`` which provides endpoints to be
 added to the main queue listener in the notification agent. This main queue
 endpoint inherits :class:`ceilometer.pipeline.base.MainNotificationEndpoint`
-and is defines which notification priorites to listen, normalises the data,
+and defines which notification priorities to listen, normalises the data,
 and redirects the data for pipeline processing or requeuing depending on
 `workload_partitioning` configuration.
 
 If a pipeline is configured to support `workload_partitioning`, data from the
-main queue endpoints are sharded and requeued in internal queues. The
+main queue endpoints are shared and requeued in internal queues. The
 notification agent configures a second notification consumer to handle these
 internal queues and pushes data to endpoints defined by
 ``get_interim_endpoints`` in the pipeline manager. These interim endpoints
-define how to handle the sharded, normalised data models for pipeline
+define how to handle the shared, normalised data models for pipeline
 processing
 
 Both main queue and interim queue notification endpoints should implement:
@@ -110,7 +110,7 @@ Both main queue and interim queue notification endpoints should implement:
 ``event_types``
    A sequence of strings defining the event types the endpoint should handle
 
-``process_notifications(self, priority, message)``
+``process_notifications(self, priority, notifications)``
    Receives an event message from the list provided to ``event_types`` and
    returns a sequence of objects. Using the SampleEndpoint, it should yield
    ``Sample`` objects as defined in the :file:`ceilometer/sample.py` file.
