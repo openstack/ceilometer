@@ -33,9 +33,10 @@ sources:
           - network_sink
 sinks:
     - name: meter_sink
-      transformers:
       publishers:
           - gnocchi://
+
+    # All these transformers are deprecated, and will be removed in the future, don't use them.
     - name: cpu_sink
       transformers:
           - name: "rate_of_change"
@@ -48,6 +49,8 @@ sinks:
                     scale: "100.0 / (10**9 * (resource_metadata.cpu_number or 1))"
       publishers:
           - gnocchi://
+
+    # All these transformers are deprecated, and will be removed in the future, don't use them.
     - name: cpu_delta_sink
       transformers:
           - name: "delta"
@@ -57,6 +60,8 @@ sinks:
                 growth_only: True
       publishers:
           - gnocchi://
+
+    # All these transformers are deprecated, and will be removed in the future, don't use them.
     - name: disk_sink
       transformers:
           - name: "rate_of_change"
@@ -72,6 +77,8 @@ sinks:
                     type: "gauge"
       publishers:
           - gnocchi://
+
+    # All these transformers are deprecated, and will be removed in the future, don't use them.
     - name: network_sink
       transformers:
           - name: "rate_of_change"

@@ -27,9 +27,3 @@ Data collection
    central and compute agents as necessary. The agents are designed to scale
    horizontally. For more information refer to the `high availability guide
    <https://docs.openstack.org/ha-guide/controller-ha-telemetry.html>`_.
-
-#. `workload_partitioning` of notification agents is only required if
-   the pipeline configuration leverages transformers. It may also be enabled if
-   batching is required to minimize load on the defined publisher targets. If
-   transformers are not enabled, multiple agents may still be deployed without
-   `workload_partitioning` and processing will be done greedily.

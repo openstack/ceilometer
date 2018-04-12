@@ -37,6 +37,7 @@ LOG = log.getLogger(__name__)
 
 OPTS = [
     cfg.IntOpt('pipeline_processing_queues',
+               deprecated_for_removal=True,
                default=10,
                min=1,
                help='Number of queues to parallelize workload across. This '
@@ -47,6 +48,7 @@ OPTS = [
                 default=True,
                 help='Acknowledge message when event persistence fails.'),
     cfg.BoolOpt('workload_partitioning',
+                deprecated_for_removal=True,
                 default=False,
                 help='Enable workload partitioning, allowing multiple '
                      'notification agents to be run simultaneously.'),
