@@ -1,0 +1,3 @@
+---
+features:
+  - use memory usable metric from libvirt memoryStats if available.

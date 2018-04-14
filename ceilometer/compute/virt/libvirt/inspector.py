@@ -151,7 +151,10 @@ class LibvirtInspector(virt_inspector.Inspector):
         memory_swap_in = memory_swap_out = None
         memory_stats = domain.memoryStats()
         # Stat provided from libvirt is in KB, converting it to MB.
-        if 'available' in memory_stats and 'unused' in memory_stats:
+        if 'usable' in memory_stats and 'available' in memory_stats:
+            memory_used = (memory_stats['available'] -
+                           memory_stats['usable']) / units.Ki
+        elif 'available' in memory_stats and 'unused' in memory_stats:
             memory_used = (memory_stats['available'] -
                            memory_stats['unused']) / units.Ki
         if 'rss' in memory_stats:

@@ -474,6 +474,27 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertIsNone(stats.memory_swap_in)
             self.assertIsNone(stats.memory_swap_out)
 
+    def test_inspect_memory_with_usable(self):
+        domain = mock.Mock()
+        domain.info.return_value = (0, 0, 0, 2, 999999)
+        domain.memoryStats.return_value = {'available': 76800,
+                                           'rss': 30000,
+                                           'swap_in': 5120,
+                                           'swap_out': 8192,
+                                           'unused': 25600,
+                                           'usable': 51200}
+        conn = mock.Mock()
+        conn.domainListGetStats.return_value = [({}, {})]
+        conn.lookupByUUIDString.return_value = domain
+
+        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
+                        'refresh_libvirt_connection', return_value=conn):
+            stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertEqual(25600 / units.Ki, stats.memory_usage)
+            self.assertEqual(30000 / units.Ki, stats.memory_resident)
+            self.assertEqual(5120 / units.Ki, stats.memory_swap_in)
+            self.assertEqual(8192 / units.Ki, stats.memory_swap_out)
+
     def test_inspect_perf_events_libvirt_less_than_2_3_0(self):
         domain = mock.Mock()
         domain.info.return_value = (0, 0, 51200, 2, 999999)
