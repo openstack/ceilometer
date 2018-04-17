@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    A new pulisher have been added to push data to Prometheus Pushgateway.
