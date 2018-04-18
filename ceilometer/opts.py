@@ -30,6 +30,7 @@ import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
 import ceilometer.keystone_client
 import ceilometer.meter.notifications
+import ceilometer.monasca_opts
 import ceilometer.neutron_client
 import ceilometer.notification
 import ceilometer.nova_client
@@ -99,6 +100,7 @@ def list_opts():
          itertools.chain(ceilometer.ipmi.platform.intel_node_manager.OPTS,
                          ceilometer.ipmi.pollsters.OPTS)),
         ('meter', ceilometer.meter.notifications.OPTS),
+        ('monasca', ceilometer.monasca_opts.OPTS),
         ('notification',
          itertools.chain(ceilometer.notification.OPTS,
                          ceilometer.notification.EXCHANGES_OPTS)),

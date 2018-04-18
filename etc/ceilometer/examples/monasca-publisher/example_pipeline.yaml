@@ -1,0 +1,44 @@
+# An example pipeline.yaml
+# Reference https://docs.openstack.org/ceilometer/latest/admin/telemetry-measurements.html
+# for other possible meters.
+---
+sources:
+    - name: compute_source
+      interval: 30
+      meters:
+          - "memory"
+          - "vcpus"
+      sinks:
+          - meter_sink
+    - name: network_source
+      interval: 30
+      meters:
+          - "bandwidth"
+      sinks:
+          - meter_sink
+    - name: image_source
+      interval: 30
+      meters:
+          - "image.size"
+      sinks:
+          - meter_sink
+    - name: volume_source
+      interval: 30
+      meters:
+          - "volume.size"
+          - "snapshot.size"
+      sinks:
+          - meter_sink
+    - name: swift_source
+      interval: 3600
+      meters:
+          - "storage.objects"
+          - "storage.objects.size"
+          - "storage.objects.containers"
+      sinks:
+          - meter_sink
+sinks:
+    - name: meter_sink
+      transformers:
+      publishers:
+         - monasca://https://<your monasca instance virtual IP>:8070/v2.0

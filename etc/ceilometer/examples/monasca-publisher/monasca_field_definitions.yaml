@@ -1,0 +1,58 @@
+dimensions:
+    - resource_id
+    - project_id
+    - user_id
+    - region
+    - type
+    - unit
+    - source
+metadata:
+    common:
+        - event_type
+        - audit_period_beginning
+        - audit_period_ending
+        - availability_zone
+    memory:
+        - state
+        - memory_mb
+        - root_gb
+        - vcpus
+        - disk_gb
+        - ephemeral_gb
+        - host
+        - instance_flavor_id
+        - image_ref_url
+        - created_at
+        - deleted_at
+        - launched_at
+    vcpus:
+        - state
+        - memory_mb
+        - root_gb
+        - vcpus
+        - disk_gb
+        - ephemeral_gb
+        - host
+        - instance_flavor_id
+        - image_ref_url
+        - created_at
+        - deleted_at
+        - launched_at
+    image.size:
+        - size
+        - status
+        - is_public
+        - properties.image_type
+    snapshot.size:
+        - volume_size
+        - state
+        - status
+        - created_at
+        - host
+    volume.size:
+        - size
+        - volume_type
+        - status
+        - created_at
+        - host
+        - status

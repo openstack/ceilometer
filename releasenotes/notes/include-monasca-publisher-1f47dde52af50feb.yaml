@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Include a publisher for the Monasca API. A ``monasca://`` pipeline sink
+    will send data to a Monasca instance, using credentials configured in
+    ceilometer.conf. This functionality was previously available in the
+    Ceilosca project
+    (https://github.com/openstack/monasca-ceilometer).
