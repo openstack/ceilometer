@@ -377,8 +377,8 @@ function start_ceilometer {
 # stop_ceilometer() - Stop running processes
 function stop_ceilometer {
 
-    # Kill the ceilometer screen windows
-    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification; do
+    # Kill the ceilometer and gnocchi services
+    for serv in ceilometer-acompute ceilometer-acentral ceilometer-aipmi ceilometer-anotification gnocchi-api gnocchi-metricd; do
         stop_process $serv
     done
 }
