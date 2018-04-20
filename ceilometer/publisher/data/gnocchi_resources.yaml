@@ -215,7 +215,6 @@ resources:
     metrics:
       storage.objects.incoming.bytes:
       storage.objects.outgoing.bytes:
-      storage.api.request:
       storage.objects.size:
       storage.objects:
       storage.objects.containers:

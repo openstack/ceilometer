@@ -271,7 +271,7 @@ class PublisherTest(base.BaseTestCase):
                                           'filter_project option')
 
     def test_activity_filter_match_swift_event(self):
-        self.samples[0].name = 'storage.api.request'
+        self.samples[0].name = 'storage.objects.outgoing.bytes'
         self.samples[0].resource_id = 'a2d42c23-d518-46b6-96ab-3fba2e146859'
         self._do_test_activity_filter(1)
 
