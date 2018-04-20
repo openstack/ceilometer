@@ -1,0 +1,10 @@
+---
+deprecations:
+  - |
+    Usage of transformers in Ceilometer pipelines is deprecated. Transformers in Ceilometer
+    have never computed samples correctly when you have multiple workers. This functionality can
+    be done by the storage backend easily without all issues that Ceilometer has. For example, the
+    rating is already computed in Gnocchi today.
+  - |
+    Pipeline Partitioning is also deprecated. This was only useful to
+    workaround of some issues that tranformers has.

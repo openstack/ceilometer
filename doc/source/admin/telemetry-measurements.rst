@@ -356,12 +356,11 @@ The following meters are collected for OpenStack Compute.
     To enable libvirt ``disk.*`` support when running on RBD-backed shared
     storage, you need to install libvirt version 1.2.16+.
 
-The Telemetry service supports creating new meters by using
-transformers. For more details about transformers see
-:ref:`telemetry-transformers`. Among the meters gathered from libvirt and
-Hyper-V, there are a few which are derived from other meters. The list of
-meters that are created by using the ``rate_of_change`` transformer from the
-above table is the following:
+The Telemetry service supports creating new meters by using transformers, but
+this is deprecated and discouraged to use. Among the meters gathered from
+libvirt and Hyper-V, there are a few which are derived from other meters. The
+list of meters that are created by using the ``rate_of_change`` transformer
+from the above table is the following:
 
 -  cpu_util
 

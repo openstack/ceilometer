@@ -154,27 +154,6 @@ Ceilometer offers the ability to take data gathered by the agents, manipulate
 it, and publish it in various combinations via multiple pipelines. This
 functionality is handled by the notification agents.
 
-Transforming the data
----------------------
-
-.. figure:: ./4-Transformer.png
-   :width: 100%
-   :align: center
-   :alt: Transformer example
-
-   Example of aggregation of multiple cpu time usage samples in a single
-   cpu percentage sample.
-
-The data gathered from the polling and notifications agents contains a wealth
-of data and if combined with historical or temporal context, can be used to
-derive even more data. Ceilometer offers various transformers which can be used
-to manipulate data in the pipeline.
-
-.. note::
-
-   The equivalent functionality can be handled more stably by storage
-   drivers such as Gnocchi.
-
 Publishing the data
 -------------------
 
