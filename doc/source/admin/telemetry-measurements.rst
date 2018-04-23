@@ -756,11 +756,6 @@ The following meters are collected for OpenStack Object Storage:
 | storage.objects.ou\| Delta | B     | storage ID | Notific\| Number of outgo\|
 | tgoing.bytes       |       |       |            | ation   | ing bytes       |
 +--------------------+-------+-------+------------+---------+-----------------+
-| storage.api.request| Delta | requ\ | storage ID | Notific\| Number of API r\|
-|                    |       | est   |            | ation   | equests against |
-|                    |       |       |            |         | OpenStack Obje\ |
-|                    |       |       |            |         | ct Storage      |
-+--------------------+-------+-------+------------+---------+-----------------+
 | storage.containers\| Gauge | object| storage ID\| Pollster| Number of objec\|
 | .objects           |       |       | /container |         | ts in container |
 +--------------------+-------+-------+------------+---------+-----------------+
