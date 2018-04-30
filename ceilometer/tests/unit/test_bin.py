@@ -110,19 +110,3 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
                 break
         else:
             self.fail('Did not detect expected warning: %s' % expected)
-
-    def test_polling_namespaces_invalid_value_in_config(self):
-        content = ("[DEFAULT]\n"
-                   "transport_url = fake://\n"
-                   "polling_namespaces = ['central']\n")
-        if six.PY3:
-            content = content.encode('utf-8')
-        self.tempfile = fileutils.write_to_tempfile(content=content,
-                                                    prefix='ceilometer',
-                                                    suffix='.conf')
-        self.subp = subprocess.Popen(
-            ["ceilometer-polling", "--config-file=%s" % self.tempfile],
-            stderr=subprocess.PIPE)
-        __, err = self.subp.communicate()
-        self.assertIn(b"Exception: Valid values are ['compute', 'central', "
-                      b"'ipmi'], but found [\"['central']\"]", err)

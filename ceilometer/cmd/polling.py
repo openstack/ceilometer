@@ -62,7 +62,6 @@ class DeduplicatedCfgList(cfg.types.List):
 CLI_OPTS = [
     MultiChoicesOpt('polling-namespaces',
                     default=['compute', 'central'],
-                    choices=['compute', 'central', 'ipmi'],
                     dest='polling_namespaces',
                     help='Polling namespace(s) to be used while '
                          'resource polling'),
