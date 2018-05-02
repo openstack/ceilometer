@@ -195,14 +195,12 @@ class SNMPInspector(base.Inspector):
     def get_oid_value(oid_cache, oid_def, suffix='', host=None):
         oid, converter = oid_def
         value = oid_cache[oid + suffix]
+        if isinstance(value, rfc1905.NoSuchObject):
+            LOG.debug("OID %s%s has no value" % (
+                oid, " on %s" % host.hostname if host else ""))
+            return None
         if converter:
-            try:
-                value = converter(value)
-            except ValueError:
-                if isinstance(value, rfc1905.NoSuchObject):
-                    LOG.debug("OID %s%s has no value" % (
-                        oid, " on %s" % host.hostname if host else ""))
-                    return None
+            value = converter(value)
         return value
 
     @classmethod
