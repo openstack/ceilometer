@@ -71,12 +71,12 @@ Glossary
      RPC driver.
 
    non-repudiable
-     “Non-repudiation refers to a state of affairs where the purported
+     "Non-repudiation refers to a state of affairs where the purported
      maker of a statement will not be able to successfully challenge
      the validity of the statement or contract. The term is often
      seen in a legal setting wherein the authenticity of a signature
      is being challenged. In such an instance, the authenticity is
-     being "repudiated".”
+     being "repudiated"."
      (Wikipedia, [#]_)
 
    project
