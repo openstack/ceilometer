@@ -17,7 +17,8 @@
 import mock
 from oslo_utils import netutils
 from oslotest import mockpatch
-from pysnmp.proto.rfc1905 import noSuchObject
+from pysnmp.proto import rfc1905
+import six
 
 from ceilometer.hardware.inspector import snmp
 from ceilometer.tests import base as test_base
@@ -35,14 +36,18 @@ class FakeObjectName(object):
 
 class FakeCommandGenerator(object):
     def getCmd(self, authData, transportTarget, *oids, **kwargs):
-        emptyOID = '1.3.6.1.4.1.2021.4.14.0'
+        emptyOIDs = {
+            '1.3.6.1.4.1.2021.4.14.0': rfc1905.noSuchObject,
+            '1.3.6.1.4.1.2021.4.14.1': rfc1905.noSuchInstance,
+        }
         varBinds = [
             (FakeObjectName(oid), int(oid.split('.')[-1]))
             for oid in oids
-            if oid != emptyOID
+            if oid not in emptyOIDs
         ]
-        if emptyOID in oids:
-            varBinds += [(FakeObjectName(emptyOID), noSuchObject)]
+        for emptyOID, exc in six.iteritems(emptyOIDs):
+            if emptyOID in oids:
+                varBinds += [(FakeObjectName(emptyOID), exc)]
         return (None, None, 0, varBinds)
 
     def bulkCmd(authData, transportTarget, nonRepeaters, maxRepetitions,
@@ -78,6 +83,13 @@ class TestSNMPInspector(test_base.BaseTestCase):
             'metadata': {},
             'post_op': None,
         },
+        'test_nosuch_instance': {
+            'matching_type': snmp.EXACT,
+            'metric_oid': ('1.3.6.1.4.1.2021.4.14.1', int),
+            'metadata': {},
+            'post_op': None,
+        },
+
     }
 
     def setUp(self):
@@ -123,6 +135,18 @@ class TestSNMPInspector(test_base.BaseTestCase):
                                                 self.mapping['test_nosuch']))
         except ValueError:
             self.fail("got ValueError when interpreting NoSuchObject return")
+
+    def test_inspect_no_such_instance(self):
+        cache = {}
+        try:
+            # inspect_generic() is a generator, so we explicitly need to
+            # iterate through it in order to trigger the exception.
+            list(self.inspector.inspect_generic(self.host,
+                                                cache,
+                                                {},
+                                                self.mapping['test_nosuch']))
+        except ValueError:
+            self.fail("got ValueError when interpreting NoSuchInstance return")
 
     def test_inspect_generic_exact(self):
         self.inspector._fake_post_op = self._fake_post_op
