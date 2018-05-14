@@ -257,7 +257,7 @@ endpoint in the pipeline definition files. The HTTP target should be set along
 with the publisher declaration. For example, additional configuration options
 can be passed in: ``http://localhost:80/?option1=value1&option2=value2``
 
-The following options are availble:
+The following options are available:
 
 ``timeout``
     The number of seconds before HTTP request times out.
