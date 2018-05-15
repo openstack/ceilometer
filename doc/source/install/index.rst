@@ -6,8 +6,8 @@ Installation Guide
    :maxdepth: 2
 
    get_started.rst
-   install-compute.rst
    install-controller.rst
+   install-compute.rst
    verify.rst
    next-steps.rst
 
