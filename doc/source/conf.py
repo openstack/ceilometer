@@ -11,10 +11,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import subprocess
 import sys
 import os
-import warnings
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
