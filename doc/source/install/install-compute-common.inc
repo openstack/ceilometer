@@ -59,13 +59,13 @@ Configure Compute to poll IPMI meters
   To enable IPMI meters, ensure IPMITool is installed and the host supports
   Intel Node Manager.
 
-* Edit the ``/etc/sudoers`` file and include::
+* Edit the ``/etc/sudoers`` file and include:
 
   .. code-block:: ini
 
      ceilometer ALL = (root) NOPASSWD: /usr/bin/ceilometer-rootwrap /etc/ceilometer/rootwrap.conf *
 
-* Edit the ``/etc/ceilometer/polling.yaml`` to include the required meters, for example::
+* Edit the ``/etc/ceilometer/polling.yaml`` to include the required meters, for example:
 
   .. code-block:: yaml
 
