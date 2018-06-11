@@ -130,6 +130,7 @@ def list_opts():
         ('publisher', ceilometer.publisher.utils.OPTS),
         ('publisher_notifier', ceilometer.publisher.messaging.NOTIFIER_OPTS),
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
+        ('rgw_client', ceilometer.objectstore.rgw.CLIENT_OPTS),
         ('service_types',
          itertools.chain(ceilometer.image.discovery.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
