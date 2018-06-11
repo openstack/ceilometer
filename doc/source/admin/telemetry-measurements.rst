@@ -770,7 +770,7 @@ Ceph Object Storage
 In order to gather meters from Ceph, you have to install and configure
 the Ceph Object Gateway (radosgw) as it is described in the `Installation
 Manual <http://docs.ceph.com/docs/master/radosgw/>`__. You also have to enable
-`usage logging <http://ceph.com/docs/master/man/8/radosgw/#usage-logging>`__ in
+`usage logging <http://docs.ceph.com/docs/master/man/8/radosgw/#usage-logging>`__ in
 order to get the related meters from Ceph. You will need an
 ``admin`` user with ``users``, ``buckets``, ``metadata`` and ``usage``
 ``caps`` configured.
