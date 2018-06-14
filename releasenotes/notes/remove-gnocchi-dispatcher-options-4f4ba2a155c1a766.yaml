@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated `gnocchi_dispatcher` option group has been removed.
