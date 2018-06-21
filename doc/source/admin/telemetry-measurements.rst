@@ -21,9 +21,7 @@ below.
    order to be able to collect all the samples you need. For further
    information about configuration requirements see the `Telemetry chapter
    <https://docs.openstack.org/ceilometer/latest/install/index.html>`__
-   in the Installation Tutorials and Guides. Also check the `Telemetry manual
-   installation <https://docs.openstack.org/ceilometer/latest/contributor/install/manual.html>`__
-   description.
+   in the Installation Tutorials and Guides.
 
 Telemetry uses the following meter types:
 
