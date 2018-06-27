@@ -21,10 +21,6 @@ import six
 from stevedore import extension
 
 
-class PluginBase(object):
-    """Base class for all plugins."""
-
-
 class ExtensionLoadError(Exception):
     """Error of loading pollster plugin.
 
@@ -50,7 +46,7 @@ class PollsterPermanentError(Exception):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class PollsterBase(PluginBase):
+class PollsterBase(object):
     """Base class for plugins that support the polling API."""
 
     def setup_environment(self):
