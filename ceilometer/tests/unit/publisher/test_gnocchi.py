@@ -316,6 +316,43 @@ class PublisherWorkflowTest(base.BaseTestCase,
                             testscenarios.TestWithScenarios):
 
     sample_scenarios = [
+        ('cpu', dict(
+            sample=sample.Sample(
+                resource_id=str(uuid.uuid4()) + "_foobar",
+                name='cpu',
+                unit='ns',
+                type=sample.TYPE_CUMULATIVE,
+                volume=500,
+                user_id='test_user',
+                project_id='test_project',
+                source='openstack',
+                timestamp='2012-05-08 20:23:48.028195',
+                resource_metadata={
+                    'host': 'foo',
+                    'image_ref': 'imageref!',
+                    'instance_flavor_id': 1234,
+                    'display_name': 'myinstance',
+                },
+            ),
+            metric_attributes={
+                "archive_policy_name": "ceilometer-low-rate",
+                "unit": "ns",
+                "measures": [{
+                    'timestamp': '2012-05-08 20:23:48.028195',
+                    'value': 500
+                }]
+            },
+            postable_attributes={
+                'user_id': 'test_user',
+                'project_id': 'test_project',
+            },
+            patchable_attributes={
+                'host': 'foo',
+                'image_ref': 'imageref!',
+                'flavor_id': 1234,
+                'display_name': 'myinstance',
+            },
+            resource_type='instance')),
         ('disk.root.size', dict(
             sample=sample.Sample(
                 resource_id=str(uuid.uuid4()) + "_foobar",
@@ -352,20 +389,6 @@ class PublisherWorkflowTest(base.BaseTestCase,
                 'flavor_id': 1234,
                 'display_name': 'myinstance',
             },
-            metric_names=[
-                'disk.root.size', 'disk.ephemeral.size',
-                'memory', 'vcpus', 'memory.usage', 'memory.resident',
-                'memory.swap.in', 'memory.swap.out',
-                'memory.bandwidth.total', 'memory.bandwidth.local',
-                'cpu', 'cpu.delta', 'cpu_util', 'vcpus', 'disk.read.requests',
-                'cpu_l3_cache', 'perf.cpu.cycles', 'perf.instructions',
-                'perf.cache.references', 'perf.cache.misses',
-                'disk.read.requests.rate', 'disk.write.requests',
-                'disk.write.requests.rate', 'disk.read.bytes',
-                'disk.read.bytes.rate', 'disk.write.bytes',
-                'disk.write.bytes.rate', 'disk.latency', 'disk.iops',
-                'disk.capacity', 'disk.allocation', 'disk.usage',
-                'compute.instance.booting.time'],
             resource_type='instance')),
         ('hardware.ipmi.node.power', dict(
             sample=sample.Sample(
@@ -396,15 +419,6 @@ class PublisherWorkflowTest(base.BaseTestCase,
             },
             patchable_attributes={
             },
-            metric_names=[
-                'hardware.ipmi.node.power', 'hardware.ipmi.node.temperature',
-                'hardware.ipmi.node.inlet_temperature',
-                'hardware.ipmi.node.outlet_temperature',
-                'hardware.ipmi.node.fan', 'hardware.ipmi.node.current',
-                'hardware.ipmi.node.voltage', 'hardware.ipmi.node.airflow',
-                'hardware.ipmi.node.cups', 'hardware.ipmi.node.cpu_util',
-                'hardware.ipmi.node.mem_util', 'hardware.ipmi.node.io_util'
-            ],
             resource_type='ipmi')),
     ]
 
@@ -544,19 +558,6 @@ class PublisherWorkflowTest(base.BaseTestCase,
             attributes = self.postable_attributes.copy()
             attributes.update(self.patchable_attributes)
             attributes['id'] = self.sample.resource_id
-            attributes['metrics'] = dict((metric_name, {})
-                                         for metric_name in self.metric_names)
-            for k, v in six.iteritems(attributes['metrics']):
-                if k in ["cpu", "disk.read.requests", "disk.write.requests",
-                         "disk.read.bytes", "disk.write.bytes"]:
-                    v["archive_policy_name"] = "ceilometer-low-rate"
-                else:
-                    v["archive_policy_name"] = "ceilometer-low"
-
-                if k == 'disk.root.size':
-                    v['unit'] = 'GB'
-                elif k == 'hardware.ipmi.node.power':
-                    v['unit'] = 'W'
             expected_calls.append(mock.call.resource.create(
                 self.resource_type, attributes))
 

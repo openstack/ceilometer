@@ -1,0 +1,6 @@
+---
+issues:
+  - |
+    Ceilometer created metrics that could never get measures depending on the
+    polling configuration. Metrics are now created only if Ceilometer gets at
+    least a measure for them.
