@@ -356,8 +356,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                         'resource_type': rd.cfg['resource_type'],
                         'resource': {"id": resource_id,
                                      "user_id": sample.user_id,
-                                     "project_id": sample.project_id,
-                                     "metrics": rd.metrics}}
+                                     "project_id": sample.project_id}}
 
                 gnocchi_data[resource_id].setdefault(
                     "resource_extra", {}).update(rd.sample_attributes(sample))
@@ -371,9 +370,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     {'timestamp': sample.timestamp,
                      'value': sample.volume}
                 )
-                # TODO(gordc): unit should really be part of metric definition
-                gnocchi_data[resource_id]['resource']['metrics'][
-                    metric_name]['unit'] = sample.unit
 
         try:
             self.batch_measures(measures, gnocchi_data)
