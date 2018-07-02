@@ -2,7 +2,7 @@
 *.mo
 *.pyc
 .coverage
-.testrepository
+.stestr
 .tox
 AUTHORS
 build/*

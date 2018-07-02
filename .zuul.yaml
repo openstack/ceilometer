@@ -27,6 +27,7 @@
     check:
       jobs:
         - telemetry-tox-py37
+        - openstack-tox-cover
         - grenade-dsvm-ceilometer:
             irrelevant-files:
               - ^(test-|)requirements.txt$
