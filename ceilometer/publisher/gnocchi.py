@@ -198,25 +198,19 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         # TODO(jd) allow to override Gnocchi endpoint via the host in the URL
         options = urlparse.parse_qs(parsed_url.query)
 
-        self.filter_project = options.get(
-            'filter_project',
-            [conf.dispatcher_gnocchi.filter_project])[-1]
+        self.filter_project = options.get('filter_project', [True])[-1]
 
         resources_definition_file = options.get(
-            'resources_definition_file',
-            [conf.dispatcher_gnocchi.resources_definition_file])[-1]
+            'resources_definition_file', ['gnocchi_resources.yaml'])[-1]
 
-        archive_policy_override = options.get(
-            'archive_policy',
-            [conf.dispatcher_gnocchi.archive_policy])[-1]
+        archive_policy_override = options.get('archive_policy', [None])[-1]
         self.resources_definition, self.archive_policies_definition = (
             self._load_definitions(conf, archive_policy_override,
                                    resources_definition_file))
         self.metric_map = dict((metric, rd) for rd in self.resources_definition
                                for metric in rd.metrics)
 
-        timeout = options.get('timeout',
-                              [conf.dispatcher_gnocchi.request_timeout])[-1]
+        timeout = options.get('timeout', [6.05])[-1]
         self._ks_client = keystone_client.get_client(conf)
 
         self.cache = None
