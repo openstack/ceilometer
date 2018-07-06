@@ -113,26 +113,6 @@ class TestDiskPollsters(TestBaseDiskIO):
         super(TestDiskPollsters, self).setUp()
         self.inspector.inspect_disks = mock.Mock(return_value=self.DISKS)
 
-    def test_disk_read_requests(self):
-        self._check_aggregate_samples(disk.ReadRequestsPollster,
-                                      'disk.read.requests', 5,
-                                      expected_device=['vda1', 'vda2'])
-
-    def test_disk_read_bytes(self):
-        self._check_aggregate_samples(disk.ReadBytesPollster,
-                                      'disk.read.bytes', 3,
-                                      expected_device=['vda1', 'vda2'])
-
-    def test_disk_write_requests(self):
-        self._check_aggregate_samples(disk.WriteRequestsPollster,
-                                      'disk.write.requests', 11,
-                                      expected_device=['vda1', 'vda2'])
-
-    def test_disk_write_bytes(self):
-        self._check_aggregate_samples(disk.WriteBytesPollster,
-                                      'disk.write.bytes', 8,
-                                      expected_device=['vda1', 'vda2'])
-
     def test_per_disk_read_requests(self):
         self._check_per_device_samples(disk.PerDeviceReadRequestsPollster,
                                        'disk.device.read.requests', 2,
@@ -184,71 +164,6 @@ class TestDiskPollsters(TestBaseDiskIO):
             'disk.device.write.latency', 400, 'vda2')
 
 
-class TestDiskRatePollsters(TestBaseDiskIO):
-
-    DISKS = [
-        virt_inspector.DiskRateStats("disk1", 1024, 300, 5120, 700),
-        virt_inspector.DiskRateStats("disk2", 2048, 400, 6144, 800)
-    ]
-    TYPE = 'gauge'
-
-    def setUp(self):
-        super(TestDiskRatePollsters, self).setUp()
-        self.inspector.inspect_disk_rates = mock.Mock(return_value=self.DISKS)
-
-    def test_disk_read_bytes_rate(self):
-        self._check_aggregate_samples(disk.ReadBytesRatePollster,
-                                      'disk.read.bytes.rate', 3072,
-                                      expected_device=['disk1', 'disk2'])
-
-    def test_disk_read_requests_rate(self):
-        self._check_aggregate_samples(disk.ReadRequestsRatePollster,
-                                      'disk.read.requests.rate', 700,
-                                      expected_device=['disk1', 'disk2'])
-
-    def test_disk_write_bytes_rate(self):
-        self._check_aggregate_samples(disk.WriteBytesRatePollster,
-                                      'disk.write.bytes.rate', 11264,
-                                      expected_device=['disk1', 'disk2'])
-
-    def test_disk_write_requests_rate(self):
-        self._check_aggregate_samples(disk.WriteRequestsRatePollster,
-                                      'disk.write.requests.rate', 1500,
-                                      expected_device=['disk1', 'disk2'])
-
-    def test_per_disk_read_bytes_rate(self):
-        self._check_per_device_samples(disk.PerDeviceReadBytesRatePollster,
-                                       'disk.device.read.bytes.rate',
-                                       1024, 'disk1')
-        self._check_per_device_samples(disk.PerDeviceReadBytesRatePollster,
-                                       'disk.device.read.bytes.rate',
-                                       2048, 'disk2')
-
-    def test_per_disk_read_requests_rate(self):
-        self._check_per_device_samples(disk.PerDeviceReadRequestsRatePollster,
-                                       'disk.device.read.requests.rate',
-                                       300, 'disk1')
-        self._check_per_device_samples(disk.PerDeviceReadRequestsRatePollster,
-                                       'disk.device.read.requests.rate',
-                                       400, 'disk2')
-
-    def test_per_disk_write_bytes_rate(self):
-        self._check_per_device_samples(disk.PerDeviceWriteBytesRatePollster,
-                                       'disk.device.write.bytes.rate',
-                                       5120, 'disk1')
-        self._check_per_device_samples(disk.PerDeviceWriteBytesRatePollster,
-                                       'disk.device.write.bytes.rate', 6144,
-                                       'disk2')
-
-    def test_per_disk_write_requests_rate(self):
-        self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
-                                       'disk.device.write.requests.rate', 700,
-                                       'disk1')
-        self._check_per_device_samples(disk.PerDeviceWriteRequestsRatePollster,
-                                       'disk.device.write.requests.rate', 800,
-                                       'disk2')
-
-
 class TestDiskLatencyPollsters(TestBaseDiskIO):
 
     DISKS = [
@@ -261,10 +176,6 @@ class TestDiskLatencyPollsters(TestBaseDiskIO):
         super(TestDiskLatencyPollsters, self).setUp()
         self.inspector.inspect_disk_latency = mock.Mock(
             return_value=self.DISKS)
-
-    def test_disk_latency(self):
-        self._check_aggregate_samples(disk.DiskLatencyPollster,
-                                      'disk.latency', 3)
 
     def test_per_device_latency(self):
         self._check_per_device_samples(disk.PerDeviceDiskLatencyPollster,
@@ -285,10 +196,6 @@ class TestDiskIOPSPollsters(TestBaseDiskIO):
     def setUp(self):
         super(TestDiskIOPSPollsters, self).setUp()
         self.inspector.inspect_disk_iops = mock.Mock(return_value=self.DISKS)
-
-    def test_disk_iops(self):
-        self._check_aggregate_samples(disk.DiskIOPSPollster,
-                                      'disk.iops', 30)
 
     def test_per_device_iops(self):
         self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
@@ -311,21 +218,6 @@ class TestDiskInfoPollsters(TestBaseDiskIO):
     def setUp(self):
         super(TestDiskInfoPollsters, self).setUp()
         self.inspector.inspect_disk_info = mock.Mock(return_value=self.DISKS)
-
-    def test_disk_capacity(self):
-        self._check_aggregate_samples(disk.CapacityPollster,
-                                      'disk.capacity', 7,
-                                      expected_device=['vda1', 'vda2'])
-
-    def test_disk_allocation(self):
-        self._check_aggregate_samples(disk.AllocationPollster,
-                                      'disk.allocation', 5,
-                                      expected_device=['vda1', 'vda2'])
-
-    def test_disk_physical(self):
-        self._check_aggregate_samples(disk.PhysicalPollster,
-                                      'disk.usage', 3,
-                                      expected_device=['vda1', 'vda2'])
 
     def test_per_disk_capacity(self):
         self._check_per_device_samples(disk.PerDeviceCapacityPollster,
