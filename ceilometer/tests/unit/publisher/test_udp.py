@@ -16,7 +16,6 @@
 """
 
 import datetime
-import socket
 
 import mock
 import msgpack
@@ -112,42 +111,6 @@ class TestUDPPublisher(base.BaseTestCase):
         super(TestUDPPublisher, self).setUp()
         self.CONF = service.prepare_service([], [])
         self.CONF.publisher.telemetry_secret = 'not-so-secret'
-
-    def _check_udp_socket(self, url, expected_addr_family):
-        with mock.patch.object(socket, 'socket') as mock_socket:
-            udp.UDPPublisher(self.CONF, netutils.urlsplit(url))
-            mock_socket.assert_called_with(expected_addr_family,
-                                           socket.SOCK_DGRAM)
-
-    def test_publisher_udp_socket_ipv4(self):
-        self._check_udp_socket('udp://127.0.0.1:4952',
-                               socket.AF_INET)
-
-    def test_publisher_udp_socket_ipv6(self):
-        self._check_udp_socket('udp://[::1]:4952',
-                               socket.AF_INET6)
-
-    def test_publisher_udp_socket_ipv4_hostname(self):
-        host = "ipv4.google.com"
-        try:
-            socket.getaddrinfo(host, None,
-                               socket.AF_INET,
-                               socket.SOCK_DGRAM)
-        except socket.gaierror:
-            self.skipTest("cannot resolve not running test")
-        url = "udp://"+host+":4952"
-        self._check_udp_socket(url, socket.AF_INET)
-
-    def test_publisher_udp_socket_ipv6_hostname(self):
-        host = "ipv6.google.com"
-        try:
-            socket.getaddrinfo(host, None,
-                               socket.AF_INET6,
-                               socket.SOCK_DGRAM)
-        except socket.gaierror:
-            self.skipTest("cannot resolve not running test")
-        url = "udp://"+host+":4952"
-        self._check_udp_socket(url, socket.AF_INET6)
 
     def test_published(self):
         self.data_sent = []
