@@ -83,7 +83,7 @@ class _Base(plugin_base.PollsterBase):
     def _get_account_info(self, ksclient, tenants):
         endpoint = self._get_endpoint(self.conf, ksclient)
         if not endpoint:
-            raise StopIteration()
+            return
 
         swift_api_method = getattr(swift, '%s_account' % self.METHOD)
         for t in tenants:

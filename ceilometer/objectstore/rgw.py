@@ -85,7 +85,7 @@ class _Base(plugin_base.PollsterBase):
     def _get_account_info(self, ksclient, tenants):
         endpoint = self._get_endpoint(self.conf, ksclient)
         if not endpoint:
-            raise StopIteration()
+            return
 
         try:
             from ceilometer.objectstore import rgw_client as c_rgw_client

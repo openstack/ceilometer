@@ -153,7 +153,7 @@ class MeterDefinition(object):
             nb_samples = len(sample['name'])
             # skip if no meters in payload
             if nb_samples <= 0:
-                raise StopIteration
+                return
 
             attributes = self.SAMPLE_ATTRIBUTES + ["message", "metadata"]
 
@@ -172,7 +172,7 @@ class MeterDefinition(object):
                                 '"%(name)s" field instead of %(total)d.' %
                                 dict(name=name, nb=nb,
                                      total=nb_samples))
-                    raise StopIteration
+                    return
 
             # NOTE(sileht): Transform the sample with multiple values per
             # attribute into multiple samples with one value per attribute.

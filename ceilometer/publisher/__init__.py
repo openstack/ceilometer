@@ -16,7 +16,6 @@
 
 import abc
 
-import funcsigs
 from oslo_log import log
 from oslo_utils import netutils
 import six
@@ -34,13 +33,7 @@ def get_publisher(conf, url, namespace):
     """
     parse_result = netutils.urlsplit(url)
     loaded_driver = driver.DriverManager(namespace, parse_result.scheme)
-    if len(funcsigs.signature(loaded_driver.driver).parameters) == 2:
-        return loaded_driver.driver(conf, parse_result)
-    else:
-        # We keep it just the time to cleanup panko
-        LOG.warning("%s publisher use the deprecated class signature",
-                    parse_result.scheme)
-        return loaded_driver.driver(parse_result)
+    return loaded_driver.driver(conf, parse_result)
 
 
 @six.add_metaclass(abc.ABCMeta)
