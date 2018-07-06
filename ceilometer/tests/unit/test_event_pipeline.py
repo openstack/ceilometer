@@ -16,15 +16,12 @@ import traceback
 import uuid
 
 import fixtures
-import mock
-import oslo_messaging
 
 from ceilometer.event import models
 from ceilometer.pipeline import base as pipeline
 from ceilometer.pipeline import event
 from ceilometer import publisher
 from ceilometer.publisher import test as test_publisher
-from ceilometer.publisher import utils
 from ceilometer import service
 from ceilometer.tests import base
 
@@ -357,40 +354,3 @@ class EventPipelineTestCase(base.BaseTestCase):
     def test_unique_pipeline_names(self):
         self._dup_pipeline_name_cfg()
         self._exception_create_pipelinemanager()
-
-    def test_event_pipeline_endpoint_requeue_on_failure(self):
-        self.CONF.set_override("ack_on_event_error", False,
-                               group="notification")
-        self.CONF.set_override("telemetry_secret", "not-so-secret",
-                               group="publisher")
-        test_data = {
-            'message_id': uuid.uuid4(),
-            'event_type': 'a',
-            'generated': '2013-08-08 21:06:37.803826',
-            'traits': [
-                {'name': 't_text',
-                 'value': 1,
-                 'dtype': 'text_trait'
-                 }
-            ],
-            'raw': {'status': 'started'}
-        }
-        message_sign = utils.compute_signature(test_data, 'not-so-secret')
-        test_data['message_signature'] = message_sign
-
-        fake_publisher = mock.Mock()
-        self.useFixture(fixtures.MockPatch(
-            'ceilometer.publisher.test.TestPublisher',
-            return_value=fake_publisher))
-
-        self._build_and_set_new_pipeline()
-        pipeline_manager = event.EventPipelineManager(self.CONF)
-        pipe = pipeline_manager.pipelines[0]
-        event_pipeline_endpoint = event.InterimEventEndpoint(
-            self.CONF, pipeline.PublishContext([pipe]), pipe.name)
-
-        fake_publisher.publish_events.side_effect = Exception
-        ret = event_pipeline_endpoint.sample([
-            {'ctxt': {}, 'publisher_id': 'compute.vagrant-precise',
-             'event_type': 'a', 'payload': [test_data], 'metadata': {}}])
-        self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)

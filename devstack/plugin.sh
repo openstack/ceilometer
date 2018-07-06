@@ -262,7 +262,6 @@ function configure_ceilometer {
 
     if [[ -n "$CEILOMETER_COORDINATION_URL" ]]; then
         iniset $CEILOMETER_CONF coordination backend_url $CEILOMETER_COORDINATION_URL
-        iniset $CEILOMETER_CONF notification workload_partitioning True
         iniset $CEILOMETER_CONF notification workers $API_WORKERS
     fi
 

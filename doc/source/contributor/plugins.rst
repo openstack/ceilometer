@@ -94,18 +94,9 @@ Additionally, it must set ``get_main_endpoints`` which provides endpoints to be
 added to the main queue listener in the notification agent. This main queue
 endpoint inherits :class:`ceilometer.pipeline.base.MainNotificationEndpoint`
 and defines which notification priorities to listen, normalises the data,
-and redirects the data for pipeline processing or requeuing depending on
-`workload_partitioning` configuration.
+and redirects the data for pipeline processing.
 
-If a pipeline is configured to support `workload_partitioning`, data from the
-main queue endpoints are shared and requeued in internal queues. The
-notification agent configures a second notification consumer to handle these
-internal queues and pushes data to endpoints defined by
-``get_interim_endpoints`` in the pipeline manager. These interim endpoints
-define how to handle the shared, normalised data models for pipeline
-processing
-
-Both main queue and interim queue notification endpoints should implement:
+Notification endpoints should implement:
 
 ``event_types``
    A sequence of strings defining the event types the endpoint should handle
