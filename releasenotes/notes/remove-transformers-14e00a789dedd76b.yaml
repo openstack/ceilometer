@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The support for transformers has been removed from the pipeline.

@@ -100,7 +100,7 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
     def publish_samples(self, samples):
         """Publish samples on RPC.
 
-        :param samples: Samples from pipeline after transformation.
+        :param samples: Samples from pipeline.
 
         """
 
@@ -172,7 +172,7 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
     def publish_events(self, events):
         """Send an event message for publishing
 
-        :param events: events from pipeline after transformation
+        :param events: events from pipeline.
         """
         ev_list = [utils.message_from_event(
             event, self.conf.publisher.telemetry_secret) for event in events]
@@ -216,7 +216,6 @@ class NotifierPublisher(MessagingPublisher):
                 - notifier_sink
         sinks:
             - name: notifier_sink
-              transformers:
               publishers:
                 - notifier://[notifier_ip]:[notifier_port]?topic=[topic]&
                   driver=driver&max_retry=100
