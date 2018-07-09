@@ -335,14 +335,10 @@ class NotificationEndpoint(object):
         # for the generic notification exchange we have to consume all its
         # queues
 
-
-class MainNotificationEndpoint(NotificationEndpoint):
-    """Listens to queues on all priority levels and clears by default."""
-
-    audit = NotificationEndpoint._consume_and_drop
-    critical = NotificationEndpoint._consume_and_drop
-    debug = NotificationEndpoint._consume_and_drop
-    error = NotificationEndpoint._consume_and_drop
-    info = NotificationEndpoint._consume_and_drop
-    sample = NotificationEndpoint._consume_and_drop
-    warn = NotificationEndpoint._consume_and_drop
+    audit = _consume_and_drop
+    critical = _consume_and_drop
+    debug = _consume_and_drop
+    error = _consume_and_drop
+    info = _consume_and_drop
+    sample = _consume_and_drop
+    warn = _consume_and_drop
