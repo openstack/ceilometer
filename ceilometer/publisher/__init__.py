@@ -16,9 +16,14 @@
 
 import abc
 
+import funcsigs
+from oslo_log import log
 from oslo_utils import netutils
 import six
 from stevedore import driver
+
+
+LOG = log.getLogger(__name__)
 
 
 def get_publisher(conf, url, namespace):
@@ -29,9 +34,12 @@ def get_publisher(conf, url, namespace):
     """
     parse_result = netutils.urlsplit(url)
     loaded_driver = driver.DriverManager(namespace, parse_result.scheme)
-    if issubclass(loaded_driver.driver, ConfigPublisherBase):
+    if len(funcsigs.signature(loaded_driver.driver).parameters) == 2:
         return loaded_driver.driver(conf, parse_result)
     else:
+        # We keep it just the time to cleanup panko
+        LOG.warning("%s publisher use the deprecated class signature",
+                    parse_result.scheme)
         return loaded_driver.driver(parse_result)
 
 
