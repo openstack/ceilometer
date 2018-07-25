@@ -263,9 +263,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     archive_policy_default,
                     archive_policy_override,
                     plugin_manager))
-            except Exception as exc:
-                LOG.error("Failed to load resource due to error %s" %
-                          exc)
+            except Exception:
+                LOG.error("Failed to load resource due to error",
+                          exc_info=True)
         return resource_defs, data.get("archive_policies", [])
 
     def ensures_archives_policies(self):

@@ -421,9 +421,6 @@ SNMP:
 | hardware.cpu.load.\ | Gauge | proc\| host ID  | Pollster | CPU load in the  |
 | 15min               |       | ess  |          |          | past 15 minutes  |
 +---------------------+-------+------+----------+----------+------------------+
-| hardware.cpu.util   | Gauge | %    | host ID  | Pollster | cpu usage        |
-|                     |       |      |          |          | percentage       |
-+---------------------+-------+------+----------+----------+------------------+
 | hardware.disk.size\ | Gauge | KB   | disk ID  | Pollster | Total disk size  |
 | .total              |       |      |          |          |                  |
 +---------------------+-------+------+----------+----------+------------------+
@@ -477,9 +474,6 @@ SNMP:
 | ocks                |       |      |          |          | nt to block dev\ |
 |                     |       |      |          |          | ice              |
 +---------------------+-------+------+----------+----------+------------------+
-| hardware.system_st\ | Gauge | %    | host ID  | Pollster | CPU idle percen\ |
-| ats.cpu.idle        |       |      |          |          | tage             |
-+---------------------+-------+------+----------+----------+------------------+
 | **Meters added in the Queens release**                                      |
 +---------------------+-------+------+----------+----------+------------------+
 | hardware.disk.read.\| Gauge | B    | disk ID  | Pollster | Bytes read from  |
@@ -493,6 +487,25 @@ SNMP:
 +---------------------+-------+------+----------+----------+------------------+
 | hardware.disk.write\| Gauge | requ\| disk ID  | Pollster | Write requests to|
 | .requests           |       | ests |          |          | device since boot|
++---------------------+-------+------+----------+----------+------------------+
+| **Meters added in the Stein release**                                       |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.user   | Gauge | tick | host ID  | Pollster | CPU user in tick |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.system | Gauge | tick | host ID  | Pollster | CPU system in t\ |
+|                     |       |      |          |          | ick              |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.nice   | Gauge | tick | host ID  | Pollster | CPU nice in tick |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.idle   | Gauge | tick | host ID  | Pollster | CPU idle in tick |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.wait   | Gauge | tick | host ID  | Pollster | CPU wait in tick |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.kernel | Gauge | tick | host ID  | Pollster | CPU kernel in t\ |
+|                     |       |      |          |          | ick              |
++---------------------+-------+------+----------+----------+------------------+
+| hardware.cpu.inter\ | Gauge | tick | host ID  | Pollster | CPU interrupt i\ |
+| rupt                |       |      |          |          | n tick           |
 +---------------------+-------+------+----------+----------+------------------+
 
 OpenStack Image service

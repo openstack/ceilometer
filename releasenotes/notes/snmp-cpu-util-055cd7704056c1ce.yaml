@@ -1,0 +1,14 @@
+---
+features:
+  - |
+    new metrics are available for snmp polling hardware.cpu.user,
+    hardware.cpu.nice, hardware.cpu.system, hardware.cpu.idle,
+    hardware.cpu.wait, hardware.cpu.kernel, hardware.cpu.interrupt.
+    They replace deprecated hardware.cpu.util and
+    hardware.system_stats.cpu.idle.
+
+deprecations:
+  - |
+    metrics hardware.cpu.util and hardware.system_stats.cpu.idle are now
+    deprecated. Other hardware.cpu.* metrics should be used instead.
+
