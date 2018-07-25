@@ -9,9 +9,24 @@
       - openstack-infra/devstack-gate
       - openstack/ceilometer
 
+- job:
+    name: telemetry-tox-py37
+    parent: openstack-tox
+    timeout: 2400
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^api-ref/.*$
+      - ^doc/.*$
+      - ^releasenotes/.*$
+    vars:
+      tox_envlist: py37
+      bindep_profile: test py37
+    nodeset: fedora-latest
+
 - project:
     check:
       jobs:
+        - telemetry-tox-py37
         - grenade-dsvm-ceilometer:
             irrelevant-files:
               - ^(test-|)requirements.txt$
@@ -19,6 +34,7 @@
         - telemetry-dsvm-integration
     gate:
       jobs:
+        - telemetry-tox-py37
         - grenade-dsvm-ceilometer:
             irrelevant-files:
               - ^(test-|)requirements.txt$
