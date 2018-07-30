@@ -1,0 +1,13 @@
+---
+features:
+  - >
+    Add support for configuring the size of samples the poller will send in
+    each batch.
+upgrade:
+  - >
+    batch_size option added to [polling] section of configuration.
+    Use batch_size=0 to disable batching of samples.
+deprecations:
+  - >
+    The option batch_polled_samples in the [DEFAULT] section is deprecated.
+    Use batch_size option in [polling] to configure and/or disable batching.

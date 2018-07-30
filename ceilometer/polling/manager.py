@@ -45,9 +45,13 @@ LOG = log.getLogger(__name__)
 OPTS = [
     cfg.BoolOpt('batch_polled_samples',
                 default=True,
+                deprecated_for_removal=True,
                 help='To reduce polling agent load, samples are sent to the '
                      'notification agent in a batch. To gain higher '
-                     'throughput at the cost of load set this to False.'),
+                     'throughput at the cost of load set this to False. '
+                     'This option is deprecated, to disable batching set '
+                     'batch_size = 0 in the polling group.'
+                ),
 ]
 
 POLLING_OPTS = [
@@ -62,6 +66,10 @@ POLLING_OPTS = [
                     'config files. For each sub-group of the agent '
                     'pool with the same partitioning_group_prefix a disjoint '
                     'subset of pollsters should be loaded.'),
+    cfg.IntOpt('batch_size',
+               default=50,
+               help='Batch size of samples to send to notification agent, '
+                    'Set to 0 to disable'),
 ]
 
 
@@ -132,6 +140,12 @@ class PollingTask(object):
         self.resources = collections.defaultdict(resource_factory)
 
         self._batch = self.manager.conf.batch_polled_samples
+        self._batch_size = self.manager.conf.polling.batch_size
+
+        if not self._batch:
+            # Support deprecated way of disabling baching
+            self._batch_size = 0
+
         self._telemetry_secret = self.manager.conf.publisher.telemetry_secret
 
     def add(self, pollster, source):
@@ -194,7 +208,10 @@ class PollingTask(object):
                             publisher_utils.meter_message_from_counter(
                                 sample, self._telemetry_secret
                             ))
-                        if self._batch:
+                        if self._batch_size:
+                            if len(sample_batch) >= self._batch_size:
+                                self._send_notification(sample_batch)
+                                sample_batch = []
                             sample_batch.append(sample_dict)
                         else:
                             self._send_notification([sample_dict])
