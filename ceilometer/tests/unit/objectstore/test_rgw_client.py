@@ -152,7 +152,7 @@ class TestRGWAdminClient(base.BaseTestCase):
     def setUp(self):
         super(TestRGWAdminClient, self).setUp()
         self.client = rgw_client.RGWAdminClient('http://127.0.0.1:8080/admin',
-                                                'abcde', 'secret')
+                                                'abcde', 'secret', False)
         self.get_resp = mock.MagicMock()
         self.get = mock.patch('requests.get',
                               return_value=self.get_resp).start()
@@ -179,6 +179,24 @@ class TestRGWAdminClient(base.BaseTestCase):
         expected = {'num_buckets': 2, 'size': 1042, 'num_objects': 1001,
                     'buckets': bucket_list}
         self.assertEqual(expected, actual)
+        self.assertEqual(1, len(self.get.call_args_list))
+        self.assertEqual('foo',
+                         self.get.call_args_list[0][1]['params']['uid'])
+
+    def test_get_buckets_implicit_tenants(self):
+        self.get_resp.status_code = 200
+        self.get_resp.json.return_value = buckets_json
+        self.client.implicit_tenants = True
+        actual = self.client.get_bucket('foo')
+        bucket_list = [rgw_client.RGWAdminClient.Bucket('somefoo', 1000, 1000),
+                       rgw_client.RGWAdminClient.Bucket('somefoo31', 1, 42),
+                       ]
+        expected = {'num_buckets': 2, 'size': 1042, 'num_objects': 1001,
+                    'buckets': bucket_list}
+        self.assertEqual(expected, actual)
+        self.assertEqual(1, len(self.get.call_args_list))
+        self.assertEqual('foo$foo',
+                         self.get.call_args_list[0][1]['params']['uid'])
 
     def test_get_usage(self):
         self.get_resp.status_code = 200
@@ -186,3 +204,17 @@ class TestRGWAdminClient(base.BaseTestCase):
         actual = self.client.get_usage('foo')
         expected = 7
         self.assertEqual(expected, actual)
+        self.assertEqual(1, len(self.get.call_args_list))
+        self.assertEqual('foo',
+                         self.get.call_args_list[0][1]['params']['uid'])
+
+    def test_get_usage_implicit_tenants(self):
+        self.get_resp.status_code = 200
+        self.get_resp.json.return_value = usage_json
+        self.client.implicit_tenants = True
+        actual = self.client.get_usage('foo')
+        expected = 7
+        self.assertEqual(expected, actual)
+        self.assertEqual(1, len(self.get.call_args_list))
+        self.assertEqual('foo$foo',
+                         self.get.call_args_list[0][1]['params']['uid'])

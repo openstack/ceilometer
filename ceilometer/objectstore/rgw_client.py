@@ -30,11 +30,12 @@ class RGWAdminAPIFailed(Exception):
 class RGWAdminClient(object):
     Bucket = namedtuple('Bucket', 'name, num_objects, size')
 
-    def __init__(self, endpoint, access_key, secret_key):
+    def __init__(self, endpoint, access_key, secret_key, implicit_tenants):
         self.access_key = access_key
         self.secret = secret_key
         self.endpoint = endpoint
         self.hostname = urlparse.urlparse(endpoint).netloc
+        self.implicit_tenants = implicit_tenants
 
     def _make_request(self, path, req_params):
         uri = "{0}/{1}".format(self.endpoint, path)
@@ -51,8 +52,12 @@ class RGWAdminClient(object):
         return r.json()
 
     def get_bucket(self, tenant_id):
+        if self.implicit_tenants:
+            rgw_uid = tenant_id + "$" + tenant_id
+        else:
+            rgw_uid = tenant_id
         path = "bucket"
-        req_params = {"uid": tenant_id, "stats": "true"}
+        req_params = {"uid": rgw_uid, "stats": "true"}
         json_data = self._make_request(path, req_params)
         stats = {'num_buckets': 0, 'buckets': [], 'size': 0, 'num_objects': 0}
         stats['num_buckets'] = len(json_data)
@@ -66,8 +71,12 @@ class RGWAdminClient(object):
         return stats
 
     def get_usage(self, tenant_id):
+        if self.implicit_tenants:
+            rgw_uid = tenant_id + "$" + tenant_id
+        else:
+            rgw_uid = tenant_id
         path = "usage"
-        req_params = {"uid": tenant_id}
+        req_params = {"uid": rgw_uid}
         json_data = self._make_request(path, req_params)
         usage_data = json_data["summary"]
         return sum((it["total"]["ops"] for it in usage_data))

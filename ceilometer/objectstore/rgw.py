@@ -40,6 +40,12 @@ CREDENTIAL_OPTS = [
                help='Secret key for Radosgw Admin.')
 ]
 
+CLIENT_OPTS = [
+    cfg.BoolOpt('implicit_tenants',
+                default=False,
+                help='Whether RGW uses implicit tenants or not.'),
+]
+
 
 class _Base(plugin_base.PollsterBase):
     METHOD = 'bucket'
@@ -49,6 +55,7 @@ class _Base(plugin_base.PollsterBase):
         super(_Base, self).__init__(conf)
         self.access_key = self.conf.rgw_admin_credentials.access_key
         self.secret = self.conf.rgw_admin_credentials.secret_key
+        self.implicit_tenants = self.conf.rgw_client.implicit_tenants
 
     @property
     def default_discovery(self):
@@ -91,7 +98,8 @@ class _Base(plugin_base.PollsterBase):
             from ceilometer.objectstore import rgw_client as c_rgw_client
             rgw_client = c_rgw_client.RGWAdminClient(endpoint,
                                                      self.access_key,
-                                                     self.secret)
+                                                     self.secret,
+                                                     self.implicit_tenants)
         except ImportError:
             raise plugin_base.PollsterPermanentError(tenants)
 
