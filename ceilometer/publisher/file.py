@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import logging
 import logging.handlers
 
@@ -41,12 +42,13 @@ class FilePublisher(publisher.ConfigPublisherBase):
             meters:
                 - "*"
             publishers:
-                - file:///var/test?max_bytes=10000000&backup_count=5
+                - file:///var/test?max_bytes=10000000&backup_count=5&json
 
     File path is required for this publisher to work properly. If max_bytes
     or backup_count is missing, FileHandler will be used to save the metering
     data. If max_bytes and backup_count are present, RotatingFileHandler will
-    be used to save the metering data.
+    be used to save the metering data. The json argument is used to explicitely
+    ask ceilometer to write json into the file.
     """
 
     def __init__(self, conf, parsed_url):
@@ -61,9 +63,13 @@ class FilePublisher(publisher.ConfigPublisherBase):
         rfh = None
         max_bytes = 0
         backup_count = 0
+        self.output_json = None
         # Handling other configuration options in the query string
         if parsed_url.query:
-            params = urlparse.parse_qs(parsed_url.query)
+            params = urlparse.parse_qs(parsed_url.query,
+                                       keep_blank_values=True)
+            if "json" in params:
+                self.output_json = True
             if params.get('max_bytes') and params.get('backup_count'):
                 try:
                     max_bytes = int(params.get('max_bytes')[0])
@@ -90,7 +96,10 @@ class FilePublisher(publisher.ConfigPublisherBase):
         """
         if self.publisher_logger:
             for sample in samples:
-                self.publisher_logger.info(sample.as_dict())
+                if self.output_json:
+                    self.publisher_logger.info(json.dumps(sample.as_dict()))
+                else:
+                    self.publisher_logger.info(sample.as_dict())
 
     def publish_events(self, events):
         """Send an event message for publishing
@@ -99,4 +108,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
         """
         if self.publisher_logger:
             for event in events:
-                self.publisher_logger.info(event.as_dict())
+                if self.output_json:
+                    self.publisher_logger.info(json.dumps(event.as_dict()))
+                else:
+                    self.publisher_logger.info(event.as_dict())

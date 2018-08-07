@@ -247,6 +247,10 @@ The following options are available for the ``file`` publisher:
     the newest data is always the one that is specified without any
     extensions.
 
+``json``
+    If this option is present, will force ceilometer to write json format
+    into the file.
+
 http
 ````
 

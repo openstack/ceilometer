@@ -16,6 +16,7 @@
 """
 
 import datetime
+import json
 import logging.handlers
 import os
 import tempfile
@@ -120,3 +121,32 @@ class TestFilePublisher(base.BaseTestCase):
         publisher.publish_samples(self.test_data)
 
         self.assertIsNone(publisher.publisher_logger)
+
+    def test_file_publisher_json(self):
+        tempdir = tempfile.mkdtemp()
+        name = '%s/log_file_json' % tempdir
+        parsed_url = netutils.urlsplit('file://%s?json' % name)
+
+        publisher = file.FilePublisher(self.CONF, parsed_url)
+        publisher.publish_samples(self.test_data)
+
+        handler = publisher.publisher_logger.handlers[0]
+        self.assertIsInstance(handler,
+                              logging.handlers.RotatingFileHandler)
+        self.assertEqual([0, name, 0], [handler.maxBytes,
+                                        handler.baseFilename,
+                                        handler.backupCount])
+        self.assertTrue(os.path.exists(name))
+        with open(name, 'r') as f:
+            content = f.readlines()
+
+        self.assertEqual(len(self.test_data), len(content))
+        for index, line in enumerate(content):
+            try:
+                json_data = json.loads(line)
+            except ValueError:
+                self.fail("File written is not valid json")
+            self.assertEqual(self.test_data[index].id,
+                             json_data['id'])
+            self.assertEqual(self.test_data[index].timestamp,
+                             json_data['timestamp'])
