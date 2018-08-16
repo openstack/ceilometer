@@ -401,7 +401,7 @@ class AgentManager(cotyledon.Service):
         super(AgentManager, self).run()
         self.polling_manager = PollingManager(self.conf)
         if self.partition_coordinator:
-            self.partition_coordinator.start()
+            self.partition_coordinator.start(start_heart=True)
             self.join_partitioning_groups()
         self.start_polling_tasks()
 
@@ -416,6 +416,11 @@ class AgentManager(cotyledon.Service):
         # and exception to get a new one in this polling cycle.
         self._keystone = None
         self._keystone_last_exception = None
+
+        # Note(leehom): if coordinator enabled call run_watchers to
+        # update group member info before collecting
+        if self.partition_coordinator:
+            self.partition_coordinator.run_watchers()
 
         task.poll_and_notify()
 
