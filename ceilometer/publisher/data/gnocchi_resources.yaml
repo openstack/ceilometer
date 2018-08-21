@@ -18,6 +18,29 @@ archive_policies:
     definition:
       - granularity: 5 minutes
         timespan: 30 days
+  - name: ceilometer-high
+    aggregation_methods:
+      - mean
+    back_window: 0
+    definition:
+      - granularity: 1 second
+        timespan: 1 hour
+      - granularity: 1 minute
+        timespan: 1 day
+      - granularity: 1 hour
+        timespan: 365 days
+  - name: ceilometer-high-rate
+    aggregation_methods:
+      - mean
+      - rate:mean
+    back_window: 0
+    definition:
+      - granularity: 1 second
+        timespan: 1 hour
+      - granularity: 1 minute
+        timespan: 1 day
+      - granularity: 1 hour
+        timespan: 365 days
 
 resources:
   - resource_type: identity
