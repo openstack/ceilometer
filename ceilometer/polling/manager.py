@@ -42,18 +42,6 @@ from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
-OPTS = [
-    cfg.BoolOpt('batch_polled_samples',
-                default=True,
-                deprecated_for_removal=True,
-                help='To reduce polling agent load, samples are sent to the '
-                     'notification agent in a batch. To gain higher '
-                     'throughput at the cost of load set this to False. '
-                     'This option is deprecated, to disable batching set '
-                     'batch_size = 0 in the polling group.'
-                ),
-]
-
 POLLING_OPTS = [
     cfg.StrOpt('cfg_file',
                default="polling.yaml",
@@ -139,12 +127,7 @@ class PollingTask(object):
         resource_factory = lambda: Resources(agent_manager)
         self.resources = collections.defaultdict(resource_factory)
 
-        self._batch = self.manager.conf.batch_polled_samples
         self._batch_size = self.manager.conf.polling.batch_size
-
-        if not self._batch:
-            # Support deprecated way of disabling baching
-            self._batch_size = 0
 
         self._telemetry_secret = self.manager.conf.publisher.telemetry_secret
 

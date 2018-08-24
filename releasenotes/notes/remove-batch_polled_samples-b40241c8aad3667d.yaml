@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Remove deprecated option `batch_polled_samples`.

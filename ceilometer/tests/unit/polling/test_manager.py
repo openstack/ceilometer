@@ -791,10 +791,6 @@ class TestPollingAgent(BaseAgent):
                  res_list="[<NovaLikeServer: unknown-name>]",
                  source=source_name))
 
-    def test_batching_polled_samples_false_deprecated(self):
-        self.CONF.set_override('batch_polled_samples', False)
-        self._batching_samples(4, 4)
-
     def test_batching_polled_samples_disable_batch(self):
         self.CONF.set_override('batch_size', 0, group='polling')
         self._batching_samples(4, 4)
