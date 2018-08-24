@@ -15,7 +15,6 @@ import itertools
 import os
 import re
 
-import pkg_resources
 import six
 
 from oslo_config import cfg
@@ -28,15 +27,6 @@ from ceilometer.pipeline import sample as endpoint
 from ceilometer import sample as sample_util
 
 OPTS = [
-    cfg.StrOpt('meter_definitions_cfg_file',
-               deprecated_for_removal=True,
-               help="Configuration file for defining meter "
-                    "notifications. This option is deprecated "
-                    "and use meter_definitions_dirs to "
-                    "configure meter notification file. Meter "
-                    "definitions configuration file will be sought "
-                    "according to the parameter."
-               ),
     cfg.MultiStrOpt('meter_definitions_dirs',
                     default=["/etc/ceilometer/meters.d",
                              os.path.abspath(
@@ -200,11 +190,6 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
             for filepath in sorted(glob.glob(os.path.join(dir, "*.yaml"))):
                 if filepath is not None:
                     mfs.append(filepath)
-        if self.conf.meter.meter_definitions_cfg_file is not None:
-            mfs.append(
-                pkg_resources.resource_filename(
-                    self.conf.meter.meter_definitions_cfg_file)
-            )
         for mf in mfs:
             meters_cfg = declarative.load_definitions(
                 self.conf, {}, mf)

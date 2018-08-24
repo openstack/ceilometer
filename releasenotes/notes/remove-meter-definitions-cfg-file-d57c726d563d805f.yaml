@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated `meter_definitions_cfg_file` option has been removed.
