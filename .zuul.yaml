@@ -24,6 +24,12 @@
     nodeset: fedora-latest
 
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - publish-openstack-sphinx-docs
+      - periodic-stable-jobs
+      - release-notes-jobs
     check:
       jobs:
         - telemetry-tox-py37
@@ -34,6 +40,7 @@
               - ^setup.cfg$
         - telemetry-dsvm-integration
     gate:
+      queue: telemetry
       jobs:
         - telemetry-tox-py37
         - grenade-dsvm-ceilometer:
