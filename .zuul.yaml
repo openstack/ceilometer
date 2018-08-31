@@ -10,6 +10,12 @@
       - openstack/ceilometer
 
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - publish-openstack-sphinx-docs
+      - periodic-stable-jobs
+      - release-notes-jobs
     check:
       jobs:
         - grenade-dsvm-ceilometer:
@@ -18,6 +24,7 @@
               - ^setup.cfg$
         - telemetry-dsvm-integration
     gate:
+      queue: telemetry
       jobs:
         - grenade-dsvm-ceilometer:
             irrelevant-files:
