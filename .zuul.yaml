@@ -61,6 +61,12 @@
       - openstack/ceilometer
 
 - project:
+    templates:
+      - openstack-python-jobs
+      - openstack-python35-jobs
+      - publish-openstack-sphinx-docs
+      - periodic-stable-jobs
+      - release-notes-jobs
     check:
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
@@ -87,6 +93,7 @@
         - tripleo-ci-centos-7-scenario002-multinode-oooq-container:
             voting: false
     gate:
+      queue: telemetry
       jobs:
         - ceilometer-dsvm-tempest-plugin-mongodb
         - ceilometer-dsvm-tempest-plugin-mysql
