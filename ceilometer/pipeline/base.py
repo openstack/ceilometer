@@ -22,7 +22,6 @@ import oslo_messaging
 import six
 
 from ceilometer import agent
-from ceilometer import messaging
 from ceilometer import publisher
 
 OPTS = [
@@ -43,52 +42,6 @@ LOG = log.getLogger(__name__)
 class PipelineException(agent.ConfigException):
     def __init__(self, message, cfg):
         super(PipelineException, self).__init__('Pipeline', message, cfg)
-
-
-class InterimPublishContext(object):
-    """Publisher to hash/shard data to pipelines"""
-
-    def __init__(self, conf, mgr):
-        self.conf = conf
-        self.mgr = mgr
-        self.notifiers = self._get_notifiers(messaging.get_transport(conf))
-
-    def _get_notifiers(self, transport):
-        notifiers = []
-        for x in range(self.conf.notification.pipeline_processing_queues):
-            notifiers.append(oslo_messaging.Notifier(
-                transport,
-                driver=self.conf.publisher_notifier.telemetry_driver,
-                topics=['-'.join(
-                    [self.mgr.NOTIFICATION_IPC, self.mgr.pm_type, str(x)])]))
-        return notifiers
-
-    @staticmethod
-    def hash_grouping(datapoint, grouping_keys):
-        # FIXME(gordc): this logic only supports a single grouping_key. we
-        # need to change to support pipeline with multiple transformers and
-        # different grouping_keys
-        value = ''
-        for key in grouping_keys or []:
-            value += datapoint.get(key) if datapoint.get(key) else ''
-        return hash(value)
-
-    def __enter__(self):
-        def p(data):
-            data = [data] if not isinstance(data, list) else data
-            for datapoint in data:
-                for pipe in self.mgr.pipelines:
-                    if pipe.supported(datapoint):
-                        serialized_data = pipe.serializer(datapoint)
-                        key = (self.hash_grouping(serialized_data,
-                                                  pipe.get_grouping_key())
-                               % len(self.notifiers))
-                        self.notifiers[key].sample({}, event_type=pipe.name,
-                                                   payload=[serialized_data])
-        return p
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        pass
 
 
 class PublishContext(object):
@@ -239,23 +192,9 @@ class Pipeline(object):
     def publish_data(self, data):
         """Publish data from pipeline."""
 
-    @abc.abstractproperty
-    def default_grouping_key(self):
-        """Attribute to hash data on. Pass if no partitioning."""
-
     @abc.abstractmethod
     def supported(self, data):
         """Attribute to filter on. Pass if no partitioning."""
-
-    @abc.abstractmethod
-    def serializer(self, data):
-        """Serialize data for interim transport. Pass if no partitioning."""
-
-    def get_grouping_key(self):
-        keys = []
-        for transformer in self.sink.transformers:
-            keys += transformer.grouping_keys
-        return list(set(keys)) or self.default_grouping_key
 
 
 class PublisherManager(object):
@@ -281,7 +220,7 @@ class PipelineManager(agent.ConfigManagerBase):
 
     NOTIFICATION_IPC = 'ceilometer_ipc'
 
-    def __init__(self, conf, cfg_file, transformer_manager, partition):
+    def __init__(self, conf, cfg_file, transformer_manager):
         """Setup the pipelines according to config.
 
         The configuration is supported as follows:
@@ -381,7 +320,6 @@ class PipelineManager(agent.ConfigManagerBase):
                     unique_names.add(pipe.name)
                     self.pipelines.append(pipe)
         unique_names.clear()
-        self.partition = partition
 
     @abc.abstractproperty
     def pm_type(self):
@@ -403,21 +341,8 @@ class PipelineManager(agent.ConfigManagerBase):
         """Build publisher for pipeline publishing."""
         return PublishContext(self.pipelines)
 
-    def interim_publisher(self):
-        """Build publishing context for IPC."""
-        return InterimPublishContext(self.conf, self)
-
-    def get_main_publisher(self):
-        """Return the publishing context to use"""
-        return (self.interim_publisher() if self.partition else
-                self.publisher())
-
     def get_main_endpoints(self):
         """Return endpoints for main queue."""
-        pass
-
-    def get_interim_endpoints(self):
-        """Return endpoints for interim pipeline queues."""
         pass
 
 

@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The deprecated workload partitioning for notification agent has been removed.

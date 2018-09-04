@@ -30,8 +30,6 @@ LOG = log.getLogger(__name__)
 class BaseConversionTransformer(transformer.TransformerBase):
     """Transformer to derive conversion."""
 
-    grouping_keys = ['resource_id']
-
     def __init__(self, source=None, target=None, **kwargs):
         """Initialize transformer with configured parameters.
 

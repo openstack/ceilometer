@@ -10,15 +10,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from itertools import chain
-
 from oslo_log import log
 from stevedore import extension
 
 from ceilometer import agent
 from ceilometer.pipeline import base
-from ceilometer.publisher import utils as publisher_utils
-from ceilometer import sample as sample_util
 
 LOG = log.getLogger(__name__)
 
@@ -50,37 +46,6 @@ class SampleEndpoint(base.MainNotificationEndpoint):
     def build_sample(notification):
         """Build sample from provided notification."""
         pass
-
-
-class InterimSampleEndpoint(base.NotificationEndpoint):
-    def __init__(self, conf, publisher, pipe_name):
-        self.event_types = [pipe_name]
-        super(InterimSampleEndpoint, self).__init__(conf, publisher)
-
-    def sample(self, notifications):
-        return self.process_notifications('sample', notifications)
-
-    def process_notifications(self, priority, notifications):
-        samples = chain.from_iterable(m["payload"] for m in notifications)
-        samples = [
-            sample_util.Sample(name=s['counter_name'],
-                               type=s['counter_type'],
-                               unit=s['counter_unit'],
-                               volume=s['counter_volume'],
-                               user_id=s['user_id'],
-                               project_id=s['project_id'],
-                               resource_id=s['resource_id'],
-                               timestamp=s['timestamp'],
-                               resource_metadata=s['resource_metadata'],
-                               source=s.get('source'),
-                               # NOTE(sileht): May come from an older node,
-                               # Put None in this case.
-                               monotonic_time=s.get('monotonic_time'))
-            for s in samples if publisher_utils.verify_signature(
-                s, self.conf.publisher.telemetry_secret)
-        ]
-        with self.publisher as p:
-            p(samples)
 
 
 class SampleSource(base.PipelineSource):
@@ -181,8 +146,6 @@ class SampleSink(base.Sink):
 class SamplePipeline(base.Pipeline):
     """Represents a pipeline for Samples."""
 
-    default_grouping_key = ['resource_id']
-
     def _validate_volume(self, s):
         volume = s.volume
         if volume is None:
@@ -219,10 +182,6 @@ class SamplePipeline(base.Pipeline):
                      and self._validate_volume(s)]
         self.sink.publish_samples(supported)
 
-    def serializer(self, sample):
-        return publisher_utils.meter_message_from_counter(
-            sample, self.conf.publisher.telemetry_secret)
-
     def supported(self, sample):
         return self.source.support_meter(sample.name)
 
@@ -234,10 +193,9 @@ class SamplePipelineManager(base.PipelineManager):
     pm_source = SampleSource
     pm_sink = SampleSink
 
-    def __init__(self, conf, partition=False):
+    def __init__(self, conf):
         super(SamplePipelineManager, self).__init__(
-            conf, conf.pipeline_cfg_file, self.get_transform_manager(),
-            partition)
+            conf, conf.pipeline_cfg_file, self.get_transform_manager())
 
     @staticmethod
     def get_transform_manager():
@@ -247,13 +205,5 @@ class SamplePipelineManager(base.PipelineManager):
         exts = extension.ExtensionManager(
             namespace='ceilometer.sample.endpoint',
             invoke_on_load=True,
-            invoke_args=(self.conf, self.get_main_publisher()))
+            invoke_args=(self.conf, self.publisher()))
         return [ext.obj for ext in exts]
-
-    def get_interim_endpoints(self):
-        # FIXME(gordc): change this so we shard data rather than per
-        # pipeline. this will allow us to use self.publisher and less
-        # queues.
-        return [InterimSampleEndpoint(
-            self.conf, base.PublishContext([pipe]), pipe.name)
-            for pipe in self.pipelines]

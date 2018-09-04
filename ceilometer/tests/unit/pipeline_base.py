@@ -75,7 +75,6 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     class TransformerClass(transformer.TransformerBase):
         samples = []
-        grouping_keys = ['counter_name']
 
         def __init__(self, append_name='_update'):
             self.__class__.samples = []
@@ -102,7 +101,6 @@ class BasePipelineTestCase(base.BaseTestCase):
 
     class TransformerClassDrop(transformer.TransformerBase):
         samples = []
-        grouping_keys = ['resource_id']
 
         def __init__(self):
             self.__class__.samples = []
@@ -111,7 +109,6 @@ class BasePipelineTestCase(base.BaseTestCase):
             self.__class__.samples.append(counter)
 
     class TransformerClassException(object):
-        grouping_keys = ['resource_id']
 
         @staticmethod
         def handle_sample(counter):
@@ -2171,46 +2168,3 @@ class BasePipelineTestCase(base.BaseTestCase):
     def test_unique_pipeline_names(self):
         self._dup_pipeline_name_cfg()
         self._exception_create_pipelinemanager()
-
-    def test_get_pipeline_grouping_key(self):
-        transformer_cfg = [
-            {
-                'name': 'update',
-                'parameters': {}
-            },
-            {
-                'name': 'unit_conversion',
-                'parameters': {
-                    'source': {},
-                    'target': {'name': 'cpu_mins',
-                               'unit': 'min',
-                               'scale': 'volume'},
-                }
-            },
-            {
-                'name': 'update',
-                'parameters': {}
-            },
-        ]
-        self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._build_and_set_new_pipeline()
-        pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertEqual(set(['resource_id', 'counter_name']),
-                         set(pipeline_manager.pipelines[0].get_grouping_key()))
-
-    def test_get_pipeline_duplicate_grouping_key(self):
-        transformer_cfg = [
-            {
-                'name': 'update',
-                'parameters': {}
-            },
-            {
-                'name': 'update',
-                'parameters': {}
-            },
-        ]
-        self._set_pipeline_cfg('transformers', transformer_cfg)
-        self._build_and_set_new_pipeline()
-        pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        self.assertEqual(['counter_name'],
-                         pipeline_manager.pipelines[0].get_grouping_key())
