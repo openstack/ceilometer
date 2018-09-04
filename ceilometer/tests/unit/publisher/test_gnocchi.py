@@ -534,6 +534,8 @@ class PublisherWorkflowTest(base.BaseTestCase,
         expected_calls = [
             mock.call.archive_policy.get("ceilometer-low"),
             mock.call.archive_policy.get("ceilometer-low-rate"),
+            mock.call.archive_policy.get("ceilometer-high"),
+            mock.call.archive_policy.get("ceilometer-high-rate"),
             mock.call.metric.batch_resources_metrics_measures(
                 {resource_id: {metric_name: self.metric_attributes}},
                 create_metrics=True)
