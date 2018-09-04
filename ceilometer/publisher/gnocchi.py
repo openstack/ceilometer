@@ -252,7 +252,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             pkg_resources.resource_filename(__name__,
                                             "data/gnocchi_resources.yaml"))
 
-        archive_policy_default = data.get("archive_policy_default", "low")
+        archive_policy_default = data.get("archive_policy_default",
+                                          "ceilometer-low")
         resource_defs = []
         for resource in data.get('resources', []):
             try:
