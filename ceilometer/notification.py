@@ -119,14 +119,12 @@ class NotificationService(cotyledon.Service):
             on_missing_entrypoints_callback=self._log_missing_pipeline,
             invoke_args=(self.conf,))]
 
-        self.transport = messaging.get_transport(self.conf)
-
         # FIXME(sileht): endpoint uses the notification_topics option
         # and it should not because this is an oslo_messaging option
         # not a ceilometer. Until we have something to get the
         # notification_topics in another way, we must create a transport
         # to ensure the option has been registered by oslo_messaging.
-        messaging.get_notifier(self.transport, '')
+        messaging.get_notifier(messaging.get_transport(self.conf), '')
 
         endpoints = []
         for pipe_mgr in self.managers:
