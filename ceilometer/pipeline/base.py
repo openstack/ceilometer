@@ -187,8 +187,6 @@ class PipelineManager(agent.ConfigManagerBase):
     Pipeline manager sets up pipelines according to config file
     """
 
-    NOTIFICATION_IPC = 'ceilometer_ipc'
-
     def __init__(self, conf, cfg_file):
         """Setup the pipelines according to config.
 
