@@ -89,11 +89,7 @@ class NotificationService(cotyledon.Service):
         super(NotificationService, self).__init__(worker_id)
         self.startup_delay = worker_id
         self.conf = conf
-
         self.listeners = []
-        # NOTE(kbespalov): for the pipeline queues used a single amqp host
-        # hence only one listener is required
-        self.pipeline_listener = None
 
     def get_targets(self):
         """Return a sequence of oslo_messaging.Target
@@ -159,8 +155,6 @@ class NotificationService(cotyledon.Service):
             listener.wait()
 
     def terminate(self):
-        if self.pipeline_listener:
-            self.kill_listeners([self.pipeline_listener])
         self.kill_listeners(self.listeners)
 
         super(NotificationService, self).terminate()
