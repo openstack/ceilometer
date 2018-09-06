@@ -104,7 +104,8 @@ class NotificationService(cotyledon.Service):
                 for exchange in
                 set(self.conf.notification.notification_control_exchanges)]
 
-    def _log_missing_pipeline(self, names):
+    @staticmethod
+    def _log_missing_pipeline(names):
         LOG.error(_('Could not load the following pipelines: %s'), names)
 
     def run(self):
