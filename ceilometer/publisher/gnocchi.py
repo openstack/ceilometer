@@ -198,7 +198,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         # TODO(jd) allow to override Gnocchi endpoint via the host in the URL
         options = urlparse.parse_qs(parsed_url.query)
 
-        self.filter_project = options.get('filter_project', [True])[-1]
+        self.filter_project = options.get('filter_project', ['service'])[-1]
 
         resources_definition_file = options.get(
             'resources_definition_file', ['gnocchi_resources.yaml'])[-1]
