@@ -92,7 +92,7 @@ pipelines based on a given configuration file. Pipelines are required to define
 `Source` and `Sink` permutations to describe how to process notification.
 Additionally, it must set ``get_main_endpoints`` which provides endpoints to be
 added to the main queue listener in the notification agent. This main queue
-endpoint inherits :class:`ceilometer.pipeline.base.MainNotificationEndpoint`
+endpoint inherits :class:`ceilometer.pipeline.base.NotificationEndpoint`
 and defines which notification priorities to listen, normalises the data,
 and redirects the data for pipeline processing.
 

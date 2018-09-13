@@ -22,7 +22,7 @@ from ceilometer.pipeline import base
 LOG = log.getLogger(__name__)
 
 
-class EventEndpoint(base.MainNotificationEndpoint):
+class EventEndpoint(base.NotificationEndpoint):
 
     event_types = []
 

@@ -19,7 +19,7 @@ from ceilometer.pipeline import base
 LOG = log.getLogger(__name__)
 
 
-class SampleEndpoint(base.MainNotificationEndpoint):
+class SampleEndpoint(base.NotificationEndpoint):
 
     def info(self, notifications):
         """Convert message at info level to Ceilometer sample.
