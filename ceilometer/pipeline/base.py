@@ -237,7 +237,6 @@ class PipelineManager(agent.ConfigManagerBase):
         if not ('sources' in cfg and 'sinks' in cfg):
             raise PipelineException("Both sources & sinks are required",
                                     cfg)
-        LOG.info('detected decoupled pipeline config format')
         publisher_manager = PublisherManager(self.conf, self.pm_type)
 
         unique_names = set()
