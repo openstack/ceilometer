@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The notifier publisher options `metering_topic` and `event_topic` are
+    deprecated and will be removed. Use the `topic` query parameter in the
+    notifier publisher URL instead.

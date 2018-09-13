@@ -41,11 +41,13 @@ NOTIFIER_OPTS = [
                default='metering',
                help='The topic that ceilometer uses for metering '
                'notifications.',
+               deprecated_for_removal=True,
                ),
     cfg.StrOpt('event_topic',
                default='event',
                help='The topic that ceilometer uses for event '
                'notifications.',
+               deprecated_for_removal=True,
                ),
     cfg.StrOpt('telemetry_driver',
                default='messagingv2',
