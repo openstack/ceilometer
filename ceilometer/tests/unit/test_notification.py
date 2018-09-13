@@ -141,7 +141,6 @@ class BaseRealNotification(BaseNotificationTest):
             }],
             'sinks': [{
                 'name': 'test_sink',
-                'transformers': [],
                 'publishers': ['test://']
             }]
         })

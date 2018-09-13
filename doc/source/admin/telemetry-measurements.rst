@@ -103,14 +103,6 @@ The following meters are collected for OpenStack Compute.
 | cpu       | Cumu\ | ns   | instance | Pollster | Libvirt,| CPU time used    |
 |           | lative|      | ID       |          | Hyper-V |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| cpu.delta | Delta | ns   | instance | Pollster | Libvirt,| CPU time used s\ |
-|           |       |      | ID       |          | Hyper-V | ince previous d\ |
-|           |       |      |          |          |         | atapoint         |
-+-----------+-------+------+----------+----------+---------+------------------+
-| cpu_util  | Gauge | %    | instance | Pollster | LibVirt,| Average CPU      |
-|           |       |      | ID       |          | vSphere,| utilization      |
-|           |       |      |          |          | XenAPI  |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | vcpus     | Gauge | vcpu | instance | Notific\ | Libvirt,| Number of virtual|
 |           |       |      | ID       | ation    | Hyper-V | CPUs allocated to|
 |           |       |      |          |          |         | the instance     |
@@ -118,16 +110,8 @@ The following meters are collected for OpenStack Compute.
 | disk.read\| Cumul\| req\ | instance | Pollster | Libvirt,| Number of read   |
 | .requests | ative | uest | ID       |          | Hyper-V | requests         |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.read\| Gauge | requ\| instance | Pollster | Libvirt,| Average rate of  |
-| .requests\|       | est/s| ID       |          | Hyper-V,| read requests    |
-| .rate     |       |      |          |          | vSphere |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | disk.writ\| Cumul\| req\ | instance | Pollster | Libvirt,| Number of write  |
 | e.requests| ative | uest | ID       |          | Hyper-V | requests         |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.writ\| Gauge | requ\| instance | Pollster | Libvirt,| Average rate of  |
-| e.request\|       | est/s| ID       |          | Hyper-V,| write requests   |
-| s.rate    |       |      |          |          | vSphere |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.read\| Cumu\ | B    | instance | Pollster | Libvirt,| Volume of reads  |
 | .bytes    | lative|      | ID       |          | Hyper-V |                  |
@@ -149,37 +133,17 @@ The following meters are collected for OpenStack Compute.
 | ice.read\ | lative| uest |          |          | Hyper-V | requests         |
 | .requests |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Gauge | requ\| disk ID  | Pollster | Libvirt,| Average rate of  |
-| ice.read\ |       | est/s|          |          | Hyper-V,| read requests    |
-| .requests\|       |      |          |          | vSphere |                  |
-| .rate     |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt,| Number of write  |
 | ice.write\| lative| uest |          |          | Hyper-V | requests         |
 | .requests |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Gauge | requ\| disk ID  | Pollster | Libvirt,| Average rate of  |
-| ice.write\|       | est/s|          |          | Hyper-V,| write requests   |
-| .requests\|       |      |          |          | vSphere |                  |
-| .rate     |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Cumu\ | B    | disk ID  | Pollster | Libvirt,| Volume of reads  |
 | ice.read\ | lative|      |          |          | Hyper-V |                  |
 | .bytes    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Gauge | B/s  | disk ID  | Pollster | Libvirt,| Average rate of  |
-| ice.read\ |       |      |          |          | Hyper-V,| reads            |
-| .bytes    |       |      |          |          | vSphere |                  |
-| .rate     |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Cumu\ | B    | disk ID  | Pollster | Libvirt,| Volume of writes |
 | ice.write\| lative|      |          |          | Hyper-V |                  |
 | .bytes    |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Gauge | B/s  | disk ID  | Pollster | Libvirt,| Average rate of  |
-| ice.write\|       |      |          |          | Hyper-V,| writes           |
-| .bytes    |       |      |          |          | vSphere |                  |
-| .rate     |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.root\| Gauge | GB   | instance | Notific\ | Libvirt,| Size of root disk|
 | .size     |       |      | ID       | ation    | Hyper-V |                  |
@@ -236,37 +200,17 @@ The following meters are collected for OpenStack Compute.
 | incoming.\| lative|      | ID       |          | Hyper-V | incoming bytes   |
 | bytes     |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Gauge | B/s  | interface| Pollster | Libvirt,| Average rate of  |
-| incoming.\|       |      | ID       |          | Hyper-V,| incoming bytes   |
-| bytes.rate|       |      |          |          | vSphere,|                  |
-|           |       |      |          |          | XenAPI  |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | network.\ | Cumu\ | B    | interface| Pollster | Libvirt,| Number of        |
 | outgoing\ | lative|      | ID       |          | Hyper-V | outgoing bytes   |
 | .bytes    |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Gauge | B/s  | interface| Pollster | Libvirt,| Average rate of  |
-| outgoing.\|       |      | ID       |          | Hyper-V,| outgoing bytes   |
-| bytes.rate|       |      |          |          | vSphere,|                  |
-|           |       |      |          |          | XenAPI  |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | network.\ | Cumu\ | pac\ | interface| Pollster | Libvirt,| Number of        |
 | incoming\ | lative| ket  | ID       |          | Hyper-V | incoming packets |
 | .packets  |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Gauge | pack\| interface| Pollster | Libvirt,| Average rate of  |
-| incoming\ |       | et/s | ID       |          | Hyper-V,| incoming packets |
-| .packets\ |       |      |          |          | vSphere,|                  |
-| .rate     |       |      |          |          | XenAPI  |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | network.\ | Cumu\ | pac\ | interface| Pollster | Libvirt,| Number of        |
 | outgoing\ | lative| ket  | ID       |          | Hyper-V | outgoing packets |
 | .packets  |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Gauge | pac\ | interface| Pollster | Libvirt,| Average rate of  |
-| outgoing\ |       | ket/s| ID       |          | Hyper-V,| outgoing packets |
-| .packets\ |       |      |          |          | vSphere,|                  |
-| .rate     |       |      |          |          | XenAPI  |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | **Meters added in the Newton release**                                      |
 +-----------+-------+------+----------+----------+---------+------------------+
@@ -353,50 +297,6 @@ The following meters are collected for OpenStack Compute.
 
     To enable libvirt ``disk.*`` support when running on RBD-backed shared
     storage, you need to install libvirt version 1.2.16+.
-
-The Telemetry service supports creating new meters by using transformers, but
-this is deprecated and discouraged to use. Among the meters gathered from
-libvirt and Hyper-V, there are a few which are derived from other meters. The
-list of meters that are created by using the ``rate_of_change`` transformer
-from the above table is the following:
-
--  cpu_util
-
--  cpu.delta
-
--  disk.read.requests.rate
-
--  disk.write.requests.rate
-
--  disk.read.bytes.rate
-
--  disk.write.bytes.rate
-
--  disk.device.read.requests.rate
-
--  disk.device.write.requests.rate
-
--  disk.device.read.bytes.rate
-
--  disk.device.write.bytes.rate
-
--  network.incoming.bytes.rate
-
--  network.outgoing.bytes.rate
-
--  network.incoming.packets.rate
-
--  network.outgoing.packets.rate
-
-.. note::
-
-    If storing data in Gnocchi, derived rate_of_change metrics are also
-    computed using Gnocchi in addition to Ceilometer transformers. It avoids
-    missing data when Ceilometer services restart.
-    To minimize Ceilometer memory requirements transformers can be disabled.
-    These ``rate_of_change`` meters are deprecated and will be removed in
-    default Ceilometer configuration in future release.
-
 
 OpenStack Compute is capable of collecting ``CPU`` related meters from
 the compute host machines. In order to use that you need to set the

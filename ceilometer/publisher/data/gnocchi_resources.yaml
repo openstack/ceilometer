@@ -86,8 +86,6 @@ resources:
       vcpus:
       cpu:
         archive_policy_name: ceilometer-low-rate
-      cpu.delta:
-      cpu_util:
       cpu_l3_cache:
       disk.root.size:
       disk.ephemeral.size:
@@ -132,8 +130,6 @@ resources:
 
   - resource_type: instance_network_interface
     metrics:
-      network.outgoing.packets.rate:
-      network.incoming.packets.rate:
       network.outgoing.packets:
         archive_policy_name: ceilometer-low-rate
       network.incoming.packets:
@@ -146,8 +142,6 @@ resources:
         archive_policy_name: ceilometer-low-rate
       network.incoming.packets.error:
         archive_policy_name: ceilometer-low-rate
-      network.outgoing.bytes.rate:
-      network.incoming.bytes.rate:
       network.outgoing.bytes:
         archive_policy_name: ceilometer-low-rate
       network.incoming.bytes:
@@ -160,16 +154,12 @@ resources:
     metrics:
       disk.device.read.requests:
         archive_policy_name: ceilometer-low-rate
-      disk.device.read.requests.rate:
       disk.device.write.requests:
         archive_policy_name: ceilometer-low-rate
-      disk.device.write.requests.rate:
       disk.device.read.bytes:
         archive_policy_name: ceilometer-low-rate
-      disk.device.read.bytes.rate:
       disk.device.write.bytes:
         archive_policy_name: ceilometer-low-rate
-      disk.device.write.bytes.rate:
       disk.device.latency:
       disk.device.read.latency:
       disk.device.write.latency:

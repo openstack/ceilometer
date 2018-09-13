@@ -12,9 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-import yaml
-
 from ceilometer.pipeline import base
 from ceilometer.pipeline import sample as pipeline
 from ceilometer import sample
@@ -27,7 +24,6 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
                   'meters': ['a'],
                   'sinks': ['test_sink']}
         sink = {'name': 'test_sink',
-                'transformers': [{'name': 'update', 'parameters': {}}],
                 'publishers': ['test://']}
         self.pipeline_cfg = {'sources': [source], 'sinks': [sink]}
 
@@ -39,13 +35,6 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.pipeline_cfg['sinks'].append({
             'name': 'second_sink',
-            'transformers': [{
-                'name': 'update',
-                'parameters':
-                {
-                    'append_name': '_new',
-                }
-            }],
             'publishers': ['new'],
         })
 
@@ -57,13 +46,6 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         })
         self.pipeline_cfg['sinks'].append({
             'name': 'second_sink',
-            'transformers': [{
-                'name': 'update',
-                'parameters':
-                {
-                    'append_name': '_new',
-                }
-            }],
             'publishers': ['except'],
         })
 
@@ -113,13 +95,6 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         self._set_pipeline_cfg('meters', meter_cfg)
         self.pipeline_cfg['sinks'].append({
             'name': 'second_sink',
-            'transformers': [{
-                'name': 'update',
-                'parameters':
-                {
-                    'append_name': '_new',
-                }
-            }],
             'publishers': ['new'],
         })
         self.pipeline_cfg['sources'][0]['sinks'].append('second_sink')
@@ -150,12 +125,11 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
                          str(pipeline_manager.pipelines[1]))
         test_publisher = pipeline_manager.pipelines[0].publishers[0]
         new_publisher = pipeline_manager.pipelines[1].publishers[0]
-        for publisher, sfx in [(test_publisher, '_update'),
-                               (new_publisher, '_new')]:
+        for publisher in (test_publisher, new_publisher):
             self.assertEqual(2, len(publisher.samples))
             self.assertEqual(2, publisher.calls)
-            self.assertEqual('a' + sfx, getattr(publisher.samples[0], "name"))
-            self.assertEqual('b' + sfx, getattr(publisher.samples[1], "name"))
+            self.assertEqual('a', getattr(publisher.samples[0], "name"))
+            self.assertEqual('b', getattr(publisher.samples[1], "name"))
 
     def test_multiple_sources_with_single_sink(self):
         self.pipeline_cfg['sources'].append({
@@ -193,68 +167,8 @@ class TestDecoupledPipeline(pipeline_base.BasePipelineTestCase):
         for publisher in [test_publisher, another_publisher]:
             self.assertEqual(2, len(publisher.samples))
             self.assertEqual(2, publisher.calls)
-            self.assertEqual('a_update', getattr(publisher.samples[0], "name"))
-            self.assertEqual('b_update', getattr(publisher.samples[1], "name"))
-
-        transformed_samples = self.TransformerClass.samples
-        self.assertEqual(2, len(transformed_samples))
-        self.assertEqual(['a', 'b'],
-                         [getattr(s, 'name') for s in transformed_samples])
-
-    def _do_test_rate_of_change_in_boilerplate_pipeline_cfg(self, index,
-                                                            meters, units):
-        with open('ceilometer/pipeline/data/pipeline.yaml') as fap:
-            data = fap.read()
-        pipeline_cfg = yaml.safe_load(data)
-        for s in pipeline_cfg['sinks']:
-            s['publishers'] = ['test://']
-        name = self.cfg2file(pipeline_cfg)
-        self.CONF.set_override('pipeline_cfg_file', name)
-        pipeline_manager = pipeline.SamplePipelineManager(self.CONF)
-        pipe = pipeline_manager.pipelines[index]
-        self._do_test_rate_of_change_mapping(pipe, meters, units)
-
-    def test_rate_of_change_boilerplate_disk_read_cfg(self):
-        meters = ('disk.read.bytes', 'disk.read.requests')
-        units = ('B', 'request')
-        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
-                                                                 meters,
-                                                                 units)
-
-    def test_rate_of_change_boilerplate_disk_write_cfg(self):
-        meters = ('disk.write.bytes', 'disk.write.requests')
-        units = ('B', 'request')
-        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
-                                                                 meters,
-                                                                 units)
-
-    def test_rate_of_change_boilerplate_network_incoming_cfg(self):
-        meters = ('network.incoming.bytes', 'network.incoming.packets')
-        units = ('B', 'packet')
-        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(4,
-                                                                 meters,
-                                                                 units)
-
-    def test_rate_of_change_boilerplate_per_disk_device_read_cfg(self):
-        meters = ('disk.device.read.bytes', 'disk.device.read.requests')
-        units = ('B', 'request')
-        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
-                                                                 meters,
-                                                                 units)
-
-    def test_rate_of_change_boilerplate_per_disk_device_write_cfg(self):
-        meters = ('disk.device.write.bytes', 'disk.device.write.requests')
-        units = ('B', 'request')
-        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(3,
-                                                                 meters,
-                                                                 units)
-
-    def test_rate_of_change_boilerplate_network_outgoing_cfg(self):
-        meters = ('network.outgoing.bytes', 'network.outgoing.packets')
-        units = ('B', 'packet')
-        self._do_test_rate_of_change_in_boilerplate_pipeline_cfg(4,
-                                                                 meters,
-                                                                 units)
+            self.assertEqual('a', getattr(publisher.samples[0], "name"))
+            self.assertEqual('b', getattr(publisher.samples[1], "name"))
 
     def test_duplicated_sinks_names(self):
         self.pipeline_cfg['sinks'].append({

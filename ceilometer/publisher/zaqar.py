@@ -36,7 +36,6 @@ class ZaqarPublisher(publisher.ConfigPublisherBase):
                 - zaqar_sink
         sinks:
             - name: zaqar_sink
-            transformers:
             publishers:
                 - zaqar://?queue=meter_queue&ttl=1200
 
@@ -63,7 +62,7 @@ class ZaqarPublisher(publisher.ConfigPublisherBase):
     def publish_samples(self, samples):
         """Send a metering message for publishing
 
-        :param samples: Samples from pipeline after transformation
+        :param samples: Samples from pipeline.
         """
         queue = self.client.queue(self.queue_name)
         messages = [{'body': sample.as_dict(), 'ttl': self.ttl}
@@ -73,7 +72,7 @@ class ZaqarPublisher(publisher.ConfigPublisherBase):
     def publish_events(self, events):
         """Send an event message for publishing
 
-        :param events: events from pipeline after transformation
+        :param events: events from pipeline.
         """
         queue = self.client.queue(self.queue_name)
         messages = [{'body': event.serialize(), 'ttl': self.ttl}

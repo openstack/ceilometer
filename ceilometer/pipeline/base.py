@@ -91,33 +91,22 @@ class Sink(object):
     Each sink config is concerned *only* with the transformation rules
     and publication conduits for data.
 
-    In effect, a sink describes a chain of handlers. The chain starts
-    with zero or more transformers and ends with one or more publishers.
-
-    The first transformer in the chain is passed data from the
-    corresponding source, takes some action such as deriving rate of
-    change, performing unit conversion, or aggregating, before passing
-    the modified data to next step.
-
-    The subsequent transformers, if any, handle the data similarly.
+    In effect, a sink describes a chain of handlers. The chain ends with one or
+    more publishers.
 
     At the end of the chain, publishers publish the data. The exact
     publishing method depends on publisher type, for example, pushing
     into data storage via the message bus providing guaranteed delivery,
     or for loss-tolerant data UDP may be used.
 
-    If no transformers are included in the chain, the publishers are
-    passed data directly from the sink which are published unchanged.
     """
 
-    def __init__(self, conf, cfg, transformer_manager, publisher_manager):
+    def __init__(self, conf, cfg, publisher_manager):
         self.conf = conf
         self.cfg = cfg
 
         try:
             self.name = cfg['name']
-            # It's legal to have no transformer specified
-            self.transformer_cfg = cfg.get('transformers') or []
         except KeyError as err:
             raise PipelineException(
                 "Required field %s not specified" % err.args[0], cfg)
@@ -138,29 +127,9 @@ class Sink(object):
                           exc_info=True)
 
         self.multi_publish = True if len(self.publishers) > 1 else False
-        self.transformers = self._setup_transformers(cfg, transformer_manager)
 
     def __str__(self):
         return self.name
-
-    def _setup_transformers(self, cfg, transformer_manager):
-        transformers = []
-        for transformer in self.transformer_cfg:
-            parameter = transformer['parameters'] or {}
-            try:
-                ext = transformer_manager[transformer['name']]
-            except KeyError:
-                raise PipelineException(
-                    "No transformer named %s loaded" % transformer['name'],
-                    cfg)
-            transformers.append(ext.plugin(**parameter))
-            LOG.info(
-                "Pipeline %(pipeline)s: Setup transformer instance %(name)s "
-                "with parameter %(param)s" % ({'pipeline': self,
-                                               'name': transformer['name'],
-                                               'param': parameter}))
-
-        return transformers
 
     @staticmethod
     def flush():
@@ -220,7 +189,7 @@ class PipelineManager(agent.ConfigManagerBase):
 
     NOTIFICATION_IPC = 'ceilometer_ipc'
 
-    def __init__(self, conf, cfg_file, transformer_manager):
+    def __init__(self, conf, cfg_file):
         """Setup the pipelines according to config.
 
         The configuration is supported as follows:
@@ -244,13 +213,6 @@ class PipelineManager(agent.ConfigManagerBase):
                      },
                     ],
          "sinks": [{"name": sink_1,
-                    "transformers": [
-                           {"name": "Transformer_1",
-                         "parameters": {"p1": "value"}},
-
-                           {"name": "Transformer_2",
-                            "parameters": {"p1": "value"}},
-                          ],
                      "publishers": ["publisher_1", "publisher_2"]
                     },
                     {"name": sink_2,
@@ -267,8 +229,6 @@ class PipelineManager(agent.ConfigManagerBase):
         Valid meters definition is all "included meter names", all
         "excluded meter names", wildcard and "excluded meter names", or
         only wildcard.
-
-        Transformer's name is plugin name in setup.cfg.
 
         Publisher's name is plugin name in setup.cfg
 
@@ -303,7 +263,6 @@ class PipelineManager(agent.ConfigManagerBase):
             else:
                 unique_names.add(name)
                 sinks[s['name']] = self.pm_sink(self.conf, s,
-                                                transformer_manager,
                                                 publisher_manager)
         unique_names.clear()
 
