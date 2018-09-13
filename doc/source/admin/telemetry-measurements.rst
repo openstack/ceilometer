@@ -107,28 +107,6 @@ The following meters are collected for OpenStack Compute.
 |           |       |      | ID       | ation    | Hyper-V | CPUs allocated to|
 |           |       |      |          |          |         | the instance     |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.read\| Cumul\| req\ | instance | Pollster | Libvirt,| Number of read   |
-| .requests | ative | uest | ID       |          | Hyper-V | requests         |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.writ\| Cumul\| req\ | instance | Pollster | Libvirt,| Number of write  |
-| e.requests| ative | uest | ID       |          | Hyper-V | requests         |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.read\| Cumu\ | B    | instance | Pollster | Libvirt,| Volume of reads  |
-| .bytes    | lative|      | ID       |          | Hyper-V |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.read\| Gauge | B/s  | instance | Pollster | Libvirt,| Average rate of  |
-| .bytes.\  |       |      | ID       |          | Hyper-V,| reads            |
-| rate      |       |      |          |          | vSphere,|                  |
-|           |       |      |          |          | XenAPI  |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.writ\| Cumu\ | B    | instance | Pollster | Libvirt,| Volume of writes |
-| e.bytes   | lative|      | ID       |          | Hyper-V |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.writ\| Gauge | B/s  | instance | Pollster | Libvirt,| Average rate of  |
-| e.bytes.\ |       |      | ID       |          | Hyper-V,| writes           |
-| rate      |       |      |          |          | vSphere,|                  |
-|           |       |      |          |          | XenAPI  |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt,| Number of read   |
 | ice.read\ | lative| uest |          |          | Hyper-V | requests         |
 | .requests |       |      |          |          |         |                  |
@@ -151,33 +129,12 @@ The following meters are collected for OpenStack Compute.
 | disk.ephe\| Gauge | GB   | instance | Notific\ | Libvirt,| Size of ephemeral|
 | meral.size|       |      | ID       | ation    | Hyper-V | disk             |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.lat\ | Gauge | ms   | instance | Pollster | Hyper-V | Average disk la\ |
-| ency      |       |      | ID       |          |         | tency            |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.iop\ | Gauge | coun\| instance | Pollster | Hyper-V | Average disk io\ |
-| s         |       | t/s  | ID       |          |         | ps               |
-+-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Gauge | ms   | disk ID  | Pollster | Hyper-V | Average disk la\ |
 | ice.late\ |       |      |          |          |         | tency per device |
 | ncy       |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Gauge | coun\| disk ID  | Pollster | Hyper-V | Average disk io\ |
 | ice.iops  |       | t/s  |          |          |         | ps per device    |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.cap\ | Gauge | B    | instance | Pollster | Libvirt | The amount of d\ |
-| acity     |       |      | ID       |          |         | isk that the in\ |
-|           |       |      |          |          |         | stance can see   |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.all\ | Gauge | B    | instance | Pollster | Libvirt | The amount of d\ |
-| ocation   |       |      | ID       |          |         | isk occupied by  |
-|           |       |      |          |          |         | the instance o\  |
-|           |       |      |          |          |         | n the host mach\ |
-|           |       |      |          |          |         | ine              |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.usa\ | Gauge | B    | instance | Pollster | Libvirt | The physical si\ |
-| ge        |       |      | ID       |          |         | ze in bytes of   |
-|           |       |      |          |          |         | the image conta\ |
-|           |       |      |          |          |         | iner on the host |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Gauge | B    | disk ID  | Pollster | Libvirt | The amount of d\ |
 | ice.capa\ |       |      |          |          |         | isk per device   |

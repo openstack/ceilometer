@@ -89,18 +89,6 @@ resources:
       cpu_l3_cache:
       disk.root.size:
       disk.ephemeral.size:
-      disk.read.requests:
-        archive_policy_name: ceilometer-low-rate
-      disk.read.requests.rate:
-      disk.write.requests:
-        archive_policy_name: ceilometer-low-rate
-      disk.write.requests.rate:
-      disk.read.bytes:
-        archive_policy_name: ceilometer-low-rate
-      disk.read.bytes.rate:
-      disk.write.bytes:
-        archive_policy_name: ceilometer-low-rate
-      disk.write.bytes.rate:
       disk.latency:
       disk.iops:
       disk.capacity:

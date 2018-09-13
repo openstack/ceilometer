@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The deprecated `disk.*` meters have been removed. Use the `disk.device.*`
+    meters instead.

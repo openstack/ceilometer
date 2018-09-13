@@ -1,0 +1,12 @@
+---
+upgrade:
+  - |
+    The deprecated meter for compute where removed:
+      - disk.read.requests.rate
+      - disk.write.requests.rate
+      - disk.read.bytes.rate
+      - disk.write.bytes.rate
+      - disk.device.read.requests.rate
+      - disk.device.write.requests.rate
+      - disk.device.read.bytes.rate
+      - disk.device.write.bytes.rate
