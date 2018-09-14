@@ -13,13 +13,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import hashlib
 import os
 import pkg_resources
 
 from oslo_log import log
 from oslo_utils import fnmatch
-import six
 import yaml
 
 LOG = log.getLogger(__name__)
@@ -49,55 +47,24 @@ class ConfigManagerBase(object):
 
     def __init__(self, conf):
         self.conf = conf
-        self.cfg_loc = None
 
     def load_config(self, cfg_file, fallback_cfg_prefix='pipeline/data/'):
         """Load a configuration file and set its refresh values."""
         if os.path.exists(cfg_file):
-            self.cfg_loc = cfg_file
+            cfg_loc = cfg_file
         else:
-            self.cfg_loc = self.conf.find_file(cfg_file)
-        if not self.cfg_loc and fallback_cfg_prefix is not None:
-            LOG.debug("No pipeline definitions configuration file found! "
-                      "Using default config.")
-            self.cfg_loc = pkg_resources.resource_filename(
-                __name__, fallback_cfg_prefix + cfg_file)
-        with open(self.cfg_loc) as fap:
-            data = fap.read()
-        conf = yaml.safe_load(data)
-        self.cfg_mtime = self.get_cfg_mtime()
-        self.cfg_hash = self.get_cfg_hash()
+            cfg_loc = self.conf.find_file(cfg_file)
+            if not cfg_loc and fallback_cfg_prefix is not None:
+                LOG.debug("No pipeline definitions configuration file found! "
+                          "Using default config.")
+                cfg_loc = pkg_resources.resource_filename(
+                    __name__, fallback_cfg_prefix + cfg_file)
+            else:
+                raise RuntimeError("No configuration file can be found")
+        with open(cfg_loc) as fap:
+            conf = yaml.safe_load(fap)
         LOG.info("Config file: %s", conf)
         return conf
-
-    def get_cfg_mtime(self):
-        """Return modification time of cfg file"""
-        return os.path.getmtime(self.cfg_loc) if self.cfg_loc else None
-
-    def get_cfg_hash(self):
-        """Return hash of configuration file"""
-        if not self.cfg_loc:
-            return None
-
-        with open(self.cfg_loc) as fap:
-            data = fap.read()
-        if six.PY3:
-            data = data.encode('utf-8')
-
-        file_hash = hashlib.md5(data).hexdigest()
-        return file_hash
-
-    def cfg_changed(self):
-        """Returns hash of changed cfg else False."""
-        mtime = self.get_cfg_mtime()
-        if mtime > self.cfg_mtime:
-            LOG.info('Configuration file has been updated.')
-            self.cfg_mtime = mtime
-            _hash = self.get_cfg_hash()
-            if _hash != self.cfg_hash:
-                LOG.info("Detected change in configuration.")
-                return _hash
-        return False
 
 
 class Source(object):
