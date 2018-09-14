@@ -124,13 +124,13 @@ class Source(object):
         if not data:
             raise SourceException('No %s specified' % d_type, self.cfg)
 
-        if ([x for x in data if x[0] not in '!*'] and
-           [x for x in data if x[0] == '!']):
+        if (any(x for x in data if x[0] not in '!*') and
+           any(x for x in data if x[0] == '!')):
             raise SourceException(
                 'Both included and excluded %s specified' % d_type,
                 self.cfg)
 
-        if '*' in data and [x for x in data if x[0] not in '!*']:
+        if '*' in data and any(x for x in data if x[0] not in '!*'):
             raise SourceException(
                 'Included %s specified with wildcard' % d_type,
                 self.cfg)
