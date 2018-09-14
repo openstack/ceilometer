@@ -59,8 +59,6 @@ class ConfigManagerBase(object):
                           "Using default config.")
                 cfg_loc = pkg_resources.resource_filename(
                     __name__, 'pipeline/data/' + cfg_file)
-            else:
-                raise RuntimeError("No configuration file can be found")
         with open(cfg_loc) as fap:
             conf = yaml.safe_load(fap)
         LOG.info("Config file: %s", conf)
