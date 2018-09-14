@@ -48,17 +48,17 @@ class ConfigManagerBase(object):
     def __init__(self, conf):
         self.conf = conf
 
-    def load_config(self, cfg_file, fallback_cfg_prefix='pipeline/data/'):
+    def load_config(self, cfg_file):
         """Load a configuration file and set its refresh values."""
         if os.path.exists(cfg_file):
             cfg_loc = cfg_file
         else:
             cfg_loc = self.conf.find_file(cfg_file)
-            if not cfg_loc and fallback_cfg_prefix is not None:
+            if not cfg_loc:
                 LOG.debug("No pipeline definitions configuration file found! "
                           "Using default config.")
                 cfg_loc = pkg_resources.resource_filename(
-                    __name__, fallback_cfg_prefix + cfg_file)
+                    __name__, 'pipeline/data/' + cfg_file)
             else:
                 raise RuntimeError("No configuration file can be found")
         with open(cfg_loc) as fap:
