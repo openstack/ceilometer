@@ -30,7 +30,6 @@ import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
 import ceilometer.keystone_client
 import ceilometer.meter.notifications
-import ceilometer.middleware
 import ceilometer.neutron_client
 import ceilometer.notification
 import ceilometer.nova_client
