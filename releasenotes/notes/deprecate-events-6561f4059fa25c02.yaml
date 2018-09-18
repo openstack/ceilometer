@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    The Ceilometer event subsystem and pipeline is now deprecated and will be
+    removed in a future release.
