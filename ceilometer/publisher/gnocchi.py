@@ -199,6 +199,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         options = urlparse.parse_qs(parsed_url.query)
 
         self.filter_project = options.get('filter_project', ['service'])[-1]
+        self.filter_domain = options.get('filter_domain', ['Default'])[-1]
 
         resources_definition_file = options.get(
             'resources_definition_file', ['gnocchi_resources.yaml'])[-1]
@@ -284,7 +285,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             if self._gnocchi_project_id is None:
                 try:
                     project = self._ks_client.projects.find(
-                        name=self.filter_project)
+                        name=self.filter_project,
+                        domain=self.filter_domain)
                 except ka_exceptions.NotFound:
                     LOG.warning('filtered project not found in keystone,'
                                 ' ignoring the filter_project '
