@@ -532,10 +532,24 @@ class PublisherWorkflowTest(base.BaseTestCase,
         gnocchi_id = uuid.uuid4()
 
         expected_calls = [
-            mock.call.archive_policy.get("ceilometer-low"),
-            mock.call.archive_policy.get("ceilometer-low-rate"),
-            mock.call.archive_policy.get("ceilometer-high"),
-            mock.call.archive_policy.get("ceilometer-high-rate"),
+            mock.call.archive_policy.create({"name": "ceilometer-low",
+                                             "back_window": 0,
+                                             "aggregation_methods": ["mean"],
+                                             "definition": mock.ANY}),
+            mock.call.archive_policy.create({"name": "ceilometer-low-rate",
+                                             "back_window": 0,
+                                             "aggregation_methods": [
+                                                 "mean", "rate:mean"],
+                                             "definition": mock.ANY}),
+            mock.call.archive_policy.create({"name": "ceilometer-high",
+                                             "back_window": 0,
+                                             "aggregation_methods": ["mean"],
+                                             "definition": mock.ANY}),
+            mock.call.archive_policy.create({"name": "ceilometer-high-rate",
+                                             "back_window": 0,
+                                             "aggregation_methods": [
+                                                 "mean", "rate:mean"],
+                                             "definition": mock.ANY}),
             mock.call.metric.batch_resources_metrics_measures(
                 {resource_id: {metric_name: self.metric_attributes}},
                 create_metrics=True)

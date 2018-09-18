@@ -272,9 +272,10 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         if not self._already_configured_archive_policies:
             for ap in self.archive_policies_definition:
                 try:
-                    self._gnocchi.archive_policy.get(ap["name"])
-                except gnocchi_exc.ArchivePolicyNotFound:
                     self._gnocchi.archive_policy.create(ap)
+                except gnocchi_exc.ArchivePolicyAlreadyExists:
+                    # created in the meantime by another worker
+                    pass
             self._already_configured_archive_policies = True
 
     @property
