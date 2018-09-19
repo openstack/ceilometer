@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2018-03-01 19:09+0000\n"
+"POT-Creation-Date: 2018-09-19 00:45+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,10 +28,6 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0\n"
 "Generated-By: Babel 2.2.0\n"
 "X-Generator: Zanata 4.3.3\n"
-
-#, python-format
-msgid "Arithmetic transformer must use at least one meter in expression '%s'"
-msgstr "算术变形器在表达式'%s'中必须至少使用一个指标"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -48,9 +44,6 @@ msgid ""
 msgstr ""
 "查找实例 <名称为 %(name)s，标识为 %(id)s> 时，libvirt 中出错：[错误代码 "
 "%(error_code)s] %(ex)s"
-
-msgid "Expression evaluated to a NaN value!"
-msgstr "表达式计算结果为NaN！"
 
 #, python-format
 msgid ""
@@ -137,10 +130,6 @@ msgstr "必填项%s没有填写"
 msgid "The field 'fields' is required for %s"
 msgstr "%s 需要字段“fields”"
 
-#, python-format
-msgid "Unable to evaluate expression %(expr)s: %(exc)s"
-msgstr "无法计算表达式%(expr)s：%(exc)s"
-
 msgid "Unable to send sample over UDP"
 msgstr "无法通过UDP发送采样"
 
@@ -187,14 +176,6 @@ msgstr "错误的传感器类型"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "读取定义文件%(file)s时遇到YAML错误"
-
-#, python-format
-msgid "dropping out of time order sample: %s"
-msgstr "正在退出时间顺序样本：%s"
-
-#, python-format
-msgid "dropping sample with no predecessor: %s"
-msgstr "因为之前没有数据（用来计算差值）因而丢弃数据：%s"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmi输出长度不匹配"

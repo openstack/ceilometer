@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2018-03-01 19:09+0000\n"
+"POT-Creation-Date: 2018-09-19 00:45+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Chinese (Taiwan)\n"
-
-#, python-format
-msgid "Arithmetic transformer must use at least one meter in expression '%s'"
-msgstr "在表示式 '%s' 中，算術轉換器必須至少使用一種計量"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -40,9 +36,6 @@ msgid ""
 msgstr ""
 "查閱實例 <名稱=%(name)s，ID=%(id)s> 時，libvirt 中發生錯誤：[錯誤碼 "
 "%(error_code)s] %(ex)s"
-
-msgid "Expression evaluated to a NaN value!"
-msgstr "表示式已求值為非數字值！"
 
 #, python-format
 msgid ""
@@ -128,10 +121,6 @@ msgstr "未指定必要欄位 %s"
 msgid "The field 'fields' is required for %s"
 msgstr "%s 需要欄位「欄位」"
 
-#, python-format
-msgid "Unable to evaluate expression %(expr)s: %(exc)s"
-msgstr "無法對表示式 %(expr)s 進行求值：%(exc)s"
-
 msgid "Unable to send sample over UDP"
 msgstr "無法透過 UDP 來傳送樣本"
 
@@ -178,14 +167,6 @@ msgstr "感應器類型錯誤"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "讀取定義檔 %(file)s 時發生 YAML 錯誤"
-
-#, python-format
-msgid "dropping out of time order sample: %s"
-msgstr "正在刪除不在時間順序內的範例：%s"
-
-#, python-format
-msgid "dropping sample with no predecessor: %s"
-msgstr "正在捨棄不含前一版本的樣本：%s"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 輸出長度不符"

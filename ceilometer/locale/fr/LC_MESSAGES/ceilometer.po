@@ -24,9 +24,9 @@
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev161\n"
+"Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-11-21 04:18+0000\n"
+"POT-Creation-Date: 2018-09-19 00:45+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,14 +35,8 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.9.6\n"
+"X-Generator: Zanata 4.3.3\n"
 "Language-Team: French\n"
-
-#, python-format
-msgid "Arithmetic transformer must use at least one meter in expression '%s'"
-msgstr ""
-"Le transformateur arithmétique doit utiliser au moins un mètre dans "
-"l'expression '%s'"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -59,9 +53,6 @@ msgid ""
 msgstr ""
 "Erreur de libvirt lors de la recherche de l'instance <name=%(name)s, id="
 "%(id)s> : [Code d'erreur %(error_code)s] %(ex)s"
-
-msgid "Expression evaluated to a NaN value!"
-msgstr "Expression évaluée avec une valeur not-a-number !"
 
 #, python-format
 msgid ""
@@ -157,10 +148,6 @@ msgstr "Champ requis %s non spécifiée"
 msgid "The field 'fields' is required for %s"
 msgstr "Le champ 'fields' est requis pour  %s"
 
-#, python-format
-msgid "Unable to evaluate expression %(expr)s: %(exc)s"
-msgstr "Impossible d'évaluer l'expression %(expr)s : %(exc)s"
-
 msgid "Unable to send sample over UDP"
 msgstr "Impossible d'envoyer l'échantillon en UDP"
 
@@ -209,14 +196,6 @@ msgstr "Type de détecteur incorrect"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "Erreur YAML lors de la lecture du fichier de définitions %(file)s"
-
-#, python-format
-msgid "dropping out of time order sample: %s"
-msgstr "suppression de l'exemple de classement dans le temps : %s"
-
-#, python-format
-msgid "dropping sample with no predecessor: %s"
-msgstr "abandon de l'échantillon sans prédécesseur: %s"
 
 msgid "ipmitool output length mismatch"
 msgstr "Non-concordance de longueur de la sortie ipmitool"
