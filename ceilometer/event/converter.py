@@ -27,14 +27,17 @@ from ceilometer.i18n import _
 OPTS = [
     cfg.StrOpt('definitions_cfg_file',
                default="event_definitions.yaml",
+               deprecated_for_removal=True,
                help="Configuration file for event definitions."
                ),
     cfg.BoolOpt('drop_unmatched_notifications',
                 default=False,
+                deprecated_for_removal=True,
                 help='Drop notifications if no event definition matches. '
                 '(Otherwise, we convert them with just the default traits)'),
     cfg.MultiStrOpt('store_raw',
                     default=[],
+                    deprecated_for_removal=True,
                     help='Store the raw notification for select priority '
                     'levels (info and/or error). By default, raw details are '
                     'not captured.')
