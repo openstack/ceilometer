@@ -15,7 +15,6 @@
 
 import abc
 
-from debtcollector import moves
 from oslo_log import log
 from oslo_utils import timeutils
 import six
@@ -49,10 +48,7 @@ class TraitPluginBase(object):
         """
         super(TraitPluginBase, self).__init__()
 
-    @moves.moved_method('trait_values', version=6.0, removal_version="?")
-    def trait_value(self, match_list):
-        pass
-
+    @abc.abstractmethod
     def trait_values(self, match_list):
         """Convert a set of fields to one or multiple Trait values.
 
@@ -99,14 +95,11 @@ class TraitPluginBase(object):
               def __init__(self, **kw):
                   super(DefaultPlugin, self).__init__()
 
-              def trait_value(self, match_list):
+              def trait_values(self, match_list):
                   if not match_list:
                       return None
                   return [ match[1] for match in match_list]
         """
-
-        # For backwards compatibility for the renamed method.
-        return [self.trait_value(match_list)]
 
 
 class SplitterTraitPlugin(TraitPluginBase):
@@ -209,11 +202,11 @@ class TimedeltaPlugin(TraitPluginBase):
     # TODO(idegtiarov): refactor code to have meter_plugins separate from
     # trait_plugins
 
-    def trait_value(self, match_list):
+    def trait_values(self, match_list):
         if len(match_list) != 2:
             LOG.warning('Timedelta plugin is required two timestamp fields'
                         ' to create timedelta value.')
-            return
+            return [None]
         start, end = match_list
         try:
             start_time = timeutils.parse_isotime(start[1])
@@ -224,5 +217,5 @@ class TimedeltaPlugin(TraitPluginBase):
                         '%(err)s' %
                         dict(start=start[0], end=end[0], err=err)
                         )
-            return
-        return abs((end_time - start_time).total_seconds())
+            return [None]
+        return [abs((end_time - start_time).total_seconds())]
