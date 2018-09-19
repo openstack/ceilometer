@@ -8,9 +8,9 @@
 # 笹原 昌美 <ebb0de1@jp.ibm.com>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: ceilometer 9.0.1.dev161\n"
+"Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-11-21 04:18+0000\n"
+"POT-Creation-Date: 2018-09-19 00:45+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,14 +19,8 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.9.6\n"
+"X-Generator: Zanata 4.3.3\n"
 "Language-Team: Japanese\n"
-
-#, python-format
-msgid "Arithmetic transformer must use at least one meter in expression '%s'"
-msgstr ""
-"演算変換プログラムは、式 '%s' で少なくとも 1 つのメーターを使用する必要があり"
-"ます"
 
 #, python-format
 msgid "Could not connect to XenAPI: %s"
@@ -43,9 +37,6 @@ msgid ""
 msgstr ""
 "インスタンス <name=%(name)s, id=%(id)s> の検索中に libvirt でエラーが発生しま"
 "した: [エラーコード %(error_code)s] %(ex)s"
-
-msgid "Expression evaluated to a NaN value!"
-msgstr "式が NaN 値に評価されました。"
 
 #, python-format
 msgid ""
@@ -140,10 +131,6 @@ msgstr "必須フィールド %s が指定されていません"
 msgid "The field 'fields' is required for %s"
 msgstr "%s にはフィールド 'fields' が必要です"
 
-#, python-format
-msgid "Unable to evaluate expression %(expr)s: %(exc)s"
-msgstr "式 %(expr)s を評価できません: %(exc)s"
-
 msgid "Unable to send sample over UDP"
 msgstr "UDP 経由でサンプルを送信できません"
 
@@ -201,14 +188,6 @@ msgstr "センサー種別が正しくありません"
 #, python-format
 msgid "YAML error reading Definitions file %(file)s"
 msgstr "定義ファイル %(file)s での読み取りの YAML エラー"
-
-#, python-format
-msgid "dropping out of time order sample: %s"
-msgstr "期限切れのオーダーサンプルを廃棄しています: %s"
-
-#, python-format
-msgid "dropping sample with no predecessor: %s"
-msgstr "サンプル (先行なし) を廃棄しています: %s"
 
 msgid "ipmitool output length mismatch"
 msgstr "ipmitool 出力の長さが一致しません"

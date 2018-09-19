@@ -4,11 +4,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-09 10:27+0000\n"
+"POT-Creation-Date: 2018-09-19 00:45+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2018-09-10 12:19+0000\n"
+"PO-Revision-Date: 2018-09-14 09:17+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom)\n"
 "Language: en_GB\n"
@@ -20,9 +20,6 @@ msgstr "10.0.0"
 
 msgid "10.0.1"
 msgstr "10.0.1"
-
-msgid "11.0.0-13"
-msgstr "11.0.0-13"
 
 msgid "5.0.1"
 msgstr "5.0.1"
@@ -801,6 +798,13 @@ msgstr ""
 "The deprecated `compute.workload_partitioning` option has been removed in "
 "favour of `compute.instance_discovery_method`."
 
+msgid ""
+"The deprecated `disk.*` meters have been removed. Use the `disk.device.*` "
+"meters instead."
+msgstr ""
+"The deprecated `disk.*` meters have been removed. Use the `disk.device.*` "
+"meters instead."
+
 msgid "The deprecated `meter_definitions_cfg_file` option has been removed."
 msgstr "The deprecated `meter_definitions_cfg_file` option has been removed."
 
@@ -833,6 +837,9 @@ msgstr ""
 "The deprecated Kafka publisher has been removed, use NotifierPublisher "
 "instead."
 
+msgid "The deprecated meter for compute where removed:"
+msgstr "The deprecated meter for compute where removed:"
+
 msgid ""
 "The deprecated support of configure polling in the `pipeline.yaml` file has "
 "been removed. Ceilometer now only uses the `polling.yaml` file for polling "
@@ -864,6 +871,15 @@ msgstr ""
 "events. By default, the notification agent will continue to load both "
 "pipelines and build both data models. To selectively enable a pipeline, "
 "configure the `pipelines` option under the `[notification]` section."
+
+msgid ""
+"The notifier publisher options `metering_topic` and `event_topic` are "
+"deprecated and will be removed. Use the `topic` query parameter in the "
+"notifier publisher URL instead."
+msgstr ""
+"The notifier publisher options `metering_topic` and `event_topic` are "
+"deprecated and will be removed. Use the `topic` query parameter in the "
+"notifier publisher URL instead."
 
 msgid ""
 "The option 'glance_page_size' has been removed because it's not actually "
@@ -908,6 +924,9 @@ msgstr ""
 "the backend (e.g. Gnocchi is down), then the dispatcher raised and the data "
 "were lost forever. This was completely unacceptable, and nobody should be "
 "able to configure Ceilometer in that way.\""
+
+msgid "The support for transformers has been removed from the pipeline."
+msgstr "The support for transformers has been removed from the pipeline."
 
 msgid ""
 "The tenant (project) discovery code in the polling agent now scans for "
@@ -1243,6 +1262,30 @@ msgstr ""
 "disk.* aggregated metrics for instance are deprecated, in favour of the per "
 "disk metrics (disk.device.*). Now, it's up to the backend to provide such an "
 "aggregation feature. Gnocchi already provides this."
+
+msgid "disk.device.read.bytes.rate"
+msgstr "disk.device.read.bytes.rate"
+
+msgid "disk.device.read.requests.rate"
+msgstr "disk.device.read.requests.rate"
+
+msgid "disk.device.write.bytes.rate"
+msgstr "disk.device.write.bytes.rate"
+
+msgid "disk.device.write.requests.rate"
+msgstr "disk.device.write.requests.rate"
+
+msgid "disk.read.bytes.rate"
+msgstr "disk.read.bytes.rate"
+
+msgid "disk.read.requests.rate"
+msgstr "disk.read.requests.rate"
+
+msgid "disk.write.bytes.rate"
+msgstr "disk.write.bytes.rate"
+
+msgid "disk.write.requests.rate"
+msgstr "disk.write.requests.rate"
 
 msgid "gnocchi_resources.yaml in Ceilometer should be updated."
 msgstr "gnocchi_resources.yaml in Ceilometer should be updated."
