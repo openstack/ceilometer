@@ -28,8 +28,10 @@ class _BaseDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):
         super(_BaseDiscovery, self).__init__(conf)
         creds = conf.service_credentials
+        # NOTE(tobias-urdin): We set 3.43 (the maximum for Pike) because
+        # we need atleast 3.41 to get user_id on snapshots.
         self.client = cinder_client.Client(
-            version='3',
+            version='3.43',
             session=keystone_client.get_session(conf),
             region_name=creds.region_name,
             interface=creds.interface,
