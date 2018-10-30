@@ -38,6 +38,7 @@ Overview
    contributor/index
    admin/index
    configuration/index
+   cli/index
 
 Appendix
 ========
