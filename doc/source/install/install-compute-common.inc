@@ -45,6 +45,9 @@ Configure Compute to use Telemetry
      ...
      instance_usage_audit = True
      instance_usage_audit_period = hour
+
+     [notifications]
+     ...
      notify_on_state_change = vm_and_task_state
 
      [oslo_messaging_notifications]
