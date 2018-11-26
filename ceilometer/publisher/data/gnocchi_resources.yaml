@@ -262,6 +262,20 @@ resources:
       hardware.cpu.load.5min:
       hardware.cpu.load.15min:
       hardware.cpu.util:
+      hardware.cpu.user:
+        archive_policy_name: ceilometer-low-rate
+      hardware.cpu.nice:
+        archive_policy_name: ceilometer-low-rate
+      hardware.cpu.system:
+        archive_policy_name: ceilometer-low-rate
+      hardware.cpu.idle:
+        archive_policy_name: ceilometer-low-rate
+      hardware.cpu.wait:
+        archive_policy_name: ceilometer-low-rate
+      hardware.cpu.kernel:
+        archive_policy_name: ceilometer-low-rate
+      hardware.cpu.interrupt:
+        archive_policy_name: ceilometer-low-rate
       hardware.memory.total:
       hardware.memory.used:
       hardware.memory.swap.total:
