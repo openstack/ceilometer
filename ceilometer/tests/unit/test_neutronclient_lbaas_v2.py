@@ -281,7 +281,7 @@ class TestNeutronClientLBaaSV2(base.BaseTestCase):
             'fcf23bde-8cf9-4616-883f-208cebcbf858': 'ONLINE',
             'fcf23bde-8cf9-4616-883f-208cebcbf969': 'OFFLINE'}
 
-        for key in result_status.keys():
+        for key in result_status:
             self.assertIn(key, expected_keys)
             self.assertEqual(excepted_status[key], result_status[key])
 
@@ -300,7 +300,7 @@ class TestNeutronClientLBaaSV2(base.BaseTestCase):
             '4c0a0a5f-cf8f-44b7-b912-957daa8ce5e5': 'ONLINE',
             '4c0a0a5f-cf8f-44b7-b912-957daa8ce6f6': 'OFFLINE'}
 
-        for key in result_status.keys():
+        for key in result_status:
             self.assertIn(key, expected_keys)
             self.assertEqual(excepted_status[key], result_status[key])
 
@@ -317,7 +317,7 @@ class TestNeutronClientLBaaSV2(base.BaseTestCase):
             '35cb8516-1173-4035-8dae-0dae3453f37f': 'ONLINE',
             '35cb8516-1173-4035-8dae-0dae3453f48e': 'OFFLINE'}
 
-        for key in result_status.keys():
+        for key in result_status:
             self.assertIn(key, expected_keys)
             self.assertEqual(excepted_status[key], result_status[key])
 
