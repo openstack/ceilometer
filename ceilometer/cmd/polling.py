@@ -14,6 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
 import shlex
 
 import cotyledon
@@ -72,18 +73,31 @@ CLI_OPTS = [
 ]
 
 
-def create_polling_service(worker_id, conf):
-    return manager.AgentManager(worker_id,
-                                conf,
-                                conf.polling_namespaces)
-
-
-def main():
+def _prepare_config():
     conf = cfg.ConfigOpts()
     conf.register_cli_opts(CLI_OPTS)
     service.prepare_service(conf=conf)
-    priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
+    return conf
+
+
+def create_polling_service(worker_id, conf=None):
+    if conf is None:
+        conf = _prepare_config()
+        conf.log_opt_values(LOG, log.DEBUG)
+    return manager.AgentManager(worker_id,
+                                conf)
+
+
+def main():
     sm = cotyledon.ServiceManager()
-    sm.add(create_polling_service, args=(conf,))
-    oslo_config_glue.setup(sm, conf)
+    # On Windows, we can only initialize conf objects in the subprocess.
+    # As a consequence, we can't use oslo_config_glue.setup() on Windows,
+    # because cotyledon.ServiceManager objects are not picklable.
+    if os.name == 'nt':
+        sm.add(create_polling_service)
+    else:
+        conf = _prepare_config()
+        priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
+        oslo_config_glue.setup(sm, conf)
+        sm.add(create_polling_service, args=(conf,))
     sm.run()
