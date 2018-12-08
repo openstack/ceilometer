@@ -31,10 +31,17 @@ def get_gnocchiclient(conf, request_timeout=None):
         pool_maxsize=conf.max_parallel_requests)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
+    interface = conf[group].interface
+    region_name = conf[group].region_name
+    gnocchi_url = session.get_endpoint(service_type='metric',
+                                       service_name='gnocchi',
+                                       interface=interface,
+                                       region_name=region_name)
     return client.Client(
         '1', session, adapter_options={'connect_retries': 3,
-                                       'interface': conf[group].interface,
-                                       'region_name': conf[group].region_name})
+                                       'interface': interface,
+                                       'region_name': region_name,
+                                       'endpoint_override': gnocchi_url})
 
 
 # NOTE(sileht): This is the initial resource types created in Gnocchi

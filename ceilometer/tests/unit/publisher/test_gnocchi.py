@@ -178,6 +178,9 @@ class PublisherTest(base.BaseTestCase):
         self.useFixture(fixtures.MockPatch(
             'gnocchiclient.v1.client.Client',
             return_value=mock.Mock()))
+        self.useFixture(fixtures.MockPatch(
+            'ceilometer.keystone_client.get_session',
+            return_value=mock.Mock()))
         self.ks_client = ks_client
 
     def test_config_load(self):
@@ -447,6 +450,9 @@ class PublisherWorkflowTest(base.BaseTestCase,
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
         self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_client',
+            return_value=ks_client))
+        self.useFixture(fixtures.MockPatch(
+            'ceilometer.keystone_client.get_session',
             return_value=ks_client))
         self.ks_client = ks_client
 
