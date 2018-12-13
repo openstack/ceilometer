@@ -63,6 +63,6 @@
         # While other jobs take 20-30 minutes
         # We can reenable it when they take less times.
         - tripleo-ci-centos-7-scenario001-multinode-oooq
-        - tripleo-ci-centos-7-scenario001-multinode-oooq-container
+        - tripleo-ci-centos-7-scenario001-standalone
         - tripleo-ci-centos-7-scenario002-multinode-oooq
         - tripleo-ci-centos-7-scenario002-multinode-oooq-container
