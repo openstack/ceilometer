@@ -209,7 +209,7 @@ function cleanup_ceilometer {
     sudo rmdir "$CEILOMETER_CONF_DIR"
 }
 
-# Set configuraiton for cache backend.
+# Set configuration for cache backend.
 # NOTE(cdent): This currently only works for redis. Still working
 # out how to express the other backends.
 function _ceilometer_configure_cache_backend {
