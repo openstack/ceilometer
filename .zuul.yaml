@@ -65,4 +65,4 @@
         - tripleo-ci-centos-7-scenario001-multinode-oooq
         - tripleo-ci-centos-7-scenario001-standalone
         - tripleo-ci-centos-7-scenario002-multinode-oooq
-        - tripleo-ci-centos-7-scenario002-multinode-oooq-container
+        - tripleo-ci-centos-7-scenario002-standalone
