@@ -89,7 +89,6 @@ function _ceilometer_config_apache_wsgi {
     sudo mkdir -p $CEILOMETER_WSGI_DIR
 
     local ceilometer_apache_conf=$(apache_site_config_for ceilometer)
-    local apache_version=$(get_apache_version)
     local venv_path=""
 
     if [[ ${USE_VENV} = True ]]; then
