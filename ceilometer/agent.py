@@ -61,7 +61,7 @@ class ConfigManagerBase(object):
                     __name__, 'pipeline/data/' + cfg_file)
         with open(cfg_loc) as fap:
             conf = yaml.safe_load(fap)
-        LOG.info("Config file: %s", conf)
+        LOG.debug("Config file: %s", conf)
         return conf
 
 
