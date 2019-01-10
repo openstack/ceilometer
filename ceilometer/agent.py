@@ -67,7 +67,7 @@ class ConfigManagerBase(object):
         conf = yaml.safe_load(data)
         self.cfg_mtime = self.get_cfg_mtime()
         self.cfg_hash = self.get_cfg_hash()
-        LOG.info("Config file: %s", conf)
+        LOG.debug("Config file: %s", conf)
         return conf
 
     def get_cfg_mtime(self):
