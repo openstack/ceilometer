@@ -38,6 +38,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         super(LibvirtInspector, self).__init__(conf)
         # NOTE(sileht): create a connection on startup
         self.connection
+        self.cache = {}
 
     @property
     def connection(self):
@@ -115,6 +116,29 @@ class LibvirtInspector(virt_inspector.Inspector):
             params['bridge'] = bridge
 
             dom_stats = domain.interfaceStats(name)
+
+            # Retrieve previous values
+            prev = self.cache.get(name)
+
+            # Store values for next call
+            self.cache[name] = dom_stats
+
+            if prev:
+                # Compute stats
+                rx_delta = dom_stats[0] - prev[0]
+                tx_delta = dom_stats[4] - prev[4]
+
+                # Avoid negative values
+                if rx_delta < 0:
+                    rx_delta = dom_stats[0]
+                if tx_delta < 0:
+                    tx_delta = dom_stats[4]
+            else:
+                LOG.debug('No delta meter predecessor for %s / %s' %
+                          (instance.id, name))
+                rx_delta = 0
+                tx_delta = 0
+
             yield virt_inspector.InterfaceStats(name=name,
                                                 mac=mac_address,
                                                 fref=fref,
@@ -123,10 +147,12 @@ class LibvirtInspector(virt_inspector.Inspector):
                                                 rx_packets=dom_stats[1],
                                                 rx_errors=dom_stats[2],
                                                 rx_drop=dom_stats[3],
+                                                rx_bytes_delta=rx_delta,
                                                 tx_bytes=dom_stats[4],
                                                 tx_packets=dom_stats[5],
                                                 tx_errors=dom_stats[6],
-                                                tx_drop=dom_stats[7])
+                                                tx_drop=dom_stats[7],
+                                                tx_bytes_delta=tx_delta)
 
     @staticmethod
     def _get_disk_devices(domain):

@@ -127,7 +127,9 @@ class HyperVInspector(virt_inspector.Inspector):
                 tx_bytes=vnic_metrics['tx_mb'] * units.Mi,
                 tx_packets=0,
                 tx_drop=0,
-                tx_errors=0)
+                tx_errors=0,
+                rx_bytes_delta=0,
+                tx_bytes_delta=0)
 
     @convert_exceptions(exception_conversion_map)
     def inspect_disks(self, instance, duration):

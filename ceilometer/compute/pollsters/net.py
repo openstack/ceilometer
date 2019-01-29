@@ -109,3 +109,17 @@ class OutgoingErrorsPollster(NetworkPollster):
     sample_type = sample.TYPE_CUMULATIVE
     sample_unit = 'packet'
     sample_stats_key = 'tx_errors'
+
+
+class IncomingBytesDeltaPollster(NetworkPollster):
+    sample_name = 'network.incoming.bytes.delta'
+    sample_type = sample.TYPE_DELTA
+    sample_unit = 'B'
+    sample_stats_key = 'rx_bytes_delta'
+
+
+class OutgoingBytesDeltaPollster(NetworkPollster):
+    sample_name = 'network.outgoing.packets.delta'
+    sample_type = sample.TYPE_DELTA
+    sample_unit = 'B'
+    sample_stats_key = 'tx_bytes_delta'
