@@ -97,6 +97,23 @@ class LibvirtInspector(virt_inspector.Inspector):
 
             params = dict((p.get('name').lower(), p.get('value'))
                           for p in iface.findall('filterref/parameter'))
+
+            # Extract interface ID
+            try:
+                interfaceid = iface.find('virtualport').find(
+                    'parameters').get('interfaceid')
+            except AttributeError:
+                interfaceid = None
+
+            # Extract source bridge
+            try:
+                bridge = iface.find('source').get('bridge')
+            except AttributeError:
+                bridge = None
+
+            params['interfaceid'] = interfaceid
+            params['bridge'] = bridge
+
             dom_stats = domain.interfaceStats(name)
             yield virt_inspector.InterfaceStats(name=name,
                                                 mac=mac_address,

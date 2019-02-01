@@ -242,7 +242,9 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual('vnet2', vnic2.name)
             self.assertEqual('fa:16:3e:96:33:f0', vnic2.mac)
             self.assertIsNone(vnic2.fref)
-            self.assertEqual(dict(), vnic2.parameters)
+            self.assertEqual(
+                {'interfaceid': None, 'bridge': 'qbr420008b3-7c'},
+                vnic2.parameters)
             self.assertEqual(9, vnic2.rx_bytes)
             self.assertEqual(10, vnic2.rx_packets)
             self.assertEqual(11, vnic2.tx_bytes)
