@@ -488,6 +488,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             rd, operation = rd
             if operation == EVENT_DELETE:
                 self._delete_event(rd, event)
+            if operation == EVENT_CREATE:
+                self._create_event(rd, event)
 
     def _delete_event(self, rd, event):
         ended_at = timeutils.utcnow().isoformat()
@@ -505,6 +507,19 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
         for resource in to_end:
             self._set_ended_at(resource, ended_at)
+
+    def _create_event(self, rd, event):
+        resource = rd.event_attributes(event)
+        resource_type = resource.pop('type')
+
+        try:
+            self._create_resource(resource_type, resource)
+        except gnocchi_exc.ResourceAlreadyExists:
+            LOG.debug("Create event received on existing resource (%s), "
+                      "ignore it.", resource['id'])
+        except Exception:
+            LOG.error("Failed to create resource %s", resource,
+                      exc_info=True)
 
     def _search_resource(self, resource_type, query):
         try:
