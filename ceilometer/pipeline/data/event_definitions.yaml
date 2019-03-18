@@ -50,6 +50,11 @@
     deleted_at:
       type: datetime
       fields: payload.deleted_at
+- event_type: compute.instance.create.end
+  traits:
+    <<: *instance_traits
+    availability_zone:
+      fields: payload.availability_zone
 - event_type: compute.instance.update
   traits:
     <<: *instance_traits
