@@ -622,7 +622,7 @@ class TestPollingAgent(BaseAgent):
         pollster = list(polling_task.pollster_matches['test_polling'])[0]
         polling_task.poll_and_notify()
         LOG.debug.assert_called_with(
-            'Skip pollster %(name)s, no %(p_context)sresources found this '
+            'Skip pollster %(name)s, no %(p_context)s resources found this '
             'cycle', {'name': pollster.name, 'p_context': ''})
 
     @mock.patch('ceilometer.polling.manager.LOG')
@@ -637,7 +637,7 @@ class TestPollingAgent(BaseAgent):
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         polling_task.poll_and_notify()
         LOG.debug.assert_called_with(
-            'Skip pollster %(name)s, no %(p_context)sresources found this '
+            'Skip pollster %(name)s, no %(p_context)s resources found this '
             'cycle', {'name': 'test', 'p_context': 'new '})
 
     @mock.patch('oslo_utils.timeutils.utcnow')

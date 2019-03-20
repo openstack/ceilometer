@@ -167,7 +167,7 @@ class PollingTask(object):
                 # If no resources, skip for this pollster
                 if not polling_resources:
                     p_context = 'new ' if history else ''
-                    LOG.debug("Skip pollster %(name)s, no %(p_context)s"
+                    LOG.debug("Skip pollster %(name)s, no %(p_context)s "
                               "resources found this cycle",
                               {'name': pollster.name, 'p_context': p_context})
                     continue
