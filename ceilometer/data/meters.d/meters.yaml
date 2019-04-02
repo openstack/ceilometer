@@ -113,6 +113,7 @@ metric:
   - name: 'volume.size'
     event_type:
       - 'volume.exists'
+      - 'volume.retype'
       - 'volume.create.*'
       - 'volume.delete.*'
       - 'volume.resize.*'
