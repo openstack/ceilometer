@@ -33,7 +33,6 @@
       type: int
       fields: payload.vcpus
     instance_type_id:
-      type: int
       fields: payload.instance_type_id
     instance_type:
       fields: payload.instance_type
