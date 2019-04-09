@@ -57,7 +57,7 @@ class PrometheusPublisher(http.HttpPublisher):
 
             if metric_type and s.name not in doc_done:
                 data += "# TYPE %s %s\n" % (s.name, metric_type)
-                doc_done.add(s.name)
+                doc_done.add(s.name.replace(".", "_"))
 
             # NOTE(sileht): prometheus pushgateway doesn't allow to push
             # timestamp_ms
@@ -70,7 +70,7 @@ class PrometheusPublisher(http.HttpPublisher):
             #     s.name, s.resource_id, s.volume, timestamp_ms)
 
             data += '%s{resource_id="%s"} %s\n' % (
-                s.name, s.resource_id, s.volume)
+                s.name.replace(".", "_"), s.resource_id, s.volume)
         self._do_post(data)
 
     @staticmethod
