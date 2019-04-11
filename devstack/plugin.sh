@@ -405,7 +405,7 @@ if is_service_enabled ceilometer; then
         start_ceilometer
     elif [[ "$1" == "stack" && "$2" == "test-config" ]]; then
         iniset $TEMPEST_CONFIG telemetry alarm_granularity $CEILOMETER_ALARM_GRANULARITY
-        iniset $TEMPEST_CONFIG telemetry alarm_threshold 10000000000
+        iniset $TEMPEST_CONFIG telemetry alarm_threshold 10000000
         iniset $TEMPEST_CONFIG telemetry alarm_metric_name cpu
         iniset $TEMPEST_CONFIG telemetry alarm_aggregation_method rate:mean
     fi
