@@ -84,27 +84,6 @@ function _ceilometer_install_redis {
     pip_install_gr redis
 }
 
-# Configure mod_wsgi
-function _ceilometer_config_apache_wsgi {
-    sudo mkdir -p $CEILOMETER_WSGI_DIR
-
-    local ceilometer_apache_conf=$(apache_site_config_for ceilometer)
-    local venv_path=""
-
-    if [[ ${USE_VENV} = True ]]; then
-        venv_path="python-path=${PROJECT_VENV["ceilometer"]}/lib/$(python_version)/site-packages"
-    fi
-
-    sudo cp $CEILOMETER_DIR/devstack/apache-ceilometer.template $ceilometer_apache_conf
-    sudo sed -e "
-        s|%PORT%|$CEILOMETER_SERVICE_PORT|g;
-        s|%APACHE_NAME%|$APACHE_NAME|g;
-        s|%WSGIAPP%|$CEILOMETER_WSGI_DIR/app|g;
-        s|%USER%|$STACK_USER|g;
-        s|%VIRTUALENV%|$venv_path|g
-    " -i $ceilometer_apache_conf
-}
-
 # Install required services for coordination
 function _ceilometer_prepare_coordination {
     if echo $CEILOMETER_COORDINATION_URL | grep -q '^memcached:'; then
