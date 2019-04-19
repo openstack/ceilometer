@@ -5,7 +5,7 @@
     post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb/post.yaml
     timeout: 7800
     required-projects:
-      - openstack-infra/devstack-gate
+      - openstack/devstack-gate
       - openstack/ceilometer
       - openstack/tempest
 
@@ -16,7 +16,7 @@
     post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mongodb-identity-v3-only/post.yaml
     timeout: 7800
     required-projects:
-      - openstack-infra/devstack-gate
+      - openstack/devstack-gate
       - openstack/ceilometer
       - openstack/tempest
 
@@ -27,7 +27,7 @@
     post-run: playbooks/legacy/ceilometer-dsvm-tempest-plugin-mysql/post.yaml
     timeout: 7800
     required-projects:
-      - openstack-infra/devstack-gate
+      - openstack/devstack-gate
       - openstack/ceilometer
       - openstack/tempest
 
@@ -56,8 +56,8 @@
     post-run: playbooks/legacy/grenade-dsvm-ceilometer/post.yaml
     timeout: 10800
     required-projects:
-      - openstack-dev/grenade
-      - openstack-infra/devstack-gate
+      - openstack/grenade
+      - openstack/devstack-gate
       - openstack/ceilometer
 
 - project:
