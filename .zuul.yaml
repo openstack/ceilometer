@@ -5,8 +5,8 @@
     post-run: playbooks/legacy/grenade-dsvm-ceilometer/post.yaml
     timeout: 10800
     required-projects:
-      - openstack-dev/grenade
-      - openstack-infra/devstack-gate
+      - openstack/grenade
+      - openstack/devstack-gate
       - openstack/ceilometer
 
 - project:
