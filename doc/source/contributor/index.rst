@@ -15,8 +15,8 @@ contributing to Ceilometer, please follow the workflow found here_.
 :Bug tracker: https://bugs.launchpad.net/ceilometer
 :Mailing list: http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev (prefix subjects with ``[Ceilometer]`` for faster responses)
 :Wiki: https://wiki.openstack.org/wiki/Ceilometer
-:Code Hosting: https://git.openstack.org/cgit/openstack/ceilometer/
-:Code Review: https://review.openstack.org/#/q/status:open+project:openstack/ceilometer,n,z
+:Code Hosting: https://opendev.org/openstack/ceilometer/
+:Code Review: https://review.opendev.org/#/q/status:open+project:openstack/ceilometer,n,z
 
 Overview
 ========

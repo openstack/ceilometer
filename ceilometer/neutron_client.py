@@ -278,7 +278,7 @@ class Client(object):
         # FIXME(liamji) the following meters are experimental and
         # may generate a large load against neutron api. The future
         # enhancements can be tracked against:
-        # https://review.openstack.org/#/c/218560.
+        # https://review.opendev.org/#/c/218560.
         # After it has been merged and the neutron client supports
         # with the corresponding apis, will change to use the new
         # method to get the status of the members.
@@ -324,7 +324,7 @@ class Client(object):
         # FIXME(liamji) the following meters are experimental and
         # may generate a large load against neutron api. The future
         # enhancements can be tracked against:
-        # https://review.openstack.org/#/c/218560.
+        # https://review.opendev.org/#/c/218560.
         # After it has been merged and the neutron client supports
         # with the corresponding apis, will change to use the new
         # method to get the status of the listeners.
@@ -362,7 +362,7 @@ class Client(object):
         # FIXME(liamji) the following meters are experimental and
         # may generate a large load against neutron api. The future
         # enhancements can be tracked against:
-        # https://review.openstack.org/#/c/218560.
+        # https://review.opendev.org/#/c/218560.
         # After it has been merged and the neutron client supports
         # with the corresponding apis, will change to use the new
         # method to get the status of the pools.

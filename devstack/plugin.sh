@@ -4,7 +4,7 @@
 # looks like
 #
 # [[local|localrc]]
-# enable_plugin ceilometer https://git.openstack.org/openstack/ceilometer
+# enable_plugin ceilometer https://opendev.org/openstack/ceilometer
 #
 # By default all ceilometer services are started (see devstack/settings)
 # except for the ceilometer-aipmi service. To disable a specific service
