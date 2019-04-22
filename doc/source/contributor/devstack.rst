@@ -16,7 +16,7 @@ Configuring devstack
    enabled in ``local.conf`` but adding the following::
 
      # Enable the Ceilometer devstack plugin
-     enable_plugin ceilometer https://git.openstack.org/openstack/ceilometer.git
+     enable_plugin ceilometer https://opendev.org/openstack/ceilometer.git
 
    By default, all ceilometer services except for ceilometer-ipmi agent will
    be enabled
@@ -27,8 +27,8 @@ Configuring devstack
 
    Optionally, services which extend Ceilometer can be enabled::
 
-     enable_plugin aodh https://git.openstack.org/openstack/aodh
-     enable_plugin panko https://git.openstack.org/openstack/panko
+     enable_plugin aodh https://opendev.org/openstack/aodh
+     enable_plugin panko https://opendev.org/openstack/panko
 
    These plugins should be added before ceilometer.
 
