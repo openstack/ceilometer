@@ -17,3 +17,9 @@ subunit.log
 
 # Files created by releasenotes build
 releasenotes/build
+
+#swap file
+*.swp
+
+#IntelJ Idea
+.idea/
