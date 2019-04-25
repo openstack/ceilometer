@@ -2,6 +2,6 @@
 # This file should be owned by (and only-writeable by) the root user
 
 [Filters]
-# ceilometer/ipmi/nodemanager/node_manager.py: 'ipmitool'
+# ceilometer/ipmi/platform/ipmitool.py: 'ipmitool'
 ipmitool: CommandFilter, ipmitool, root
 
