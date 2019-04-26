@@ -351,7 +351,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 
             self.assertEqual(1, len(disks))
             self.assertEqual('vda', disks[0].device)
-            self.assertEqual(1, disks[0].capacity)
+            self.assertEqual(3, disks[0].capacity)
             self.assertEqual(2, disks[0].allocation)
             self.assertEqual(3, disks[0].physical)
 

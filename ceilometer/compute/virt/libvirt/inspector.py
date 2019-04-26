@@ -154,8 +154,12 @@ class LibvirtInspector(virt_inspector.Inspector):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         for device in self._get_disk_devices(domain):
             block_info = domain.blockInfo(device)
+            # if vm mount cdrom, libvirt will align by 4K bytes, capacity may
+            # be smaller than physical, avoid with this.
+            # https://libvirt.org/html/libvirt-libvirt-domain.html
+            disk_capacity = max(block_info[0], block_info[2])
             yield virt_inspector.DiskInfo(device=device,
-                                          capacity=block_info[0],
+                                          capacity=disk_capacity,
                                           allocation=block_info[1],
                                           physical=block_info[2])
 
