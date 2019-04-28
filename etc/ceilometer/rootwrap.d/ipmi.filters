@@ -2,6 +2,4 @@
 # This file should be owned by (and only-writeable by) the root user
 
 [Filters]
-# ceilometer/ipmi/platform/ipmitool.py: 'ipmitool'
-ipmitool: CommandFilter, ipmitool, root
-
+privsep-rootwrap-sys_admin: RegExpFilter, privsep-helper, root, privsep-helper, --config-file, /etc/(?!\.\.).*, --privsep_context, ceilometer.privsep.sys_admin_pctxt, --privsep_sock_path, /tmp/.*

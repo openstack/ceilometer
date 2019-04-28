@@ -21,6 +21,7 @@ oslo.i18n==3.15.3
 oslo.log==3.36.0
 oslo.messaging==6.2.0
 oslo.messaging[kafka]==6.2.0
+oslo.privsep==1.32.0
 oslo.reports==1.18.0
 oslo.rootwrap==2.0.0
 oslo.utils==3.37.0

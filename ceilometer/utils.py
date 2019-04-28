@@ -20,7 +20,6 @@
 
 import threading
 
-from oslo_concurrency import processutils
 from oslo_config import cfg
 
 ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
@@ -41,13 +40,6 @@ def _get_root_helper():
 def setup_root_helper(conf):
     global ROOTWRAP_CONF
     ROOTWRAP_CONF = conf.rootwrap_config
-
-
-def execute(*cmd, **kwargs):
-    """Convenience wrapper around oslo's execute() method."""
-    if 'run_as_root' in kwargs and 'root_helper' not in kwargs:
-        kwargs['root_helper'] = _get_root_helper()
-    return processutils.execute(*cmd, **kwargs)
 
 
 def spawn_thread(target, *args, **kwargs):
