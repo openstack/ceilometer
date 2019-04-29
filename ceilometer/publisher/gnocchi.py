@@ -530,8 +530,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             return self._gnocchi.resource.search(
                 resource_type, json.loads(query))
         except Exception:
-            LOG.error("Fail to search resource type %{resource_type}s "
-                      "with '%{query}s'",
+            LOG.error("Fail to search resource type %(resource_type)s "
+                      "with '%(query)s'",
                       {'resource_type': resource_type, 'query': query},
                       exc_info=True)
         return []
