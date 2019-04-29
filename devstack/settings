@@ -57,24 +57,6 @@ GITBRANCH["python-ceilometerclient"]=${CEILOMETERCLIENT_BRANCH:-master}
 GITDIR["python-ceilometerclient"]=$DEST/python-ceilometerclient
 GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
 
-# Make sure panko plugin is enabled before ceilometer
-function _ceilometer_check_for_storage  {
-    local plugins="${DEVSTACK_PLUGINS}"
-    local plugin
-
-    local seen_ceilometer=False
-
-    for plugin in ${plugins//,/ }; do
-        if [ "$plugin" == 'ceilometer' ]; then
-             seen_ceilometer=True
-        elif [ "$plugin" == 'panko' ] && [[ "$seen_ceilometer" == 'True' ]]; then
-             die $LINENO "Panko must be enabled before ceilometer!"
-        fi
-    done
-}
-
-_ceilometer_check_for_storage
-
 # Get rid of this before done.
 # Tell emacs to use shell-script-mode
 ## Local variables:
