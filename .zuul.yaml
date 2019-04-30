@@ -4,6 +4,13 @@
     run: playbooks/legacy/grenade-dsvm-ceilometer/run.yaml
     post-run: playbooks/legacy/grenade-dsvm-ceilometer/post.yaml
     timeout: 10800
+    irrelevant-files: &ceilometer-irrelevant-files
+      - ^(test-|)requirements.txt$
+      - ^setup.cfg$
+      - ^doc/.*$
+      - ^.*\.rst$
+      - ^releasenotes/.*$
+      - ^ceilometer/tests/.*$
     required-projects:
       - openstack/grenade
       - openstack/devstack-gate
@@ -21,19 +28,15 @@
       - openstack-lower-constraints-jobs
     check:
       jobs:
-        - grenade-dsvm-ceilometer:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
-        - telemetry-dsvm-integration
+        - grenade-dsvm-ceilometer
+        - telemetry-dsvm-integration:
+            irrelevant-files: *ceilometer-irrelevant-files
     gate:
       queue: telemetry
       jobs:
-        - grenade-dsvm-ceilometer:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
-        - telemetry-dsvm-integration
+        - grenade-dsvm-ceilometer
+        - telemetry-dsvm-integration:
+            irrelevant-files: *ceilometer-irrelevant-files
     experimental:
       jobs:
         # TripleO jobs that deploy Telemetry.
