@@ -220,7 +220,7 @@ class Sample(Base):
         Index('ix_sample_meter_id_resource_id', 'meter_id', 'resource_id'),
         _COMMON_TABLE_ARGS,
     )
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     meter_id = Column(Integer, ForeignKey('meter.id'))
     resource_id = Column(Integer, ForeignKey('resource.internal_id'))
     volume = Column(Float(53))
