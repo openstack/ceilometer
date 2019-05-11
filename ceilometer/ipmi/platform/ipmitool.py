@@ -17,7 +17,8 @@ from oslo_concurrency import processutils
 
 from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as ipmiexcept
-from ceilometer import utils
+
+import ceilometer.privsep.ipmitool
 
 
 # Following 2 functions are copied from ironic project to handle ipmitool's
@@ -123,7 +124,7 @@ def execute_ipmi_cmd(template=None):
             command = f(self, **kwargs)
             args.extend(command.split(" "))
             try:
-                (out, __) = utils.execute(*args, run_as_root=True)
+                (out, __) = ceilometer.privsep.ipmitool.ipmi(*args)
             except processutils.ProcessExecutionError:
                 raise ipmiexcept.IPMIException(_("running ipmitool failure"))
             return _parse_output(out, template)

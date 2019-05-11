@@ -14,13 +14,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import shlex
+
 import cotyledon
 from cotyledon import oslo_config_glue
 from oslo_config import cfg
 from oslo_log import log
+from oslo_privsep import priv_context
 
 from ceilometer.polling import manager
 from ceilometer import service
+from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
@@ -78,6 +82,7 @@ def main():
     conf = cfg.ConfigOpts()
     conf.register_cli_opts(CLI_OPTS)
     service.prepare_service(conf=conf)
+    priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
     sm = cotyledon.ServiceManager()
     sm.add(create_polling_service, args=(conf,))
     oslo_config_glue.setup(sm, conf)
