@@ -44,7 +44,7 @@ IRC Channel: #openstack-telemetry on `Freenode`_.
 
 Mailinglist
 -----------
-Project use http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-dev
+Project use http://lists.openstack.org/cgi-bin/mailman/listinfo/openstack-discuss
 as the mailinglist. Please use tag ``[Ceilometer]`` in the subject for new
 threads.
 
