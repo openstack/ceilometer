@@ -112,9 +112,11 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
             for sample in samples
         ]
         topic = self.conf.publisher_notifier.metering_topic
-        self.local_queue.append((topic, meters))
+        with self.queue_lock:
+            self.local_queue.append((topic, meters))
 
         if self.per_meter_topic:
+            queue_per_meter_topic = []
             for meter_name, meter_list in itertools.groupby(
                     sorted(meters, key=operator.itemgetter('counter_name')),
                     operator.itemgetter('counter_name')):
@@ -122,7 +124,9 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
                 topic_name = topic + '.' + meter_name
                 LOG.debug('Publishing %(m)d samples on %(n)s',
                           {'m': len(meter_list), 'n': topic_name})
-                self.local_queue.append((topic_name, meter_list))
+                queue_per_meter_topic.append((topic_name, meter_list))
+            with self.queue_lock:
+                self.local_queue.extend(queue_per_meter_topic)
 
         self.flush()
 
@@ -180,7 +184,8 @@ class MessagingPublisher(publisher.ConfigPublisherBase):
             event, self.conf.publisher.telemetry_secret) for event in events]
 
         topic = self.conf.publisher_notifier.event_topic
-        self.local_queue.append((topic, ev_list))
+        with self.queue_lock:
+            self.local_queue.append((topic, ev_list))
         self.flush()
 
     @abc.abstractmethod
