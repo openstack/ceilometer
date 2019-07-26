@@ -66,6 +66,17 @@ class TestMeterDefinition(test_base.BaseTestCase):
             self.assertEqual("Unrecognized type value invalid",
                              e.brief_message)
 
+    def test_config_missing_unit_field(self):
+        cfg = dict(name='hardware.cpu.user',
+                   snmp_inspector={"matching_type": "type_exact",
+                                   "oid": "1.3.6.1.4.1.2021.11.50.0",
+                                   "type": "int"})
+        try:
+            generic.MeterDefinition(cfg)
+        except declarative.MeterDefinitionException as e:
+            self.assertEqual("Missing field unit",
+                             e.brief_message)
+
     @mock.patch('ceilometer.hardware.pollsters.generic.LOG')
     def test_bad_metric_skip(self, LOG):
         cfg = {'metric': [dict(name='test1',
