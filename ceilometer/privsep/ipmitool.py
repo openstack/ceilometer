@@ -22,4 +22,4 @@ import ceilometer.privsep
 
 @ceilometer.privsep.sys_admin_pctxt.entrypoint
 def ipmi(*cmd):
-    processutils.execute(*cmd)
+    return processutils.execute(*cmd)
