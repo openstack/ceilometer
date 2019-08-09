@@ -26,4 +26,9 @@ Data collection
 #. If polling many resources or at a high frequency, you can add additional
    central and compute agents as necessary. The agents are designed to scale
    horizontally. For more information refer to the `high availability guide
-   <https://docs.openstack.org/ha-guide/controller-ha-telemetry.html>`_.
+   <https://docs.openstack.org/ha-guide/>`_.
+
+   .. note::
+
+      The High Availability Guide is a work in progress and is changing
+      rapidly while testing continues.
