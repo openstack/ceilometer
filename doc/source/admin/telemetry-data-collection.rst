@@ -294,6 +294,11 @@ Some of the services polled with this agent are:
 To install and configure this service use the :ref:`install_rdo`
 section in the Installation Tutorials and Guides.
 
+Although Ceilometer has a set of default polling agents, operators can
+add new pollsters dynamically via the dynamic pollsters subsystem
+:ref:`telemetry_dynamic_pollster`.
+
+
 .. _telemetry-ipmi-agent:
 
 IPMI agent
