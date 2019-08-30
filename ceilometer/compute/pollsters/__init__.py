@@ -13,8 +13,13 @@
 # under the License.
 
 import collections
+import six
 
-import monotonic
+if six.PY2:
+    from monotonic import monotonic as now
+else:
+    from time import monotonic as now
+
 from oslo_log import log
 from oslo_utils import timeutils
 
@@ -94,7 +99,7 @@ class GenericComputePollster(plugin_base.PollsterBase):
         if instance.id not in cache[self.inspector_method]:
             result = getattr(self.inspector, self.inspector_method)(
                 instance, duration)
-            polled_time = monotonic.monotonic()
+            polled_time = now()
             # Ensure we don't cache an iterator
             if isinstance(result, collections.Iterable):
                 result = list(result)
