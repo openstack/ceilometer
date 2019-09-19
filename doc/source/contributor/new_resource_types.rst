@@ -35,7 +35,7 @@ how to add/remove or update Gnocchi resource types to support new Ceilometer
 data.
 
 The modification or creation of Gnocchi resource type definitions are managed
-:section:`resources_update_operations` of :file:`ceilometer/gnocchi_client.py`.
+`resources_update_operations` of :file:`ceilometer/gnocchi_client.py`.
 
 The following operations are supported:
 

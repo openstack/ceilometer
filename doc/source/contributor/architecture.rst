@@ -183,6 +183,6 @@ Storing/Accessing the data
 
 Ceilometer is designed solely to generate and normalise cloud data. The data
 created by Ceilometer can be pushed to any number of target using publishers
-mentioned in :ref:`pipeline-publishers` section. The recommended workflow is to
+mentioned in `pipeline-publishers` section. The recommended workflow is to
 push data to Gnocchi_ for efficient time-series storage and resource lifecycle
 tracking.
