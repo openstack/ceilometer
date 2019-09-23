@@ -237,6 +237,7 @@ resources:
       snapshot.size:
       volume.snapshot.size:
       volume.backup.size:
+      backup.size:
     attributes:
       display_name: resource_metadata.(display_name|name)
       volume_type: resource_metadata.volume_type
