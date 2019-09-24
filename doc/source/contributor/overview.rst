@@ -16,7 +16,7 @@ As the project started to come to life, collecting an
 community started to realize that a secondary goal could be added to
 Ceilometer: become a standard way to meter, regardless of the
 purpose of the collection. This data can then be pushed to any set of targets
-using provided publishers mentioned in :ref:`pipeline-publishers` section.
+using provided publishers mentioned in `pipeline-publishers` section.
 
 .. _increasing number of meters: https://docs.openstack.org/ceilometer/latest/contributor/measurements.html
 

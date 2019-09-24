@@ -49,7 +49,7 @@ Event Structure
 ~~~~~~~~~~~~~~~
 
 To facilitate downstream processing (billing and/or aggregation), a
-:doc:`minimum required data set and format <format>` has been defined for
+`minimum required data set and format <format>` has been defined for
 services, however events generally contain the following information:
 
 event_type
