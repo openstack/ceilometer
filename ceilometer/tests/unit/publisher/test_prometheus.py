@@ -65,6 +65,17 @@ class TestPrometheusPublisher(base.BaseTestCase):
             timestamp=datetime.datetime.now().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
+        sample.Sample(
+            name='delta.epsilon',
+            type=sample.TYPE_GAUGE,
+            unit='',
+            volume=7,
+            user_id='test',
+            project_id='test',
+            resource_id=resource_id,
+            timestamp=datetime.datetime.now().isoformat(),
+            resource_metadata={'name': 'TestPublish'},
+        ),
     ]
 
     def setUp(self):
@@ -88,7 +99,9 @@ alpha{resource_id="%s"} 1
 beta{resource_id="%s"} 3
 # TYPE gamma gauge
 gamma{resource_id="%s"} 5
-""" % (self.resource_id, self.resource_id, self.resource_id)
+# TYPE delta_epsilon gauge
+delta_epsilon{resource_id="%s"} 7
+""" % (self.resource_id, self.resource_id, self.resource_id, self.resource_id)
 
         expected = [
             mock.call('http://localhost:90/metrics/job/os',
@@ -118,7 +131,9 @@ alpha{resource_id="%s"} 1
 beta{resource_id="%s"} 3
 # TYPE gamma gauge
 gamma{resource_id="%s"} 5
-""" % (self.resource_id, self.resource_id, self.resource_id)
+# TYPE delta_epsilon gauge
+delta_epsilon{resource_id="%s"} 7
+""" % (self.resource_id, self.resource_id, self.resource_id, self.resource_id)
 
         expected = [
             mock.call('https://localhost:90/metrics/job/os',
