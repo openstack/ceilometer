@@ -8,15 +8,16 @@
 # Ettore Atalan <atalanttore@googlemail.com>, 2014
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
 # Andreas Jaeger <jaegerandi@gmail.com>, 2018. #zanata
+# Andreas Jaeger <jaegerandi@gmail.com>, 2019. #zanata
 msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2018-09-19 00:45+0000\n"
+"POT-Creation-Date: 2019-10-03 16:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2018-08-05 08:47+0000\n"
+"PO-Revision-Date: 2019-10-03 08:56+0000\n"
 "Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -27,6 +28,14 @@ msgstr ""
 #, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "Es konnte keine Verbindung zu XenAPI hergestellt werden: %s"
+
+#, python-format
+msgid "Could not get VM %s CPU number"
+msgstr "VM %s CPU Nummer konnte nicht abgerufen werden"
+
+#, python-format
+msgid "Could not load the following pipelines: %s"
+msgstr "Konnte die folgenden Pipelines nicht laden: %s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -47,6 +56,14 @@ msgid ""
 msgstr ""
 "Fehler beim Überprüfen von Daten der Instanz <name=%(name)s, id=%(id)s>, "
 "Domänenstatus ist ABGESCHALTET."
+
+#, python-format
+msgid ""
+"Failed to inspect instance %(instance_uuid)s stats, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"Fehler beim Überprüfen der Statistik der Instanz %(instance_uuid)s, "
+"Informationen können nicht von libvirt abgerufen werden: %(error)s"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
@@ -206,6 +223,10 @@ msgstr ""
 #, python-format
 msgid "Unrecognized type value %s"
 msgstr "Nicht erkannter Typwert %s"
+
+#, python-format
+msgid "VM %s is poweredOff in VMware vSphere"
+msgstr "VM %s ist ausgeschaltet in VMware vSphere"
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
