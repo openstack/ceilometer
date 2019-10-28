@@ -375,3 +375,47 @@ class TestDynamicPollster(base.BaseTestCase):
             "6c7a0e87-7f2e-45d3-89ca-5a2dbba71a0e", second_element.project_id)
         self.assertEqual(
             "20b5a704-b481-4603-a99e-2636c144b876", second_element.user_id)
+
+    def test_retrieve_entries_from_response_response_is_a_list(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        response = [{"object1-attr1": 1}, {"object1-attr2": 2}]
+        entries = pollster.retrieve_entries_from_response(response)
+
+        self.assertEqual(response, entries)
+
+    def test_retrieve_entries_using_first_entry_from_response(self):
+        self.pollster_definition_only_required_fields[
+            'response_entries_key'] = "first"
+
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        first_entries_from_response = [{"object1-attr1": 1},
+                                       {"object1-attr2": 2}]
+        second_entries_from_response = [{"object1-attr3": 3},
+                                        {"object1-attr4": 33}]
+
+        response = {"first": first_entries_from_response,
+                    "second": second_entries_from_response}
+        entries = pollster.retrieve_entries_from_response(response)
+
+        self.assertEqual(first_entries_from_response, entries)
+
+    def test_retrieve_entries_using_second_entry_from_response(self):
+        self.pollster_definition_only_required_fields[
+            'response_entries_key'] = "second"
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        first_entries_from_response = [{"object1-attr1": 1},
+                                       {"object1-attr2": 2}]
+        second_entries_from_response = [{"object1-attr3": 3},
+                                        {"object1-attr4": 33}]
+
+        response = {"first": first_entries_from_response,
+                    "second": second_entries_from_response}
+        entries = pollster.retrieve_entries_from_response(response)
+
+        self.assertEqual(second_entries_from_response, entries)
