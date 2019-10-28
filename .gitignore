@@ -23,3 +23,9 @@ releasenotes/build
 
 #IntelJ Idea
 .idea/
+
+#venv
+venv/
+
+#Pyenv files
+.python-version

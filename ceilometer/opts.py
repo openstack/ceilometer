@@ -73,6 +73,7 @@ def list_opts():
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.base.OPTS,
+                         ceilometer.polling.manager.POLLING_OPTS,
                          ceilometer.sample.OPTS,
                          ceilometer.utils.OPTS,
                          OPTS)),

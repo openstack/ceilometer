@@ -20,6 +20,7 @@ Configuration
    telemetry-data-collection
    telemetry-data-pipelines
    telemetry-best-practices
+   telemetry-dynamic-pollster
 
 Data Types
 ==========

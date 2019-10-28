@@ -15,8 +15,10 @@
 # under the License.
 
 import collections
+import glob
 import itertools
 import logging
+import os
 import random
 import uuid
 
@@ -34,8 +36,10 @@ from stevedore import extension
 from tooz import coordination
 
 from ceilometer import agent
+from ceilometer import declarative
 from ceilometer import keystone_client
 from ceilometer import messaging
+from ceilometer.polling import dynamic_pollster
 from ceilometer.polling import plugin_base
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
@@ -58,6 +62,10 @@ POLLING_OPTS = [
                default=50,
                help='Batch size of samples to send to notification agent, '
                     'Set to 0 to disable'),
+    cfg.MultiStrOpt('pollsters_definitions_dirs',
+                    default=["/etc/ceilometer/pollsters.d"],
+                    help="List of directories with YAML files used "
+                         "to created pollsters.")
 ]
 
 
@@ -93,7 +101,7 @@ class Resources(object):
                     not self.agent_manager.partition_coordinator or
                     self.agent_manager.hashrings[
                         static_resources_group].belongs_to_self(
-                            six.text_type(v))] + source_discovery
+                        six.text_type(v))] + source_discovery
 
         return source_discovery
 
@@ -245,8 +253,12 @@ class AgentManager(cotyledon.Service):
         extensions_fb = (self._extensions_from_builder('poll', namespace)
                          for namespace in namespaces)
 
+        # Create dynamic pollsters
+        extensions_dynamic_pollsters = self.create_dynamic_pollsters()
+
         self.extensions = list(itertools.chain(*list(extensions))) + list(
-            itertools.chain(*list(extensions_fb)))
+            itertools.chain(*list(extensions_fb))) + list(
+            extensions_dynamic_pollsters)
 
         if not self.extensions:
             LOG.warning('No valid pollsters can be loaded from %s '
@@ -279,6 +291,70 @@ class AgentManager(cotyledon.Service):
 
         self._keystone = None
         self._keystone_last_exception = None
+
+    def create_dynamic_pollsters(self):
+        """Creates dynamic pollsters
+
+        This method Creates dynamic pollsters based on configurations placed on
+        'pollsters_definitions_dirs'
+
+        :return: a list with the dynamic pollsters defined by the operator.
+        """
+
+        pollsters_definitions_dirs = self.conf.pollsters_definitions_dirs
+        if not pollsters_definitions_dirs:
+            LOG.info("Variable 'pollsters_definitions_dirs' not defined.")
+            return []
+
+        LOG.info("Looking for dynamic pollsters configurations at [%s].",
+                 pollsters_definitions_dirs)
+        pollsters_definitions_files = []
+        for directory in pollsters_definitions_dirs:
+            files = glob.glob(os.path.join(directory, "*.yaml"))
+            if not files:
+                LOG.info("No dynamic pollsters found in folder [%s].",
+                         directory)
+                continue
+            for filepath in sorted(files):
+                if filepath is not None:
+                    pollsters_definitions_files.append(filepath)
+
+        if not pollsters_definitions_files:
+            LOG.info("No dynamic pollsters file found in dirs [%s].",
+                     pollsters_definitions_dirs)
+            return []
+
+        pollsters_definitions = {}
+        for pollsters_definitions_file in pollsters_definitions_files:
+            pollsters_cfg = declarative.load_definitions(
+                self.conf, {}, pollsters_definitions_file)
+
+            LOG.info("File [%s] has [%s] dynamic pollster configurations.",
+                     pollsters_definitions_file, len(pollsters_cfg))
+
+            for pollster_cfg in pollsters_cfg:
+                pollster_name = pollster_cfg['name']
+                if pollster_name not in pollsters_definitions:
+                    LOG.info("Loading dynamic pollster [%s] from file [%s].",
+                             pollster_name, pollsters_definitions_file)
+                    try:
+                        dynamic_pollster_object = dynamic_pollster.\
+                            DynamicPollster(pollster_cfg, self.conf)
+                        pollsters_definitions[pollster_name] = \
+                            dynamic_pollster_object
+                    except Exception as e:
+                        LOG.error(
+                            "Error [%s] while loading dynamic pollster [%s].",
+                            e, pollster_name)
+
+                else:
+                    LOG.info(
+                        "Dynamic pollster [%s] is already defined."
+                        "Therefore, we are skipping it.", pollster_name)
+
+        LOG.debug("Total of dynamic pollsters [%s] loaded.",
+                  len(pollsters_definitions))
+        return pollsters_definitions.values()
 
     @staticmethod
     def _get_ext_mgr(namespace, *args, **kwargs):
@@ -371,7 +447,6 @@ class AgentManager(cotyledon.Service):
             futures.ThreadPoolExecutor(max_workers=len(data)))
 
         for interval, polling_task in data.items():
-
             @periodics.periodic(spacing=interval, run_immediately=True)
             def task(running_task):
                 self.interval_task(running_task)
@@ -461,9 +536,9 @@ class AgentManager(cotyledon.Service):
                         service_type = getattr(
                             self.conf.service_types,
                             discoverer.KEYSTONE_REQUIRED_FOR_SERVICE)
-                        if not keystone_client.get_service_catalog(
-                                self.keystone).get_endpoints(
-                                    service_type=service_type):
+                        if not keystone_client.\
+                                get_service_catalog(self.keystone).\
+                                get_endpoints(service_type=service_type):
                             LOG.warning(
                                 'Skipping %(name)s, %(service_type)s service '
                                 'is not registered in keystone',

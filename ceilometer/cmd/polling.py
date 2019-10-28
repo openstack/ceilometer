@@ -69,7 +69,7 @@ CLI_OPTS = [
                     default=['compute', 'central'],
                     dest='polling_namespaces',
                     help='Polling namespace(s) to be used while '
-                         'resource polling'),
+                         'resource polling')
 ]
 
 

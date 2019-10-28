@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add dynamic pollster system. The dynamic pollster system enables operators
+    to gather new metrics on the fly (without needing to code pollsters).

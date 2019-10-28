@@ -42,6 +42,10 @@ class ResourceDefinitionException(DefinitionException):
     pass
 
 
+class DynamicPollsterDefinitionException(DefinitionException):
+    pass
+
+
 class Definition(object):
     JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
     GETTERS_CACHE = {}
