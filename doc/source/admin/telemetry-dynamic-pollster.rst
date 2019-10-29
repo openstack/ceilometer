@@ -47,7 +47,9 @@ attributes to define a dynamic pollster:
    the unit or some other meaningful String value;
 
 *  ``value_attribute``: mandatory attribute; defines the attribute in the
-   JSON response from the URL of the component being polled. In our magnum
+   JSON response from the URL of the component being polled. We also accept
+   nested values dictionaries. To use a nested value one can simply use
+   ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``. In our magnum
    example, we can use ``status`` as the value attribute;
 
 *  ``endpoint_type``: mandatory field; defines the endpoint type that is
@@ -155,7 +157,8 @@ attributes to define a dynamic pollster:
    contains a list, instead of an object where one of its attributes is a list
    of entries, we use the list directly. Therefore, this option will be
    ignored when the API is returning the list/array of entries to be processed
-   directly.
+   directly. We also accept nested values dictionaries. To use a nested value
+   one can simply use ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``
 
 
 The complete YAML configuration to gather data from Magnum (that has been used

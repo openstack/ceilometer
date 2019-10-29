@@ -17,17 +17,19 @@
     '/etc/ceilometer/pollsters.d/'. The pollster are defined in YAML files
     similar to the idea used for handling notifications.
 """
-
 from oslo_log import log
 from oslo_utils import timeutils
+
 from requests import RequestException
 
 from ceilometer import declarative
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 
-
+from functools import reduce
+import operator
 import requests
+
 from six.moves.urllib import parse as url_parse
 
 LOG = log.getLogger(__name__)
@@ -126,7 +128,8 @@ class DynamicPollster(plugin_base.PollsterBase):
             for pollster_sample in samples:
                 response_value_attribute_name = self.pollster_definitions[
                     'value_attribute']
-                value = pollster_sample[response_value_attribute_name]
+                value = self.retrieve_attribute_nested_value(
+                    pollster_sample, response_value_attribute_name)
 
                 skip_sample_values = \
                     self.pollster_definitions['skip_sample_values']
@@ -239,4 +242,11 @@ class DynamicPollster(plugin_base.PollsterBase):
             except RuntimeError as e:
                 LOG.debug("Generator threw a StopIteration "
                           "and we need to catch it [%s].", e)
-        return response_json[first_entry_name]
+        return self.retrieve_attribute_nested_value(response_json,
+                                                    first_entry_name)
+
+    def retrieve_attribute_nested_value(self, json_object, attribute_key):
+        LOG.debug("Retrieving the nested keys [%s] from [%s].",
+                  attribute_key, json_object)
+        nested_keys = attribute_key.split(".")
+        return reduce(operator.getitem, nested_keys, json_object)
