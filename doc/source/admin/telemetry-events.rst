@@ -6,9 +6,6 @@ In addition to meters, the Telemetry service collects events triggered
 within an OpenStack environment. This section provides a brief summary
 of the events format in the Telemetry service.
 
-.. warning::
-   Events support is deprecated.
-
 While a sample represents a single, numeric datapoint within a
 time-series, an event is a broader concept that represents the state of
 a resource at a point in time. The state may be described using various
