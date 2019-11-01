@@ -246,7 +246,7 @@ file in a [monasca] section::
   region_name = <region name, such as RegionOne>
 
 
-..note::
+.. note::
   The username specified should be for a Keystone user that has the
   ``monasca_agent`` or ``monasca_user`` role enabled. For management purposes,
   this may be the ceilometer user if the appropriate role is granted.
