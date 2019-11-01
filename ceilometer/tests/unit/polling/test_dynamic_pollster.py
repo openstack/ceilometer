@@ -419,3 +419,33 @@ class TestDynamicPollster(base.BaseTestCase):
         entries = pollster.retrieve_entries_from_response(response)
 
         self.assertEqual(second_entries_from_response, entries)
+
+    def test_retrieve_attribute_nested_value_non_nested_key(self):
+        key = "key"
+        value = [{"d": 2}, {"g": {"h": "val"}}]
+
+        json_object = {"key": value}
+
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        returned_value = pollster.retrieve_attribute_nested_value(
+            json_object, key)
+
+        self.assertEqual(value, returned_value)
+
+    def test_retrieve_attribute_nested_value_nested_key(self):
+        key = "key.subKey"
+
+        value1 = [{"d": 2}, {"g": {"h": "val"}}]
+        sub_value = [{"r": 245}, {"h": {"yu": "yu"}}]
+
+        json_object = {"key": {"subKey": sub_value, "subkey2": value1}}
+
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        returned_value = pollster.retrieve_attribute_nested_value(
+            json_object, key)
+
+        self.assertEqual(sub_value, returned_value)
