@@ -31,7 +31,6 @@ OPTS = [
                ),
     cfg.StrOpt('event_pipeline_cfg_file',
                default="event_pipeline.yaml",
-               deprecated_for_removal=True,
                help="Configuration file for event pipeline definition."
                ),
 ]
