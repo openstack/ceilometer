@@ -132,11 +132,11 @@ attributes to define a dynamic pollster:
    attribute is only used when ``value_mapping`` is defined. Moreover, it
    has a default of ``-1``.
 
-*  ``metadata_mapping``: the map used to create new metadata fields. The key
-   is a metadata name that exists in the response of the request we make,
-   and the value of this map is the new desired metadata field that will be
-   created with the content of the metadata that we are mapping.
-   The ``metadata_mapping`` can be created as follows:
+*  ``metadata_mapping``: optional parameter. The map used to create new
+   metadata fields. The key is a metadata name that exists in the response
+   of the request we make, and the value of this map is the new desired
+   metadata field that will be created with the content of the metadata that
+   we are mapping. The ``metadata_mapping`` can be created as follows:
 
   .. code-block:: yaml
 
@@ -144,8 +144,19 @@ attributes to define a dynamic pollster:
       name: "display_name"
       some_attribute: "new_attribute_name"
 
-*  ``preserve_mapped_metadata``: indicates if we preserve the old metadata name
-   when it gets mapped to a new one. The default value is ``True``.
+*  ``preserve_mapped_metadata``: optional parameter. It indicates if we
+   preserve the old metadata name when it gets mapped to a new one.
+   The default value is ``True``.
+
+*  ``response_entries_key``: optional parameter. This value is used to define
+   the "key" of the response that will be used to look-up the entries used in
+   the dynamic pollster processing. If no ``response_entries_key`` is informed
+   by the operator, we will use the first we find. Moreover, if the response
+   contains a list, instead of an object where one of its attributes is a list
+   of entries, we use the list directly. Therefore, this option will be
+   ignored when the API is returning the list/array of entries to be processed
+   directly.
+
 
 The complete YAML configuration to gather data from Magnum (that has been used
 as an example) is the following:

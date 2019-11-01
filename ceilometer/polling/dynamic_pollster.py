@@ -38,7 +38,8 @@ class DynamicPollster(plugin_base.PollsterBase):
     OPTIONAL_POLLSTER_FIELDS = ['metadata_fields', 'skip_sample_values',
                                 'value_mapping', 'default_value',
                                 'metadata_mapping',
-                                'preserve_mapped_metadata']
+                                'preserve_mapped_metadata'
+                                'response_entries_key']
 
     REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit',
                                 'value_attribute', 'endpoint_type',
@@ -77,6 +78,9 @@ class DynamicPollster(plugin_base.PollsterBase):
 
         if 'metadata_mapping' not in self.pollster_definitions:
             self.pollster_definitions['metadata_mapping'] = {}
+
+        if 'response_entries_key' not in self.pollster_definitions:
+            self.pollster_definitions['response_entries_key'] = None
 
     def validate_pollster_definition(self):
         missing_required_fields = \
@@ -221,11 +225,18 @@ class DynamicPollster(plugin_base.PollsterBase):
                   response_json, url, self.name)
 
         if entry_size > 0:
-            first_entry_name = None
+            return self.retrieve_entries_from_response(response_json)
+        return []
+
+    def retrieve_entries_from_response(self, response_json):
+        if isinstance(response_json, list):
+            return response_json
+
+        first_entry_name = self.pollster_definitions['response_entries_key']
+        if not first_entry_name:
             try:
                 first_entry_name = next(iter(response_json))
             except RuntimeError as e:
                 LOG.debug("Generator threw a StopIteration "
-                          "and we need to catch it [%s].",  e)
-            return response_json[first_entry_name]
-        return []
+                          "and we need to catch it [%s].", e)
+        return response_json[first_entry_name]
