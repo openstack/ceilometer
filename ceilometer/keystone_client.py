@@ -23,7 +23,7 @@ DEFAULT_GROUP = "service_credentials"
 
 # List of group that can set auth_section to use a different
 # credentials section
-OVERRIDABLE_GROUPS = ['gnocchi', 'zaqar']
+OVERRIDABLE_GROUPS = ['gnocchi', 'zaqar', 'monasca']
 
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
