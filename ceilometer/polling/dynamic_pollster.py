@@ -40,20 +40,23 @@ class DynamicPollster(plugin_base.PollsterBase):
     OPTIONAL_POLLSTER_FIELDS = ['metadata_fields', 'skip_sample_values',
                                 'value_mapping', 'default_value',
                                 'metadata_mapping',
-                                'preserve_mapped_metadata'
+                                'preserve_mapped_metadata',
                                 'response_entries_key']
 
     REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit',
                                 'value_attribute', 'endpoint_type',
                                 'url_path']
 
-    ALL_POLLSTER_FIELDS = OPTIONAL_POLLSTER_FIELDS + REQUIRED_POLLSTER_FIELDS
-
+    # Mandatory name field
     name = ""
 
     def __init__(self, pollster_definitions, conf=None):
         super(DynamicPollster, self).__init__(conf)
-        LOG.debug("Dynamic pollster created with [%s]",
+
+        self.ALL_POLLSTER_FIELDS =\
+            self.OPTIONAL_POLLSTER_FIELDS + self.REQUIRED_POLLSTER_FIELDS
+
+        LOG.debug("%s instantiated with [%s]", __name__,
                   pollster_definitions)
 
         self.pollster_definitions = pollster_definitions
@@ -63,9 +66,12 @@ class DynamicPollster(plugin_base.PollsterBase):
             LOG.debug("Metadata fields configured to [%s].",
                       self.pollster_definitions['metadata_fields'])
 
+        self.set_default_values()
+
         self.name = self.pollster_definitions['name']
         self.obj = self
 
+    def set_default_values(self):
         if 'skip_sample_values' not in self.pollster_definitions:
             self.pollster_definitions['skip_sample_values'] = []
 
@@ -113,17 +119,17 @@ class DynamicPollster(plugin_base.PollsterBase):
             LOG.debug("No resources received for processing.")
             yield None
 
-        for endpoint in resources:
-            LOG.debug("Executing get sample on URL [%s].", endpoint)
+        for r in resources:
+            LOG.debug("Executing get sample for resource [%s].", r)
 
             samples = list([])
             try:
                 samples = self.execute_request_get_samples(
-                    keystone_client=manager._keystone, endpoint=endpoint)
+                    keystone_client=manager._keystone, resource=r)
             except RequestException as e:
                 LOG.warning("Error [%s] while loading samples for [%s] "
                             "for dynamic pollster [%s].",
-                            e, endpoint, self.name)
+                            e, r, self.name)
 
             for pollster_sample in samples:
                 response_value_attribute_name = self.pollster_definitions[
@@ -149,6 +155,10 @@ class DynamicPollster(plugin_base.PollsterBase):
                 if 'project_id' in pollster_sample:
                     project_id = pollster_sample["project_id"]
 
+                resource_id = None
+                if 'id' in pollster_sample:
+                    resource_id = pollster_sample["id"]
+
                 metadata = []
                 if 'metadata_fields' in self.pollster_definitions:
                     metadata = dict((k, pollster_sample.get(k))
@@ -165,7 +175,7 @@ class DynamicPollster(plugin_base.PollsterBase):
 
                     user_id=user_id,
                     project_id=project_id,
-                    resource_id=pollster_sample["id"],
+                    resource_id=resource_id,
 
                     resource_metadata=metadata
                 )
@@ -213,12 +223,8 @@ class DynamicPollster(plugin_base.PollsterBase):
     def default_discovery(self):
         return 'endpoint:' + self.pollster_definitions['endpoint_type']
 
-    def execute_request_get_samples(self, keystone_client, endpoint):
-        url = url_parse.urljoin(
-            endpoint, self.pollster_definitions['url_path'])
-        resp = keystone_client.session.get(url, authenticated=True)
-        if resp.status_code != requests.codes.ok:
-            resp.raise_for_status()
+    def execute_request_get_samples(self, **kwargs):
+        resp, url = self.internal_execute_request_get_samples(kwargs)
 
         response_json = resp.json()
 
@@ -230,6 +236,16 @@ class DynamicPollster(plugin_base.PollsterBase):
         if entry_size > 0:
             return self.retrieve_entries_from_response(response_json)
         return []
+
+    def internal_execute_request_get_samples(self, kwargs):
+        keystone_client = kwargs['keystone_client']
+        endpoint = kwargs['resource']
+        url = url_parse.urljoin(
+            endpoint, self.pollster_definitions['url_path'])
+        resp = keystone_client.session.get(url, authenticated=True)
+        if resp.status_code != requests.codes.ok:
+            resp.raise_for_status()
+        return resp, url
 
     def retrieve_entries_from_response(self, response_json):
         if isinstance(response_json, list):

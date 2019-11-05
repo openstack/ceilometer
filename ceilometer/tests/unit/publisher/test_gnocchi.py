@@ -618,6 +618,8 @@ class PublisherWorkflowTest(base.BaseTestCase,
         expected_debug = [
             mock.call('filtered project found: %s',
                       'a2d42c23-d518-46b6-96ab-3fba2e146859'),
+            mock.call('Processing sample [%s] for resource ID [%s].',
+                      self.sample, resource_id),
         ]
 
         measures_posted = False
