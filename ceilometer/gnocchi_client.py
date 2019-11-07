@@ -224,6 +224,12 @@ resources_update_operations = [
          {"op": "add", "path": "/attributes/instance_id",
           "value": {"type": "uuid", "required": False}},
      ]},
+    {"desc": "add loadbalancer resource type",
+     "type": "create_resource_type",
+     "resource_type": "loadbalancer",
+     "data": [{
+         "attributes": {}
+     }]},
 ]
 
 # NOTE(sileht): We use LooseVersion because pbr can generate invalid
