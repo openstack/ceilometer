@@ -60,7 +60,7 @@ OPTS = [
                help='Frequency of checking if batch criteria is met.'),
     cfg.BoolOpt('retry_on_failure',
                 default=False,
-                help='Indicates whether publisher retries publishing'
+                help='Indicates whether publisher retries publishing '
                      'sample in case of failure. Only a few error cases '
                      'are queued for a retry.'),
     # NOTE: the retry interval is hard coded for the periodicals decorator
