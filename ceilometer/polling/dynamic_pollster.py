@@ -264,5 +264,28 @@ class DynamicPollster(plugin_base.PollsterBase):
     def retrieve_attribute_nested_value(self, json_object, attribute_key):
         LOG.debug("Retrieving the nested keys [%s] from [%s].",
                   attribute_key, json_object)
+
+        keys_and_operations = attribute_key.split("|")
+        attribute_key = keys_and_operations[0].strip()
+
         nested_keys = attribute_key.split(".")
-        return reduce(operator.getitem, nested_keys, json_object)
+        value = reduce(operator.getitem, nested_keys, json_object)
+
+        # We have operations to be executed against the value extracted
+        if len(keys_and_operations) > 1:
+            for operation in keys_and_operations[1::]:
+                # The operation must be performed onto the 'value' variable
+                if 'value' not in operation:
+                    raise declarative.DynamicPollsterDefinitionException(
+                        "The attribute field operation [%s] must use the ["
+                        "value] variable." % operation,
+                        self.pollster_definitions)
+
+                LOG.debug("Executing operation [%s] against value[%s].",
+                          operation, value)
+
+                value = eval(operation.strip())
+
+                LOG.debug("Result [%s] of operation [%s] against value [%s].",
+                          value, operation)
+        return value

@@ -451,3 +451,52 @@ class TestDynamicPollster(base.BaseTestCase):
             json_object, key)
 
         self.assertEqual(sub_value, returned_value)
+
+    def test_retrieve_attribute_nested_value_with_operation_on_attribute(self):
+        # spaces here are added on purpose at the end to make sure we
+        # execute the strip in the code before the eval
+        key = "key.subKey | value + 1|value / 2  |  value * 3"
+
+        value1 = [{"d": 2}, {"g": {"h": "val"}}]
+        sub_value = 1
+        expected_value_after_operations = 3
+        json_object = {"key": {"subKey": sub_value, "subkey2": value1}}
+
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        returned_value = pollster.retrieve_attribute_nested_value(
+            json_object, key)
+
+        self.assertEqual(expected_value_after_operations, returned_value)
+
+    def test_retrieve_attribute_nested_value_simulate_radosgw_processing(self):
+        key = "user | value.split('$') | value[0] | value.strip()"
+
+        json_object = {"categories": [
+            {
+                "bytes_received": 0,
+                "bytes_sent": 357088,
+                "category": "complete_multipart",
+                "ops": 472,
+                "successful_ops": 472
+            }],
+            "total": {
+                "bytes_received": 206739531986,
+                "bytes_sent": 273793180,
+                "ops": 119690,
+                "successful_ops": 119682
+            },
+            "user":
+                " 00ab8d7e76fc4$00ab8d7e76fc45a37776732"
+        }
+
+        expected_value_after_operations = "00ab8d7e76fc4"
+
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        returned_value = pollster.retrieve_attribute_nested_value(json_object,
+                                                                  key)
+
+        self.assertEqual(expected_value_after_operations, returned_value)

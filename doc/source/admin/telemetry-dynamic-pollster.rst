@@ -24,9 +24,6 @@ dynamic pollster system:
    fashion. This feature is "a nice" to have, but is currently not
    implemented.
 
-*  APIs that return a list of entries directly, without a first key for the
-   list. An example is Aodh alarm list.
-
 
 The dynamic pollsters system configuration (for OpenStack APIs)
 ---------------------------------------------------------------
@@ -329,3 +326,53 @@ ones), we can use the `successful_ops`.
   project_id_attribute: "user"
   resource_id_attribute: "user"
   response_entries_key: "summary"
+
+Operations on extracted attributes
+----------------------------------
+
+The dynamic pollster system can execute Python operations to transform the
+attributes that are extracted from the JSON response that the system handles.
+
+One example of use case is the RadosGW that uses <project_id$project_id> as the
+username (which is normally mapped to the Gnocchi resource_id). With this
+feature (operations on extracted attributes), one can create configurations in
+the dynamic pollster to clean/normalize that variable. It is as simple as
+defining `resource_id_attribute: "user | value.split('$')[0].strip()"`
+
+The operations are separated by `|` symbol. The first element of the expression
+is the key to be retrieved from the JSON object. The other elements are
+operations that can be applied to the `value` variable. The value variable
+is the variable we use to hold the data being extracted. The previous
+example can be rewritten as:
+`resource_id_attribute: "user | value.split ('$') | value[0] | value.strip()"`
+
+As follows we present a complete configuration for a RadosGW dynamic
+pollster that is removing the `$` symbol, and getting the first part of the
+String.
+
+.. code-block:: yaml
+
+  ---
+
+  - name: "dynamic.radosgw.api.request.successful_ops"
+  sample_type: "gauge"
+  unit: "request"
+  value_attribute: "total.successful_ops"
+  url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+  module: "awsauth"
+  authentication_object: "S3Auth"
+  authentication_parameters: "<access_key>, <secret_key>,
+  <rados_gateway_server>"
+  user_id_attribute: "user | value.split ('$') | value[0]"
+  project_id_attribute: "user | value.split ('$') | value[0]"
+  resource_id_attribute: "user | value.split ('$') | value[0]"
+  response_entries_key: "summary"
+
+The Dynamic pollster configuration options that support this feature are the
+following:
+
+* value_attribute
+* response_entries_key
+* user_id_attribute
+* project_id_attribute
+* resource_id_attribute
