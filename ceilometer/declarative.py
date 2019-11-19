@@ -42,11 +42,16 @@ class ResourceDefinitionException(DefinitionException):
     pass
 
 
-class DynamicPollsterDefinitionException(DefinitionException):
+class DynamicPollsterException(DefinitionException):
     pass
 
 
-class NonOpenStackApisDynamicPollsterException(DefinitionException):
+class DynamicPollsterDefinitionException(DynamicPollsterException):
+    pass
+
+
+class NonOpenStackApisDynamicPollsterException\
+        (DynamicPollsterDefinitionException):
     pass
 
 

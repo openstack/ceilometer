@@ -14,6 +14,7 @@
 """Tests for ceilometer/polling/dynamic_pollster.py
 """
 
+from oslotest import base
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
 from ceilometer.polling import dynamic_pollster
@@ -23,11 +24,85 @@ import copy
 import logging
 import mock
 
-from oslotest import base
-
 import requests
 
 LOG = logging.getLogger(__name__)
+
+
+REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit',
+                            'value_attribute', 'endpoint_type',
+                            'url_path']
+
+
+class SampleGenerator(object):
+
+    def __init__(self, samples_dict, turn_to_list=False):
+        self.turn_to_list = turn_to_list
+        self.samples_dict = {}
+        for k, v in samples_dict.items():
+            if isinstance(v, list):
+                self.samples_dict[k] = [0, v]
+            else:
+                self.samples_dict[k] = [0, [v]]
+
+    def get_next_sample_dict(self):
+        _dict = {}
+        for key in self.samples_dict.keys():
+            _dict[key] = self.get_next_sample(key)
+
+        if self.turn_to_list:
+            _dict = [_dict]
+        return _dict
+
+    def get_next_sample(self, key):
+        samples = self.samples_dict[key][1]
+        samples_next_iteration = self.samples_dict[key][0] % len(samples)
+        self.samples_dict[key][0] += 1
+        _sample = samples[samples_next_iteration]
+        if isinstance(_sample, SampleGenerator):
+            return _sample.get_next_sample_dict()
+        return _sample
+
+
+class PagedSamplesGenerator(SampleGenerator):
+
+    def __init__(self, samples_dict, dict_name, page_link_name):
+        super(PagedSamplesGenerator, self).__init__(samples_dict)
+        self.dict_name = dict_name
+        self.page_link_name = page_link_name
+        self.response = {}
+
+    def generate_samples(self, page_base_link, page_links, last_page_size):
+        self.response.clear()
+        current_page_link = page_base_link
+        for page_link, page_size in page_links.items():
+            page_link = page_base_link + "/" + page_link
+            self.response[current_page_link] = {
+                self.page_link_name: page_link,
+                self.dict_name: self.populate_page(page_size)
+            }
+            current_page_link = page_link
+
+        self.response[current_page_link] = {
+            self.dict_name: self.populate_page(last_page_size)
+        }
+
+    def populate_page(self, page_size):
+        page = []
+        for item_number in range(0, page_size):
+            page.append(self.get_next_sample_dict())
+
+        return page
+
+
+class PagedSamplesGeneratorHttpRequestMock(PagedSamplesGenerator):
+
+    def mock_request(self, url, **kwargs):
+        return_value = TestDynamicPollster.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value.json_object = self.response[url]
+
+        return return_value
 
 
 class TestDynamicPollster(base.BaseTestCase):
@@ -42,7 +117,8 @@ class TestDynamicPollster(base.BaseTestCase):
             raise requests.HTTPError("Mock HTTP error.", response=self)
 
     class FakeManager(object):
-        _keystone = None
+        def __init__(self, keystone=None):
+            self._keystone = keystone
 
     def setUp(self):
         super(TestDynamicPollster, self).setUp()
@@ -62,18 +138,60 @@ class TestDynamicPollster(base.BaseTestCase):
                 'old-metadata-name': "new-metadata-name"
             },
             'preserve_mapped_metadata': False}
+
         self.pollster_definition_all_fields.update(
             self.pollster_definition_only_required_fields)
+
+        self.multi_metric_pollster_definition = {
+            'name': "test-pollster.{category}", 'sample_type': "gauge",
+            'unit': "test", 'value_attribute': "[categories].ops",
+            'endpoint_type': "test", 'url_path': "v1/test/endpoint/fake"}
 
     def execute_basic_asserts(self, pollster, pollster_definition):
         self.assertEqual(pollster, pollster.obj)
         self.assertEqual(pollster_definition['name'], pollster.name)
 
-        for key in pollster.REQUIRED_POLLSTER_FIELDS:
+        for key in REQUIRED_POLLSTER_FIELDS:
             self.assertEqual(pollster_definition[key],
                              pollster.pollster_definitions[key])
 
         self.assertEqual(pollster_definition, pollster.pollster_definitions)
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_skip_samples(self, keystone_mock):
+        generator = PagedSamplesGeneratorHttpRequestMock(samples_dict={
+            'volume': SampleGenerator(samples_dict={
+                'name': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+                'tmp': ['ra', 'rb', 'rc', 'rd', 're', 'rf', 'rg', 'rh']},
+                turn_to_list=True),
+            'id': [1, 2, 3, 4, 5, 6, 7, 8],
+            'name': ['a1', 'b2', 'c3', 'd4', 'e5', 'f6', 'g7', 'h8']
+        }, dict_name='servers', page_link_name='server_link')
+
+        generator.generate_samples('http://test.com/v1/test-volumes', {
+            'marker=c3': 3,
+            'marker=f6': 3
+        }, 2)
+
+        keystone_mock.session.get.side_effect = generator.mock_request
+        fake_manager = self.FakeManager(keystone=keystone_mock)
+
+        pollster_definition = dict(self.multi_metric_pollster_definition)
+        pollster_definition['name'] = 'test-pollster.{name}'
+        pollster_definition['value_attribute'] = '[volume].tmp'
+        pollster_definition['skip_sample_values'] = ['rb']
+        pollster_definition['url_path'] = 'v1/test-volumes'
+        pollster_definition['response_entries_key'] = 'servers'
+        pollster = dynamic_pollster.DynamicPollster(pollster_definition)
+        samples = pollster.get_samples(fake_manager, None, ['http://test.com'])
+        self.assertEqual(['ra', 'rc'], list(map(lambda s: s.volume, samples)))
+
+        pollster_definition['name'] = 'test-pollster'
+        pollster_definition['value_attribute'] = 'name'
+        pollster_definition['skip_sample_values'] = ['b2']
+        pollster = dynamic_pollster.DynamicPollster(pollster_definition)
+        samples = pollster.get_samples(fake_manager, None, ['http://test.com'])
+        self.assertEqual(['a1', 'c3'], list(map(lambda s: s.volume, samples)))
 
     def test_all_required_fields_ok(self):
         pollster = dynamic_pollster.DynamicPollster(
@@ -112,8 +230,7 @@ class TestDynamicPollster(base.BaseTestCase):
             False, pollster.pollster_definitions['preserve_mapped_metadata'])
 
     def test_all_required_fields_exceptions(self):
-        for key in dynamic_pollster.\
-                DynamicPollster.REQUIRED_POLLSTER_FIELDS:
+        for key in REQUIRED_POLLSTER_FIELDS:
             pollster_definition = copy.deepcopy(
                 self.pollster_definition_only_required_fields)
             pollster_definition.pop(key)
@@ -148,7 +265,8 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        self.assertEqual("endpoint:test", pollster.default_discovery)
+        self.assertEqual("endpoint:test", pollster.definitions.sample_gatherer
+                         .default_discovery)
 
     @mock.patch('keystoneclient.v2_0.client.Client')
     def test_execute_request_get_samples_empty_response(self, client_mock):
@@ -161,9 +279,10 @@ class TestDynamicPollster(base.BaseTestCase):
 
         client_mock.session.get.return_value = return_value
 
-        samples = pollster.execute_request_get_samples(
-            keystone_client=client_mock,
-            resource="https://endpoint.server.name/")
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples(
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
 
         self.assertEqual(0, len(samples))
 
@@ -179,9 +298,10 @@ class TestDynamicPollster(base.BaseTestCase):
 
         client_mock.session.get.return_value = return_value
 
-        samples = pollster.execute_request_get_samples(
-            keystone_client=client_mock,
-            resource="https://endpoint.server.name/")
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples(
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
 
         self.assertEqual(3, len(samples))
 
@@ -197,7 +317,8 @@ class TestDynamicPollster(base.BaseTestCase):
         client_mock.session.get.return_value = return_value
 
         exception = self.assertRaises(requests.HTTPError,
-                                      pollster.execute_request_get_samples,
+                                      pollster.definitions.sample_gatherer.
+                                      execute_request_get_samples,
                                       keystone_client=client_mock,
                                       resource="https://endpoint.server.name/")
         self.assertEqual("Mock HTTP error.", str(exception))
@@ -211,7 +332,8 @@ class TestDynamicPollster(base.BaseTestCase):
         self.pollster_definition_only_required_fields['metadata_mapping'] = {}
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
-        pollster.generate_new_metadata_fields(metadata)
+        pollster.definitions.sample_extractor.generate_new_metadata_fields(
+            metadata,  self.pollster_definition_only_required_fields)
 
         self.assertEqual(metadata_before_call, metadata)
 
@@ -227,7 +349,8 @@ class TestDynamicPollster(base.BaseTestCase):
             'preserve_mapped_metadata'] = True
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
-        pollster.generate_new_metadata_fields(metadata)
+        pollster.definitions.sample_extractor.generate_new_metadata_fields(
+            metadata, self.pollster_definition_only_required_fields)
 
         self.assertEqual(expected_metadata, metadata)
 
@@ -244,7 +367,8 @@ class TestDynamicPollster(base.BaseTestCase):
             'preserve_mapped_metadata'] = False
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
-        pollster.generate_new_metadata_fields(metadata)
+        pollster.definitions.sample_extractor.generate_new_metadata_fields(
+            metadata, self.pollster_definition_only_required_fields)
 
         self.assertEqual(expected_clean_metadata, metadata)
 
@@ -255,7 +379,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         value_to_be_mapped = "test"
         expected_value = value_to_be_mapped
-        value = pollster.execute_value_mapping(value_to_be_mapped)
+        value = pollster.definitions.value_mapper. \
+            execute_value_mapping(value_to_be_mapped)
 
         self.assertEqual(expected_value, value)
 
@@ -267,7 +392,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         value_to_be_mapped = "test"
         expected_value = -1
-        value = pollster.execute_value_mapping(value_to_be_mapped)
+        value = pollster.definitions.value_mapper. \
+            execute_value_mapping(value_to_be_mapped)
 
         self.assertEqual(expected_value, value)
 
@@ -282,7 +408,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         value_to_be_mapped = "test"
         expected_value = 0
-        value = pollster.execute_value_mapping(value_to_be_mapped)
+        value = pollster.definitions.value_mapper. \
+            execute_value_mapping(value_to_be_mapped)
 
         self.assertEqual(expected_value, value)
 
@@ -294,7 +421,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         value_to_be_mapped = "test"
         expected_value = 'new-value'
-        value = pollster.execute_value_mapping(value_to_be_mapped)
+        value = pollster.definitions.value_mapper. \
+            execute_value_mapping(value_to_be_mapped)
 
         self.assertEqual(expected_value, value)
 
@@ -306,7 +434,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(None, next(samples))
 
     @mock.patch('ceilometer.polling.dynamic_pollster.'
-                'DynamicPollster.execute_request_get_samples')
+                'PollsterSampleGatherer.execute_request_get_samples')
     def test_get_samples_empty_samples(self, execute_request_get_samples_mock):
         execute_request_get_samples_mock.side_effect = []
 
@@ -346,7 +474,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return samples_list
 
     @mock.patch.object(
-        dynamic_pollster.DynamicPollster,
+        dynamic_pollster.PollsterSampleGatherer,
         'execute_request_get_samples',
         fake_sample_list)
     def test_get_samples(self):
@@ -383,7 +511,8 @@ class TestDynamicPollster(base.BaseTestCase):
             self.pollster_definition_only_required_fields)
 
         response = [{"object1-attr1": 1}, {"object1-attr2": 2}]
-        entries = pollster.retrieve_entries_from_response(response)
+        entries = pollster.definitions.sample_gatherer. \
+            retrieve_entries_from_response(response)
 
         self.assertEqual(response, entries)
 
@@ -401,7 +530,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         response = {"first": first_entries_from_response,
                     "second": second_entries_from_response}
-        entries = pollster.retrieve_entries_from_response(response)
+        entries = pollster.definitions.sample_gatherer. \
+            retrieve_entries_from_response(response)
 
         self.assertEqual(first_entries_from_response, entries)
 
@@ -418,7 +548,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         response = {"first": first_entries_from_response,
                     "second": second_entries_from_response}
-        entries = pollster.retrieve_entries_from_response(response)
+        entries = pollster.definitions.sample_gatherer. \
+            retrieve_entries_from_response(response)
 
         self.assertEqual(second_entries_from_response, entries)
 
@@ -431,8 +562,8 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        returned_value = pollster.retrieve_attribute_nested_value(
-            json_object, key)
+        returned_value = pollster.definitions.sample_extractor.\
+            retrieve_attribute_nested_value(json_object, key)
 
         self.assertEqual(value, returned_value)
 
@@ -447,8 +578,8 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        returned_value = pollster.retrieve_attribute_nested_value(
-            json_object, key)
+        returned_value = pollster.definitions.sample_extractor. \
+            retrieve_attribute_nested_value(json_object, key)
 
         self.assertEqual(sub_value, returned_value)
 
@@ -465,8 +596,8 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        returned_value = pollster.retrieve_attribute_nested_value(
-            json_object, key)
+        returned_value = pollster.definitions.sample_extractor.\
+            retrieve_attribute_nested_value(json_object, key)
 
         self.assertEqual(expected_value_after_operations, returned_value)
 
@@ -496,7 +627,83 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        returned_value = pollster.retrieve_attribute_nested_value(json_object,
-                                                                  key)
+        returned_value = pollster.definitions.sample_extractor.\
+            retrieve_attribute_nested_value(json_object, key)
 
         self.assertEqual(expected_value_after_operations, returned_value)
+
+    def fake_sample_multi_metric(self, keystone_client=None, resource=None):
+        multi_metric_sample_list = [
+            {"categories": [
+                {
+                    "bytes_received": 0,
+                    "bytes_sent": 0,
+                    "category": "create_bucket",
+                    "ops": 2,
+                    "successful_ops": 2
+                },
+                {
+                    "bytes_received": 0,
+                    "bytes_sent": 2120428,
+                    "category": "get_obj",
+                    "ops": 46,
+                    "successful_ops": 46
+                },
+                {
+                    "bytes_received": 0,
+                    "bytes_sent": 21484,
+                    "category": "list_bucket",
+                    "ops": 8,
+                    "successful_ops": 8
+                },
+                {
+                    "bytes_received": 6889056,
+                    "bytes_sent": 0,
+                    "category": "put_obj",
+                    "ops": 46,
+                    "successful_ops": 6
+                }],
+                "total": {
+                    "bytes_received": 6889056,
+                    "bytes_sent": 2141912,
+                    "ops": 102,
+                    "successful_ops": 106
+                },
+                "user": "test-user"}]
+        return multi_metric_sample_list
+
+    @mock.patch.object(
+        dynamic_pollster.PollsterSampleGatherer,
+        'execute_request_get_samples',
+        fake_sample_multi_metric)
+    def test_get_samples_multi_metric_pollster(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.multi_metric_pollster_definition)
+
+        fake_manager = self.FakeManager()
+        samples = pollster.get_samples(
+            fake_manager, None, ["https://endpoint.server.name.com/"])
+
+        samples_list = list(samples)
+        self.assertEqual(4, len(samples_list))
+
+        create_bucket_sample = [
+            s for s in samples_list
+            if s.name == "test-pollster.create_bucket"][0]
+
+        get_obj_sample = [
+            s for s in samples_list
+            if s.name == "test-pollster.get_obj"][0]
+
+        list_bucket_sample = [
+            s for s in samples_list
+            if s.name == "test-pollster.list_bucket"][0]
+
+        put_obj_sample = [
+            s for s in samples_list
+            if s.name == "test-pollster.put_obj"][0]
+
+        self.assertEqual(2, create_bucket_sample.volume)
+        self.assertEqual(46, get_obj_sample.volume)
+        self.assertEqual(8, list_bucket_sample.volume)
+        self.assertEqual(46, put_obj_sample.volume)

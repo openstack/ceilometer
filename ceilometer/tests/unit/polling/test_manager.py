@@ -27,9 +27,10 @@ from stevedore import extension
 from ceilometer.compute import discovery as nova_discover
 from ceilometer.hardware import discovery
 from ceilometer.polling.dynamic_pollster import DynamicPollster
+from ceilometer.polling.dynamic_pollster import \
+    NonOpenStackApisPollsterDefinition
+from ceilometer.polling.dynamic_pollster import SingleMetricPollsterDefinitions
 from ceilometer.polling import manager
-from ceilometer.polling.non_openstack_dynamic_pollster import \
-    NonOpenStackApisDynamicPollster
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 from ceilometer import service
@@ -900,10 +901,10 @@ class TestPollingAgentPartitioned(BaseAgent):
             'name': "test-pollster", 'sample_type': "gauge", 'unit': "test",
             'value_attribute': "volume", 'endpoint_type': "test",
             'url_path': "v1/test/endpoint/fake"}
-        pollster = self.mgr.instantiate_dynamic_pollster(
-            pollster_definition_only_required_fields)
+        pollster = DynamicPollster(pollster_definition_only_required_fields)
 
-        self.assertIsInstance(pollster, DynamicPollster)
+        self.assertIsInstance(pollster.definitions,
+                              SingleMetricPollsterDefinitions)
 
     def test_instantiate_dynamic_pollster_non_openstack_api(self):
         pollster_definition_only_required_fields = {
@@ -911,7 +912,7 @@ class TestPollingAgentPartitioned(BaseAgent):
             'value_attribute': "volume",
             'url_path': "v1/test/endpoint/fake", 'module': "module-name",
             'authentication_object': "authentication_object"}
-        pollster = self.mgr.instantiate_dynamic_pollster(
-            pollster_definition_only_required_fields)
+        pollster = DynamicPollster(pollster_definition_only_required_fields)
 
-        self.assertIsInstance(pollster, NonOpenStackApisDynamicPollster)
+        self.assertIsInstance(pollster.definitions,
+                              NonOpenStackApisPollsterDefinition)

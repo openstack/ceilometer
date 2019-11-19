@@ -376,3 +376,210 @@ following:
 * user_id_attribute
 * project_id_attribute
 * resource_id_attribute
+
+Multi metric dynamic pollsters (handling attribute values with list of objects)
+-------------------------------------------------------------------------------
+
+The initial idea for this feature comes from the `categories` fields that we
+can find in the `summary` object of the RadosGW API. Each user has a
+`categories` attribute in the response; in the `categories` list, we can find
+the object that presents in a granular fashion the consumption of different
+RadosGW API operations such as GET, PUT, POST, and may others.
+
+As follows we present an example of such a JSON response.
+
+.. code-block:: json
+
+  {
+      "entries": [
+          {
+              "buckets": [
+                  {
+                      "bucket": "",
+                      "categories": [
+                          {
+                              "bytes_received": 0,
+                              "bytes_sent": 40,
+                              "category": "list_buckets",
+                              "ops": 2,
+                              "successful_ops": 2
+                          }
+                      ],
+                      "epoch": 1572969600,
+                      "owner": "user",
+                      "time": "2019-11-21 00:00:00.000000Z"
+                  },
+                  {
+                      "bucket": "-",
+                      "categories": [
+                          {
+                              "bytes_received": 0,
+                              "bytes_sent": 0,
+                              "category": "get_obj",
+                              "ops": 1,
+                              "successful_ops": 0
+                          }
+                      ],
+                      "epoch": 1572969600,
+                      "owner": "someOtherUser",
+                      "time": "2019-11-21 00:00:00.000000Z"
+                  }
+              ]
+          }
+      ]
+      "summary": [
+          {
+              "categories": [
+                  {
+                      "bytes_received": 0,
+                      "bytes_sent": 0,
+                      "category": "create_bucket",
+                      "ops": 2,
+                      "successful_ops": 2
+                  },
+                  {
+                      "bytes_received": 0,
+                      "bytes_sent": 2120428,
+                      "category": "get_obj",
+                      "ops": 46,
+                      "successful_ops": 46
+                  },
+                  {
+                      "bytes_received": 0,
+                      "bytes_sent": 21484,
+                      "category": "list_bucket",
+                      "ops": 8,
+                      "successful_ops": 8
+                  },
+                  {
+                      "bytes_received": 6889056,
+                      "bytes_sent": 0,
+                      "category": "put_obj",
+                      "ops": 46,
+                      "successful_ops": 46
+                  }
+              ],
+              "total": {
+                  "bytes_received": 6889056,
+                  "bytes_sent": 2141912,
+                  "ops": 102,
+                  "successful_ops": 102
+              },
+              "user": "user"
+          },
+          {
+              "categories": [
+                  {
+                      "bytes_received": 0,
+                      "bytes_sent": 0,
+                      "category": "create_bucket",
+                      "ops": 1,
+                      "successful_ops": 1
+                  },
+                  {
+                      "bytes_received": 0,
+                      "bytes_sent": 0,
+                      "category": "delete_obj",
+                      "ops": 23,
+                      "successful_ops": 23
+                  },
+                  {
+                      "bytes_received": 0,
+                      "bytes_sent": 5371,
+                      "category": "list_bucket",
+                      "ops": 2,
+                      "successful_ops": 2
+                  },
+                  {
+                      "bytes_received": 3444350,
+                      "bytes_sent": 0,
+                      "category": "put_obj",
+                      "ops": 23,
+                      "successful_ops": 23
+                  }
+              ],
+              "total": {
+                  "bytes_received": 3444350,
+                  "bytes_sent": 5371,
+                  "ops": 49,
+                  "successful_ops": 49
+              },
+              "user": "someOtherUser"
+          }
+      ]
+  }
+
+In that context, and having in mind that we have APIs with similar data
+structures, we developed an extension for the dynamic pollster that enables
+multi-metric processing for a single pollster. It works as follows.
+
+The pollster name will contain a placeholder for the variable that
+identifies the "submetric". E.g. `dynamic.radosgw.api.request.{category}`.
+The placeholder `{category}` indicates the object's attribute that is in the
+list of objects that we use to load the sub metric name. Then, we must use a
+special notation in the `value_attribute` configuration to indicate that we are
+dealing with a list of objects. This is achieved via `[]` (brackets); for
+instance, in the `dynamic.radosgw.api.request.{category}`, we can use
+`[categories].ops` as the `value_attribute`. This indicates that the value we
+retrieve is a list of objects, and when the dynamic pollster processes it, we
+want it (the pollster) to load the `ops` value for the sub metrics being
+generated.
+
+Examples on how to create multi-metric pollster to handle data from RadosGW API
+are presented as follows:
+
+.. code-block:: yaml
+
+  ---
+
+  - name: "dynamic.radosgw.api.request.{category}"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "[categories].ops"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters:  "<access_key>, <secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user | value.split('$')[0]"
+    project_id_attribute: "user | value.split('$') | value[0]"
+    resource_id_attribute: "user  | value.split('$') | value[0]"
+    response_entries_key: "summary"
+
+  - name: "dynamic.radosgw.api.request.successful_ops.{category}"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "[categories].successful_ops"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters:  "<access_key>, <secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user | value.split('$')[0]"
+    project_id_attribute: "user | value.split('$') | value[0]"
+    resource_id_attribute: "user  | value.split('$') | value[0]"
+    response_entries_key: "summary"
+
+  - name: "dynamic.radosgw.api.bytes_sent.{category}"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "[categories].bytes_sent"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters:  "<access_key>, <secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user | value.split('$')[0]"
+    project_id_attribute: "user | value.split('$') | value[0]"
+    resource_id_attribute: "user  | value.split('$') | value[0]"
+    response_entries_key: "summary"
+
+  - name: "dynamic.radosgw.api.bytes_received.{category}"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "[categories].bytes_received"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters:  "<access_key>, <secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user | value.split('$')[0]"
+    project_id_attribute: "user | value.split('$') | value[0]"
+    resource_id_attribute: "user  | value.split('$') | value[0]"
+    response_entries_key: "summary"
