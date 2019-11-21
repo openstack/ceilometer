@@ -40,6 +40,7 @@ from ceilometer import declarative
 from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer.polling import dynamic_pollster
+from ceilometer.polling import non_openstack_dynamic_pollster
 from ceilometer.polling import plugin_base
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
@@ -338,10 +339,8 @@ class AgentManager(cotyledon.Service):
                     LOG.info("Loading dynamic pollster [%s] from file [%s].",
                              pollster_name, pollsters_definitions_file)
                     try:
-                        dynamic_pollster_object = dynamic_pollster.\
-                            DynamicPollster(pollster_cfg, self.conf)
-                        pollsters_definitions[pollster_name] = \
-                            dynamic_pollster_object
+                        pollsters_definitions[pollster_name] =\
+                            self.instantiate_dynamic_pollster(pollster_cfg)
                     except Exception as e:
                         LOG.error(
                             "Error [%s] while loading dynamic pollster [%s].",
@@ -355,6 +354,13 @@ class AgentManager(cotyledon.Service):
         LOG.debug("Total of dynamic pollsters [%s] loaded.",
                   len(pollsters_definitions))
         return pollsters_definitions.values()
+
+    def instantiate_dynamic_pollster(self, pollster_cfg):
+        if 'module' in pollster_cfg:
+            return non_openstack_dynamic_pollster\
+                .NonOpenStackApisDynamicPollster(pollster_cfg, self.conf)
+        else:
+            return dynamic_pollster.DynamicPollster(pollster_cfg, self.conf)
 
     @staticmethod
     def _get_ext_mgr(namespace, *args, **kwargs):

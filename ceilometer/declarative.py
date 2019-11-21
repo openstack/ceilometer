@@ -24,7 +24,7 @@ LOG = log.getLogger(__name__)
 
 
 class DefinitionException(Exception):
-    def __init__(self, message, definition_cfg):
+    def __init__(self, message, definition_cfg=None):
         msg = '%s %s: %s' % (self.__class__.__name__, definition_cfg, message)
         super(DefinitionException, self).__init__(msg)
         self.brief_message = message
@@ -43,6 +43,10 @@ class ResourceDefinitionException(DefinitionException):
 
 
 class DynamicPollsterDefinitionException(DefinitionException):
+    pass
+
+
+class NonOpenStackApisDynamicPollsterException(DefinitionException):
     pass
 
 

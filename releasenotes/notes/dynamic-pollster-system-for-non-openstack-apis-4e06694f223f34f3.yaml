@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add the support for non-OpenStack APIs in the dynamic pollster system.
+    This extension enables operators to create pollster on the fly to handle
+    metrics from systems such as the RadosGW API.

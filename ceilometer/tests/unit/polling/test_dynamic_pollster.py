@@ -11,7 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Tests for ceilometer/central/manager.py
+"""Tests for ceilometer/polling/dynamic_pollster.py
 """
 
 
@@ -162,7 +162,8 @@ class TestDynamicPollster(base.BaseTestCase):
         client_mock.session.get.return_value = return_value
 
         samples = pollster.execute_request_get_samples(
-            client_mock, "https://endpoint.server.name/")
+            keystone_client=client_mock,
+            resource="https://endpoint.server.name/")
 
         self.assertEqual(0, len(samples))
 
@@ -179,7 +180,8 @@ class TestDynamicPollster(base.BaseTestCase):
         client_mock.session.get.return_value = return_value
 
         samples = pollster.execute_request_get_samples(
-            client_mock, "https://endpoint.server.name/")
+            keystone_client=client_mock,
+            resource="https://endpoint.server.name/")
 
         self.assertEqual(3, len(samples))
 
@@ -196,8 +198,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         exception = self.assertRaises(requests.HTTPError,
                                       pollster.execute_request_get_samples,
-                                      client_mock,
-                                      "https://endpoint.server.name/")
+                                      keystone_client=client_mock,
+                                      resource="https://endpoint.server.name/")
         self.assertEqual("Mock HTTP error.", str(exception))
 
     def test_generate_new_metadata_fields_no_metadata_mapping(self):
@@ -325,7 +327,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(0, len(samples_list))
 
-    def fake_sample_list(self, keystone_client=None, endpoint=None):
+    def fake_sample_list(self, keystone_client=None, resource=None):
         samples_list = list()
         samples_list.append(
             {'name': "sample5", 'volume': 5, 'description': "desc-sample-5",

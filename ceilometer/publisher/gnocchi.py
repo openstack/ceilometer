@@ -338,9 +338,10 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         for resource_id, samples_of_resource in resource_grouped_samples:
             # NOTE(sileht): / is forbidden by Gnocchi
             resource_id = resource_id.replace('/', '_')
-
             for sample in samples_of_resource:
                 metric_name = sample.name
+                LOG.debug("Processing sample [%s] for resource ID [%s].",
+                          sample, resource_id)
                 rd = self.metric_map.get(metric_name)
                 if rd is None:
                     if metric_name not in self._already_logged_metric_names:

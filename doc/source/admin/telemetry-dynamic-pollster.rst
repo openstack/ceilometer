@@ -24,14 +24,12 @@ dynamic pollster system:
    fashion. This feature is "a nice" to have, but is currently not
    implemented.
 
-*  non-OpenStack APIs such as RadosGW (currently in development)
-
 *  APIs that return a list of entries directly, without a first key for the
    list. An example is Aodh alarm list.
 
 
-The dynamic pollsters system configuration
-------------------------------------------
+The dynamic pollsters system configuration (for OpenStack APIs)
+---------------------------------------------------------------
 Each YAML file in the dynamic pollster feature can use the following
 attributes to define a dynamic pollster:
 
@@ -243,3 +241,91 @@ desires):
   metadata_mapping:
     name: "display_name"
   default_value: 0
+
+The dynamic pollsters system configuration (for non-OpenStack APIs)
+-------------------------------------------------------------------
+
+The dynamic pollster system can also be used for non-OpenStack APIs.
+to configure non-OpenStack APIs, one can use all but one attribute of
+the Dynamic pollster system. The attribute that is not supported is
+the ``endpoint_type``. The dynamic pollster system for non-OpenStack APIs
+is activated automatically when one uses the configurations ``module``.
+
+The extra parameters that are available when using the Non-OpenStack
+dynamic pollster sub-subsystem are the following:
+
+*  ``module``: required parameter. It is the python module name that Ceilometer
+   has to load to use the authentication object when executing requests against
+   the API. For instance, if one wants to create a pollster to gather data from
+   RadosGW, he/she can use the ``awsauth`` python module.
+
+* ``authentication_object``: mandatory parameter. The name of the class that we
+  can find in the ``module`` that Ceilometer will use as the authentication
+  object in the request. For instance, when using the ``awsauth`` python module
+  to gather data from RadosGW, one can use the authentication object as
+  ``S3Auth``.
+
+* ``authentication_parameters``: optional parameter. It is a comma separated
+  value that will be used to instantiate the ``authentication_object``. For
+  instance, if we gather data from RadosGW, and we use the ``S3Auth`` class,
+  the ``authentication_parameters`` can be configured as
+  ``<rados_gw_access_key>, rados_gw_secret_key, rados_gw_host_name``.
+
+* ``barbican_secret_id``: optional parameter. The Barbican secret ID,
+  from which, Ceilometer can retrieve the comma separated values of the
+  ``authentication_parameters``.
+
+* ``user_id_attribute``: optional parameter. The name of the attribute in the
+  entries that are processed from ``response_entries_key`` elements that
+  will be mapped to ``user_id`` attribute that is sent to Gnocchi.
+
+* ``project_id_attribute``: optional parameter. The name of the attribute in
+  the entries that are processed from ``response_entries_key`` elements that
+  will be mapped to ``project_id`` attribute that is sent to Gnocchi.
+
+* ``resource_id_attribute``: optional parameter. The name of the attribute
+  in the entries that are processed from ``response_entries_key`` elements that
+  will be mapped to ``id`` attribute that is sent to Gnocchi.
+
+As follows we present an example on how to convert the hard-coded pollster
+for `radosgw.api.request` metric to the dynamic pollster model:
+
+.. code-block:: yaml
+
+  ---
+
+  - name: "dynamic.radosgw.api.request"
+  sample_type: "gauge"
+  unit: "request"
+  value_attribute: "total.ops"
+  url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+  module: "awsauth"
+  authentication_object: "S3Auth"
+  authentication_parameters: "<access_key>, <secret_key>,
+  <rados_gateway_server>"
+  user_id_attribute: "user"
+  project_id_attribute: "user"
+  resource_id_attribute: "user"
+  response_entries_key: "summary"
+
+We can take that example a bit further, and instead of gathering the `total
+.ops` variable, which counts for all the requests (even the unsuccessful
+ones), we can use the `successful_ops`.
+
+.. code-block:: yaml
+
+  ---
+
+  - name: "dynamic.radosgw.api.request.successful_ops"
+  sample_type: "gauge"
+  unit: "request"
+  value_attribute: "total.successful_ops"
+  url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+  module: "awsauth"
+  authentication_object: "S3Auth"
+  authentication_parameters: "<access_key>, <secret_key>,
+  <rados_gateway_server>"
+  user_id_attribute: "user"
+  project_id_attribute: "user"
+  resource_id_attribute: "user"
+  response_entries_key: "summary"
