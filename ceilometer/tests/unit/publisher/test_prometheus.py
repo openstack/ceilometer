@@ -95,12 +95,12 @@ class TestPrometheusPublisher(base.BaseTestCase):
             publisher.publish_samples(self.sample_data)
 
         data = """# TYPE alpha counter
-alpha{resource_id="%s"} 1
-beta{resource_id="%s"} 3
+alpha{resource_id="%s", project_id="test"} 1
+beta{resource_id="%s", project_id="test"} 3
 # TYPE gamma gauge
-gamma{resource_id="%s"} 5
+gamma{resource_id="%s", project_id="test"} 5
 # TYPE delta_epsilon gauge
-delta_epsilon{resource_id="%s"} 7
+delta_epsilon{resource_id="%s", project_id="test"} 7
 """ % (self.resource_id, self.resource_id, self.resource_id, self.resource_id)
 
         expected = [
@@ -127,12 +127,12 @@ delta_epsilon{resource_id="%s"} 7
             publisher.publish_samples(self.sample_data)
 
         data = """# TYPE alpha counter
-alpha{resource_id="%s"} 1
-beta{resource_id="%s"} 3
+alpha{resource_id="%s", project_id="test"} 1
+beta{resource_id="%s", project_id="test"} 3
 # TYPE gamma gauge
-gamma{resource_id="%s"} 5
+gamma{resource_id="%s", project_id="test"} 5
 # TYPE delta_epsilon gauge
-delta_epsilon{resource_id="%s"} 7
+delta_epsilon{resource_id="%s", project_id="test"} 7
 """ % (self.resource_id, self.resource_id, self.resource_id, self.resource_id)
 
         expected = [

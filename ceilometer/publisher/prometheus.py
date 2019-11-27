@@ -71,8 +71,8 @@ class PrometheusPublisher(http.HttpPublisher):
             # data += '%s{resource_id="%s"} %s %d\n' % (
             #     curated_sname, s.resource_id, s.volume, timestamp_ms)
 
-            data += '%s{resource_id="%s"} %s\n' % (
-                curated_sname, s.resource_id, s.volume)
+            data += '%s{resource_id="%s", project_id="%s"} %s\n' % (
+                curated_sname, s.resource_id, s.project_id, s.volume)
         self._do_post(data)
 
     @staticmethod
