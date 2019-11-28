@@ -395,3 +395,15 @@ resources:
     attributes:
       controller: resource_metadata.controller
       switch: resource_metadata.switch
+
+  - resource_type: loadbalancer
+    metrics:
+      network.services.lb.outgoing.bytes:
+      network.services.lb.incoming.bytes:
+      network.services.lb.pool:
+      network.services.lb.listener:
+      network.services.lb.member:
+      network.services.lb.health_monitor:
+      network.services.lb.loadbalancer:
+      network.services.lb.total.connections:
+      network.services.lb.active.connections:
