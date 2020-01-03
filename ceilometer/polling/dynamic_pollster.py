@@ -286,6 +286,6 @@ class DynamicPollster(plugin_base.PollsterBase):
 
                 value = eval(operation.strip())
 
-                LOG.debug("Result [%s] of operation [%s] against value [%s].",
+                LOG.debug("Result [%s] of operation [%s].",
                           value, operation)
         return value
