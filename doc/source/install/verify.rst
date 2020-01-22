@@ -14,8 +14,7 @@ integration for additional services contain more meters.
 .. note::
 
    The following uses Gnocchi to verify data. Alternatively, data can be
-   published to a file backend temporarily by adding ``meter_dispatchers=file``
-   or a ``file://`` publisher.
+   published to a file backend temporarily by using a ``file://`` publisher.
 
 #. Source the ``admin`` credentials to gain access to
    admin-only CLI commands:
