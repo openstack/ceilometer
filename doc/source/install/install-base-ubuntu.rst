@@ -13,7 +13,7 @@ Before you install and configure the Telemetry service, you must
 configure a target to send metering data to. The recommended endpoint
 is Gnocchi_.
 
-.. _Gnocchi: http://gnocchi.xyz
+.. _Gnocchi: https://gnocchi.osci.io
 .. include:: install-base-prereq-common.inc
 
 Install Gnocchi

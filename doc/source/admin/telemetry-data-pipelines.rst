@@ -144,7 +144,7 @@ in the Identity service as Ceilometer discovers the exact path via the Identity
 service.
 
 More details on how to enable and configure gnocchi can be found on its
-`official documentation page <http://gnocchi.xyz>`__.
+`official documentation page <https://gnocchi.osci.io>`__.
 
 prometheus
 ``````````

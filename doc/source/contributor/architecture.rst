@@ -38,7 +38,7 @@ can send alerts when user defined rules are broken. Lastly, Panko_ is the event
 storage project designed to capture document-oriented data such as logs and
 system event actions.
 
-.. _Gnocchi: http://gnocchi.xyz/
+.. _Gnocchi: https://gnocchi.osci.io/
 .. _Aodh: https://docs.openstack.org/aodh/latest/
 .. _Panko: https://docs.openstack.org/panko/latest/
 

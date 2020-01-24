@@ -46,7 +46,7 @@ models have their own storage service and each support various back ends.
 
 The list of supported base back ends for measurements:
 
--  `gnocchi <http://gnocchi.xyz/>`__
+-  `gnocchi <https://gnocchi.osci.io/>`__
 
 -  `Monasca <https://docs.openstack.org/monasca-api/latest/>`__
 

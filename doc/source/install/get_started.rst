@@ -42,4 +42,4 @@ analysis.
    storage and statistical analysis of Ceilometer data, Gnocchi_ is
    recommended.
 
-.. _Gnocchi: http://gnocchi.xyz
+.. _Gnocchi: https://gnocchi.osci.io
