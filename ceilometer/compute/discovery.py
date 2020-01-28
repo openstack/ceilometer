@@ -24,7 +24,6 @@ from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 
-
 try:
     import libvirt
 except ImportError:
@@ -147,7 +146,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                     raise
                 LOG.error(
                     "Fail to get domain uuid %s metadata, libvirtError: %s",
-                    domain.UUIDString(), e.message)
+                    domain.UUIDString(), e)
                 continue
 
             full_xml = etree.fromstring(domain.XMLDesc())
