@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    [`bug 1848286 <https://bugs.launchpad.net/charm-octavia/+bug/1848286>`_]
+    Enable load balancer metrics by adding the loadbalancer resource type,
+    allowing Gnocchi to capture measurement data for Octavia load balancers.
