@@ -9,20 +9,6 @@
       - openstack/devstack-gate
       - openstack/ceilometer
 
-- job:
-    name: telemetry-tox-py37
-    parent: openstack-tox
-    timeout: 2400
-    irrelevant-files:
-      - ^.*\.rst$
-      - ^api-ref/.*$
-      - ^doc/.*$
-      - ^releasenotes/.*$
-    vars:
-      tox_envlist: py37
-      bindep_profile: test py37
-    nodeset: fedora-latest
-
 - project:
     templates:
       - openstack-python-jobs
@@ -32,22 +18,38 @@
       - release-notes-jobs
     check:
       jobs:
-        - telemetry-tox-py37
         - openstack-tox-cover
         - grenade-dsvm-ceilometer:
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
-        - telemetry-dsvm-integration
+              - ^reno.yaml$
+        - telemetry-dsvm-integration:
+            voting: false
+            irrelevant-files:
+              - ^(test-|)requirements.txt$
+              - ^setup.cfg$
+              - ^reno.yaml$
+              - ^doc/.*$
+              - ^.*\.rst$
+              - ^releasenotes/.*$
     gate:
       queue: telemetry
       jobs:
-        - telemetry-tox-py37
         - grenade-dsvm-ceilometer:
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
-        - telemetry-dsvm-integration
+              - ^reno.yaml$
+        - telemetry-dsvm-integration:
+            voting: false
+            irrelevant-files:
+              - ^(test-|)requirements.txt$
+              - ^setup.cfg$
+              - ^reno.yaml$
+              - ^doc/.*$
+              - ^.*\.rst$
+              - ^releasenotes/.*$
     experimental:
       jobs:
         # TripleO jobs that deploy Telemetry.
