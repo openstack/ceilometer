@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Add availability_zone attribute to gnocchi instance resources.
+    Populates this attribute by consuming instance.create.end events.
+upgrade:
+  - |
+    To take advantage of this new feature you will need to update your
+    gnocchi_resources.yaml file. See the example file for an example.
+    You will need to ensure all required attributes of an instance
+    are specified in the event_attributes.

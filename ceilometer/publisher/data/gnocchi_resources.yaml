@@ -101,8 +101,16 @@ resources:
       flavor_name: resource_metadata.(instance_type|(flavor.name)|flavor_name)
       server_group: resource_metadata.user_metadata.server_group
     event_delete: compute.instance.delete.start
+    event_create: compute.instance.create.end
     event_attributes:
       id: instance_id
+      display_name: display_name
+      host: host
+      availability_zone: availability_zone
+      flavor_id: instance_type_id
+      flavor_name: instance_type
+      user_id: user_id
+      project_id: project_id
     event_associated_resources:
       instance_network_interface: '{"=": {"instance_id": "%s"}}'
       instance_disk: '{"=": {"instance_id": "%s"}}'
