@@ -50,7 +50,7 @@ INSTANCE_DELETE_START = models.Event(
             models.Trait('tenant_id', 1, u'7c150a59fe714e6f9263774af9688f0e'),
             models.Trait('root_gb', 2, 0),
             models.Trait('ephemeral_gb', 2, 0),
-            models.Trait('instance_type_id', 2, 2),
+            models.Trait('instance_type_id', 2, u'2'),
             models.Trait('vcpus', 2, 1),
             models.Trait('memory_mb', 2, 512),
             models.Trait(
