@@ -13,8 +13,8 @@
 # under the License.
 
 import json
+from unittest import mock
 
-import mock
 from oslotest import base
 
 from ceilometer.objectstore import rgw_client

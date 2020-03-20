@@ -16,9 +16,9 @@
 
 import abc
 import traceback
+from unittest import mock
 
 import fixtures
-import mock
 from oslo_utils import timeutils
 import six
 

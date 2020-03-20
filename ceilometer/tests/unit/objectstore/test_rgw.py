@@ -13,10 +13,10 @@
 # under the License.
 
 import collections
+from unittest import mock
 
 import fixtures
 from keystoneauth1 import exceptions
-import mock
 from oslotest import base
 import testscenarios.testcase
 

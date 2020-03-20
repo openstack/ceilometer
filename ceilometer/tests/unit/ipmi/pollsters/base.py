@@ -13,9 +13,9 @@
 # under the License.
 
 import abc
+from unittest import mock
 
 import fixtures
-import mock
 import six
 
 from ceilometer.polling import manager

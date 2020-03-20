@@ -12,15 +12,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/publisher/http.py
-"""
+"""Tests for ceilometer/publisher/http.py"""
 
 import datetime
-import mock
+from unittest import mock
+import uuid
+
 from oslotest import base
 import requests
 from six.moves.urllib import parse as urlparse
-import uuid
 
 from ceilometer.event import models as event
 from ceilometer.publisher import http

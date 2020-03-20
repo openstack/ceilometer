@@ -12,16 +12,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import mock
+from unittest import mock
 
+from monascaclient import exc
 from oslo_utils import netutils
 from oslotest import base
+import tenacity
 
 from ceilometer import monasca_client
 from ceilometer import service
-
-from monascaclient import exc
-import tenacity
 
 
 class TestMonascaClient(base.BaseTestCase):

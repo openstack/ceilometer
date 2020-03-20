@@ -18,9 +18,9 @@
 """Tests for ceilometer agent manager"""
 import copy
 import datetime
-import fixtures
-import mock
+from unittest import mock
 
+import fixtures
 from keystoneauth1 import exceptions as ka_exceptions
 from stevedore import extension
 
@@ -34,7 +34,6 @@ from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 from ceilometer import service
-
 from ceilometer.tests import base
 
 

@@ -11,12 +11,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Tests for ceilometer/polling/non_openstack_dynamic_pollster.py
-"""
+"""Tests for ceilometer/polling/non_openstack_dynamic_pollster.py"""
 import copy
 import sys
+from unittest import mock
 
-import mock
+from oslotest import base
 import requests
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
@@ -27,9 +27,6 @@ from ceilometer.polling.dynamic_pollster import \
     NonOpenStackApisPollsterDefinition
 from ceilometer.polling.dynamic_pollster import PollsterSampleGatherer
 from ceilometer.polling.dynamic_pollster import SingleMetricPollsterDefinitions
-
-
-from oslotest import base
 
 REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit', 'value_attribute',
                             'url_path', 'module', 'authentication_object']

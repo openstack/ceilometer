@@ -14,12 +14,12 @@
 # under the License.
 
 import os
+from unittest import mock
 import uuid
 
 import fixtures
 from gnocchiclient import exceptions as gnocchi_exc
 from keystoneauth1 import exceptions as ka_exceptions
-import mock
 from oslo_config import fixture as config_fixture
 from oslo_utils import fileutils
 from oslo_utils import fixture as utils_fixture

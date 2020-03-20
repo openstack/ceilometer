@@ -10,16 +10,15 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer.meter.notifications
-"""
+"""Tests for ceilometer.meter.notifications"""
 import copy
-import fixtures
-import mock
-import six
-import yaml
+from unittest import mock
 
+import fixtures
 from oslo_utils import encodeutils
 from oslo_utils import fileutils
+import six
+import yaml
 
 from ceilometer import declarative
 from ceilometer.meter import notifications

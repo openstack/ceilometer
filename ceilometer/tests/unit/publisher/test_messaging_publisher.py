@@ -12,12 +12,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/publisher/messaging.py
-"""
+"""Tests for ceilometer/publisher/messaging.py"""
 import datetime
+from unittest import mock
 import uuid
 
-import mock
 import oslo_messaging
 from oslo_messaging._drivers import impl_kafka as kafka_driver
 from oslo_utils import netutils

@@ -11,10 +11,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import datetime
+import iso8601
+from unittest import mock
 
 import fixtures
-import iso8601
-import mock
 import testtools
 
 try:

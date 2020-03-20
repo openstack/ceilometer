@@ -12,10 +12,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/hardware/inspector/snmp/inspector.py
-"""
+"""Tests for ceilometer/hardware/inspector/snmp/inspector.py"""
+from unittest import mock
+
 import fixtures
-import mock
 from oslo_utils import netutils
 from pysnmp.proto import rfc1905
 import six

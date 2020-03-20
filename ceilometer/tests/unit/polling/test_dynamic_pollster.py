@@ -11,20 +11,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Tests for ceilometer/polling/dynamic_pollster.py
-"""
+"""Tests for ceilometer/polling/dynamic_pollster.py"""
+import copy
+import logging
+from unittest import mock
 
 from oslotest import base
+import requests
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
 from ceilometer.polling import dynamic_pollster
 from ceilometer import sample
-
-import copy
-import logging
-import mock
-
-import requests
 
 LOG = logging.getLogger(__name__)
 

@@ -15,8 +15,8 @@
 """Tests for Ceilometer notify daemon."""
 
 import time
+from unittest import mock
 
-import mock
 from oslo_utils import fileutils
 import six
 import yaml

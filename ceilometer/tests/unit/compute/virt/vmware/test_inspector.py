@@ -16,7 +16,8 @@
 Tests for VMware vSphere inspector.
 """
 
-import mock
+from unittest import mock
+
 from oslo_vmware import api
 from oslotest import base
 

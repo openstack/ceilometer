@@ -13,14 +13,13 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for ceilometer/publisher/monasca.py
-"""
+"""Tests for ceilometer/publisher/monasca.py"""
 
 import datetime
 import fixtures
 import time
+from unittest import mock
 
-import mock
 from oslotest import base
 
 from ceilometer import monasca_client as mon_client

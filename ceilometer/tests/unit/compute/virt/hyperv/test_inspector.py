@@ -16,8 +16,8 @@ Tests for Hyper-V inspector.
 """
 
 import sys
+from unittest import mock
 
-import mock
 from os_win import exceptions as os_win_exc
 from oslo_utils import units
 from oslotest import base

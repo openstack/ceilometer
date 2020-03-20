@@ -13,12 +13,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import mock
-import six
-import yaml
+from unittest import mock
 
 import fixtures
 from oslo_utils import fileutils
+import six
+import yaml
 
 from ceilometer import declarative
 from ceilometer.hardware.inspector import base as inspector_base

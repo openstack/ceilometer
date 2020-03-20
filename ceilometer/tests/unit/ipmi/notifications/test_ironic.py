@@ -12,10 +12,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for producing IPMI sample messages from notification events.
-"""
+"""Tests for producing IPMI sample messages from notification events."""
 
-import mock
+from unittest import mock
+
 from oslotest import base
 
 from ceilometer.ipmi.notifications import ironic as ipmi

@@ -13,9 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 """Tests for Ceilometer notify daemon."""
+from unittest import mock
 
 import fixtures
-import mock
 import oslo_messaging
 from oslo_utils import fileutils
 import six

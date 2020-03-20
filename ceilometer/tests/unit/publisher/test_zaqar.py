@@ -12,10 +12,11 @@
 # under the License.
 
 import datetime
-import mock
+from unittest import mock
+import uuid
+
 from oslotest import base
 from six.moves.urllib import parse as urlparse
-import uuid
 
 from ceilometer.event import models as event
 from ceilometer.publisher import zaqar

@@ -13,8 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import abc
+from unittest import mock
 
-import mock
 from oslotest import base
 import six
 from six.moves.urllib import parse as url_parse

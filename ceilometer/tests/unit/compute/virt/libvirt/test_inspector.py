@@ -11,11 +11,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for libvirt inspector.
-"""
+"""Tests for libvirt inspector."""
+from unittest import mock
 
 import fixtures
-import mock
 from oslo_utils import units
 from oslotest import base
 

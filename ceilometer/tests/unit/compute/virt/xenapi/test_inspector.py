@@ -11,10 +11,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Tests for xenapi inspector.
-"""
+"""Tests for xenapi inspector."""
 
-import mock
+from unittest import mock
+
 from oslotest import base
 
 from ceilometer.compute.virt.xenapi import inspector as xenapi_inspector

@@ -14,9 +14,9 @@
 # under the License.
 
 import datetime
+from unittest import mock
 
 import jsonpath_rw_ext
-import mock
 import six
 
 from ceilometer import declarative

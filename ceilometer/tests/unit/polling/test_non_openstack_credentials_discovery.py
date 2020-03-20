@@ -11,13 +11,14 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import mock
+from unittest import mock
+
+from oslotest import base
 import requests
 
 from ceilometer.polling.discovery.endpoint import EndpointDiscovery
 from ceilometer.polling.discovery.non_openstack_credentials_discovery import \
     NonOpenStackCredentialsDiscovery
-from oslotest import base
 
 
 class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):

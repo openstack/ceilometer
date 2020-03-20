@@ -14,8 +14,8 @@
 
 import abc
 import tempfile
+from unittest import mock
 
-import mock
 from oslotest import base
 import six
 
