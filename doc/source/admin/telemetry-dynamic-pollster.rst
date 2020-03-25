@@ -60,7 +60,9 @@ attributes to define a dynamic pollster:
 
 *  ``metadata_fields``: optional field. It is a list of all fields that
    the response of the request executed with ``url_path`` that we want to
-   retrieve. As an example, for magnum, one can use the following values:
+   retrieve. To use a nested value one can simply use
+   ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``. As an example,
+   for magnum, one can use the following values:
 
   .. code-block:: yaml
 

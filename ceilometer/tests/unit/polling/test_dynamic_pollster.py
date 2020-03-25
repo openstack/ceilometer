@@ -847,3 +847,45 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertTrue("headers" not in request_args)
         self.assertTrue("authenticated" in request_args)
         self.assertTrue(request_args["authenticated"])
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_metadata_nested_objects(self, keystone_mock):
+        generator = PagedSamplesGeneratorHttpRequestMock(samples_dict={
+            'flavor': [{"name": "a", "ram": 1}, {"name": "b", "ram": 2},
+                       {"name": "c", "ram": 3}, {"name": "d", "ram": 4},
+                       {"name": "e", "ram": 5}, {"name": "f", "ram": 6},
+                       {"name": "g", "ram": 7}, {"name": "h", "ram": 8}],
+            'name': ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'],
+            'state': ['Active', 'Error', 'Down', 'Active', 'Active',
+                      'Migrating', 'Active', 'Error']
+        }, dict_name='servers', page_link_name='server_link')
+
+        generator.generate_samples('http://test.com/v1/test-servers', {
+            'marker=c3': 3,
+            'marker=f6': 3
+        }, 2)
+
+        keystone_mock.session.get.side_effect = generator.mock_request
+        fake_manager = self.FakeManager(keystone=keystone_mock)
+
+        pollster_definition = dict(self.multi_metric_pollster_definition)
+        pollster_definition['name'] = 'test-pollster'
+        pollster_definition['value_attribute'] = 'state'
+        pollster_definition['url_path'] = 'v1/test-servers'
+        pollster_definition['response_entries_key'] = 'servers'
+        pollster_definition['metadata_fields'] = ['flavor.name', 'flavor.ram']
+        pollster_definition['next_sample_url_attribute'] = \
+            'server_link | filter(lambda v: v.get("rel") == "next", value) |' \
+            'list(value)| value [0] | value.get("href")'
+        pollster = dynamic_pollster.DynamicPollster(pollster_definition)
+
+        samples = pollster.get_samples(fake_manager, None, ['http://test.com'])
+
+        samples = list(samples)
+
+        self.assertEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+                         list(map(lambda s: s.resource_metadata["flavor.name"],
+                                  samples)))
+        self.assertEqual(list(range(1, 9)),
+                         list(map(lambda s: s.resource_metadata["flavor.ram"],
+                                  samples)))

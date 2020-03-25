@@ -111,10 +111,14 @@ class PollsterSampleExtractor(object):
     def generate_sample(self, pollster_sample, pollster_definitons=None):
         pollster_definitions =\
             pollster_definitons or self.definitions.configurations
-        metadata = []
+
+        metadata = dict()
         if 'metadata_fields' in pollster_definitions:
-            metadata = dict((k, pollster_sample.get(k))
-                            for k in pollster_definitions['metadata_fields'])
+            for k in pollster_definitions['metadata_fields']:
+                val = self.retrieve_attribute_nested_value(pollster_sample, k)
+
+                if val:
+                    metadata[k] = val
 
         self.generate_new_metadata_fields(
             metadata=metadata, pollster_definitions=pollster_definitions)
@@ -134,8 +138,12 @@ class PollsterSampleExtractor(object):
 
         attribute_key = value_attribute or self.definitions.\
             extract_attribute_key()
-        LOG.debug("Retrieving the nested keys [%s] from [%s].",
-                  attribute_key, json_object)
+
+        LOG.debug(
+            "Retrieving the nested keys [%s] from [%s] or pollster [""%s].",
+            attribute_key, json_object,
+            self.definitions.configurations["name"])
+
         keys_and_operations = attribute_key.split("|")
         attribute_key = keys_and_operations[0].strip()
 
@@ -158,11 +166,15 @@ class PollsterSampleExtractor(object):
                     "The attribute field operation [%s] must use the ["
                     "value] variable." % operation,
                     self.definitions.configurations)
-            LOG.debug("Executing operation [%s] against value [%s].",
-                      operation, value)
+
+            LOG.debug("Executing operation [%s] against value[%s] for "
+                      "pollster [%s].", operation, value,
+                      self.definitions.configurations["name"])
+
             value = eval(operation.strip())
-            LOG.debug("Result [%s] of operation [%s].",
-                      value, operation)
+            LOG.debug(
+                "Result [%s] of operation [%s] for pollster [%s].",
+                value, operation, self.definitions.configurations["name"])
         return value
 
 
