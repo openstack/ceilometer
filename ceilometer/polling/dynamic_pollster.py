@@ -319,10 +319,39 @@ class PollsterValueMapper(object):
 
 
 class PollsterDefinition(object):
+    """Represents a dynamic pollster configuration/parameter
+
+    It abstract the job of developers when creating or extending parameters,
+    such as validating parameters name, values and so on.
+    """
 
     def __init__(self, name, required=False, on_missing=lambda df: df.default,
                  default=None, validation_regex=None, creatable=True,
                  validator=None):
+        """Create a dynamic pollster configuration/parameter
+
+        :param name: the name of the pollster parameter/configuration.
+        :param required: indicates if the configuration/parameter is
+               optional or not.
+        :param on_missing: function that is executed when the
+               parameter/configuration is missing.
+        :param default: the default value to be used.
+        :param validation_regex: the regular expression used to validate the
+               name of the configuration/parameter.
+        :param creatable: it is an override mechanism to avoid creating
+               a configuration/parameter with the default value. The default
+               is ``True``; therefore, we always use the default value.
+               However, we can disable the use of the default value by
+               setting ``False``. When we set this configuration to
+               ``False``, the parameter is not added to the definition
+               dictionary if not defined by the operator in the pollster
+               YAML configuration file.
+        :param validator: function used to validate the value of the
+               parameter/configuration when it is given by the user. This
+               function signature should receive a value that is the value of
+               the parameter to be validate.
+        """
+
         self.name = name
         self.required = required
         self.on_missing = on_missing
@@ -370,7 +399,7 @@ class PollsterDefinitions(object):
         PollsterDefinition(name='user_id_attribute', default="user_id"),
         PollsterDefinition(name='resource_id_attribute', default="id"),
         PollsterDefinition(name='project_id_attribute', default="project_id"),
-    ]
+        PollsterDefinition(name='headers')]
 
     extra_definitions = []
 
@@ -553,10 +582,26 @@ class PollsterSampleGatherer(object):
     def internal_execute_request_get_samples(self, kwargs):
         keystone_client = kwargs['keystone_client']
         url = self.get_request_linked_samples_url(kwargs)
-        resp = keystone_client.session.get(url, authenticated=True)
+
+        request_arguments = self.create_request_arguments()
+        LOG.debug("Executing request against [url=%s] with parameters ["
+                  "%s] for pollsters [%s]", url, request_arguments,
+                  self.definitions.configurations["name"])
+
+        resp = keystone_client.session.get(url, **request_arguments)
+
         if resp.status_code != requests.codes.ok:
             resp.raise_for_status()
         return resp, url
+
+    def create_request_arguments(self):
+        request_args = {
+            "authenticated": True
+        }
+        request_headers = self.definitions.configurations['headers']
+        if request_headers:
+            request_args['headers'] = request_headers
+        return request_args
 
     def get_request_linked_samples_url(self, kwargs):
         next_sample_url = kwargs.get('next_sample_url')
@@ -633,9 +678,13 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         authenticator_arguments = list(map(str.strip, credentials.split(",")))
         authenticator_instance = authenticator_class(*authenticator_arguments)
 
-        resp = requests.get(
-            url,
-            auth=authenticator_instance)
+        request_arguments = self.create_request_arguments()
+        request_arguments["auth"] = authenticator_instance
+
+        LOG.debug("Executing request against [url=%s] with parameters ["
+                  "%s] for pollsters [%s]", url, request_arguments,
+                  self.definitions.configurations["name"])
+        resp = requests.get(url, **request_arguments)
 
         if resp.status_code != requests.codes.ok:
             raise declarative.NonOpenStackApisDynamicPollsterException(
@@ -644,6 +693,36 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
                 % (url, resp.status_code, resp.reason))
 
         return resp, url
+
+    def create_request_arguments(self):
+        request_arguments = super(
+            NonOpenStackApisSamplesGatherer, self).create_request_arguments()
+
+        request_arguments.pop("authenticated")
+
+        return request_arguments
+
+    def execute_request_get_samples(self, **kwargs):
+        samples = super(NonOpenStackApisSamplesGatherer,
+                        self).execute_request_get_samples(**kwargs)
+
+        if samples:
+            user_id_attribute = self.definitions.configurations[
+                'user_id_attribute']
+            project_id_attribute = self.definitions.configurations[
+                'project_id_attribute']
+            resource_id_attribute = self.definitions.configurations[
+                'resource_id_attribute']
+
+            for request_sample in samples:
+                self.generate_new_attributes_in_sample(
+                    request_sample, user_id_attribute, 'user_id')
+                self.generate_new_attributes_in_sample(
+                    request_sample, project_id_attribute, 'project_id')
+                self.generate_new_attributes_in_sample(
+                    request_sample, resource_id_attribute, 'id')
+
+        return samples
 
     def generate_new_attributes_in_sample(
             self, sample, attribute_key, new_attribute_key):

@@ -780,3 +780,70 @@ class TestDynamicPollster(base.BaseTestCase):
         returned_value = pollster.definitions.sample_extractor.\
             retrieve_attribute_nested_value(json_object, key)
         self.assertEqual(0, returned_value)
+
+    def test_create_request_arguments_NonOpenStackApisSamplesGatherer(self):
+        pollster_definition = {
+            'name': "test-pollster", 'sample_type': "gauge", 'unit': "test",
+            'value_attribute': "volume",
+            'url_path': "https://test.com/v1/test/endpoint/fake",
+            "module": "someModule",
+            "authentication_object": "objectAuthentication",
+            "authentication_parameters": "authParam",
+            "headers": [{"header1": "val1"}, {"header2": "val2"}]}
+
+        pollster = dynamic_pollster.DynamicPollster(pollster_definition)
+
+        request_args = pollster.definitions.sample_gatherer\
+            .create_request_arguments()
+
+        self.assertTrue("headers" in request_args)
+        self.assertEqual(2, len(request_args["headers"]))
+
+        self.assertEqual(['header1', 'header2'],
+                         list(map(lambda h: list(h.keys())[0],
+                                  request_args["headers"])))
+
+        self.assertEqual(['val1', 'val2'],
+                         list(map(lambda h: list(h.values())[0],
+                                  request_args["headers"])))
+
+        self.assertTrue("authenticated" not in request_args)
+
+    def test_create_request_arguments_PollsterSampleGatherer(self):
+        pollster_definition = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        pollster_definition["headers"] = [
+            {"x-openstack-nova-api-version": "2.46"},
+            {"custom_header": "custom"},
+            {"some_other_header": "something"}]
+
+        pollster = dynamic_pollster.DynamicPollster(pollster_definition)
+
+        request_args = pollster.definitions.sample_gatherer\
+            .create_request_arguments()
+
+        self.assertTrue("headers" in request_args)
+        self.assertTrue("authenticated" in request_args)
+        self.assertTrue(request_args["authenticated"])
+
+        self.assertEqual(3, len(request_args["headers"]))
+
+        self.assertEqual(['x-openstack-nova-api-version', 'custom_header',
+                          "some_other_header"],
+                         list(map(lambda h: list(h.keys())[0],
+                                  request_args["headers"])))
+
+        self.assertEqual(['2.46', 'custom', 'something'],
+                         list(map(lambda h: list(h.values())[0],
+                                  request_args["headers"])))
+
+    def test_create_request_arguments_PollsterSampleGatherer_no_headers(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        request_args =\
+            pollster.definitions.sample_gatherer.create_request_arguments()
+
+        self.assertTrue("headers" not in request_args)
+        self.assertTrue("authenticated" in request_args)
+        self.assertTrue(request_args["authenticated"])

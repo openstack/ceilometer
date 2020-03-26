@@ -171,6 +171,16 @@ attributes to define a dynamic pollster:
    ``response_entries_key`` elements that will be mapped to ``id`` attribute
    that is sent to Gnocchi.
 
+* ``headers``: optional parameter. It is a map (similar to the
+  metadata_mapping) of key and value that can be used to customize the header
+  of the request that is executed against the URL. This configuration works
+  for both OpenStack and non-OpenStack dynamic pollster configuration.
+
+  .. code-block:: yaml
+
+    headers:
+      "x-openstack-nova-api-version": "2.46"
+
 The complete YAML configuration to gather data from Magnum (that has been used
 as an example) is the following:
 
