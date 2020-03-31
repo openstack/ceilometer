@@ -330,7 +330,7 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
         pollster.definitions.sample_extractor.generate_new_metadata_fields(
-            metadata,  self.pollster_definition_only_required_fields)
+            metadata, self.pollster_definition_only_required_fields)
 
         self.assertEqual(metadata_before_call, metadata)
 

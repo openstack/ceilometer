@@ -26,7 +26,10 @@ Guidelines for writing new hacking checks
 
 """
 
+from hacking import core
 
+
+@core.flake8ext
 def no_log_warn(logical_line):
     """Disallow 'LOG.warn('
 
@@ -38,6 +41,7 @@ def no_log_warn(logical_line):
         yield(0, 'C301 Use LOG.warning() rather than LOG.warn()')
 
 
+@core.flake8ext
 def no_os_popen(logical_line):
     """Disallow 'os.popen('
 
@@ -50,8 +54,3 @@ def no_os_popen(logical_line):
     if 'os.popen(' in logical_line:
         yield(0, 'C302 Deprecated library function os.popen(). '
                  'Replace it using subprocess module. ')
-
-
-def factory(register):
-    register(no_log_warn)
-    register(no_os_popen)

@@ -119,7 +119,7 @@ class SensorNotification(endpoint.SampleEndpoint):
 
                 try:
                     sensor_reading = info['payload']['Sensor Reading']
-                except KeyError as exc:
+                except KeyError:
                     raise InvalidSensorData(
                         "missing 'Sensor Reading' in payload"
                     )

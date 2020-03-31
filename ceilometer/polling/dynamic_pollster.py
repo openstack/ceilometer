@@ -345,7 +345,7 @@ class PollsterDefinition(object):
 
 class PollsterDefinitions(object):
 
-    POLLSTER_VALID_NAMES_REGEXP = "^([\w-]+)(\.[\w-]+)*(\.{[\w-]+})?$"
+    POLLSTER_VALID_NAMES_REGEXP = r"^([\w-]+)(\.[\w-]+)*(\.{[\w-]+})?$"
 
     standard_definitions = [
         PollsterDefinition(name='name', required=True,
@@ -416,10 +416,10 @@ class PollsterDefinitions(object):
 
 class MultiMetricPollsterDefinitions(PollsterDefinitions):
 
-    MULTI_METRIC_POLLSTER_NAME_REGEXP = ".*(\.{(\w+)})$"
+    MULTI_METRIC_POLLSTER_NAME_REGEXP = r".*(\.{(\w+)})$"
     pattern_pollster_name = re.compile(
         MULTI_METRIC_POLLSTER_NAME_REGEXP)
-    MULTI_METRIC_POLLSTER_VALUE_ATTRIBUTE_REGEXP = "^(\[(\w+)\])((\.\w+)+)$"
+    MULTI_METRIC_POLLSTER_VALUE_ATTRIBUTE_REGEXP = r"^(\[(\w+)\])((\.\w+)+)$"
     pattern_pollster_value_attribute = re.compile(
         MULTI_METRIC_POLLSTER_VALUE_ATTRIBUTE_REGEXP)
 

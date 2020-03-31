@@ -47,7 +47,7 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
     @staticmethod
     def fake_get_fip_service():
         return [{'router_id': 'e24f8a37-1bb7-49e4-833c-049bb21986d2',
-                 'status':  'ACTIVE',
+                 'status': 'ACTIVE',
                  'tenant_id': '54a00c50ee4c4396b2f8dc220a2bed57',
                  'floating_network_id':
                      'f41f399e-d63e-47c6-9a19-21c4e4fbbba0',
@@ -56,7 +56,7 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
                  'port_id': '93a0d2c7-a397-444c-9d75-d2ac89b6f209',
                  'id': '18ca27bf-72bc-40c8-9c13-414d564ea367'},
                 {'router_id': 'astf8a37-1bb7-49e4-833c-049bb21986d2',
-                 'status':  'DOWN',
+                 'status': 'DOWN',
                  'tenant_id': '34a00c50ee4c4396b2f8dc220a2bed57',
                  'floating_network_id':
                      'gh1f399e-d63e-47c6-9a19-21c4e4fbbba0',
@@ -65,7 +65,7 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
                  'port_id': '453a0d2c7-a397-444c-9d75-d2ac89b6f209',
                  'id': 'jkca27bf-72bc-40c8-9c13-414d564ea367'},
                 {'router_id': 'e2478937-1bb7-49e4-833c-049bb21986d2',
-                 'status':  'error',
+                 'status': 'error',
                  'tenant_id': '54a0gggg50ee4c4396b2f8dc220a2bed57',
                  'floating_network_id':
                      'po1f399e-d63e-47c6-9a19-21c4e4fbbba0',

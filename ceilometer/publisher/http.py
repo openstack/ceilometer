@@ -100,7 +100,8 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         password = parsed_url.password
         if username:
             self.client_auth = (username, password)
-            netloc = parsed_url.netloc.replace(username+':'+password+'@', '')
+            netloc = parsed_url.netloc.replace(username + ':' + password + '@',
+                                               '')
         else:
             self.client_auth = None
             netloc = parsed_url.netloc

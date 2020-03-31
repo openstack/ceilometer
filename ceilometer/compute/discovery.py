@@ -187,7 +187,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 image_xml = metadata_xml.find("./root[@type='image']")
                 image = ({'id': image_xml.attrib['uuid']}
                          if image_xml is not None else None)
-            except AttributeError as e:
+            except AttributeError:
                 LOG.error(
                     "Fail to get domain uuid %s metadata: "
                     "metadata was missing expected attributes",

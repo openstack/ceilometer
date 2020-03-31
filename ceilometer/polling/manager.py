@@ -132,7 +132,7 @@ class PollingTask(object):
 
         # we relate the static resources and per-source discovery to
         # each combination of pollster and matching source
-        resource_factory = lambda: Resources(agent_manager)
+        resource_factory = lambda: Resources(agent_manager)  # noqa: E731
         self.resources = collections.defaultdict(resource_factory)
 
         self._batch_size = self.manager.conf.polling.batch_size

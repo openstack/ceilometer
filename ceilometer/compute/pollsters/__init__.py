@@ -13,12 +13,7 @@
 # under the License.
 
 import collections
-import six
-
-if six.PY2:
-    from monotonic import monotonic as now
-else:
-    from time import monotonic as now
+from time import monotonic as now
 
 from oslo_log import log
 from oslo_utils import timeutils

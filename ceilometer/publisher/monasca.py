@@ -125,7 +125,7 @@ class MonascaPublisher(publisher.ConfigPublisherBase):
         except Exception:
             LOG.info(traceback.format_exc())
             if hasattr(self, 'archive_handler'):
-                    self.archive_handler.publish_samples(None, metrics)
+                self.archive_handler.publish_samples(None, metrics)
 
     def publish_samples(self, samples):
         """Main method called to publish samples."""

@@ -414,10 +414,10 @@ class OpenDayLightDriver(driver.Driver):
         val_iter, key_func = None, None
         if isinstance(value, dict):
             val_iter = six.iteritems(value)
-            key_func = lambda k: key_base + '.' + k if key_base else k
+            key_func = lambda k: key_base + '.' + k if key_base else k  # noqa
         elif isinstance(value, (tuple, list)):
             val_iter = enumerate(value)
-            key_func = lambda k: key_base + '[%d]' % k
+            key_func = lambda k: key_base + '[%d]' % k  # noqa: E731
 
         if val_iter:
             for k, v in val_iter:
