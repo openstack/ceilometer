@@ -158,7 +158,6 @@ class GenericComputePollster(plugin_base.PollsterBase):
                             '%(instance_id)s, non-fatal reason: %(exc)s',
                             {'pollster': self.__class__.__name__,
                              'instance_id': instance.id, 'exc': e})
-                raise plugin_base.PollsterPermanentError(resources)
             except ceilometer.NotImplementedError:
                 # Selected inspector does not implement this pollster.
                 LOG.debug('%(inspector)s does not provide data for '
