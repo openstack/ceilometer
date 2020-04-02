@@ -14,4 +14,5 @@ testscenarios>=0.4 # Apache-2.0/BSD
 testtools>=1.4.0 # MIT
 gabbi>=1.30.0 # Apache-2.0
 requests-aws>=0.1.4 # BSD License (3 clause)
-stestr>=1.0.0 # Apache-2.0
+stestr>=1.0.0,<3.0.0;python_version<'3.0' # Apache-2.0
+stestr>=1.0.0;python_version>='3.0' # Apache-2.0
