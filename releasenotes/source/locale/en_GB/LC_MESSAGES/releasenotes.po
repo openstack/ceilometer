@@ -1,15 +1,16 @@
 # Andi Chandler <andi@gowling.com>, 2017. #zanata
 # Andi Chandler <andi@gowling.com>, 2018. #zanata
 # Andi Chandler <andi@gowling.com>, 2019. #zanata
+# Andi Chandler <andi@gowling.com>, 2020. #zanata
 msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-22 10:15+0000\n"
+"POT-Creation-Date: 2020-04-02 07:48+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2019-12-22 08:07+0000\n"
+"PO-Revision-Date: 2020-04-07 07:41+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom)\n"
 "Language: en_GB\n"
@@ -22,23 +23,32 @@ msgstr "10.0.0"
 msgid "10.0.1"
 msgstr "10.0.1"
 
-msgid "10.0.1-11"
-msgstr "10.0.1-11"
+msgid "10.0.1-12"
+msgstr "10.0.1-12"
 
 msgid "11.0.0"
 msgstr "11.0.0"
 
+msgid "11.1.0"
+msgstr "11.1.0"
+
+msgid "11.1.0-3"
+msgstr "11.1.0-3"
+
 msgid "12.0.0"
 msgstr "12.0.0"
 
-msgid "12.0.0-15"
-msgstr "12.0.0-15"
+msgid "12.1.0"
+msgstr "12.1.0"
 
 msgid "13.0.0"
 msgstr "13.0.0"
 
-msgid "13.0.0.0rc1-20"
-msgstr "13.0.0.0rc1-20"
+msgid "13.0.0.0rc1-31"
+msgstr "13.0.0.0rc1-31"
+
+msgid "13.1.0"
+msgstr "13.1.0"
 
 msgid "5.0.1"
 msgstr "5.0.1"
@@ -988,8 +998,8 @@ msgstr ""
 "The deprecated `disk.*` meters have been removed. Use the `disk.device.*` "
 "meters instead."
 
-msgid "The deprecated `gnocchi_dispatcher` option group has been removed."
-msgstr "The deprecated `gnocchi_dispatcher` option group has been removed."
+msgid "The deprecated `dispatcher_gnocchi` option group has been removed."
+msgstr "The deprecated `dispatcher_gnocchi` option group has been removed."
 
 msgid "The deprecated `meter_definitions_cfg_file` option has been removed."
 msgstr "The deprecated `meter_definitions_cfg_file` option has been removed."
@@ -1453,6 +1463,15 @@ msgid ""
 msgstr ""
 "[`bug 1597618 <https://bugs.launchpad.net/ceilometer/+bug/1597618>`_] Add "
 "the full support of SNMP v3 user security model."
+
+msgid ""
+"[`bug 1848286 <https://bugs.launchpad.net/charm-octavia/+bug/1848286>`_] "
+"Enable load balancer metrics by adding the loadbalancer resource type, "
+"allowing Gnocchi to capture measurement data for Octavia load balancers."
+msgstr ""
+"[`bug 1848286 <https://bugs.launchpad.net/charm-octavia/+bug/1848286>`_] "
+"Enable load balancer metrics by adding the loadbalancer resource type, "
+"allowing Gnocchi to capture measurement data for Octavia load balancers."
 
 msgid ""
 "[`bug 255569 <https://bugs.launchpad.net/ceilometer/+bug/255569>`_] Fix "
