@@ -26,9 +26,9 @@ Metering
 If you divide a billing process into a 3 step process, as is commonly done in
 the telco industry, the steps are:
 
-1. :term:`Metering`
-2. :term:`Rating`
-3. :term:`Billing`
+1. :term:`metering`
+2. :term:`rating`
+3. :term:`billing`
 
 Ceilometer's initial goal was, and still is, strictly limited to step
 one. This is a choice made from the beginning not to go into rating or billing,
