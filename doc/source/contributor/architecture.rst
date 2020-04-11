@@ -59,9 +59,9 @@ How is data collected?
 
 The Ceilometer project created 2 methods to collect data:
 
-1. :term:`Notification agent` which takes messages generated on the
+1. :term:`notification agent` which takes messages generated on the
    notification bus and transforms them into Ceilometer samples or events.
-2. :term:`Polling agent`, will poll some API or other tool to collect
+2. :term:`polling agent`, will poll some API or other tool to collect
    information at a regular interval. The polling approach may impose
    significant on the API services so should only be used on optimised
    endpoints.
