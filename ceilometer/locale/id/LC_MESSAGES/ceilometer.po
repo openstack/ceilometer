@@ -1,0 +1,246 @@
+# suhartono <cloudsuhartono@gmail.com>, 2020. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: ceilometer VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2020-04-23 03:45+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2020-05-21 04:16+0000\n"
+"Last-Translator: suhartono <cloudsuhartono@gmail.com>\n"
+"Language-Team: Indonesian\n"
+"Language: id\n"
+"X-Generator: Zanata 4.3.3\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+#, python-format
+msgid "Could not connect to XenAPI: %s"
+msgstr "Tidak dapat terhubung ke XenAPI: %s"
+
+#, python-format
+msgid "Could not get VM %s CPU number"
+msgstr "Tidak bisa mendapatkan nomor CPU VM %s"
+
+#, python-format
+msgid "Could not load the following pipelines: %s"
+msgstr "Tidak dapat memuat pipelines berikut: %s"
+
+#, python-format
+msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
+msgstr "Dropping Notification %(type)s (uuid:%(msgid)s)"
+
+#, python-format
+msgid ""
+"Error from libvirt while looking up instance <name=%(name)s, id=%(id)s>: "
+"[Error Code %(error_code)s] %(ex)s"
+msgstr ""
+"Kesalahan dari libvirt saat melihat ke atas instance <name=%(name)s, id="
+"%(id)s>: [Error Code %(error_code)s] %(ex)s"
+
+#, python-format
+msgid ""
+"Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
+"is SHUTOFF."
+msgstr ""
+"Gagal memeriksa data instance <name=%(name)s, id=%(id)s>,  status domain "
+"adalah SHUTOFF."
+
+#, python-format
+msgid ""
+"Failed to inspect instance %(instance_uuid)s stats, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"Gagal memeriksa statistik instance %(instance_uuid)s, tidak dapat memperoleh "
+"info dari libvirt: %(error)s"
+
+#, python-format
+msgid "Failed to publish %d datapoints, dropping them"
+msgstr "Gagal mempublikasikan %d datapoints,  menjatuhkannya"
+
+#, python-format
+msgid "Failed to publish %d datapoints, queue them"
+msgstr "Gagal mempublikasikan %d datapoints, antri mereka"
+
+#, python-format
+msgid ""
+"Invalid YAML syntax in Definitions file %(file)s at line: %(line)s, column: "
+"%(column)s."
+msgstr ""
+"Sintaks YAML tidak valid di file Definisi %(file)s  di line: %(line)s, "
+"column: %(column)s."
+
+#, python-format
+msgid "Invalid trait type '%(type)s' for trait %(trait)s"
+msgstr "Invalid trait type '%(type)s' untuk trait %(trait)s"
+
+#, python-format
+msgid "Invalid type %s specified"
+msgstr "Jenis %s ditentukan tidak valid"
+
+#, python-format
+msgid "Missing field %s"
+msgstr "Field tidak ada %s"
+
+#, python-format
+msgid "Multiple VM %s found in XenServer"
+msgstr "Beberapa VM %s  ditemukan di XenServer"
+
+msgid "Must specify connection_url, and connection_password to use"
+msgstr ""
+"Harus menentukan connection_url, dan connection_password untuk digunakan"
+
+#, python-format
+msgid "No plugin named %(plugin)s available for %(name)s"
+msgstr "Tidak ada plugin bernama %(plugin)s  yang tersedia untuk %(name)s"
+
+msgid "Node Manager init failed"
+msgstr "Init Node Manager gagal"
+
+#, python-format
+msgid "OpenDaylight API returned %(status)s %(reason)s"
+msgstr "OpenDaylight API mengembalikan %(status)s %(reason)s"
+
+#, python-format
+msgid "Opencontrail API returned %(status)s %(reason)s"
+msgstr "Opencontrail API mengembalikan %(status)s %(reason)s"
+
+#, python-format
+msgid ""
+"Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
+msgstr ""
+"Kesalahan parsing dalam spesifikasi JSONPath '%(jsonpath)s' untuk %(name)s: "
+"%(err)ss"
+
+#, python-format
+msgid "Plugin specified, but no plugin name supplied for %s"
+msgstr ""
+"Plugin ditentukan, tetapi tidak ada nama plugin yang disediakan untuk %s"
+
+#, python-format
+msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
+msgstr "Sensor polling %(mtr)s  gagal untuk %(cnt)s times!"
+
+#, python-format
+msgid "Polling %(name)s failed for %(cnt)s times!"
+msgstr "Polling %(name)s gagal untuk %(cnt)s times!"
+
+#, python-format
+msgid "Pollster for %s is disabled!"
+msgstr "Pollster untuk %s dinonaktifkan!"
+
+#, python-format
+msgid ""
+"Publisher max local_queue length is exceeded, dropping %d oldest samples"
+msgstr ""
+"Panjang max local_queue penerbit terlampaui, menjatuhkan %d  sampel tertua"
+
+#, python-format
+msgid "Publishing policy is unknown (%s) force to default"
+msgstr "Kebijakan penerbitan tidak diketahui (%s)  dipaksa ke default"
+
+#, python-format
+msgid "RGW AdminOps API returned %(status)s %(reason)s"
+msgstr "RGW AdminOps API mengembalikan %(status)s %(reason)s"
+
+#, python-format
+msgid "Required field %(field)s should be a %(type)s"
+msgstr "Field wajib %(field)s harus berupa %(type)s"
+
+#, python-format
+msgid "Required field %s not specified"
+msgstr "Bidang wajib %s tidak ditentukan"
+
+#, python-format
+msgid "Required fields %s not specified"
+msgstr "Fields wajib %s  tidak ditentukan"
+
+msgid "Sample Check"
+msgstr "Sample Check"
+
+#, python-format
+msgid "The field 'fields' is required for %s"
+msgstr "Bidang 'fields' diperlukan untuk %s"
+
+msgid "Unable to send sample over UDP"
+msgstr "Tidak dapat mengirim sampel melalui UDP"
+
+#, python-format
+msgid ""
+"Unknown status %(stat)s received on Load Balancer %(id)s, skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s diterima pada Load Balancer %(id)s, "
+"melewatkan sampel"
+
+#, python-format
+msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s diterima pada fw %(id)s, melewatkan sampel"
+
+#, python-format
+msgid "Unknown status %(stat)s received on listener %(id)s, skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s diterima pada  listener %(id)s, melewatkan "
+"sampel"
+
+#, python-format
+msgid "Unknown status %(stat)s received on member %(id)s, skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s diterima pada member %(id)s, melewatkan "
+"sampel"
+
+#, python-format
+msgid "Unknown status %(stat)s received on pool %(id)s, skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s diterima di pool %(id)s, melewatkan sampel"
+
+#, python-format
+msgid "Unknown status %(stat)s received on vip %(id)s, skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s diterima pada vip %(id)s, melewatkan sampel"
+
+#, python-format
+msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
+msgstr ""
+"Status tidak diketahui %(stat)s  diterima pada vpn %(id)s, melewatkan sampel"
+
+#, python-format
+msgid "Unrecognized type value %s"
+msgstr "Nilai jenis tidak dikenal %s"
+
+#, python-format
+msgid "VM %s is poweredOff in VMware vSphere"
+msgstr "VM %s  poweredOff di VMware vSphere"
+
+#, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "VM %s tidak ditemukan di VMware vSphere"
+
+#, python-format
+msgid "VM %s not found in XenServer"
+msgstr "VM %s tidak ditemukan di XenServer"
+
+msgid "Wrong sensor type"
+msgstr "Jenis sensor salah"
+
+#, python-format
+msgid "YAML error reading Definitions file %(file)s"
+msgstr "Kesalahan YAML membaca file Definisi %(file)s"
+
+msgid "ipmitool output length mismatch"
+msgstr "panjang keluaran ipmitool tidak cocok"
+
+#, python-format
+msgid "monasca_client: using %s as Monasca endpoint"
+msgstr "monasca_client: menggunakan %s sebagai endpoint Monasca"
+
+msgid "parse IPMI sensor data failed,No data retrieved from given input"
+msgstr ""
+"parse data sensor IPMI gagal, Tidak ada data yang diambil dari input yang "
+"diberikan"
+
+msgid "parse IPMI sensor data failed,unknown sensor type"
+msgstr "parse data sensor IPMI gagal, tipe sensor tidak dikenal"
+
+msgid "running ipmitool failure"
+msgstr "menjalankan kegagalan ipmitool"
