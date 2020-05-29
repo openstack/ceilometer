@@ -11,13 +11,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Tests for ceilometer/polling/non_openstack_dynamic_pollster.py"""
+"""Tests for Non-OpenStack dynamic pollsters
+"""
+
 import copy
 import sys
 from unittest import mock
 
 from oslotest import base
 import requests
+from six.moves.urllib import parse as url_parse
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
 from ceilometer.declarative import NonOpenStackApisDynamicPollsterException
@@ -28,6 +31,7 @@ from ceilometer.polling.dynamic_pollster import \
 from ceilometer.polling.dynamic_pollster import NonOpenStackApisSamplesGatherer
 from ceilometer.polling.dynamic_pollster import PollsterSampleGatherer
 from ceilometer.polling.dynamic_pollster import SingleMetricPollsterDefinitions
+
 
 REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit', 'value_attribute',
                             'url_path', 'module', 'authentication_object']
@@ -116,7 +120,8 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
         self.pollster_definition_only_required_fields = {
             'name': "test-pollster", 'sample_type': "gauge", 'unit': "test",
             'value_attribute': "volume",
-            'url_path': "v1/test/endpoint/fake", 'module': "module-name",
+            'url_path': "http://server.com/v1/test/endpoint/fake",
+            'module': "module-name",
             'authentication_object': "authentication_object"}
 
         self.pollster_definition_all_fields = {
@@ -431,3 +436,46 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
         self.assertEqual(46, get_obj_sample.volume)
         self.assertEqual(8, list_bucket_sample.volume)
         self.assertEqual(46, put_obj_sample.volume)
+
+    def test_get_request_linked_samples_url_no_next_sample(self):
+        pollster = DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        expected_url = self.pollster_definition_only_required_fields[
+            'url_path']
+
+        kwargs = {'resource': "non-openstack-resource"}
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(kwargs)
+
+        self.assertEqual(expected_url, url)
+
+    def test_get_request_linked_samples_url_next_sample_url(self):
+        pollster = DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        base_url = self.pollster_definition_only_required_fields['url_path']
+        next_sample_path = "/next_page"
+        expected_url = url_parse.urljoin(base_url, next_sample_path)
+
+        kwargs = {'next_sample_url': expected_url}
+
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(kwargs)
+
+        self.assertEqual(expected_url, url)
+
+    def test_get_request_linked_samples_url_next_sample_only_url_path(self):
+        pollster = DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        base_url = self.pollster_definition_only_required_fields['url_path']
+        next_sample_path = "/next_page"
+        expected_url = url_parse.urljoin(base_url, next_sample_path)
+
+        kwargs = {'next_sample_url': next_sample_path}
+
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(kwargs)
+
+        self.assertEqual(expected_url, url)

@@ -618,13 +618,19 @@ class PollsterSampleGatherer(object):
     def get_request_linked_samples_url(self, kwargs):
         next_sample_url = kwargs.get('next_sample_url')
         if next_sample_url:
-            return next_sample_url
-        return self.get_request_url(kwargs)
+            return self.get_next_page_url(kwargs, next_sample_url)
+        return self.get_request_url(
+            kwargs, self.definitions.configurations['url_path'])
 
-    def get_request_url(self, kwargs):
+    def get_next_page_url(self, kwargs, next_sample_url):
+        parse_result = url_parse.urlparse(next_sample_url)
+        if parse_result.netloc:
+            return next_sample_url
+        return self.get_request_url(kwargs, next_sample_url)
+
+    def get_request_url(self, kwargs, url_path):
         endpoint = kwargs['resource']
-        return url_parse.urljoin(
-            endpoint, self.definitions.configurations['url_path'])
+        return url_parse.urljoin(endpoint, url_path)
 
     def retrieve_entries_from_response(self, response_json):
         if isinstance(response_json, list):
@@ -677,7 +683,7 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         if override_credentials:
             credentials = override_credentials
 
-        url = self.definitions.configurations['url_path']
+        url = self.get_request_linked_samples_url(kwargs)
 
         authenticator_module_name = self.definitions.configurations['module']
         authenticator_class_name = \
@@ -713,6 +719,12 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         request_arguments.pop("authenticated")
 
         return request_arguments
+
+    def get_request_url(self, kwargs, url_path):
+        endpoint = self.definitions.configurations['url_path']
+        if endpoint == url_path:
+            return url_path
+        return url_parse.urljoin(endpoint, url_path)
 
     def execute_request_get_samples(self, **kwargs):
         samples = super(NonOpenStackApisSamplesGatherer,
