@@ -75,7 +75,7 @@ class PagedSamplesGenerator(SampleGenerator):
         for page_link, page_size in page_links.items():
             page_link = page_base_link + "/" + page_link
             self.response[current_page_link] = {
-                self.page_link_name: page_link,
+                self.page_link_name: [{'href': page_link, 'rel': 'next'}],
                 self.dict_name: self.populate_page(page_size)
             }
             current_page_link = page_link
@@ -155,7 +155,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(pollster_definition, pollster.pollster_definitions)
 
     @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_skip_samples(self, keystone_mock):
+    def test_skip_samples_with_linked_samples(self, keystone_mock):
         generator = PagedSamplesGeneratorHttpRequestMock(samples_dict={
             'volume': SampleGenerator(samples_dict={
                 'name': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
@@ -179,16 +179,26 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster_definition['skip_sample_values'] = ['rb']
         pollster_definition['url_path'] = 'v1/test-volumes'
         pollster_definition['response_entries_key'] = 'servers'
+        pollster_definition['next_sample_url_attribute'] = \
+            'server_link | filter(lambda v: v.get("rel") == "next", value) |' \
+            'list(value) | value[0] | value.get("href")'
         pollster = dynamic_pollster.DynamicPollster(pollster_definition)
         samples = pollster.get_samples(fake_manager, None, ['http://test.com'])
-        self.assertEqual(['ra', 'rc'], list(map(lambda s: s.volume, samples)))
+        self.assertEqual(['ra', 'rc', 'rd', 're', 'rf', 'rg', 'rh'],
+                         list(map(lambda s: s.volume, samples)))
+
+        generator.generate_samples('http://test.com/v1/test-volumes', {
+            'marker=c3': 3,
+            'marker=f6': 3
+        }, 2)
 
         pollster_definition['name'] = 'test-pollster'
         pollster_definition['value_attribute'] = 'name'
         pollster_definition['skip_sample_values'] = ['b2']
         pollster = dynamic_pollster.DynamicPollster(pollster_definition)
         samples = pollster.get_samples(fake_manager, None, ['http://test.com'])
-        self.assertEqual(['a1', 'c3'], list(map(lambda s: s.volume, samples)))
+        self.assertEqual(['a1', 'c3', 'd4', 'e5', 'f6', 'g7', 'h8'],
+                         list(map(lambda s: s.volume, samples)))
 
     def test_all_required_fields_ok(self):
         pollster = dynamic_pollster.DynamicPollster(

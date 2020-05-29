@@ -16,10 +16,6 @@ Current limitations of the dynamic pollster system
 Currently, the following types of APIs are not supported by the
 dynamic pollster system:
 
-*  Paging APIs: if a user configures a dynamic pollster to gather data
-   from a paging API, the pollster will use only the entries from the first
-   page.
-
 *  Tenant APIs: Tenant APIs are the ones that need to be polled in a tenant
    fashion. This feature is "a nice" to have, but is currently not
    implemented.
@@ -583,3 +579,139 @@ are presented as follows:
     project_id_attribute: "user | value.split('$') | value[0]"
     resource_id_attribute: "user  | value.split('$') | value[0]"
     response_entries_key: "summary"
+
+Handling linked API responses
+-----------------------------
+If the consumed API returns a linked response which contains a link to the next
+response set (page), the Dynamic pollsters can be configured to follow these
+links and join all linked responses into a single one.
+
+To enable this behavior the operator will need to configure the parameter
+`next_sample_url_attribute` that must contain a mapper to the response
+attribute that contains the link to the next response page. This parameter also
+supports operations like the others `*_attribute` dynamic pollster's
+parameters.
+
+Examples on how to create a pollster to handle linked API responses are
+presented as follows:
+
+- Example of a simple linked response:
+
+    - API response:
+
+    .. code-block:: json
+
+        {
+          "server_link": "http://test.com/v1/test-volumes/marker=c3",
+          "servers": [
+            {
+              "volume": [
+                {
+                  "name": "a",
+                  "tmp": "ra"
+                }
+              ],
+              "id": 1,
+              "name": "a1"
+            },
+            {
+              "volume": [
+                {
+                  "name": "b",
+                  "tmp": "rb"
+                }
+              ],
+              "id": 2,
+              "name": "b2"
+            },
+            {
+              "volume": [
+                {
+                  "name": "c",
+                  "tmp": "rc"
+                }
+              ],
+              "id": 3,
+              "name": "c3"
+            }
+          ]
+        }
+
+    - Pollster configuration:
+
+    .. code-block:: yaml
+
+      ---
+
+      - name: "dynamic.linked.response"
+        sample_type: "gauge"
+        unit: "request"
+        value_attribute: "[volume].tmp"
+        url_path: "v1/test-volumes"
+        response_entries_key: "servers"
+        next_sample_url_attribute: "server_link"
+
+- Example of a complex linked response:
+
+    - API response:
+
+    .. code-block:: json
+
+        {
+          "server_link": [
+            {
+              "href": "http://test.com/v1/test-volumes/marker=c3",
+              "rel": "next"
+            },
+            {
+              "href": "http://test.com/v1/test-volumes/marker=b1",
+              "rel": "prev"
+            }
+          ],
+          "servers": [
+            {
+              "volume": [
+                {
+                  "name": "a",
+                  "tmp": "ra"
+                }
+              ],
+              "id": 1,
+              "name": "a1"
+            },
+            {
+              "volume": [
+                {
+                  "name": "b",
+                  "tmp": "rb"
+                }
+              ],
+              "id": 2,
+              "name": "b2"
+            },
+            {
+              "volume": [
+                {
+                  "name": "c",
+                  "tmp": "rc"
+                }
+              ],
+              "id": 3,
+              "name": "c3"
+            }
+          ]
+        }
+
+    - Pollster configuration:
+
+    .. code-block:: yaml
+
+      ---
+
+      - name: "dynamic.linked.response"
+        sample_type: "gauge"
+        unit: "request"
+        value_attribute: "[volume].tmp"
+        url_path: "v1/test-volumes"
+        response_entries_key: "servers"
+        next_sample_url_attribute: "server_link | filter(lambda v: v.get('rel') == 'next', value) | list(value) | value[0] | value.get('href')"

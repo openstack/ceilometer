@@ -361,7 +361,8 @@ class PollsterDefinitions(object):
         PollsterDefinition(name='default_value', default=-1),
         PollsterDefinition(name='metadata_mapping', default={}),
         PollsterDefinition(name='preserve_mapped_metadata', default=True),
-        PollsterDefinition(name='response_entries_key')]
+        PollsterDefinition(name='response_entries_key'),
+        PollsterDefinition(name='next_sample_url_attribute')]
 
     extra_definitions = []
 
@@ -481,18 +482,46 @@ class PollsterSampleGatherer(object):
                   response_json, url, self.definitions.configurations['name'])
 
         if entry_size > 0:
-            return self.retrieve_entries_from_response(response_json)
+            response = self.retrieve_entries_from_response(response_json)
+            url_to_next_sample = self.get_url_to_next_sample(response_json)
+            if url_to_next_sample:
+                kwargs['next_sample_url'] = url_to_next_sample
+                response += self.execute_request_get_samples(**kwargs)
+            return response
         return []
+
+    def get_url_to_next_sample(self, resp):
+        linked_sample_extractor = self.definitions.configurations[
+            'next_sample_url_attribute']
+        if not linked_sample_extractor:
+            return None
+
+        try:
+            return self.definitions.sample_extractor.\
+                retrieve_attribute_nested_value(resp, linked_sample_extractor)
+        except KeyError:
+            LOG.debug("There is no next sample url for the sample [%s] using "
+                      "the configuration [%s]", resp, linked_sample_extractor)
+        return None
 
     def internal_execute_request_get_samples(self, kwargs):
         keystone_client = kwargs['keystone_client']
-        endpoint = kwargs['resource']
-        url = url_parse.urljoin(
-            endpoint, self.definitions.configurations['url_path'])
+        url = self.get_request_linked_samples_url(kwargs)
         resp = keystone_client.session.get(url, authenticated=True)
         if resp.status_code != requests.codes.ok:
             resp.raise_for_status()
         return resp, url
+
+    def get_request_linked_samples_url(self, kwargs):
+        next_sample_url = kwargs.get('next_sample_url')
+        if next_sample_url:
+            return next_sample_url
+        return self.get_request_url(kwargs)
+
+    def get_request_url(self, kwargs):
+        endpoint = kwargs['resource']
+        return url_parse.urljoin(
+            endpoint, self.definitions.configurations['url_path'])
 
     def retrieve_entries_from_response(self, response_json):
         if isinstance(response_json, list):

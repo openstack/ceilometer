@@ -53,7 +53,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
         self.assertEqual(['No secrets found'], result)
 
     def test_discover_no_barbican_endpoint(self):
-        def discover_mock(self, type):
+        def discover_mock(self, manager, param=None):
             return []
 
         original_discover_method = EndpointDiscovery.discover
@@ -67,7 +67,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
     @mock.patch('keystoneclient.v2_0.client.Client')
     def test_discover_error_response(self, client_mock):
-        def discover_mock(self, type):
+        def discover_mock(self, manager, param=None):
             return ["barbican_url"]
 
         original_discover_method = EndpointDiscovery.discover
@@ -95,7 +95,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
     @mock.patch('keystoneclient.v2_0.client.Client')
     def test_discover_response_ok(self, client_mock):
-        def discover_mock(self, type):
+        def discover_mock(self, manager, param=None):
             return ["barbican_url"]
 
         original_discover_method = EndpointDiscovery.discover
