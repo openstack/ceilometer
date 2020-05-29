@@ -714,3 +714,48 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(46, get_obj_sample.volume)
         self.assertEqual(8, list_bucket_sample.volume)
         self.assertEqual(46, put_obj_sample.volume)
+
+    def test_execute_request_get_samples_custom_ids(self):
+        sample = {'user_id_attribute': "1",
+                  'project_id_attribute': "2",
+                  'resource_id_attribute': "3",
+                  'user_id': "234",
+                  'project_id': "2334",
+                  'id': "35"}
+
+        def internal_execute_request_get_samples_mock(self, arg):
+            class Response:
+                def json(self):
+                    return [sample]
+            return Response(), "url"
+
+        original_method = dynamic_pollster.PollsterSampleGatherer.\
+            internal_execute_request_get_samples
+        try:
+            dynamic_pollster.PollsterSampleGatherer. \
+                internal_execute_request_get_samples = \
+                internal_execute_request_get_samples_mock
+
+            self.pollster_definition_all_fields[
+                'user_id_attribute'] = 'user_id_attribute'
+            self.pollster_definition_all_fields[
+                'project_id_attribute'] = 'project_id_attribute'
+            self.pollster_definition_all_fields[
+                'resource_id_attribute'] = 'resource_id_attribute'
+
+            pollster = dynamic_pollster.DynamicPollster(
+                self.pollster_definition_all_fields)
+
+            params = {"d": "d"}
+            response = pollster.definitions.sample_gatherer. \
+                execute_request_get_samples(**params)
+
+            self.assertEqual(sample['user_id_attribute'],
+                             response[0]['user_id'])
+            self.assertEqual(sample['project_id_attribute'],
+                             response[0]['project_id'])
+            self.assertEqual(sample['resource_id_attribute'],
+                             response[0]['id'])
+        finally:
+            dynamic_pollster.PollsterSampleGatherer. \
+                internal_execute_request_get_samples = original_method

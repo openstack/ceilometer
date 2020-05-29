@@ -151,6 +151,20 @@ attributes to define a dynamic pollster:
    directly. We also accept nested values dictionaries. To use a nested value
    one can simply use ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``
 
+* ``user_id_attribute``: optional parameter. The default value is ``user_id``.
+   The name of the attribute in the entries that are processed from
+   ``response_entries_key`` elements that will be mapped to ``user_id``
+   attribute that is sent to Gnocchi.
+
+* ``project_id_attribute``: optional parameter. The default value is
+   ``project_id``. The name of the attribute in the entries that are
+   processed from ``response_entries_key`` elements that will be mapped to
+   ``project_id`` attribute that is sent to Gnocchi.
+
+* ``resource_id_attribute``: optional parameter. The default value is ``id``.
+   The name of the attribute in the entries that are processed from
+   ``response_entries_key`` elements that will be mapped to ``id`` attribute
+   that is sent to Gnocchi.
 
 The complete YAML configuration to gather data from Magnum (that has been used
 as an example) is the following:
@@ -244,8 +258,8 @@ the Dynamic pollster system. The attribute that is not supported is
 the ``endpoint_type``. The dynamic pollster system for non-OpenStack APIs
 is activated automatically when one uses the configurations ``module``.
 
-The extra parameters that are available when using the Non-OpenStack
-dynamic pollster sub-subsystem are the following:
+The extra parameters (in addition to the original ones) that are available
+when using the Non-OpenStack dynamic pollster sub-subsystem are the following:
 
 *  ``module``: required parameter. It is the python module name that Ceilometer
    has to load to use the authentication object when executing requests against
@@ -267,18 +281,6 @@ dynamic pollster sub-subsystem are the following:
 * ``barbican_secret_id``: optional parameter. The Barbican secret ID,
   from which, Ceilometer can retrieve the comma separated values of the
   ``authentication_parameters``.
-
-* ``user_id_attribute``: optional parameter. The name of the attribute in the
-  entries that are processed from ``response_entries_key`` elements that
-  will be mapped to ``user_id`` attribute that is sent to Gnocchi.
-
-* ``project_id_attribute``: optional parameter. The name of the attribute in
-  the entries that are processed from ``response_entries_key`` elements that
-  will be mapped to ``project_id`` attribute that is sent to Gnocchi.
-
-* ``resource_id_attribute``: optional parameter. The name of the attribute
-  in the entries that are processed from ``response_entries_key`` elements that
-  will be mapped to ``id`` attribute that is sent to Gnocchi.
 
 As follows we present an example on how to convert the hard-coded pollster
 for `radosgw.api.request` metric to the dynamic pollster model:

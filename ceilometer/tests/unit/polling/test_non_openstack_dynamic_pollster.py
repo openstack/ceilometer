@@ -25,6 +25,7 @@ from ceilometer.polling.dynamic_pollster import DynamicPollster
 from ceilometer.polling.dynamic_pollster import MultiMetricPollsterDefinitions
 from ceilometer.polling.dynamic_pollster import \
     NonOpenStackApisPollsterDefinition
+from ceilometer.polling.dynamic_pollster import NonOpenStackApisSamplesGatherer
 from ceilometer.polling.dynamic_pollster import PollsterSampleGatherer
 from ceilometer.polling.dynamic_pollster import SingleMetricPollsterDefinitions
 
@@ -176,9 +177,10 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
 
         pollster_definitions = pollster.pollster_definitions
 
-        self.assertEqual(None, pollster_definitions['user_id_attribute'])
-        self.assertEqual(None, pollster_definitions['project_id_attribute'])
-        self.assertEqual(None, pollster_definitions['resource_id_attribute'])
+        self.assertEqual("user_id", pollster_definitions['user_id_attribute'])
+        self.assertEqual("project_id",
+                         pollster_definitions['project_id_attribute'])
+        self.assertEqual("id", pollster_definitions['resource_id_attribute'])
         self.assertEqual('', pollster_definitions['barbican_secret_id'])
         self.assertEqual('', pollster_definitions['authentication_parameters'])
 
@@ -300,33 +302,42 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
                   'project_id_attribute': "dfghyt432345t",
                   'resource_id_attribute': "sdfghjt543"}
 
-        def execute_request_get_samples_mock(self, **kwargs):
-            samples = [sample]
-            return samples
+        def internal_execute_request_get_samples_mock(self, arg):
+            class Response:
+                def json(self):
+                    return [sample]
+            return Response(), "url"
 
-        PollsterSampleGatherer.execute_request_get_samples = \
-            execute_request_get_samples_mock
+        original_method = NonOpenStackApisSamplesGatherer. \
+            internal_execute_request_get_samples
+        try:
+            NonOpenStackApisSamplesGatherer. \
+                internal_execute_request_get_samples = \
+                internal_execute_request_get_samples_mock
 
-        self.pollster_definition_all_fields[
-            'user_id_attribute'] = 'user_id_attribute'
-        self.pollster_definition_all_fields[
-            'project_id_attribute'] = 'project_id_attribute'
-        self.pollster_definition_all_fields[
-            'resource_id_attribute'] = 'resource_id_attribute'
+            self.pollster_definition_all_fields[
+                'user_id_attribute'] = 'user_id_attribute'
+            self.pollster_definition_all_fields[
+                'project_id_attribute'] = 'project_id_attribute'
+            self.pollster_definition_all_fields[
+                'resource_id_attribute'] = 'resource_id_attribute'
 
-        pollster = DynamicPollster(
-            self.pollster_definition_all_fields)
+            pollster = DynamicPollster(
+                self.pollster_definition_all_fields)
 
-        params = {"d": "d"}
-        response = pollster.definitions.sample_gatherer. \
-            execute_request_get_samples(**params)
+            params = {"d": "d"}
+            response = pollster.definitions.sample_gatherer. \
+                execute_request_get_samples(**params)
 
-        self.assertEqual(sample['user_id_attribute'],
-                         response[0]['user_id'])
-        self.assertEqual(sample['project_id_attribute'],
-                         response[0]['project_id'])
-        self.assertEqual(sample['resource_id_attribute'],
-                         response[0]['id'])
+            self.assertEqual(sample['user_id_attribute'],
+                             response[0]['user_id'])
+            self.assertEqual(sample['project_id_attribute'],
+                             response[0]['project_id'])
+            self.assertEqual(sample['resource_id_attribute'],
+                             response[0]['id'])
+        finally:
+            NonOpenStackApisSamplesGatherer. \
+                internal_execute_request_get_samples = original_method
 
     def test_execute_request_get_samples_empty_keys(self):
         sample = {'user_id_attribute': "123456789",
