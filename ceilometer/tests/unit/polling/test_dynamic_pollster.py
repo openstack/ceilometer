@@ -759,3 +759,24 @@ class TestDynamicPollster(base.BaseTestCase):
         finally:
             dynamic_pollster.PollsterSampleGatherer. \
                 internal_execute_request_get_samples = original_method
+
+    def test_retrieve_attribute_self_reference_sample(self):
+        key = " . | value['key1']['subKey1'][0]['d'] if 'key1' in value else 0"
+
+        sub_value1 = [{"d": 2}, {"g": {"h": "val"}}]
+        sub_value2 = [{"r": 245}, {"h": {"yu": "yu"}}]
+
+        json_object = {"key1": {"subKey1": sub_value1},
+                       "key2": {"subkey2": sub_value2}}
+
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        returned_value = pollster.definitions.sample_extractor.\
+            retrieve_attribute_nested_value(json_object, key)
+        self.assertEqual(2, returned_value)
+
+        del json_object['key1']
+        returned_value = pollster.definitions.sample_extractor.\
+            retrieve_attribute_nested_value(json_object, key)
+        self.assertEqual(0, returned_value)

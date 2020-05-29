@@ -138,8 +138,12 @@ class PollsterSampleExtractor(object):
                   attribute_key, json_object)
         keys_and_operations = attribute_key.split("|")
         attribute_key = keys_and_operations[0].strip()
-        nested_keys = attribute_key.split(".")
-        value = reduce(operator.getitem, nested_keys, json_object)
+
+        if attribute_key == ".":
+            value = json_object
+        else:
+            nested_keys = attribute_key.split(".")
+            value = reduce(operator.getitem, nested_keys, json_object)
 
         return self.operate_value(keys_and_operations, value)
 

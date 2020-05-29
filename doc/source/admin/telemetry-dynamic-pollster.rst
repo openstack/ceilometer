@@ -40,8 +40,13 @@ attributes to define a dynamic pollster:
 *  ``value_attribute``: mandatory attribute; defines the attribute in the
    JSON response from the URL of the component being polled. We also accept
    nested values dictionaries. To use a nested value one can simply use
-   ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``. In our magnum
-   example, we can use ``status`` as the value attribute;
+   ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``. It is also
+   possible to reference the sample itself using ``.``; the self reference
+   of the sample is interesting in cases when the attribute might not exist.
+   Therefore, together with the operations one can first check if it exist
+   before retrieving it (e.g.
+   `` .  | value['some_field'] if 'some_field' in value else ''``).
+   In our magnum example, we can use ``status`` as the value attribute;
 
 *  ``endpoint_type``: mandatory field; defines the endpoint type that is
    used to discover the base URL of the component to be monitored; for
