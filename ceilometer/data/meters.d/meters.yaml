@@ -120,6 +120,7 @@ metric:
       - 'volume.attach.*'
       - 'volume.detach.*'
       - 'volume.update.*'
+      - 'volume.manage.*'
     type: 'gauge'
     unit: 'GB'
     volume: $.payload.size
@@ -137,6 +138,7 @@ metric:
       - 'snapshot.exists'
       - 'snapshot.create.*'
       - 'snapshot.delete.*'
+      - 'snapshot.manage.*'
     type: 'gauge'
     unit: 'GB'
     volume: $.payload.volume_size

@@ -238,6 +238,10 @@ resources:
       volume.snapshot.size:
       volume.backup.size:
       backup.size:
+      volume.manage_existing.start:
+      volume.manage_existing.end:
+      volume.manage_existing_snapshot.start:
+      volume.manage_existing_snapshot.end:
     attributes:
       display_name: resource_metadata.(display_name|name)
       volume_type: resource_metadata.volume_type
@@ -407,3 +411,4 @@ resources:
       network.services.lb.loadbalancer:
       network.services.lb.total.connections:
       network.services.lb.active.connections:
+
