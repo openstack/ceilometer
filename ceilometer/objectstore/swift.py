@@ -15,8 +15,6 @@
 """Common code for working with object stores
 """
 
-from __future__ import absolute_import
-
 from keystoneauth1 import exceptions
 from oslo_config import cfg
 from oslo_log import log

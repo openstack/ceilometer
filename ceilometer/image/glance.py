@@ -15,8 +15,6 @@
 """Common code for working with images
 """
 
-from __future__ import absolute_import
-
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 

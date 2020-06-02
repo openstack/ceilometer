@@ -13,8 +13,6 @@
 """Common code for working with volumes
 """
 
-from __future__ import absolute_import
-
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 
