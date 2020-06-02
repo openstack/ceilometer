@@ -1,9 +1,20 @@
 - job:
-    name: grenade-dsvm-ceilometer
-    parent: legacy-dsvm-base
-    run: playbooks/legacy/grenade-dsvm-ceilometer/run.yaml
-    post-run: playbooks/legacy/grenade-dsvm-ceilometer/post.yaml
-    timeout: 10800
+    name: grenade-ceilometer
+    parent: grenade
+    required-projects:
+      - opendev.org/openstack/grenade
+      - opendev.org/openstack/ceilometer
+    vars:
+      grenade_devstack_localrc:
+        shared:
+          CEILOMETER_BACKEND: none
+      devstack_plugins:
+        ceilometer: https://opendev.org/openstack/ceilometer
+      devstack_services:
+        ceilometer-acompute: true
+        ceilometer-acentral: true
+        ceilometer-aipmi: true
+        ceilometer-anotification: true
     irrelevant-files: &ceilometer-irrelevant-files
       - ^(test-|)requirements.txt$
       - ^setup.cfg$
@@ -11,10 +22,6 @@
       - ^.*\.rst$
       - ^releasenotes/.*$
       - ^ceilometer/tests/.*$
-    required-projects:
-      - openstack/grenade
-      - openstack/devstack-gate
-      - openstack/ceilometer
 
 - project:
     templates:
@@ -26,7 +33,7 @@
       - openstack-lower-constraints-jobs
     check:
       jobs:
-        - grenade-dsvm-ceilometer
+        - grenade-ceilometer
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
@@ -34,7 +41,7 @@
     gate:
       queue: telemetry
       jobs:
-        - grenade-dsvm-ceilometer
+        - grenade-ceilometer
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
