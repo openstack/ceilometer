@@ -248,8 +248,8 @@ resources:
       image_id: resource_metadata.image_id
       instance_id: resource_metadata.instance_id
     event_delete:
-      - volume.delete.start
-      - snapshot.delete.start
+      - volume.delete.end
+      - snapshot.delete.end
     event_attributes:
       id: resource_id
 

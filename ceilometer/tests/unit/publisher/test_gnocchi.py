@@ -111,8 +111,8 @@ IMAGE_DELETE_START = models.Event(
 )
 
 
-VOLUME_DELETE_START = models.Event(
-    event_type=u'volume.delete.start',
+VOLUME_DELETE_END = models.Event(
+    event_type=u'volume.delete.end',
     traits=[models.Trait(u'availability_zone', 1, u'nova'),
             models.Trait(u'created_at', 1, u'2016-11-28T13:19:53+00:00'),
             models.Trait(u'display_name', 1, u'vol-001'),
@@ -549,7 +549,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
 
         self.publisher.publish_events([INSTANCE_DELETE_START,
                                        IMAGE_DELETE_START,
-                                       VOLUME_DELETE_START,
+                                       VOLUME_DELETE_END,
                                        FLOATINGIP_DELETE_END])
         self.assertEqual(8, len(fakeclient.mock_calls))
         for call in expected_calls:
