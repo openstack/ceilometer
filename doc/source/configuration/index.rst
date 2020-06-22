@@ -17,8 +17,10 @@ can be easily created by running::
         --config-file=/etc/ceilometer/ceilometer-config-generator.conf \
         --output-file=/etc/ceilometer/ceilometer.conf
 
-The following is a sample Ceilometer configuration for adaptation and use.
-It is auto-generated from Ceilometer when this documentation is built, and
-can also be viewed in `file form <_static/ceilometer.conf.sample>`_.
+.. only:: html
 
-.. literalinclude:: ../_static/ceilometer.conf.sample
+   The following is a sample Ceilometer configuration for adaptation and use.
+   It is auto-generated from Ceilometer when this documentation is built, and
+   can also be viewed in `file form <_static/ceilometer.conf.sample>`_.
+
+   .. literalinclude:: ../_static/ceilometer.conf.sample
