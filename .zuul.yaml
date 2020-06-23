@@ -36,6 +36,7 @@
       jobs:
         - telemetry-tox-py37
         - grenade-dsvm-ceilometer:
+            voting: false
             irrelevant-files:
               - ^(test-|)requirements.txt$
               - ^setup.cfg$
@@ -44,10 +45,6 @@
       queue: telemetry
       jobs:
         - telemetry-tox-py37
-        - grenade-dsvm-ceilometer:
-            irrelevant-files:
-              - ^(test-|)requirements.txt$
-              - ^setup.cfg$
         - telemetry-dsvm-integration
     experimental:
       jobs:
