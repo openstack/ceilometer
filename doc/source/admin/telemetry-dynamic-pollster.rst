@@ -218,22 +218,22 @@ desires):
   ---
 
   - name: "dynamic.network.services.vpn.connection"
-  sample_type: "gauge"
-  unit: "ipsec_site_connection"
-  value_attribute: "status"
-  endpoint_type: "network"
-  url_path: "v2.0/vpn/ipsec-site-connections"
-  metadata_fields:
-    - "name"
-    - "vpnservice_id"
-    - "description"
-    - "status"
-    - "peer_address"
-  value_mapping:
-    ACTIVE: "1"
-  metadata_mapping:
-    name: "display_name"
-  default_value: 0
+    sample_type: "gauge"
+    unit: "ipsec_site_connection"
+    value_attribute: "status"
+    endpoint_type: "network"
+    url_path: "v2.0/vpn/ipsec-site-connections"
+    metadata_fields:
+        - "name"
+        - "vpnservice_id"
+        - "description"
+        - "status"
+        - "peer_address"
+    value_mapping:
+        ACTIVE: "1"
+    metadata_mapping:
+        name: "display_name"
+    default_value: 0
 
 The dynamic pollsters system configuration (for non-OpenStack APIs)
 -------------------------------------------------------------------
@@ -288,18 +288,17 @@ for `radosgw.api.request` metric to the dynamic pollster model:
   ---
 
   - name: "dynamic.radosgw.api.request"
-  sample_type: "gauge"
-  unit: "request"
-  value_attribute: "total.ops"
-  url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
-  module: "awsauth"
-  authentication_object: "S3Auth"
-  authentication_parameters: "<access_key>, <secret_key>,
-  <rados_gateway_server>"
-  user_id_attribute: "user"
-  project_id_attribute: "user"
-  resource_id_attribute: "user"
-  response_entries_key: "summary"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "total.ops"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters: "<access_key>,<secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user"
+    project_id_attribute: "user"
+    resource_id_attribute: "user"
+    response_entries_key: "summary"
 
 We can take that example a bit further, and instead of gathering the `total
 .ops` variable, which counts for all the requests (even the unsuccessful
@@ -310,18 +309,17 @@ ones), we can use the `successful_ops`.
   ---
 
   - name: "dynamic.radosgw.api.request.successful_ops"
-  sample_type: "gauge"
-  unit: "request"
-  value_attribute: "total.successful_ops"
-  url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
-  module: "awsauth"
-  authentication_object: "S3Auth"
-  authentication_parameters: "<access_key>, <secret_key>,
-  <rados_gateway_server>"
-  user_id_attribute: "user"
-  project_id_attribute: "user"
-  resource_id_attribute: "user"
-  response_entries_key: "summary"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "total.successful_ops"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters: "<access_key>, <secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user"
+    project_id_attribute: "user"
+    resource_id_attribute: "user"
+    response_entries_key: "summary"
 
 Operations on extracted attributes
 ----------------------------------
@@ -351,18 +349,17 @@ String.
   ---
 
   - name: "dynamic.radosgw.api.request.successful_ops"
-  sample_type: "gauge"
-  unit: "request"
-  value_attribute: "total.successful_ops"
-  url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
-  module: "awsauth"
-  authentication_object: "S3Auth"
-  authentication_parameters: "<access_key>, <secret_key>,
-  <rados_gateway_server>"
-  user_id_attribute: "user | value.split ('$') | value[0]"
-  project_id_attribute: "user | value.split ('$') | value[0]"
-  resource_id_attribute: "user | value.split ('$') | value[0]"
-  response_entries_key: "summary"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "total.successful_ops"
+    url_path: "http://rgw.service.stage.i.ewcs.ch/admin/usage"
+    module: "awsauth"
+    authentication_object: "S3Auth"
+    authentication_parameters: "<access_key>,<secret_key>,<rados_gateway_server>"
+    user_id_attribute: "user | value.split ('$') | value[0]"
+    project_id_attribute: "user | value.split ('$') | value[0]"
+    resource_id_attribute: "user | value.split ('$') | value[0]"
+    response_entries_key: "summary"
 
 The Dynamic pollster configuration options that support this feature are the
 following:
