@@ -7,8 +7,7 @@ these steps on the controller node.
 Configure the Image service to use Telemetry
 --------------------------------------------
 
-* Edit the ``/etc/glance/glance-api.conf`` and
-  ``/etc/glance/glance-registry.conf`` files and
+* Edit the ``/etc/glance/glance-api.conf`` file and
   complete the following actions:
 
   * In the ``[DEFAULT]``, ``[oslo_messaging_notifications]`` sections,
@@ -35,4 +34,4 @@ Finalize installation
 
   .. code-block:: console
 
-     # systemctl restart openstack-glance-api.service openstack-glance-registry.service
+     # systemctl restart openstack-glance-api.service
