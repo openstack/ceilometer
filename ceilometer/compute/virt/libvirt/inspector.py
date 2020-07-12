@@ -139,15 +139,23 @@ class LibvirtInspector(virt_inspector.Inspector):
     def inspect_disks(self, instance, duration):
         domain = self._get_domain_not_shut_off_or_raise(instance)
         for device in self._get_disk_devices(domain):
-            block_stats = domain.blockStats(device)
-            block_stats_flags = domain.blockStatsFlags(device, 0)
-            yield virt_inspector.DiskStats(
-                device=device,
-                read_requests=block_stats[0], read_bytes=block_stats[1],
-                write_requests=block_stats[2], write_bytes=block_stats[3],
-                errors=block_stats[4],
-                wr_total_times=block_stats_flags['wr_total_times'],
-                rd_total_times=block_stats_flags['rd_total_times'])
+            try:
+                block_stats = domain.blockStats(device)
+                block_stats_flags = domain.blockStatsFlags(device, 0)
+                yield virt_inspector.DiskStats(
+                    device=device,
+                    read_requests=block_stats[0], read_bytes=block_stats[1],
+                    write_requests=block_stats[2], write_bytes=block_stats[3],
+                    errors=block_stats[4],
+                    wr_total_times=block_stats_flags['wr_total_times'],
+                    rd_total_times=block_stats_flags['rd_total_times'])
+            except libvirt.libvirtError as ex:
+                # raised error even if lock is acquired while live migration,
+                # even it looks normal.
+                LOG.warning(_("Error from libvirt while checking blockStats, "
+                              "This may not be harmful, but please check : "
+                              "%(ex)s") % {'ex': ex})
+                pass
 
     @libvirt_utils.retry_on_disconnect
     def inspect_disk_info(self, instance, duration):
