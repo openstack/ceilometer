@@ -19,7 +19,7 @@ is Gnocchi_.
 Install Gnocchi
 ---------------
 
-#. Install the Gnocchi packages. Alternatively, Gnocchi can be install using
+#. Install the Gnocchi packages. Alternatively, Gnocchi can be installed using
    pip:
 
    .. code-block:: console

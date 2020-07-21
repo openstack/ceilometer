@@ -33,6 +33,22 @@
 
         This command provides no output.
 
+   * Create the ``ceilometer`` service entity:
+
+     .. code-block:: console
+
+        $ openstack service create --name ceilometer \
+          --description "Telemetry" metering
+        +-------------+----------------------------------+
+        | Field       | Value                            |
+        +-------------+----------------------------------+
+        | description | Telemetry                        |
+        | enabled     | True                             |
+        | id          | 5fb7fd1bb2954fddb378d4031c28c0e4 |
+        | name        | ceilometer                       |
+        | type        | metering                         |
+        +-------------+----------------------------------+
+
 3. Register Gnocchi service in Keystone:
 
    * Create the ``gnocchi`` user:
