@@ -38,6 +38,10 @@ Bug Tracking
 ------------
 - Bugs: https://bugs.launchpad.net/ceilometer
 
+Release Notes
+-------------
+- Server: https://docs.openstack.org/releasenotes/ceilometer/
+
 IRC
 ---
 IRC Channel: #openstack-telemetry on `Freenode`_.
