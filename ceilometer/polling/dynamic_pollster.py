@@ -362,7 +362,11 @@ class PollsterDefinitions(object):
         PollsterDefinition(name='metadata_mapping', default={}),
         PollsterDefinition(name='preserve_mapped_metadata', default=True),
         PollsterDefinition(name='response_entries_key'),
-        PollsterDefinition(name='next_sample_url_attribute')]
+        PollsterDefinition(name='next_sample_url_attribute'),
+        PollsterDefinition(name='user_id_attribute', default="user_id"),
+        PollsterDefinition(name='resource_id_attribute', default="id"),
+        PollsterDefinition(name='project_id_attribute', default="project_id"),
+    ]
 
     extra_definitions = []
 
@@ -482,13 +486,51 @@ class PollsterSampleGatherer(object):
                   response_json, url, self.definitions.configurations['name'])
 
         if entry_size > 0:
-            response = self.retrieve_entries_from_response(response_json)
+            samples = self.retrieve_entries_from_response(response_json)
             url_to_next_sample = self.get_url_to_next_sample(response_json)
             if url_to_next_sample:
                 kwargs['next_sample_url'] = url_to_next_sample
-                response += self.execute_request_get_samples(**kwargs)
-            return response
+                samples += self.execute_request_get_samples(**kwargs)
+
+            self.execute_id_overrides(samples)
+            return samples
         return []
+
+    def execute_id_overrides(self, samples):
+        if samples:
+            user_id_attribute = self.definitions.configurations[
+                'user_id_attribute']
+            project_id_attribute = self.definitions.configurations[
+                'project_id_attribute']
+            resource_id_attribute = self.definitions.configurations[
+                'resource_id_attribute']
+
+            for request_sample in samples:
+                self.generate_new_attributes_in_sample(
+                    request_sample, user_id_attribute, 'user_id')
+                self.generate_new_attributes_in_sample(
+                    request_sample, project_id_attribute, 'project_id')
+                self.generate_new_attributes_in_sample(
+                    request_sample, resource_id_attribute, 'id')
+
+    def generate_new_attributes_in_sample(
+            self, sample, attribute_key, new_attribute_key):
+
+        if attribute_key == new_attribute_key:
+            LOG.debug("We do not need to generate new attribute as the "
+                      "attribute_key[%s] and the new_attribute_key[%s] "
+                      "configurations are the same.",
+                      attribute_key, new_attribute_key)
+            return
+
+        if attribute_key:
+            attribute_value = self.definitions.sample_extractor.\
+                retrieve_attribute_nested_value(sample, attribute_key)
+
+            LOG.debug("Mapped attribute [%s] to value [%s] in sample [%s].",
+                      attribute_key, attribute_value, sample)
+
+            sample[new_attribute_key] = attribute_value
 
     def get_url_to_next_sample(self, resp):
         linked_sample_extractor = self.definitions.configurations[
@@ -545,11 +587,8 @@ class NonOpenStackApisPollsterDefinition(PollsterDefinitions):
         PollsterDefinition(name='value_attribute', required=True),
         PollsterDefinition(name='module', required=True),
         PollsterDefinition(name='authentication_object', required=True),
-        PollsterDefinition(name='user_id_attribute'),
-        PollsterDefinition(name='resource_id_attribute'),
         PollsterDefinition(name='barbican_secret_id', default=""),
         PollsterDefinition(name='authentication_parameters', default=""),
-        PollsterDefinition(name='project_id_attribute'),
         PollsterDefinition(name='endpoint_type')]
 
     def __init__(self, configurations):
@@ -601,28 +640,6 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
                 % (url, resp.status_code, resp.reason))
 
         return resp, url
-
-    def execute_request_get_samples(self, **kwargs):
-        samples = super(NonOpenStackApisSamplesGatherer,
-                        self).execute_request_get_samples(**kwargs)
-
-        if samples:
-            user_id_attribute = self.definitions.configurations[
-                'user_id_attribute']
-            project_id_attribute = self.definitions.configurations[
-                'project_id_attribute']
-            resource_id_attribute = self.definitions.configurations[
-                'resource_id_attribute']
-
-            for request_sample in samples:
-                self.generate_new_attributes_in_sample(
-                    request_sample, user_id_attribute, 'user_id')
-                self.generate_new_attributes_in_sample(
-                    request_sample, project_id_attribute, 'project_id')
-                self.generate_new_attributes_in_sample(
-                    request_sample, resource_id_attribute, 'id')
-
-        return samples
 
     def generate_new_attributes_in_sample(
             self, sample, attribute_key, new_attribute_key):
