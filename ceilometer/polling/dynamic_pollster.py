@@ -682,7 +682,7 @@ class DynamicPollster(plugin_base.PollsterBase):
 
     @property
     def default_discovery(self):
-        return self.definitions.sample_gatherer.default_discovery()
+        return self.definitions.sample_gatherer.default_discovery
 
     def load_samples(self, resource, manager):
         try:
