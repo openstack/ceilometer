@@ -11,20 +11,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Tests for ceilometer/polling/dynamic_pollster.py"""
+"""Tests for OpenStack dynamic pollster
+"""
 import copy
 import logging
 from unittest import mock
 
-from oslotest import base
 import requests
+from six.moves.urllib import parse as url_parse
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
 from ceilometer.polling import dynamic_pollster
 from ceilometer import sample
+from oslotest import base
 
 LOG = logging.getLogger(__name__)
-
 
 REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit',
                             'value_attribute', 'endpoint_type',
@@ -889,3 +890,48 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(list(range(1, 9)),
                          list(map(lambda s: s.resource_metadata["flavor.ram"],
                                   samples)))
+
+    def test_get_request_linked_samples_url_no_next_sample(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        base_url = "http://test.com/something_that_we_do_not_care"
+        expected_url = url_parse.urljoin(
+            base_url, self.pollster_definition_only_required_fields[
+                'url_path'])
+
+        kwargs = {'resource': base_url}
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(kwargs)
+
+        self.assertEqual(expected_url, url)
+
+    def test_get_request_linked_samples_url_next_sample_url(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        base_url = "http://test.com/something_that_we_do_not_care"
+        expected_url = "http://test.com/next_page"
+
+        kwargs = {'resource': base_url,
+                  'next_sample_url': expected_url}
+
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(kwargs)
+
+        self.assertEqual(expected_url, url)
+
+    def test_get_request_linked_samples_url_next_sample_only_url_path(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        base_url = "http://test.com/something_that_we_do_not_care"
+        expected_url = "http://test.com/next_page"
+
+        kwargs = {'resource': base_url,
+                  'next_sample_url': "/next_page"}
+
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(kwargs)
+
+        self.assertEqual(expected_url, url)
