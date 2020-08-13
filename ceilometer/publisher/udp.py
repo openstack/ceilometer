@@ -69,7 +69,7 @@ class UDPPublisher(publisher.ConfigPublisherBase):
                       "%(host)s:%(port)d", {'msg': msg, 'host': host,
                                             'port': port})
             try:
-                self.socket.sendto(msgpack.dumps(msg),
+                self.socket.sendto(msgpack.dumps(msg, use_bin_type=True),
                                    (self.host, self.port))
             except Exception as e:
                 LOG.warning(_("Unable to send sample over UDP"))

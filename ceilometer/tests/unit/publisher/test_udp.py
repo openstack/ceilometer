@@ -125,7 +125,7 @@ class TestUDPPublisher(base.BaseTestCase):
         sent_counters = []
 
         for data, dest in self.data_sent:
-            counter = msgpack.loads(data, encoding="utf-8")
+            counter = msgpack.loads(data, raw=False)
             sent_counters.append(counter)
 
             # Check destination
