@@ -336,8 +336,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         gnocchi_data = {}
         measures = {}
         for resource_id, samples_of_resource in resource_grouped_samples:
-            # NOTE(sileht): / is forbidden by Gnocchi
-            resource_id = resource_id.replace('/', '_')
             for sample in samples_of_resource:
                 metric_name = sample.name
                 LOG.debug("Processing sample [%s] for resource ID [%s].",
@@ -350,6 +348,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                         self._already_logged_metric_names.add(metric_name)
                     continue
 
+                # NOTE(sileht): / is forbidden by Gnocchi
+                resource_id = resource_id.replace('/', '_')
                 if resource_id not in gnocchi_data:
                     gnocchi_data[resource_id] = {
                         'resource_type': rd.cfg['resource_type'],
