@@ -281,7 +281,7 @@ def upgrade_resource_types(conf):
         elif ops['type'] == 'create_resource_type':
             try:
                 gnocchi.resource_type.get(name=ops['resource_type'])
-            except gnocchi_exc.ResourceTypeNotFound:
+            except (gnocchi_exc.ResourceTypeNotFound, gnocchi_exc.NotFound):
                 rt = {'name': ops['resource_type'],
                       'attributes': ops['data'][0]['attributes']}
                 gnocchi.resource_type.create(resource_type=rt)
