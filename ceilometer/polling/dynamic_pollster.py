@@ -59,7 +59,7 @@ class PollsterDefinitionBuilder(object):
         if not supported_definitions:
             raise declarative.DynamicPollsterDefinitionException(
                 "Your configurations do not fit any type of DynamicPollsters, "
-                "please recheck them. Used configurations = [%s]." %
+                "please recheck them. Used configurations are [%s]." %
                 configurations)
 
         definition_name = self.join_supported_definitions_names(
