@@ -494,6 +494,23 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 self._delete_event(rd, event)
             if operation == EVENT_CREATE:
                 self._create_event(rd, event)
+            if operation == EVENT_UPDATE:
+                self._update_event(rd, event)
+
+    def _update_event(self, rd, event):
+        resource = rd.event_attributes(event)
+        associated_resources = rd.cfg.get('event_associated_resources', {})
+
+        if associated_resources:
+            to_update = itertools.chain([resource], *[
+                self._search_resource(resource_type, query % resource['id'])
+                for resource_type, query in associated_resources.items()
+            ])
+        else:
+            to_update = [resource]
+
+        for resource in to_update:
+            self._set_update_attributes(resource)
 
     def _delete_event(self, rd, event):
         ended_at = timeutils.utcnow().isoformat()
@@ -535,6 +552,19 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                       {'resource_type': resource_type, 'query': query},
                       exc_info=True)
         return []
+
+    def _set_update_attributes(self, resource):
+        try:
+            resource_id = resource.pop('id')
+            resource_type = resource.pop('type')
+
+            self._if_not_cached(resource_type, resource_id, resource)
+        except gnocchi_exc.ResourceNotFound:
+            LOG.debug("Update event received on unexisting resource (%s), "
+                      "ignore it.", resource['id'])
+        except Exception:
+            LOG.error("Fail to update the resource %s", resource,
+                      exc_info=True)
 
     def _set_ended_at(self, resource, ended_at):
         try:
