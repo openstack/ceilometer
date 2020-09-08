@@ -117,8 +117,8 @@ class PollsterSampleExtractor(object):
             for k in pollster_definitions['metadata_fields']:
                 val = self.retrieve_attribute_nested_value(pollster_sample, k)
 
-                if val:
-                    metadata[k] = val
+                LOG.debug("Assigning value [%s] to metadata key [%s].", val, k)
+                metadata[k] = val
 
         self.generate_new_metadata_fields(
             metadata=metadata, pollster_definitions=pollster_definitions)

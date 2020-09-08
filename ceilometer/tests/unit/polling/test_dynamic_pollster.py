@@ -935,3 +935,65 @@ class TestDynamicPollster(base.BaseTestCase):
             .get_request_linked_samples_url(kwargs)
 
         self.assertEqual(expected_url, url)
+
+    def test_generate_sample_and_extract_metadata(self):
+        definition = self.pollster_definition_only_required_fields.copy()
+        definition['metadata_fields'] = ["metadata1", 'metadata2']
+
+        pollster = dynamic_pollster.DynamicPollster(definition)
+
+        pollster_sample = {'metadata1': 'metadata1',
+                           'metadata2': 'metadata2',
+                           'value': 1}
+
+        sample = pollster.definitions.sample_extractor.generate_sample(
+            pollster_sample)
+
+        self.assertEqual(1, sample.volume)
+        self.assertEqual(2, len(sample.resource_metadata))
+        self.assertEqual('metadata1', sample.resource_metadata['metadata1'])
+        self.assertEqual('metadata2', sample.resource_metadata['metadata2'])
+
+    def test_generate_sample_and_extract_metadata_false_value(self):
+        definition = self.pollster_definition_only_required_fields.copy()
+        definition['metadata_fields'] = ["metadata1",
+                                         'metadata2',
+                                         'metadata3_false']
+
+        pollster = dynamic_pollster.DynamicPollster(definition)
+
+        pollster_sample = {'metadata1': 'metadata1',
+                           'metadata2': 'metadata2',
+                           'metadata3_false': False,
+                           'value': 1}
+
+        sample = pollster.definitions.sample_extractor.generate_sample(
+            pollster_sample)
+
+        self.assertEqual(1, sample.volume)
+        self.assertEqual(3, len(sample.resource_metadata))
+        self.assertEqual('metadata1', sample.resource_metadata['metadata1'])
+        self.assertEqual('metadata2', sample.resource_metadata['metadata2'])
+        self.assertIs(False, sample.resource_metadata['metadata3_false'])
+
+    def test_generate_sample_and_extract_metadata_none_value(self):
+        definition = self.pollster_definition_only_required_fields.copy()
+        definition['metadata_fields'] = ["metadata1",
+                                         'metadata2',
+                                         'metadata3']
+
+        pollster = dynamic_pollster.DynamicPollster(definition)
+
+        pollster_sample = {'metadata1': 'metadata1',
+                           'metadata2': 'metadata2',
+                           'metadata3': None,
+                           'value': 1}
+
+        sample = pollster.definitions.sample_extractor.generate_sample(
+            pollster_sample)
+
+        self.assertEqual(1, sample.volume)
+        self.assertEqual(3, len(sample.resource_metadata))
+        self.assertEqual('metadata1', sample.resource_metadata['metadata1'])
+        self.assertEqual('metadata2', sample.resource_metadata['metadata2'])
+        self.assertIsNone(sample.resource_metadata['metadata3'])
