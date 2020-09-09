@@ -26,6 +26,13 @@ The dynamic pollsters system configuration (for OpenStack APIs)
 Each YAML file in the dynamic pollster feature can use the following
 attributes to define a dynamic pollster:
 
+.. warning::
+    Caution: Ceilometer does not accept complex value data structure for
+    ``value`` and ``metadata`` configurations. Therefore, if you are extracting
+    a complex data structure (Object, list, map, or others), you can take
+    advantage of the ``Operations on extracted attributes`` feature to transform
+    the object into a simple value (string or number)
+
 *  ``name``: mandatory field. It specifies the name/key of the dynamic
    pollster. For instance, a pollster for magnum can use the name
    ``dynamic.magnum.cluster``;
@@ -41,11 +48,11 @@ attributes to define a dynamic pollster:
    JSON response from the URL of the component being polled. We also accept
    nested values dictionaries. To use a nested value one can simply use
    ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``. It is also
-   possible to reference the sample itself using ``.``; the self reference
-   of the sample is interesting in cases when the attribute might not exist.
-   Therefore, together with the operations one can first check if it exist
-   before retrieving it (e.g.
-   `` .  | value['some_field'] if 'some_field' in value else ''``).
+   possible to reference the sample itself using ``"." (dot)``; the self
+   reference of the sample is interesting in cases when the attribute might
+   not exist. Therefore, together with the operations options, one can first
+   check if it exist before retrieving it (example:
+   ``". | value['some_field'] if 'some_field' in value else ''"``).
    In our magnum example, we can use ``status`` as the value attribute;
 
 *  ``endpoint_type``: mandatory field; defines the endpoint type that is
@@ -158,25 +165,25 @@ attributes to define a dynamic pollster:
    directly. We also accept nested values dictionaries. To use a nested value
    one can simply use ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``
 
-* ``user_id_attribute``: optional parameter. The default value is ``user_id``.
+*  ``user_id_attribute``: optional parameter. The default value is ``user_id``.
    The name of the attribute in the entries that are processed from
    ``response_entries_key`` elements that will be mapped to ``user_id``
    attribute that is sent to Gnocchi.
 
-* ``project_id_attribute``: optional parameter. The default value is
+*  ``project_id_attribute``: optional parameter. The default value is
    ``project_id``. The name of the attribute in the entries that are
    processed from ``response_entries_key`` elements that will be mapped to
    ``project_id`` attribute that is sent to Gnocchi.
 
-* ``resource_id_attribute``: optional parameter. The default value is ``id``.
+*  ``resource_id_attribute``: optional parameter. The default value is ``id``.
    The name of the attribute in the entries that are processed from
    ``response_entries_key`` elements that will be mapped to ``id`` attribute
    that is sent to Gnocchi.
 
-* ``headers``: optional parameter. It is a map (similar to the
-  metadata_mapping) of key and value that can be used to customize the header
-  of the request that is executed against the URL. This configuration works
-  for both OpenStack and non-OpenStack dynamic pollster configuration.
+*  ``headers``: optional parameter. It is a map (similar to the
+   metadata_mapping) of key and value that can be used to customize the header
+   of the request that is executed against the URL. This configuration works
+   for both OpenStack and non-OpenStack dynamic pollster configuration.
 
   .. code-block:: yaml
 
