@@ -18,7 +18,7 @@ import logging
 import logging.handlers
 
 from oslo_log import log
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer import publisher
 

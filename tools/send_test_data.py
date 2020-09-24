@@ -30,7 +30,6 @@ import uuid
 
 import make_test_data
 import oslo_messaging
-from six import moves
 
 from ceilometer import messaging
 from ceilometer.publisher import utils
@@ -59,7 +58,7 @@ def generate_data(conf, send_batch, make_data_args, samples_count,
 
     make_data_args.resource_id = None
     resources_list = [str(uuid.uuid4())
-                      for _ in moves.xrange(resources_count)]
+                      for _ in range(resources_count)]
     resource_samples = {resource: 0 for resource in resources_list}
     batch = []
     count = 0

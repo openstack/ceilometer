@@ -16,7 +16,7 @@
 
 import copy
 
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer import sample
 

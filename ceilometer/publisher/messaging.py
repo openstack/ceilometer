@@ -26,7 +26,7 @@ import oslo_messaging
 from oslo_utils import encodeutils
 from oslo_utils import excutils
 import six
-import six.moves.urllib.parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer.i18n import _
 from ceilometer import messaging

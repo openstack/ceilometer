@@ -14,7 +14,7 @@
 
 import re
 
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opencontrail import client

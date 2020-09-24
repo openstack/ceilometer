@@ -18,9 +18,9 @@
 from keystoneauth1 import exceptions
 from oslo_config import cfg
 from oslo_log import log
-import six.moves.urllib.parse as urlparse
 from swiftclient import client as swift
 from swiftclient.exceptions import ClientException
+from urllib import parse as urlparse
 
 from ceilometer import keystone_client
 from ceilometer.polling import plugin_base

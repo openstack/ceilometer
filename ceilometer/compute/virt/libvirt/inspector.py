@@ -202,7 +202,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         # have holes according to
         # https://libvirt.org/git/?p=libvirt.git;a=blob;f=src/libvirt-domain.c
         # virConnectGetAllDomainStats()
-        for vcpu in six.moves.range(stats.get('vcpu.maximum', 0)):
+        for vcpu in range(stats.get('vcpu.maximum', 0)):
             try:
                 cpu_time += (stats.get('vcpu.%s.time' % vcpu) +
                              stats.get('vcpu.%s.wait' % vcpu))

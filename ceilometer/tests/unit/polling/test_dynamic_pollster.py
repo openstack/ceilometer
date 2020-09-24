@@ -18,7 +18,7 @@ import logging
 from unittest import mock
 
 import requests
-from six.moves.urllib import parse as url_parse
+from urllib import parse as urlparse
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
 from ceilometer.polling import dynamic_pollster
@@ -896,7 +896,7 @@ class TestDynamicPollster(base.BaseTestCase):
             self.pollster_definition_only_required_fields)
 
         base_url = "http://test.com/something_that_we_do_not_care"
-        expected_url = url_parse.urljoin(
+        expected_url = urlparse.urljoin(
             base_url, self.pollster_definition_only_required_fields[
                 'url_path'])
 

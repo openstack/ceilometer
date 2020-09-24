@@ -33,7 +33,7 @@ from functools import reduce
 import operator
 import requests
 
-from six.moves.urllib import parse as url_parse
+from urllib import parse as urlparse
 
 LOG = log.getLogger(__name__)
 
@@ -623,14 +623,14 @@ class PollsterSampleGatherer(object):
             kwargs, self.definitions.configurations['url_path'])
 
     def get_next_page_url(self, kwargs, next_sample_url):
-        parse_result = url_parse.urlparse(next_sample_url)
+        parse_result = urlparse.urlparse(next_sample_url)
         if parse_result.netloc:
             return next_sample_url
         return self.get_request_url(kwargs, next_sample_url)
 
     def get_request_url(self, kwargs, url_path):
         endpoint = kwargs['resource']
-        return url_parse.urljoin(endpoint, url_path)
+        return urlparse.urljoin(endpoint, url_path)
 
     def retrieve_entries_from_response(self, response_json):
         if isinstance(response_json, list):
@@ -724,7 +724,7 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         endpoint = self.definitions.configurations['url_path']
         if endpoint == url_path:
             return url_path
-        return url_parse.urljoin(endpoint, url_path)
+        return urlparse.urljoin(endpoint, url_path)
 
     def execute_request_get_samples(self, **kwargs):
         samples = super(NonOpenStackApisSamplesGatherer,

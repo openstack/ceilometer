@@ -15,8 +15,7 @@
 
 from oslo_log import log
 import six
-from six import moves
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer.network.statistics import driver
 from ceilometer.network.statistics.opendaylight import client
@@ -284,7 +283,7 @@ class OpenDayLightDriver(driver.Driver):
             break
 
         # link status to hosts
-        for hosts, status in moves.zip(
+        for hosts, status in zip(
                 [data['active_hosts'], data['inactive_hosts']],
                 ['active', 'inactive']):
             for host_config in hosts['hostConfig']:
