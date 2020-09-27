@@ -352,6 +352,27 @@ class PublisherTest(base.BaseTestCase):
         d.publish_samples(samples)
         self.assertEqual(0, len(fake_batch.call_args[0][1]))
 
+    @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
+                '.batch_measures')
+    def test_unhandled_meter_with_no_resource_id(self, fake_batch):
+        samples = [sample.Sample(
+            name='unknown.meter',
+            unit='GB',
+            type=sample.TYPE_GAUGE,
+            volume=2,
+            user_id='test_user',
+            project_id='test_project',
+            source='openstack',
+            timestamp='2014-05-08 20:23:48.028195',
+            resource_id=None,
+            resource_metadata={}
+        )]
+        url = netutils.urlsplit("gnocchi://")
+        d = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        d._already_checked_archive_policies = True
+        d.publish_samples(samples)
+        self.assertEqual(0, len(fake_batch.call_args[0][1]))
+
 
 class MockResponse(mock.NonCallableMock):
     def __init__(self, code):
