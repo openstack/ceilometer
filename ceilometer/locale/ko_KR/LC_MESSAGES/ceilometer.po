@@ -9,16 +9,17 @@
 # Sungjin Kang <potopro@gmail.com>, 2013
 # Sungjin Kang <potopro@gmail.com>, 2013
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
+# Jongwon Lee <tothebinaryworld@gmail.com>, 2020. #zanata
 msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2018-09-19 00:45+0000\n"
+"POT-Creation-Date: 2020-09-29 07:18+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-12 04:27+0000\n"
-"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
+"PO-Revision-Date: 2020-10-05 01:55+0000\n"
+"Last-Translator: Jongwon Lee <tothebinaryworld@gmail.com>\n"
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.0\n"
@@ -28,6 +29,10 @@ msgstr ""
 #, python-format
 msgid "Could not connect to XenAPI: %s"
 msgstr "XenAPI를 연결할 수 없음: %s"
+
+#, python-format
+msgid "Could not load the following pipelines: %s"
+msgstr "다음 파이프라인을 로드할 수 없음: %s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -68,6 +73,10 @@ msgstr ""
 #, python-format
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "특성 %(trait)s에 대한 올바르지 않은 특성 유형 '%(type)s'"
+
+#, python-format
+msgid "Invalid type %s specified"
+msgstr "올바르지 않은 유형 %s이(가) 지정됨"
 
 #, python-format
 msgid "Multiple VM %s found in XenServer"
@@ -126,6 +135,9 @@ msgstr "RGW AdminOps API가 %(status)s %(reason)s을(를) 리턴함"
 msgid "Required field %s not specified"
 msgstr "필수 필드 %s이(가) 지정되지 않음"
 
+msgid "Sample Check"
+msgstr "샘플 체크"
+
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s에 'fields' 필드 필요"
@@ -166,6 +178,14 @@ msgstr ""
 #, python-format
 msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
 msgstr "vpn%(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플 건너뛰기"
+
+#, python-format
+msgid "Unrecognized type value %s"
+msgstr "인식되지 않은 유형 값 %s"
+
+#, python-format
+msgid "VM %s is poweredOff in VMware vSphere"
+msgstr "VM %s is poweredOff in VMware vSphere "
 
 #, python-format
 msgid "VM %s not found in VMware vSphere"
