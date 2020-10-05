@@ -4,6 +4,7 @@
     run: playbooks/legacy/grenade-dsvm-ceilometer/run.yaml
     post-run: playbooks/legacy/grenade-dsvm-ceilometer/post.yaml
     timeout: 10800
+    voting: false
     irrelevant-files: &ceilometer-irrelevant-files
       - ^(test-|)requirements.txt$
       - ^setup.cfg$
@@ -15,7 +16,6 @@
       - openstack/grenade
       - openstack/devstack-gate
       - openstack/ceilometer
-
 - project:
     templates:
       - openstack-cover-jobs
@@ -28,32 +28,7 @@
     check:
       jobs:
         - grenade-dsvm-ceilometer
-        - telemetry-dsvm-integration:
-            irrelevant-files: *ceilometer-irrelevant-files
-        - telemetry-dsvm-integration-ipv6-only:
-            irrelevant-files: *ceilometer-irrelevant-files
     gate:
       queue: telemetry
       jobs:
         - grenade-dsvm-ceilometer
-        - telemetry-dsvm-integration:
-            irrelevant-files: *ceilometer-irrelevant-files
-        - telemetry-dsvm-integration-ipv6-only:
-            irrelevant-files: *ceilometer-irrelevant-files
-    experimental:
-      jobs:
-        # TripleO jobs that deploy Telemetry.
-        # Note we don't use a project-template here, so it's easier
-        # to disable voting on one specific job if things go wrong.
-        # tripleo-ci-centos-7-scenario00(1|2)-multinode-oooq will only
-        # run on stable/pike while the -container will run in Queens
-        # and beyond.
-        # If you need any support to debug these jobs in case of
-        # failures, please reach us on #tripleo IRC channel.
-        # NOTE(sileht): These job takes 3 hours and fail most of the times.
-        # While other jobs take 20-30 minutes
-        # We can reenable it when they take less times.
-        - tripleo-ci-centos-7-scenario001-multinode-oooq
-        - tripleo-ci-centos-7-scenario001-standalone
-        - tripleo-ci-centos-7-scenario002-multinode-oooq
-        - tripleo-ci-centos-7-scenario002-standalone
