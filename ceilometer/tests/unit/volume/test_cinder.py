@@ -148,6 +148,8 @@ class TestVolumeSizePollster(base.BaseTestCase):
         self.assertEqual('1ae69721-d071-4156-a2bd-b11bb43ec2e3',
                          volume_size_samples[0].resource_metadata
                          ["instance_id"])
+        self.assertEqual('nova', volume_size_samples[0].resource_metadata
+                         ["availability_zone"])
 
 
 class TestVolumeSnapshotSizePollster(base.BaseTestCase):

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The resource metadata for the Cinder volume size poller now includes
+    the availability zone field.

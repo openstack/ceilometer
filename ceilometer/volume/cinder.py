@@ -39,6 +39,7 @@ class VolumeSizePollster(_Base):
     FIELDS = ['name',
               'status',
               'volume_type',
+              'availability_zone',
               'os-vol-host-attr:host',
               'migration_status',
               'attachments',
