@@ -20,7 +20,7 @@ from unittest import mock
 
 from oslotest import base
 import requests
-from six.moves.urllib import parse as url_parse
+from urllib import parse as urlparse
 
 from ceilometer.declarative import DynamicPollsterDefinitionException
 from ceilometer.declarative import NonOpenStackApisDynamicPollsterException
@@ -456,7 +456,7 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
 
         base_url = self.pollster_definition_only_required_fields['url_path']
         next_sample_path = "/next_page"
-        expected_url = url_parse.urljoin(base_url, next_sample_path)
+        expected_url = urlparse.urljoin(base_url, next_sample_path)
 
         kwargs = {'next_sample_url': expected_url}
 
@@ -471,7 +471,7 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
 
         base_url = self.pollster_definition_only_required_fields['url_path']
         next_sample_path = "/next_page"
-        expected_url = url_parse.urljoin(base_url, next_sample_path)
+        expected_url = urlparse.urljoin(base_url, next_sample_path)
 
         kwargs = {'next_sample_url': next_sample_path}
 

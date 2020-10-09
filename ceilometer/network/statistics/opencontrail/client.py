@@ -17,7 +17,7 @@ import copy
 from oslo_log import log
 import requests
 import six
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer.i18n import _
 

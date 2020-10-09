@@ -19,7 +19,7 @@ from oslo_log import log
 from oslo_utils import strutils
 import requests
 from requests import adapters
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer import publisher
 

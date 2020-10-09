@@ -21,7 +21,8 @@ from oslo_log import log
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1905
 import six
-import six.moves.urllib.parse as urlparse
+
+from urllib import parse as urlparse
 
 from ceilometer.hardware.inspector import base
 

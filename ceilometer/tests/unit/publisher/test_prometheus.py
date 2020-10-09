@@ -20,7 +20,7 @@ import uuid
 
 from oslotest import base
 import requests
-from six.moves.urllib import parse as urlparse
+from urllib import parse as urlparse
 
 from ceilometer.publisher import prometheus
 from ceilometer import sample

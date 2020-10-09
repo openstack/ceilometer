@@ -27,8 +27,8 @@ from oslo_log import log
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import six
-import six.moves.urllib.parse as urlparse
 from stevedore import extension
+from urllib import parse as urlparse
 
 from ceilometer import declarative
 from ceilometer import gnocchi_client

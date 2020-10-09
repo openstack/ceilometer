@@ -18,7 +18,8 @@ from collections import namedtuple
 
 from awsauth import S3Auth
 import requests
-import six.moves.urllib.parse as urlparse
+
+from urllib import parse as urlparse
 
 from ceilometer.i18n import _
 

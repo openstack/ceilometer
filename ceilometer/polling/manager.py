@@ -31,9 +31,9 @@ from oslo_log import log
 import oslo_messaging
 from oslo_utils import timeutils
 import six
-from six.moves.urllib import parse as urlparse
 from stevedore import extension
 from tooz import coordination
+from urllib import parse as urlparse
 
 from ceilometer import agent
 from ceilometer import declarative
