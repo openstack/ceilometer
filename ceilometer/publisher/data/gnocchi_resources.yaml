@@ -250,8 +250,10 @@ resources:
     event_delete:
       - volume.delete.end
       - snapshot.delete.end
+    event_update: volume.transfer.accept.end
     event_attributes:
       id: resource_id
+      project_id: project_id
 
   - resource_type: volume_provider
     metrics:
