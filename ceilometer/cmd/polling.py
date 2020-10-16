@@ -84,8 +84,7 @@ def create_polling_service(worker_id, conf=None):
     if conf is None:
         conf = _prepare_config()
         conf.log_opt_values(LOG, log.DEBUG)
-    return manager.AgentManager(worker_id,
-                                conf)
+    return manager.AgentManager(worker_id, conf, conf.polling_namespaces)
 
 
 def main():
