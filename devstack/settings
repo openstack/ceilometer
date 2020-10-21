@@ -16,10 +16,6 @@ if [ "$CEILOMETER_BACKEND" = "gnocchi" ]; then
     enable_service gnocchi-api gnocchi-metricd
 fi
 
-# Use mariadb at least until below issue fix is released
-# https://github.com/gnocchixyz/gnocchi/issues/1069
-MYSQL_SERVICE_NAME=mariadb
-
 # Gnocchi default archive_policy for Ceilometer
 # TODO(sileht): when Gnocchi 4.0 is out use the tarball instead
 GNOCCHI_GIT_PATH=${GNOCCHI_GIT_PATH:-git+https://github.com/gnocchixyz/gnocchi#egg=gnocchi}
