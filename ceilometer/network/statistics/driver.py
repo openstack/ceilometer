@@ -15,11 +15,8 @@
 
 import abc
 
-import six
 
-
-@six.add_metaclass(abc.ABCMeta)
-class Driver(object):
+class Driver(object, metaclass=abc.ABCMeta):
     def __init__(self, conf):
         self.conf = conf
 

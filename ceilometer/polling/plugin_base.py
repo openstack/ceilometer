@@ -17,7 +17,6 @@
 
 import abc
 
-import six
 from stevedore import extension
 
 
@@ -45,8 +44,7 @@ class PollsterPermanentError(Exception):
         self.fail_res_list = resources
 
 
-@six.add_metaclass(abc.ABCMeta)
-class PollsterBase(object):
+class PollsterBase(object, metaclass=abc.ABCMeta):
     """Base class for plugins that support the polling API."""
 
     def setup_environment(self):
@@ -124,8 +122,7 @@ class PollsterBase(object):
         return extensions
 
 
-@six.add_metaclass(abc.ABCMeta)
-class DiscoveryBase(object):
+class DiscoveryBase(object, metaclass=abc.ABCMeta):
     KEYSTONE_REQUIRED_FOR_SERVICE = None
     """Service type required in keystone catalog to works"""
 

@@ -16,7 +16,6 @@ import copy
 
 from oslo_log import log
 import requests
-import six
 from urllib import parse as urlparse
 
 from ceilometer.i18n import _
@@ -75,12 +74,12 @@ class AnalyticsAPIBaseClient(object):
         curl_command = ['REQ: curl -i -X GET ']
 
         params = []
-        for name, value in six.iteritems(req_params['data']):
+        for name, value in req_params['data'].items():
             params.append("%s=%s" % (name, value))
 
         curl_command.append('"%s?%s" ' % (url, '&'.join(params)))
 
-        for name, value in six.iteritems(req_params['headers']):
+        for name, value in req_params['headers'].items():
             curl_command.append('-H "%s: %s" ' % (name, value))
 
         LOG.debug(''.join(curl_command))
@@ -93,7 +92,7 @@ class AnalyticsAPIBaseClient(object):
                                                   resp.status_code,
                                                   resp.reason)]
         dump.extend('%s: %s\n' % (k, v)
-                    for k, v in six.iteritems(resp.headers))
+                    for k, v in resp.headers.items())
         dump.append('\n')
         if resp.content:
             dump.extend([resp.content, '\n'])

@@ -20,7 +20,6 @@ import sys
 from os_win import exceptions as os_win_exc
 from os_win import utilsfactory
 from oslo_utils import units
-import six
 
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
@@ -37,12 +36,8 @@ def convert_exceptions(exception_map, yields=True):
                 break
 
         exc_info = sys.exc_info()
-        # NOTE(claudiub): Python 3 raises the exception object given as
-        # the second argument in six.reraise.
-        # The original message will be maintained by passing the
-        # original exception.
-        exc = raised_exception(six.text_type(exc_info[1]))
-        six.reraise(raised_exception, exc, exc_info[2])
+        exc = raised_exception(str(exc_info[1]))
+        raise exc.with_traceback(exc_info[2])
 
     def decorator(function):
         if yields:

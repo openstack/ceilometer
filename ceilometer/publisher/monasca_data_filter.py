@@ -19,7 +19,6 @@ import datetime
 from jsonpath_rw_ext import parser
 from oslo_log import log
 from oslo_utils import timeutils
-import six
 import yaml
 
 from ceilometer import sample as sample_util
@@ -135,7 +134,7 @@ class MonascaDataFilter(object):
             if len(val_matches) > 0:
                 # resolve the find to the first match and get value
                 val = val_matches[0].value
-                if not isinstance(val, (str, six.text_type)) \
+                if not isinstance(val, (str, str)) \
                    and not isinstance(val, int):
                     # Don't support lists or dicts or ...
                     raise CeiloscaMappingDefinitionException(

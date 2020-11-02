@@ -17,7 +17,6 @@ from unittest import mock
 
 import fixtures
 from oslo_utils import fileutils
-import six
 import yaml
 
 from ceilometer import declarative
@@ -128,8 +127,7 @@ class TestGenericPollsters(test_base.BaseTestCase):
         self.pollster = generic.GenericHardwareDeclarativePollster(self.conf)
 
     def _setup_meter_def_file(self, cfg):
-        if six.PY3:
-            cfg = cfg.encode('utf-8')
+        cfg = cfg.encode('utf-8')
         meter_cfg_file = fileutils.write_to_tempfile(content=cfg,
                                                      prefix="snmp",
                                                      suffix="yaml")

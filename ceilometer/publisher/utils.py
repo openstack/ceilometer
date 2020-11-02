@@ -20,7 +20,6 @@ import hmac
 
 from oslo_config import cfg
 from oslo_utils import secretutils
-import six
 
 
 OPTS = [
@@ -47,7 +46,7 @@ def decode_unicode(input):
         # predictable insertion order to avoid inconsistencies in the
         # message signature computation for equivalent payloads modulo
         # ordering
-        for key, value in sorted(six.iteritems(input)):
+        for key, value in sorted(input.items()):
             temp[decode_unicode(key)] = decode_unicode(value)
         return temp
     elif isinstance(input, (tuple, list)):
@@ -55,9 +54,9 @@ def decode_unicode(input):
         # the tuple would become list. So we have to generate the value as
         # list here.
         return [decode_unicode(element) for element in input]
-    elif isinstance(input, six.text_type):
+    elif isinstance(input, str):
         return input.encode('utf-8')
-    elif six.PY3 and isinstance(input, six.binary_type):
+    elif isinstance(input, bytes):
         return input.decode('utf-8')
     else:
         return input
@@ -65,7 +64,7 @@ def decode_unicode(input):
 
 def recursive_keypairs(d, separator=':'):
     """Generator that produces sequence of keypairs for nested dictionaries."""
-    for name, value in sorted(six.iteritems(d)):
+    for name, value in sorted(d.items()):
         if isinstance(value, dict):
             for subname, subvalue in recursive_keypairs(value, separator):
                 yield ('%s%s%s' % (name, separator, subname), subvalue)
@@ -80,7 +79,7 @@ def compute_signature(message, secret):
     if not secret:
         return ''
 
-    if isinstance(secret, six.text_type):
+    if isinstance(secret, str):
         secret = secret.encode('utf-8')
     digest_maker = hmac.new(secret, b'', hashlib.sha256)
     for name, value in recursive_keypairs(message):
@@ -88,8 +87,8 @@ def compute_signature(message, secret):
             # Skip any existing signature value, which would not have
             # been part of the original message.
             continue
-        digest_maker.update(six.text_type(name).encode('utf-8'))
-        digest_maker.update(six.text_type(value).encode('utf-8'))
+        digest_maker.update(str(name).encode('utf-8'))
+        digest_maker.update(str(value).encode('utf-8'))
     return digest_maker.hexdigest()
 
 
@@ -105,13 +104,12 @@ def verify_signature(message, secret):
     old_sig = message.get('message_signature', '')
     new_sig = compute_signature(message, secret)
 
-    if isinstance(old_sig, six.text_type):
+    if isinstance(old_sig, str):
         try:
             old_sig = old_sig.encode('ascii')
         except UnicodeDecodeError:
             return False
-    if six.PY3:
-        new_sig = new_sig.encode('ascii')
+    new_sig = new_sig.encode('ascii')
 
     return secretutils.constant_time_compare(new_sig, old_sig)
 

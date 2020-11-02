@@ -17,7 +17,6 @@ import datetime
 from unittest import mock
 
 import jsonpath_rw_ext
-import six
 
 from ceilometer import declarative
 from ceilometer.event import converter
@@ -65,7 +64,7 @@ class ConverterBase(base.BaseTestCase):
             elif dtype == models.Trait.DATETIME_TYPE:
                 self.assertIsInstance(trait.value, datetime.datetime)
             elif dtype == models.Trait.TEXT_TYPE:
-                self.assertIsInstance(trait.value, six.string_types)
+                self.assertIsInstance(trait.value, str)
 
     def assertDoesNotHaveTrait(self, event, name):
         traits = [trait for trait in event.traits if trait.name == name]

@@ -20,7 +20,6 @@ import copy
 from oslo_log import log
 from pysnmp.entity.rfc3413.oneliner import cmdgen
 from pysnmp.proto import rfc1905
-import six
 
 from urllib import parse as urlparse
 
@@ -207,7 +206,7 @@ class SNMPInspector(base.Inspector):
     @classmethod
     def construct_metadata(cls, oid_cache, meta_defs, suffix='', host=None):
         metadata = {}
-        for key, oid_def in six.iteritems(meta_defs):
+        for key, oid_def in meta_defs.items():
             metadata[key] = cls.get_oid_value(oid_cache, oid_def, suffix, host)
         return metadata
 
@@ -291,7 +290,7 @@ class SNMPInspector(base.Inspector):
             # populate the oid into cache
             self._query_oids(host, [_interface_ip_oid], cache, True)
         ip_addr = ''
-        for k, v in six.iteritems(oid_cache):
+        for k, v in oid_cache.items():
             if k.startswith(_interface_ip_oid) and v == int(suffix[1:]):
                 ip_addr = k.replace(_interface_ip_oid + ".", "")
         metadata.update(ip=ip_addr)
@@ -342,6 +341,6 @@ class SNMPInspector(base.Inspector):
         processed['metric_oid'] = (param['oid'], eval(param['type']))
         processed['post_op'] = param.get('post_op', None)
         processed['metadata'] = {}
-        for k, v in six.iteritems(param.get('metadata', {})):
+        for k, v in param.get('metadata', {}).items():
             processed['metadata'][k] = (v['oid'], eval(v['type']))
         return processed

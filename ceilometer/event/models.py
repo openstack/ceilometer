@@ -13,7 +13,6 @@
 """Model classes for use in the events storage API.
 """
 from oslo_utils import timeutils
-import six
 
 
 def serialize_dt(value):
@@ -26,7 +25,7 @@ class Model(object):
 
     def __init__(self, **kwds):
         self.fields = list(kwds)
-        for k, v in six.iteritems(kwds):
+        for k, v in kwds.items():
             setattr(self, k, v)
 
     def as_dict(self):
@@ -78,7 +77,7 @@ class Event(Model):
     def __repr__(self):
         trait_list = []
         if self.traits:
-            trait_list = [six.text_type(trait) for trait in self.traits]
+            trait_list = [str(trait) for trait in self.traits]
         return ("<Event: %s, %s, %s, %s>" %
                 (self.message_id, self.event_type, self.generated,
                  " ".join(trait_list)))
@@ -146,6 +145,6 @@ class Trait(Model):
         if trait_type is cls.DATETIME_TYPE:
             return timeutils.normalize_time(timeutils.parse_isotime(value))
         # Cropping the text value to match the TraitText value size
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             return value.decode('utf-8')[:255]
-        return six.text_type(value)[:255]
+        return str(value)[:255]

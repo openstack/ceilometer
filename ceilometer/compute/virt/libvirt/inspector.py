@@ -17,7 +17,6 @@
 from lxml import etree
 from oslo_log import log as logging
 from oslo_utils import units
-import six
 
 try:
     import libvirt
@@ -60,7 +59,7 @@ class LibvirtInspector(virt_inspector.Inspector):
                                  'ex': ex}
             raise virt_inspector.InstanceNotFoundException(msg)
         except Exception as ex:
-            raise virt_inspector.InspectorException(six.text_type(ex))
+            raise virt_inspector.InspectorException(str(ex))
 
     def _get_domain_not_shut_off_or_raise(self, instance):
         instance_name = util.instance_name(instance)

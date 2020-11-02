@@ -17,13 +17,11 @@ import abc
 
 from oslo_log import log
 from oslo_utils import timeutils
-import six
 
 LOG = log.getLogger(__name__)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TraitPluginBase(object):
+class TraitPluginBase(object, metaclass=abc.ABCMeta):
     """Base class for plugins.
 
     It converts notification fields to Trait values.
@@ -132,7 +130,7 @@ class SplitterTraitPlugin(TraitPluginBase):
                 for match in match_list]
 
     def _trait_value(self, match):
-        value = six.text_type(match[1])
+        value = str(match[1])
         if self.max_split is not None:
             values = value.split(self.separator, self.max_split)
         else:

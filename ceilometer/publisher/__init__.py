@@ -18,7 +18,6 @@ import abc
 
 from oslo_log import log
 from oslo_utils import netutils
-import six
 from stevedore import driver
 
 
@@ -36,8 +35,7 @@ def get_publisher(conf, url, namespace):
     return loaded_driver.driver(conf, parse_result)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class ConfigPublisherBase(object):
+class ConfigPublisherBase(object, metaclass=abc.ABCMeta):
     """Base class for plugins that publish data."""
 
     def __init__(self, conf, parsed_url):

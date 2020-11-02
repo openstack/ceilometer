@@ -17,7 +17,6 @@
 """
 
 from oslotest import base
-import six
 
 from ceilometer.compute.pollsters import util
 from ceilometer.polling import manager
@@ -83,7 +82,7 @@ class TestLocationMetadata(base.BaseTestCase):
 
     def test_metadata(self):
         md = util._get_metadata_from_object(self.CONF, self.instance)
-        for prop, value in six.iteritems(self.INSTANCE_PROPERTIES):
+        for prop, value in self.INSTANCE_PROPERTIES.items():
             if prop not in ("metadata"):
                 # Special cases
                 if prop == 'name':

@@ -19,7 +19,6 @@ import pkg_resources
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import netutils
-import six
 
 from ceilometer import declarative
 from ceilometer.hardware import inspector as insloader
@@ -44,7 +43,7 @@ class MeterDefinition(object):
     def __init__(self, definition_cfg):
         self.cfg = definition_cfg
         for fname, fval in self.cfg.items():
-            if (isinstance(fname, six.string_types) and
+            if (isinstance(fname, str) and
                 (fname in self.required_fields or
                  fname.endswith('_inspector'))):
                 setattr(self, fname, fval)

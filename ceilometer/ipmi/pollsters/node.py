@@ -15,7 +15,6 @@
 import abc
 
 from oslo_log import log
-import six
 
 from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as nmexcept
@@ -26,8 +25,7 @@ from ceilometer import sample
 LOG = log.getLogger(__name__)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class _Base(plugin_base.PollsterBase):
+class _Base(plugin_base.PollsterBase, metaclass=abc.ABCMeta):
 
     def setup_environment(self):
         super(_Base, self).setup_environment()

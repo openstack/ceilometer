@@ -25,7 +25,6 @@ from oslo_log import log
 import oslo_messaging
 from oslo_utils import encodeutils
 from oslo_utils import excutils
-import six
 from urllib import parse as urlparse
 
 from ceilometer.i18n import _
@@ -70,8 +69,7 @@ def raise_delivery_failure(exc):
                               cause=exc)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class MessagingPublisher(publisher.ConfigPublisherBase):
+class MessagingPublisher(publisher.ConfigPublisherBase, metaclass=abc.ABCMeta):
 
     def __init__(self, conf, parsed_url):
         super(MessagingPublisher, self).__init__(conf, parsed_url)

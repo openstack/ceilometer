@@ -17,7 +17,6 @@ import subprocess
 import time
 
 from oslo_utils import fileutils
-import six
 
 from ceilometer.tests import base
 
@@ -27,8 +26,7 @@ class BinTestCase(base.BaseTestCase):
         super(BinTestCase, self).setUp()
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n")
-        if six.PY3:
-            content = content.encode('utf-8')
+        content = content.encode('utf-8')
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
                                                     suffix='.conf')
@@ -52,8 +50,7 @@ class BinSendSampleTestCase(base.BaseTestCase):
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n"
                    "pipeline_cfg_file={0}\n".format(pipeline_cfg_file))
-        if six.PY3:
-            content = content.encode('utf-8')
+        content = content.encode('utf-8')
 
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
@@ -89,8 +86,7 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
     def test_starting_with_duplication_namespaces(self):
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n")
-        if six.PY3:
-            content = content.encode('utf-8')
+        content = content.encode('utf-8')
         self.tempfile = fileutils.write_to_tempfile(content=content,
                                                     prefix='ceilometer',
                                                     suffix='.conf')

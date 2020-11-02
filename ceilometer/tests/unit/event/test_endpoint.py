@@ -18,7 +18,6 @@ from unittest import mock
 import fixtures
 import oslo_messaging
 from oslo_utils import fileutils
-import six
 import yaml
 
 from ceilometer.pipeline import event as event_pipe
@@ -101,8 +100,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
             }]
         })
 
-        if six.PY3:
-            ev_pipeline = ev_pipeline.encode('utf-8')
+        ev_pipeline = ev_pipeline.encode('utf-8')
         ev_pipeline_cfg_file = fileutils.write_to_tempfile(
             content=ev_pipeline, prefix="event_pipeline", suffix="yaml")
         self.CONF.set_override('event_pipeline_cfg_file',

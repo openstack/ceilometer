@@ -18,7 +18,6 @@ import time
 from unittest import mock
 
 from oslo_utils import fileutils
-import six
 import yaml
 
 from ceilometer import messaging
@@ -144,8 +143,7 @@ class BaseRealNotification(BaseNotificationTest):
                 'publishers': ['test://']
             }]
         })
-        if six.PY3:
-            pipeline = pipeline.encode('utf-8')
+        pipeline = pipeline.encode('utf-8')
 
         pipeline_cfg_file = fileutils.write_to_tempfile(content=pipeline,
                                                         prefix="pipeline",
@@ -164,8 +162,7 @@ class BaseRealNotification(BaseNotificationTest):
                 'publishers': ['test://']
             }]
         })
-        if six.PY3:
-            ev_pipeline = ev_pipeline.encode('utf-8')
+        ev_pipeline = ev_pipeline.encode('utf-8')
 
         ev_pipeline_cfg_file = fileutils.write_to_tempfile(
             content=ev_pipeline, prefix="event_pipeline", suffix="yaml")

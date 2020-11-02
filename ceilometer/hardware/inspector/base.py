@@ -16,11 +16,8 @@
 
 import abc
 
-import six
 
-
-@six.add_metaclass(abc.ABCMeta)
-class Inspector(object):
+class Inspector(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def inspect_generic(self, host, cache, extra_metadata, param):
         """A generic inspect function.

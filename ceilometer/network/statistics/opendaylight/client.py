@@ -14,11 +14,9 @@
 # under the License.
 
 import abc
-
 from oslo_log import log
 import requests
 from requests import auth
-import six
 
 from ceilometer.i18n import _
 
@@ -26,8 +24,7 @@ from ceilometer.i18n import _
 LOG = log.getLogger(__name__)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class _Base(object):
+class _Base(object, metaclass=abc.ABCMeta):
     """Base class of OpenDaylight REST APIs Clients."""
 
     @abc.abstractproperty
@@ -196,7 +193,7 @@ class Client(object):
 
             curl_command.append('--user "%s":"***" ' % auth_class.username)
 
-        for name, value in six.iteritems(self._req_params['headers']):
+        for name, value in self._req_params['headers'].items():
             curl_command.append('-H "%s: %s" ' % (name, value))
 
         LOG.debug(''.join(curl_command))
@@ -208,7 +205,7 @@ class Client(object):
                                                   resp.status_code,
                                                   resp.reason)]
         dump.extend('%s: %s\n' % (k, v)
-                    for k, v in six.iteritems(resp.headers))
+                    for k, v in resp.headers.items())
         dump.append('\n')
         if resp.content:
             dump.extend([resp.content, '\n'])

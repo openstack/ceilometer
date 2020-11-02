@@ -17,7 +17,6 @@ import tempfile
 from unittest import mock
 
 from oslotest import base
-import six
 
 from ceilometer.ipmi.platform import intel_node_manager as node_manager
 from ceilometer.privsep import ipmitool
@@ -25,8 +24,7 @@ from ceilometer import service
 from ceilometer.tests.unit.ipmi.platform import fake_utils
 
 
-@six.add_metaclass(abc.ABCMeta)
-class _Base(base.BaseTestCase):
+class _Base(base.BaseTestCase, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def init_test_engine(self):
@@ -42,15 +40,11 @@ class _Base(base.BaseTestCase):
 
     @staticmethod
     def _new_no_singleton(cls, *args, **kwargs):
-        if six.PY3:
-            # We call init manually due to a py3 bug:
-            # https://bugs.python.org/issue25731
-            obj = super(node_manager.NodeManager, cls).__new__(cls)
-            obj.__init__(*args, **kwargs)
-            return obj
-        else:
-            return super(node_manager.NodeManager, cls).__new__(
-                cls, *args, **kwargs)
+        # We call init manually due to a py3 bug:
+        # https://bugs.python.org/issue25731
+        obj = super(node_manager.NodeManager, cls).__new__(cls)
+        obj.__init__(*args, **kwargs)
+        return obj
 
 
 class TestNodeManagerV3(_Base):

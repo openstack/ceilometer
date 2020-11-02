@@ -15,8 +15,6 @@ import itertools
 import os
 import re
 
-import six
-
 from oslo_config import cfg
 from oslo_log import log
 from stevedore import extension
@@ -60,7 +58,7 @@ class MeterDefinition(object):
                 _("Required fields %s not specified") % missing, self.cfg)
 
         self._event_type = self.cfg.get('event_type')
-        if isinstance(self._event_type, six.string_types):
+        if isinstance(self._event_type, str):
             self._event_type = [self._event_type]
         self._event_type = [re.compile(etype) for etype in self._event_type]
 
@@ -93,7 +91,7 @@ class MeterDefinition(object):
 
         # List of fields we expected when multiple meter are in the payload
         self.lookup = self.cfg.get('lookup')
-        if isinstance(self.lookup, six.string_types):
+        if isinstance(self.lookup, str):
             self.lookup = [self.lookup]
 
     def match_type(self, meter_name):
@@ -204,7 +202,7 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
                     md = MeterDefinition(meter_cfg, self.conf, plugin_manager)
                 except declarative.DefinitionException as e:
                     errmsg = "Error loading meter definition: %s"
-                    LOG.error(errmsg, six.text_type(e))
+                    LOG.error(errmsg, str(e))
                 else:
                     definitions[meter_cfg['name']] = md
         return definitions.values()

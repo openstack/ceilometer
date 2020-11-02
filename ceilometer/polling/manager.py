@@ -30,7 +30,6 @@ from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
 from oslo_utils import timeutils
-import six
 from stevedore import extension
 from tooz import coordination
 from urllib import parse as urlparse
@@ -101,7 +100,7 @@ class Resources(object):
                     not self.agent_manager.partition_coordinator or
                     self.agent_manager.hashrings[
                         static_resources_group].belongs_to_self(
-                        six.text_type(v))] + source_discovery
+                        str(v))] + source_discovery
 
         return source_discovery
 
@@ -550,7 +549,7 @@ class AgentManager(cotyledon.Service):
                         discovered = [
                             v for v in discovered if self.hashrings[
                                 self.construct_group_id(discoverer.group_id)
-                            ].belongs_to_self(six.text_type(v))]
+                            ].belongs_to_self(str(v))]
 
                     resources.extend(discovered)
                     if discovery_cache is not None:

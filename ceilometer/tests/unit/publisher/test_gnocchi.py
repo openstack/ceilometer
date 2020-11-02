@@ -26,7 +26,6 @@ from oslo_utils import fixture as utils_fixture
 from oslo_utils import netutils
 from oslo_utils import timeutils
 import requests
-import six
 from stevedore import extension
 import testscenarios
 
@@ -281,8 +280,7 @@ class PublisherTest(base.BaseTestCase):
                     ]
 
         for content in contents:
-            if six.PY3:
-                content = content.encode('utf-8')
+            content = content.encode('utf-8')
 
             temp = fileutils.write_to_tempfile(content=content,
                                                prefix='gnocchi_resources',

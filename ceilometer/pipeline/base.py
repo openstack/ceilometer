@@ -19,7 +19,6 @@ import abc
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
-import six
 
 from ceilometer import agent
 from ceilometer import publisher
@@ -136,8 +135,7 @@ class Sink(object):
         """Flush data after all events have been injected to pipeline."""
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Pipeline(object):
+class Pipeline(object, metaclass=abc.ABCMeta):
     """Represents a coupling between a sink and a corresponding source."""
 
     def __init__(self, conf, source, sink):

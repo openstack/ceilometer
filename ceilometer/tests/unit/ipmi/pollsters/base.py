@@ -16,15 +16,13 @@ import abc
 from unittest import mock
 
 import fixtures
-import six
 
 from ceilometer.polling import manager
 from ceilometer import service
 from ceilometer.tests import base
 
 
-@six.add_metaclass(abc.ABCMeta)
-class TestPollsterBase(base.BaseTestCase):
+class TestPollsterBase(base.BaseTestCase, metaclass=abc.ABCMeta):
 
     def setUp(self):
         super(TestPollsterBase, self).setUp()

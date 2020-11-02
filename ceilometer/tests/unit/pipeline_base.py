@@ -20,7 +20,6 @@ from unittest import mock
 
 import fixtures
 from oslo_utils import timeutils
-import six
 
 from ceilometer.pipeline import base as pipe_base
 from ceilometer.pipeline import sample as pipeline
@@ -31,8 +30,7 @@ from ceilometer import service
 from ceilometer.tests import base
 
 
-@six.add_metaclass(abc.ABCMeta)
-class BasePipelineTestCase(base.BaseTestCase):
+class BasePipelineTestCase(base.BaseTestCase, metaclass=abc.ABCMeta):
 
     def get_publisher(self, conf, url, namespace=''):
         fake_drivers = {'test://': test_publisher.TestPublisher,

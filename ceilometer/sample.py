@@ -25,7 +25,6 @@ import uuid
 
 from oslo_config import cfg
 from oslo_utils import timeutils
-import six
 
 OPTS = [
     cfg.StrOpt('sample_source',
@@ -51,7 +50,7 @@ def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
     for prefix in conf.reserved_metadata_namespace:
         md = dict(
             (k[len(prefix):].replace('.', '_'),
-             v[:limit] if isinstance(v, six.string_types) else v)
+             v[:limit] if isinstance(v, str) else v)
             for k, v in src_metadata.items()
             if (k.startswith(prefix) and
                 k[len(prefix):].replace('.', '_') not in dest_metadata)
@@ -61,7 +60,7 @@ def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
     for metadata_key in conf.reserved_metadata_keys:
         md = dict(
             (k.replace('.', '_'),
-             v[:limit] if isinstance(v, six.string_types) else v)
+             v[:limit] if isinstance(v, str) else v)
             for k, v in src_metadata.items()
             if (k == metadata_key and
                 k.replace('.', '_') not in dest_metadata)

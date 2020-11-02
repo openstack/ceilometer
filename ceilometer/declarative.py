@@ -15,7 +15,6 @@ import os
 
 from jsonpath_rw_ext import parser
 from oslo_log import log
-import six
 import yaml
 
 from ceilometer.i18n import _
@@ -71,7 +70,7 @@ class Definition(object):
 
             if 'plugin' in cfg:
                 plugin_cfg = cfg['plugin']
-                if isinstance(plugin_cfg, six.string_types):
+                if isinstance(plugin_cfg, str):
                     plugin_name = plugin_cfg
                     plugin_params = {}
                 else:
@@ -107,7 +106,7 @@ class Definition(object):
             else:
                 fields = '|'.join('(%s)' % path for path in fields)
 
-        if isinstance(fields, six.integer_types):
+        if isinstance(fields, int):
             self.getter = fields
         else:
             try:

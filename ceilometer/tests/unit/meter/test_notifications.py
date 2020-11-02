@@ -17,7 +17,6 @@ from unittest import mock
 import fixtures
 from oslo_utils import encodeutils
 from oslo_utils import fileutils
-import six
 import yaml
 
 from ceilometer import declarative
@@ -291,8 +290,7 @@ class TestMeterProcessing(test.BaseTestCase):
             cfgs = [cfgs]
         meter_cfg_files = list()
         for cfg in cfgs:
-            if six.PY3:
-                cfg = cfg.encode('utf-8')
+            cfg = cfg.encode('utf-8')
             meter_cfg_files.append(fileutils.write_to_tempfile(content=cfg,
                                                                path=self.path,
                                                                prefix="meters",

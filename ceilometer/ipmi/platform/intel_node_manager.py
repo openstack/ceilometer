@@ -28,7 +28,6 @@ import threading
 import time
 
 from oslo_config import cfg
-import six
 
 from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as nmexcept
@@ -178,8 +177,7 @@ class NodeManager(object):
         with open(file_path, 'rb') as bin_fp:
             data_str = binascii.hexlify(bin_fp.read())
 
-        if six.PY3:
-            data_str = data_str.decode('ascii')
+        data_str = data_str.decode('ascii')
         oem_id_index = data_str.find(prefix)
         if oem_id_index != -1:
             ret = data_str[oem_id_index + len(prefix):

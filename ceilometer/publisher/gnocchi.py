@@ -26,7 +26,6 @@ from keystoneauth1 import exceptions as ka_exceptions
 from oslo_log import log
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
-import six
 from stevedore import extension
 from urllib import parse as urlparse
 
@@ -43,8 +42,7 @@ LOG = log.getLogger(__name__)
 
 def cache_key_mangler(key):
     """Construct an opaque cache key."""
-    if six.PY2:
-        key = key.encode('utf-8')
+
     return uuid.uuid5(CACHE_NAMESPACE, key).hex
 
 
@@ -53,10 +51,10 @@ EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE = ("create", "update", "delete")
 
 class ResourcesDefinition(object):
 
-    MANDATORY_FIELDS = {'resource_type': six.string_types,
+    MANDATORY_FIELDS = {'resource_type': str,
                         'metrics': (dict, list)}
 
-    MANDATORY_EVENT_FIELDS = {'id': six.string_types}
+    MANDATORY_EVENT_FIELDS = {'id': str}
 
     def __init__(self, definition_cfg, archive_policy_default,
                  archive_policy_override, plugin_manager):
@@ -373,9 +371,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         try:
             self.batch_measures(measures, gnocchi_data)
         except gnocchi_exc.ClientException as e:
-            LOG.error(six.text_type(e))
+            LOG.error(str(e))
         except Exception as e:
-            LOG.error(six.text_type(e), exc_info=True)
+            LOG.error(str(e), exc_info=True)
 
         for info in gnocchi_data.values():
             resource = info["resource"]
@@ -387,9 +385,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 self._if_not_cached(resource_type, resource['id'],
                                     resource_extra)
             except gnocchi_exc.ClientException as e:
-                LOG.error(six.text_type(e))
+                LOG.error(str(e))
             except Exception as e:
-                LOG.error(six.text_type(e), exc_info=True)
+                LOG.error(str(e), exc_info=True)
 
     @staticmethod
     def _extract_resources_from_error(e, resource_infos):
@@ -422,7 +420,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     pass
                 except gnocchi_exc.ClientException as e:
                     LOG.error('Error creating resource %(id)s: %(err)s',
-                              {'id': resource['id'], 'err': six.text_type(e)})
+                              {'id': resource['id'], 'err': str(e)})
                     # We cannot post measures for this resource
                     # and we can't patch it later
                     del measures[resource['id']]

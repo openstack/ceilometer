@@ -17,7 +17,6 @@ import abc
 import collections
 
 from oslo_log import log
-import six
 
 from ceilometer.i18n import _
 from ceilometer.network.services import base
@@ -217,8 +216,7 @@ class LBHealthMonitorPollster(base.BaseServicesPollster):
             )
 
 
-@six.add_metaclass(abc.ABCMeta)
-class _LBStatsPollster(base.BaseServicesPollster):
+class _LBStatsPollster(base.BaseServicesPollster, metaclass=abc.ABCMeta):
     """Base Statistics pollster.
 
      It is capturing the statistics info and yielding samples for connections

@@ -18,7 +18,6 @@ from oslo_log import log
 from oslo_utils import fnmatch
 from oslo_utils import timeutils
 import pkg_resources
-import six
 
 from ceilometer import declarative
 from ceilometer.event import models
@@ -97,7 +96,7 @@ class EventDefinition(object):
             raise declarative.EventDefinitionException(
                 _("Required field %s not specified") % err.args[0], self.cfg)
 
-        if isinstance(event_type, six.string_types):
+        if isinstance(event_type, str):
             event_type = [event_type]
 
         for t in event_type:
