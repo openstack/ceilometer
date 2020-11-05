@@ -141,7 +141,8 @@ class XenapiInspector(virt_inspector.Inspector):
                 parameters=None,
                 rx_bytes=bw_vif['bw_in'], rx_packets=-1, rx_drop=-1,
                 rx_errors=-1, tx_bytes=bw_vif['bw_out'], tx_packets=-1,
-                tx_drop=-1, tx_errors=-1)
+                tx_drop=-1, tx_errors=-1, rx_bytes_delta=-1,
+                tx_bytes_delta=-1)
 
     def inspect_vnic_rates(self, instance, duration):
         instance_name = util.instance_name(instance)

@@ -50,7 +50,8 @@ class TestNetPollster(base.TestPollsterBase):
             rx_bytes=1, rx_packets=2,
             rx_drop=20, rx_errors=21,
             tx_bytes=3, tx_packets=4,
-            tx_drop=22, tx_errors=23)
+            tx_drop=22, tx_errors=23,
+            rx_bytes_delta=42, tx_bytes_delta=43)
 
         self.vnic1 = virt_inspector.InterfaceStats(
             name='vnet1',
@@ -63,7 +64,8 @@ class TestNetPollster(base.TestPollsterBase):
             rx_bytes=5, rx_packets=6,
             rx_drop=24, rx_errors=25,
             tx_bytes=7, tx_packets=8,
-            tx_drop=26, tx_errors=27)
+            tx_drop=26, tx_errors=27,
+            rx_bytes_delta=44, tx_bytes_delta=45)
 
         self.vnic2 = virt_inspector.InterfaceStats(
             name='vnet2',
@@ -76,7 +78,8 @@ class TestNetPollster(base.TestPollsterBase):
             rx_bytes=9, rx_packets=10,
             rx_drop=28, rx_errors=29,
             tx_bytes=11, tx_packets=12,
-            tx_drop=30, tx_errors=31)
+            tx_drop=30, tx_errors=31,
+            rx_bytes_delta=46, tx_bytes_delta=47)
 
         vnics = [
             self.vnic0,
@@ -117,7 +120,7 @@ class TestNetPollster(base.TestPollsterBase):
 
         self.faux_instance = FauxInstance(**self.INSTANCE_PROPERTIES)
 
-    def _check_get_samples(self, factory, expected):
+    def _check_get_samples(self, factory, expected, kind='cumulative'):
         mgr = manager.AgentManager(0, self.CONF)
         pollster = factory(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
@@ -131,7 +134,7 @@ class TestNetPollster(base.TestPollsterBase):
                      ]
             self.assertEqual(len(match), 1, 'missing ip %s' % ip)
             self.assertEqual(expected_volume, match[0].volume)
-            self.assertEqual('cumulative', match[0].type)
+            self.assertEqual(kind, match[0].type)
             self.assertEqual(expected_rid, match[0].resource_id)
 
         for ip, volume, rid in expected:
@@ -157,6 +160,30 @@ class TestNetPollster(base.TestPollsterBase):
              ('192.168.0.4', 11,
               "%s-%s" % (instance_name_id, self.vnic2.name)),
              ],
+        )
+
+    def test_incoming_bytes_delta(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.IncomingBytesDeltaPollster,
+            [('10.0.0.2', 42, self.vnic0.fref),
+             ('192.168.0.3', 44, self.vnic1.fref),
+             ('192.168.0.4', 46,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+            'delta',
+        )
+
+    def test_outgoing_bytes_delta(self):
+        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        self._check_get_samples(
+            net.OutgoingBytesDeltaPollster,
+            [('10.0.0.2', 43, self.vnic0.fref),
+             ('192.168.0.3', 45, self.vnic1.fref),
+             ('192.168.0.4', 47,
+              "%s-%s" % (instance_name_id, self.vnic2.name)),
+             ],
+            'delta',
         )
 
     def test_incoming_packets(self):
