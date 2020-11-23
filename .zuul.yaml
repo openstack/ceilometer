@@ -28,7 +28,13 @@
     check:
       jobs:
         - grenade-dsvm-ceilometer
+        - telemetry-dsvm-integration-train:
+            irrelevant-files: *ceilometer-irrelevant-files
     gate:
       queue: telemetry
       jobs:
         - grenade-dsvm-ceilometer
+        - telemetry-dsvm-integration-train:
+            irrelevant-files: *ceilometer-irrelevant-files
+        - telemetry-dsvm-integration-ipv6-only:
+            irrelevant-files: *ceilometer-irrelevant-files
