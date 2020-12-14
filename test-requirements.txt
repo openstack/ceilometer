@@ -14,3 +14,4 @@ testtools>=2.2.0 # MIT
 gabbi>=1.30.0 # Apache-2.0
 requests-aws>=0.1.4 # BSD License (3 clause)
 stestr>=2.0.0 # Apache-2.0
+testresources>=2.0.1 # Apache-2.0
