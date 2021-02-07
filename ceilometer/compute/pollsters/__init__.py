@@ -96,7 +96,7 @@ class GenericComputePollster(plugin_base.PollsterBase):
                 instance, duration)
             polled_time = now()
             # Ensure we don't cache an iterator
-            if isinstance(result, collections.Iterable):
+            if isinstance(result, collections.abc.Iterable):
                 result = list(result)
             else:
                 result = [result]
