@@ -128,9 +128,10 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
     @cachetools.cachedmethod(operator.attrgetter('_flavor_cache'))
     def get_flavor_id(self, name):
         try:
-            return self.nova_cli.nova_client.flavors.find(name=name).id
+            return self.nova_cli.nova_client.flavors.find(
+                name=name, is_public=None).id
         except exceptions.NotFound:
-            return None
+            return name
 
     @libvirt_utils.retry_on_disconnect
     def discover_libvirt_polling(self, manager, param=None):

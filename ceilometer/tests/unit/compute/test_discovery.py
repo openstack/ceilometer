@@ -17,6 +17,8 @@ from unittest import mock
 import fixtures
 import testtools
 
+from novaclient import exceptions
+
 try:
     import libvirt
 except ImportError:
@@ -297,3 +299,29 @@ class TestDiscovery(base.BaseTestCase):
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
+
+    def test_get_flavor_id(self):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.client.nova_client = mock.MagicMock()
+        self.client.nova_client.flavors = mock.MagicMock()
+        fake_flavor = mock.MagicMock()
+        fake_flavor.id = 'fake_id'
+
+        self.client.nova_client.flavors.find = mock.MagicMock(
+            return_value=fake_flavor)
+        dsc = discovery.InstanceDiscovery(self.CONF)
+
+        flavor_name = 'fake_name'
+
+        ret_flavor_id = dsc.get_flavor_id(flavor_name)
+        self.assertEqual('fake_id', ret_flavor_id)
+
+        # test raise NotFound exception
+        self.client.nova_client.flavors.find = mock.MagicMock(
+            side_effect=exceptions.NotFound(404))
+        dsc = discovery.InstanceDiscovery(self.CONF)
+
+        ret_flavor_id = dsc.get_flavor_id(flavor_name)
+        self.assertEqual(flavor_name, ret_flavor_id)
