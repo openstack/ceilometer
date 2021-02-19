@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Support for XenServer/Xen Cloud Platform has been deprecated and will be
+    removed in a future release.

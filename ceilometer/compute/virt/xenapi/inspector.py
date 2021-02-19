@@ -30,12 +30,21 @@ opt_group = cfg.OptGroup(name='xenapi',
 
 OPTS = [
     cfg.StrOpt('connection_url',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for XenServer/Xen Cloud Platform '
+                                 'has been deprecated',
                help='URL for connection to XenServer/Xen Cloud Platform.'),
     cfg.StrOpt('connection_username',
                default='root',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for XenServer/Xen Cloud Platform '
+                                 'has been deprecated',
                help='Username for connection to XenServer/Xen Cloud '
                     'Platform.'),
     cfg.StrOpt('connection_password',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for XenServer/Xen Cloud Platform '
+                                 'has been deprecated',
                help='Password for connection to XenServer/Xen Cloud Platform.',
                secret=True),
 ]
