@@ -28,7 +28,7 @@ OPTS = [
                default='libvirt',
                help='Inspector to use for inspecting the hypervisor layer. '
                     'Known inspectors are libvirt, hyperv, vsphere '
-                    'and xenapi.'),
+                    'and xenapi. Note that xenapi has been deprecated.'),
 ]
 
 
@@ -270,6 +270,9 @@ class Inspector(object):
 
 
 def get_hypervisor_inspector(conf):
+    if conf.hypervisor_inspector == 'xenapi':
+        LOG.warning('Support for XenServer/Xen Cloud Platform has been '
+                    'deprecated and will be removed in a future release')
     try:
         namespace = 'ceilometer.compute.virt'
         mgr = driver.DriverManager(namespace,
