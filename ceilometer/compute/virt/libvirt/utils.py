@@ -108,7 +108,8 @@ def is_disconnection_exception(e):
 
 retry_on_disconnect = tenacity.retry(
     retry=tenacity.retry_if_exception(is_disconnection_exception),
-    stop=tenacity.stop_after_attempt(2))
+    stop=tenacity.stop_after_attempt(3),
+    wait=tenacity.wait_exponential(multiplier=3, min=1, max=60))
 
 
 def raise_nodata_if_unsupported(method):

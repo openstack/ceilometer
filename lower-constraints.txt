@@ -41,7 +41,7 @@ requests-aws==0.1.4
 six==1.10.0
 stestr==2.0.0
 stevedore==3.0.0
-tenacity==4.12.0
+tenacity==6.3.1
 testresources==2.0.1
 testscenarios==0.4
 testtools==2.2.0
