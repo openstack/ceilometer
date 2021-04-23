@@ -21,7 +21,6 @@ import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
 import ceilometer.compute.virt.vmware.inspector
-import ceilometer.compute.virt.xenapi.inspector
 import ceilometer.event.converter
 import ceilometer.hardware.discovery
 import ceilometer.hardware.pollsters.generic
@@ -118,7 +117,6 @@ def list_opts():
                          ceilometer.objectstore.swift.SERVICE_OPTS,
                          ceilometer.volume.discovery.SERVICE_OPTS,)),
         ('vmware', ceilometer.compute.virt.vmware.inspector.OPTS),
-        ('xenapi', ceilometer.compute.virt.xenapi.inspector.OPTS),
     ]
 
 

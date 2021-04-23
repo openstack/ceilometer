@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Support for XenServer/Xen Cloud Platform has been removed.

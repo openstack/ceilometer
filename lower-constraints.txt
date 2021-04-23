@@ -11,7 +11,6 @@ lxml==4.5.1
 monotonic==0.6
 msgpack==0.5.2
 os-win==3.0.0
-os-xenapi==0.3.3
 oslo.cache==1.26.0
 oslo.concurrency==3.26.0
 oslo.config==6.0.0
