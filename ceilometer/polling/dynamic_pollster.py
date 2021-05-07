@@ -411,7 +411,8 @@ class PollsterDefinitions(object):
         PollsterDefinition(name='user_id_attribute', default="user_id"),
         PollsterDefinition(name='resource_id_attribute', default="id"),
         PollsterDefinition(name='project_id_attribute', default="project_id"),
-        PollsterDefinition(name='headers')]
+        PollsterDefinition(name='headers'),
+        PollsterDefinition(name='timeout', default=30)]
 
     extra_definitions = []
 
@@ -613,6 +614,7 @@ class PollsterSampleGatherer(object):
         request_headers = self.definitions.configurations['headers']
         if request_headers:
             request_args['headers'] = request_headers
+        request_args['timeout'] = self.definitions.configurations['timeout']
         return request_args
 
     def get_request_linked_samples_url(self, kwargs):

@@ -190,6 +190,14 @@ attributes to define a dynamic pollster:
     headers:
       "x-openstack-nova-api-version": "2.46"
 
+*  ``timeout``: optional parameter. Defines the request timeout for the
+   requests executed by the dynamic pollsters to gather data. The default
+   timeout value is 30 seconds. If it is set to `None`, this means that the
+   request never times out on the client side. Therefore, one might have
+   problems if the server never closes the connection. The pollsters are
+   executed serially, one after the other. Therefore, if the request hangs,
+   all pollsters (including the non-dynamic ones) will stop executing.
+
 The complete YAML configuration to gather data from Magnum (that has been used
 as an example) is the following:
 
