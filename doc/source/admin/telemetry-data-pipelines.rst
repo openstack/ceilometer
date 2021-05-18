@@ -169,13 +169,6 @@ You can read more `here <https://github.com/prometheus/pushgateway#about-timesta
 Due to this, this is not recommended to use this publisher for billing purpose
 as timestamps in Prometheus will not be exact.
 
-panko
-`````
-
-Event data in Ceilometer can be stored in panko which provides an HTTP REST
-interface to query system events in OpenStack. To push data to panko,
-set the publisher to ``panko://``.
-
 notifier
 ````````
 
@@ -327,6 +320,5 @@ specified. A sample ``publishers`` section in the
 
    publishers:
        - gnocchi://
-       - panko://
        - udp://10.0.0.2:1234
        - notifier://?policy=drop&max_queue_length=512&topic=custom_target

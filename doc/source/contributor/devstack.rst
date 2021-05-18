@@ -28,7 +28,6 @@ Configuring devstack
    Optionally, services which extend Ceilometer can be enabled::
 
      enable_plugin aodh https://opendev.org/openstack/aodh
-     enable_plugin panko https://opendev.org/openstack/panko
 
    These plugins should be added before ceilometer.
 

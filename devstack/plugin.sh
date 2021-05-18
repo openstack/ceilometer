@@ -207,12 +207,7 @@ function _ceilometer_configure_cache_backend {
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
-        # It's ok for the backend to be 'none', if panko is enabled. We do not
-        # combine this condition with the outer if statement, so that the else
-        # clause below is not executed.
-        if ! is_service_enabled panko-api; then
-            echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
-        fi
+        echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
         sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=gnocchi_swift/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
         ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
@@ -220,12 +215,6 @@ function _ceilometer_configure_storage_backend {
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
     fi
 
-    # configure panko
-    if is_service_enabled panko-api; then
-        if ! grep -q 'panko' $CEILOMETER_CONF_DIR/event_pipeline.yaml ; then
-            echo '          - panko://' >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
-        fi
-    fi
 }
 
 # Configure Ceilometer
