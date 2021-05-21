@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    The ``[coordination] check_watchers`` parameter has been deprecated since
+    it has been ineffective.
