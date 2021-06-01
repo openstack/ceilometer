@@ -44,7 +44,7 @@ Release Notes
 
 IRC
 ---
-IRC Channel: #openstack-telemetry on `Freenode`_.
+IRC Channel: #openstack-telemetry on `OFTC`_.
 
 Mailinglist
 -----------
@@ -53,5 +53,5 @@ as the mailinglist. Please use tag ``[Ceilometer]`` in the subject for new
 threads.
 
 
-.. _Freenode: https://freenode.net/
+.. _OFTC: https://oftc.net/
 
