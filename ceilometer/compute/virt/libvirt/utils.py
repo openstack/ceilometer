@@ -30,7 +30,7 @@ LOG = logging.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('libvirt_type',
                default='kvm',
-               choices=['kvm', 'lxc', 'qemu', 'uml', 'xen'],
+               choices=['kvm', 'lxc', 'qemu', 'uml'],
                help='Libvirt domain type.'),
     cfg.StrOpt('libvirt_uri',
                default='',
@@ -38,7 +38,7 @@ OPTS = [
                     '(which is dependent on libvirt_type).'),
 ]
 
-LIBVIRT_PER_TYPE_URIS = dict(uml='uml:///system', xen='xen:///', lxc='lxc:///')
+LIBVIRT_PER_TYPE_URIS = dict(uml='uml:///system', lxc='lxc:///')
 
 
 # We don't use the libvirt constants in case of libvirt is not available

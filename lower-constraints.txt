@@ -10,7 +10,6 @@ keystoneauth1==3.18.0
 lxml==4.5.1
 msgpack==0.5.2
 os-win==3.0.0
-os-xenapi==0.3.3
 oslo.cache==1.26.0
 oslo.concurrency==3.26.0
 oslo.config==6.0.0
