@@ -5,3 +5,6 @@ build-essential [platform:dpkg]
 libffi-dev [platform:dpkg]
 gettext [platform:dpkg]
 python37 [platform:rpm py37]
+
+# PDF Docs package dependencies
+tex-gyre [platform:dpkg doc]
