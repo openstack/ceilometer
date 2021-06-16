@@ -19,6 +19,7 @@ from oslo_vmware import api
 from oslotest import base
 
 from ceilometer.compute.virt.vmware import vsphere_operations
+from ceilometer.tests.unit.compute.virt.vmware import fake as vmware_fake
 
 
 class VsphereOperationsTest(base.BaseTestCase):
@@ -41,8 +42,8 @@ class VsphereOperationsTest(base.BaseTestCase):
 
         def construct_mock_vm_object(vm_moid, vm_instance):
             vm_object = mock.MagicMock()
-            vm_object.obj.value = vm_moid
-            vm_object.obj._type = "VirtualMachine"
+            vm_object.obj = vmware_fake.ManagedObjectReference(
+                'VirtualMachine', value=vm_moid)
             vm_object.propSet[0].val = vm_instance
             return vm_object
 
@@ -74,8 +75,8 @@ class VsphereOperationsTest(base.BaseTestCase):
         self.assertEqual("VirtualMachine", vm_object._type)
 
     def test_query_vm_property(self):
-        vm_object = mock.MagicMock()
-        vm_object.value = "vm-21"
+        vm_object = vmware_fake.ManagedObjectReference('VirtualMachine',
+                                                       value='vm-21')
         vm_property_name = "runtime.powerState"
         vm_property_val = "poweredON"
 
@@ -131,9 +132,8 @@ class VsphereOperationsTest(base.BaseTestCase):
         self.assertEqual(2, counter_id)
 
     def test_query_vm_stats(self):
-
-        vm_object = mock.MagicMock()
-        vm_object.value = "vm-21"
+        vm_object = vmware_fake.ManagedObjectReference('VirtualMachine',
+                                                       value='vm-21')
         device1 = "device-1"
         device2 = "device-2"
         device3 = "device-3"
