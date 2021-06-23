@@ -35,8 +35,7 @@ Code Repository
 
 Bug Tracking
 ------------
-- Bugs: https://storyboard.openstack.org/#!/project_group/telemetry
-  specifically: https://storyboard.openstack.org/#!/project/openstack/ceilometer
+- Bugs: https://bugs.launchpad.net/ceilometer/
 
 Release Notes
 -------------
