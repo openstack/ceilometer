@@ -171,7 +171,7 @@ function configure_gnocchi {
     write_uwsgi_config "$GNOCCHI_UWSGI_FILE" "$CEILOMETER_BIN_DIR/gnocchi-api" "/metric"
 
     if [ -n "$GNOCCHI_COORDINATOR_URL" ]; then
-        iniset $GNOCCHI_CONF storage coordination_url "$GNOCCHI_COORDINATOR_URL"
+        iniset $GNOCCHI_CONF coordination_url "$GNOCCHI_COORDINATOR_URL"
     fi
 }
 
