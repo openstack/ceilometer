@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 from collections import defaultdict
+import fnmatch
 import hashlib
 import itertools
 import json
@@ -24,7 +25,6 @@ import uuid
 from gnocchiclient import exceptions as gnocchi_exc
 from keystoneauth1 import exceptions as ka_exceptions
 from oslo_log import log
-from oslo_utils import fnmatch
 from oslo_utils import timeutils
 from stevedore import extension
 from urllib import parse as urlparse
