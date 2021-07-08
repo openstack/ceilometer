@@ -52,7 +52,7 @@ Database backend
 Installation
    The current best source of information on how to deploy this project is
    found as the devstack implementation but feel free to come to
-   #openstack-metering on freenode for more info.
+   #openstack-metering on OFTC for more info.
 
 Volume of data
    Please note that metering can generate lots of data very quickly. Have a
