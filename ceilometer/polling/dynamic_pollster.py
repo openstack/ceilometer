@@ -21,13 +21,13 @@ import copy
 import re
 
 from oslo_log import log
-from oslo_utils import timeutils
 
 from requests import RequestException
 
 from ceilometer import declarative
 from ceilometer.polling import plugin_base
 from ceilometer import sample as ceilometer_sample
+from ceilometer import utils as ceilometer_utils
 
 from functools import reduce
 import operator
@@ -123,7 +123,7 @@ class PollsterSampleExtractor(object):
         self.generate_new_metadata_fields(
             metadata=metadata, pollster_definitions=pollster_definitions)
         return ceilometer_sample.Sample(
-            timestamp=timeutils.isotime(),
+            timestamp=ceilometer_utils.isotime(),
             name=pollster_definitions['name'],
             type=pollster_definitions['sample_type'],
             unit=pollster_definitions['unit'],

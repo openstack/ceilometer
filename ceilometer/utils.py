@@ -21,6 +21,7 @@
 import threading
 
 from oslo_config import cfg
+from oslo_utils import timeutils
 
 ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
 
@@ -47,3 +48,16 @@ def spawn_thread(target, *args, **kwargs):
     t.daemon = True
     t.start()
     return t
+
+
+def isotime(at=None):
+    """Current time as ISO string,
+
+    :returns: Current time in ISO format
+    """
+    if not at:
+        at = timeutils.utcnow()
+    date_string = at.strftime("%Y-%m-%dT%H:%M:%S")
+    tz = at.tzinfo.tzname(None) if at.tzinfo else 'UTC'
+    date_string += ('Z' if tz == 'UTC' else tz)
+    return date_string
