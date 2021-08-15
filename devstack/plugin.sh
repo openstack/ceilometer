@@ -97,9 +97,8 @@ function _ceilometer_prepare_coordination {
 function _ceilometer_prepare_virt_drivers {
     # Only install virt drivers if we're running nova compute
     if is_service_enabled n-cpu ; then
-        if [[ "$VIRT_DRIVER" = 'libvirt' && "$DISTRO" != 'rhel8' ]]; then
-            pip_install_gr libvirt-python
-        fi
+        # NOTE(tkajinam): pythonN-libvirt is installed using distro
+        # packages in devstack
 
         if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
             pip_install_gr oslo.vmware
