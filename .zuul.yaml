@@ -25,13 +25,6 @@
       - ^releasenotes/.*$
       - ^ceilometer/tests/.*$
 
-- job:
-    name: telemetry-dsvm-integration-centos-8s
-    nodeset: devstack-single-node-centos-8-stream
-    parent: telemetry-dsvm-integration
-    description: |
-      Functional testing for a Centos 8 stream system
-
 - project:
     templates:
       - openstack-cover-jobs
@@ -43,8 +36,6 @@
     check:
       jobs:
         - grenade-ceilometer
-        - telemetry-dsvm-integration-centos-8s:
-            irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
@@ -53,8 +44,6 @@
       queue: telemetry
       jobs:
         - grenade-ceilometer
-        - telemetry-dsvm-integration-centos-8s:
-            irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
