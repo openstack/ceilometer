@@ -1,0 +1,7 @@
+---
+fixes:
+  - >
+    [`bug 1940660 <https://bugs.launchpad.net/ceilometer/+bug/1940660>`_]
+    Fixes an issue with the Swift pollster where the ``[service_credentials]
+    cafile`` option was not used. This could prevent communication with
+    TLS-enabled Swift APIs.
