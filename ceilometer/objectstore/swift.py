@@ -86,10 +86,14 @@ class _Base(plugin_base.PollsterBase):
         swift_api_method = getattr(swift, '%s_account' % self.METHOD)
         for t in tenants:
             try:
-                yield (t.id, swift_api_method(
+                http_conn = swift.http_connection(
                     self._neaten_url(endpoint, t.id,
                                      self.conf.reseller_prefix),
-                    keystone_client.get_auth_token(ksclient)))
+                    cacert=self.conf.service_credentials.cafile)
+                yield (t.id, swift_api_method(
+                    None,
+                    keystone_client.get_auth_token(ksclient),
+                    http_conn))
             except ClientException as e:
                 if e.http_status == 404:
                     LOG.warning("Swift tenant id %s not found.", t.id)

@@ -188,18 +188,27 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         mock_method = mock.MagicMock()
         endpoint = 'end://point/'
         api_method = '%s_account' % self.pollster.METHOD
+        mock_connection = mock.MagicMock()
         with fixtures.MockPatchObject(swift_client,
                                       api_method,
                                       new=mock_method):
-            with fixtures.MockPatchObject(
-                    self.manager._service_catalog, 'url_for',
-                    return_value=endpoint):
-                list(self.pollster.get_samples(self.manager, {},
-                                               ASSIGNED_TENANTS))
+            with fixtures.MockPatchObject(swift_client,
+                                          'http_connection',
+                                          new=mock_connection):
+                with fixtures.MockPatchObject(
+                        self.manager._service_catalog, 'url_for',
+                        return_value=endpoint):
+                    list(self.pollster.get_samples(self.manager, {},
+                                                   ASSIGNED_TENANTS))
         expected = [mock.call(self.pollster._neaten_url(
-            endpoint, t.id, self.CONF.reseller_prefix),
-            self.manager._auth_token)
-            for t in ASSIGNED_TENANTS]
+                              endpoint, t.id, self.CONF.reseller_prefix),
+                              cacert=None)
+                    for t in ASSIGNED_TENANTS]
+        self.assertEqual(expected, mock_connection.call_args_list)
+
+        expected = [mock.call(None, self.manager._auth_token,
+                              mock_connection.return_value)
+                    for t in ASSIGNED_TENANTS]
         self.assertEqual(expected, mock_method.call_args_list)
 
     def test_get_endpoint_only_once(self):
@@ -208,13 +217,16 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         api_method = '%s_account' % self.pollster.METHOD
         with fixtures.MockPatchObject(swift_client, api_method,
                                       new=mock.MagicMock()):
-            with fixtures.MockPatchObject(
-                    self.manager._service_catalog, 'url_for',
-                    new=mock_url_for):
-                list(self.pollster.get_samples(self.manager, {},
-                                               ASSIGNED_TENANTS))
-                list(self.pollster.get_samples(self.manager, {},
-                                               ASSIGNED_TENANTS))
+            with fixtures.MockPatchObject(swift_client,
+                                          'http_connection',
+                                          new=mock.MagicMock()):
+                with fixtures.MockPatchObject(
+                        self.manager._service_catalog, 'url_for',
+                        new=mock_url_for):
+                    list(self.pollster.get_samples(self.manager, {},
+                                                   ASSIGNED_TENANTS))
+                    list(self.pollster.get_samples(self.manager, {},
+                                                   ASSIGNED_TENANTS))
         self.assertEqual(1, mock_url_for.call_count)
 
     def test_endpoint_notfound(self):
