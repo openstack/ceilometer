@@ -32,6 +32,22 @@ Install Gnocchi
       Depending on your environment size, consider installing Gnocchi
       separately as it makes extensive use of the cpu.
 
+#. Install the uWSGI packages. The following method uses operating system
+   provided packages. Another alternative would be to use pip(or pip3,
+   depending on the distribution); using pip is not described in this doc:
+
+   .. code-block:: console
+
+      # yum install uwsgi-plugin-common uwsgi-plugin-python3 uwsgi
+
+   .. note::
+
+      Since the provided gnocchi-api wraps around uwsgi, you need to
+      make sure that uWSGI is installed if you want to use gnocchi-api
+      to run Gnocchi API.
+      As Gnocchi API tier runs using WSGI, it can also alternatively
+      be run using Apache httpd and mod_wsgi, or any other HTTP daemon.
+
 .. include:: install-gnocchi.inc
 
 Finalize Gnocchi installation
