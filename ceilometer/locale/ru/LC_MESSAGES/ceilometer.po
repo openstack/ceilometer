@@ -4,16 +4,17 @@
 #
 # Translators:
 # Andreas Jaeger <jaegerandi@gmail.com>, 2016. #zanata
+# Roman Gorshunov <roman.gorshunov@att.com>, 2021. #zanata
 msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2018-09-19 00:45+0000\n"
+"POT-Creation-Date: 2021-09-15 14:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-04-12 04:26+0000\n"
-"Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
+"PO-Revision-Date: 2021-09-06 03:48+0000\n"
+"Last-Translator: Roman Gorshunov <roman.gorshunov@att.com>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
@@ -23,12 +24,20 @@ msgstr ""
 "Language-Team: Russian\n"
 
 #, python-format
-msgid "Could not connect to XenAPI: %s"
-msgstr "Не удалось подключиться к XenAPI: %s"
+msgid "Could not load the following pipelines: %s"
+msgstr "Не удалось загрузить следующие цепочки: %s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
 msgstr "Удаление уведомления %(type)s (uuid:%(msgid)s)"
+
+#, python-format
+msgid ""
+"Error from libvirt while checking blockStats, This may not be harmful, but "
+"please check : %(ex)s"
+msgstr ""
+"Ошибка в libvirt при проверке blockStats, Это может быть нормальным, но, "
+"пожалуйста, проверьте : %(ex)s"
 
 #, python-format
 msgid ""
@@ -45,6 +54,14 @@ msgid ""
 msgstr ""
 "Не удалось проверить данные экземпляра <имя=%(name)s, ИД=%(id)s>, состояние "
 "домена - SHUTOFF."
+
+#, python-format
+msgid ""
+"Failed to inspect instance %(instance_uuid)s stats, can not get info from "
+"libvirt: %(error)s"
+msgstr ""
+"Не удалось проверить статистику инстанса %(instance_uuid)s, не удалось "
+"получить информацию от libvirt: %(error)s"
 
 #, python-format
 msgid "Failed to publish %d datapoints, dropping them"
@@ -67,11 +84,12 @@ msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr "Недопустимый тип особенности %(type)s для особенности %(trait)s"
 
 #, python-format
-msgid "Multiple VM %s found in XenServer"
-msgstr "Найдено несколько виртуальных машин %s в XenServer"
+msgid "Invalid type %s specified"
+msgstr "Указан недопустимый тип %s"
 
-msgid "Must specify connection_url, and connection_password to use"
-msgstr "Необходимо указать connection_url и connection_password"
+#, python-format
+msgid "Missing field %s"
+msgstr "Отсутствует поле %s"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
@@ -79,6 +97,10 @@ msgstr "Нет доступного модуля %(plugin)s для %(name)s"
 
 msgid "Node Manager init failed"
 msgstr "Сбой инициализации администратора узлов"
+
+#, python-format
+msgid "OpenDaylight API returned %(status)s %(reason)s"
+msgstr "Функция API OpenDaylight вернула %(status)s %(reason)s"
 
 #, python-format
 msgid "Opencontrail API returned %(status)s %(reason)s"
@@ -122,8 +144,19 @@ msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "Функция API RGW AdminOps вернула %(status)s %(reason)s"
 
 #, python-format
+msgid "Required field %(field)s should be a %(type)s"
+msgstr "Обязательное поле %(field)s должно быть типа %(type)s"
+
+#, python-format
 msgid "Required field %s not specified"
 msgstr "Не указано обязательное поле %s"
+
+#, python-format
+msgid "Required fields %s not specified"
+msgstr "Не указаны обязательные поля %s"
+
+msgid "Sample Check"
+msgstr "Тестовая проверка"
 
 #, python-format
 msgid "The field 'fields' is required for %s"
@@ -172,12 +205,16 @@ msgstr ""
 "В VPN %(id)s получено неизвестное состояние %(stat)s, пример пропускается"
 
 #, python-format
-msgid "VM %s not found in VMware vSphere"
-msgstr "Виртуальная машина %s не найдена в VMware vSphere"
+msgid "Unrecognized type value %s"
+msgstr "Нераспознанный тип значения '%s'"
 
 #, python-format
-msgid "VM %s not found in XenServer"
-msgstr "Не найдена виртуальная машина %s в XenServer"
+msgid "VM %s is poweredOff in VMware vSphere"
+msgstr "Виртуальная машина %s выключена в VMware vSphere"
+
+#, python-format
+msgid "VM %s not found in VMware vSphere"
+msgstr "Виртуальная машина %s не найдена в VMware vSphere"
 
 msgid "Wrong sensor type"
 msgstr "Неверный тип датчика"
@@ -188,6 +225,10 @@ msgstr "Ошибка YAML при чтении файла определений 
 
 msgid "ipmitool output length mismatch"
 msgstr "несоответствие длины вывода ipmitool"
+
+#, python-format
+msgid "monasca_client: using %s as Monasca endpoint"
+msgstr "monasca_client: %s используется как точка подключения Monasca"
 
 msgid "parse IPMI sensor data failed,No data retrieved from given input"
 msgstr ""

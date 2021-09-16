@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2018-09-19 00:45+0000\n"
+"POT-Creation-Date: 2021-09-15 14:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Italian\n"
-
-#, python-format
-msgid "Could not connect to XenAPI: %s"
-msgstr "Impossibile connettersi a XenAPI: %s"
 
 #, python-format
 msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
@@ -65,14 +61,6 @@ msgstr ""
 msgid "Invalid trait type '%(type)s' for trait %(trait)s"
 msgstr ""
 "Tipo di caratteristica non valido '%(type)s' per la caratteristica %(trait)s"
-
-#, python-format
-msgid "Multiple VM %s found in XenServer"
-msgstr "Più VM %s trovate in XenServer"
-
-msgid "Must specify connection_url, and connection_password to use"
-msgstr ""
-"È necessario specificare connection_url e connection_password da utilizzare"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
@@ -175,10 +163,6 @@ msgstr ""
 #, python-format
 msgid "VM %s not found in VMware vSphere"
 msgstr "VM %s non trovata in VMware vSphere"
-
-#, python-format
-msgid "VM %s not found in XenServer"
-msgstr "VM %s non trovata in XenServer"
 
 msgid "Wrong sensor type"
 msgstr "Tipo di sensore errato"

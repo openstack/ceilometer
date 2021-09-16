@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2020-09-29 07:18+0000\n"
+"POT-Creation-Date: 2021-09-15 14:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,10 +25,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Korean (South Korea)\n"
-
-#, python-format
-msgid "Could not connect to XenAPI: %s"
-msgstr "XenAPI를 연결할 수 없음: %s"
 
 #, python-format
 msgid "Could not load the following pipelines: %s"
@@ -77,13 +73,6 @@ msgstr "특성 %(trait)s에 대한 올바르지 않은 특성 유형 '%(type)s'"
 #, python-format
 msgid "Invalid type %s specified"
 msgstr "올바르지 않은 유형 %s이(가) 지정됨"
-
-#, python-format
-msgid "Multiple VM %s found in XenServer"
-msgstr "여러 VM %s을(를) XenServer에서 찾음 "
-
-msgid "Must specify connection_url, and connection_password to use"
-msgstr "사용할 connection_url 및 connection_password를 지정해야 함 "
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
@@ -190,10 +179,6 @@ msgstr "VM %s is poweredOff in VMware vSphere "
 #, python-format
 msgid "VM %s not found in VMware vSphere"
 msgstr "VM %s을(를) VMware vSphere에서 찾을 수 없음"
-
-#, python-format
-msgid "VM %s not found in XenServer"
-msgstr "VM %s을(를) XenServer에서 찾을 수 없음 "
 
 msgid "Wrong sensor type"
 msgstr "잘못된 센서 유형"

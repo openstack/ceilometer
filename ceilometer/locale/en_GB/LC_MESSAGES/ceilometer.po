@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2020-09-29 07:18+0000\n"
+"POT-Creation-Date: 2021-09-15 14:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,14 +23,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: English (United Kingdom)\n"
-
-#, python-format
-msgid "Could not connect to XenAPI: %s"
-msgstr "Could not connect to XenAPI: %s"
-
-#, python-format
-msgid "Could not get VM %s CPU number"
-msgstr "Could not get VM %s CPU number"
 
 #, python-format
 msgid "Could not load the following pipelines: %s"
@@ -99,13 +91,6 @@ msgstr "Invalid type %s specified"
 #, python-format
 msgid "Missing field %s"
 msgstr "Missing field %s"
-
-#, python-format
-msgid "Multiple VM %s found in XenServer"
-msgstr "Multiple VM %s found in XenServer"
-
-msgid "Must specify connection_url, and connection_password to use"
-msgstr "Must specify connection_url, and connection_password to use"
 
 #, python-format
 msgid "No plugin named %(plugin)s available for %(name)s"
@@ -221,10 +206,6 @@ msgstr "VM %s is poweredOff in VMware vSphere"
 #, python-format
 msgid "VM %s not found in VMware vSphere"
 msgstr "VM %s not found in VMware vSphere"
-
-#, python-format
-msgid "VM %s not found in XenServer"
-msgstr "VM %s not found in XenServer"
 
 msgid "Wrong sensor type"
 msgstr "Wrong sensor type"
