@@ -15,6 +15,7 @@
 
 import itertools
 import pkg_resources
+import warnings
 
 from oslo_config import cfg
 from oslo_log import log
@@ -30,6 +31,7 @@ from ceilometer import sample
 OPTS = [
     cfg.StrOpt('meter_definitions_file',
                default="snmp.yaml",
+               deprecated_for_removal=True,
                help="Configuration file for defining hardware snmp meters."
                ),
 ]
@@ -65,6 +67,10 @@ class GenericHardwareDeclarativePollster(plugin_base.PollsterBase):
     def __init__(self, conf):
         super(GenericHardwareDeclarativePollster, self).__init__(conf)
         self.inspectors = {}
+
+        warnings.warn('GenericHardwareDeclarativePollster has been deprecated '
+                      'and will be removed in a future release.',
+                      category=DeprecationWarning, stacklevel=3)
 
     def _update_meter_definition(self, definition):
         self.meter_definition = definition

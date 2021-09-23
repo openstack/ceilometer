@@ -1,0 +1,13 @@
+---
+deprecations:
+  - |
+    ``GenericHardwareDeclarativePollster`` has been deprecated and will be
+    removed in a future release. This pollster was designed to be used in
+    TripleO deployment to gather hardware metrics from overcloud nodes but
+    Telemetry services are no longer deployed in undercloud in current TripleO.
+
+  - |
+    The ``NodesDiscoveryTripleO`` discovery plugin has been deprecated and
+    will be removed in a future release. This plugin is designed for TripleO
+    deployment but no longer used since Telemetry services were removed from
+    undercloud.
