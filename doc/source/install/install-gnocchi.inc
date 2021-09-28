@@ -1,4 +1,4 @@
-2. Create the database for Gnocchi's indexer:
+3. Create the database for Gnocchi's indexer:
 
    * Use the database access client to connect to the database
      server as the ``root`` user:
@@ -26,7 +26,7 @@
 
    * Exit the database access client.
 
-3. Edit the ``/etc/gnocchi/gnocchi.conf`` file and add Keystone options:
+4. Edit the ``/etc/gnocchi/gnocchi.conf`` file and add Keystone options:
 
    * In the ``[api]`` section, configure gnocchi to use keystone:
 
@@ -34,6 +34,8 @@
 
         [api]
         auth_mode = keystone
+        port = 8041
+        uwsgi_mode = http-socket
 
    * In the ``[keystone_authtoken]`` section, configure keystone
      authentication:
@@ -78,7 +80,7 @@
         file_basepath = /var/lib/gnocchi
         driver = file
 
-4. Initialize Gnocchi:
+5. Initialize Gnocchi:
 
    .. code-block:: console
 
