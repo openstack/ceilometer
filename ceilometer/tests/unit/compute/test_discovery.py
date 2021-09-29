@@ -130,6 +130,9 @@ class FakeManualInstanceConn(object):
     def listAllDomains(self):
         return [FakeManualInstanceDomain()]
 
+    def isAlive(self):
+        return False
+
 
 class TestDiscovery(base.BaseTestCase):
 
@@ -288,14 +291,13 @@ class TestDiscovery(base.BaseTestCase):
                          self.client.instance_get_all_by_host.call_args_list)
 
     @testtools.skipUnless(libvirt, "libvirt not available")
-    @mock.patch.object(utils, "libvirt")
-    @mock.patch.object(discovery, "libvirt")
-    def test_discovery_with_libvirt_error(self, libvirt, libvirt2):
+    @mock.patch.object(libvirt, "VIR_DOMAIN_METADATA_ELEMENT", 2)
+    @mock.patch.object(libvirt, "openReadOnly")
+    def test_discovery_with_libvirt_error(self, openReadOnly):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        libvirt.VIR_DOMAIN_METADATA_ELEMENT = 2
-        libvirt2.openReadOnly.return_value = FakeManualInstanceConn()
+        openReadOnly.return_value = FakeManualInstanceConn()
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
