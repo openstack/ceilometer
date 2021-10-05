@@ -140,7 +140,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             try:
                 xml_string = domain.metadata(
                     libvirt.VIR_DOMAIN_METADATA_ELEMENT,
-                    "http://openstack.org/xmlns/libvirt/nova/1.0")
+                    "http://openstack.org/xmlns/libvirt/nova/1.1")
             except libvirt.libvirtError as e:
                 if libvirt_utils.is_disconnection_exception(e):
                     # Re-raise the exception so it's handled and retries
