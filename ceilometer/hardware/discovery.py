@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import warnings
+
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
@@ -24,29 +26,36 @@ LOG = log.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('url_scheme',
                default='snmp://',
+               deprecated_for_removal=True,
                help='URL scheme to use for hardware nodes.'),
     cfg.StrOpt('readonly_user_name',
                default='ro_snmp_user',
+               deprecated_for_removal=True,
                help='SNMPd user name of all nodes running in the cloud.'),
     cfg.StrOpt('readonly_user_password',
                default='password',
+               deprecated_for_removal=True,
                help='SNMPd v3 authentication password of all the nodes '
                     'running in the cloud.',
                secret=True),
     cfg.StrOpt('readonly_user_auth_proto',
                choices=['md5', 'sha'],
+               deprecated_for_removal=True,
                help='SNMPd v3 authentication algorithm of all the nodes '
                     'running in the cloud'),
     cfg.StrOpt('readonly_user_priv_proto',
                choices=['des', 'aes128', '3des', 'aes192', 'aes256'],
+               deprecated_for_removal=True,
                help='SNMPd v3 encryption algorithm of all the nodes '
                     'running in the cloud'),
     cfg.StrOpt('readonly_user_priv_password',
+               deprecated_for_removal=True,
                help='SNMPd v3 encryption password of all the nodes '
                     'running in the cloud.',
                secret=True),
     cfg.StrOpt('tripleo_network_name',
                default='ctlplane',
+               deprecated_for_removal=True,
                help='Name of the control plane Tripleo network')
 ]
 
@@ -57,6 +66,10 @@ class NodesDiscoveryTripleO(plugin_base.DiscoveryBase):
         self.nova_cli = nova_client.Client(conf)
         self.last_run = None
         self.instances = {}
+
+        warnings.warn('GenericHardwareDeclarativePollster has been deprecated '
+                      'and will be removed in a future release.',
+                      category=DeprecationWarning, stacklevel=3)
 
     def _make_resource_url(self, ip):
         hwconf = self.conf.hardware
