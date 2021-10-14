@@ -250,7 +250,9 @@ resources:
     event_delete:
       - volume.delete.end
       - snapshot.delete.end
-    event_update: volume.transfer.accept.end
+    event_update:
+      - volume.transfer.accept.end
+      - snapshot.transfer.accept.end
     event_attributes:
       id: resource_id
       project_id: project_id
@@ -413,4 +415,5 @@ resources:
       network.services.lb.loadbalancer:
       network.services.lb.total.connections:
       network.services.lb.active.connections:
+
 
