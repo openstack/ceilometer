@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Support for Neutron LBaaS has been officially deprecated. The feature has
+    been useless since the Neutron LBaaS project was retired.

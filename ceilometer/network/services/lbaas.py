@@ -15,6 +15,7 @@
 
 import abc
 import collections
+import warnings
 
 from oslo_log import log
 
@@ -46,6 +47,10 @@ class BaseLBPollster(base.BaseServicesPollster):
     def __init__(self, conf):
         super(BaseLBPollster, self).__init__(conf)
         self.lb_version = self.conf.service_types.neutron_lbaas_version
+
+        warnings.warn('Support for Neutron LBaaS has been deprecated '
+                      'and will be removed in a future release.',
+                      category=DeprecationWarning, stacklevel=3)
 
     def get_load_balancer_status_id(self, value):
         if self.lb_version == 'v1':
