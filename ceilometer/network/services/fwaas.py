@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import warnings
+
 from oslo_log import log
 
 from ceilometer.i18n import _
@@ -31,6 +33,13 @@ class FirewallPollster(base.BaseServicesPollster):
               'status',
               'firewall_policy_id',
               ]
+
+    def __init__(self, conf):
+        super(FirewallPollster, self).__init__(conf)
+
+        warnings.warn('Support for Neutron FWaaS has been deprecated '
+                      'and will be removed in a future release.',
+                      category=DeprecationWarning, stacklevel=3)
 
     @property
     def default_discovery(self):
@@ -71,6 +80,13 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
               'shared',
               'audited',
               ]
+
+    def __init__(self, conf):
+        super(FirewallPolicyPollster, self).__init__(conf)
+
+        warnings.warn('Support for Neutron FWaaS has been deprecated '
+                      'and will be removed in a future release.',
+                      category=DeprecationWarning, stacklevel=3)
 
     @property
     def default_discovery(self):
