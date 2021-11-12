@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    The ``[notification] batch_size`` parameter now takes effect to enable
+    batch processing of notifications. The ``[notification] batch_timeout``
+    parameter has been restored at the same time to determine how much and
+    how long notifications are kept.
