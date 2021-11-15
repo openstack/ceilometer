@@ -27,6 +27,8 @@ SERVICE_OPTS = [
                help='Neutron service type.'),
     cfg.StrOpt('neutron_lbaas_version',
                default='v2',
+               deprecated_for_removal=True,
+               deprecated_reason='Neutron LBaaS has been retired',
                choices=('v1', 'v2'),
                help='Neutron load balancer version.')
 ]
