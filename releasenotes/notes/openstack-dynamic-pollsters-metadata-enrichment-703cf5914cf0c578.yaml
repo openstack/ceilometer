@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    OpenStack Dynamic pollsters metadata enrichment with other OpenStack API's data.

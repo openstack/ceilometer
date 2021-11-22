@@ -463,7 +463,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(0, len(samples_list))
 
-    def fake_sample_list(self, keystone_client=None, resource=None):
+    def fake_sample_list(self, **kwargs):
         samples_list = list()
         samples_list.append(
             {'name': "sample5", 'volume': 5, 'description': "desc-sample-5",
@@ -520,7 +520,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         response = [{"object1-attr1": 1}, {"object1-attr2": 2}]
         entries = pollster.definitions.sample_gatherer. \
-            retrieve_entries_from_response(response)
+            retrieve_entries_from_response(response, pollster.definitions)
 
         self.assertEqual(response, entries)
 
@@ -538,8 +538,9 @@ class TestDynamicPollster(base.BaseTestCase):
 
         response = {"first": first_entries_from_response,
                     "second": second_entries_from_response}
-        entries = pollster.definitions.sample_gatherer. \
-            retrieve_entries_from_response(response)
+        entries = pollster.definitions.sample_gatherer.\
+            retrieve_entries_from_response(
+                response, pollster.definitions.configurations)
 
         self.assertEqual(first_entries_from_response, entries)
 
@@ -557,7 +558,8 @@ class TestDynamicPollster(base.BaseTestCase):
         response = {"first": first_entries_from_response,
                     "second": second_entries_from_response}
         entries = pollster.definitions.sample_gatherer. \
-            retrieve_entries_from_response(response)
+            retrieve_entries_from_response(response,
+                                           pollster.definitions.configurations)
 
         self.assertEqual(second_entries_from_response, entries)
 
@@ -640,7 +642,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(expected_value_after_operations, returned_value)
 
-    def fake_sample_multi_metric(self, keystone_client=None, resource=None):
+    def fake_sample_multi_metric(self, **kwargs):
         multi_metric_sample_list = [
             {"categories": [
                 {
@@ -724,17 +726,17 @@ class TestDynamicPollster(base.BaseTestCase):
                   'project_id': "2334",
                   'id': "35"}
 
-        def internal_execute_request_get_samples_mock(self, arg):
+        def internal_execute_request_get_samples_mock(self, **kwargs):
             class Response:
                 def json(self):
                     return [sample]
             return Response(), "url"
 
         original_method = dynamic_pollster.PollsterSampleGatherer.\
-            internal_execute_request_get_samples
+            _internal_execute_request_get_samples
         try:
             dynamic_pollster.PollsterSampleGatherer. \
-                internal_execute_request_get_samples = \
+                _internal_execute_request_get_samples = \
                 internal_execute_request_get_samples_mock
 
             self.pollster_definition_all_fields[
@@ -759,7 +761,7 @@ class TestDynamicPollster(base.BaseTestCase):
                              response[0]['id'])
         finally:
             dynamic_pollster.PollsterSampleGatherer. \
-                internal_execute_request_get_samples = original_method
+                _internal_execute_request_get_samples = original_method
 
     def test_retrieve_attribute_self_reference_sample(self):
         key = " . | value['key1']['subKey1'][0]['d'] if 'key1' in value else 0"
@@ -795,7 +797,7 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(pollster_definition)
 
         request_args = pollster.definitions.sample_gatherer\
-            .create_request_arguments()
+            .create_request_arguments(pollster.definitions.configurations)
 
         self.assertTrue("headers" in request_args)
         self.assertEqual(2, len(request_args["headers"]))
@@ -821,7 +823,7 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(pollster_definition)
 
         request_args = pollster.definitions.sample_gatherer\
-            .create_request_arguments()
+            .create_request_arguments(pollster.definitions.configurations)
 
         self.assertTrue("headers" in request_args)
         self.assertTrue("authenticated" in request_args)
@@ -843,7 +845,8 @@ class TestDynamicPollster(base.BaseTestCase):
             self.pollster_definition_only_required_fields)
 
         request_args =\
-            pollster.definitions.sample_gatherer.create_request_arguments()
+            pollster.definitions.sample_gatherer.create_request_arguments(
+                pollster.definitions.configurations)
 
         self.assertTrue("headers" not in request_args)
         self.assertTrue("authenticated" in request_args)
@@ -902,7 +905,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         kwargs = {'resource': base_url}
         url = pollster.definitions.sample_gatherer\
-            .get_request_linked_samples_url(kwargs)
+            .get_request_linked_samples_url(
+                kwargs, pollster.definitions.configurations)
 
         self.assertEqual(expected_url, url)
 
@@ -917,7 +921,7 @@ class TestDynamicPollster(base.BaseTestCase):
                   'next_sample_url': expected_url}
 
         url = pollster.definitions.sample_gatherer\
-            .get_request_linked_samples_url(kwargs)
+            .get_request_linked_samples_url(kwargs, pollster.definitions)
 
         self.assertEqual(expected_url, url)
 
@@ -932,7 +936,8 @@ class TestDynamicPollster(base.BaseTestCase):
                   'next_sample_url': "/next_page"}
 
         url = pollster.definitions.sample_gatherer\
-            .get_request_linked_samples_url(kwargs)
+            .get_request_linked_samples_url(
+                kwargs, pollster.definitions.configurations)
 
         self.assertEqual(expected_url, url)
 
@@ -947,7 +952,8 @@ class TestDynamicPollster(base.BaseTestCase):
                            'value': 1}
 
         sample = pollster.definitions.sample_extractor.generate_sample(
-            pollster_sample)
+            pollster_sample, pollster.definitions.configurations,
+            manager=mock.Mock())
 
         self.assertEqual(1, sample.volume)
         self.assertEqual(2, len(sample.resource_metadata))
@@ -968,7 +974,8 @@ class TestDynamicPollster(base.BaseTestCase):
                            'value': 1}
 
         sample = pollster.definitions.sample_extractor.generate_sample(
-            pollster_sample)
+            pollster_sample, pollster.definitions.configurations,
+            manager=mock.Mock())
 
         self.assertEqual(1, sample.volume)
         self.assertEqual(3, len(sample.resource_metadata))
@@ -990,7 +997,8 @@ class TestDynamicPollster(base.BaseTestCase):
                            'value': 1}
 
         sample = pollster.definitions.sample_extractor.generate_sample(
-            pollster_sample)
+            pollster_sample, pollster.definitions.configurations,
+            manager=mock.Mock())
 
         self.assertEqual(1, sample.volume)
         self.assertEqual(3, len(sample.resource_metadata))
