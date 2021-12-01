@@ -285,9 +285,11 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                         "as `self.filter_project` is None.")
                     return None
                 try:
+                    domain = self._ks_client.domains.find(
+                        name=self.filter_domain)
                     project = self._ks_client.projects.find(
                         name=self.filter_project,
-                        domain=self.filter_domain)
+                        domain_id=domain.id)
                 except ka_exceptions.NotFound:
                     LOG.warning('Filtered project [%s] not found in keystone, '
                                 'ignoring the filter_project option' %
