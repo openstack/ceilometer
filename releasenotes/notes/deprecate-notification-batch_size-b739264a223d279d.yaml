@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    The ``[notification] batch_size`` parameter has been deprecated.
+    The parameter has not used since the Stein release.

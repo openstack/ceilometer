@@ -44,10 +44,13 @@ OPTS = [
                          "notifications go to rabbit-nova:5672, while all "
                          "cinder notifications go to rabbit-cinder:5672."),
     cfg.IntOpt('batch_size',
-               default=100, min=1,
+               default=1, min=1,
                help='Number of notification messages to wait before '
-               'publishing them. Batching is advised when transformations are '
-               'applied in pipeline.'),
+               'publishing them.'),
+    cfg.IntOpt('batch_timeout',
+               help='Number of seconds to wait before dispatching samples '
+                    'when batch_size is not reached (None means indefinitely).'
+               ),
     cfg.IntOpt('workers',
                default=1,
                min=1,
@@ -138,7 +141,9 @@ class NotificationService(cotyledon.Service):
             # NOTE(gordc): ignore batching as we want pull
             # to maintain sequencing as much as possible.
             listener = messaging.get_batch_notification_listener(
-                transport, targets, endpoints, allow_requeue=True)
+                transport, targets, endpoints, allow_requeue=True,
+                batch_size=self.conf.notification.batch_size,
+                batch_timeout=self.conf.notification.batch_timeout)
             listener.start(
                 override_pool_size=self.conf.max_parallel_requests
             )
