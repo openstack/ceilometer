@@ -78,6 +78,12 @@ LIBVIRT_STATUS = {
     VIR_DOMAIN_PMSUSPENDED: 'suspended',
 }
 
+# NOTE(pas-ha) in the order from newest to oldest
+NOVA_METADATA_VERSIONS = (
+    "http://openstack.org/xmlns/libvirt/nova/1.1",
+    "http://openstack.org/xmlns/libvirt/nova/1.0",
+)
+
 
 def new_libvirt_connection(conf):
     if not libvirt:
@@ -124,3 +130,31 @@ def raise_nodata_if_unsupported(method):
                         "error": e}
             raise virt_inspector.NoDataException(msg)
     return inner
+
+
+@retry_on_disconnect
+def instance_metadata(domain):
+    xml_string = None
+    last_error = None
+    for meta_version in NOVA_METADATA_VERSIONS:
+        try:
+            xml_string = domain.metadata(
+                libvirt.VIR_DOMAIN_METADATA_ELEMENT, meta_version)
+            break
+        except libvirt.libvirtError as exc:
+            if exc.get_error_code() == libvirt.VIR_ERR_NO_DOMAIN_METADATA:
+                LOG.warning("Failed to find metadata %s in domain %s",
+                            meta_version, domain.UUIDString())
+                last_error = exc
+                continue
+            elif is_disconnection_exception(exc):
+                # Re-raise the exception so it's handled and retries
+                raise
+            last_error = exc
+
+    if xml_string is None:
+        LOG.error(
+            "Fail to get domain uuid %s metadata, libvirtError: %s",
+            domain.UUIDString(), last_error
+        )
+    return xml_string
