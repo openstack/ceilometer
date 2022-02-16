@@ -746,3 +746,148 @@ presented as follows:
         url_path: "v1/test-volumes"
         response_entries_key: "servers"
         next_sample_url_attribute: "server_link | filter(lambda v: v.get('rel') == 'next', value) | list(value) | value[0] | value.get('href')"
+
+OpenStack Dynamic pollsters metadata enrichment with other OpenStack API's data
+-------------------------------------------------------------------------------
+
+Sometimes we want/need to add/gather extra metadata for the samples being
+handled by Ceilometer Dynamic pollsters, such as the project name, domain id,
+domain name, and other metadata that are not always accessible via the
+OpenStack component where the sample is gathered.
+
+For instance, when gathering the status of virtual machines (VMs) from Nova,
+we only have the `tenant_id`, which must be used as the `project_id`. However,
+for billing and later invoicing one might need/want the project name, domain
+id, and other metadata that are available in Keystone (and maybe some others
+that are scattered over other components). To achieve that, one can use the
+OpenStack metadata enrichment option. This feature is only available
+to *OpenStack pollsters*, and can only gather extra metadata from OpenStack
+APIs. As follows we present an example that shows a dynamic pollster
+configuration to gather virtual machine (VM) status, and to enrich the data
+pushed to the storage backend (e.g. Gnocchi) with project name, domain ID,
+and domain name.
+
+    .. code-block:: yaml
+
+      ---
+
+      - name: "dynamic_pollster.instance.status"
+        next_sample_url_attribute: "server_links | filter(lambda v: v.get('rel') == 'next', value) | list(value) | value[0] | value.get('href') | value.replace('http:', 'https:')"
+        sample_type: "gauge"
+        unit: "server"
+        value_attribute: "status"
+        endpoint_type: "compute"
+        url_path: "/v2.1/servers/detail?all_tenants=true"
+        headers:
+          "Openstack-API-Version": "compute 2.65"
+        project_id_attribute: "tenant_id"
+        metadata_fields:
+          - "status"
+          - "name"
+          - "flavor.vcpus"
+          - "flavor.ram"
+          - "flavor.disk"
+          - "flavor.ephemeral"
+          - "flavor.swap"
+          - "flavor.original_name"
+          - "image | value or { 'id': '' } | value['id']"
+          - "OS-EXT-AZ:availability_zone"
+          - "OS-EXT-SRV-ATTR:host"
+          - "user_id"
+          - "tags | ','.join(value)"
+          - "locked"
+        value_mapping:
+          ACTIVE: "1"
+        default_value: 0
+        metadata_mapping:
+          "OS-EXT-AZ:availability_zone": "dynamic_availability_zone"
+          "OS-EXT-SRV-ATTR:host": "dynamic_host"
+          "flavor.original_name": "dynamic_flavor_name"
+          "flavor.vcpus": "dynamic_flavor_vcpus"
+          "flavor.ram": "dynamic_flavor_ram"
+          "flavor.disk": "dynamic_flavor_disk"
+          "flavor.ephemeral": "dynamic_flavor_ephemeral"
+          "flavor.swap": "dynamic_flavor_swap"
+          "image | value or { 'id': '' } | value['id']": "dynamic_image_ref"
+          "name": "dynamic_display_name"
+          "locked": "dynamic_locked"
+          "tags | ','.join(value)": "dynamic_tags"
+        extra_metadata_fields_cache_seconds: 3600
+        extra_metadata_fields:
+          - name: "project_name"
+            endpoint_type: "identity"
+            url_path: "'/v3/projects/' + str(sample['project_id'])"
+            headers:
+              "Openstack-API-Version": "identity latest"
+            value: "name"
+            extra_metadata_fields_cache_seconds: 1800 # overriding the default cache policy
+          - name: "domain_id"
+            endpoint_type: "identity"
+            url_path: "'/v3/projects/' + str(sample['project_id'])"
+            headers:
+              "Openstack-API-Version": "identity latest"
+            value: "domain_id"
+          - name: "domain_name"
+            endpoint_type: "identity"
+            url_path: "'/v3/domains/' + str(extra_metadata_captured['domain_id'])"
+            headers:
+              "Openstack-API-Version": "identity latest"
+            value: "name"
+
+The above example can be used to gather and persist in the backend the
+status of VMs. It will persist `1` in the backend as a measure for every
+collecting period if the VM's status is `ACTIVE`, and `0` otherwise. This is
+quite useful to create hashmap rating rules for running VMs in CloudKitty.
+Then, to enrich the resource in the storage backend, we are adding extra
+metadata that are collected in Keystone via the `extra_metadata_fields`
+options.
+
+The metadata enrichment feature has the following options:
+
+*  ``extra_metadata_fields_cache_seconds``: optional parameter. Defines the
+   extra metadata request's response cache. Some requests, such as the ones
+   executed against Keystone to retrieve extra metadata are rather static.
+   Therefore, one does not need to constantly re-execute the request. That
+   is the reason why we cache the response of such requests. By default the
+   cache time to live (TTL) for responses is `3600` seconds. However, this
+   value can be increased of decreased.
+
+*  ``extra_metadata_fields``: optional parameter. This option is a list of
+   objects, where each one of its elements is an extra metadata definition.
+   Each one of the extra metadata definition can have the options defined in
+   the dynamic pollsters such as to handle paged responses, operations on the
+   extracted values, headers and so on. The basic options that must be
+   defined for an extra metadata definitions are the following:
+
+    *  ``name``:  This option is mandatory. The name of the extra metadata.
+       This is the name that is going to be used by the metadata. If there is
+       already any other metadata gathered via `metadata_fields` option or
+       transformed via `metadata_mapping` configuration, this metadata is
+       going to be discarded.
+
+    *  ``endpoint_type``:  The endpoint type that we want to execute the
+       call against. This option is mandatory. It works similarly to the
+       `endpoint_type` option in the dynamic pollster definition.
+
+    *  ``url_path``: This option is mandatory. It works similarly to the
+       `url_path` option in the dynamic pollster definition. However, this
+       `one enables operators to execute/evaluate expressions in runtime, which
+       `allows one to retrieve the information from previously gathered
+       metadata via ``extra_metadata_captured` dictionary, or via the
+       `sample` itself.
+
+    *  ``value``: This configuration is mandatory. It works similarly to the
+       `value_attribute` option in the dynamic pollster definition. It is
+       the value we want to extract from the response, and assign in the
+       metadata being generated.
+
+    *  ``headers``: This option is optional. It works similarly to the
+       `headers` option in the dynamic pollster definition.
+
+    *  ``next_sample_url_attribute``: This option is optional. It works
+       similarly to the `next_sample_url_attribute` option in the dynamic
+       pollster definition.
+
+    *  ``response_entries_key``: This option is optional. It works
+       similarly to the `response_entries_key` option in the dynamic
+       pollster definition.

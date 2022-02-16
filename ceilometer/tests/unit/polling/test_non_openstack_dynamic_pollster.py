@@ -47,7 +47,7 @@ OPTIONAL_POLLSTER_FIELDS = ['metadata_fields', 'skip_sample_values',
 ALL_POLLSTER_FIELDS = REQUIRED_POLLSTER_FIELDS + OPTIONAL_POLLSTER_FIELDS
 
 
-def fake_sample_multi_metric(self, keystone_client=None, resource=None):
+def fake_sample_multi_metric(self, **kwargs):
     multi_metric_sample_list = [
         {"user_id": "UID-U007",
          "project_id": "UID-P007",
@@ -236,8 +236,9 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
 
         kwargs = {'resource': "credentials"}
 
-        resp, url = pollster.definitions.sample_gatherer. \
-            internal_execute_request_get_samples(kwargs)
+        resp, url = pollster.definitions.sample_gatherer.\
+            _internal_execute_request_get_samples(
+                pollster.definitions.configurations, **kwargs)
 
         self.assertEqual(
             self.pollster_definition_only_required_fields['url_path'], url)
@@ -265,7 +266,8 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
                 exception = self.assertRaises(
                     NonOpenStackApisDynamicPollsterException,
                     pollster.definitions.sample_gatherer.
-                    internal_execute_request_get_samples, kwargs)
+                    _internal_execute_request_get_samples,
+                    pollster.definitions.configurations, **kwargs)
 
                 self.assertEqual(
                     "NonOpenStackApisDynamicPollsterException"
@@ -307,17 +309,18 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
                   'project_id_attribute': "dfghyt432345t",
                   'resource_id_attribute': "sdfghjt543"}
 
-        def internal_execute_request_get_samples_mock(self, arg):
+        def internal_execute_request_get_samples_mock(
+                self, definitions, **kwargs):
             class Response:
                 def json(self):
                     return [sample]
             return Response(), "url"
 
         original_method = NonOpenStackApisSamplesGatherer. \
-            internal_execute_request_get_samples
+            _internal_execute_request_get_samples
         try:
             NonOpenStackApisSamplesGatherer. \
-                internal_execute_request_get_samples = \
+                _internal_execute_request_get_samples = \
                 internal_execute_request_get_samples_mock
 
             self.pollster_definition_all_fields[
@@ -342,7 +345,7 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
                              response[0]['id'])
         finally:
             NonOpenStackApisSamplesGatherer. \
-                internal_execute_request_get_samples = original_method
+                _internal_execute_request_get_samples = original_method
 
     def test_execute_request_get_samples_empty_keys(self):
         sample = {'user_id_attribute': "123456789",
@@ -446,7 +449,8 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
 
         kwargs = {'resource': "non-openstack-resource"}
         url = pollster.definitions.sample_gatherer\
-            .get_request_linked_samples_url(kwargs)
+            .get_request_linked_samples_url(
+                kwargs, pollster.definitions.configurations)
 
         self.assertEqual(expected_url, url)
 
@@ -461,7 +465,7 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
         kwargs = {'next_sample_url': expected_url}
 
         url = pollster.definitions.sample_gatherer\
-            .get_request_linked_samples_url(kwargs)
+            .get_request_linked_samples_url(kwargs, pollster.definitions)
 
         self.assertEqual(expected_url, url)
 
@@ -476,6 +480,7 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
         kwargs = {'next_sample_url': next_sample_path}
 
         url = pollster.definitions.sample_gatherer\
-            .get_request_linked_samples_url(kwargs)
+            .get_request_linked_samples_url(
+                kwargs, pollster.definitions.configurations)
 
         self.assertEqual(expected_url, url)
