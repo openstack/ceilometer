@@ -70,7 +70,7 @@ class MeterDefinition(object):
         self._fallback_user_id = declarative.Definition(
             'user_id', "ctxt.user_id|ctxt.user", plugin_manager)
         self._fallback_project_id = declarative.Definition(
-            'project_id', "ctxt.tenant_id|ctxt.tenant", plugin_manager)
+            'project_id', "ctxt.project_id|ctxt.tenant_id", plugin_manager)
         self._attributes = {}
         self._metadata_attributes = {}
         self._user_meta = None
