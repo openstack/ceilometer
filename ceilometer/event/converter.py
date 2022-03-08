@@ -74,13 +74,13 @@ class EventDefinition(object):
         service=dict(type='text', fields='publisher_id'),
         request_id=dict(type='text', fields='ctxt.request_id'),
         project_id=dict(type='text', fields=['payload.tenant_id',
-                                             'ctxt.tenant']),
+                                             'ctxt.project_id']),
         user_id=dict(type='text', fields=['payload.user_id',
                                           'ctxt.user_id']),
         # TODO(dikonoor):tenant_id is old terminology and should
         # be deprecated
         tenant_id=dict(type='text', fields=['payload.tenant_id',
-                                            'ctxt.tenant']),
+                                            'ctxt.project_id']),
     )
 
     def __init__(self, definition_cfg, trait_plugin_mgr, raw_levels):
