@@ -144,8 +144,8 @@ def instance_metadata(domain):
             break
         except libvirt.libvirtError as exc:
             if exc.get_error_code() == libvirt.VIR_ERR_NO_DOMAIN_METADATA:
-                LOG.warning("Failed to find metadata %s in domain %s",
-                            meta_version, domain.UUIDString())
+                LOG.debug("Failed to find metadata %s in domain %s",
+                          meta_version, domain.UUIDString())
                 last_error = exc
                 continue
             elif is_disconnection_exception(exc):
