@@ -322,7 +322,7 @@
       fields: payload.target.metadata.object
     observer_id:
       fields: payload.observer.id
-- event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'pool.*', 'vip.*', 'member.*', 'health_monitor.*', 'healthmonitor.*', 'listener.*', 'loadbalancer.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
+- event_type: ['network.*', 'subnet.*', 'port.*', 'router.*', 'floatingip.*', 'firewall.*', 'firewall_policy.*', 'firewall_rule.*', 'vpnservice.*', 'ipsecpolicy.*', 'ikepolicy.*', 'ipsec_site_connection.*']
   traits: &network_traits
     user_id:
       fields: ctxt.user_id
@@ -361,51 +361,6 @@
     <<: *network_traits
     resource_id:
       fields: ['payload.floatingip.id', 'payload.id']
-- event_type: pool.*
-  traits:
-    <<: *network_traits
-    name:
-      fields: payload.pool.name
-    resource_id:
-      fields: ['payload.pool.id', 'payload.id']
-- event_type: vip.*
-  traits:
-    <<: *network_traits
-    resource_id:
-      fields: ['payload.vip.id', 'payload.id']
-- event_type: member.*
-  traits:
-    <<: *network_traits
-    resource_id:
-      fields: ['payload.member.id', 'payload.id']
-- event_type: health_monitor.*
-  traits:
-    <<: *network_traits
-    name:
-      fields: payload.health_monitor.name
-    resource_id:
-      fields: ['payload.health_monitor.id', 'payload.id']
-- event_type: healthmonitor.*
-  traits:
-    <<: *network_traits
-    name:
-      fields: payload.healthmonitor.name
-    resource_id:
-      fields: ['payload.healthmonitor.id', 'payload.id']
-- event_type: listener.*
-  traits:
-    <<: *network_traits
-    name:
-      fields: payload.listener.name
-    resource_id:
-      fields: ['payload.listener.id', 'payload.id']
-- event_type: loadbalancer.*
-  traits:
-    <<: *network_traits
-    name:
-      fields: payload.loadbalancer.name
-    resource_id:
-      fields: ['payload.loadbalancer.id', 'payload.id']
 - event_type: firewall.*
   traits:
     <<: *network_traits

@@ -240,12 +240,6 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}
      }]},
-    {"desc": "add loadbalancer resource type",
-     "type": "create_resource_type",
-     "resource_type": "loadbalancer",
-     "data": [{
-         "attributes": {}
-     }]},
 ]
 
 # NOTE(sileht): We use LooseVersion because pbr can generate invalid

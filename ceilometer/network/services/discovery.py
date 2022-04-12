@@ -25,59 +25,6 @@ class _BaseServicesDiscovery(plugin_base.DiscoveryBase):
         self.neutron_cli = neutron_client.Client(conf)
 
 
-class LBPoolsDiscovery(_BaseServicesDiscovery):
-    def discover(self, manager, param=None):
-        """Discover resources to monitor."""
-
-        pools = self.neutron_cli.pool_get_all()
-        return [i for i in pools
-                if i.get('status') != 'error']
-
-
-class LBVipsDiscovery(_BaseServicesDiscovery):
-    def discover(self, manager, param=None):
-        """Discover resources to monitor."""
-
-        vips = self.neutron_cli.vip_get_all()
-        return [i for i in vips
-                if i.get('status', None) != 'error']
-
-
-class LBMembersDiscovery(_BaseServicesDiscovery):
-    def discover(self, manager, param=None):
-        """Discover resources to monitor."""
-
-        members = self.neutron_cli.member_get_all()
-        return [i for i in members
-                if i.get('status', None) != 'error']
-
-
-class LBListenersDiscovery(_BaseServicesDiscovery):
-    def discover(self, manager, param=None):
-        """Discover load balancer listener resources to monitor."""
-
-        listeners = self.neutron_cli.list_listener()
-        return [i for i in listeners
-                if i.get('operating_status', None) != 'error']
-
-
-class LBLoadBalancersDiscovery(_BaseServicesDiscovery):
-    def discover(self, manager, param=None):
-        """Discover load balancer resources to monitor."""
-
-        loadbalancers = self.neutron_cli.list_loadbalancer()
-        return [i for i in loadbalancers
-                if i.get('operating_status', None) != 'error']
-
-
-class LBHealthMonitorsDiscovery(_BaseServicesDiscovery):
-    def discover(self, manager, param=None):
-        """Discover resources to monitor."""
-
-        probes = self.neutron_cli.health_monitor_get_all()
-        return probes
-
-
 class VPNServicesDiscovery(_BaseServicesDiscovery):
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
