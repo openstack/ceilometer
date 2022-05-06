@@ -22,8 +22,6 @@ import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
 import ceilometer.compute.virt.vmware.inspector
 import ceilometer.event.converter
-import ceilometer.hardware.discovery
-import ceilometer.hardware.pollsters.generic
 import ceilometer.image.discovery
 import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
@@ -95,9 +93,6 @@ def list_opts():
                 'membership has changed'),
         ]),
         ('event', ceilometer.event.converter.OPTS),
-        ('hardware', itertools.chain(
-            ceilometer.hardware.discovery.OPTS,
-            ceilometer.hardware.pollsters.generic.OPTS)),
         ('ipmi',
          itertools.chain(ceilometer.ipmi.platform.intel_node_manager.OPTS,
                          ceilometer.ipmi.pollsters.OPTS)),

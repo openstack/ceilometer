@@ -23,7 +23,6 @@ oslo.messaging>=10.3.0 # Apache-2.0
 oslo.upgradecheck>=0.1.1 # Apache-2.0
 oslo.utils>=4.7.0 # Apache-2.0
 oslo.privsep>=1.32.0 # Apache-2.0
-pysnmp<5.0.0,>=4.2.3 # BSD
 python-glanceclient>=2.8.0 # Apache-2.0
 python-keystoneclient>=3.18.0 # Apache-2.0
 keystoneauth1>=3.18.0 # Apache-2.0
