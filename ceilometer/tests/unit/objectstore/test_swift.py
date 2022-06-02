@@ -207,7 +207,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
         self.assertEqual(expected, mock_connection.call_args_list)
 
         expected = [mock.call(None, self.manager._auth_token,
-                              mock_connection.return_value)
+                              http_conn=mock_connection.return_value)
                     for t in ASSIGNED_TENANTS]
         self.assertEqual(expected, mock_method.call_args_list)
 
