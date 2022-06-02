@@ -93,7 +93,7 @@ class _Base(plugin_base.PollsterBase):
                 yield (t.id, swift_api_method(
                     None,
                     keystone_client.get_auth_token(ksclient),
-                    http_conn))
+                    http_conn=http_conn))
             except ClientException as e:
                 if e.http_status == 404:
                     LOG.warning("Swift tenant id %s not found.", t.id)
