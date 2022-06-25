@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    The ``[coordination] check_watchers`` parameter has been removed.

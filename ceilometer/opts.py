@@ -85,14 +85,7 @@ def list_opts():
                 'left empty, per-deployment central agent and per-host '
                 'compute agent won\'t do workload '
                 'partitioning and will only function correctly if a '
-                'single instance of that service is running.'),
-            cfg.FloatOpt(
-                'check_watchers',
-                default=10.0,
-                deprecated_for_removal=True,
-                deprecated_reason='This parameter is no longer used.',
-                help='Number of seconds between checks to see if group '
-                'membership has changed'),
+                'single instance of that service is running.')
         ]),
         ('event', ceilometer.event.converter.OPTS),
         ('hardware', itertools.chain(
