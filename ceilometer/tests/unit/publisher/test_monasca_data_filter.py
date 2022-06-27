@@ -17,7 +17,6 @@
 import datetime
 from unittest import mock
 
-from oslo_utils import timeutils
 from oslotest import base
 
 from ceilometer import monasca_opts
@@ -140,9 +139,8 @@ class TestMonUtils(base.BaseTestCase):
             self.assertEqual(s.project_id, r['dimensions'].get('project_id'))
             self.assertEqual(s.resource_id, r['dimensions'].get('resource_id'))
             # 2015-04-07T20:07:06.156986 compare upto millisec
-            monasca_ts = \
-                timeutils.iso8601_from_timestamp(r['timestamp'] / 1000.0,
-                                                 microsecond=True)[:23]
+            monasca_ts = datetime.datetime.utcfromtimestamp(
+                r['timestamp'] / 1000.0).isoformat()[:23]
             self.assertEqual(s.timestamp[:23], monasca_ts)
 
     def test_process_sample_field_mappings(self):
