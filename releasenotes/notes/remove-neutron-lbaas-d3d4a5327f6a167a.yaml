@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Support for neutron-lbaas resources has been removed.
