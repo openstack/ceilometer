@@ -14,13 +14,14 @@
 """Tests for OpenStack dynamic pollster
 """
 import copy
+import json
 import logging
 from unittest import mock
 
 import requests
 from urllib import parse as urlparse
 
-from ceilometer.declarative import DynamicPollsterDefinitionException
+from ceilometer import declarative
 from ceilometer.polling import dynamic_pollster
 from ceilometer import sample
 from oslotest import base
@@ -107,6 +108,11 @@ class TestDynamicPollster(base.BaseTestCase):
     class FakeResponse(object):
         status_code = None
         json_object = None
+        _text = None
+
+        @property
+        def text(self):
+            return self._text or json.dumps(self.json_object)
 
         def json(self):
             return self.json_object
@@ -242,9 +248,10 @@ class TestDynamicPollster(base.BaseTestCase):
             pollster_definition = copy.deepcopy(
                 self.pollster_definition_only_required_fields)
             pollster_definition.pop(key)
-            exception = self.assertRaises(DynamicPollsterDefinitionException,
-                                          dynamic_pollster.DynamicPollster,
-                                          pollster_definition)
+            exception = self.assertRaises(
+                declarative.DynamicPollsterDefinitionException,
+                dynamic_pollster.DynamicPollster,
+                pollster_definition)
             self.assertEqual("Required fields ['%s'] not specified."
                              % key, exception.brief_message)
 
@@ -252,7 +259,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.pollster_definition_only_required_fields[
             'sample_type'] = "invalid_sample_type"
         exception = self.assertRaises(
-            DynamicPollsterDefinitionException,
+            declarative.DynamicPollsterDefinitionException,
             dynamic_pollster.DynamicPollster,
             self.pollster_definition_only_required_fields)
         self.assertEqual("Invalid sample type [invalid_sample_type]. "
@@ -312,6 +319,147 @@ class TestDynamicPollster(base.BaseTestCase):
                 resource="https://endpoint.server.name/")
 
         self.assertEqual(3, len(samples))
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_json_response_handler(
+            self, client_mock):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '{"test": [1,2,3]}'
+
+        client_mock.session.get.return_value = return_value
+
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples(
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
+
+        self.assertEqual(3, len(samples))
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_xml_response_handler(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['response_handlers'] = ['xml']
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '<test>123</test>'
+        client_mock.session.get.return_value = return_value
+
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples(
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
+
+        self.assertEqual(3, len(samples))
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_xml_json_response_handler(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['response_handlers'] = ['xml', 'json']
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '<test>123</test>'
+        client_mock.session.get.return_value = return_value
+
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples(
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
+
+        self.assertEqual(3, len(samples))
+
+        return_value._text = '{"test": [1,2,3,4]}'
+
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples(
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
+
+        self.assertEqual(4, len(samples))
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_xml_json_response_handler_invalid_response(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['response_handlers'] = ['xml', 'json']
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = 'Invalid response'
+        client_mock.session.get.return_value = return_value
+
+        with self.assertLogs('ceilometer.polling.dynamic_pollster',
+                             level='DEBUG') as logs:
+            gatherer = pollster.definitions.sample_gatherer
+            exception = self.assertRaises(
+                declarative.InvalidResponseTypeException,
+                gatherer.execute_request_get_samples,
+                keystone_client=client_mock,
+                resource="https://endpoint.server.name/")
+
+            xml_handling_error = logs.output[2]
+            json_handling_error = logs.output[3]
+
+            self.assertIn(
+                'DEBUG:ceilometer.polling.dynamic_pollster:'
+                'Error handling response [Invalid response] '
+                'with handler [XMLResponseHandler]',
+                xml_handling_error)
+
+            self.assertIn(
+                'DEBUG:ceilometer.polling.dynamic_pollster:'
+                'Error handling response [Invalid response] '
+                'with handler [JsonResponseHandler]',
+                json_handling_error)
+
+            self.assertEqual(
+                "InvalidResponseTypeException None: "
+                "No remaining handlers to handle the response "
+                "[Invalid response], used handlers "
+                "[XMLResponseHandler, JsonResponseHandler]. "
+                "[{'url_path': 'v1/test/endpoint/fake'}].",
+                str(exception))
+
+    def test_configure_response_handler_definition_invalid_value(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['response_handlers'] = ['jason']
+
+        exception = self.assertRaises(
+            declarative.DynamicPollsterDefinitionException,
+            dynamic_pollster.DynamicPollster,
+            pollster_definitions=definitions)
+        self.assertEqual("DynamicPollsterDefinitionException None: "
+                         "Invalid response_handler value [jason]. "
+                         "Accepted values are [json, xml, text]",
+                         str(exception))
+
+    def test_configure_response_handler_definition_invalid_type(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['response_handlers'] = 'json'
+
+        exception = self.assertRaises(
+            declarative.DynamicPollsterDefinitionException,
+            dynamic_pollster.DynamicPollster,
+            pollster_definitions=definitions)
+        self.assertEqual("DynamicPollsterDefinitionException None: "
+                         "Invalid response_handlers configuration. "
+                         "It must be a list. Provided value type: str",
+                         str(exception))
 
     @mock.patch('keystoneclient.v2_0.client.Client')
     def test_execute_request_get_samples_exception_on_request(
@@ -728,6 +876,10 @@ class TestDynamicPollster(base.BaseTestCase):
 
         def internal_execute_request_get_samples_mock(self, **kwargs):
             class Response:
+                @property
+                def text(self):
+                    return json.dumps([sample])
+
                 def json(self):
                     return [sample]
             return Response(), "url"

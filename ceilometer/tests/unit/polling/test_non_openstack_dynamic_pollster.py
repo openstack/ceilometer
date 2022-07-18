@@ -15,6 +15,7 @@
 """
 
 import copy
+import json
 import sys
 from unittest import mock
 
@@ -312,6 +313,11 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
         def internal_execute_request_get_samples_mock(
                 self, definitions, **kwargs):
             class Response:
+
+                @property
+                def text(self):
+                    return json.dumps([sample])
+
                 def json(self):
                     return [sample]
             return Response(), "url"

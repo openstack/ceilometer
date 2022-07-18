@@ -18,8 +18,10 @@
     similar to the idea used for handling notifications.
 """
 import copy
+import json
 import re
 import time
+import xmltodict
 
 from oslo_log import log
 
@@ -44,6 +46,80 @@ def validate_sample_type(sample_type):
         raise declarative.DynamicPollsterDefinitionException(
             "Invalid sample type [%s]. Valid ones are [%s]."
             % (sample_type, ceilometer_sample.TYPES))
+
+
+class XMLResponseHandler(object):
+    """This response handler converts an XML in string format to a dict"""
+
+    @staticmethod
+    def handle(response):
+        return xmltodict.parse(response)
+
+
+class JsonResponseHandler(object):
+    """This response handler converts a JSON in string format to a dict"""
+
+    @staticmethod
+    def handle(response):
+        return json.loads(response)
+
+
+class PlainTextResponseHandler(object):
+    """This response handler converts a string to a dict {'out'=<string>}"""
+
+    @staticmethod
+    def handle(response):
+        return {'out': str(response)}
+
+
+VALID_HANDLERS = {
+    'json': JsonResponseHandler,
+    'xml': XMLResponseHandler,
+    'text': PlainTextResponseHandler
+}
+
+
+def validate_response_handler(val):
+    if not isinstance(val, list):
+        raise declarative.DynamicPollsterDefinitionException(
+            "Invalid response_handlers configuration. It must be a list. "
+            "Provided value type: %s" % type(val).__name__)
+
+    for value in val:
+        if value not in VALID_HANDLERS:
+            raise declarative.DynamicPollsterDefinitionException(
+                "Invalid response_handler value [%s]. Accepted values "
+                "are [%s]" % (value, ', '.join(list(VALID_HANDLERS))))
+
+
+class ResponseHandlerChain(object):
+    """Tries to convert a string to a dict using the response handlers"""
+
+    def __init__(self, response_handlers, **meta):
+        if not isinstance(response_handlers, list):
+            response_handlers = list(response_handlers)
+
+        self.response_handlers = response_handlers
+        self.meta = meta
+
+    def handle(self, response):
+        failed_handlers = []
+        for handler in self.response_handlers:
+            try:
+                return handler.handle(response)
+            except Exception as e:
+                handler_name = handler.__name__
+                failed_handlers.append(handler_name)
+                LOG.debug(
+                    "Error handling response [%s] with handler [%s]: %s. "
+                    "We will try the next one, if multiple handlers were "
+                    "configured.",
+                    response, handler_name, e)
+
+        handlers_str = ', '.join(failed_handlers)
+        raise declarative.InvalidResponseTypeException(
+            "No remaining handlers to handle the response [%s], "
+            "used handlers [%s]. [%s]." % (response, handlers_str, self.meta))
 
 
 class PollsterDefinitionBuilder(object):
@@ -440,7 +516,9 @@ class PollsterDefinitions(object):
         PollsterDefinition(name='timeout', default=30),
         PollsterDefinition(name='extra_metadata_fields_cache_seconds',
                            default=3600),
-        PollsterDefinition(name='extra_metadata_fields')
+        PollsterDefinition(name='extra_metadata_fields'),
+        PollsterDefinition(name='response_handlers', default=['json'],
+                           validator=validate_response_handler)
     ]
 
     extra_definitions = []
@@ -655,6 +733,11 @@ class PollsterSampleGatherer(object):
 
     def __init__(self, definitions):
         self.definitions = definitions
+        self.response_handler_chain = ResponseHandlerChain(
+            map(VALID_HANDLERS.get,
+                self.definitions.configurations['response_handlers']),
+            url_path=definitions.configurations['url_path']
+        )
 
     @property
     def default_discovery(self):
@@ -668,17 +751,17 @@ class PollsterSampleGatherer(object):
         resp, url = self._internal_execute_request_get_samples(
             definitions=definitions, **kwargs)
 
-        response_json = resp.json()
-        entry_size = len(response_json)
-        LOG.debug("Entries [%s] in the JSON for request [%s] "
+        response_dict = self.response_handler_chain.handle(resp.text)
+        entry_size = len(response_dict)
+        LOG.debug("Entries [%s] in the DICT for request [%s] "
                   "for dynamic pollster [%s].",
-                  response_json, url, definitions['name'])
+                  response_dict, url, definitions['name'])
 
         if entry_size > 0:
             samples = self.retrieve_entries_from_response(
-                response_json, definitions)
+                response_dict, definitions)
             url_to_next_sample = self.get_url_to_next_sample(
-                response_json, definitions)
+                response_dict, definitions)
 
             self.prepare_samples(definitions, samples, **kwargs)
 
