@@ -378,6 +378,17 @@ class TestPollingAgent(BaseAgent):
         super(TestPollingAgent, self).setUp()
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
+        ks_client = mock.Mock(auth_token='fake_token')
+        ks_client.projects.get.return_value = mock.Mock(
+            name='admin', id='4465ecd1438b4d23a866cf8447387a7b'
+        )
+        ks_client.users.get.return_value = mock.Mock(
+            name='admin', id='c0c935468e654d5a8baae1a08adf4dfb'
+        )
+        self.useFixture(fixtures.MockPatch(
+            'ceilometer.keystone_client.get_client',
+            return_value=ks_client))
+        self.ks_client = ks_client
         self.setup_polling()
 
     @mock.patch('ceilometer.polling.manager.PollingManager')

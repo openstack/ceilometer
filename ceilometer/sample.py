@@ -94,13 +94,16 @@ class Sample(object):
 
     def __init__(self, name, type, unit, volume, user_id, project_id,
                  resource_id, timestamp=None, resource_metadata=None,
-                 source=None, id=None, monotonic_time=None):
+                 source=None, id=None, monotonic_time=None,
+                 user_name=None, project_name=None):
         self.name = name
         self.type = type
         self.unit = unit
         self.volume = volume
         self.user_id = user_id
+        self.user_name = user_name
         self.project_id = project_id
+        self.project_name = project_name
         self.resource_id = resource_id
         self.timestamp = timestamp
         self.resource_metadata = resource_metadata or {}
