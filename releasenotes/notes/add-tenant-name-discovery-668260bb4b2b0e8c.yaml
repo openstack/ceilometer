@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Identify user and projects names with the help of their UUIDs 
+    in the polled samples. If they are identified, set "project_name" 
+    and "user_name" fields in the sample to the corresponding values.

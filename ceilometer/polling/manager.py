@@ -35,6 +35,7 @@ from tooz import coordination
 from urllib import parse as urlparse
 
 from ceilometer import agent
+from ceilometer import cache_utils
 from ceilometer import declarative
 from ceilometer import keystone_client
 from ceilometer import messaging
@@ -44,6 +45,8 @@ from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
 
 LOG = log.getLogger(__name__)
+
+CACHE_DURATION = 3600
 
 POLLING_OPTS = [
     cfg.StrOpt('cfg_file',
@@ -64,7 +67,18 @@ POLLING_OPTS = [
     cfg.MultiStrOpt('pollsters_definitions_dirs',
                     default=["/etc/ceilometer/pollsters.d"],
                     help="List of directories with YAML files used "
-                         "to created pollsters.")
+                         "to created pollsters."),
+    cfg.BoolOpt('tenant_name_discovery',
+                default=False,
+                help="Identify project and user names from polled samples"
+                     "By default, collecting these values is disabled due"
+                     "to the fact that it could overwhelm keystone service"
+                     "with lots of continuous requests depending upon the"
+                     "number of projects, users and samples polled from"
+                     "the environment. While using this feature, it is"
+                     "recommended that ceilometer be configured with a"
+                     "caching backend to reduce the number of calls"
+                     "made to keystone"),
 ]
 
 
@@ -138,10 +152,38 @@ class PollingTask(object):
 
         self._telemetry_secret = self.manager.conf.publisher.telemetry_secret
 
+        self.ks_client = self.manager.keystone
+
+        self.cache_client = cache_utils.get_client(
+            self.manager.conf,
+            expiration_time=CACHE_DURATION
+        )
+
     def add(self, pollster, source):
         self.pollster_matches[source.name].add(pollster)
         key = Resources.key(source.name, pollster)
         self.resources[key].setup(source)
+
+    def resolve_uuid_from_cache(self, attr, uuid):
+        if self.cache_client:
+            name = self.cache_client.get(uuid)
+            if name:
+                return name
+            name = self.resolve_uuid_from_keystone(attr, uuid)
+            self.cache_client.set(uuid, name)
+            return name
+
+        # Retrieve project and user names from Keystone only
+        # if ceilometer doesn't have a caching backend
+        return self.resolve_uuid_from_keystone(attr, uuid)
+
+    def resolve_uuid_from_keystone(self, attr, uuid):
+        try:
+            return getattr(self.ks_client, attr).get(uuid).name
+        except AttributeError as e:
+            LOG.warning("Found '%s' while resolving uuid %s to name", e, uuid)
+        except ka_exceptions.NotFound as e:
+            LOG.warning(e.message)
 
     def poll_and_notify(self):
         """Polling sample and notify."""
@@ -194,6 +236,25 @@ class PollingTask(object):
                     for sample in samples:
                         # Note(yuywz): Unify the timestamp of polled samples
                         sample.set_timestamp(polling_timestamp)
+
+                        if self.manager.conf.tenant_name_discovery:
+
+                            # Try to resolve project UUIDs from cache first,
+                            # and then keystone
+                            if sample.project_id:
+                                sample.project_name = \
+                                    self.resolve_uuid_from_cache(
+                                        "projects", sample.project_id
+                                    )
+
+                            # Try to resolve user UUIDs from cache first,
+                            # and then keystone
+                            if sample.user_id:
+                                sample.user_name = \
+                                    self.resolve_uuid_from_cache(
+                                        "users", sample.user_id
+                                    )
+
                         sample_dict = (
                             publisher_utils.meter_message_from_counter(
                                 sample, self._telemetry_secret
