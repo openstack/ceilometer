@@ -275,19 +275,23 @@ class PipelineManager(agent.ConfigManagerBase):
                     self.pipelines.append(pipe)
         unique_names.clear()
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def pm_type(self):
         """Pipeline manager type."""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def pm_pipeline(self):
         """Pipeline class"""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def pm_source(self):
         """Pipeline source class"""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def pm_sink(self):
         """Pipeline sink class"""
 

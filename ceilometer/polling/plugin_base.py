@@ -63,7 +63,8 @@ class PollsterBase(object, metaclass=abc.ABCMeta):
         except Exception as err:
             raise ExtensionLoadError(err)
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def default_discovery(self):
         """Default discovery to use for this pollster.
 

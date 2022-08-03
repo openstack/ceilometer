@@ -27,7 +27,8 @@ LOG = log.getLogger(__name__)
 class _Base(object, metaclass=abc.ABCMeta):
     """Base class of OpenDaylight REST APIs Clients."""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def base_url(self):
         """Returns base url for each REST API."""
 
