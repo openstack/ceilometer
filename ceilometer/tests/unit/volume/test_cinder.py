@@ -18,38 +18,38 @@ from ceilometer.volume import cinder
 
 VOLUME_LIST = [
     type('Volume', (object,),
-         {u'migration_status': None,
-          u'attachments': [
-              {u'server_id': u'1ae69721-d071-4156-a2bd-b11bb43ec2e3',
-               u'attachment_id': u'f903d95e-f999-4a34-8be7-119eadd9bb4f',
-               u'attached_at': u'2016-07-14T03:55:57.000000',
-               u'host_name': None,
-               u'volume_id': u'd94c18fb-b680-4912-9741-da69ee83c94f',
-               u'device': u'/dev/vdb',
-               u'id': u'd94c18fb-b680-4912-9741-da69ee83c94f'}],
-          u'links': [{
-              u'href': u'http://fake_link3',
-              u'rel': u'self'},
+         {'migration_status': None,
+          'attachments': [
+              {'server_id': '1ae69721-d071-4156-a2bd-b11bb43ec2e3',
+               'attachment_id': 'f903d95e-f999-4a34-8be7-119eadd9bb4f',
+               'attached_at': '2016-07-14T03:55:57.000000',
+               'host_name': None,
+               'volume_id': 'd94c18fb-b680-4912-9741-da69ee83c94f',
+               'device': '/dev/vdb',
+               'id': 'd94c18fb-b680-4912-9741-da69ee83c94f'}],
+          'links': [{
+              'href': 'http://fake_link3',
+              'rel': 'self'},
               {
-                  u'href': u'http://fake_link4',
-                  u'rel': u'bookmark'}],
-          u'availability_zone': u'nova',
-          u'os-vol-host-attr:host': u'test@lvmdriver-1#lvmdriver-1',
-          u'encrypted': False,
-          u'updated_at': u'2016-07-14T03:55:57.000000',
-          u'replication_status': u'disabled',
-          u'snapshot_id': None,
-          u'id': u'd94c18fb-b680-4912-9741-da69ee83c94f',
-          u'size': 1,
-          u'user_id': u'be255bd31eb944578000fc762fde6dcf',
-          u'os-vol-tenant-attr:tenant_id': u'6824974c08974d4db864bbaa6bc08303',
-          u'os-vol-mig-status-attr:migstat': None,
-          u'metadata': {u'readonly': u'False', u'attached_mode': u'rw'},
-          u'status': u'in-use',
-          u'description': None,
-          u'multiattach': False,
-          u'source_volid': None,
-          u'consistencygroup_id': None,
+                  'href': 'http://fake_link4',
+                  'rel': 'bookmark'}],
+          'availability_zone': 'nova',
+          'os-vol-host-attr:host': 'test@lvmdriver-1#lvmdriver-1',
+          'encrypted': False,
+          'updated_at': '2016-07-14T03:55:57.000000',
+          'replication_status': 'disabled',
+          'snapshot_id': None,
+          'id': 'd94c18fb-b680-4912-9741-da69ee83c94f',
+          'size': 1,
+          'user_id': 'be255bd31eb944578000fc762fde6dcf',
+          'os-vol-tenant-attr:tenant_id': '6824974c08974d4db864bbaa6bc08303',
+          'os-vol-mig-status-attr:migstat': None,
+          'metadata': {'readonly': 'False', 'attached_mode': 'rw'},
+          'status': 'in-use',
+          'description': None,
+          'multiattach': False,
+          'source_volid': None,
+          'consistencygroup_id': None,
           u"volume_image_metadata": {
               u"checksum": u"17d9daa4fb8e20b0f6b7dec0d46fdddf",
               u"container_format": u"bare",
@@ -62,27 +62,27 @@ VOLUME_LIST = [
               u"min_ram": u"0",
               u"size": u"1572864000"
           },
-          u'os-vol-mig-status-attr:name_id': None,
-          u'name': None,
-          u'bootable': u'false',
-          u'created_at': u'2016-06-23T08:27:45.000000',
-          u'volume_type': u'lvmdriver-1'})
+          'os-vol-mig-status-attr:name_id': None,
+          'name': None,
+          'bootable': 'false',
+          'created_at': '2016-06-23T08:27:45.000000',
+          'volume_type': 'lvmdriver-1'})
 ]
 
 SNAPSHOT_LIST = [
     type('VolumeSnapshot', (object,),
-         {u'status': u'available',
-          u'os-extended-snapshot-attributes:progress': u'100%',
-          u'description': None,
-          u'os-extended-snapshot-attributes:project_id':
-              u'6824974c08974d4db864bbaa6bc08303',
-          u'size': 1,
-          u'user_id': u'be255bd31eb944578000fc762fde6dcf',
-          u'updated_at': u'2016-10-19T07:56:55.000000',
-          u'id': u'b1ea6783-f952-491e-a4ed-23a6a562e1cf',
-          u'volume_id': u'6f27bc42-c834-49ea-ae75-8d1073b37806',
-          u'metadata': {},
-          u'created_at': u'2016-10-19T07:56:55.000000',
+         {'status': 'available',
+          'os-extended-snapshot-attributes:progress': '100%',
+          'description': None,
+          'os-extended-snapshot-attributes:project_id':
+              '6824974c08974d4db864bbaa6bc08303',
+          'size': 1,
+          'user_id': 'be255bd31eb944578000fc762fde6dcf',
+          'updated_at': '2016-10-19T07:56:55.000000',
+          'id': 'b1ea6783-f952-491e-a4ed-23a6a562e1cf',
+          'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
+          'metadata': {},
+          'created_at': '2016-10-19T07:56:55.000000',
           u"volume_image_metadata": {
               u"checksum": u"17d9daa4fb8e20b0f6b7dec0d46fdddf",
               u"container_format": u"bare",
@@ -95,34 +95,34 @@ SNAPSHOT_LIST = [
               u"min_ram": u"0",
               u"size": u"1572864000"
           },
-          u'name': None})
+          'name': None})
 ]
 
 BACKUP_LIST = [
     type('VolumeBackup', (object,),
-         {u'status': u'available',
-          u'object_count': 0,
-          u'container': None,
-          u'name': None,
-          u'links': [{
-              u'href': u'http://fake_urla',
-              u'rel': u'self'}, {
-              u'href': u'http://fake_urlb',
-              u'rel': u'bookmark'}],
-          u'availability_zone': u'nova',
-          u'created_at': u'2016-10-19T06:55:23.000000',
-          u'snapshot_id': None,
-          u'updated_at': u'2016-10-19T06:55:23.000000',
-          u'data_timestamp': u'2016-10-19T06:55:23.000000',
-          u'description': None,
-          u'has_dependent_backups': False,
-          u'volume_id': u'6f27bc42-c834-49ea-ae75-8d1073b37806',
-          u'os-backup-project-attr:project_id':
-              u'6824974c08974d4db864bbaa6bc08303',
-          u'fail_reason': u"",
-          u'is_incremental': False,
-          u'id': u'75a52125-85ff-4a8d-b2aa-580f3b22273f',
-          u'size': 1})
+         {'status': 'available',
+          'object_count': 0,
+          'container': None,
+          'name': None,
+          'links': [{
+              'href': 'http://fake_urla',
+              'rel': 'self'}, {
+              'href': 'http://fake_urlb',
+              'rel': 'bookmark'}],
+          'availability_zone': 'nova',
+          'created_at': '2016-10-19T06:55:23.000000',
+          'snapshot_id': None,
+          'updated_at': '2016-10-19T06:55:23.000000',
+          'data_timestamp': '2016-10-19T06:55:23.000000',
+          'description': None,
+          'has_dependent_backups': False,
+          'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
+          'os-backup-project-attr:project_id':
+              '6824974c08974d4db864bbaa6bc08303',
+          'fail_reason': u"",
+          'is_incremental': False,
+          'id': '75a52125-85ff-4a8d-b2aa-580f3b22273f',
+          'size': 1})
 ]
 
 

@@ -78,7 +78,7 @@ class TestSignature(base.BaseTestCase):
 
     def test_verify_signature_unicode(self):
         data = {'a': 'A', 'b': 'B',
-                'message_signature': u''}
+                'message_signature': ''}
         self.assertFalse(utils.verify_signature(data, 'not-so-secret'))
 
     def test_verify_signature_nested(self):
@@ -109,8 +109,8 @@ class TestSignature(base.BaseTestCase):
         self.assertTrue(utils.verify_signature(jsondata, 'not-so-secret'))
 
     def test_verify_unicode_symbols(self):
-        data = {u'a\xe9\u0437': 'A',
-                'b': u'B\xe9\u0437'
+        data = {'a\xe9\u0437': 'A',
+                'b': 'B\xe9\u0437'
                 }
         data['message_signature'] = utils.compute_signature(
             data,
