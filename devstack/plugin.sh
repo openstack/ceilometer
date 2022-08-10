@@ -208,7 +208,7 @@ function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
         echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
     elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=gnocchi_swift/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
+        sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=service/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
         ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
     else
         die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"

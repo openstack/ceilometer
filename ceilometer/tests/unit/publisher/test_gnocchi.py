@@ -339,9 +339,9 @@ class PublisherTest(base.BaseTestCase):
     def test_activity_gnocchi_project_not_found(self, logger):
         self.ks_client.projects.find.side_effect = ka_exceptions.NotFound
         self._do_test_activity_filter(2)
-        logger.warning.assert_called_with('filtered project not found in '
+        logger.warning.assert_called_with('project %s not found in '
                                           'keystone, ignoring the '
-                                          'filter_project option')
+                                          'filter_project option', 'service')
 
     def test_activity_filter_match_swift_event(self):
         self.samples[0].name = 'storage.objects.outgoing.bytes'
