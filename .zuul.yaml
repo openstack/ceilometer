@@ -40,6 +40,10 @@
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-centos-8s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+        - telemetry-dsvm-integration-centos-9s:
+            irrelevant-files: *ceilometer-irrelevant-files
+        - telemetry-dsvm-integration-centos-9s-fips:
+            irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
@@ -50,6 +54,10 @@
         - telemetry-dsvm-integration-centos-8s:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-centos-8s-fips:
+            irrelevant-files: *ceilometer-irrelevant-files
+        - telemetry-dsvm-integration-centos-9s:
+            irrelevant-files: *ceilometer-irrelevant-files
+        - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
