@@ -69,7 +69,7 @@ The Ceilometer project created 2 methods to collect data:
 The first method is supported by the ceilometer-notification agent, which
 monitors the message queues for notifications. Polling agents can be configured
 either to poll the local hypervisor or remote APIs (public REST APIs exposed by
-services and host-level SNMP/IPMI daemons).
+services and host-level IPMI daemons).
 
 Notification Agent: Listening for data
 ---------------------------------------

@@ -25,7 +25,6 @@ from keystoneauth1 import exceptions as ka_exceptions
 from stevedore import extension
 
 from ceilometer.compute import discovery as nova_discover
-from ceilometer.hardware import discovery
 from ceilometer.polling.dynamic_pollster import DynamicPollster
 from ceilometer.polling.dynamic_pollster import \
     NonOpenStackApisPollsterDefinition
@@ -688,48 +687,6 @@ class TestPollingAgent(BaseAgent):
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
-
-    @mock.patch('ceilometer.polling.manager.LOG')
-    @mock.patch('ceilometer.nova_client.LOG')
-    def test_hardware_discover_fail_minimize_logs(self, novalog, baselog):
-        class PollsterHardware(TestPollster):
-            discovery = 'tripleo_overcloud_nodes'
-
-        class PollsterHardwareAnother(TestPollster):
-            discovery = 'tripleo_overcloud_nodes'
-
-        self.mgr.extensions.extend([
-            extension.Extension('testhardware',
-                                None,
-                                None,
-                                PollsterHardware(self.CONF), ),
-            extension.Extension('testhardware2',
-                                None,
-                                None,
-                                PollsterHardwareAnother(self.CONF), )
-        ])
-        ext = extension.Extension('tripleo_overcloud_nodes',
-                                  None,
-                                  None,
-                                  discovery.NodesDiscoveryTripleO(self.CONF))
-        self.mgr.discoveries = (extension.ExtensionManager
-                                .make_test_instance([ext]))
-
-        poll_cfg = {
-            'sources': [{
-                'name': "test_hardware",
-                'interval': 10,
-                'meters': ['testhardware', 'testhardware2'],
-                'sinks': ['test_sink']}],
-            'sinks': [{
-                'name': 'test_sink',
-                'publishers': ["test"]}]
-        }
-        self.setup_polling(poll_cfg)
-        polling_tasks = self.mgr.setup_polling_tasks()
-        self.mgr.interval_task(list(polling_tasks.values())[0])
-        self.assertEqual(1, novalog.exception.call_count)
-        self.assertFalse(baselog.exception.called)
 
     @mock.patch('ceilometer.polling.manager.LOG')
     def test_polling_exception(self, LOG):

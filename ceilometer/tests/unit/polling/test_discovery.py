@@ -18,7 +18,6 @@ from unittest import mock
 
 from oslotest import base
 
-from ceilometer.hardware import discovery as hardware
 from ceilometer.polling.discovery import endpoint
 from ceilometer.polling.discovery import localnode
 from ceilometer.polling.discovery import tenant as project
@@ -146,63 +145,3 @@ class TestProjectDiscovery(base.BaseTestCase):
         result = self.discovery.discover(self.manager)
         self.assertEqual(len(result), 3)
         self.assertEqual(self.manager.keystone.projects.list.call_count, 2)
-
-
-class TestHardwareDiscovery(base.BaseTestCase):
-    class MockInstance(object):
-        addresses = {'ctlplane': [
-            {'addr': '0.0.0.0',
-             'OS-EXT-IPS-MAC:mac_addr': '01-23-45-67-89-ab'}
-        ]}
-        id = 'resource_id'
-        image = {'id': 'image_id'}
-        flavor = {'id': 'flavor_id'}
-
-    expected = {
-        'resource_id': 'resource_id',
-        'resource_url': 'snmp://ro_snmp_user:password@0.0.0.0',
-        'mac_addr': '01-23-45-67-89-ab',
-        'image_id': 'image_id',
-        'flavor_id': 'flavor_id',
-    }
-
-    expected_usm = {
-        'resource_id': 'resource_id',
-        'resource_url': ''.join(['snmp://ro_snmp_user:password@0.0.0.0',
-                                 '?priv_proto=aes192',
-                                 '&priv_password=priv_pass']),
-        'mac_addr': '01-23-45-67-89-ab',
-        'image_id': 'image_id',
-        'flavor_id': 'flavor_id',
-    }
-
-    def setUp(self):
-        super(TestHardwareDiscovery, self).setUp()
-        self.CONF = service.prepare_service([], [])
-        self.discovery = hardware.NodesDiscoveryTripleO(self.CONF)
-        self.discovery.nova_cli = mock.MagicMock()
-        self.manager = mock.MagicMock()
-
-    def test_hardware_discovery(self):
-        self.discovery.nova_cli.instance_get_all.return_value = [
-            self.MockInstance()]
-        resources = self.discovery.discover(self.manager)
-        self.assertEqual(1, len(resources))
-        self.assertEqual(self.expected, resources[0])
-
-    def test_hardware_discovery_without_flavor(self):
-        instance = self.MockInstance()
-        instance.flavor = {}
-        self.discovery.nova_cli.instance_get_all.return_value = [instance]
-        resources = self.discovery.discover(self.manager)
-        self.assertEqual(0, len(resources))
-
-    def test_hardware_discovery_usm(self):
-        self.CONF.set_override('readonly_user_priv_proto', 'aes192',
-                               group='hardware')
-        self.CONF.set_override('readonly_user_priv_password', 'priv_pass',
-                               group='hardware')
-        self.discovery.nova_cli.instance_get_all.return_value = [
-            self.MockInstance()]
-        resources = self.discovery.discover(self.manager)
-        self.assertEqual(self.expected_usm, resources[0])

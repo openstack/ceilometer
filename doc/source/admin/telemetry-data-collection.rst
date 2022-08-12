@@ -19,9 +19,8 @@ Notifications
     messages from the configured message queue system.
 
 Polling
-    Retrieve information directly from the hypervisor or from the host
-    machine using SNMP, or by using the APIs of other OpenStack
-    services.
+    Retrieve information directly from the hypervisor or by using the APIs of
+    other OpenStack services.
 
 Notifications
 =============
@@ -281,15 +280,13 @@ Central agent
 ~~~~~~~~~~~~~
 
 This agent is responsible for polling public REST APIs to retrieve additional
-information on OpenStack resources not already surfaced via notifications,
-and also for polling hardware resources over SNMP.
+information on OpenStack resources not already surfaced via notifications.
 
 Some of the services polled with this agent are:
 
 -  OpenStack Networking
 -  OpenStack Object Storage
 -  OpenStack Block Storage
--  Hardware resources via SNMP
 
 To install and configure this service use the :ref:`install_rdo`
 section in the Installation Tutorials and Guides.

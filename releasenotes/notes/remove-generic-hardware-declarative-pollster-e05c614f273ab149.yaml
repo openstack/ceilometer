@@ -1,0 +1,8 @@
+---
+upgrade:
+  - |
+    ``GenericHardwareDeclarativePollster`` has been removed. Because of this
+    removal all metrics gathered by SNMP daemon have been removed as well.
+
+  - |
+    The ``NodesDiscoveryTripleO`` discovery plugin has been removed.
