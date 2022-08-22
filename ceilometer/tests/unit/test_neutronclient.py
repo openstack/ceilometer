@@ -64,6 +64,6 @@ class TestNeutronClient(base.BaseTestCase):
                   'router:external': True,
                   'shared': False,
                   'status': 'ACTIVE',
-                  'subnets': [u'c4b6f5b8-3508-4896-b238-a441f25fb492'],
+                  'subnets': ['c4b6f5b8-3508-4896-b238-a441f25fb492'],
                   'tenant_id': '62d6f08bbd3a44f6ad6f00ca15cce4e5'},
                  ]}

@@ -55,8 +55,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Ceilometer Release Notes'
-copyright = u'2015, Ceilometer Developers'
+project = 'Ceilometer Release Notes'
+copyright = '2015, Ceilometer Developers'
 
 # Release notes do not need a version number in the title, they
 # cover multiple releases.
@@ -209,8 +209,8 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ('index', 'CeilometerReleaseNotes.tex',
-     u'Ceilometer Release Notes Documentation',
-     u'Ceilometer Developers', 'manual'),
+     'Ceilometer Release Notes Documentation',
+     'Ceilometer Developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -240,7 +240,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'ceilometerreleasenotes',
-     u'Ceilometer Release Notes Documentation', [u'Ceilometer Developers'], 1)
+     'Ceilometer Release Notes Documentation', ['Ceilometer Developers'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -254,8 +254,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'CeilometerReleaseNotes',
-     u'Ceilometer Release Notes Documentation',
-     u'Ceilometer Developers', 'CeilometerReleaseNotes',
+     'Ceilometer Release Notes Documentation',
+     'Ceilometer Developers', 'CeilometerReleaseNotes',
      'One line description of project.',
      'Miscellaneous'),
 ]

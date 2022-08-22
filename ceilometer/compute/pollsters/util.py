@@ -34,15 +34,15 @@ def _get_metadata_from_object(conf, instance):
     instance_type = instance.flavor['name'] if instance.flavor else None
     metadata = {
         'display_name': instance.name,
-        'name': getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', u''),
+        'name': getattr(instance, 'OS-EXT-SRV-ATTR:instance_name', ''),
         'instance_id': instance.id,
         'instance_type': instance_type,
         'host': instance.hostId,
-        'instance_host': getattr(instance, 'OS-EXT-SRV-ATTR:host', u''),
+        'instance_host': getattr(instance, 'OS-EXT-SRV-ATTR:host', ''),
         'flavor': instance.flavor,
         'status': instance.status.lower(),
-        'state': getattr(instance, 'OS-EXT-STS:vm_state', u''),
-        'task_state': getattr(instance, 'OS-EXT-STS:task_state', u''),
+        'state': getattr(instance, 'OS-EXT-STS:vm_state', ''),
+        'task_state': getattr(instance, 'OS-EXT-STS:task_state', ''),
     }
 
     # Image properties

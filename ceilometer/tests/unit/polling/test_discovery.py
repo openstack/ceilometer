@@ -77,15 +77,15 @@ class TestProjectDiscovery(base.BaseTestCase):
         domain_heat.name = 'heat'
         domain_heat.enabled = True
         domain_heat.links = {
-            u'self': u'http://192.168.1.1/identity/v3/domains/'
-                     u'2f42ab40b7ad4140815ef830d816a16c'}
+            'self': 'http://192.168.1.1/identity/v3/domains/'
+                    '2f42ab40b7ad4140815ef830d816a16c'}
 
         domain_default = mock.MagicMock()
         domain_default.id = 'default'
         domain_default.name = 'Default'
         domain_default.enabled = True
         domain_default.links = {
-            u'self': u'http://192.168.1.1/identity/v3/domains/default'}
+            'self': 'http://192.168.1.1/identity/v3/domains/default'}
 
         project_admin = mock.MagicMock()
         project_admin.id = '2ce92449a23145ef9c539f3327960ce3'
@@ -95,8 +95,8 @@ class TestProjectDiscovery(base.BaseTestCase):
         project_admin.is_domain = False
         project_admin.enabled = True
         project_admin.links = {
-            u'self': u'http://192.168.4.46/identity/v3/projects/'
-                     u'2ce92449a23145ef9c539f3327960ce3'},
+            'self': 'http://192.168.4.46/identity/v3/projects/'
+                    '2ce92449a23145ef9c539f3327960ce3'},
 
         project_service = mock.MagicMock()
         project_service.id = '9bf93b86bca04e3b815f86a5de083adc'
@@ -106,8 +106,8 @@ class TestProjectDiscovery(base.BaseTestCase):
         project_service.is_domain = False
         project_service.enabled = True
         project_service.links = {
-            u'self': u'http://192.168.4.46/identity/v3/projects/'
-                     u'9bf93b86bca04e3b815f86a5de083adc'}
+            'self': 'http://192.168.4.46/identity/v3/projects/'
+                    '9bf93b86bca04e3b815f86a5de083adc'}
 
         project_demo = mock.MagicMock()
         project_demo.id = '57d96b9af18d43bb9d047f436279b0be'
@@ -117,8 +117,8 @@ class TestProjectDiscovery(base.BaseTestCase):
         project_demo.is_domain = False
         project_demo.enabled = True
         project_demo.links = {
-            u'self': u'http://192.168.4.46/identity/v3/projects/'
-                     u'57d96b9af18d43bb9d047f436279b0be'}
+            'self': 'http://192.168.4.46/identity/v3/projects/'
+                    '57d96b9af18d43bb9d047f436279b0be'}
 
         self.domains = [domain_heat, domain_default]
         self.default_domain_projects = [project_admin, project_service]
