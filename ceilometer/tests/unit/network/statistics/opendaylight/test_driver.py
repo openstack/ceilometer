@@ -24,35 +24,43 @@ from ceilometer import service
 
 class _Base(base.BaseTestCase, metaclass=abc.ABCMeta):
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def flow_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def port_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def table_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def topology_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def switch_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def user_links_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def active_hosts_data(self):
         pass
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def inactive_hosts_data(self):
         pass
 

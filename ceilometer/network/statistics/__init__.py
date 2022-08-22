@@ -35,15 +35,18 @@ class _Base(plugin_base.PollsterBase, metaclass=abc.ABCMeta):
         # pipeline configuration
         return None
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def meter_name(self):
         """Return a Meter Name."""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def meter_type(self):
         """Return a Meter Type."""
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def meter_unit(self):
         """Return a Meter Unit."""
 
