@@ -198,6 +198,11 @@ attributes to define a dynamic pollster:
    executed serially, one after the other. Therefore, if the request hangs,
    all pollsters (including the non-dynamic ones) will stop executing.
 
+*  ``namespaces``: optional parameter. Defines the namespaces (running
+   ceilometer instances) where the pollster will be instantiated. This
+   parameter accepts a single string value or a list of strings. The
+   default value is `central`.
+
 The complete YAML configuration to gather data from Magnum (that has been used
 as an example) is the following:
 
