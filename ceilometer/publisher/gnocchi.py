@@ -24,6 +24,7 @@ import uuid
 
 from gnocchiclient import exceptions as gnocchi_exc
 from keystoneauth1 import exceptions as ka_exceptions
+import oslo_cache
 from oslo_log import log
 from oslo_utils import timeutils
 from stevedore import extension
@@ -214,7 +215,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
         self.cache = None
         try:
-            import oslo_cache
             oslo_cache.configure(conf)
             # NOTE(cdent): The default cache backend is a real but
             # noop backend. We don't want to use that here because
@@ -225,8 +225,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 self.cache = oslo_cache.configure_cache_region(
                     conf, cache_region)
                 self.cache.key_mangler = cache_key_mangler
-        except ImportError:
-            pass
         except oslo_cache.exception.ConfigurationError as exc:
             LOG.warning('unable to configure oslo_cache: %s', exc)
 
