@@ -95,8 +95,8 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
     @mock.patch('keystoneclient.v2_0.client.Client')
     def test_discover_response_ok(self, client_mock):
-        def discover_mock(self, manager, param=None):
-            return ["barbican_url"]
+        discover_mock = mock.MagicMock()
+        discover_mock.return_value = ["barbican_url"]
 
         original_discover_method = EndpointDiscovery.discover
         EndpointDiscovery.discover = discover_mock
@@ -108,9 +108,11 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
         client_mock.session.get.return_value = return_value
 
-        response = self.discovery.discover(
-            manager=self.FakeManager(client_mock), param="param")
+        fake_manager = self.FakeManager(client_mock)
+        response = self.discovery.discover(manager=fake_manager, param="param")
 
         self.assertEqual(["content"], response)
 
+        discover_mock.assert_has_calls([
+            mock.call(fake_manager, "key-manager")])
         EndpointDiscovery.discover = original_discover_method
