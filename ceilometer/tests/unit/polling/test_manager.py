@@ -422,6 +422,76 @@ class TestPollingAgent(BaseAgent):
         self.assertIn(60, polling_tasks.keys())
         self.assertNotIn(10, polling_tasks.keys())
 
+    @mock.patch('glob.glob')
+    @mock.patch('ceilometer.declarative.load_definitions')
+    def test_setup_polling_dynamic_pollster_namespace(self, load_mock,
+                                                      glob_mock):
+        glob_mock.return_value = ['test.yml']
+        load_mock.return_value = [{
+            'name': "test.dynamic.pollster",
+            'namespaces': "dynamic",
+            'sample_type': 'gauge',
+            'unit': 'test',
+            'endpoint_type': 'test',
+            'url_path': 'test',
+            'value_attribute': 'test'
+        }, {
+            'name': "test.compute.central.pollster",
+            'sample_type': 'gauge',
+            'namespaces': ["compute", "central"],
+            'unit': 'test',
+            'endpoint_type': 'test',
+            'url_path': 'test',
+            'value_attribute': 'test'
+        }, {
+            'name': "test.compute.pollster",
+            'namespaces': ["compute"],
+            'sample_type': 'gauge',
+            'unit': 'test',
+            'endpoint_type': 'test',
+            'url_path': 'test',
+            'value_attribute': 'test'
+        }, {
+            'name': "test.central.pollster",
+            'sample_type': 'gauge',
+            'unit': 'test',
+            'endpoint_type': 'test',
+            'url_path': 'test',
+            'value_attribute': 'test'
+        }]
+        mgr = manager.AgentManager(0, self.CONF, namespaces=['dynamic'])
+        self.assertEqual(len(mgr.extensions), 1)
+        self.assertEqual(
+            mgr.extensions[0].definitions.configurations['name'],
+            'test.dynamic.pollster')
+
+        mgr = manager.AgentManager(0, self.CONF)
+        self.assertEqual(
+            mgr.extensions[-3].definitions.configurations['name'],
+            'test.compute.central.pollster')
+        self.assertEqual(
+            mgr.extensions[-2].definitions.configurations['name'],
+            'test.compute.pollster')
+        self.assertEqual(
+            mgr.extensions[-1].definitions.configurations['name'],
+            'test.central.pollster')
+
+        mgr = manager.AgentManager(0, self.CONF, namespaces=['compute'])
+        self.assertEqual(
+            mgr.extensions[-2].definitions.configurations['name'],
+            'test.compute.central.pollster')
+        self.assertEqual(
+            mgr.extensions[-1].definitions.configurations['name'],
+            'test.compute.pollster')
+
+        mgr = manager.AgentManager(0, self.CONF, ['central'])
+        self.assertEqual(
+            mgr.extensions[-2].definitions.configurations['name'],
+            'test.compute.central.pollster')
+        self.assertEqual(
+            mgr.extensions[-1].definitions.configurations['name'],
+            'test.central.pollster')
+
     def test_setup_polling_task_same_interval(self):
         self.polling_cfg['sources'].append({
             'name': 'test_polling_1',

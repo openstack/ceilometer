@@ -253,7 +253,8 @@ class AgentManager(cotyledon.Service):
                          for namespace in namespaces)
 
         # Create dynamic pollsters
-        extensions_dynamic_pollsters = self.create_dynamic_pollsters()
+        extensions_dynamic_pollsters = self.create_dynamic_pollsters(
+            namespaces)
 
         self.extensions = list(itertools.chain(*list(extensions))) + list(
             itertools.chain(*list(extensions_fb))) + list(
@@ -291,15 +292,18 @@ class AgentManager(cotyledon.Service):
         self._keystone = None
         self._keystone_last_exception = None
 
-    def create_dynamic_pollsters(self):
+    def create_dynamic_pollsters(self, namespaces):
         """Creates dynamic pollsters
 
         This method Creates dynamic pollsters based on configurations placed on
         'pollsters_definitions_dirs'
 
+        :param namespaces: The namespaces we are running on to validate if
+                           the pollster should be instantiated or not.
         :return: a list with the dynamic pollsters defined by the operator.
         """
 
+        namespaces_set = set(namespaces)
         pollsters_definitions_dirs = self.conf.pollsters_definitions_dirs
         if not pollsters_definitions_dirs:
             LOG.info("Variable 'pollsters_definitions_dirs' not defined.")
@@ -333,6 +337,21 @@ class AgentManager(cotyledon.Service):
 
             for pollster_cfg in pollsters_cfg:
                 pollster_name = pollster_cfg['name']
+                pollster_namespaces = pollster_cfg.get(
+                    'namespaces', ['central'])
+                if isinstance(pollster_namespaces, list):
+                    pollster_namespaces = set(pollster_namespaces)
+                else:
+                    pollster_namespaces = {pollster_namespaces}
+
+                if not bool(namespaces_set & pollster_namespaces):
+                    LOG.info("The pollster [%s] is not configured to run in "
+                             "these namespaces %s, the configured namespaces "
+                             "for this pollster are %s. Therefore, we are "
+                             "skipping it.", pollster_name, namespaces_set,
+                             pollster_namespaces)
+                    continue
+
                 if pollster_name not in pollsters_definitions:
                     LOG.info("Loading dynamic pollster [%s] from file [%s].",
                              pollster_name, pollsters_definitions_file)
