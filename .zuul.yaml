@@ -31,7 +31,6 @@
         - telemetry-dsvm-integration-train:
             irrelevant-files: *ceilometer-irrelevant-files
     gate:
-      queue: telemetry
       jobs:
         - grenade-dsvm-ceilometer
         - telemetry-dsvm-integration-train:
