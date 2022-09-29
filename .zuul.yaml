@@ -39,7 +39,6 @@
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
     gate:
-      queue: telemetry
       jobs:
         - grenade-ceilometer
         - telemetry-dsvm-integration:
