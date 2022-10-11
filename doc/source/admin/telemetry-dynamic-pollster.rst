@@ -45,7 +45,7 @@ attributes to define a dynamic pollster:
    the unit or some other meaningful String value;
 
 *  ``value_attribute``: mandatory attribute; defines the attribute in the
-   JSON response from the URL of the component being polled. We also accept
+   response from the URL of the component being polled. We also accept
    nested values dictionaries. To use a nested value one can simply use
    ``attribute1.attribute2.<asMuchAsNeeded>.lastattribute``. It is also
    possible to reference the sample itself using ``"." (dot)``; the self
@@ -285,6 +285,117 @@ desires):
     metadata_mapping:
         name: "display_name"
     default_value: 0
+
+*  ``response_handlers``: optional parameter. Defines the response
+   handlers used to handle the response. For now, the supported values
+   are:
+
+   ``json``: This handler will interpret the response as a `JSON` and will
+   convert it to a `dictionary` which can be manipulated using the
+   operations options when mapping the attributes:
+
+   .. code-block:: yaml
+
+     ---
+
+     - name: "dynamic.json.response"
+       sample_type: "gauge"
+       [...]
+       response_handlers:
+          - json
+
+   Response to handle:
+
+   .. code-block:: json
+
+     {
+        "test": {
+          "list": [1, 2, 3]
+        }
+     }
+
+   Response handled:
+
+   .. code-block:: python
+
+     {
+        'test': {
+          'list': [1, 2, 3]
+        }
+     }
+
+
+   ``xml``: This handler will interpret the response as an `XML` and will
+   convert it to a `dictionary` which can be manipulated using the
+   operations options when mapping the attributes:
+
+   .. code-block:: yaml
+
+     ---
+
+     - name: "dynamic.json.response"
+       sample_type: "gauge"
+       [...]
+       response_handlers:
+          - xml
+
+   Response to handle:
+
+   .. code-block:: xml
+
+     <test>
+       <list>1</list>
+       <list>2</list>
+       <list>3</list>
+     </test>
+
+   Response handled:
+
+   .. code-block:: python
+
+     {
+        'test': {
+          'list': [1, 2, 3]
+        }
+     }
+
+   ``text``: This handler will interpret the response as a `PlainText` and
+   will convert it to a `dictionary` which can be manipulated using the
+   operations options when mapping the attributes:
+
+   .. code-block:: yaml
+
+     ---
+
+     - name: "dynamic.json.response"
+       sample_type: "gauge"
+       [...]
+       response_handlers:
+          - text
+
+   Response to handle:
+
+   .. code-block:: text
+
+     Plain text response
+
+   Response handled:
+
+   .. code-block:: python
+
+     {
+        'out': "Plain text response"
+     }
+
+   They can be used together or individually. If not defined, the
+   `default` value will be `json`. If you set 2 or more response
+   handlers, the first configured handler will be used to try to
+   handle the response, if it is not possible, a `DEBUG` log
+   message will be displayed, then the next will be used
+   and so on. If no configured handler was able to handle
+   the response, an empty dict will be returned and a `WARNING`
+   log will be displayed to warn operators that the response was
+   not able to be handled by any configured handler.
 
 The dynamic pollsters system configuration (for non-OpenStack APIs)
 -------------------------------------------------------------------

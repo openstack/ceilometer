@@ -49,6 +49,10 @@ class DynamicPollsterDefinitionException(DynamicPollsterException):
     pass
 
 
+class InvalidResponseTypeException(DynamicPollsterException):
+    pass
+
+
 class NonOpenStackApisDynamicPollsterException\
         (DynamicPollsterDefinitionException):
     pass
