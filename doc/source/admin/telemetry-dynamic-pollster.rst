@@ -471,6 +471,62 @@ ones), we can use the `successful_ops`.
     resource_id_attribute: "user"
     response_entries_key: "summary"
 
+The dynamic pollsters system configuration (for local host commands)
+--------------------------------------------------------------------
+
+The dynamic pollster system can also be used for local host commands,
+these commands must be installed in the system that is running the
+Ceilometer compute agent.
+To configure local hosts commands, one can use all but two attributes of
+the Dynamic pollster system. The attributes that are not supported are
+the ``endpoint_type`` and ``url_path``. The dynamic pollster system for
+local host commands is activated automatically when one uses the
+configuration ``host_command``.
+
+The extra parameter (in addition to the original ones) that is available
+when using the local host commands dynamic pollster sub-subsystem is the
+following:
+
+*  ``host_command``: required parameter. It is the host command that will
+   be executed in the same host the Ceilometer dynamic pollster agent is
+   running. The output of the command will be processed by the pollster and
+   stored in the configured backend.
+
+As follows we present an example on how to use the local host command:
+
+.. code-block:: yaml
+
+  ---
+
+  - name: "dynamic.host.command"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "value"
+    response_entries_key: "test"
+    host_command: "echo '<test><user_id>id1_u</user_id><project_id>id1_p</project_id><id>id1</id><meta>meta-data-to-store</meta><value>1</value></test>'"
+    metadata_fields:
+        - "meta"
+    response_handlers:
+        - xml
+
+To execute multi page host commands, the `next_sample_url_attribute`
+must generate the next sample command, like the following example:
+
+.. code-block:: yaml
+
+  ---
+
+  - name: "dynamic.s3.objects.size"
+    sample_type: "gauge"
+    unit: "request"
+    value_attribute: "Size"
+    project_id_attribute: "Owner.ID"
+    user_id_attribute: "Owner.ID"
+    resource_id_attribute: "Key"
+    response_entries_key: "Contents"
+    host_command: "aws s3api list-objects"
+    next_sample_url_attribute: NextToken | 'aws s3api list-objects --starting-token "' + value + '"'
+
 Operations on extracted attributes
 ----------------------------------
 
@@ -876,12 +932,10 @@ we only have the `tenant_id`, which must be used as the `project_id`. However,
 for billing and later invoicing one might need/want the project name, domain
 id, and other metadata that are available in Keystone (and maybe some others
 that are scattered over other components). To achieve that, one can use the
-OpenStack metadata enrichment option. This feature is only available
-to *OpenStack pollsters*, and can only gather extra metadata from OpenStack
-APIs. As follows we present an example that shows a dynamic pollster
-configuration to gather virtual machine (VM) status, and to enrich the data
-pushed to the storage backend (e.g. Gnocchi) with project name, domain ID,
-and domain name.
+OpenStack metadata enrichment option. As follows we present an example that
+shows a dynamic pollster configuration to gather virtual machine (VM) status,
+and to enrich the data pushed to the storage backend (e.g. Gnocchi) with
+project name, domain ID, and domain name.
 
     .. code-block:: yaml
 
@@ -937,26 +991,59 @@ and domain name.
               "Openstack-API-Version": "identity latest"
             value: "name"
             extra_metadata_fields_cache_seconds: 1800 # overriding the default cache policy
+            metadata_fields:
+                - id
           - name: "domain_id"
             endpoint_type: "identity"
             url_path: "'/v3/projects/' + str(sample['project_id'])"
             headers:
               "Openstack-API-Version": "identity latest"
             value: "domain_id"
+            metadata_fields:
+                - id
           - name: "domain_name"
             endpoint_type: "identity"
             url_path: "'/v3/domains/' + str(extra_metadata_captured['domain_id'])"
             headers:
               "Openstack-API-Version": "identity latest"
             value: "name"
+            metadata_fields:
+                - id
+          - name: "operating-system"
+            host_command: "'get-vm --vm-name ' + str(extra_metadata_by_name['project_name']['metadata']['id'])"
+            value: "os"
+
 
 The above example can be used to gather and persist in the backend the
 status of VMs. It will persist `1` in the backend as a measure for every
 collecting period if the VM's status is `ACTIVE`, and `0` otherwise. This is
 quite useful to create hashmap rating rules for running VMs in CloudKitty.
 Then, to enrich the resource in the storage backend, we are adding extra
-metadata that are collected in Keystone via the `extra_metadata_fields`
-options.
+metadata that are collected in Keystone and in the local host via the
+`extra_metadata_fields` options. If you have multiples `extra_metadata_fields`
+defining the same `metadata_field`, the last not `None` metadata value will
+be used.
+
+To operate values in the `extra_metadata_fields`, you can access 3 local
+variables:
+
+*  ``sample``: it is a dictionary which holds the current data of the root
+   sample. The root sample is the final sample that will be persisted in the
+   configured storage backend.
+
+*  ``extra_metadata_captured``: it is a dictionary which holds the current
+   data of all `extra_metadata_fields` processed before this one.
+   If you have multiples `extra_metadata_fields` defining the same
+   `metadata_field`, the last not `None` metadata value will be used.
+
+*  ``extra_metadata_by_name``: it is a dictionary which holds the data of
+   all `extra_metadata_fields` processed before this one. No data is
+   overwritten in this variable. To access an specific `extra_metadata_field`
+   using this variable, you can do
+   `extra_metadata_by_name['<extra_metadata_field_name>']['value']` to get
+   its value, or
+   `extra_metadata_by_name['<extra_metadata_field_name>']['metadata']['<metadata>']`
+   to get its metadata.
 
 The metadata enrichment feature has the following options:
 
@@ -969,41 +1056,13 @@ The metadata enrichment feature has the following options:
    value can be increased of decreased.
 
 *  ``extra_metadata_fields``: optional parameter. This option is a list of
-   objects, where each one of its elements is an extra metadata definition.
-   Each one of the extra metadata definition can have the options defined in
-   the dynamic pollsters such as to handle paged responses, operations on the
-   extracted values, headers and so on. The basic options that must be
-   defined for an extra metadata definitions are the following:
+   objects or a single one, where each one of its elements is an
+   dynamic pollster configuration set. Each one of the extra metadata
+   definition can have the same options defined in the dynamic pollsters,
+   including the `extra_metadata_fields` option, so this option is a
+   multi-level option. When defined, the result of the collected data will
+   be merged in the final sample resource metadata. If some of the required
+   dynamic pollster configuration is not set in the `extra_metadata_fields`,
+   will be used the parent pollster configuration, except the `name`.
 
-    *  ``name``:  This option is mandatory. The name of the extra metadata.
-       This is the name that is going to be used by the metadata. If there is
-       already any other metadata gathered via `metadata_fields` option or
-       transformed via `metadata_mapping` configuration, this metadata is
-       going to be discarded.
 
-    *  ``endpoint_type``:  The endpoint type that we want to execute the
-       call against. This option is mandatory. It works similarly to the
-       `endpoint_type` option in the dynamic pollster definition.
-
-    *  ``url_path``: This option is mandatory. It works similarly to the
-       `url_path` option in the dynamic pollster definition. However, this
-       `one enables operators to execute/evaluate expressions in runtime, which
-       `allows one to retrieve the information from previously gathered
-       metadata via ``extra_metadata_captured` dictionary, or via the
-       `sample` itself.
-
-    *  ``value``: This configuration is mandatory. It works similarly to the
-       `value_attribute` option in the dynamic pollster definition. It is
-       the value we want to extract from the response, and assign in the
-       metadata being generated.
-
-    *  ``headers``: This option is optional. It works similarly to the
-       `headers` option in the dynamic pollster definition.
-
-    *  ``next_sample_url_attribute``: This option is optional. It works
-       similarly to the `next_sample_url_attribute` option in the dynamic
-       pollster definition.
-
-    *  ``response_entries_key``: This option is optional. It works
-       similarly to the `response_entries_key` option in the dynamic
-       pollster definition.

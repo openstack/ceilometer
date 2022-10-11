@@ -20,6 +20,7 @@
 import copy
 import json
 import re
+import subprocess
 import time
 import xmltodict
 
@@ -205,7 +206,7 @@ class PollsterSampleExtractor(object):
             metadata=metadata, pollster_definitions=pollster_definitions)
 
         extra_metadata = self.definitions.retrieve_extra_metadata(
-            kwargs['manager'], pollster_sample)
+            kwargs['manager'], pollster_sample, kwargs['conf'])
 
         for key in extra_metadata.keys():
             if key in metadata.keys():
@@ -518,7 +519,8 @@ class PollsterDefinitions(object):
                            default=3600),
         PollsterDefinition(name='extra_metadata_fields'),
         PollsterDefinition(name='response_handlers', default=['json'],
-                           validator=validate_response_handler)
+                           validator=validate_response_handler),
+        PollsterDefinition(name='base_metadata', default={})
     ]
 
     extra_definitions = []
@@ -572,114 +574,75 @@ class PollsterDefinitions(object):
                 "Required fields %s not specified."
                 % missing, self.configurations)
 
-    def retrieve_extra_metadata(self, manager, request_sample):
+    def retrieve_extra_metadata(self, manager, request_sample, pollster_conf):
         extra_metadata_fields = self.configurations['extra_metadata_fields']
         if extra_metadata_fields:
-            if isinstance(self, NonOpenStackApisPollsterDefinition):
-                raise declarative.NonOpenStackApisDynamicPollsterException(
-                    "Not supported the use of extra metadata gathering for "
-                    "non-openstack pollsters [%s] (yet)."
-                    % self.configurations['name'])
-
-            return self._retrieve_extra_metadata(
-                extra_metadata_fields, manager, request_sample)
+            extra_metadata_samples = {}
+            extra_metadata_by_name = {}
+            if not isinstance(extra_metadata_fields, (list, tuple)):
+                extra_metadata_fields = [extra_metadata_fields]
+            for ext_metadata in extra_metadata_fields:
+                ext_metadata.setdefault(
+                    'sample_type', self.configurations['sample_type'])
+                ext_metadata.setdefault('unit', self.configurations['unit'])
+                ext_metadata.setdefault(
+                    'value_attribute', ext_metadata.get(
+                        'value', self.configurations['value_attribute']))
+                ext_metadata['base_metadata'] = {
+                    'extra_metadata_captured': extra_metadata_samples,
+                    'extra_metadata_by_name': extra_metadata_by_name,
+                    'sample': request_sample
+                }
+                parent_cache_ttl = self.configurations[
+                    'extra_metadata_fields_cache_seconds']
+                cache_ttl = ext_metadata.get(
+                    'extra_metadata_fields_cache_seconds', parent_cache_ttl
+                )
+                response_cache = self.response_cache
+                extra_metadata_pollster = DynamicPollster(
+                    ext_metadata, conf=pollster_conf, cache_ttl=cache_ttl,
+                    extra_metadata_responses_cache=response_cache,
+                )
+                resources = [None]
+                if ext_metadata.get('endpoint_type'):
+                    resources = manager.discover([
+                        extra_metadata_pollster.default_discovery], {})
+                samples = extra_metadata_pollster.get_samples(
+                    manager, None, resources)
+                for sample in samples:
+                    self.fill_extra_metadata_samples(
+                        extra_metadata_by_name,
+                        extra_metadata_samples,
+                        sample)
+            return extra_metadata_samples
 
         LOG.debug("No extra metadata to be captured for pollsters [%s] and "
                   "request sample [%s].", self.definitions, request_sample)
         return {}
 
-    def _retrieve_extra_metadata(
-            self, extra_metadata_fields, manager, request_sample):
-        LOG.debug("Processing extra metadata fields [%s] for "
-                  "sample [%s].", extra_metadata_fields,
-                  request_sample)
-
-        extra_metadata_captured = {}
-        for extra_metadata in extra_metadata_fields:
-            extra_metadata_name = extra_metadata['name']
-
-            if extra_metadata_name in extra_metadata_captured.keys():
-                LOG.warning("Duplicated extra metadata name [%s]. Therefore, "
-                            "we do not process this iteration [%s].",
-                            extra_metadata_name, extra_metadata)
+    def fill_extra_metadata_samples(self, extra_metadata_by_name,
+                                    extra_metadata_samples, sample):
+        extra_metadata_samples[sample.name] = sample.volume
+        LOG.debug("Merging the sample metadata [%s] of the "
+                  "extra_metadata_field [%s], with the "
+                  "extra_metadata_samples [%s].",
+                  sample.resource_metadata,
+                  sample.name,
+                  extra_metadata_samples)
+        for key, value in sample.resource_metadata.items():
+            if value is None and key in extra_metadata_samples:
+                LOG.debug("Metadata [%s] for extra_metadata_field [%s] "
+                          "is None, skipping metadata override by None "
+                          "value", key, sample.name)
                 continue
+            extra_metadata_samples[key] = value
+        extra_metadata_by_name[sample.name] = {
+            'value': sample.volume,
+            'metadata': sample.resource_metadata
+        }
 
-            LOG.debug("Processing extra metadata [%s] for sample [%s].",
-                      extra_metadata_name, request_sample)
-
-            endpoint_type = 'endpoint:' + extra_metadata['endpoint_type']
-            if not endpoint_type.endswith(
-                    PollsterDefinitions.EXTERNAL_ENDPOINT_TYPE):
-                response = self.execute_openstack_extra_metadata_gathering(
-                    endpoint_type, extra_metadata, manager, request_sample,
-                    extra_metadata_captured)
-            else:
-                raise declarative.NonOpenStackApisDynamicPollsterException(
-                    "Not supported the use of extra metadata gathering for "
-                    "non-openstack endpoints [%s] (yet)." % extra_metadata)
-
-            extra_metadata_extractor_kwargs = {
-                'value_attribute': extra_metadata['value'],
-                'sample': request_sample}
-
-            extra_metadata_value = \
-                self.sample_extractor.retrieve_attribute_nested_value(
-                    response, **extra_metadata_extractor_kwargs)
-
-            LOG.debug("Generated extra metadata [%s] with value [%s].",
-                      extra_metadata_name, extra_metadata_value)
-            extra_metadata_captured[extra_metadata_name] = extra_metadata_value
-
-        return extra_metadata_captured
-
-    def execute_openstack_extra_metadata_gathering(self, endpoint_type,
-                                                   extra_metadata, manager,
-                                                   request_sample,
-                                                   extra_metadata_captured):
-        url_for_endpoint_type = manager.discover(
-            [endpoint_type], self.response_cache)
-
-        LOG.debug("URL [%s] found for endpoint type [%s].",
-                  url_for_endpoint_type, endpoint_type)
-
-        if url_for_endpoint_type:
-            url_for_endpoint_type = url_for_endpoint_type[0]
-
-        self.sample_gatherer.generate_url_path(
-            extra_metadata, request_sample, extra_metadata_captured)
-
-        cached_response, max_ttl_for_cache = self.response_cache.get(
-            extra_metadata['url_path'], (None, None))
-
-        extra_metadata_fields_cache_seconds = extra_metadata.get(
-            'extra_metadata_fields_cache_seconds',
-            self.configurations['extra_metadata_fields_cache_seconds'])
-
-        current_time = time.time()
-        if cached_response and max_ttl_for_cache >= current_time:
-            LOG.debug("Returning response [%s] for request [%s] as the TTL "
-                      "[max=%s, current_time=%s] has not expired yet.",
-                      cached_response, extra_metadata['url_path'],
-                      max_ttl_for_cache, current_time)
-            return cached_response
-
-        if cached_response:
-            LOG.debug("Cleaning cached response [%s] for request [%s] "
-                      "as the TTL [max=%s, current_time=%s] has expired.",
-                      cached_response, extra_metadata['url_path'],
-                      max_ttl_for_cache, current_time)
-
-        response = self.sample_gatherer.execute_request_for_definitions(
-            extra_metadata, **{'manager': manager,
-                               'keystone_client': manager._keystone,
-                               'resource': url_for_endpoint_type,
-                               'execute_id_overrides': False})
-
-        max_ttl_for_cache = time.time() + extra_metadata_fields_cache_seconds
-
-        cache_tuple = (response, max_ttl_for_cache)
-        self.response_cache[extra_metadata['url_path']] = cache_tuple
-        return response
+        LOG.debug("extra_metadata_samples after merging: [%s].",
+                  extra_metadata_samples)
 
 
 class MultiMetricPollsterDefinitions(PollsterDefinitions):
@@ -739,6 +702,42 @@ class PollsterSampleGatherer(object):
             url_path=definitions.configurations['url_path']
         )
 
+    def get_cache_key(self, definitions, **kwargs):
+        return self.get_request_linked_samples_url(kwargs, definitions)
+
+    def get_cached_response(self, definitions, **kwargs):
+        if self.definitions.cache_ttl == 0:
+            return
+        cache_key = self.get_cache_key(definitions, **kwargs)
+        response_cache = self.definitions.response_cache
+        cached_response, max_ttl_for_cache = response_cache.get(
+            cache_key, (None, None))
+
+        current_time = time.time()
+        if cached_response and max_ttl_for_cache >= current_time:
+            LOG.debug("Returning response [%s] for request [%s] as the TTL "
+                      "[max=%s, current_time=%s] has not expired yet.",
+                      cached_response, definitions,
+                      max_ttl_for_cache, current_time)
+            return cached_response
+
+        if cached_response and max_ttl_for_cache < current_time:
+            LOG.debug("Cleaning cached response [%s] for request [%s] "
+                      "as the TTL [max=%s, current_time=%s] has expired.",
+                      cached_response, definitions,
+                      max_ttl_for_cache, current_time)
+            response_cache.pop(cache_key, None)
+
+    def store_cached_response(self, definitions, resp, **kwargs):
+        if self.definitions.cache_ttl == 0:
+            return
+        cache_key = self.get_cache_key(definitions, **kwargs)
+        extra_metadata_fields_cache_seconds = self.definitions.cache_ttl
+        max_ttl_for_cache = time.time() + extra_metadata_fields_cache_seconds
+
+        cache_tuple = (resp, max_ttl_for_cache)
+        self.definitions.response_cache[cache_key] = cache_tuple
+
     @property
     def default_discovery(self):
         return 'endpoint:' + self.definitions.configurations['endpoint_type']
@@ -748,10 +747,14 @@ class PollsterSampleGatherer(object):
             self.definitions.configurations, **kwargs)
 
     def execute_request_for_definitions(self, definitions, **kwargs):
-        resp, url = self._internal_execute_request_get_samples(
-            definitions=definitions, **kwargs)
+        if response_dict := self.get_cached_response(definitions, **kwargs):
+            url = 'cached'
+        else:
+            resp, url = self._internal_execute_request_get_samples(
+                definitions=definitions, **kwargs)
+            response_dict = self.response_handler_chain.handle(resp.text)
+            self.store_cached_response(definitions, response_dict, **kwargs)
 
-        response_dict = self.response_handler_chain.handle(resp.text)
         entry_size = len(response_dict)
         LOG.debug("Entries [%s] in the DICT for request [%s] "
                   "for dynamic pollster [%s].",
@@ -789,21 +792,6 @@ class PollsterSampleGatherer(object):
                     request_sample, project_id_attribute, 'project_id')
                 self.generate_new_attributes_in_sample(
                     request_sample, resource_id_attribute, 'id')
-
-    def generate_url_path(self, extra_metadata, sample,
-                          extra_metadata_captured):
-        if not extra_metadata.get('url_path_original'):
-            extra_metadata[
-                'url_path_original'] = extra_metadata['url_path']
-
-        extra_metadata['url_path'] = eval(
-            extra_metadata['url_path_original'])
-
-        LOG.debug("URL [%s] generated for pattern [%s] for sample [%s] and "
-                  "extra metadata captured [%s].",
-                  extra_metadata['url_path'],
-                  extra_metadata['url_path_original'], sample,
-                  extra_metadata_captured)
 
     def generate_new_attributes_in_sample(
             self, sample, attribute_key, new_attribute_key):
@@ -881,6 +869,15 @@ class PollsterSampleGatherer(object):
 
     def get_request_url(self, kwargs, url_path):
         endpoint = kwargs['resource']
+        params = copy.deepcopy(
+            self.definitions.configurations.get(
+                'base_metadata', {}))
+        try:
+            url_path = eval(url_path, params)
+        except Exception:
+            LOG.debug("Cannot eval path [%s] with params [%s],"
+                      " using [%s] instead.",
+                      url_path, params, url_path)
         return urlparse.urljoin(endpoint, url_path)
 
     def retrieve_entries_from_response(self, response_json, definitions):
@@ -917,6 +914,57 @@ class NonOpenStackApisPollsterDefinition(PollsterDefinitions):
     @staticmethod
     def is_field_applicable_to_definition(configurations):
         return configurations.get('module')
+
+
+class HostCommandPollsterDefinition(PollsterDefinitions):
+
+    extra_definitions = [
+        PollsterDefinition(name='endpoint_type', required=False),
+        PollsterDefinition(name='url_path', required=False),
+        PollsterDefinition(name='host_command', required=True)]
+
+    def __init__(self, configurations):
+        super(HostCommandPollsterDefinition, self).__init__(
+            configurations)
+        self.sample_gatherer = HostCommandSamplesGatherer(self)
+
+    @staticmethod
+    def is_field_applicable_to_definition(configurations):
+        return configurations.get('host_command')
+
+
+class HostCommandSamplesGatherer(PollsterSampleGatherer):
+
+    class Response(object):
+        def __init__(self, text):
+            self.text = text
+
+    def get_cache_key(self, definitions, **kwargs):
+        return self.get_command(definitions)
+
+    def _internal_execute_request_get_samples(self, definitions, **kwargs):
+        command = self.get_command(definitions, **kwargs)
+        LOG.debug('Running Host command: [%s]', command)
+        result = subprocess.getoutput(command)
+        LOG.debug('Host command [%s] result: [%s]', command, result)
+        return self.Response(result), command
+
+    def get_command(self, definitions, next_sample_url=None, **kwargs):
+        command = next_sample_url or definitions['host_command']
+        params = copy.deepcopy(
+            self.definitions.configurations.get(
+                'base_metadata', {}))
+        try:
+            command = eval(command, params)
+        except Exception:
+            LOG.debug("Cannot eval command [%s] with params [%s],"
+                      " using [%s] instead.",
+                      command, params, command)
+        return command
+
+    @property
+    def default_discovery(self):
+        return 'local_node'
 
 
 class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
@@ -1010,8 +1058,10 @@ class DynamicPollster(plugin_base.PollsterBase):
     # Mandatory name field
     name = ""
 
-    def __init__(self, pollster_definitions={}, conf=None,
-                 supported_definitions=[NonOpenStackApisPollsterDefinition,
+    def __init__(self, pollster_definitions={}, conf=None, cache_ttl=0,
+                 extra_metadata_responses_cache=None,
+                 supported_definitions=[HostCommandPollsterDefinition,
+                                        NonOpenStackApisPollsterDefinition,
                                         MultiMetricPollsterDefinitions,
                                         SingleMetricPollsterDefinitions]):
         super(DynamicPollster, self).__init__(conf)
@@ -1021,6 +1071,10 @@ class DynamicPollster(plugin_base.PollsterBase):
 
         self.definitions = PollsterDefinitionBuilder(
             self.supported_definitions).build_definitions(pollster_definitions)
+        self.definitions.cache_ttl = cache_ttl
+        self.definitions.response_cache = extra_metadata_responses_cache
+        if extra_metadata_responses_cache is None:
+            self.definitions.response_cache = {}
         self.pollster_definitions = self.definitions.configurations
         if 'metadata_fields' in self.pollster_definitions:
             LOG.debug("Metadata fields configured to [%s].",
@@ -1054,9 +1108,12 @@ class DynamicPollster(plugin_base.PollsterBase):
         for r in resources:
             LOG.debug("Executing get sample for resource [%s].", r)
             samples = self.load_samples(r, manager)
+            if not isinstance(samples, (list, tuple)):
+                samples = [samples]
             for pollster_sample in samples:
-                kwargs = {'manager': manager, 'resource': r}
-                sample = self.extract_sample(pollster_sample, **kwargs)
+                sample = self.extract_sample(
+                    pollster_sample, manager=manager,
+                    resource=r, conf=self.conf)
                 if isinstance(sample, SkippedSample):
                     continue
                 yield from sample

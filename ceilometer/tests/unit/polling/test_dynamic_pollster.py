@@ -389,6 +389,424 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(4, len(samples))
 
     @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_extra_metadata_fields_cache_disabled(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        extra_metadata_fields = {
+            'extra_metadata_fields_cache_seconds': 0,
+            'name': "project_name",
+            'endpoint_type': "identity",
+            'url_path': "'/v3/projects/' + str(sample['project_id'])",
+            'value': "name",
+        }
+        definitions['value_attribute'] = 'project_id'
+        definitions['extra_metadata_fields'] = extra_metadata_fields
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '''
+                    {"projects": [
+                        {"project_id": 9999, "name": "project1"},
+                        {"project_id": 8888, "name": "project2"},
+                        {"project_id": 7777, "name": "project3"},
+                        {"project_id": 9999, "name": "project1"},
+                        {"project_id": 8888, "name": "project2"},
+                        {"project_id": 7777, "name": "project3"},
+                        {"project_id": 9999, "name": "project1"},
+                        {"project_id": 8888, "name": "project2"},
+                        {"project_id": 7777, "name": "project3"}]
+                    }
+                '''
+
+        return_value9999 = self.FakeResponse()
+        return_value9999.status_code = requests.codes.ok
+        return_value9999._text = '''
+                    {"project":
+                        {"project_id": 9999, "name": "project1"}
+                    }
+                '''
+
+        return_value8888 = self.FakeResponse()
+        return_value8888.status_code = requests.codes.ok
+        return_value8888._text = '''
+                    {"project":
+                        {"project_id": 8888, "name": "project2"}
+                    }
+                '''
+
+        return_value7777 = self.FakeResponse()
+        return_value7777.status_code = requests.codes.ok
+        return_value7777._text = '''
+                    {"project":
+                        {"project_id": 7777, "name": "project3"}
+                    }
+                '''
+
+        def get(url, *args, **kwargs):
+            if '9999' in url:
+                return return_value9999
+            if '8888' in url:
+                return return_value8888
+            if '7777' in url:
+                return return_value7777
+            return return_value
+
+        client_mock.session.get.side_effect = get
+        manager = mock.Mock
+        manager._keystone = client_mock
+
+        def discover(*args, **kwargs):
+            return ["https://endpoint.server.name/"]
+
+        manager.discover = discover
+        samples = pollster.get_samples(
+            manager=manager, cache=None,
+            resources=["https://endpoint.server.name/"])
+
+        samples = list(samples)
+
+        n_calls = client_mock.session.get.call_count
+        self.assertEqual(9, len(samples))
+        self.assertEqual(10, n_calls)
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_extra_metadata_fields_cache_enabled(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        extra_metadata_fields = {
+            'extra_metadata_fields_cache_seconds': 3600,
+            'name': "project_name",
+            'endpoint_type': "identity",
+            'url_path': "'/v3/projects/' + str(sample['project_id'])",
+            'value': "name",
+        }
+        definitions['value_attribute'] = 'project_id'
+        definitions['extra_metadata_fields'] = extra_metadata_fields
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '''
+                    {"projects": [
+                        {"project_id": 9999, "name": "project1"},
+                        {"project_id": 8888, "name": "project2"},
+                        {"project_id": 7777, "name": "project3"},
+                        {"project_id": 9999, "name": "project4"},
+                        {"project_id": 8888, "name": "project5"},
+                        {"project_id": 7777, "name": "project6"},
+                        {"project_id": 9999, "name": "project7"},
+                        {"project_id": 8888, "name": "project8"},
+                        {"project_id": 7777, "name": "project9"}]
+                    }
+                '''
+
+        return_value9999 = self.FakeResponse()
+        return_value9999.status_code = requests.codes.ok
+        return_value9999._text = '''
+                    {"project":
+                        {"project_id": 9999, "name": "project1"}
+                    }
+                '''
+
+        return_value8888 = self.FakeResponse()
+        return_value8888.status_code = requests.codes.ok
+        return_value8888._text = '''
+                    {"project":
+                        {"project_id": 8888, "name": "project2"}
+                    }
+                '''
+
+        return_value7777 = self.FakeResponse()
+        return_value7777.status_code = requests.codes.ok
+        return_value7777._text = '''
+                    {"project":
+                        {"project_id": 7777, "name": "project3"}
+                    }
+                '''
+
+        def get(url, *args, **kwargs):
+            if '9999' in url:
+                return return_value9999
+            if '8888' in url:
+                return return_value8888
+            if '7777' in url:
+                return return_value7777
+            return return_value
+
+        client_mock.session.get.side_effect = get
+        manager = mock.Mock
+        manager._keystone = client_mock
+
+        def discover(*args, **kwargs):
+            return ["https://endpoint.server.name/"]
+
+        manager.discover = discover
+        samples = pollster.get_samples(
+            manager=manager, cache=None,
+            resources=["https://endpoint.server.name/"])
+
+        samples = list(samples)
+
+        n_calls = client_mock.session.get.call_count
+        self.assertEqual(9, len(samples))
+        self.assertEqual(4, n_calls)
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_extra_metadata_fields(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        extra_metadata_fields = [{
+            'name': "project_name",
+            'endpoint_type': "identity",
+            'url_path': "'/v3/projects/' + str(sample['project_id'])",
+            'value': "name",
+            'metadata_fields': ['meta']
+        }, {
+            'name': "project_alias",
+            'endpoint_type': "identity",
+            'url_path': "'/v3/projects/' + "
+                        "str(extra_metadata_captured['project_name'])",
+            'value': "name",
+            'metadata_fields': ['meta']
+        }, {
+            'name': "project_meta",
+            'endpoint_type': "identity",
+            'url_path': "'/v3/projects/' + "
+                        "str(extra_metadata_by_name['project_name']"
+                        "['metadata']['meta'])",
+            'value': "project_id",
+            'metadata_fields': ['meta']
+        }]
+        definitions['value_attribute'] = 'project_id'
+        definitions['extra_metadata_fields'] = extra_metadata_fields
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '''
+                    {"projects": [
+                        {"project_id": 9999, "name": "project1"},
+                        {"project_id": 8888, "name": "project2"},
+                        {"project_id": 7777, "name": "project3"}]
+                    }
+                '''
+
+        return_value9999 = self.FakeResponse()
+        return_value9999.status_code = requests.codes.ok
+        return_value9999._text = '''
+                    {"project":
+                        {"project_id": 9999, "name": "project1",
+                        "meta": "m1"}
+                    }
+                '''
+
+        return_value8888 = self.FakeResponse()
+        return_value8888.status_code = requests.codes.ok
+        return_value8888._text = '''
+                    {"project":
+                        {"project_id": 8888, "name": "project2",
+                        "meta": "m2"}
+                    }
+                '''
+
+        return_value7777 = self.FakeResponse()
+        return_value7777.status_code = requests.codes.ok
+        return_value7777._text = '''
+                    {"project":
+                        {"project_id": 7777, "name": "project3",
+                        "meta": "m3"}
+                    }
+                '''
+
+        return_valueP1 = self.FakeResponse()
+        return_valueP1.status_code = requests.codes.ok
+        return_valueP1._text = '''
+                    {"project":
+                        {"project_id": 7777, "name": "p1",
+                        "meta": null}
+                    }
+                '''
+
+        return_valueP2 = self.FakeResponse()
+        return_valueP2.status_code = requests.codes.ok
+        return_valueP2._text = '''
+                    {"project":
+                        {"project_id": 7777, "name": "p2",
+                        "meta": null}
+                    }
+                '''
+
+        return_valueP3 = self.FakeResponse()
+        return_valueP3.status_code = requests.codes.ok
+        return_valueP3._text = '''
+                    {"project":
+                        {"project_id": 7777, "name": "p3",
+                        "meta": null}
+                    }
+                '''
+
+        return_valueM1 = self.FakeResponse()
+        return_valueM1.status_code = requests.codes.ok
+        return_valueM1._text = '''
+                    {"project":
+                        {"project_id": "META1", "name": "p3",
+                        "meta": null}
+                    }
+                '''
+
+        return_valueM2 = self.FakeResponse()
+        return_valueM2.status_code = requests.codes.ok
+        return_valueM2._text = '''
+                    {"project":
+                        {"project_id": "META2", "name": "p3",
+                        "meta": null}
+                    }
+                '''
+
+        return_valueM3 = self.FakeResponse()
+        return_valueM3.status_code = requests.codes.ok
+        return_valueM3._text = '''
+                    {"project":
+                        {"project_id": "META3", "name": "p3",
+                        "meta": null}
+                    }
+                '''
+
+        def get(url, *args, **kwargs):
+            if '9999' in url:
+                return return_value9999
+            if '8888' in url:
+                return return_value8888
+            if '7777' in url:
+                return return_value7777
+            if 'project1' in url:
+                return return_valueP1
+            if 'project2' in url:
+                return return_valueP2
+            if 'project3' in url:
+                return return_valueP3
+            if 'm1' in url:
+                return return_valueM1
+            if 'm2' in url:
+                return return_valueM2
+            if 'm3' in url:
+                return return_valueM3
+
+            return return_value
+
+        client_mock.session.get = get
+        manager = mock.Mock
+        manager._keystone = client_mock
+
+        def discover(*args, **kwargs):
+            return ["https://endpoint.server.name/"]
+
+        manager.discover = discover
+        samples = pollster.get_samples(
+            manager=manager, cache=None,
+            resources=["https://endpoint.server.name/"])
+
+        samples = list(samples)
+        self.assertEqual(3, len(samples))
+
+        self.assertEqual(samples[0].volume, 9999)
+        self.assertEqual(samples[1].volume, 8888)
+        self.assertEqual(samples[2].volume, 7777)
+
+        self.assertEqual(samples[0].resource_metadata,
+                         {'project_name': 'project1',
+                          'project_alias': 'p1',
+                          'meta': 'm1',
+                          'project_meta': 'META1'})
+        self.assertEqual(samples[1].resource_metadata,
+                         {'project_name': 'project2',
+                          'project_alias': 'p2',
+                          'meta': 'm2',
+                          'project_meta': 'META2'})
+        self.assertEqual(samples[2].resource_metadata,
+                         {'project_name': 'project3',
+                          'project_alias': 'p3',
+                          'meta': 'm3',
+                          'project_meta': 'META3'})
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_extra_metadata_fields_different_requests(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+
+        command = ''' \'\'\'echo '{"project":
+        {"project_id": \'\'\'+ str(sample['project_id'])
+         +\'\'\' , "name": "project1"}}' \'\'\' '''.replace('\n', '')
+
+        command2 = ''' \'\'\'echo '{"project":
+        {"project_id": \'\'\'+ str(sample['project_id'])
+         +\'\'\' , "name": "project2"}}' \'\'\' '''.replace('\n', '')
+
+        extra_metadata_fields_embedded = {
+            'name': "project_name2",
+            'host_command': command2,
+            'value': "name",
+        }
+
+        extra_metadata_fields = {
+            'name': "project_id2",
+            'host_command': command,
+            'value': "project_id",
+            'extra_metadata_fields': extra_metadata_fields_embedded
+        }
+
+        definitions['value_attribute'] = 'project_id'
+        definitions['extra_metadata_fields'] = extra_metadata_fields
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '''
+                    {"projects": [
+                        {"project_id": 9999, "name": "project1"},
+                        {"project_id": 8888, "name": "project2"},
+                        {"project_id": 7777, "name": "project3"}]
+                    }
+                '''
+
+        def get(url, *args, **kwargs):
+            return return_value
+
+        client_mock.session.get = get
+        manager = mock.Mock
+        manager._keystone = client_mock
+
+        def discover(*args, **kwargs):
+            return ["https://endpoint.server.name/"]
+
+        manager.discover = discover
+        samples = pollster.get_samples(
+            manager=manager, cache=None,
+            resources=["https://endpoint.server.name/"])
+
+        samples = list(samples)
+        self.assertEqual(3, len(samples))
+
+        self.assertEqual(samples[0].volume, 9999)
+        self.assertEqual(samples[1].volume, 8888)
+        self.assertEqual(samples[2].volume, 7777)
+
+        self.assertEqual(samples[0].resource_metadata,
+                         {'project_id2': 9999,
+                          'project_name2': 'project2'})
+        self.assertEqual(samples[1].resource_metadata,
+                         {'project_id2': 8888,
+                          'project_name2': 'project2'})
+        self.assertEqual(samples[2].resource_metadata,
+                         {'project_id2': 7777,
+                          'project_name2': 'project2'})
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
     def test_execute_request_xml_json_response_handler_invalid_response(
             self, client_mock):
         definitions = copy.deepcopy(
@@ -410,8 +828,8 @@ class TestDynamicPollster(base.BaseTestCase):
                 keystone_client=client_mock,
                 resource="https://endpoint.server.name/")
 
-            xml_handling_error = logs.output[2]
-            json_handling_error = logs.output[3]
+            xml_handling_error = logs.output[3]
+            json_handling_error = logs.output[4]
 
             self.assertIn(
                 'DEBUG:ceilometer.polling.dynamic_pollster:'
@@ -478,6 +896,57 @@ class TestDynamicPollster(base.BaseTestCase):
                                       keystone_client=client_mock,
                                       resource="https://endpoint.server.name/")
         self.assertEqual("Mock HTTP error.", str(exception))
+
+    def test_execute_host_command_paged_responses(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['host_command'] = '''
+        echo '{"server": [{"status": "ACTIVE"}], "next": ""}'
+        '''
+        str_json = "'{\\\"server\\\": [{\\\"status\\\": \\\"INACTIVE\\\"}]}'"
+        definitions['next_sample_url_attribute'] = \
+            "next|\"echo \"+value+\"" + str_json + '"'
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+        samples = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples()
+        resp_json = [{'status': 'ACTIVE'}, {'status': 'INACTIVE'}]
+        self.assertEqual(resp_json, samples)
+
+    def test_execute_host_command_response_handler(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['response_handlers'] = ['xml', 'json']
+        definitions['host_command'] = 'echo "<a><y>xml\n</y><s>xml</s></a>"'
+        entry = 'a'
+        definitions['response_entries_key'] = entry
+        definitions.pop('url_path')
+        definitions.pop('endpoint_type')
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        samples_xml = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples()
+
+        definitions['host_command'] = 'echo \'{"a": {"y":"json",' \
+                                      '\n"s":"json"}}\''
+        samples_json = pollster.definitions.sample_gatherer. \
+            execute_request_get_samples()
+
+        resp_xml = {'a': {'y': 'xml', 's': 'xml'}}
+        resp_json = {'a': {'y': 'json', 's': 'json'}}
+        self.assertEqual(resp_xml[entry], samples_xml)
+        self.assertEqual(resp_json[entry], samples_json)
+
+    def test_execute_host_command_invalid_command(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['host_command'] = 'invalid-command'
+        definitions.pop('url_path')
+        definitions.pop('endpoint_type')
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        self.assertRaises(
+            declarative.InvalidResponseTypeException,
+            pollster.definitions.sample_gatherer.execute_request_get_samples)
 
     def test_generate_new_metadata_fields_no_metadata_mapping(self):
         metadata = {'name': 'someName',
@@ -1105,7 +1574,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         sample = pollster.definitions.sample_extractor.generate_sample(
             pollster_sample, pollster.definitions.configurations,
-            manager=mock.Mock())
+            manager=mock.Mock(), conf={})
 
         self.assertEqual(1, sample.volume)
         self.assertEqual(2, len(sample.resource_metadata))
@@ -1127,7 +1596,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         sample = pollster.definitions.sample_extractor.generate_sample(
             pollster_sample, pollster.definitions.configurations,
-            manager=mock.Mock())
+            manager=mock.Mock(), conf={})
 
         self.assertEqual(1, sample.volume)
         self.assertEqual(3, len(sample.resource_metadata))
@@ -1150,7 +1619,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         sample = pollster.definitions.sample_extractor.generate_sample(
             pollster_sample, pollster.definitions.configurations,
-            manager=mock.Mock())
+            manager=mock.Mock(), conf={})
 
         self.assertEqual(1, sample.volume)
         self.assertEqual(3, len(sample.resource_metadata))
