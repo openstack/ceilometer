@@ -983,6 +983,13 @@ project name, domain ID, and domain name.
           "locked": "dynamic_locked"
           "tags | ','.join(value)": "dynamic_tags"
         extra_metadata_fields_cache_seconds: 3600
+        extra_metadata_fields_skip:
+          - value: '1'
+            metadata:
+              dynamic_flavor_vcpus: 4
+          - value: '1'
+            metadata:
+              dynamic_flavor_vcpus: 2
         extra_metadata_fields:
           - name: "project_name"
             endpoint_type: "identity"
@@ -1064,5 +1071,11 @@ The metadata enrichment feature has the following options:
    be merged in the final sample resource metadata. If some of the required
    dynamic pollster configuration is not set in the `extra_metadata_fields`,
    will be used the parent pollster configuration, except the `name`.
+
+*  ``extra_metadata_fields_skip``: optional parameter. This option is a list
+   of objects or a single one, where each one of its elements is a set of
+   key/value pairs. When defined, if any set of key/value pairs is a subset
+   of the collected sample, then the extra_metadata_fields gathering of this
+   sample will be skipped.
 
 

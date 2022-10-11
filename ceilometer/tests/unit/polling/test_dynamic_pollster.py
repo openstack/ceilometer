@@ -734,6 +734,171 @@ class TestDynamicPollster(base.BaseTestCase):
                           'project_meta': 'META3'})
 
     @mock.patch('keystoneclient.v2_0.client.Client')
+    def test_execute_request_extra_metadata_fields_skip(
+            self, client_mock):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        extra_metadata_fields = [{
+            'name': "project_name",
+            'endpoint_type': "identity",
+            'url_path': "'/v3/projects/' + str(sample['project_id'])",
+            'value': "name",
+        }, {
+            'name': "project_alias",
+            'endpoint_type': "identity",
+            'extra_metadata_fields_skip': [{
+                'value': 7777
+            }],
+            'url_path': "'/v3/projects/' + "
+                        "str(sample['p_name'])",
+            'value': "name",
+        }]
+        definitions['value_attribute'] = 'project_id'
+        definitions['metadata_fields'] = ['to_skip', 'p_name']
+        definitions['extra_metadata_fields'] = extra_metadata_fields
+        definitions['extra_metadata_fields_skip'] = [{
+            'metadata': {
+                'to_skip': 'skip1'
+            }
+        }, {
+            'value': 8888
+        }]
+        pollster = dynamic_pollster.DynamicPollster(definitions)
+
+        return_value = self.FakeResponse()
+        return_value.status_code = requests.codes.ok
+        return_value._text = '''
+                        {"projects": [
+                            {"project_id": 9999, "p_name": "project1",
+                            "to_skip": "skip1"},
+                            {"project_id": 8888, "p_name": "project2",
+                            "to_skip": "skip2"},
+                            {"project_id": 7777, "p_name": "project3",
+                            "to_skip": "skip3"},
+                            {"project_id": 6666, "p_name": "project4",
+                            "to_skip": "skip4"}]
+                        }
+                    '''
+
+        return_value9999 = self.FakeResponse()
+        return_value9999.status_code = requests.codes.ok
+        return_value9999._text = '''
+                        {"project":
+                            {"project_id": 9999, "name": "project1"}
+                        }
+                    '''
+
+        return_value8888 = self.FakeResponse()
+        return_value8888.status_code = requests.codes.ok
+        return_value8888._text = '''
+                        {"project":
+                            {"project_id": 8888, "name": "project2"}
+                        }
+                    '''
+
+        return_value7777 = self.FakeResponse()
+        return_value7777.status_code = requests.codes.ok
+        return_value7777._text = '''
+                        {"project":
+                            {"project_id": 7777, "name": "project3"}
+                        }
+                    '''
+
+        return_value6666 = self.FakeResponse()
+        return_value6666.status_code = requests.codes.ok
+        return_value6666._text = '''
+                        {"project":
+                            {"project_id": 6666, "name": "project4"}
+                        }
+                    '''
+
+        return_valueP1 = self.FakeResponse()
+        return_valueP1.status_code = requests.codes.ok
+        return_valueP1._text = '''
+                        {"project":
+                            {"project_id": 7777, "name": "p1"}
+                        }
+                    '''
+
+        return_valueP2 = self.FakeResponse()
+        return_valueP2.status_code = requests.codes.ok
+        return_valueP2._text = '''
+                        {"project":
+                            {"project_id": 7777, "name": "p2"}
+                        }
+                    '''
+
+        return_valueP3 = self.FakeResponse()
+        return_valueP3.status_code = requests.codes.ok
+        return_valueP3._text = '''
+                        {"project":
+                            {"project_id": 7777, "name": "p3"}
+                        }
+                    '''
+
+        return_valueP4 = self.FakeResponse()
+        return_valueP4.status_code = requests.codes.ok
+        return_valueP4._text = '''
+                        {"project":
+                            {"project_id": 6666, "name": "p4"}
+                        }
+                    '''
+
+        def get(url, *args, **kwargs):
+            if '9999' in url:
+                return return_value9999
+            if '8888' in url:
+                return return_value8888
+            if '7777' in url:
+                return return_value7777
+            if '6666' in url:
+                return return_value6666
+            if 'project1' in url:
+                return return_valueP1
+            if 'project2' in url:
+                return return_valueP2
+            if 'project3' in url:
+                return return_valueP3
+            if 'project4' in url:
+                return return_valueP4
+
+            return return_value
+
+        client_mock.session.get = get
+        manager = mock.Mock
+        manager._keystone = client_mock
+
+        def discover(*args, **kwargs):
+            return ["https://endpoint.server.name/"]
+
+        manager.discover = discover
+        samples = pollster.get_samples(
+            manager=manager, cache=None,
+            resources=["https://endpoint.server.name/"])
+
+        samples = list(samples)
+        self.assertEqual(4, len(samples))
+
+        self.assertEqual(samples[0].volume, 9999)
+        self.assertEqual(samples[1].volume, 8888)
+        self.assertEqual(samples[2].volume, 7777)
+
+        self.assertEqual(samples[0].resource_metadata,
+                         {'p_name': 'project1', 'project_alias': 'p1',
+                          'to_skip': 'skip1'})
+        self.assertEqual(samples[1].resource_metadata,
+                         {'p_name': 'project2', 'project_alias': 'p2',
+                          'to_skip': 'skip2'})
+        self.assertEqual(samples[2].resource_metadata,
+                         {'p_name': 'project3', 'project_name': 'project3',
+                          'to_skip': 'skip3'})
+        self.assertEqual(samples[3].resource_metadata,
+                         {'p_name': 'project4',
+                          'project_alias': 'p4',
+                          'project_name': 'project4',
+                          'to_skip': 'skip4'})
+
+    @mock.patch('keystoneclient.v2_0.client.Client')
     def test_execute_request_extra_metadata_fields_different_requests(
             self, client_mock):
         definitions = copy.deepcopy(
@@ -863,6 +1028,39 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual("DynamicPollsterDefinitionException None: "
                          "Invalid response_handler value [jason]. "
                          "Accepted values are [json, xml, text]",
+                         str(exception))
+
+    def test_configure_extra_metadata_field_skip_invalid_value(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['extra_metadata_fields_skip'] = 'teste'
+
+        exception = self.assertRaises(
+            declarative.DynamicPollsterDefinitionException,
+            dynamic_pollster.DynamicPollster,
+            pollster_definitions=definitions)
+        self.assertEqual("DynamicPollsterDefinitionException None: "
+                         "Invalid extra_metadata_fields_skip configuration."
+                         " It must be a list of maps. Provided value: teste,"
+                         " value type: str.",
+                         str(exception))
+
+    def test_configure_extra_metadata_field_skip_invalid_sub_value(self):
+        definitions = copy.deepcopy(
+            self.pollster_definition_only_required_fields)
+        definitions['extra_metadata_fields_skip'] = [{'test': '1'},
+                                                     {'test': '2'},
+                                                     'teste']
+
+        exception = self.assertRaises(
+            declarative.DynamicPollsterDefinitionException,
+            dynamic_pollster.DynamicPollster,
+            pollster_definitions=definitions)
+        self.assertEqual("DynamicPollsterDefinitionException None: "
+                         "Invalid extra_metadata_fields_skip configuration."
+                         " It must be a list of maps. Provided value: "
+                         "[{'test': '1'}, {'test': '2'}, 'teste'], "
+                         "value type: list.",
                          str(exception))
 
     def test_configure_response_handler_definition_invalid_type(self):

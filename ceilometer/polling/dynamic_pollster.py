@@ -93,6 +93,15 @@ def validate_response_handler(val):
                 "are [%s]" % (value, ', '.join(list(VALID_HANDLERS))))
 
 
+def validate_extra_metadata_skip_samples(val):
+    if not isinstance(val, list) or next(
+            filter(lambda v: not isinstance(v, dict), val), None):
+        raise declarative.DynamicPollsterDefinitionException(
+            "Invalid extra_metadata_fields_skip configuration."
+            " It must be a list of maps. Provided value: %s,"
+            " value type: %s." % (val, type(val).__name__))
+
+
 class ResponseHandlerChain(object):
     """Tries to convert a string to a dict using the response handlers"""
 
@@ -205,6 +214,7 @@ class PollsterSampleExtractor(object):
         self.generate_new_metadata_fields(
             metadata=metadata, pollster_definitions=pollster_definitions)
 
+        pollster_sample['metadata'] = metadata
         extra_metadata = self.definitions.retrieve_extra_metadata(
             kwargs['manager'], pollster_sample, kwargs['conf'])
 
@@ -518,6 +528,8 @@ class PollsterDefinitions(object):
         PollsterDefinition(name='extra_metadata_fields_cache_seconds',
                            default=3600),
         PollsterDefinition(name='extra_metadata_fields'),
+        PollsterDefinition(name='extra_metadata_fields_skip', default=[{}],
+                           validator=validate_extra_metadata_skip_samples),
         PollsterDefinition(name='response_handlers', default=['json'],
                            validator=validate_response_handler),
         PollsterDefinition(name='base_metadata', default={})
@@ -574,6 +586,39 @@ class PollsterDefinitions(object):
                 "Required fields %s not specified."
                 % missing, self.configurations)
 
+    def should_skip_extra_metadata(self, skip, sample):
+        match_msg = "Sample [%s] %smatches with configured" \
+                    " extra_metadata_fields_skip [%s]."
+        if skip == sample:
+            LOG.debug(match_msg, sample, "", skip)
+            return True
+        if not isinstance(skip, dict) or not isinstance(sample, dict):
+            LOG.debug(match_msg, sample, "not ", skip)
+            return False
+
+        for key in skip:
+            if key not in sample:
+                LOG.debug(match_msg, sample, "not ", skip)
+                return False
+            if not self.should_skip_extra_metadata(skip[key], sample[key]):
+                LOG.debug(match_msg, sample, "not ", skip)
+                return False
+
+        LOG.debug(match_msg, sample, "", skip)
+        return True
+
+    def skip_sample(self, request_sample, skips):
+        for skip in skips:
+            if not skip:
+                continue
+            if self.should_skip_extra_metadata(skip, request_sample):
+                LOG.debug("Skipping extra_metadata_field gathering for "
+                          "sample [%s] as defined in the "
+                          "extra_metadata_fields_skip [%s]", request_sample,
+                          skip)
+                return True
+        return False
+
     def retrieve_extra_metadata(self, manager, request_sample, pollster_conf):
         extra_metadata_fields = self.configurations['extra_metadata_fields']
         if extra_metadata_fields:
@@ -582,6 +627,9 @@ class PollsterDefinitions(object):
             if not isinstance(extra_metadata_fields, (list, tuple)):
                 extra_metadata_fields = [extra_metadata_fields]
             for ext_metadata in extra_metadata_fields:
+                ext_metadata.setdefault(
+                    'extra_metadata_fields_skip',
+                    self.configurations['extra_metadata_fields_skip'])
                 ext_metadata.setdefault(
                     'sample_type', self.configurations['sample_type'])
                 ext_metadata.setdefault('unit', self.configurations['unit'])
@@ -603,6 +651,11 @@ class PollsterDefinitions(object):
                     ext_metadata, conf=pollster_conf, cache_ttl=cache_ttl,
                     extra_metadata_responses_cache=response_cache,
                 )
+
+                skips = ext_metadata['extra_metadata_fields_skip']
+                if self.skip_sample(request_sample, skips):
+                    continue
+
                 resources = [None]
                 if ext_metadata.get('endpoint_type'):
                     resources = manager.discover([
