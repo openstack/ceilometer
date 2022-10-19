@@ -17,7 +17,7 @@ Install components
 
   .. code-block:: console
 
-     # yum install python-ceilometermiddleware
+     # dnf install python3-ceilometermiddleware
 
 .. include:: install-swift-config-common.inc
 

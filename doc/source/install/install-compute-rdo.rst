@@ -11,8 +11,8 @@ Install and configure components
 
    .. code-block:: console
 
-      # yum install openstack-ceilometer-compute
-      # yum install openstack-ceilometer-ipmi (optional)
+      # dnf install openstack-ceilometer-compute
+      # dnf install openstack-ceilometer-ipmi (optional)
 
 .. include:: install-compute-common.inc
 
