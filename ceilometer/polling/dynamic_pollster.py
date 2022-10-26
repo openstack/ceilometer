@@ -66,11 +66,11 @@ class JsonResponseHandler(object):
 
 
 class PlainTextResponseHandler(object):
-    """This response handler converts a string to a dict {'out'=<string>}"""
+    """Response handler converts string to a list of dict [{'out'=<string>}]"""
 
     @staticmethod
     def handle(response):
-        return {'out': str(response)}
+        return [{'out': str(response)}]
 
 
 VALID_HANDLERS = {
@@ -218,6 +218,8 @@ class PollsterSampleExtractor(object):
         extra_metadata = self.definitions.retrieve_extra_metadata(
             kwargs['manager'], pollster_sample, kwargs['conf'])
 
+        LOG.debug("Extra metadata [%s] collected for sample [%s].",
+                  extra_metadata, pollster_sample)
         for key in extra_metadata.keys():
             if key in metadata.keys():
                 LOG.warning("The extra metadata key [%s] already exist in "
