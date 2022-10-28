@@ -159,7 +159,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
 
     def _individual_post(self, data):
         for d in data:
-            self._do_post(json.dumps(data))
+            self._do_post(json.dumps(d))
 
     def _batch_post(self, data):
         if not data:
