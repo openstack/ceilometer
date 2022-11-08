@@ -14,13 +14,11 @@
 # under the License.
 from collections import defaultdict
 import fnmatch
-import hashlib
 import itertools
 import json
 import operator
 import pkg_resources
 import threading
-import uuid
 
 from gnocchiclient import exceptions as gnocchi_exc
 from keystoneauth1 import exceptions as ka_exceptions
@@ -29,21 +27,14 @@ from oslo_utils import timeutils
 from stevedore import extension
 from urllib import parse as urlparse
 
+from ceilometer import cache_utils
 from ceilometer import declarative
 from ceilometer import gnocchi_client
 from ceilometer.i18n import _
 from ceilometer import keystone_client
 from ceilometer import publisher
 
-NAME_ENCODED = __name__.encode('utf-8')
-CACHE_NAMESPACE = uuid.UUID(bytes=hashlib.md5(NAME_ENCODED).digest())
 LOG = log.getLogger(__name__)
-
-
-def cache_key_mangler(key):
-    """Construct an opaque cache key."""
-
-    return uuid.uuid5(CACHE_NAMESPACE, key).hex
 
 
 EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE = ("create", "update", "delete")
@@ -212,23 +203,11 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         timeout = options.get('timeout', [6.05])[-1]
         self._ks_client = keystone_client.get_client(conf)
 
-        self.cache = None
-        try:
-            import oslo_cache
-            oslo_cache.configure(conf)
-            # NOTE(cdent): The default cache backend is a real but
-            # noop backend. We don't want to use that here because
-            # we want to avoid the cache pathways entirely if the
-            # cache has not been configured explicitly.
-            if conf.cache.enabled:
-                cache_region = oslo_cache.create_region()
-                self.cache = oslo_cache.configure_cache_region(
-                    conf, cache_region)
-                self.cache.key_mangler = cache_key_mangler
-        except ImportError:
-            pass
-        except oslo_cache.exception.ConfigurationError as exc:
-            LOG.warning('unable to configure oslo_cache: %s', exc)
+        # NOTE(cdent): The default cache backend is a real but
+        # noop backend. We don't want to use that here because
+        # we want to avoid the cache pathways entirely if the
+        # cache has not been configured explicitly.
+        self.cache = cache_utils.get_client(conf)
 
         self._gnocchi_project_id = None
         self._gnocchi_project_id_lock = threading.Lock()
