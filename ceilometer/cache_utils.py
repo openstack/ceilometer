@@ -14,9 +14,22 @@
 # under the License.
 
 """Simple wrapper for oslo_cache."""
-
+import uuid
 
 from oslo_cache import core as cache
+from oslo_cache import exception
+from oslo_log import log
+from oslo_utils.secretutils import md5
+
+# Default cache expiration period
+CACHE_DURATION = 86400
+
+NAME_ENCODED = __name__.encode('utf-8')
+CACHE_NAMESPACE = uuid.UUID(
+    bytes=md5(NAME_ENCODED, usedforsecurity=False).digest()
+)
+
+LOG = log.getLogger(__name__)
 
 
 class CacheClient(object):
@@ -36,18 +49,30 @@ class CacheClient(object):
         return self.region.delete(key)
 
 
-def get_client(conf, expiration_time=0):
+def get_client(conf):
     cache.configure(conf)
-    if conf.cache.enabled:
-        return CacheClient(_get_default_cache_region(
-            conf,
-            expiration_time=expiration_time
-        ))
+    if 'cache' in conf.keys() and conf.cache.enabled:
+        region = get_cache_region(conf)
+        if region:
+            return CacheClient(region)
 
 
-def _get_default_cache_region(conf, expiration_time):
-    region = cache.create_region()
-    if expiration_time != 0:
-        conf.cache.expiration_time = expiration_time
-    cache.configure_cache_region(conf, region)
-    return region
+def get_cache_region(conf):
+    # Set expiration time to default CACHE_DURATION if missing in conf
+    if not conf.cache.expiration_time:
+        conf.cache.expiration_time = CACHE_DURATION
+
+    try:
+        region = cache.create_region()
+        cache.configure_cache_region(conf, region)
+        cache.key_mangler = cache_key_mangler
+        return region
+    except exception.ConfigurationError as e:
+        LOG.error("failed to configure oslo_cache. %s", str(e))
+        LOG.warning("using keystone to identify names from polled samples")
+
+
+def cache_key_mangler(key):
+    """Construct an opaque cache key."""
+
+    return uuid.uuid5(CACHE_NAMESPACE, key).hex
