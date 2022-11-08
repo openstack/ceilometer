@@ -46,8 +46,6 @@ from ceilometer import utils
 
 LOG = log.getLogger(__name__)
 
-CACHE_DURATION = 3600
-
 POLLING_OPTS = [
     cfg.StrOpt('cfg_file',
                default="polling.yaml",
@@ -154,10 +152,7 @@ class PollingTask(object):
 
         self.ks_client = self.manager.keystone
 
-        self.cache_client = cache_utils.get_client(
-            self.manager.conf,
-            expiration_time=CACHE_DURATION
-        )
+        self.cache_client = cache_utils.get_client(self.manager.conf)
 
     def add(self, pollster, source):
         self.pollster_matches[source.name].add(pollster)
@@ -169,9 +164,11 @@ class PollingTask(object):
             name = self.cache_client.get(uuid)
             if name:
                 return name
-            name = self.resolve_uuid_from_keystone(attr, uuid)
-            self.cache_client.set(uuid, name)
-            return name
+        # empty cache_client means either caching is not enabled or
+        # there was an error configuring cache
+        name = self.resolve_uuid_from_keystone(attr, uuid)
+        self.cache_client.set(uuid, name)
+        return name
 
         # Retrieve project and user names from Keystone only
         # if ceilometer doesn't have a caching backend
