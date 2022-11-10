@@ -380,9 +380,13 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         try:
             self.batch_measures(measures, gnocchi_data)
         except gnocchi_exc.ClientException as e:
-            LOG.error(str(e))
+            LOG.error("Gnocchi client exception while pushing measures [%s] "
+                      "for gnocchi data [%s]: [%s].", measures, gnocchi_data,
+                      str(e))
         except Exception as e:
-            LOG.error(str(e), exc_info=True)
+            LOG.error("Unexpected exception while pushing measures [%s] for "
+                      "gnocchi data [%s]: [%s].", measures, gnocchi_data,
+                      str(e), exc_info=True)
 
         for info in gnocchi_data.values():
             resource = info["resource"]
@@ -394,9 +398,15 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 self._if_not_cached(resource_type, resource['id'],
                                     resource_extra)
             except gnocchi_exc.ClientException as e:
-                LOG.error(str(e))
+                LOG.error("Gnocchi client exception updating resource type "
+                          "[%s] with ID [%s] for resource data [%s]: [%s].",
+                          resource_type, resource.get('id'), resource_extra,
+                          str(e))
             except Exception as e:
-                LOG.error(str(e), exc_info=True)
+                LOG.error("Unexpected exception updating resource type [%s] "
+                          "with ID [%s] for resource data [%s]: [%s].",
+                          resource_type, resource.get('id'), resource_extra,
+                          str(e), exc_info=True)
 
     @staticmethod
     def _extract_resources_from_error(e, resource_infos):
@@ -411,6 +421,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         # NOTE(sileht): We don't care about error here, we want
         # resources metadata always been updated
         try:
+            LOG.debug("Executing batch resource metrics measures for resource "
+                      "[%s] and measures [%s].", resource_infos, measures)
+
             self._gnocchi.metric.batch_resources_metrics_measures(
                 measures, create_metrics=True)
         except gnocchi_exc.BadRequest as e:

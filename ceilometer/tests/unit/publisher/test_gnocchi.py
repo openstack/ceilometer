@@ -704,6 +704,8 @@ class PublisherWorkflowTest(base.BaseTestCase,
     @mock.patch('ceilometer.publisher.gnocchi.LOG')
     @mock.patch('gnocchiclient.v1.client.Client')
     def test_workflow(self, fakeclient_cls, logger):
+        url = netutils.urlsplit("gnocchi://")
+        publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
 
         fakeclient = fakeclient_cls.return_value
 
@@ -734,12 +736,27 @@ class PublisherWorkflowTest(base.BaseTestCase,
                 {resource_id: {metric_name: self.metric_attributes}},
                 create_metrics=True)
         ]
+
+        resource_definition = publisher.metric_map.get(self.sample.name)
+
+        expected_measures_in_log = {resource_id: {self.sample.name: {
+            'measures': [{'timestamp': self.sample.timestamp,
+                          'value': self.sample.volume}],
+            'archive_policy_name': resource_definition.metrics[
+                metric_name]["archive_policy_name"],
+            'unit': self.sample.unit}}}
+
+        resource_type = resource_definition.cfg['resource_type']
+
         expected_debug = [
             mock.call('filtered project found: %s',
                       'a2d42c23-d518-46b6-96ab-3fba2e146859'),
             mock.call('Processing sample [%s] for resource ID [%s].',
                       self.sample, resource_id),
-        ]
+            mock.call('Executing batch resource metrics measures for resource '
+                      '[%s] and measures [%s].',
+                      mock.ANY,
+                      expected_measures_in_log)]
 
         measures_posted = False
         batch_side_effect = []
@@ -804,8 +821,6 @@ class PublisherWorkflowTest(base.BaseTestCase,
         batch = fakeclient.metric.batch_resources_metrics_measures
         batch.side_effect = batch_side_effect
 
-        url = netutils.urlsplit("gnocchi://")
-        publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
         publisher.publish_samples([self.sample])
 
         # Check that the last log message is the expected one
@@ -813,7 +828,17 @@ class PublisherWorkflowTest(base.BaseTestCase,
                 or self.create_resource_fail
                 or self.retry_post_measures_fail
                 or (self.update_resource_fail and self.patchable_attributes)):
-            logger.error.assert_called_with('boom!', exc_info=True)
+
+            if self.update_resource_fail and self.patchable_attributes:
+                logger.error.assert_called_with(
+                    'Unexpected exception updating resource type [%s] with '
+                    'ID [%s] for resource data [%s]: [%s].', resource_type,
+                    resource_id, mock.ANY, 'boom!', exc_info=True)
+            else:
+                logger.error.assert_called_with(
+                    'Unexpected exception while pushing measures [%s] for '
+                    'gnocchi data [%s]: [%s].', expected_measures_in_log,
+                    mock.ANY, 'boom!', exc_info=True)
         else:
             self.assertEqual(0, logger.error.call_count)
         self.assertEqual(expected_calls, fakeclient.mock_calls)
