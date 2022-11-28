@@ -114,7 +114,7 @@ def verify_signature(message, secret):
     return secretutils.constant_time_compare(new_sig, old_sig)
 
 
-def meter_message_from_counter(sample, secret):
+def meter_message_from_counter(sample, secret, publisher_id=None):
     """Make a metering message ready to be published or stored.
 
     Returns a dictionary containing a metering message
@@ -135,6 +135,8 @@ def meter_message_from_counter(sample, secret):
            'message_id': sample.id,
            'monotonic_time': sample.monotonic_time,
            }
+    if publisher_id is not None:
+        msg['publisher_id'] = publisher_id
     msg['message_signature'] = compute_signature(msg, secret)
     return msg
 
