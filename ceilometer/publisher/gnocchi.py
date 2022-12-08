@@ -285,9 +285,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                         name=self.filter_project,
                         domain=self.filter_domain)
                 except ka_exceptions.NotFound:
-                    LOG.warning('filtered project not found in keystone,'
+                    LOG.warning('project %s not found in keystone,'
                                 ' ignoring the filter_project '
-                                'option')
+                                'option', self.filter_project)
                     self.filter_project = None
                     return None
                 except Exception:
