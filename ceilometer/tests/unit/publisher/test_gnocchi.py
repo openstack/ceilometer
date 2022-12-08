@@ -339,9 +339,9 @@ class PublisherTest(base.BaseTestCase):
     def test_activity_gnocchi_project_not_found(self, logger):
         self.ks_client.projects.find.side_effect = ka_exceptions.NotFound
         self._do_test_activity_filter(2)
-        logger.warning.assert_called_with('project %s not found in '
-                                          'keystone, ignoring the '
-                                          'filter_project option', 'service')
+        logger.warning.assert_called_with(
+            'Filtered project [service] not found in keystone, ignoring the '
+            'filter_project option')
 
     def test_activity_filter_match_swift_event(self):
         self.samples[0].name = 'storage.objects.outgoing.bytes'
@@ -749,8 +749,11 @@ class PublisherWorkflowTest(base.BaseTestCase,
         resource_type = resource_definition.cfg['resource_type']
 
         expected_debug = [
-            mock.call('filtered project found: %s',
+            mock.call('Filtered project [%s] found with ID [%s].', 'service',
                       'a2d42c23-d518-46b6-96ab-3fba2e146859'),
+            mock.call('Sample [%s] is not a Gnocchi activity; therefore, we '
+                      'do not filter it out and push it to Gnocchi.',
+                      self.sample),
             mock.call('Processing sample [%s] for resource ID [%s].',
                       self.sample, resource_id),
             mock.call('Executing batch resource metrics measures for resource '
