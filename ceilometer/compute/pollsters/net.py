@@ -119,7 +119,7 @@ class IncomingBytesDeltaPollster(NetworkPollster):
 
 
 class OutgoingBytesDeltaPollster(NetworkPollster):
-    sample_name = 'network.outgoing.packets.delta'
+    sample_name = 'network.outgoing.bytes.delta'
     sample_type = sample.TYPE_DELTA
     sample_unit = 'B'
     sample_stats_key = 'tx_bytes_delta'
