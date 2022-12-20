@@ -24,8 +24,8 @@ Install Gnocchi
 
    .. code-block:: console
 
-      # yum install openstack-gnocchi-api openstack-gnocchi-metricd \
-        python-gnocchiclient
+      # dnf install openstack-gnocchi-api openstack-gnocchi-metricd \
+        python3-gnocchiclient
 
    .. note::
 
@@ -38,7 +38,7 @@ Install Gnocchi
 
    .. code-block:: console
 
-      # yum install uwsgi-plugin-common uwsgi-plugin-python3 uwsgi
+      # dnf install uwsgi-plugin-common uwsgi-plugin-python3 uwsgi
 
    .. note::
 
@@ -70,7 +70,7 @@ Install and configure components
 
    .. code-block:: console
 
-      # yum install openstack-ceilometer-notification \
+      # dnf install openstack-ceilometer-notification \
         openstack-ceilometer-central
 
 .. include:: install-base-config-common.inc
