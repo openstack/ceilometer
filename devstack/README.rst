@@ -22,4 +22,7 @@ Enabling Ceilometer in DevStack
    installation of Ceilometer. If you don't want to use their default value,
    you can set a new one in ``local.conf``.
 
+   Alternitvely you can modify copy and modify the sample ``local.conf``
+   located at ``ceilometer/devstack/local.conf.sample``
+
 3. Run ``stack.sh``.
