@@ -16,9 +16,11 @@ if [ "$CEILOMETER_BACKEND" = "gnocchi" ]; then
     enable_service gnocchi-api gnocchi-metricd
 fi
 
+
+GNOCCHI_DIR=${GNOCCHI_DIR:-${DEST}/gnocchi}
+GNOCCHI_BRANCH=${GNOCCHI_BRANCH:-"master"}
+GNOCCHI_REPO=${GNOCCHI_REPO:-https://github.com/gnocchixyz/gnocchi}
 # Gnocchi default archive_policy for Ceilometer
-# TODO(sileht): when Gnocchi 4.0 is out use the tarball instead
-GNOCCHI_GIT_PATH=${GNOCCHI_GIT_PATH:-git+https://github.com/gnocchixyz/gnocchi#egg=gnocchi}
 if [ -n "$GNOCCHI_ARCHIVE_POLICY_TEMPEST" ]; then
     GNOCCHI_ARCHIVE_POLICY=$GNOCCHI_ARCHIVE_POLICY_TEMPEST
 else
