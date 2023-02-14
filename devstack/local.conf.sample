@@ -1,0 +1,45 @@
+[[local|localrc]]
+# Common options
+# --------------
+#RECLONE=True
+#FORCE=True
+#OFFLINE=True
+#USE_PYTHON3=True
+#PYTHON3_VERSION=3.8
+# HOST_IP shoudl be set to an ip that is present on the host
+# e.g. the ip of eth0. This will be used to bind api endpoints and horizon.
+HOST_IP=<hostip>
+
+# Minimal Contents
+# ----------------
+
+# While ``stack.sh`` is happy to run without ``localrc``, devlife is better when
+# there are a few minimal variables set:
+
+# If the ``*_PASSWORD`` variables are not set here you will be prompted to enter
+# values for them by ``stack.sh``and they will be added to ``local.conf``.
+ADMIN_PASSWORD=password
+DATABASE_PASSWORD=$ADMIN_PASSWORD
+RABBIT_PASSWORD=$ADMIN_PASSWORD
+SERVICE_PASSWORD=$ADMIN_PASSWORD
+
+LOGFILE=$DEST/logs/stack.sh.log
+LOGDAYS=2
+
+# the plugin line order matters but the placment in the file does not
+enable_plugin aodh https://opendev.org/openstack/aodh
+enable_plugin ceilometer https://opendev.org/openstack/ceilometer.git
+
+# Gnocchi settings
+# Gnocchi is optional but can be enbaled by uncommenting CEILOMETER_BACKEND
+CEILOMETER_BACKEND=gnocchi
+
+# if gnocchi is not in LIBS_FROM_GIT it will install from pypi.
+# Currently this is broken with the latest gnocchi release 4.4.2
+# so we need to install from git until
+# https://github.com/gnocchixyz/gnocchi/issues/1290 is resolved
+LIBS_FROM_GIT+=gnocchi
+
+# to control the version of gnocchi installed from git uncomment these options
+#GNOCCHI_BRANCH="master"
+#GNOCCHI_REPO=https://github.com/gnocchixyz/gnocchi
