@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The default ``polling.yaml`` file has been updated and now it enables
+    meters related to cinder by default.
