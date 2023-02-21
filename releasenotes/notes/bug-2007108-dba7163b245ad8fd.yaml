@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    [`bug 2007108 <https://bugs.launchpad.net/ceilometer/+bug/2007108>`_]
+    The retired metrics dependent on SNMP have been removed from the default
+    ``polling.yaml``.
