@@ -14,3 +14,6 @@ sources:
         - disk.device.read.requests
         - disk.device.write.bytes
         - disk.device.write.requests
+        - volume.size
+        - volume.snapshot.size
+        - volume.backup.size
