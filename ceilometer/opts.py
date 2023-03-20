@@ -79,6 +79,7 @@ def list_opts():
         ('coordination', [
             cfg.StrOpt(
                 'backend_url',
+                secret=True,
                 help='The backend URL to use for distributed coordination. If '
                 'left empty, per-deployment central agent and per-host '
                 'compute agent won\'t do workload '
