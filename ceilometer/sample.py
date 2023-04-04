@@ -121,7 +121,8 @@ class Sample(object):
     @classmethod
     def from_notification(cls, name, type, volume, unit,
                           user_id, project_id, resource_id,
-                          message, timestamp=None, metadata=None, source=None):
+                          message, timestamp=None, metadata=None, source=None,
+                          user_name=None, project_name=None):
         if not metadata:
             metadata = (copy.copy(message['payload'])
                         if isinstance(message['payload'], dict) else {})
@@ -138,7 +139,9 @@ class Sample(object):
                    resource_id=resource_id,
                    timestamp=ts,
                    resource_metadata=metadata,
-                   source=source)
+                   source=source,
+                   user_name=user_name,
+                   project_name=project_name)
 
     def set_timestamp(self, timestamp):
         self.timestamp = timestamp
