@@ -159,29 +159,6 @@ class PollingTask(object):
         key = Resources.key(source.name, pollster)
         self.resources[key].setup(source)
 
-    def resolve_uuid_from_cache(self, attr, uuid):
-        if self.cache_client:
-            name = self.cache_client.get(uuid)
-            if name:
-                return name
-        # empty cache_client means either caching is not enabled or
-        # there was an error configuring cache
-        name = self.resolve_uuid_from_keystone(attr, uuid)
-        self.cache_client.set(uuid, name)
-        return name
-
-        # Retrieve project and user names from Keystone only
-        # if ceilometer doesn't have a caching backend
-        return self.resolve_uuid_from_keystone(attr, uuid)
-
-    def resolve_uuid_from_keystone(self, attr, uuid):
-        try:
-            return getattr(self.ks_client, attr).get(uuid).name
-        except AttributeError as e:
-            LOG.warning("Found '%s' while resolving uuid %s to name", e, uuid)
-        except ka_exceptions.NotFound as e:
-            LOG.warning(e.message)
-
     def poll_and_notify(self):
         """Polling sample and notify."""
         cache = {}
@@ -240,16 +217,20 @@ class PollingTask(object):
                             # and then keystone
                             if sample.project_id:
                                 sample.project_name = \
-                                    self.resolve_uuid_from_cache(
-                                        "projects", sample.project_id
+                                    cache_utils.resolve_uuid_from_cache(
+                                        self.manager.conf,
+                                        "projects",
+                                        sample.project_id
                                     )
 
                             # Try to resolve user UUIDs from cache first,
                             # and then keystone
                             if sample.user_id:
                                 sample.user_name = \
-                                    self.resolve_uuid_from_cache(
-                                        "users", sample.user_id
+                                    cache_utils.resolve_uuid_from_cache(
+                                        self.manager.conf,
+                                        "users",
+                                        sample.user_id
                                     )
 
                         sample_dict = (
