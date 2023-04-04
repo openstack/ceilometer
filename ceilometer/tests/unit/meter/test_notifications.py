@@ -139,22 +139,26 @@ MIDDLEWARE_EVENT = {
 FULL_MULTI_MSG = {
     'event_type': u'full.sample',
     'payload': [{
-                u'counter_name': u'instance1',
-                u'user_id': u'user1',
-                u'resource_id': u'res1',
-                u'counter_unit': u'ns',
-                u'counter_volume': 28.0,
-                u'project_id': u'proj1',
-                u'counter_type': u'gauge'
+                'counter_name': 'instance1',
+                'user_id': 'user1',
+                'user_name': 'test-resource',
+                'resource_id': 'res1',
+                'counter_unit': 'ns',
+                'counter_volume': 28.0,
+                'project_id': 'proj1',
+                'project_name': 'test-resource',
+                'counter_type': 'gauge'
                 },
                 {
-                u'counter_name': u'instance2',
-                u'user_id': u'user2',
-                u'resource_id': u'res2',
-                u'counter_unit': u'%',
-                u'counter_volume': 1.0,
-                u'project_id': u'proj2',
-                u'counter_type': u'delta'
+                'counter_name': 'instance2',
+                'user_id': 'user2',
+                'user_name': 'test-resource',
+                'resource_id': 'res2',
+                'counter_unit': '%',
+                'counter_volume': 1.0,
+                'project_id': 'proj2',
+                'project_name': 'test-resource',
+                'counter_type': 'delta'
                 }],
     u'ctxt': {u'domain': None,
               u'request_id': u'req-da91b4bf-d2b5-43ae-8b66-c7752e72726d',
@@ -615,7 +619,16 @@ class TestMeterProcessing(test.BaseTestCase):
         c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
 
-    def test_multi_meter_payload_all_multi(self):
+    @mock.patch('ceilometer.cache_utils.resolve_uuid_from_cache')
+    def test_multi_meter_payload_all_multi(self, fake_cached_resource_name):
+
+        # return "test-resource" as the name of the user and project from cache
+        fake_cached_resource_name.return_value = "test-resource"
+
+        # expect user_name and project_name values to be set to "test-resource"
+        fake_user_name = "test-resource"
+        fake_project_name = "test-resource"
+
         cfg = yaml.dump(
             {'metric': [dict(name="$.payload.[*].counter_name",
                         event_type="full.sample",
@@ -640,6 +653,8 @@ class TestMeterProcessing(test.BaseTestCase):
             self.assertEqual(msg[idx]['resource_id'], s1['resource_id'])
             self.assertEqual(msg[idx]['project_id'], s1['project_id'])
             self.assertEqual(msg[idx]['user_id'], s1['user_id'])
+            self.assertEqual(fake_user_name, s1['user_name'])
+            self.assertEqual(fake_project_name, s1['project_name'])
 
     @mock.patch('ceilometer.meter.notifications.LOG')
     def test_multi_meter_payload_invalid_missing(self, LOG):

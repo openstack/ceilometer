@@ -16,6 +16,8 @@
 """Simple wrapper for oslo_cache."""
 import uuid
 
+from ceilometer import keystone_client
+from keystoneauth1 import exceptions as ka_exceptions
 from oslo_cache import core as cache
 from oslo_cache import exception
 from oslo_log import log
@@ -76,3 +78,29 @@ def cache_key_mangler(key):
     """Construct an opaque cache key."""
 
     return uuid.uuid5(CACHE_NAMESPACE, key).hex
+
+
+def resolve_uuid_from_cache(conf, attr, uuid):
+    # empty cache_client means either caching is not enabled or
+    # there was an error configuring cache
+    cache_client = get_client(conf)
+    if cache_client:
+        resource_name = cache_client.get(uuid)
+        if resource_name:
+            return resource_name
+
+    # Retrieve project and user names from Keystone only
+    # if ceilometer doesn't have a caching backend
+    resource_name = resolve_uuid_from_keystone(conf, attr, uuid)
+    if cache_client:
+        cache_client.set(uuid, resource_name)
+    return resource_name
+
+
+def resolve_uuid_from_keystone(conf, attr, uuid):
+    try:
+        return getattr(keystone_client.get_client(conf), attr).get(uuid).name
+    except AttributeError as e:
+        LOG.warning("Found '%s' while resolving uuid %s to name", e, uuid)
+    except ka_exceptions.NotFound as e:
+        LOG.warning(e.message)
