@@ -51,7 +51,11 @@ class TCPPublisher(publisher.ConfigPublisherBase):
                 "Cannot resolve host %s, creating AF_INET socket...",
                 self.host)
             self.addr_family = socket.AF_INET
-        self.create_and_connect()
+        try:
+            self.create_and_connect()
+        except Exception:
+            LOG.error(_("Unable to connect to the "
+                      "remote endpoint"))
 
     def create_and_connect(self):
         self.socket = socket.socket(self.addr_family,
@@ -77,8 +81,8 @@ class TCPPublisher(publisher.ConfigPublisherBase):
             try:
                 self.socket.send(msg_len + encoded_msg)
             except Exception:
-                LOG.warning(_("Unable to send sample over TCP,"
-                              "trying to reconnect and resend the message"))
+                LOG.error(_("Unable to send sample over TCP,"
+                          "trying to reconnect and resend the message"))
                 self.create_and_connect()
                 try:
                     self.socket.send(msg_len + encoded_msg)
