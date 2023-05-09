@@ -694,9 +694,13 @@ class TestPollingAgent(BaseAgent):
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         polling_task.poll_and_notify()
-        LOG.info.assert_called_with(
-            'Polling pollster %(poll)s in the context of %(src)s',
-            {'poll': 'test', 'src': 'test_polling'})
+
+        LOG.info.assert_has_calls([
+            mock.call('Polling pollster %(poll)s in the context of %(src)s',
+                      {'poll': 'test', 'src': 'test_polling'}),
+            mock.call('Finished polling pollster %(poll)s in the context '
+                      'of %(src)s', {'poll': 'test', 'src': 'test_polling'})
+        ])
 
     @mock.patch('ceilometer.polling.manager.LOG')
     def test_skip_polling_and_notify_with_no_resources(self, LOG):

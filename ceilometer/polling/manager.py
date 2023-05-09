@@ -248,6 +248,9 @@ class PollingTask(object):
                     if sample_batch:
                         self._send_notification(sample_batch)
 
+                    LOG.info("Finished polling pollster %(poll)s in the "
+                             "context of %(src)s", dict(poll=pollster.name,
+                                                        src=source_name))
                 except plugin_base.PollsterPermanentError as err:
                     LOG.error(
                         'Prevent pollster %(name)s from '
