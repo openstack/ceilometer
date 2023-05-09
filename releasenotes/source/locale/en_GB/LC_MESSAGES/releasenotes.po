@@ -9,11 +9,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer Release Notes\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-06 02:53+0000\n"
+"POT-Creation-Date: 2023-04-24 15:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2023-02-10 12:09+0000\n"
+"PO-Revision-Date: 2023-05-08 09:55+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom)\n"
 "Language: en_GB\n"
@@ -65,17 +65,35 @@ msgstr "16.0.0"
 msgid "16.0.1"
 msgstr "16.0.1"
 
+msgid "16.0.1-8"
+msgstr "16.0.1-8"
+
 msgid "17.0.0"
 msgstr "17.0.0"
+
+msgid "17.0.2-3"
+msgstr "17.0.2-3"
 
 msgid "18.0.0"
 msgstr "18.0.0"
 
+msgid "18.0.0-11"
+msgstr "18.0.0-11"
+
 msgid "19.0.0"
 msgstr "19.0.0"
 
-msgid "19.0.0-6"
-msgstr "19.0.0-6"
+msgid "19.0.0-11"
+msgstr "19.0.0-11"
+
+msgid "20.0.0"
+msgstr "20.0.0"
+
+msgid "20.0.0-7"
+msgstr "20.0.0-7"
+
+msgid "2023.1 Series Release Notes"
+msgstr "2023.1 Series Release Notes"
 
 msgid "5.0.1"
 msgstr "5.0.1"
@@ -598,15 +616,6 @@ msgstr ""
 
 msgid ""
 "In an effort to minimise the noise, Ceilometer will no longer produce meters "
-"which have no measurable data associated with it. Image meter only captures "
-"state information which is already captured in events and other meters."
-msgstr ""
-"In an effort to minimise the noise, Ceilometer will no longer produce meters "
-"which have no measurable data associated with it. Image meter only captures "
-"state information which is already captured in events and other meters."
-
-msgid ""
-"In an effort to minimise the noise, Ceilometer will no longer produce meters "
 "which have no measureable data associated with it. Image meter only captures "
 "state information which is already captured in events and other meters."
 msgstr ""
@@ -1102,6 +1111,13 @@ msgstr ""
 "publisher to 'gnocchi', 'http', 'panko', or any combination of available "
 "publishers listed in documentation."
 
+msgid ""
+"The default ``polling.yaml`` file has been updated and now it enables meters "
+"related to cinder by default."
+msgstr ""
+"The default ``polling.yaml`` file has been updated and now it enables meters "
+"related to cinder by default."
+
 msgid "The deprecated Ceilometer API has been removed."
 msgstr "The deprecated Ceilometer API has been removed."
 
@@ -1121,9 +1137,6 @@ msgstr ""
 
 msgid "The deprecated `dispatcher_gnocchi` option group has been removed."
 msgstr "The deprecated `dispatcher_gnocchi` option group has been removed."
-
-msgid "The deprecated `gnocchi_dispatcher` option group has been removed."
-msgstr "The deprecated `gnocchi_dispatcher` option group has been removed."
 
 msgid "The deprecated `meter_definitions_cfg_file` option has been removed."
 msgstr "The deprecated `meter_definitions_cfg_file` option has been removed."
@@ -1632,6 +1645,15 @@ msgstr ""
 "an issue with the Swift pollster where the ``[service_credentials] cafile`` "
 "option was not used. This could prevent communication with TLS-enabled Swift "
 "APIs."
+
+msgid ""
+"[`bug 2007108 <https://bugs.launchpad.net/ceilometer/+bug/2007108>`_] The "
+"retired metrics dependent on SNMP have been removed from the default "
+"``polling.yaml``."
+msgstr ""
+"[`bug 2007108 <https://bugs.launchpad.net/ceilometer/+bug/2007108>`_] The "
+"retired metrics dependent on SNMP have been removed from the default "
+"``polling.yaml``."
 
 msgid ""
 "[`bug 255569 <https://bugs.launchpad.net/ceilometer/+bug/255569>`_] Fix "
