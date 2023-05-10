@@ -34,6 +34,7 @@
       - publish-openstack-docs-pti
       - periodic-stable-jobs
       - release-notes-jobs-python3
+      - check-requirements
     check:
       jobs:
         - grenade-ceilometer
