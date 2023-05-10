@@ -850,6 +850,9 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         if override_credentials:
             credentials = override_credentials
 
+        if not isinstance(credentials, str):
+            credentials = self.normalize_credentials_to_string(credentials)
+
         url = self.get_request_linked_samples_url(kwargs, definitions)
 
         authenticator_module_name = definitions['module']
@@ -877,6 +880,17 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
                 % (url, resp.status_code, resp.reason))
 
         return resp, url
+
+    @staticmethod
+    def normalize_credentials_to_string(credentials):
+        if isinstance(credentials, bytes):
+            credentials = credentials.decode('utf-8')
+        else:
+            credentials = str(credentials)
+        LOG.debug("Credentials [%s] were not defined as a string. "
+                  "Therefore, we converted it to a string like object.",
+                  credentials)
+        return credentials
 
     def create_request_arguments(self, definitions):
         request_arguments = super(
