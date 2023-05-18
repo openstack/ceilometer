@@ -383,7 +383,7 @@ metric:
 
   # Identity
   # NOTE(gordc): hack because jsonpath-rw-ext can't concat starting with string.
-  - name: $.payload.outcome - $.payload.outcome + 'identity.authenticate.' + $.payload.outcome
+  - name: $.payload.outcome.`sub(/.*/, )` + 'identity.authenticate.' + $.payload.outcome
     type: 'delta'
     unit: 'user'
     volume: 1
