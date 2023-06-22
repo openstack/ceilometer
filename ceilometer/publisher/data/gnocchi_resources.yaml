@@ -201,6 +201,7 @@ resources:
       - 'hardware.ipmi.temperature'
       - 'hardware.ipmi.current'
       - 'hardware.ipmi.voltage'
+      - 'hardware.ipmi.fan'
     attributes:
       node: resource_metadata.node
 
