@@ -47,6 +47,11 @@ class SensorPollster(plugin_base.PollsterBase):
 
     @staticmethod
     def _get_sensor_types(data, sensor_type):
+        # Ipmitool reports 'Pwr Consumption' as sensor type 'Current'.
+        # Set sensor_type to 'Current' when polling 'Power' metrics.
+        if sensor_type == 'Power':
+            sensor_type = 'Current'
+
         try:
             return (sensor_type_data for _, sensor_type_data
                     in data[sensor_type].items())
@@ -79,6 +84,10 @@ class SensorPollster(plugin_base.PollsterBase):
                 sensor_reading = sensor_data['Sensor Reading']
                 sensor_id = sensor_data['Sensor ID']
             except KeyError:
+                continue
+
+            # Do not pick up power consumption metrics from 'Current' sensor
+            if self.METRIC == 'Current' and 'Pwr Consumption' in sensor_id:
                 continue
 
             if not parser.validate_reading(sensor_reading):
@@ -123,3 +132,7 @@ class FanSensorPollster(SensorPollster):
 
 class VoltageSensorPollster(SensorPollster):
     METRIC = 'Voltage'
+
+
+class PowerSensorPollster(SensorPollster):
+    METRIC = 'Power'

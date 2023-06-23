@@ -19,6 +19,7 @@ from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as ipmiexcept
 
 import ceilometer.privsep.ipmitool
+import shlex
 
 
 # Following 2 functions are copied from ironic project to handle ipmitool's
@@ -122,7 +123,7 @@ def execute_ipmi_cmd(template=None):
         def _execute(self, **kwargs):
             args = ['ipmitool']
             command = f(self, **kwargs)
-            args.extend(command.split(" "))
+            args.extend(shlex.split(command))
             try:
                 (out, __) = ceilometer.privsep.ipmitool.ipmi(*args)
             except processutils.ProcessExecutionError:

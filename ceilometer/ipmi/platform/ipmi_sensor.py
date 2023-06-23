@@ -24,7 +24,8 @@ IPMICMD = {"sdr_dump": "sdr dump",
            "sensor_dump_temperature": "sdr -v type Temperature",
            "sensor_dump_current": "sdr -v type Current",
            "sensor_dump_fan": "sdr -v type Fan",
-           "sensor_dump_voltage": "sdr -v type Voltage"}
+           "sensor_dump_voltage": "sdr -v type Voltage",
+           "sensor_dump_power": "sensor get 'Pwr Consumption'"}
 
 # Requires translation of output into dict
 DICT_TRANSLATE_TEMPLATE = {"translate": 1}
@@ -75,6 +76,11 @@ class IPMISensor(object):
         return IPMICMD['sensor_dump_voltage']
 
     @ipmitool.execute_ipmi_cmd(DICT_TRANSLATE_TEMPLATE)
+    def _read_sensor_power(self):
+        """Get the sensor data for Power."""
+        return IPMICMD['sensor_dump_power']
+
+    @ipmitool.execute_ipmi_cmd(DICT_TRANSLATE_TEMPLATE)
     def _read_sensor_current(self):
         """Get the sensor data for Current."""
         return IPMICMD['sensor_dump_current']
@@ -93,7 +99,8 @@ class IPMISensor(object):
                    'Temperature': self._read_sensor_temperature,
                    'Fan': self._read_sensor_fan,
                    'Voltage': self._read_sensor_voltage,
-                   'Current': self._read_sensor_current}
+                   'Current': self._read_sensor_current,
+                   'Power': self._read_sensor_power}
 
         try:
             return mapping[sensor_type]()

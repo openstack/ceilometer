@@ -226,6 +226,26 @@ Sensor ID              : PS2 Curr Out % (0x59)
  Assertions Enabled    : unc+ ucr+
  Deassertions Enabled  : unc+ ucr+
 
+Sensor ID              : Pwr Consumption (0x76)
+ Entity ID             : 7.1 (System Board)
+ Sensor Type (Threshold)  : Current (0x03)
+ Sensor Reading        : 154 (+/- 0) Watts
+ Status                : ok
+ Nominal Reading       : 1034.000
+ Normal Maximum        : 1056.000
+ Upper critical        : 1914.000
+ Upper non-critical    : 1738.000
+ Positive Hysteresis   : Unspecified
+ Negative Hysteresis   : Unspecified
+ Minimum sensor range  : Unspecified
+ Maximum sensor range  : 5588.000
+ Event Message Control : Per-threshold
+ Readable Thresholds   : unc ucr
+ Settable Thresholds   : unc
+ Assertion Events      :
+ Assertions Enabled    : unc+ ucr+
+ Deassertions Enabled  : unc+ ucr+
+
 """
 
 sensor_fan_data = """Sensor ID              : System Fan 1 (0x30)

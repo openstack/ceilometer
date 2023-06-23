@@ -32,6 +32,10 @@ VOLTAGE_SENSOR_DATA = {
     'Voltage': ipmi_test_data.VOLTAGE_DATA
 }
 
+POWER_SENSOR_DATA = {
+    'Current': ipmi_test_data.POWER_DATA
+}
+
 MISSING_SENSOR_DATA = ipmi_test_data.MISSING_SENSOR['payload']['payload']
 MALFORMED_SENSOR_DATA = ipmi_test_data.BAD_SENSOR['payload']['payload']
 MISSING_ID_SENSOR_DATA = ipmi_test_data.NO_SENSOR_ID['payload']['payload']
@@ -115,7 +119,7 @@ class TestCurrentSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(1, float(130), self.CONF.host)
+        self._verify_metering(1, float(0.800), self.CONF.host)
 
 
 class TestVoltageSensorPollster(base.TestPollsterBase):
@@ -130,3 +134,17 @@ class TestVoltageSensorPollster(base.TestPollsterBase):
         self._test_get_samples()
 
         self._verify_metering(4, float(3.309), self.CONF.host)
+
+
+class TestPowerSensorPollster(base.TestPollsterBase):
+
+    def fake_sensor_data(self, sensor_type):
+        return POWER_SENSOR_DATA
+
+    def make_pollster(self):
+        return sensor.PowerSensorPollster(self.CONF)
+
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        self._verify_metering(1, int(154), self.CONF.host)

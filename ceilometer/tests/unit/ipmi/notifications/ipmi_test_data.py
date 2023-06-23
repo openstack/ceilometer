@@ -273,9 +273,9 @@ TEMPERATURE_DATA = {
 
 
 CURRENT_DATA = {
-    'Avg Power (0x2e)': {
+    'Current 1 (0x6b)': {
         'Status': 'ok',
-        'Sensor Reading': '130 (+/- 0) Watts',
+        'Sensor Reading': '0.800 (+/- 0) Amps',
         'Entity ID': '21.0 (Power Management)',
         'Assertions Enabled': '',
         'Event Message Control': 'Per-threshold',
@@ -284,10 +284,56 @@ CURRENT_DATA = {
         'Sensor Type (Analog)': 'Current',
         'Negative Hysteresis': 'Unspecified',
         'Maximum sensor range': 'Unspecified',
-        'Sensor ID': 'Avg Power (0x2e)',
+        'Sensor ID': 'Current 1 (0x6b)',
         'Assertion Events': '',
         'Minimum sensor range': '2550.000',
         'Settable Thresholds': 'No Thresholds'
+    },
+    'Pwr Consumption (0x76)': {
+        'Entity ID': '7.1 (System Board)',
+        'Sensor Type (Threshold)': 'Current (0x03)',
+        'Sensor Reading': '160 (+/- 0) Watts',
+        'Status': 'ok',
+        'Nominal Reading': '1034.000',
+        'Normal Maximum': '1056.000',
+        'Upper critical': '1914.000',
+        'Upper non-critical': '1738.000',
+        'Positive Hysteresis': 'Unspecified',
+        'Negative Hysteresis': 'Unspecified',
+        'Minimum sensor range': 'Unspecified',
+        'Maximum sensor range': '5588.000',
+        'Sensor ID': 'Pwr Consumption (0x76)',
+        'Event Message Control': 'Per-threshold',
+        'Readable Thresholds': 'unc ucr',
+        'Settable Thresholds': 'unc',
+        'Assertion Events': '',
+        'Assertions Enabled': 'unc+ ucr+',
+        'Deassertions Enabled': 'unc+ ucr+'
+    }
+}
+
+
+POWER_DATA = {
+    'Pwr Consumption (0x76)': {
+        'Entity ID': '7.1 (System Board)',
+        'Sensor Type (Threshold)': 'Current (0x03)',
+        'Sensor Reading': '154 (+/- 0) Watts',
+        'Status': 'ok',
+        'Nominal Reading': '1034.000',
+        'Normal Maximum': '1056.000',
+        'Upper critical': '1914.000',
+        'Upper non-critical': '1738.000',
+        'Positive Hysteresis': 'Unspecified',
+        'Negative Hysteresis': 'Unspecified',
+        'Minimum sensor range': 'Unspecified',
+        'Maximum sensor range': '5588.000',
+        'Sensor ID': 'Pwr Consumption (0x76)',
+        'Event Message Control': 'Per-threshold',
+        'Readable Thresholds': 'unc ucr',
+        'Settable Thresholds': 'unc',
+        'Assertion Events': '',
+        'Assertions Enabled': 'unc+ ucr+',
+        'Deassertions Enabled': 'unc+ ucr+'
     }
 }
 
@@ -661,7 +707,8 @@ SENSOR_DATA = {
             'Temperature': TEMPERATURE_DATA,
             'Current': CURRENT_DATA,
             'Fan': FAN_DATA,
-            'Voltage': VOLTAGE_DATA
+            'Voltage': VOLTAGE_DATA,
+            'Power': POWER_DATA
         }
     }
 }

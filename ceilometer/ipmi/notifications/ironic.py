@@ -115,6 +115,13 @@ class SensorNotification(endpoint.SampleEndpoint):
                 except KeyError as exc:
                     raise InvalidSensorData('missing key in payload: %s' % exc)
 
+                # Do not pick up power consumption metrics from Current sensor
+                if (
+                    self.metric == 'Current' and
+                    'Pwr Consumption' in payload['Sensor ID']
+                ):
+                    continue
+
                 info = self._package_payload(message, payload)
 
                 try:
@@ -159,3 +166,7 @@ class FanSensorNotification(SensorNotification):
 
 class VoltageSensorNotification(SensorNotification):
     metric = 'Voltage'
+
+
+class PowerSensorNotification(SensorNotification):
+    metric = 'Power'

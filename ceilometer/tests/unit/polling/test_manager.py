@@ -102,7 +102,7 @@ class TestManager(base.BaseTestCase):
         mgr = manager.AgentManager(0, self.conf,
                                    namespaces=['ipmi'])
         # 8 pollsters for Node Manager
-        self.assertEqual(12, len(mgr.extensions))
+        self.assertEqual(13, len(mgr.extensions))
 
     # Skip loading pollster upon ExtensionLoadError
     @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',

@@ -69,11 +69,24 @@ class TestIPMISensor(base.BaseTestCase):
         self.assertIn('Current', sensors)
         self.assertEqual(1, len(sensors))
 
-        # 2 sensor data in total.
+        # 3 sensor data in total.
         # Check ceilometer/tests/ipmi/platform/ipmi_test_data.py
-        self.assertEqual(2, len(sensors['Current']))
+        self.assertEqual(3, len(sensors['Current']))
         sensor = sensors['Current']['PS1 Curr Out % (0x58)']
         self.assertEqual('11 (+/- 0) unspecified', sensor['Sensor Reading'])
+
+    def test_read_sensor_power(self):
+        sensors = self.ipmi.read_sensor_any('Current')
+
+        # only Current data returned.
+        self.assertIn('Current', sensors)
+        self.assertEqual(1, len(sensors))
+
+        # 3 sensor data in total.
+        # Check ceilometer/tests/ipmi/platform/ipmi_test_data.py
+        self.assertEqual(3, len(sensors['Current']))
+        sensor = sensors['Current']['Pwr Consumption (0x76)']
+        self.assertEqual('154 (+/- 0) Watts', sensor['Sensor Reading'])
 
     def test_read_sensor_fan(self):
         sensors = self.ipmi.read_sensor_any('Fan')

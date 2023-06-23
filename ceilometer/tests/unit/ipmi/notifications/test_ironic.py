@@ -71,13 +71,34 @@ class TestNotifications(base.BaseTestCase):
 
         self.assertEqual(1, len(counters), 'expected 1 current reading')
         resource_id = (
-            'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad-avg_power_(0x2e)'
+            'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad-current_1_(0x6b)'
         )
         test_counter = counters[resource_id]
-        self.assertEqual(130.0, test_counter.volume)
-        self.assertEqual('W', test_counter.unit)
+        self.assertEqual(0.800, test_counter.volume)
+        self.assertEqual('Amps', test_counter.unit)
         self.assertEqual(sample.TYPE_GAUGE, test_counter.type)
         self.assertEqual('hardware.ipmi.current', test_counter.name)
+
+    def test_ipmi_power_notification(self):
+        """Test IPMI Power sample from Current sensor.
+
+        A single power reading is effectively the same as temperature,
+        modulo "power".
+        """
+        processor = ipmi.PowerSensorNotification(None, None)
+        counters = dict([(counter.resource_id, counter) for counter in
+                         processor.build_sample(
+                             ipmi_test_data.SENSOR_DATA)])
+
+        self.assertEqual(1, len(counters), 'expected 1 current reading')
+        resource_id = (
+            'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad-pwr_consumption_(0x76)'
+        )
+        test_counter = counters[resource_id]
+        self.assertEqual(154, test_counter.volume)
+        self.assertEqual('W', test_counter.unit)
+        self.assertEqual(sample.TYPE_GAUGE, test_counter.type)
+        self.assertEqual('hardware.ipmi.power', test_counter.name)
 
     def test_ipmi_fan_notification(self):
         """Test IPMI Fan sensor data.
