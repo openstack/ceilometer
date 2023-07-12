@@ -40,8 +40,10 @@
         - grenade-ceilometer
         - telemetry-dsvm-integration-centos-9s:
             irrelevant-files: *ceilometer-irrelevant-files
+            voting: false
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+            voting: false
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
@@ -51,8 +53,10 @@
         - grenade-ceilometer
         - telemetry-dsvm-integration-centos-9s:
             irrelevant-files: *ceilometer-irrelevant-files
+            voting: false
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+            voting: false
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
         - telemetry-dsvm-integration-ipv6-only:
