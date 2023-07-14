@@ -52,6 +52,7 @@ class MeterDefinition(object):
     def __init__(self, definition_cfg, conf, plugin_manager):
         self.conf = conf
         self.cfg = definition_cfg
+        self._cache = cache_utils.get_client(self.conf)
         missing = [field for field in self.REQUIRED_FIELDS
                    if not self.cfg.get(field)]
         if missing:
@@ -169,18 +170,20 @@ class MeterDefinition(object):
                 sample = dict((attributes[idx], value)
                               for idx, value in enumerate(values))
 
-                # populate user_name and project_name fields in the sample
-                # created from notifications
-                if sample['user_id']:
-                    sample['user_name'] = \
-                        cache_utils.resolve_uuid_from_cache(
-                            self.conf, 'users', sample['user_id']
-                        )
-                if sample['project_id']:
-                    sample['project_name'] = \
-                        cache_utils.resolve_uuid_from_cache(
-                            self.conf, 'projects', sample['project_id']
-                        )
+                if (
+                    self.conf.polling.tenant_name_discovery and
+                    self._cache
+                ):
+                    # populate user_name and project_name fields in the sample
+                    # created from notifications
+                    if sample['user_id']:
+                        sample['user_name'] = \
+                            self._cache.resolve_uuid_from_cache(
+                                'users', sample['user_id'])
+                    if sample['project_id']:
+                        sample['project_name'] = \
+                            self._cache.resolve_uuid_from_cache(
+                                'projects', sample['project_id'])
                 yield sample
         else:
             yield sample

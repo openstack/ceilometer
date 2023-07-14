@@ -15,6 +15,8 @@ import copy
 from unittest import mock
 
 import fixtures
+from oslo_cache import core as cache
+from oslo_config import fixture as config_fixture
 from oslo_utils import encodeutils
 from oslo_utils import fileutils
 import yaml
@@ -141,23 +143,23 @@ FULL_MULTI_MSG = {
     'payload': [{
                 'counter_name': 'instance1',
                 'user_id': 'user1',
-                'user_name': 'test-resource',
+                'user_name': 'fake-name',
                 'resource_id': 'res1',
                 'counter_unit': 'ns',
                 'counter_volume': 28.0,
                 'project_id': 'proj1',
-                'project_name': 'test-resource',
+                'project_name': 'fake-name',
                 'counter_type': 'gauge'
                 },
                 {
                 'counter_name': 'instance2',
                 'user_id': 'user2',
-                'user_name': 'test-resource',
+                'user_name': 'fake-name',
                 'resource_id': 'res2',
                 'counter_unit': '%',
                 'counter_volume': 1.0,
                 'project_id': 'proj2',
-                'project_name': 'test-resource',
+                'project_name': 'fake-name',
                 'counter_type': 'delta'
                 }],
     'ctxt': {'domain': None,
@@ -238,7 +240,6 @@ METRICS_UPDATE = {
 
 
 class TestMeterDefinition(test.BaseTestCase):
-
     def test_config_definition(self):
         cfg = dict(name="test",
                    event_type="test.create",
@@ -247,7 +248,8 @@ class TestMeterDefinition(test.BaseTestCase):
                    volume="$.payload.volume",
                    resource_id="$.payload.resource_id",
                    project_id="$.payload.project_id")
-        handler = notifications.MeterDefinition(cfg, mock.Mock(), mock.Mock())
+        conf = ceilometer_service.prepare_service([], [])
+        handler = notifications.MeterDefinition(cfg, conf, mock.Mock())
         self.assertTrue(handler.match_type("test.create"))
         sample = list(handler.to_samples(NOTIFICATION))[0]
         self.assertEqual(1.0, sample["volume"])
@@ -258,8 +260,9 @@ class TestMeterDefinition(test.BaseTestCase):
 
     def test_config_required_missing_fields(self):
         cfg = dict()
+        conf = ceilometer_service.prepare_service([], [])
         try:
-            notifications.MeterDefinition(cfg, mock.Mock(), mock.Mock())
+            notifications.MeterDefinition(cfg, conf, mock.Mock())
         except declarative.DefinitionException as e:
             self.assertIn("Required fields ['name', 'type', 'event_type',"
                           " 'unit', 'volume', 'resource_id']"
@@ -270,11 +273,20 @@ class TestMeterDefinition(test.BaseTestCase):
         cfg = dict(name="test", type="foo", event_type="bar.create",
                    unit="foo", volume="bar",
                    resource_id="bea70e51c7340cb9d555b15cbfcaec23")
+        conf = ceilometer_service.prepare_service([], [])
         try:
-            notifications.MeterDefinition(cfg, mock.Mock(), mock.Mock())
+            notifications.MeterDefinition(cfg, conf, mock.Mock())
         except declarative.DefinitionException as e:
             self.assertIn("Invalid type foo specified",
                           encodeutils.exception_to_unicode(e))
+
+
+class CacheConfFixture(config_fixture.Config):
+    def setUp(self):
+        super(CacheConfFixture, self).setUp()
+        self.conf = ceilometer_service.\
+            prepare_service(argv=[], config_files=[])
+        cache.configure(self.conf)
 
 
 class TestMeterProcessing(test.BaseTestCase):
@@ -282,6 +294,15 @@ class TestMeterProcessing(test.BaseTestCase):
     def setUp(self):
         super(TestMeterProcessing, self).setUp()
         self.CONF = ceilometer_service.prepare_service([], [])
+        dict_conf_fixture = CacheConfFixture(self.CONF)
+        self.useFixture(dict_conf_fixture)
+        dict_conf_fixture.config(enabled=True, group='cache')
+        dict_conf_fixture.config(expiration_time=600,
+                                 backend='oslo_cache.dict',
+                                 group='cache')
+        dict_conf_fixture.config(tenant_name_discovery=True, group='polling')
+        self.CONF = dict_conf_fixture.conf
+
         self.path = self.useFixture(fixtures.TempDir()).path
         self.handler = notifications.ProcessMeterNotifications(
             self.CONF, mock.Mock())
@@ -619,16 +640,11 @@ class TestMeterProcessing(test.BaseTestCase):
         c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
 
-    @mock.patch('ceilometer.cache_utils.resolve_uuid_from_cache')
-    def test_multi_meter_payload_all_multi(self, fake_cached_resource_name):
-
-        # return "test-resource" as the name of the user and project from cache
-        fake_cached_resource_name.return_value = "test-resource"
-
-        # expect user_name and project_name values to be set to "test-resource"
-        fake_user_name = "test-resource"
-        fake_project_name = "test-resource"
-
+    @mock.patch(
+        'ceilometer.cache_utils.CacheClient._resolve_uuid_from_keystone'
+    )
+    def test_multi_meter_payload_all_multi(self, resolved_uuid):
+        resolved_uuid.return_value = "fake-name"
         cfg = yaml.dump(
             {'metric': [dict(name="$.payload.[*].counter_name",
                         event_type="full.sample",
@@ -653,8 +669,8 @@ class TestMeterProcessing(test.BaseTestCase):
             self.assertEqual(msg[idx]['resource_id'], s1['resource_id'])
             self.assertEqual(msg[idx]['project_id'], s1['project_id'])
             self.assertEqual(msg[idx]['user_id'], s1['user_id'])
-            self.assertEqual(fake_user_name, s1['user_name'])
-            self.assertEqual(fake_project_name, s1['project_name'])
+            self.assertEqual(msg[idx]['project_name'], s1['project_name'])
+            self.assertEqual(msg[idx]['user_name'], s1['user_name'])
 
     @mock.patch('ceilometer.meter.notifications.LOG')
     def test_multi_meter_payload_invalid_missing(self, LOG):
