@@ -109,6 +109,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
         if self.publisher_logger:
             for event in events:
                 if self.output_json:
-                    self.publisher_logger.info(json.dumps(event.as_dict()))
+                    self.publisher_logger.info(json.dumps(event.as_dict(),
+                                                          default=str))
                 else:
                     self.publisher_logger.info(event.as_dict())
