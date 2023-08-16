@@ -16,13 +16,17 @@
 
 import cotyledon
 from cotyledon import oslo_config_glue
+from oslo_log import log
 
 from ceilometer import notification
 from ceilometer import service
 
+LOG = log.getLogger(__name__)
+
 
 def main():
     conf = service.prepare_service()
+    conf.log_opt_values(LOG, log.DEBUG)
 
     sm = cotyledon.ServiceManager()
     sm.add(notification.NotificationService,
