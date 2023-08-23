@@ -137,8 +137,12 @@ function ceilometer_create_accounts {
 
 function install_gnocchi {
     echo_summary "Installing Gnocchi"
-    if [ $GNOCCHI_GIT_PATH ]; then
-        pip_install -e $GNOCCHI_GIT_PATH[redis,${DATABASE_TYPE},keystone] uwsgi
+    if use_library_from_git "gnocchi"; then
+        # we need to git clone manually to ensure that the git repo is added
+        # to the global git repo list and ensure its cloned as the current user
+        # not as root.
+        git_clone ${GNOCCHI_REPO} ${GNOCCHI_DIR} ${GNOCCHI_BRANCH}
+        pip_install -e ${GNOCCHI_DIR}[redis,${DATABASE_TYPE},keystone] uwsgi
     else
         pip_install gnocchi[redis,${DATABASE_TYPE},keystone] uwsgi
     fi
