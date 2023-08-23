@@ -15,6 +15,7 @@ import itertools
 import os
 import re
 
+from ceilometer import cache_utils
 from oslo_config import cfg
 from oslo_log import log
 from stevedore import extension
@@ -165,8 +166,22 @@ class MeterDefinition(object):
             # NOTE(sileht): Transform the sample with multiple values per
             # attribute into multiple samples with one value per attribute.
             for values in zip(*samples_values):
-                yield dict((attributes[idx], value)
-                           for idx, value in enumerate(values))
+                sample = dict((attributes[idx], value)
+                              for idx, value in enumerate(values))
+
+                # populate user_name and project_name fields in the sample
+                # created from notifications
+                if sample['user_id']:
+                    sample['user_name'] = \
+                        cache_utils.resolve_uuid_from_cache(
+                            self.conf, 'users', sample['user_id']
+                        )
+                if sample['project_id']:
+                    sample['project_name'] = \
+                        cache_utils.resolve_uuid_from_cache(
+                            self.conf, 'projects', sample['project_id']
+                        )
+                yield sample
         else:
             yield sample
 
