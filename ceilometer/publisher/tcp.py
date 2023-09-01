@@ -32,35 +32,25 @@ LOG = log.getLogger(__name__)
 class TCPPublisher(publisher.ConfigPublisherBase):
     def __init__(self, conf, parsed_url):
         super(TCPPublisher, self).__init__(conf, parsed_url)
-        self.host, self.port = netutils.parse_host_port(
+        self.inet_addr = netutils.parse_host_port(
             parsed_url.netloc, default_port=4952)
-        addrinfo = None
-        try:
-            addrinfo = socket.getaddrinfo(self.host, None, socket.AF_INET6,
-                                          socket.SOCK_STREAM)[0]
-        except socket.gaierror:
-            try:
-                addrinfo = socket.getaddrinfo(self.host, None, socket.AF_INET,
-                                              socket.SOCK_STREAM)[0]
-            except socket.gaierror:
-                pass
-        if addrinfo:
-            self.addr_family = addrinfo[0]
-        else:
-            LOG.warning(
-                "Cannot resolve host %s, creating AF_INET socket...",
-                self.host)
-            self.addr_family = socket.AF_INET
-        try:
-            self.create_and_connect()
-        except Exception:
-            LOG.error(_("Unable to connect to the "
-                      "remote endpoint"))
+        self.socket = None
+        self.connect_socket()
 
-    def create_and_connect(self):
-        self.socket = socket.socket(self.addr_family,
-                                    socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
+    def connect_socket(self):
+        try:
+            self.socket = socket.create_connection(self.inet_addr)
+            return True
+        except socket.gaierror:
+            LOG.error(_("Unable to resolv the remote %(host)s",
+                        {'host': self.inet_addr[0],
+                         'port': self.inet_addr[1]}))
+        except TimeoutError:
+            LOG.error(_("Unable to connect to the remote endpoint "
+                        "%(host)s:%(port)d. The connection timed out.",
+                        {'host': self.inet_addr[0],
+                         'port': self.inet_addr[1]}))
+        return False
 
     def publish_samples(self, samples):
         """Send a metering message for publishing
@@ -71,24 +61,34 @@ class TCPPublisher(publisher.ConfigPublisherBase):
         for sample in samples:
             msg = utils.meter_message_from_counter(
                 sample, self.conf.publisher.telemetry_secret, self.conf.host)
-            host = self.host
-            port = self.port
             LOG.debug("Publishing sample %(msg)s over TCP to "
-                      "%(host)s:%(port)d", {'msg': msg, 'host': host,
-                                            'port': port})
+                      "%(host)s:%(port)d",
+                      {'msg': msg,
+                       'host': self.inet_addr[0],
+                       'port': self.inet_addr[1]})
             encoded_msg = msgpack.dumps(msg, use_bin_type=True)
             msg_len = len(encoded_msg).to_bytes(8, 'little')
-            try:
-                self.socket.send(msg_len + encoded_msg)
-            except Exception:
-                LOG.error(_("Unable to send sample over TCP,"
-                          "trying to reconnect and resend the message"))
-                self.create_and_connect()
+            if self.socket:
                 try:
                     self.socket.send(msg_len + encoded_msg)
-                except Exception:
-                    LOG.exception(_("Unable to reconnect and resend"
-                                  "sample over TCP"))
+                    continue
+                except OSError:
+                    LOG.warning(_("Unable to send sample over TCP, trying "
+                                  "to reconnect and resend the message"))
+            if self.connect_socket():
+                try:
+                    self.socket.send(msg_len + encoded_msg)
+                    continue
+                except OSError:
+                    pass
+            LOG.error(_("Unable to reconnect and resend sample over TCP"))
+            # NOTE (jokke): We do not handle exceptions in the calling code
+            # so raising the exception from here needs quite a bit more work.
+            # Same time we don't want to spam the retry messages as it's
+            # unlikely to change between iterations on this loop. 'break'
+            # rather than 'return' even the end result is the same feels
+            # more appropriate for now.
+            break
 
     def publish_events(self, events):
         """Send an event message for publishing
