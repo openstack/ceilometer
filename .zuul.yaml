@@ -46,8 +46,14 @@
             voting: false
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars:
+              devstack_localrc:
+                GLOBAL_VENV: False
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars:
+              devstack_localrc:
+                GLOBAL_VENV: False
     gate:
       jobs:
         - grenade-ceilometer
@@ -59,5 +65,11 @@
             voting: false
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars:
+              devstack_localrc:
+                GLOBAL_VENV: False
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars:
+              devstack_localrc:
+                GLOBAL_VENV: False
