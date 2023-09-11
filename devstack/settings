@@ -18,7 +18,7 @@ fi
 
 # Gnocchi default archive_policy for Ceilometer
 # TODO(sileht): when Gnocchi 4.0 is out use the tarball instead
-GNOCCHI_GIT_PATH=${GNOCCHI_GIT_PATH:-git+https://github.com/gnocchixyz/gnocchi.git@4.4.1#egg=gnocchi}
+GNOCCHI_GIT_PATH=${GNOCCHI_GIT_PATH:-git+https://github.com/gnocchixyz/gnocchi.git@4.4.2#egg=gnocchi}
 if [ -n "$GNOCCHI_ARCHIVE_POLICY_TEMPEST" ]; then
     GNOCCHI_ARCHIVE_POLICY=$GNOCCHI_ARCHIVE_POLICY_TEMPEST
 else
