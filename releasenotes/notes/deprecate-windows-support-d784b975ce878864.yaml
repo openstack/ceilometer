@@ -1,0 +1,6 @@
+---
+deprecations:
+  - |
+    Support for running Ceilometer in Windows operating systems has been
+    deprecated because of retirement of the Winstackers project. Because of
+    this, Hyper-V inspector is also deprecated.

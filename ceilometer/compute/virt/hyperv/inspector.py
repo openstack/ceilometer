@@ -16,6 +16,7 @@
 import collections
 import functools
 import sys
+import warnings
 
 from os_win import exceptions as os_win_exc
 from os_win import utilsfactory
@@ -81,6 +82,9 @@ class HyperVInspector(virt_inspector.Inspector):
         super(HyperVInspector, self).__init__(conf)
         self._utils = utilsfactory.get_metricsutils()
         self._host_max_cpu_clock = self._compute_host_max_cpu_clock()
+
+        warnings.warn('Support for HyperV is deprecated.',
+                      category=DeprecationWarning, stacklevel=3)
 
     def _compute_host_max_cpu_clock(self):
         hostutils = utilsfactory.get_hostutils()

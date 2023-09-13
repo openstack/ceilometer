@@ -93,6 +93,8 @@ def main():
     # As a consequence, we can't use oslo_config_glue.setup() on Windows,
     # because cotyledon.ServiceManager objects are not picklable.
     if os.name == 'nt':
+        LOG.warning("Support for Ceilometer on Windows operating systems is"
+                    "deprecated.")
         sm.add(create_polling_service)
     else:
         conf = _prepare_config()
