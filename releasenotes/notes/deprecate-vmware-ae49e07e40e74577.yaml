@@ -1,0 +1,6 @@
+---
+deprecations:
+  - |
+    Support for VMWare vSphere has been deprecated, because the vmwareapi
+    virt driver in nova has been marked experimental and may be removed in
+    a future release.

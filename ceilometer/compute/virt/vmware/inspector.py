@@ -15,6 +15,8 @@
 
 """Implementation of Inspector abstraction for VMware vSphere"""
 
+import warnings
+
 from oslo_config import cfg
 from oslo_utils import units
 
@@ -30,34 +32,53 @@ opt_group = cfg.OptGroup(name='vmware',
 OPTS = [
     cfg.HostAddressOpt('host_ip',
                        default='127.0.0.1',
+                       deprecated_for_removal=True,
+                       deprecated_reason='Support for VMWare vSphere has been '
+                                         'deprecated',
                        help='IP address of the VMware vSphere host.'),
     cfg.PortOpt('host_port',
                 default=443,
+                deprecated_for_removal=True,
+                deprecated_reason='Support for VMWare vSphere is deprecated',
                 help='Port of the VMware vSphere host.'),
     cfg.StrOpt('host_username',
                default='',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for VMWare vSphere is deprecated',
                help='Username of VMware vSphere.'),
     cfg.StrOpt('host_password',
                default='',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for VMWare vSphere is deprecated',
                help='Password of VMware vSphere.',
                secret=True),
     cfg.StrOpt('ca_file',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for VMWare vSphere is deprecated',
                help='CA bundle file to use in verifying the vCenter server '
                     'certificate.'),
     cfg.BoolOpt('insecure',
                 default=False,
+                deprecated_for_removal=True,
+                deprecated_reason='Support for VMWare vSphere is deprecated',
                 help='If true, the vCenter server certificate is not '
                      'verified. If false, then the default CA truststore is '
                      'used for verification. This option is ignored if '
                      '"ca_file" is set.'),
     cfg.IntOpt('api_retry_count',
                default=10,
+               deprecated_for_removal=True,
+               deprecated_reason='Support for VMWare vSphere is deprecated',
                help='Number of times a VMware vSphere API may be retried.'),
     cfg.FloatOpt('task_poll_interval',
+                 deprecated_for_removal=True,
+                 deprecated_reason='Support for VMWare vSphere is deprecated',
                  default=0.5,
                  help='Sleep time in seconds for polling an ongoing async '
                       'task.'),
     cfg.StrOpt('wsdl_location',
+               deprecated_for_removal=True,
+               deprecated_reason='Support for VMWare vSphere is deprecated',
                help='Optional vim service WSDL location '
                     'e.g http://<server>/vimService.wsdl. '
                     'Optional over-ride to default location for bug '
@@ -97,6 +118,9 @@ class VsphereInspector(virt_inspector.Inspector):
         super(VsphereInspector, self).__init__(conf)
         self._ops = vsphere_operations.VsphereOperations(
             get_api_session(self.conf), 1000)
+
+        warnings.warn('Support for VMWare vSphere is deprecated.',
+                      category=DeprecationWarning, stacklevel=3)
 
     def _get_vm_mobj_not_power_off_or_raise(self, instance):
         vm_mobj = self._ops.get_vm_mobj(instance.id)
