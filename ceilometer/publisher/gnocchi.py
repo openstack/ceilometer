@@ -18,6 +18,7 @@ import itertools
 import json
 import operator
 import pkg_resources
+import tenacity
 import threading
 
 from gnocchiclient import exceptions as gnocchi_exc
@@ -213,12 +214,27 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         self._gnocchi_project_id_lock = threading.Lock()
         self._gnocchi_resource_lock = LockedDefaultDict(threading.Lock)
 
-        self._gnocchi = gnocchi_client.get_gnocchiclient(
-            conf, request_timeout=timeout)
+        try:
+            self._gnocchi = self._get_gnocchi_client(conf, timeout)
+        except tenacity.RetryError as e:
+            raise e.last_attempt._exception from None
+
         self._already_logged_event_types = set()
         self._already_logged_metric_names = set()
 
         self._already_configured_archive_policies = False
+
+    @tenacity.retry(
+        stop=tenacity.stop_after_attempt(10),
+        wait=tenacity.wait_fixed(5),
+        retry=(
+            tenacity.retry_if_exception_type(ka_exceptions.ServiceUnavailable)
+            | tenacity.retry_if_exception_type(ka_exceptions.DiscoveryFailure)
+            | tenacity.retry_if_exception_type(ka_exceptions.ConnectTimeout)
+        ),
+        reraise=False)
+    def _get_gnocchi_client(self, conf, timeout):
+        return gnocchi_client.get_gnocchiclient(conf, request_timeout=timeout)
 
     @staticmethod
     def _load_definitions(conf, archive_policy_override,
