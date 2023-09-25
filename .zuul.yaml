@@ -5,7 +5,8 @@
     required-projects:
       - opendev.org/openstack/grenade
       - opendev.org/openstack/ceilometer
-      - gnocchixyz/gnocchi
+      - name: gnocchixyz/gnocchi
+        override-checkout: 4.5.1
     vars:
       configure_swap_size: 8192
       grenade_devstack_localrc:
@@ -40,23 +41,47 @@
         - telemetry-dsvm-integration-centos-9s:
             irrelevant-files: *ceilometer-irrelevant-files
             voting: false
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
             voting: false
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
     gate:
       jobs:
         - grenade-ceilometer
         - telemetry-dsvm-integration-centos-9s:
             irrelevant-files: *ceilometer-irrelevant-files
             voting: false
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
             voting: false
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
+            required-projects:
+              - name: gnocchixyz/gnocchi
+                override-checkout: 4.5.1
