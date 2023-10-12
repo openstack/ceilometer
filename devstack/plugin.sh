@@ -34,7 +34,7 @@
 # of Ceilometer (see within for additional settings):
 #
 #   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 600.
-#   CEILOMETER_BACKEND:            Database backend (e.g. 'gnocchi', 'none')
+#   CEILOMETER_BACKENDS:           List of database backends (e.g. 'gnocchi', 'sg-core', 'gnocchi,sg-core', 'none')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
 
@@ -88,7 +88,7 @@ function _ceilometer_install_redis {
 function _ceilometer_prepare_coordination {
     if echo $CEILOMETER_COORDINATION_URL | grep -q '^memcached:'; then
         install_package memcached
-    elif [[ "${CEILOMETER_COORDINATOR_URL%%:*}" == "redis" || "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" || "${CEILOMETER_BACKEND}" == "gnocchi" ]]; then
+    elif [[ "${CEILOMETER_COORDINATOR_URL%%:*}" == "redis" || "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" || "${CEILOMETER_BACKENDS}" =~ "gnocchi" ]]; then
         _ceilometer_install_redis
     fi
 }
@@ -121,7 +121,7 @@ function ceilometer_create_accounts {
         get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
     fi
 
-    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" == "gnocchi" ]; then
+    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]]; then
         create_service_user "gnocchi"
         local gnocchi_service=$(get_or_create_service "gnocchi" \
             "metric" "OpenStack Metric Service")
@@ -209,13 +209,26 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
-    if [ "$CEILOMETER_BACKEND" = 'none' ] ; then
-        echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKEND to select one."
-    elif [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-        sed -i "s/gnocchi:\/\//gnocchi:\/\/?archive_policy=${GNOCCHI_ARCHIVE_POLICY}\&filter_project=service/" $CEILOMETER_CONF_DIR/event_pipeline.yaml $CEILOMETER_CONF_DIR/pipeline.yaml
-        ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
+    if [ "$CEILOMETER_BACKENDS" = 'none' ] ; then
+        echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKENDS to select one."
     else
-        die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
+	head -n -1 $CEILOMETER_CONF_DIR/pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/pipeline.yaml
+	head -n -1 $CEILOMETER_CONF_DIR/event_pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/event_pipeline.yaml
+
+	BACKENDS=$(echo $CEILOMETER_BACKENDS | tr "," "\n")
+	for CEILOMETER_BACKEND in ${BACKENDS[@]}
+	do
+	    if [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
+		echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
+		echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/pipeline.yaml
+		! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
+	    elif [ "$CEILOMETER_BACKEND" = 'sg-core' ] ; then
+		echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
+		echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/pipeline.yaml
+	    else
+		die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
+	    fi
+	done
     fi
 
 }
@@ -303,15 +316,15 @@ function install_ceilometer {
         _ceilometer_prepare_coordination
     fi
 
-    ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" = 'gnocchi' ] && install_gnocchi
+    ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]] && install_gnocchi
 
     if is_service_enabled ceilometer-acompute ; then
         _ceilometer_prepare_virt_drivers
     fi
 
-    case $CEILOMETER_BACKEND in
-        gnocchi) extra=gnocchi;;
-    esac
+    if [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]]; then
+	extra=gnocchi
+    fi
     setup_develop $CEILOMETER_DIR $extra
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
 }
@@ -319,7 +332,7 @@ function install_ceilometer {
 # start_ceilometer() - Start running processes, including screen
 function start_ceilometer {
 
-    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [ "$CEILOMETER_BACKEND" = "gnocchi" ] ; then
+    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]] ; then
         run_process gnocchi-api "$CEILOMETER_BIN_DIR/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
         run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
