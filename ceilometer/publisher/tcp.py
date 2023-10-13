@@ -42,14 +42,19 @@ class TCPPublisher(publisher.ConfigPublisherBase):
             self.socket = socket.create_connection(self.inet_addr)
             return True
         except socket.gaierror:
-            LOG.error(_("Unable to resolv the remote %(host)s",
-                        {'host': self.inet_addr[0],
-                         'port': self.inet_addr[1]}))
+            LOG.error(_("Unable to resolv the remote %(host)s") %
+                      {'host': self.inet_addr[0],
+                       'port': self.inet_addr[1]})
         except TimeoutError:
             LOG.error(_("Unable to connect to the remote endpoint "
-                        "%(host)s:%(port)d. The connection timed out.",
-                        {'host': self.inet_addr[0],
-                         'port': self.inet_addr[1]}))
+                        "%(host)s:%(port)d. The connection timed out.") %
+                      {'host': self.inet_addr[0],
+                       'port': self.inet_addr[1]})
+        except ConnectionRefusedError:
+            LOG.error(_("Unable to connect to the remote endpoint "
+                        "%(host)s:%(port)d. Connection refused.") %
+                      {'host': self.inet_addr[0],
+                       'port': self.inet_addr[1]})
         return False
 
     def publish_samples(self, samples):
