@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Remove integration with the inactive Monasca project

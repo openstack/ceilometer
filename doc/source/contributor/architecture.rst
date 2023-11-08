@@ -176,7 +176,6 @@ Currently, processed data can be published using different transport options:
    mobile developers;
 7. https, which is http over SSL and targets a REST interface;
 8. prometheus, which publishes samples to Prometheus Pushgateway;
-9. monasca, which publishes samples to the Monasca API.
 
 
 Storing/Accessing the data

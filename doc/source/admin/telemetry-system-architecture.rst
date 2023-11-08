@@ -48,8 +48,6 @@ The list of supported base back ends for measurements:
 
 -  `gnocchi <https://gnocchi.osci.io/>`__
 
--  `Monasca <https://docs.openstack.org/monasca-api/latest/>`__
-
 The list of supported base back ends for alarms:
 
 -  `MySQL <http://www.mysql.com/>`__
