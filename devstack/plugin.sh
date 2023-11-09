@@ -209,7 +209,8 @@ function _ceilometer_configure_cache_backend {
 
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
-    if [ "$CEILOMETER_BACKENDS" = 'none' ] ; then
+    # delete any "," characters used for delimiting individual backends before checking for "none"
+    if [ $(echo "$CEILOMETER_BACKENDS" | tr -d ",") = 'none' ] ; then
         echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKENDS to select one."
     else
 	head -n -1 $CEILOMETER_CONF_DIR/pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/pipeline.yaml
