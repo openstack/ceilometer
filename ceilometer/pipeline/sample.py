@@ -38,10 +38,15 @@ class SampleEndpoint(base.NotificationEndpoint):
     def process_notifications(self, priority, notifications):
         for message in notifications:
             try:
+                LOG.debug("Processing sample notification [%s] for publisher "
+                          "[%s] with priority [%s] using the agent [%s].",
+                          message, self.publisher, priority, self)
                 with self.publisher as p:
                     p(list(self.build_sample(message)))
-            except Exception:
-                LOG.error('Fail to process notification', exc_info=True)
+            except Exception as e:
+                LOG.error('Fail to process notification message [%s]'
+                          % message, exc_info=True)
+                raise e
 
     def build_sample(notification):
         """Build sample from provided notification."""
