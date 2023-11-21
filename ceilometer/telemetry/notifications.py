@@ -31,11 +31,16 @@ class TelemetryIpc(endpoint.SampleEndpoint):
                 unit=sample_dict['counter_unit'],
                 volume=sample_dict['counter_volume'],
                 user_id=sample_dict['user_id'],
-                user_name=sample_dict['user_name'],
                 project_id=sample_dict['project_id'],
-                project_name=sample_dict['project_name'],
                 resource_id=sample_dict['resource_id'],
                 timestamp=sample_dict['timestamp'],
                 resource_metadata=sample_dict['resource_metadata'],
                 source=sample_dict['source'],
-                id=sample_dict['message_id'])
+                id=sample_dict['message_id'],
+
+                # Project name and username might not be set, depending on the
+                # configuration `tenant_name_discovery`. Therefore, we cannot
+                # assume that they exist in the sample dictionary.
+                user_name=sample_dict.get('user_name'),
+                project_name=sample_dict.get('project_name')
+            )
