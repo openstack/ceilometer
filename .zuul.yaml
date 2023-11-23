@@ -38,28 +38,41 @@
         - grenade-ceilometer
         - telemetry-dsvm-integration-centos-8s:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: &integration-tests-vars
+              tempest_test_regex: telemetry_tempest_plugin(?!.scenario.test_telemetry_integration_prometheus)
         - telemetry-dsvm-integration-centos-8s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-centos-9s:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
     gate:
       jobs:
         - grenade-ceilometer
         - telemetry-dsvm-integration-centos-8s:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-centos-8s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-centos-9s:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
+            vars: *integration-tests-vars
