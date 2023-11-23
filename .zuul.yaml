@@ -44,22 +44,27 @@
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: &integration-tests-vars
+              tempest_test_regex: telemetry_tempest_plugin(?!.scenario.test_telemetry_integration_prometheus)
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
             voting: false
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
     gate:
       jobs:
         - grenade-ceilometer
@@ -69,19 +74,23 @@
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-centos-9s-fips:
             irrelevant-files: *ceilometer-irrelevant-files
             voting: false
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration:
             irrelevant-files: *ceilometer-irrelevant-files
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
         - telemetry-dsvm-integration-ipv6-only:
             irrelevant-files: *ceilometer-irrelevant-files
             required-projects:
               - name: gnocchixyz/gnocchi
                 override-checkout: 4.5.1
+            vars: *integration-tests-vars
