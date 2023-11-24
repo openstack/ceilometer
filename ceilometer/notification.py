@@ -132,7 +132,11 @@ class NotificationService(cotyledon.Service):
 
         endpoints = []
         for pipe_mgr in self.managers:
-            endpoints.extend(pipe_mgr.get_main_endpoints())
+            LOG.debug("Loading manager endpoints for [%s].", pipe_mgr)
+            endpoint = pipe_mgr.get_main_endpoints()
+            LOG.debug("Loaded endpoints [%s] for manager [%s].",
+                      endpoint, pipe_mgr)
+            endpoints.extend(endpoint)
         targets = self.get_targets()
 
         urls = self.conf.notification.messaging_urls or [None]
