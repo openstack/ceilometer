@@ -215,6 +215,11 @@ class PollingTask(object):
 
                             # Try to resolve project UUIDs from cache first,
                             # and then keystone
+                            LOG.debug("Ceilometer is configured to resolve "
+                                      "project IDs to name; loading the "
+                                      "project name for project ID [%s] in "
+                                      "sample [%s].", sample.project_id,
+                                      sample)
                             if sample.project_id:
                                 sample.project_name = \
                                     cache_utils.resolve_uuid_from_cache(
@@ -225,6 +230,12 @@ class PollingTask(object):
 
                             # Try to resolve user UUIDs from cache first,
                             # and then keystone
+
+                            LOG.debug("Ceilometer is configured to resolve "
+                                      "user IDs to name; loading the "
+                                      "user name for user ID [%s] in "
+                                      "sample [%s].", sample.user_id,
+                                      sample)
                             if sample.user_id:
                                 sample.user_name = \
                                     cache_utils.resolve_uuid_from_cache(
@@ -232,6 +243,10 @@ class PollingTask(object):
                                         "users",
                                         sample.user_id
                                     )
+
+                            LOG.debug("Final sample generated after loading "
+                                      "the project and user names bases on "
+                                      "the IDs [%s].", sample)
 
                         sample_dict = (
                             publisher_utils.meter_message_from_counter(
