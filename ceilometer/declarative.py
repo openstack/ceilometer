@@ -195,5 +195,5 @@ def load_definitions(conf, defaults, config_file, fallback_file=None):
                   "Using default config.")
         definition_cfg = defaults
 
-    LOG.info("Definitions: %s", definition_cfg)
+    LOG.debug("Definitions: %s", definition_cfg)
     return definition_cfg

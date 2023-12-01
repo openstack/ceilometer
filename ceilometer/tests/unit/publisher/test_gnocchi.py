@@ -343,6 +343,15 @@ class PublisherTest(base.BaseTestCase):
             'Filtered project [service] not found in keystone, ignoring the '
             'filter_project option')
 
+    @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
+                '._get_gnocchi_client')
+    def test_get_gnocchi_client(self, gnocchi_cli):
+        url = netutils.urlsplit("gnocchi://")
+        gnocchi_cli.side_effect = ka_exceptions.DiscoveryFailure
+        cfg = self.conf.conf
+        publisher = gnocchi.GnocchiPublisher
+        self.assertRaises(ka_exceptions.DiscoveryFailure, publisher, cfg, url)
+
     def test_activity_filter_match_swift_event(self):
         self.samples[0].name = 'storage.objects.outgoing.bytes'
         self.samples[0].resource_id = 'a2d42c23-d518-46b6-96ab-3fba2e146859'
