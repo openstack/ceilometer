@@ -15,6 +15,7 @@
 
 from ceilometer import cache_utils
 from ceilometer import service as ceilometer_service
+from oslo_cache.backends import dictionary
 from oslo_cache import core as cache
 from oslo_config import fixture as config_fixture
 from oslotest import base
@@ -26,7 +27,6 @@ class CacheConfFixture(config_fixture.Config):
         self.conf = ceilometer_service.\
             prepare_service(argv=[], config_files=[])
         cache.configure(self.conf)
-        self.config(enabled=True, group='cache')
 
 
 class TestOsloCache(base.BaseTestCase):
@@ -37,6 +37,7 @@ class TestOsloCache(base.BaseTestCase):
 
         dict_conf_fixture = CacheConfFixture(conf)
         self.useFixture(dict_conf_fixture)
+        dict_conf_fixture.config(enabled=True, group='cache')
         dict_conf_fixture.config(expiration_time=600,
                                  backend='oslo_cache.dict',
                                  group='cache')
@@ -47,19 +48,53 @@ class TestOsloCache(base.BaseTestCase):
         # incorrect config
         faulty_conf_fixture = CacheConfFixture(conf)
         self.useFixture(faulty_conf_fixture)
+        faulty_conf_fixture.config(enabled=True, group='cache')
         faulty_conf_fixture.config(expiration_time=600,
                                    backend='dogpile.cache.memcached',
                                    group='cache',
                                    enable_retry_client='true')
-        self.faulty_cache_conf = faulty_conf_fixture.conf
+        self.faulty_conf = faulty_conf_fixture.conf
 
-        self.no_cache_conf = ceilometer_service.\
-            prepare_service(argv=[], config_files=[])
+        no_cache_fixture = CacheConfFixture(conf)
+        self.useFixture(no_cache_fixture)
+        # no_cache_fixture.config()
+        self.no_cache_conf = no_cache_fixture.conf
 
     def test_get_cache_region(self):
         self.assertIsNotNone(cache_utils.get_cache_region(self.dict_conf))
 
+        # having invalid configurations will return None
+        with self.assertLogs('ceilometer.cache_utils', level='ERROR') as logs:
+            self.assertIsNone(
+                cache_utils.get_cache_region(self.faulty_conf)
+            )
+            cache_configure_failed = logs.output
+            self.assertIn(
+                'ERROR:ceilometer.cache_utils:'
+                'failed to configure oslo_cache: '
+                'Retry client is only supported by '
+                'the \'dogpile.cache.pymemcache\' backend.',
+                cache_configure_failed)
+
     def test_get_client(self):
-        self.assertIsNotNone(cache_utils.get_client(self.dict_conf))
-        self.assertIsNone(cache_utils.get_client(self.no_cache_conf))
-        self.assertIsNone(cache_utils.get_client(self.faulty_cache_conf))
+        dict_cache_client = cache_utils.get_client(self.dict_conf)
+        self.assertIsNotNone(dict_cache_client)
+        self.assertIsInstance(dict_cache_client.region.backend,
+                              dictionary.DictCacheBackend)
+
+        no_cache_config = cache_utils.get_client(self.no_cache_conf)
+        self.assertIsNotNone(no_cache_config)
+        self.assertIsInstance(dict_cache_client.region.backend,
+                              dictionary.DictCacheBackend)
+
+        # having invalid configurations will return None
+        with self.assertLogs('ceilometer.cache_utils', level='ERROR') as logs:
+            cache_client = cache_utils.get_client(self.faulty_conf)
+            cache_configure_failed = logs.output
+            self.assertIsNone(cache_client)
+            self.assertIn(
+                'ERROR:ceilometer.cache_utils:'
+                'failed to configure oslo_cache: '
+                'Retry client is only supported by '
+                'the \'dogpile.cache.pymemcache\' backend.',
+                cache_configure_failed)

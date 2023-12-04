@@ -68,15 +68,15 @@ POLLING_OPTS = [
                          "to created pollsters."),
     cfg.BoolOpt('tenant_name_discovery',
                 default=False,
-                help="Identify project and user names from polled samples"
-                     "By default, collecting these values is disabled due"
-                     "to the fact that it could overwhelm keystone service"
-                     "with lots of continuous requests depending upon the"
-                     "number of projects, users and samples polled from"
-                     "the environment. While using this feature, it is"
-                     "recommended that ceilometer be configured with a"
-                     "caching backend to reduce the number of calls"
-                     "made to keystone"),
+                help='Identify project and user names from polled samples. '
+                     'By default, collecting these values is disabled due '
+                     'to the fact that it could overwhelm keystone service'
+                     'with lots of continuous requests depending upon the '
+                     'number of projects, users and samples polled from '
+                     'the environment. While using this feature, it is '
+                     'recommended that ceilometer be configured with a '
+                     'caching backend to reduce the number of calls '
+                     'made to keystone.'),
 ]
 
 
@@ -152,7 +152,7 @@ class PollingTask(object):
 
         self.ks_client = self.manager.keystone
 
-        self.cache_client = cache_utils.get_client(self.manager.conf)
+        self._cache = cache_utils.get_client(self.manager.conf)
 
     def add(self, pollster, source):
         self.pollster_matches[source.name].add(pollster)
@@ -211,7 +211,10 @@ class PollingTask(object):
                         # Note(yuywz): Unify the timestamp of polled samples
                         sample.set_timestamp(polling_timestamp)
 
-                        if self.manager.conf.tenant_name_discovery:
+                        if (
+                            self.manager.conf.polling.tenant_name_discovery and
+                            self._cache
+                        ):
 
                             # Try to resolve project UUIDs from cache first,
                             # and then keystone
@@ -222,8 +225,7 @@ class PollingTask(object):
                                       sample)
                             if sample.project_id:
                                 sample.project_name = \
-                                    cache_utils.resolve_uuid_from_cache(
-                                        self.manager.conf,
+                                    self._cache.resolve_uuid_from_cache(
                                         "projects",
                                         sample.project_id
                                     )
@@ -238,8 +240,7 @@ class PollingTask(object):
                                       sample)
                             if sample.user_id:
                                 sample.user_name = \
-                                    cache_utils.resolve_uuid_from_cache(
-                                        self.manager.conf,
+                                    self._cache.resolve_uuid_from_cache(
                                         "users",
                                         sample.user_id
                                     )

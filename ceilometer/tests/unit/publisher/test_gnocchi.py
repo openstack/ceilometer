@@ -710,6 +710,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
         for call in expected_calls:
             self.assertIn(call, fakeclient.mock_calls)
 
+    @mock.patch('ceilometer.cache_utils.get_client', mock.Mock())
     @mock.patch('ceilometer.publisher.gnocchi.LOG')
     @mock.patch('gnocchiclient.v1.client.Client')
     def test_workflow(self, fakeclient_cls, logger):
