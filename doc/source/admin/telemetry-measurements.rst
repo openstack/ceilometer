@@ -338,7 +338,7 @@ The following IPMI sensor meters are recorded:
 | .temperature     |       |      | ature    | n, Pollster | ing from sensor  |
 |                  |       |      | sensor   |             |                  |
 +------------------+-------+------+----------+-------------+------------------+
-| hardware.ipmi\   | Gauge | W    | current  | Notificatio\| Current reading  |
+| hardware.ipmi\   | Gauge | A    | current  | Notificatio\| Current reading  |
 | .current         |       |      | sensor   | n, Pollster | from sensor      |
 +------------------+-------+------+----------+-------------+------------------+
 | hardware.ipmi\   | Gauge | V    | voltage  | Notificatio\| Voltage reading  |
