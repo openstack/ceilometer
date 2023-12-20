@@ -13,6 +13,7 @@
 # under the License.
 
 import re
+import warnings
 
 from urllib import parse as urlparse
 
@@ -57,6 +58,11 @@ class OpencontrailDriver(driver.Driver):
       opencontrail://localhost:8081/?resource=fip_stats_list&
       virtual_network=default-domain:openstack:public
     """
+    def __init__(self, conf):
+        warnings.warn('Support for OpenContrail is deprecated.',
+                      category=DeprecationWarning, stacklevel=3)
+        super(OpencontrailDriver, self).__init__(conf)
+
     def _prepare_cache(self, endpoint, params, cache):
 
         if 'network.statistics.opencontrail' in cache:

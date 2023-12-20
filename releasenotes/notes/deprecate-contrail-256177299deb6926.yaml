@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Support for OpenContrail, which is currently known as  Tungsten Fabric, has
+    been deprecated and will be removed in a future release.
