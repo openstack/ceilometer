@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Support for OpenDaylight has been deprecated and will be removed in
+    a future release.

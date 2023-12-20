@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import warnings
+
 from oslo_log import log
 from urllib import parse as urlparse
 
@@ -77,6 +79,11 @@ class OpenDayLightDriver(driver.Driver):
       http://127.0.0.1:8080/controller/nb/v2/statistics/default/flow
       http://127.0.0.1:8080/controller/nb/v2/statistics/egg/flow
     """
+    def __init__(self, conf):
+        warnings.warn('Support for OpenDaylight is deprecated.',
+                      category=DeprecationWarning, stacklevel=3)
+        super(OpenDayLightDriver, self).__init__(conf)
+
     def _prepare_cache(self, endpoint, params, cache):
 
         if 'network.statistics.opendaylight' in cache:
