@@ -283,8 +283,6 @@ function configure_ceilometer {
     iniset $CEILOMETER_CONF service_credentials region_name $REGION_NAME
     iniset $CEILOMETER_CONF service_credentials auth_url $KEYSTONE_SERVICE_URI
 
-    configure_auth_token_middleware $CEILOMETER_CONF ceilometer $CEILOMETER_AUTH_CACHE_DIR
-
     if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
         iniset $CEILOMETER_CONF DEFAULT hypervisor_inspector vsphere
         iniset $CEILOMETER_CONF vmware host_ip "$VMWAREAPI_IP"
@@ -302,9 +300,8 @@ function configure_ceilometer {
 
 # init_ceilometer() - Initialize etc.
 function init_ceilometer {
-    # Create cache dir
-    sudo install -d -o $STACK_USER $CEILOMETER_AUTH_CACHE_DIR
-    rm -f $CEILOMETER_AUTH_CACHE_DIR/*
+    # Nothing to do
+    :
 }
 
 # Install Ceilometer.
