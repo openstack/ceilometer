@@ -28,6 +28,10 @@ FAN_SENSOR_DATA = {
     'Fan': ipmi_test_data.FAN_DATA
 }
 
+FAN_SENSOR_DATA_PERCENT = {
+    'Fan': ipmi_test_data.FAN_DATA_PERCENT
+}
+
 VOLTAGE_SENSOR_DATA = {
     'Voltage': ipmi_test_data.VOLTAGE_DATA
 }
@@ -106,6 +110,20 @@ class TestFanSensorPollster(base.TestPollsterBase):
         self._test_get_samples()
 
         self._verify_metering(12, float(7140), self.CONF.host)
+
+
+class TestFanPercentSensorPollster(base.TestPollsterBase):
+
+    def fake_sensor_data(self, sensor_type):
+        return FAN_SENSOR_DATA_PERCENT
+
+    def make_pollster(self):
+        return sensor.FanSensorPollster(self.CONF)
+
+    def test_get_samples(self):
+        self._test_get_samples()
+
+        self._verify_metering(1, float(47.04), self.CONF.host)
 
 
 class TestCurrentSensorPollster(base.TestPollsterBase):
