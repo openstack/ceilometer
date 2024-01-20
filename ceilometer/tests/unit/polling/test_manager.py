@@ -18,6 +18,8 @@
 """Tests for ceilometer agent manager"""
 import copy
 import datetime
+import shutil
+import tempfile
 from unittest import mock
 
 import fixtures
@@ -869,7 +871,10 @@ class TestPollingAgentPartitioned(BaseAgent):
 
     def setUp(self):
         super(TestPollingAgentPartitioned, self).setUp()
-        self.CONF.set_override("backend_url", "zake://", "coordination")
+        self.tempdir = tempfile.mkdtemp()
+        self.CONF.set_override("backend_url", "file://%s" % self.tempdir,
+                               "coordination")
+        self.addCleanup(shutil.rmtree, self.tempdir, ignore_errors=True)
         self.hashring = mock.MagicMock()
         self.hashring.belongs_to_self = mock.MagicMock()
         self.hashring.belongs_to_self.return_value = True
