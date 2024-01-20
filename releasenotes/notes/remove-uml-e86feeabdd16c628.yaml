@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The ``[DEFAULT] virt_type`` option no longer supports ``uml``. UML support
+    by nova was removed in nova 23.3.0 release.
