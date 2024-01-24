@@ -212,23 +212,23 @@ function _ceilometer_configure_storage_backend {
     if [ "$CEILOMETER_BACKENDS" = 'none' ] ; then
         echo_summary "All Ceilometer backends seems disabled, set \$CEILOMETER_BACKENDS to select one."
     else
-	head -n -1 $CEILOMETER_CONF_DIR/pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/pipeline.yaml
-	head -n -1 $CEILOMETER_CONF_DIR/event_pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/event_pipeline.yaml
+        head -n -1 $CEILOMETER_CONF_DIR/pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/pipeline.yaml
+        head -n -1 $CEILOMETER_CONF_DIR/event_pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/event_pipeline.yaml
 
-	BACKENDS=$(echo $CEILOMETER_BACKENDS | tr "," "\n")
-	for CEILOMETER_BACKEND in ${BACKENDS[@]}
-	do
-	    if [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
-		echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
-		echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/pipeline.yaml
-		! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
-	    elif [ "$CEILOMETER_BACKEND" = 'sg-core' ] ; then
-		echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
-		echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/pipeline.yaml
-	    else
-		die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
-	    fi
-	done
+        BACKENDS=$(echo $CEILOMETER_BACKENDS | tr "," "\n")
+        for CEILOMETER_BACKEND in ${BACKENDS[@]}
+        do
+            if [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
+                echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
+                echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/pipeline.yaml
+                ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
+            elif [ "$CEILOMETER_BACKEND" = 'sg-core' ] ; then
+                echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
+                echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/pipeline.yaml
+            else
+                die $LINENO "Unable to configure unknown CEILOMETER_BACKEND $CEILOMETER_BACKEND"
+            fi
+        done
     fi
 
 }
@@ -323,7 +323,7 @@ function install_ceilometer {
     fi
 
     if [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]]; then
-	extra=gnocchi
+        extra=gnocchi
     fi
     setup_develop $CEILOMETER_DIR $extra
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
