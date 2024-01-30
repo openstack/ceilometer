@@ -14,22 +14,15 @@
 # under the License.
 
 """Simple wrapper for oslo_cache."""
-import uuid
-
-from ceilometer import keystone_client
 from keystoneauth1 import exceptions as ka_exceptions
 from oslo_cache import core as cache
 from oslo_cache import exception
 from oslo_log import log
-from oslo_utils.secretutils import md5
+
+from ceilometer import keystone_client
 
 # Default cache expiration period
 CACHE_DURATION = 600
-
-NAME_ENCODED = __name__.encode('utf-8')
-CACHE_NAMESPACE = uuid.UUID(
-    bytes=md5(NAME_ENCODED, usedforsecurity=False).digest()
-)
 
 LOG = log.getLogger(__name__)
 
@@ -101,9 +94,3 @@ def get_cache_region(conf):
 
     except exception.ConfigurationError as e:
         LOG.error("failed to configure oslo_cache: %s", str(e))
-
-
-def cache_key_mangler(key):
-    """Construct an opaque cache key."""
-
-    return uuid.uuid5(CACHE_NAMESPACE, key).hex
