@@ -33,7 +33,7 @@
 # Several variables set in the localrc section adjust common behaviors
 # of Ceilometer (see within for additional settings):
 #
-#   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 600.
+#   CEILOMETER_PIPELINE_INTERVAL:  Seconds between pipeline processing runs. Default 300.
 #   CEILOMETER_BACKENDS:           List of database backends (e.g. 'gnocchi', 'sg-core', 'gnocchi,sg-core', 'none')
 #   CEILOMETER_COORDINATION_URL:   URL for group membership service provided by tooz.
 #   CEILOMETER_EVENT_ALARM:        Set to True to enable publisher for event alarming
