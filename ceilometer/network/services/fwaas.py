@@ -39,7 +39,7 @@ class FirewallPollster(base.BaseServicesPollster):
 
         warnings.warn('Support for Neutron FWaaS has been deprecated '
                       'and will be removed in a future release.',
-                      category=DeprecationWarning, stacklevel=3)
+                      category=DeprecationWarning, stacklevel=2)
 
     @property
     def default_discovery(self):
@@ -86,7 +86,7 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
 
         warnings.warn('Support for Neutron FWaaS has been deprecated '
                       'and will be removed in a future release.',
-                      category=DeprecationWarning, stacklevel=3)
+                      category=DeprecationWarning, stacklevel=2)
 
     @property
     def default_discovery(self):

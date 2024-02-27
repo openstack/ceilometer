@@ -84,7 +84,7 @@ class HyperVInspector(virt_inspector.Inspector):
         self._host_max_cpu_clock = self._compute_host_max_cpu_clock()
 
         warnings.warn('Support for HyperV is deprecated.',
-                      category=DeprecationWarning, stacklevel=3)
+                      category=DeprecationWarning, stacklevel=2)
 
     def _compute_host_max_cpu_clock(self):
         hostutils = utilsfactory.get_hostutils()

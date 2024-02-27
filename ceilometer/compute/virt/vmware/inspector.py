@@ -120,7 +120,7 @@ class VsphereInspector(virt_inspector.Inspector):
             get_api_session(self.conf), 1000)
 
         warnings.warn('Support for VMWare vSphere is deprecated.',
-                      category=DeprecationWarning, stacklevel=3)
+                      category=DeprecationWarning, stacklevel=2)
 
     def _get_vm_mobj_not_power_off_or_raise(self, instance):
         vm_mobj = self._ops.get_vm_mobj(instance.id)

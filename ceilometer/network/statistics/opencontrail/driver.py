@@ -60,7 +60,7 @@ class OpencontrailDriver(driver.Driver):
     """
     def __init__(self, conf):
         warnings.warn('Support for OpenContrail is deprecated.',
-                      category=DeprecationWarning, stacklevel=3)
+                      category=DeprecationWarning, stacklevel=2)
         super(OpencontrailDriver, self).__init__(conf)
 
     def _prepare_cache(self, endpoint, params, cache):
