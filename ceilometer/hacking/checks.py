@@ -38,7 +38,7 @@ def no_log_warn(logical_line):
     C301
     """
     if logical_line.startswith('LOG.warn('):
-        yield(0, 'C301 Use LOG.warning() rather than LOG.warn()')
+        yield (0, 'C301 Use LOG.warning() rather than LOG.warn()')
 
 
 @core.flake8ext
@@ -52,5 +52,5 @@ def no_os_popen(logical_line):
     """
 
     if 'os.popen(' in logical_line:
-        yield(0, 'C302 Deprecated library function os.popen(). '
-                 'Replace it using subprocess module. ')
+        yield (0, 'C302 Deprecated library function os.popen(). '
+                  'Replace it using subprocess module. ')

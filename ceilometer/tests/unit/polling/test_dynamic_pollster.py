@@ -1618,7 +1618,7 @@ class TestDynamicPollster(base.BaseTestCase):
         request_args = pollster.definitions.sample_gatherer\
             .create_request_arguments(pollster.definitions.configurations)
 
-        self.assertTrue("headers" in request_args)
+        self.assertIn("headers", request_args)
         self.assertEqual(2, len(request_args["headers"]))
 
         self.assertEqual(['header1', 'header2'],
@@ -1629,7 +1629,7 @@ class TestDynamicPollster(base.BaseTestCase):
                          list(map(lambda h: list(h.values())[0],
                                   request_args["headers"])))
 
-        self.assertTrue("authenticated" not in request_args)
+        self.assertNotIn("authenticated", request_args)
 
     def test_create_request_arguments_PollsterSampleGatherer(self):
         pollster_definition = copy.deepcopy(
@@ -1644,8 +1644,8 @@ class TestDynamicPollster(base.BaseTestCase):
         request_args = pollster.definitions.sample_gatherer\
             .create_request_arguments(pollster.definitions.configurations)
 
-        self.assertTrue("headers" in request_args)
-        self.assertTrue("authenticated" in request_args)
+        self.assertIn("headers", request_args)
+        self.assertIn("authenticated", request_args)
         self.assertTrue(request_args["authenticated"])
 
         self.assertEqual(3, len(request_args["headers"]))
@@ -1667,8 +1667,8 @@ class TestDynamicPollster(base.BaseTestCase):
             pollster.definitions.sample_gatherer.create_request_arguments(
                 pollster.definitions.configurations)
 
-        self.assertTrue("headers" not in request_args)
-        self.assertTrue("authenticated" in request_args)
+        self.assertNotIn("headers", request_args)
+        self.assertIn("authenticated", request_args)
         self.assertTrue(request_args["authenticated"])
 
     @mock.patch('keystoneclient.v2_0.client.Client')
