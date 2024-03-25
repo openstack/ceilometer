@@ -62,12 +62,13 @@ class TestEndpointDiscovery(base.BaseTestCase):
 class TestLocalnodeDiscovery(base.BaseTestCase):
     def setUp(self):
         super(TestLocalnodeDiscovery, self).setUp()
-        CONF = service.prepare_service([], [])
-        self.discovery = localnode.LocalNodeDiscovery(CONF)
+        self.conf = service.prepare_service([], [])
+        self.discovery = localnode.LocalNodeDiscovery(self.conf)
         self.manager = mock.MagicMock()
 
     def test_lockalnode_discovery(self):
-        self.assertEqual(['local_host'], self.discovery.discover(self.manager))
+        self.assertEqual([self.conf.host],
+                         self.discovery.discover(self.manager))
 
 
 class TestProjectDiscovery(base.BaseTestCase):

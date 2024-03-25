@@ -726,7 +726,7 @@ class TestPollingAgent(BaseAgent):
         polling_task.poll_and_notify()
         LOG.debug.assert_called_with(
             'Skip pollster %(name)s, no %(p_context)s resources found this '
-            'cycle', {'name': 'test', 'p_context': 'new '})
+            'cycle', {'name': 'test', 'p_context': 'new'})
 
     @mock.patch('oslo_utils.timeutils.utcnow')
     def test_polling_samples_timestamp(self, mock_utc):

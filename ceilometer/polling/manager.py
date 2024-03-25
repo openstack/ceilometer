@@ -154,7 +154,12 @@ class PollingTask(object):
 
         self._cache = cache_utils.get_client(self.manager.conf)
 
+        # element that provides a map between source names and source object
+        self.sources_map = dict()
+
     def add(self, pollster, source):
+        self.sources_map[source.name] = source
+
         self.pollster_matches[source.name].add(pollster)
         key = Resources.key(source.name, pollster)
         self.resources[key].setup(source)
@@ -171,6 +176,11 @@ class PollingTask(object):
                 candidate_res = list(
                     self.resources[key].get(discovery_cache))
                 if not candidate_res and pollster.obj.default_discovery:
+                    LOG.debug("Executing discovery process for pollsters [%s] "
+                              "and discovery method [%s] via process [%s].",
+                              pollster.obj, pollster.obj.default_discovery,
+                              self.manager.discover)
+
                     candidate_res = self.manager.discover(
                         [pollster.obj.default_discovery], discovery_cache)
 
@@ -189,7 +199,7 @@ class PollingTask(object):
 
                 # If no resources, skip for this pollster
                 if not polling_resources:
-                    p_context = 'new ' if history else ''
+                    p_context = 'new' if history else ''
                     LOG.debug("Skip pollster %(name)s, no %(p_context)s "
                               "resources found this cycle",
                               {'name': pollster.name, 'p_context': p_context})
@@ -199,6 +209,37 @@ class PollingTask(object):
                          "%(src)s",
                          dict(poll=pollster.name, src=source_name))
                 try:
+                    source_obj = self.sources_map[source_name]
+                    coordination_group_name = source_obj.group_for_coordination
+
+                    LOG.debug("Checking if we need coordination for pollster "
+                              "[%s] with coordination group name [%s].",
+                              pollster, coordination_group_name)
+                    if self.manager.hashrings and self.manager.hashrings.get(
+                            coordination_group_name):
+                        LOG.debug("The pollster [%s] is configured in a "
+                                  "source for polling that requires "
+                                  "coordination under name [%s].", pollster,
+                                  coordination_group_name)
+                        group_coordination = self.manager.hashrings[
+                            coordination_group_name].belongs_to_self(
+                            str(pollster.name))
+
+                        LOG.debug("Pollster [%s] is configured with "
+                                  "coordination [%s] under name [%s].",
+                                  pollster.name, group_coordination,
+                                  coordination_group_name)
+                        if not group_coordination:
+                            LOG.info("The pollster [%s] should be processed "
+                                     "by other node.", pollster.name)
+                            continue
+                    else:
+                        LOG.debug("The pollster [%s] is not configured in a "
+                                  "source for polling that requires "
+                                  "coordination. The current hashrings are "
+                                  "the following [%s].", pollster,
+                                  self.manager.hashrings)
+
                     polling_timestamp = timeutils.utcnow().isoformat()
                     samples = pollster.obj.get_samples(
                         manager=self.manager,
@@ -480,19 +521,68 @@ class AgentManager(cotyledon.Service):
             return []
 
     def join_partitioning_groups(self):
-        groups = set([self.construct_group_id(d.obj.group_id)
-                      for d in self.discoveries])
+        groups = set()
+        for d in self.discoveries:
+            generated_group_id = self.construct_group_id(d.obj.group_id)
+            LOG.debug("Adding discovery [%s] with group ID [%s] to build the "
+                      "coordination partitioning via constructed group ID "
+                      "[%s].", d.__dict__, d.obj.group_id, generated_group_id)
+            groups.add(generated_group_id)
+
         # let each set of statically-defined resources have its own group
-        static_resource_groups = set([
-            self.construct_group_id(hash_of_set(p.resources))
-            for p in self.polling_manager.sources
-            if p.resources
-        ])
+        static_resource_groups = set()
+        for p in self.polling_manager.sources:
+            if p.resources:
+                generated_group_id = self.construct_group_id(
+                    hash_of_set(p.resources))
+                LOG.debug("Adding pollster group [%s] with resources [%s] to "
+                          "build the coordination partitioning via "
+                          "constructed group ID [%s].", p, p.resources,
+                          generated_group_id)
+                static_resource_groups.add(generated_group_id)
+            else:
+                LOG.debug("Pollster group [%s] does not have resources defined"
+                          "to build the group ID for coordination.", p)
+
         groups.update(static_resource_groups)
+
+        # (rafaelweingartner) here we will configure the dynamic
+        # coordination process. It is useful to sync pollster that do not rely
+        # on discovery process, such as the dynamic pollster on compute nodes.
+        dynamic_pollster_groups_for_coordination = set()
+        for p in self.polling_manager.sources:
+            if p.group_id_coordination_expression:
+                if p.resources:
+                    LOG.warning("The pollster group [%s] has resources to "
+                                "execute coordination. Therefore, we do not "
+                                "add it via the dynamic coordination process.",
+                                p.name)
+                    continue
+                group_prefix = p.name
+                generated_group_id = eval(p.group_id_coordination_expression)
+
+                group_for_coordination = "%s-%s" % (
+                    group_prefix, generated_group_id)
+                dynamic_pollster_groups_for_coordination.add(
+                    group_for_coordination)
+
+                p.group_for_coordination = group_for_coordination
+                LOG.debug("Adding pollster group [%s] with dynamic "
+                          "coordination to build the coordination "
+                          "partitioning via constructed group ID [%s].",
+                          p, dynamic_pollster_groups_for_coordination)
+            else:
+                LOG.debug("Pollster group [%s] does not have an expression to "
+                          "dynamically use in the coordination process.", p)
+
+        groups.update(dynamic_pollster_groups_for_coordination)
 
         self.hashrings = dict(
             (group, self.partition_coordinator.join_partitioned_group(group))
             for group in groups)
+
+        LOG.debug("Hashrings [%s] created for pollsters definition.",
+                  self.hashrings)
 
     def setup_polling_tasks(self):
         polling_tasks = {}
@@ -730,6 +820,12 @@ class PollingSource(agent.Source):
             self.check_source_filtering(self.meters, 'meters')
         except agent.SourceException as err:
             raise PollingException(err.msg, cfg)
+
+        self.group_id_coordination_expression = cfg.get(
+            'group_id_coordination_expression')
+
+        # This value is configured when coordination is enabled.
+        self.group_for_coordination = None
 
     def get_interval(self):
         return self.interval
