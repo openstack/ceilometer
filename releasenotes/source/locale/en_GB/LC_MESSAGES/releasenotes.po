@@ -5,15 +5,16 @@
 # Andi Chandler <andi@gowling.com>, 2021. #zanata
 # Andi Chandler <andi@gowling.com>, 2022. #zanata
 # Andi Chandler <andi@gowling.com>, 2023. #zanata
+# Andi Chandler <andi@gowling.com>, 2024. #zanata
 msgid ""
 msgstr ""
 "Project-Id-Version: Ceilometer Release Notes\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-28 06:27+0000\n"
+"POT-Creation-Date: 2024-04-03 07:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2023-06-17 02:35+0000\n"
+"PO-Revision-Date: 2024-04-14 06:54+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>\n"
 "Language-Team: English (United Kingdom)\n"
 "Language: en_GB\n"
@@ -47,6 +48,9 @@ msgstr "12.1.0"
 msgid "13.0.0"
 msgstr "13.0.0"
 
+msgid "13.0.0.0rc1"
+msgstr "13.0.0.0rc1"
+
 msgid "13.1.0"
 msgstr "13.1.0"
 
@@ -65,8 +69,14 @@ msgstr "16.0.0"
 msgid "16.0.1"
 msgstr "16.0.1"
 
+msgid "16.0.1-12"
+msgstr "16.0.1-12"
+
 msgid "17.0.0"
 msgstr "17.0.0"
+
+msgid "17.0.2-6"
+msgstr "17.0.2-6"
 
 msgid "18.0.0"
 msgstr "18.0.0"
@@ -86,6 +96,18 @@ msgstr "20.0.0"
 msgid "2023.1 Series Release Notes"
 msgstr "2023.1 Series Release Notes"
 
+msgid "2023.2 Series Release Notes"
+msgstr "2023.2 Series Release Notes"
+
+msgid "2024.1 Series Release Notes"
+msgstr "2024.1 Series Release Notes"
+
+msgid "21.0.0"
+msgstr "21.0.0"
+
+msgid "22.0.0.0rc1"
+msgstr "22.0.0.0rc1"
+
 msgid "5.0.1"
 msgstr "5.0.1"
 
@@ -100,6 +122,15 @@ msgstr "6.0.0"
 
 msgid "7.0.0"
 msgstr "7.0.0"
+
+msgid "7.0.0.0b2"
+msgstr "7.0.0.0b2"
+
+msgid "7.0.0.0b3"
+msgstr "7.0.0.0b3"
+
+msgid "7.0.0.0rc1"
+msgstr "7.0.0.0rc1"
 
 msgid "7.0.1"
 msgstr "7.0.1"
@@ -861,6 +892,9 @@ msgstr "Remove direct publisher and use the explicit publisher instead."
 msgid "Remove eventlet from Ceilometer in favour of threaded approach"
 msgstr "Remove eventlet from Ceilometer in favour of threaded approach"
 
+msgid "Remove integration with the inactive Monasca project"
+msgstr "Remove integration with the inactive Monasca project"
+
 msgid "Rocky Series Release Notes"
 msgstr "Rocky Series Release Notes"
 
@@ -928,6 +962,29 @@ msgstr ""
 "been useless since the Neutron LBaaS project was retired."
 
 msgid ""
+"Support for OpenContrail, which is currently known as  Tungsten Fabric, has "
+"been deprecated and will be removed in a future release."
+msgstr ""
+"Support for OpenContrail, which is currently known as  Tungsten Fabric, has "
+"been deprecated and will be removed in a future release."
+
+msgid ""
+"Support for OpenDaylight has been deprecated and will be removed in a future "
+"release."
+msgstr ""
+"Support for OpenDaylight has been deprecated and will be removed in a future "
+"release."
+
+msgid ""
+"Support for VMWare vSphere has been deprecated, because the vmwareapi virt "
+"driver in nova has been marked experimental and may be removed in a future "
+"release."
+msgstr ""
+"Support for VMWare vSphere has been deprecated because the vmwareapi virt "
+"driver in Nova has been marked experimental and may be removed in a future "
+"release."
+
+msgid ""
 "Support for XenServer/Xen Cloud Platform has been deprecated and will be "
 "removed in a future release."
 msgstr ""
@@ -946,6 +1003,15 @@ msgid ""
 msgstr ""
 "Support for polling Neutron's LBaaS v2 API was added as v1 API in Neutron is "
 "deprecated. The same metrics are available between v1 and v2."
+
+msgid ""
+"Support for running Ceilometer in Windows operating systems has been "
+"deprecated because of retirement of the Winstackers project. Because of "
+"this, Hyper-V inspector is also deprecated."
+msgstr ""
+"Support for running Ceilometer in Windows operating systems has been "
+"deprecated because of retirement of the Winstackers project. Because of "
+"this, Hyper-V inspector is also deprecated."
 
 msgid ""
 "Support loading multiple meter definition files and allow users to add their "
@@ -1232,6 +1298,13 @@ msgstr ""
 "needed."
 
 msgid ""
+"The option ``glance_page_size`` has been removed because it's not actually "
+"needed."
+msgstr ""
+"The option ``glance_page_size`` has been removed because it's not actually "
+"needed."
+
+msgid ""
 "The option batch_polled_samples in the [DEFAULT] section is deprecated. Use "
 "batch_size option in [polling] to configure and/or disable batching."
 msgstr ""
@@ -1244,6 +1317,13 @@ msgid ""
 msgstr ""
 "The options 'requeue_event_on_dispatcher_error' and "
 "'requeue_sample_on_dispatcher_error' have been enabled and removed."
+
+msgid ""
+"The options ``requeue_event_on_dispatcher_error`` and "
+"``requeue_sample_on_dispatcher_error`` have been enabled and removed."
+msgstr ""
+"The options ``requeue_event_on_dispatcher_error`` and "
+"``requeue_sample_on_dispatcher_error`` have been enabled and removed."
 
 msgid ""
 "The pipeline dynamic refresh code has been removed. Ceilometer relies on the "
@@ -1274,6 +1354,23 @@ msgstr ""
 "the backend (e.g. Gnocchi is down), then the dispatcher raised and the data "
 "were lost forever. This was completely unacceptable, and nobody should be "
 "able to configure Ceilometer in that way.\""
+
+msgid ""
+"The previous configuration options default for "
+"``requeue_sample_on_dispatcher_error`` and "
+"``requeue_event_on_dispatcher_error`` allowed to lose data very easily: if "
+"the dispatcher failed to send data to the backend (e.g. Gnocchi is down), "
+"then the dispatcher raised and the data were lost forever. This was "
+"completely unacceptable, and nobody should be able to configure Ceilometer "
+"in that way.\""
+msgstr ""
+"The previous configuration options default for "
+"``requeue_sample_on_dispatcher_error`` and "
+"``requeue_event_on_dispatcher_error`` allowed to lose data very easily: if "
+"the dispatcher failed to send data to the backend (e.g. Gnocchi is down), "
+"then the dispatcher raised and the data were lost forever. This was "
+"completely unacceptable, and nobody should be able to configure Ceilometer "
+"in that way.\""
 
 msgid ""
 "The resource metadata for the Cinder volume size poller now includes the "
