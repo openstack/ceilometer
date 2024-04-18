@@ -97,6 +97,10 @@ class _Base(plugin_base.PollsterBase):
             except ClientException as e:
                 if e.http_status == 404:
                     LOG.warning("Swift tenant id %s not found.", t.id)
+                elif e.http_status == 403:
+                    LOG.error("The credentials configured does not have "
+                              "correct roles to access Swift tenant id %s.",
+                              t.id)
                 else:
                     raise e
 
