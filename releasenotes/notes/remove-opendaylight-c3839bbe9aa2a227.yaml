@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Support for OpenDaylight has been removed.
