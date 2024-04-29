@@ -414,6 +414,29 @@ class PublisherTest(base.BaseTestCase):
         d.publish_samples(samples)
         self.assertEqual(0, len(fake_batch.call_args[0][1]))
 
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
+    @mock.patch('gnocchiclient.v1.client.Client')
+    def test__set_update_attributes_non_existent_resource(self,
+                                                          fakeclient_cls,
+                                                          logger):
+        url = netutils.urlsplit("gnocchi://")
+        self.publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
+
+        fakeclient = fakeclient_cls.return_value
+        fakeclient.resource.update.side_effect = [
+            gnocchi_exc.ResourceNotFound(404)]
+
+        non_existent_resource = {
+            'type': 'volume',
+            'id': self.resource_id,
+        }
+
+        self.publisher._set_update_attributes(non_existent_resource)
+
+        logger.debug.assert_called_with(
+            "Update event received on unexisting resource (%s), ignore it.",
+            self.resource_id)
+
 
 class MockResponse(mock.NonCallableMock):
     def __init__(self, code):

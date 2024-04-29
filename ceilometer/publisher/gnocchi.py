@@ -599,14 +599,14 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         return []
 
     def _set_update_attributes(self, resource):
-        try:
-            resource_id = resource.pop('id')
-            resource_type = resource.pop('type')
+        resource_id = resource.pop('id')
+        resource_type = resource.pop('type')
 
+        try:
             self._if_not_cached(resource_type, resource_id, resource)
         except gnocchi_exc.ResourceNotFound:
             LOG.debug("Update event received on unexisting resource (%s), "
-                      "ignore it.", resource['id'])
+                      "ignore it.", resource_id)
         except Exception:
             LOG.error("Fail to update the resource %s", resource,
                       exc_info=True)
