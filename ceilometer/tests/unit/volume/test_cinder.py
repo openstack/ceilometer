@@ -63,6 +63,12 @@ VOLUME_LIST = [
               u"size": u"1572864000"
           },
           'os-vol-mig-status-attr:name_id': None,
+          'group_id': None,
+          'provider_id': None,
+          'shared_targets': False,
+          'service_uuid': '2f6b5a18-0cd5-4421-b97e-d2c3e85ed758',
+          'cluster_name': None,
+          'volume_type_id': '65a9f65a-4696-4435-a09d-bc44d797c529',
           'name': None,
           'bootable': 'false',
           'created_at': '2016-06-23T08:27:45.000000',
@@ -95,6 +101,7 @@ SNAPSHOT_LIST = [
               u"min_ram": u"0",
               u"size": u"1572864000"
           },
+          "group_snapshot_id": None,
           'name': None})
 ]
 
@@ -121,6 +128,8 @@ BACKUP_LIST = [
               '6824974c08974d4db864bbaa6bc08303',
           'fail_reason': u"",
           'is_incremental': False,
+          'metadata': {},
+          'user_id': 'be255bd31eb944578000fc762fde6dcf',
           'id': '75a52125-85ff-4a8d-b2aa-580f3b22273f',
           'size': 1})
 ]
