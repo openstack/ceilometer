@@ -182,15 +182,6 @@ resources_update_operations = [
          "attributes": {"controller": {"type": "string", "min_length": 0,
                                        "max_length": 255, "required": True}}
      }]},
-    {"desc": "add switch_table resource type",
-     "type": "create_resource_type",
-     "resource_type": "switch_table",
-     "data": [{
-         "attributes": {"switch": {"type": "string", "min_length": 0,
-                                   "max_length": 64, "required": True},
-                        "controller": {"type": "string", "min_length": 0,
-                                       "max_length": 255, "required": True}}
-     }]},
     {"desc": "add volume provider resource type",
      "type": "create_resource_type",
      "resource_type": "volume_provider",
