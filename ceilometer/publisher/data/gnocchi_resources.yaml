@@ -156,10 +156,8 @@ resources:
         archive_policy_name: ceilometer-low-rate
       disk.device.write.bytes:
         archive_policy_name: ceilometer-low-rate
-      disk.device.latency:
       disk.device.read.latency:
       disk.device.write.latency:
-      disk.device.iops:
       disk.device.capacity:
       disk.device.allocation:
       disk.device.usage:

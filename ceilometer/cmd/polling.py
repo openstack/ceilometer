@@ -14,7 +14,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import os
 import shlex
 
 import cotyledon
@@ -89,16 +88,8 @@ def create_polling_service(worker_id, conf=None):
 
 def main():
     sm = cotyledon.ServiceManager()
-    # On Windows, we can only initialize conf objects in the subprocess.
-    # As a consequence, we can't use oslo_config_glue.setup() on Windows,
-    # because cotyledon.ServiceManager objects are not picklable.
-    if os.name == 'nt':
-        LOG.warning("Support for Ceilometer on Windows operating systems is"
-                    "deprecated.")
-        sm.add(create_polling_service)
-    else:
-        conf = _prepare_config()
-        priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
-        oslo_config_glue.setup(sm, conf)
-        sm.add(create_polling_service, args=(conf,))
+    conf = _prepare_config()
+    priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
+    oslo_config_glue.setup(sm, conf)
+    sm.add(create_polling_service, args=(conf,))
     sm.run()

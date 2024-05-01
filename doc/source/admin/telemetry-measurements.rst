@@ -85,13 +85,13 @@ The following meters are collected for OpenStack Compute.
 +===========+=======+======+==========+==========+=========+==================+
 | **Meters added in the Mitaka release or earlier**                           |
 +-----------+-------+------+----------+----------+---------+------------------+
-| memory    | Gauge | MB   | instance | Notific\ | Libvirt,| Volume of RAM    |
-|           |       |      | ID       | ation    | Hyper-V | allocated to the |
+| memory    | Gauge | MB   | instance | Notific\ | Libvirt | Volume of RAM    |
+|           |       |      | ID       | ation    |         | allocated to the |
 |           |       |      |          |          |         | instance         |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Gauge | MB   | instance | Pollster | Libvirt,| Volume of RAM    |
-| usage     |       |      | ID       |          | Hyper-V,| used by the inst\|
-|           |       |      |          |          | vSphere,| ance from the    |
+| usage     |       |      | ID       |          | vSphere,| used by the inst\|
+|           |       |      |          |          |         | ance from the    |
 |           |       |      |          |          |         | amount of its    |
 |           |       |      |          |          |         | allocated memory |
 +-----------+-------+------+----------+----------+---------+------------------+
@@ -100,41 +100,34 @@ The following meters are collected for OpenStack Compute.
 |           |       |      |          |          |         | ance on the phy\ |
 |           |       |      |          |          |         | sical machine    |
 +-----------+-------+------+----------+----------+---------+------------------+
-| cpu       | Cumu\ | ns   | instance | Pollster | Libvirt,| CPU time used    |
-|           | lative|      | ID       |          | Hyper-V |                  |
+| cpu       | Cumu\ | ns   | instance | Pollster | Libvirt | CPU time used    |
+|           | lative|      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| vcpus     | Gauge | vcpu | instance | Notific\ | Libvirt,| Number of virtual|
-|           |       |      | ID       | ation    | Hyper-V | CPUs allocated to|
+| vcpus     | Gauge | vcpu | instance | Notific\ | Libvirt | Number of virtual|
+|           |       |      | ID       | ation    |         | CPUs allocated to|
 |           |       |      |          |          |         | the instance     |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt,| Number of read   |
-| ice.read\ | lative| uest |          |          | Hyper-V | requests         |
+| disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt | Number of read   |
+| ice.read\ | lative| uest |          |          |         | requests         |
 | .requests |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt,| Number of write  |
-| ice.write\| lative| uest |          |          | Hyper-V | requests         |
+| disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt | Number of write  |
+| ice.write\| lative| uest |          |          |         | requests         |
 | .requests |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Cumu\ | B    | disk ID  | Pollster | Libvirt,| Volume of reads  |
-| ice.read\ | lative|      |          |          | Hyper-V |                  |
+| disk.dev\ | Cumu\ | B    | disk ID  | Pollster | Libvirt | Volume of reads  |
+| ice.read\ | lative|      |          |          |         |                  |
 | .bytes    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Cumu\ | B    | disk ID  | Pollster | Libvirt,| Volume of writes |
-| ice.write\| lative|      |          |          | Hyper-V |                  |
+| disk.dev\ | Cumu\ | B    | disk ID  | Pollster | Libvirt | Volume of writes |
+| ice.write\| lative|      |          |          |         |                  |
 | .bytes    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.root\| Gauge | GB   | instance | Notific\ | Libvirt,| Size of root disk|
-| .size     |       |      | ID       | ation    | Hyper-V |                  |
+| disk.root\| Gauge | GB   | instance | Notific\ | Libvirt | Size of root disk|
+| .size     |       |      | ID       | ation    |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.ephe\| Gauge | GB   | instance | Notific\ | Libvirt,| Size of ephemeral|
-| meral.size|       |      | ID       | ation    | Hyper-V | disk             |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Gauge | ms   | disk ID  | Pollster | Hyper-V | Average disk la\ |
-| ice.late\ |       |      |          |          |         | tency per device |
-| ncy       |       |      |          |          |         |                  |
-+-----------+-------+------+----------+----------+---------+------------------+
-| disk.dev\ | Gauge | coun\| disk ID  | Pollster | Hyper-V | Average disk io\ |
-| ice.iops  |       | t/s  |          |          |         | ps per device    |
+| disk.ephe\| Gauge | GB   | instance | Notific\ | Libvirt | Size of ephemeral|
+| meral.size|       |      | ID       | ation    |         | disk             |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Gauge | B    | disk ID  | Pollster | Libvirt | The amount of d\ |
 | ice.capa\ |       |      |          |          |         | isk per device   |
@@ -153,20 +146,20 @@ The following meters are collected for OpenStack Compute.
 |           |       |      |          |          |         | iner on the hos\ |
 |           |       |      |          |          |         | t per device     |
 +-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Cumu\ | B    | interface| Pollster | Libvirt,| Number of        |
-| incoming.\| lative|      | ID       |          | Hyper-V | incoming bytes   |
+| network.\ | Cumu\ | B    | interface| Pollster | Libvirt | Number of        |
+| incoming.\| lative|      | ID       |          |         | incoming bytes   |
 | bytes     |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Cumu\ | B    | interface| Pollster | Libvirt,| Number of        |
-| outgoing\ | lative|      | ID       |          | Hyper-V | outgoing bytes   |
+| network.\ | Cumu\ | B    | interface| Pollster | Libvirt | Number of        |
+| outgoing\ | lative|      | ID       |          |         | outgoing bytes   |
 | .bytes    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Cumu\ | pac\ | interface| Pollster | Libvirt,| Number of        |
-| incoming\ | lative| ket  | ID       |          | Hyper-V | incoming packets |
+| network.\ | Cumu\ | pac\ | interface| Pollster | Libvirt | Number of        |
+| incoming\ | lative| ket  | ID       |          |         | incoming packets |
 | .packets  |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| network.\ | Cumu\ | pac\ | interface| Pollster | Libvirt,| Number of        |
-| outgoing\ | lative| ket  | ID       |          | Hyper-V | outgoing packets |
+| network.\ | Cumu\ | pac\ | interface| Pollster | Libvirt | Number of        |
+| outgoing\ | lative| ket  | ID       |          |         | outgoing packets |
 | .packets  |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | **Meters added in the Newton release**                                      |
