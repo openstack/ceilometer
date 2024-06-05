@@ -629,59 +629,6 @@ The following meters are collected for SDN:
 | switch.port.tr\ | Cumula\ | B      | switch ID | Pollster | Bytes transmitt\|
 | ansmit.bytes    | tive    |        |           |          | ed on port      |
 +-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.re\ | Cumula\ | packet | switch ID | Pollster | Drops received  |
-| ceive.drops     | tive    |        |           |          | on port         |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.tr\ | Cumula\ | packet | switch ID | Pollster | Drops transmitt\|
-| ansmit.drops    | tive    |        |           |          | ed on port      |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.re\ | Cumula\ | packet | switch ID | Pollster | Errors received |
-| ceive.errors    | tive    |        |           |          | on port         |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.tr\ | Cumula\ | packet | switch ID | Pollster | Errors transmit\|
-| ansmit.errors   | tive    |        |           |          | ted on port     |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.re\ | Cumula\ | packet | switch ID | Pollster | Frame alignment |
-| ceive.frame\_er\| tive    |        |           |          | errors receive\ |
-| ror             |         |        |           |          | d on port       |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.re\ | Cumula\ | packet | switch ID | Pollster | Overrun errors  |
-| ceive.overrun\_\| tive    |        |           |          | received on port|
-| error           |         |        |           |          |                 |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.re\ | Cumula\ | packet | switch ID | Pollster | CRC errors rece\|
-| ceive.crc\_error| tive    |        |           |          | ived on port    |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.port.co\ | Cumula\ | count  | switch ID | Pollster | Collisions on p\|
-| llision.count   | tive    |        |           |          | ort             |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.table    | Gauge   | table  | switch ID | Pollster | Duration of tab\|
-|                 |         |        |           |          | le              |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.table.a\ | Gauge   | entry  | switch ID | Pollster | Active entries  |
-| ctive.entries   |         |        |           |          | in table        |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.table.l\ | Gauge   | packet | switch ID | Pollster | Lookup packets  |
-| ookup.packets   |         |        |           |          | for table       |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.table.m\ | Gauge   | packet | switch ID | Pollster | Packets matches |
-| atched.packets  |         |        |           |          | for table       |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.flow     | Gauge   | flow   | switch ID | Pollster | Duration of flow|
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.flow.du\ | Gauge   | s      | switch ID | Pollster | Duration of flow|
-| ration.seconds  |         |        |           |          | in seconds      |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.flow.du\ | Gauge   | ns     | switch ID | Pollster | Duration of flow|
-| ration.nanosec\ |         |        |           |          | in nanoseconds  |
-| onds            |         |        |           |          |                 |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.flow.pa\ | Cumula\ | packet | switch ID | Pollster | Packets received|
-| ckets           | tive    |        |           |          |                 |
-+-----------------+---------+--------+-----------+----------+-----------------+
-| switch.flow.by\ | Cumula\ | B      | switch ID | Pollster | Bytes received  |
-| tes             | tive    |        |           |          |                 |
-+-----------------+---------+--------+-----------+----------+-----------------+
 | **Meters added in the Pike release**                                        |
 +-----------------+---------+--------+-----------+----------+-----------------+
 | port            | Gauge   | port   | port ID   | Pollster | Existence of po\|

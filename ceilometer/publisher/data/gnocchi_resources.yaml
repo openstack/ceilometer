@@ -314,14 +314,6 @@ resources:
       switch.port.transmit.packets:
       switch.port.receive.bytes:
       switch.port.transmit.bytes:
-      switch.port.receive.drops:
-      switch.port.transmit.drops:
-      switch.port.receive.errors:
-      switch.port.transmit.errors:
-      switch.port.receive.frame_error:
-      switch.port.receive.overrun_error:
-      switch.port.receive.crc_error:
-      switch.port.collision.count:
     attributes:
       switch: resource_metadata.switch
       port_number_on_switch: resource_metadata.port_number_on_switch
@@ -340,10 +332,3 @@ resources:
       port.receive.errors:
     attributes:
       controller: resource_metadata.controller
-
-  - resource_type: switch_table
-    metrics:
-      switch.table.active.entries:
-    attributes:
-      controller: resource_metadata.controller
-      switch: resource_metadata.switch
