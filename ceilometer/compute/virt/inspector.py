@@ -27,7 +27,7 @@ OPTS = [
     cfg.StrOpt('hypervisor_inspector',
                default='libvirt',
                help='Inspector to use for inspecting the hypervisor layer. '
-                    'Known inspectors are libvirt, hyperv, and vsphere.'),
+                    'Known inspectors are libvirt and vsphere.'),
 ]
 
 
@@ -129,21 +129,6 @@ DiskRateStats = collections.namedtuple('DiskRateStats',
                                         'write_bytes_rate',
                                         'write_requests_rate'])
 
-# Named tuple representing disk latency statistics.
-#
-# disk_latency: average disk latency
-#
-DiskLatencyStats = collections.namedtuple('DiskLatencyStats',
-                                          ['device', 'disk_latency'])
-
-# Named tuple representing disk iops statistics.
-#
-# iops: number of iops per second
-#
-DiskIOPSStats = collections.namedtuple('DiskIOPSStats',
-                                       ['device', 'iops_count'])
-
-
 # Named tuple representing disk Information.
 #
 # capacity: capacity of the disk
@@ -234,26 +219,6 @@ class Inspector(object):
                inspected
         :return: for each disk, the number of bytes & operations
                  read and written per second, with the error count
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_disk_latency(self, instance, duration):
-        """Inspect the disk statistics as rates for an instance.
-
-        :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
-        :return: for each disk, the average disk latency
-        """
-        raise ceilometer.NotImplementedError
-
-    def inspect_disk_iops(self, instance, duration):
-        """Inspect the disk statistics as rates for an instance.
-
-        :param instance: the target instance
-        :param duration: the last 'n' seconds, over which the value should be
-               inspected
-        :return: for each disk, the number of iops per second
         """
         raise ceilometer.NotImplementedError
 

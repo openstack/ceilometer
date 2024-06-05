@@ -164,47 +164,6 @@ class TestDiskPollsters(TestBaseDiskIO):
             'disk.device.write.latency', 400, 'vda2')
 
 
-class TestDiskLatencyPollsters(TestBaseDiskIO):
-
-    DISKS = [
-        virt_inspector.DiskLatencyStats("disk1", 1),
-        virt_inspector.DiskLatencyStats("disk2", 2)
-    ]
-    TYPE = 'gauge'
-
-    def setUp(self):
-        super(TestDiskLatencyPollsters, self).setUp()
-        self.inspector.inspect_disk_latency = mock.Mock(
-            return_value=self.DISKS)
-
-    def test_per_device_latency(self):
-        self._check_per_device_samples(disk.PerDeviceDiskLatencyPollster,
-                                       'disk.device.latency', 1, 'disk1')
-
-        self._check_per_device_samples(disk.PerDeviceDiskLatencyPollster,
-                                       'disk.device.latency', 2, 'disk2')
-
-
-class TestDiskIOPSPollsters(TestBaseDiskIO):
-
-    DISKS = [
-        virt_inspector.DiskIOPSStats("disk1", 10),
-        virt_inspector.DiskIOPSStats("disk2", 20),
-    ]
-    TYPE = 'gauge'
-
-    def setUp(self):
-        super(TestDiskIOPSPollsters, self).setUp()
-        self.inspector.inspect_disk_iops = mock.Mock(return_value=self.DISKS)
-
-    def test_per_device_iops(self):
-        self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
-                                       'disk.device.iops', 10, 'disk1')
-
-        self._check_per_device_samples(disk.PerDeviceDiskIOPSPollster,
-                                       'disk.device.iops', 20, 'disk2')
-
-
 class TestDiskInfoPollsters(TestBaseDiskIO):
 
     DISKS = [

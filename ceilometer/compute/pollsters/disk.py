@@ -58,20 +58,6 @@ class PerDeviceWriteBytesPollster(PerDeviceDiskPollster):
     sample_stats_key = 'write_bytes'
 
 
-class PerDeviceDiskLatencyPollster(PerDeviceDiskPollster):
-    inspector_method = 'inspect_disk_latency'
-    sample_name = 'disk.device.latency'
-    sample_unit = 'ms'
-    sample_stats_key = 'disk_latency'
-
-
-class PerDeviceDiskIOPSPollster(PerDeviceDiskPollster):
-    inspector_method = 'inspect_disk_iops'
-    sample_name = 'disk.device.iops'
-    sample_unit = 'count/s'
-    sample_stats_key = 'iops_count'
-
-
 class PerDeviceCapacityPollster(PerDeviceDiskPollster):
     inspector_method = 'inspect_disk_info'
     sample_name = 'disk.device.capacity'
