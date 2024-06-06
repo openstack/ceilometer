@@ -1,0 +1,12 @@
+---
+features:
+  - >
+    Add volume.volume_type_id and backup.is_incremental metadata for cinder
+    pollsters. Also user_id information is now included for backups with the
+    generated samples.
+upgrade:
+  - >
+    The cinder api microversion has been increased from Pike to Wallaby
+    version (3.64) for volume/snapshot/backup related pollsters.
+    These might not work until the cinder API has been upgraded up to this
+    microversion.

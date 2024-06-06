@@ -28,10 +28,12 @@ class _BaseDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):
         super(_BaseDiscovery, self).__init__(conf)
         creds = conf.service_credentials
-        # NOTE(tobias-urdin): We set 3.43 (the maximum for Pike) because
+        # NOTE(mnederlof): We set 3.64 (the maximum for Wallaby) because:
         # we need atleast 3.41 to get user_id on snapshots.
+        # we need atleast 3.56 for user_id and project_id on backups.
+        # we need atleast 3.63 for volume_type_id on volumes.
         self.client = cinder_client.Client(
-            version='3.43',
+            version='3.64',
             session=keystone_client.get_session(conf),
             region_name=creds.region_name,
             interface=creds.interface,

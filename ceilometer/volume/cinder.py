@@ -39,6 +39,7 @@ class VolumeSizePollster(_Base):
     FIELDS = ['name',
               'status',
               'volume_type',
+              'volume_type_id',
               'availability_zone',
               'os-vol-host-attr:host',
               'migration_status',
@@ -96,6 +97,7 @@ class VolumeBackupSize(_Base):
         return 'volume_backups'
 
     FIELDS = ['name',
+              'is_incremental',
               'object_count',
               'container',
               'volume_id',
@@ -109,7 +111,7 @@ class VolumeBackupSize(_Base):
                 type=sample.TYPE_GAUGE,
                 unit='GB',
                 volume=backup.size,
-                user_id=None,
+                user_id=backup.user_id,
                 project_id=getattr(
                     backup, 'os-backup-project-attr:project_id', None),
                 resource_id=backup.id,
