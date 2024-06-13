@@ -41,6 +41,7 @@ from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer.polling import dynamic_pollster
 from ceilometer.polling import plugin_base
+from ceilometer.polling import prom_exporter
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
 
@@ -77,6 +78,19 @@ POLLING_OPTS = [
                      'recommended that ceilometer be configured with a '
                      'caching backend to reduce the number of calls '
                      'made to keystone.'),
+    cfg.BoolOpt('enable_notifications',
+                default=True,
+                help='Whether the polling service should be sending '
+                     'notifications to RabbitMQ after polling cycles.'),
+    cfg.BoolOpt('enable_prometheus_exporter',
+                default=False,
+                help='Allow this ceilometer polling instance to '
+                     'expose directly the retrieved metrics in Prometheus '
+                     'format.'),
+    cfg.ListOpt('prometheus_listen_addresses',
+                default=["127.0.0.1:9101"],
+                help='A list of ipaddr:port combinations on which '
+                     'the exported metrics will be exposed.')
 ]
 
 
@@ -282,11 +296,14 @@ class PollingTask(object):
                         exc_info=True)
 
     def _send_notification(self, samples):
-        self.manager.notifier.sample(
-            {},
-            'telemetry.polling',
-            {'samples': samples}
-        )
+        if self.manager.conf.polling.enable_notifications:
+            self.manager.notifier.sample(
+                {},
+                'telemetry.polling',
+                {'samples': samples}
+            )
+        if self.manager.conf.polling.enable_prometheus_exporter:
+            prom_exporter.collect_metrics(samples)
 
 
 class AgentManager(cotyledon.Service):
@@ -342,10 +359,17 @@ class AgentManager(cotyledon.Service):
         self.group_prefix = ('%s-%s' % (namespace_prefix, group_prefix)
                              if group_prefix else namespace_prefix)
 
-        self.notifier = oslo_messaging.Notifier(
-            messaging.get_transport(self.conf),
-            driver=self.conf.publisher_notifier.telemetry_driver,
-            publisher_id="ceilometer.polling")
+        if self.conf.polling.enable_notifications:
+            self.notifier = oslo_messaging.Notifier(
+                messaging.get_transport(self.conf),
+                driver=self.conf.publisher_notifier.telemetry_driver,
+                publisher_id="ceilometer.polling")
+
+        if self.conf.polling.enable_prometheus_exporter:
+            for addr in self.conf.polling.prometheus_listen_addresses:
+                address = addr.split(":")
+                if len(address) == 2:
+                    prom_exporter.export(address[0], address[1])
 
         self._keystone = None
         self._keystone_last_exception = None
