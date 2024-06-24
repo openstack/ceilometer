@@ -16,12 +16,12 @@
 import functools
 import os
 import tempfile
+import unittest
 
 import fixtures
 import oslo_messaging.conffixture
 from oslo_utils import timeutils
 from oslotest import base
-from testtools import testcase
 import yaml
 
 import ceilometer
@@ -95,7 +95,7 @@ def _skip_decorator(func):
         try:
             return func(*args, **kwargs)
         except ceilometer.NotImplementedError as e:
-            raise testcase.TestSkipped(str(e))
+            raise unittest.SkipTest(str(e))
     return skip_if_not_implemented
 
 
