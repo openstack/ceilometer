@@ -19,7 +19,10 @@ import glob
 import itertools
 import logging
 import os
+import queue
 import random
+import socket
+import threading
 import uuid
 
 from concurrent import futures
@@ -51,6 +54,10 @@ POLLING_OPTS = [
                default="polling.yaml",
                help="Configuration file for polling definition."
                ),
+    cfg.StrOpt('heartbeat_socket_dir',
+               default=None,
+               help="Path to directory where socket file for polling "
+                    "heartbeat will be created."),
     cfg.StrOpt('partitioning_group_prefix',
                deprecated_group='central',
                help='Work-load partitioning group prefix. Use only if you '
@@ -87,6 +94,11 @@ def hash_of_set(s):
 class PollingException(agent.ConfigException):
     def __init__(self, message, cfg):
         super(PollingException, self).__init__('Polling', message, cfg)
+
+
+class HeartBeatException(agent.ConfigException):
+    def __init__(self, message, cfg):
+        super(HeartBeatException, self).__init__('Polling', message, cfg)
 
 
 class Resources(object):
@@ -207,6 +219,8 @@ class PollingTask(object):
                     )
                     sample_batch = []
 
+                    self.manager.heartbeat(pollster.name, polling_timestamp)
+
                     for sample in samples:
                         # Note(yuywz): Unify the timestamp of polled samples
                         sample.set_timestamp(polling_timestamp)
@@ -289,15 +303,100 @@ class PollingTask(object):
         )
 
 
+class AgentHeartBeatManager(cotyledon.Service):
+    def __init__(self, worker_id, conf, namespaces=None, queue=None):
+        super(AgentHeartBeatManager, self).__init__(worker_id)
+        self.conf = conf
+
+        if conf.polling.heartbeat_socket_dir is None:
+            raise HeartBeatException("path to a directory containing "
+                                     "heart beat sockets is required", conf)
+
+        if type(namespaces) is not list:
+            if namespaces is None:
+                namespaces = ""
+            namespaces = [namespaces]
+
+        self._lock = threading.Lock()
+        self._queue = queue
+        self._status = dict()
+        self._sock_pth = os.path.join(
+            conf.polling.heartbeat_socket_dir,
+            f"ceilometer-{'-'.join(sorted(namespaces))}.socket"
+        )
+
+        self._delete_socket()
+        self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+            self._sock.bind(self._sock_pth)
+            self._sock.listen(1)
+        except socket.error as err:
+            raise HeartBeatException("Failed to open socket file "
+                                     f"({self._sock_pth}): {err}", conf)
+
+        LOG.info("Starting heartbeat child service. Listening"
+                 f" on {self._sock_pth}")
+
+    def _delete_socket(self):
+        try:
+            os.remove(self._sock_pth)
+        except OSError:
+            pass
+
+    def terminate(self):
+        self._tpe.shutdown(wait=False, cancel_futures=True)
+        self._sock.close()
+        self._delete_socket()
+
+    def _update_status(self):
+        hb = self._queue.get()
+        with self._lock:
+            self._status[hb['pollster']] = hb['timestamp']
+        LOG.debug(f"Updated heartbeat for {hb['pollster']} "
+                  f"({hb['timestamp']})")
+
+    def _send_heartbeat(self):
+        s, addr = self._sock.accept()
+        LOG.debug("Heartbeat status report requested "
+                  f"at {self._sock_pth}")
+        with self._lock:
+            out = '\n'.join([f"{k} {v}"
+                             for k, v in self._status.items()])
+        s.sendall(out.encode('utf-8'))
+        s.close()
+        LOG.debug(f"Reported heartbeat status:\n{out}")
+
+    def run(self):
+        super(AgentHeartBeatManager, self).run()
+
+        LOG.debug("Started heartbeat child process.")
+
+        def _read_queue():
+            LOG.debug("Started heartbeat update thread")
+            while True:
+                self._update_status()
+
+        def _report_status():
+            LOG.debug("Started heartbeat reporting thread")
+            while True:
+                self._send_heartbeat()
+
+        with futures.ThreadPoolExecutor(max_workers=2) as executor:
+            self._tpe = executor
+            executor.submit(_read_queue)
+            executor.submit(_report_status)
+
+
 class AgentManager(cotyledon.Service):
 
-    def __init__(self, worker_id, conf, namespaces=None):
+    def __init__(self, worker_id, conf, namespaces=None, queue=None):
         namespaces = namespaces or ['compute', 'central']
         group_prefix = conf.polling.partitioning_group_prefix
 
         super(AgentManager, self).__init__(worker_id)
 
         self.conf = conf
+        self._queue = queue
 
         if type(namespaces) is not list:
             namespaces = [namespaces]
@@ -349,6 +448,19 @@ class AgentManager(cotyledon.Service):
 
         self._keystone = None
         self._keystone_last_exception = None
+
+    def heartbeat(self, name, timestamp):
+        """Send heartbeat data if the agent is configured to do so."""
+        if self._queue is not None:
+            try:
+                hb = {
+                    'timestamp': timestamp,
+                    'pollster': name
+                }
+                self._queue.put_nowait(hb)
+                LOG.debug(f"Polster heartbeat update: {name}")
+            except queue.Full:
+                LOG.warning(f"Heartbeat queue full. Update failed: {hb}")
 
     def create_dynamic_pollsters(self, namespaces):
         """Creates dynamic pollsters
