@@ -1,0 +1,4 @@
+---
+fixes:
+  - |
+    The ``[DEFAULT] virt_type`` option now supports ``parallels``.
