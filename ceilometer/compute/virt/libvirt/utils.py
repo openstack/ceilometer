@@ -30,7 +30,7 @@ LOG = logging.getLogger(__name__)
 OPTS = [
     cfg.StrOpt('libvirt_type',
                default='kvm',
-               choices=['kvm', 'lxc', 'qemu', 'parallels', 'uml'],
+               choices=['kvm', 'lxc', 'qemu', 'parallels'],
                help='Libvirt domain type.'),
     cfg.StrOpt('libvirt_uri',
                default='',
@@ -39,7 +39,6 @@ OPTS = [
 ]
 
 LIBVIRT_PER_TYPE_URIS = dict(
-    uml='uml:///system',
     parallels='parallels:///system',
     lxc='lxc:///')
 
