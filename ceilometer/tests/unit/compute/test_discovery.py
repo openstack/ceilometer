@@ -302,28 +302,35 @@ class TestDiscovery(base.BaseTestCase):
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
 
-    def test_get_flavor_id(self):
+    def test_get_server(self):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
         self.client.nova_client = mock.MagicMock()
-        self.client.nova_client.flavors = mock.MagicMock()
+        self.client.nova_client.servers = mock.MagicMock()
+
+        fake_server = mock.MagicMock()
+        fake_server.metadata = {'metering.server_group': 'group1'}
+
         fake_flavor = mock.MagicMock()
         fake_flavor.id = 'fake_id'
+        fake_server.flavor = fake_flavor
 
-        self.client.nova_client.flavors.find = mock.MagicMock(
-            return_value=fake_flavor)
+        self.client.nova_client.servers.get = mock.MagicMock(
+            return_value=fake_server)
         dsc = discovery.InstanceDiscovery(self.CONF)
 
-        flavor_name = 'fake_name'
+        uuid = '123456'
 
-        ret_flavor_id = dsc.get_flavor_id(flavor_name)
-        self.assertEqual('fake_id', ret_flavor_id)
+        ret_server = dsc.get_server(uuid)
+        self.assertEqual('fake_id', ret_server.flavor.id)
+        self.assertEqual({'metering.server_group': 'group1'},
+                         ret_server.metadata)
 
         # test raise NotFound exception
-        self.client.nova_client.flavors.find = mock.MagicMock(
+        self.client.nova_client.servers.get = mock.MagicMock(
             side_effect=exceptions.NotFound(404))
         dsc = discovery.InstanceDiscovery(self.CONF)
 
-        ret_flavor_id = dsc.get_flavor_id(flavor_name)
-        self.assertEqual(flavor_name, ret_flavor_id)
+        ret_server = dsc.get_server(uuid)
+        self.assertEqual(None, ret_server)

@@ -100,7 +100,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
         self.cache_expiry = conf.compute.resource_cache_expiry
         if self.method == "libvirt_metadata":
             # 4096 instances on a compute should be enough :)
-            self._flavor_cache = cachetools.LRUCache(4096)
+            self._server_cache = cachetools.LRUCache(4096)
         else:
             self.lock = threading.Lock()
             self.instances = {}
@@ -125,13 +125,12 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             return int(elem.text)
         return 0
 
-    @cachetools.cachedmethod(operator.attrgetter('_flavor_cache'))
-    def get_flavor_id(self, name):
+    @cachetools.cachedmethod(operator.attrgetter('_server_cache'))
+    def get_server(self, uuid):
         try:
-            return self.nova_cli.nova_client.flavors.find(
-                name=name, is_public=None).id
+            return self.nova_cli.nova_client.servers.get(uuid)
         except exceptions.NotFound:
-            return name
+            return None
 
     @libvirt_utils.retry_on_disconnect
     def discover_libvirt_polling(self, manager, param=None):
@@ -145,13 +144,14 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             os_type_xml = full_xml.find("./os/type")
             metadata_xml = etree.fromstring(xml_string)
 
-            # TODO(sileht): We don't have the flavor ID here So the Gnocchi
-            # resource update will fail for compute sample (or put None ?)
-            # We currently poll nova to get the flavor ID, but storing the
+            # TODO(sileht, jwysogla): We don't have the flavor ID
+            # and server metadata here. We currently poll nova to get
+            # the flavor ID, but storing the
             # flavor_id doesn't have any sense because the flavor description
             # can change over the time, we should store the detail of the
             # flavor. this is why nova doesn't put the id in the libvirt
-            # metadata
+            # metadata. I think matadata field could be eventually added to
+            # the libvirt matadata created by nova.
 
             try:
                 flavor_xml = metadata_xml.find(
@@ -164,8 +164,11 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                     "./name").text
                 instance_arch = os_type_xml.attrib["arch"]
 
+                server = self.get_server(domain.UUIDString())
+                flavor_id = (server.flavor["id"] if server is not None
+                             else flavor_xml.attrib["name"])
                 flavor = {
-                    "id": self.get_flavor_id(flavor_xml.attrib["name"]),
+                    "id": flavor_id,
                     "name": flavor_xml.attrib["name"],
                     "vcpus": self._safe_find_int(flavor_xml, "vcpus"),
                     "ram": self._safe_find_int(flavor_xml, "memory"),
@@ -179,6 +182,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 image_xml = metadata_xml.find("./root[@type='image']")
                 image = ({'id': image_xml.attrib['uuid']}
                          if image_xml is not None else None)
+                metadata = server.metadata if server is not None else {}
             except AttributeError:
                 LOG.error(
                     "Fail to get domain uuid %s metadata: "
@@ -216,7 +220,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 # NOTE(sileht): Other fields that Ceilometer tracks
                 # where we can't get the value here, but their are
                 # retrieved by notification
-                "metadata": {},
+                "metadata": metadata,
                 # "OS-EXT-STS:task_state"
                 # 'reservation_id',
                 # 'OS-EXT-AZ:availability_zone',
