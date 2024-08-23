@@ -68,7 +68,7 @@ OPTS = [
 EXCHANGES_OPTS = [
     cfg.MultiStrOpt('notification_control_exchanges',
                     default=['nova', 'glance', 'neutron', 'cinder', 'heat',
-                             'keystone', 'sahara', 'trove', 'zaqar', 'swift',
+                             'keystone', 'trove', 'zaqar', 'swift',
                              'ceilometer', 'magnum', 'dns', 'ironic', 'aodh'],
                     deprecated_group='DEFAULT',
                     deprecated_name="http_control_exchanges",

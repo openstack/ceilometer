@@ -93,7 +93,7 @@ class TestNotification(BaseNotificationTest):
         self.srv = notification.NotificationService(0, self.CONF)
 
     def test_targets(self):
-        self.assertEqual(15, len(self.srv.get_targets()))
+        self.assertEqual(14, len(self.srv.get_targets()))
 
     def test_start_multiple_listeners(self):
         urls = ["fake://vhost1", "fake://vhost2"]
