@@ -14,19 +14,13 @@ import datetime
 from unittest import mock
 
 import fixtures
-import testtools
-
+import libvirt
 from novaclient import exceptions
-
-try:
-    import libvirt
-except ImportError:
-    libvirt = None
 
 from ceilometer.compute import discovery
 from ceilometer.compute.pollsters import util
 from ceilometer import service
-import ceilometer.tests.base as base
+from ceilometer.tests import base
 
 
 LIBVIRT_METADATA_XML = """
@@ -101,6 +95,9 @@ class FakeConn:
     def listAllDomains(self):
         return [FakeDomain()]
 
+    def isAlive(self):
+        return True
+
 
 class FakeManualInstanceDomain:
     def state(self):
@@ -129,7 +126,7 @@ class FakeManualInstanceConn:
         return [FakeManualInstanceDomain()]
 
     def isAlive(self):
-        return False
+        return True
 
 
 class TestDiscovery(base.BaseTestCase):
@@ -217,14 +214,13 @@ class TestDiscovery(base.BaseTestCase):
         self.client.instance_get_all_by_host.assert_called_once_with(
             self.CONF.host, "2016-01-01T00:00:00+00:00")
 
-    @testtools.skipUnless(libvirt, "libvirt not available")
-    @mock.patch.object(libvirt, "VIR_DOMAIN_METADATA_ELEMENT", 2)
-    @mock.patch.object(libvirt, "openReadOnly")
-    def test_discovery_with_libvirt(self, openReadOnly):
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt(self, mock_libvirt_conn):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        openReadOnly.return_value = FakeConn()
+        mock_libvirt_conn.return_value = FakeConn()
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
 
@@ -288,22 +284,18 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual(expected_calls,
                          self.client.instance_get_all_by_host.call_args_list)
 
-    @testtools.skipUnless(libvirt, "libvirt not available")
-    @mock.patch.object(libvirt, "VIR_DOMAIN_METADATA_ELEMENT", 2)
-    @mock.patch.object(libvirt, "openReadOnly")
-    def test_discovery_with_libvirt_error(self, openReadOnly):
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_error(self, mock_libvirt_conn):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        openReadOnly.return_value = FakeManualInstanceConn()
+        mock_libvirt_conn.return_value = FakeManualInstanceConn()
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
 
     def test_get_server(self):
-        self.CONF.set_override("instance_discovery_method",
-                               "libvirt_metadata",
-                               group="compute")
         self.client.nova_client = mock.MagicMock()
         self.client.nova_client.servers = mock.MagicMock()
 
