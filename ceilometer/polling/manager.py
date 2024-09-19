@@ -70,7 +70,7 @@ POLLING_OPTS = [
                 default=False,
                 help='Identify project and user names from polled samples. '
                      'By default, collecting these values is disabled due '
-                     'to the fact that it could overwhelm keystone service'
+                     'to the fact that it could overwhelm keystone service '
                      'with lots of continuous requests depending upon the '
                      'number of projects, users and samples polled from '
                      'the environment. While using this feature, it is '
