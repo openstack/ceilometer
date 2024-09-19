@@ -17,6 +17,7 @@ import socket
 from keystoneauth1 import loading
 from oslo_config import cfg
 
+import ceilometer.cmd.polling
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
@@ -66,7 +67,8 @@ def list_opts():
     # This have been removed due to a recursive import issue
     return [
         ('DEFAULT',
-         itertools.chain(ceilometer.compute.virt.inspector.OPTS,
+         itertools.chain(ceilometer.cmd.polling.CLI_OPTS,
+                         ceilometer.compute.virt.inspector.OPTS,
                          ceilometer.compute.virt.libvirt.utils.OPTS,
                          ceilometer.objectstore.swift.OPTS,
                          ceilometer.pipeline.base.OPTS,
