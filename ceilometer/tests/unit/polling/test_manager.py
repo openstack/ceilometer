@@ -18,6 +18,7 @@
 """Tests for ceilometer agent manager"""
 import copy
 import datetime
+import multiprocessing
 import shutil
 import tempfile
 from unittest import mock
@@ -92,7 +93,8 @@ class TestManager(base.BaseTestCase):
         self.assertNotEqual(manager.hash_of_set(y), manager.hash_of_set(z))
 
     def test_load_plugins(self):
-        mgr = manager.AgentManager(0, self.conf)
+        mgr = manager.AgentManager(0, self.conf,
+                                   queue=multiprocessing.Queue())
         self.assertIsNotNone(list(mgr.extensions))
 
     # Test plugin load behavior based on Node Manager pollsters.
@@ -101,8 +103,8 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
     def test_load_normal_plugins(self):
-        mgr = manager.AgentManager(0, self.conf,
-                                   namespaces=['ipmi'])
+        mgr = manager.AgentManager(0, self.conf, namespaces=['ipmi'],
+                                   queue=multiprocessing.Queue())
         # 8 pollsters for Node Manager
         self.assertEqual(13, len(mgr.extensions))
 
@@ -114,7 +116,8 @@ class TestManager(base.BaseTestCase):
     def test_load_failed_plugins(self, LOG):
         # Here we additionally check that namespaces will be converted to the
         # list if param was not set as a list.
-        manager.AgentManager(0, self.conf, namespaces='ipmi')
+        manager.AgentManager(0, self.conf, namespaces='ipmi',
+                             queue=multiprocessing.Queue())
         err_msg = 'Skip loading extension for %s: %s'
         pollster_names = [
             'power', 'temperature', 'outlet_temperature',
@@ -132,7 +135,8 @@ class TestManager(base.BaseTestCase):
     @mock.patch('ceilometer.polling.manager.LOG')
     def test_import_error_in_plugin(self, LOG):
         namespaces = ['ipmi']
-        manager.AgentManager(0, self.conf, namespaces=namespaces)
+        manager.AgentManager(0, self.conf, namespaces=namespaces,
+                             queue=multiprocessing.Queue())
         LOG.warning.assert_called_with(
             'No valid pollsters can be loaded from %s namespaces', namespaces)
 
@@ -282,7 +286,8 @@ class BaseAgent(base.BaseTestCase):
         self.mgr.polling_manager = manager.PollingManager(self.CONF)
 
     def create_manager(self):
-        return manager.AgentManager(0, self.CONF)
+        queue = multiprocessing.Queue()
+        return manager.AgentManager(0, self.CONF, queue=queue)
 
     def fake_notifier_sample(self, ctxt, event_type, payload):
         for m in payload['samples']:
@@ -301,7 +306,8 @@ class BaseAgent(base.BaseTestCase):
         self.CONF = service.prepare_service([], [])
         self.CONF.set_override(
             'cfg_file',
-            self.path_get('etc/ceilometer/polling_all.yaml'), group='polling'
+            self.path_get('etc/ceilometer/polling_all.yaml'),
+            group='polling'
         )
         self.polling_cfg = {
             'sources': [{
@@ -702,6 +708,9 @@ class TestPollingAgent(BaseAgent):
                       {'poll': 'test', 'src': 'test_polling'}),
             mock.call('Finished polling pollster %(poll)s in the context '
                       'of %(src)s', {'poll': 'test', 'src': 'test_polling'})
+        ])
+        LOG.debug.assert_has_calls([
+            mock.call('Polster heartbeat update: test')
         ])
 
     @mock.patch('ceilometer.polling.manager.LOG')

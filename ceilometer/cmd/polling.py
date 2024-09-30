@@ -14,6 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import multiprocessing
 import shlex
 
 import cotyledon
@@ -79,11 +80,20 @@ def _prepare_config():
     return conf
 
 
-def create_polling_service(worker_id, conf=None):
+def create_polling_service(worker_id, conf=None, queue=None):
     if conf is None:
         conf = _prepare_config()
         conf.log_opt_values(LOG, log.DEBUG)
-    return manager.AgentManager(worker_id, conf, conf.polling_namespaces)
+    return manager.AgentManager(worker_id, conf,
+                                conf.polling_namespaces, queue)
+
+
+def create_heartbeat_service(worker_id, conf, queue=None):
+    if conf is None:
+        conf = _prepare_config()
+        conf.log_opt_values(LOG, log.DEBUG)
+    return manager.AgentHeartBeatManager(worker_id, conf,
+                                         conf.polling_namespaces, queue)
 
 
 def main():
@@ -91,5 +101,11 @@ def main():
     conf = _prepare_config()
     priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
     oslo_config_glue.setup(sm, conf)
-    sm.add(create_polling_service, args=(conf,))
+
+    if conf.polling.heartbeat_socket_dir is not None:
+        queue = multiprocessing.Queue()
+        sm.add(create_heartbeat_service, args=(conf, queue))
+    else:
+        queue = None
+    sm.add(create_polling_service, args=(conf, queue))
     sm.run()
