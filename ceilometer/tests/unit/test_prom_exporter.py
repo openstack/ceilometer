@@ -170,13 +170,19 @@ class TestPromExporter(base.BaseTestCase):
     def test_export_called(self, export):
         CONF = service.prepare_service([], [])
         CONF.polling.enable_prometheus_exporter = True
-        CONF.polling.prometheus_listen_addresses = ['127.0.0.1:9101',
-                                                    '127.0.0.1:9102']
+        CONF.polling.prometheus_listen_addresses = [
+            '127.0.0.1:9101',
+            '127.0.0.1:9102',
+            '[::1]:9103',
+            'localhost:9104',
+        ]
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
-            call('127.0.0.1', '9101'),
-            call('127.0.0.1', '9102')
+            call('127.0.0.1', 9101),
+            call('127.0.0.1', 9102),
+            call('::1', 9103),
+            call('localhost', 9104),
         ])
 
     def test_collect_metrics(self):

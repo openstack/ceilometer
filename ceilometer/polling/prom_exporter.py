@@ -20,7 +20,7 @@ CEILOMETER_REGISTRY = prom.CollectorRegistry()
 
 
 def export(prometheus_iface, prometheus_port):
-    prom.start_http_server(port=int(prometheus_port),
+    prom.start_http_server(port=prometheus_port,
                            addr=prometheus_iface,
                            registry=CEILOMETER_REGISTRY)
 

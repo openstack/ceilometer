@@ -32,6 +32,7 @@ from keystoneauth1 import exceptions as ka_exceptions
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
+from oslo_utils import netutils
 from oslo_utils import timeutils
 from stevedore import extension
 from tooz import coordination
@@ -466,9 +467,10 @@ class AgentManager(cotyledon.Service):
 
         if self.conf.polling.enable_prometheus_exporter:
             for addr in self.conf.polling.prometheus_listen_addresses:
-                address = addr.split(":")
-                if len(address) == 2:
-                    prom_exporter.export(address[0], address[1])
+                address = netutils.parse_host_port(addr)
+                if address[0] is None or address[1] is None:
+                    LOG.warning('Ignoring invalid address: %s', addr)
+                prom_exporter.export(address[0], address[1])
 
         self._keystone = None
         self._keystone_last_exception = None
