@@ -15,7 +15,6 @@
 # under the License.
 import fnmatch
 import os
-import pkg_resources
 
 from oslo_log import log
 import yaml
@@ -57,8 +56,9 @@ class ConfigManagerBase(object):
             if not cfg_loc:
                 LOG.debug("No pipeline definitions configuration file found! "
                           "Using default config.")
-                cfg_loc = pkg_resources.resource_filename(
-                    __name__, 'pipeline/data/' + cfg_file)
+                cfg_loc = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)),
+                    'pipeline', 'data', cfg_file)
         with open(cfg_loc) as fap:
             conf = yaml.safe_load(fap)
         LOG.debug("Config file: %s", conf)

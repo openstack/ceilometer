@@ -17,8 +17,7 @@ import fnmatch
 import itertools
 import json
 import operator
-import pkg_resources
-import tenacity
+import os
 import threading
 
 from gnocchiclient import exceptions as gnocchi_exc
@@ -26,6 +25,7 @@ from keystoneauth1 import exceptions as ka_exceptions
 from oslo_log import log
 from oslo_utils import timeutils
 from stevedore import extension
+import tenacity
 from urllib import parse as urlparse
 
 from ceilometer import cache_utils
@@ -243,8 +243,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             namespace='ceilometer.event.trait_plugin')
         data = declarative.load_definitions(
             conf, {}, resources_definition_file,
-            pkg_resources.resource_filename(__name__,
-                                            "data/gnocchi_resources.yaml"))
+            os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         'data', 'gnocchi_resources.yaml'))
 
         archive_policy_default = data.get("archive_policy_default",
                                           "ceilometer-low")

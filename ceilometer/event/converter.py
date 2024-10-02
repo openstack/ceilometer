@@ -14,11 +14,11 @@
 # under the License.
 
 import fnmatch
+import os
 
 from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
-import pkg_resources
 
 from ceilometer import declarative
 from ceilometer.event import models
@@ -278,10 +278,12 @@ class NotificationEventsConverter(object):
 
 def setup_events(conf, trait_plugin_mgr):
     """Setup the event definitions from yaml config file."""
+
     return NotificationEventsConverter(
         conf,
         declarative.load_definitions(
             conf, [], conf.event.definitions_cfg_file,
-            pkg_resources.resource_filename(
-                'ceilometer', "pipeline/data/event_definitions.yaml")),
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                '..', 'pipeline', 'data', 'event_definitions.yaml')),
         trait_plugin_mgr)
