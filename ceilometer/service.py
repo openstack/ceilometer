@@ -18,6 +18,7 @@ from oslo_config import cfg
 import oslo_i18n
 from oslo_log import log
 from oslo_reports import guru_meditation_report as gmr
+from oslo_reports import opts as gmr_opts
 
 from ceilometer import keystone_client
 from ceilometer import messaging
@@ -55,6 +56,7 @@ def prepare_service(argv=None, config_files=None, conf=None):
     utils.setup_root_helper(conf)
     sample.setup(conf)
 
-    gmr.TextGuruMeditation.setup_autorun(version)
+    gmr_opts.set_defaults(conf)
+    gmr.TextGuruMeditation.setup_autorun(version, conf=conf)
     messaging.setup()
     return conf
