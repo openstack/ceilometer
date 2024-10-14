@@ -24,6 +24,7 @@
       - ^doc/.*$
       - ^.*\.rst$
       - ^releasenotes/.*$
+      - ^ceilometer/locale/.*$
       - ^ceilometer/tests/.*$
 
 - project:
