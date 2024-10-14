@@ -24,7 +24,7 @@ Install Gnocchi
 
    .. code-block:: console
 
-      # apt-get install gnocchi-api gnocchi-metricd python-gnocchiclient
+      # apt-get install gnocchi-api gnocchi-metricd python3-gnocchiclient
 
    .. note::
 
