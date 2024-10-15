@@ -75,48 +75,40 @@ def _gen_labels(sample):
     labels['keys'].append("type")
     labels['values'].append(ctype)
 
-    index = 3
     if (sample.get('counter_name', '') != '' and
             sample.get('counter_name') is not None):
         labels['keys'].append("counter")
         labels['values'].append(sample['counter_name'])
-        index += 1
 
     if (sample.get('project_id', '') != '' and
             sample.get('project_id') is not None):
         labels['keys'].append("project")
         labels['values'].append(sample['project_id'])
-        index += 1
 
     if (sample.get('project_name', '') != '' and
             sample.get('project_name') is not None):
         labels['keys'].append("project_name")
         labels['values'].append(sample['project_name'])
-        index += 1
 
     if (sample.get('user_id', '') != '' and
             sample.get('user_id') is not None):
         labels['keys'].append("user")
         labels['values'].append(sample['user_id'])
-        index += 1
 
     if (sample.get('user_name', '') != '' and
             sample.get('user_name') is not None):
         labels['keys'].append("user_name")
         labels['values'].append(sample['user_name'])
-        index += 1
 
     if (sample.get('counter_unit', '') != '' and
             sample.get('counter_unit') is not None):
         labels['keys'].append("unit")
         labels['values'].append(sample['counter_unit'])
-        index += 1
 
     if (sample.get('resource_id', '') != '' and
             sample.get('resource_id') is not None):
         labels['keys'].append("resource")
         labels['values'].append(sample['resource_id'])
-        index += 1
 
     if (sample.get('resource_metadata', '') != '' and
             sample.get('resource_metadata') is not None):
@@ -125,17 +117,16 @@ def _gen_labels(sample):
         if (resource_metadata.get('host', '') != ''):
             labels['keys'].append("vm_instance")
             labels['values'].append(resource_metadata['host'])
-            index += 1
 
         if (resource_metadata.get('display_name', '') != ''):
             labels['keys'].append("resource_name")
             labels['values'].append(resource_metadata['display_name'])
 
         if (resource_metadata.get('name', '') != ''):
-            labels['keys'].append("resource_name")
-            if (labels['values'][index] if index < len(labels['values'])
-                    else '' != ''):
-                labels['values'].append(labels['values'][index] + ":" +
+            if labels['keys'][-1] != 'resource_name':
+                labels['keys'].append("resource_name")
+            if len(labels['keys']) == len(labels['values']):
+                labels['values'][-1] = (labels['values'][-1] + ":" +
                                         resource_metadata['name'])
             else:
                 labels['values'].append(resource_metadata['name'])

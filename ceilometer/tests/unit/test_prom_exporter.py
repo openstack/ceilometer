@@ -227,14 +227,14 @@ class TestPromExporter(base.BaseTestCase):
         slabels1['keys'] = ['disk', 'publisher', 'type', 'counter',
                             'project', 'user', 'unit', 'resource',
                             'vm_instance', 'resource_name',
-                            'resource_name', 'server_group']
+                            'server_group']
         slabels1['values'] = ['read', 'ceilometer', 'device',
                               'disk.device.read.latency',
                               'd965489b7f894cbda89cd2e25bfd85a0',
                               '6e7d71415cd5401cbe103829c9c5dec2',
                               'ns',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
-                              'e0d297f5df3b62ec73c8d42b', 'myserver',
+                              'e0d297f5df3b62ec73c8d42b',
                               'myserver:instance-00000002', 'none']
         label1 = prom_exporter._gen_labels(self.test_data[0])
         self.assertDictEqual(label1, slabels1)
@@ -243,14 +243,14 @@ class TestPromExporter(base.BaseTestCase):
         slabels2['keys'] = ['memory', 'publisher', 'type', 'counter',
                             'project', 'user', 'unit', 'resource',
                             'vm_instance', 'resource_name',
-                            'resource_name', 'server_group']
+                            'server_group']
         slabels2['values'] = ['e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
                               'ceilometer', 'usage', 'memory.usage',
                               'd965489b7f894cbda89cd2e25bfd85a0',
                               '6e7d71415cd5401cbe103829c9c5dec2', 'MB',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
                               'e0d297f5df3b62ec73c8d42b',
-                              'myserver', 'myserver:instance-00000002', 'none']
+                              'myserver:instance-00000002', 'none']
         label2 = prom_exporter._gen_labels(self.test_data[1])
         self.assertDictEqual(label2, slabels2)
 
