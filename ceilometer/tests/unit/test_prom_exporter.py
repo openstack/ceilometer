@@ -72,7 +72,10 @@ class TestPromExporter(base.BaseTestCase):
                 'disk_gb': 1,
                 'ephemeral_gb': 0,
                 'root_gb': 1,
-                'disk_name': 'vda'
+                'disk_name': 'vda',
+                'user_metadata': {
+                    'custom_label': 'custom value'
+                }
             },
             'message_id': '078029c7-2ee8-11ef-a915-bd45e2085de3',
             'monotonic_time': 1819980.112406547,
@@ -151,7 +154,10 @@ class TestPromExporter(base.BaseTestCase):
                 'checksum': '7734eb3945297adc90ddc6cebe8bb082',
                 'min_ram': 0,
                 'tags': [],
-                'virtual_size': 117440512
+                'virtual_size': 117440512,
+                'user_metadata': {
+                    'server_group': 'server_group123'
+                }
             },
             'message_id': '19f8f78a-2ee9-11ef-a95f-bd45e2085de3',
             'monotonic_time': None,
@@ -194,7 +200,8 @@ class TestPromExporter(base.BaseTestCase):
                          'resource': 'f9276c96-8a12-432b-96a1-559d70715f97',
                          'resource_name': 'cirros2',
                          'type': 'size',
-                         'unit': 'B'}
+                         'unit': 'B',
+                         'server_group': 'server_group123'}
         sample_dict_2 = {'counter': 'memory.usage',
                          'memory': 'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
                          'project': 'd965489b7f894cbda89cd2e25bfd85a0',
@@ -204,7 +211,8 @@ class TestPromExporter(base.BaseTestCase):
                          'type': 'usage',
                          'unit': 'MB',
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
-                         'vm_instance': 'e0d297f5df3b62ec73c8d42b'}
+                         'vm_instance': 'e0d297f5df3b62ec73c8d42b',
+                         'server_group': 'none'}
         self.assertEqual(16344576,
                          prom_exporter.CEILOMETER_REGISTRY.
                          get_sample_value('ceilometer_image_size',
@@ -219,7 +227,7 @@ class TestPromExporter(base.BaseTestCase):
         slabels1['keys'] = ['disk', 'publisher', 'type', 'counter',
                             'project', 'user', 'unit', 'resource',
                             'vm_instance', 'resource_name',
-                            'resource_name']
+                            'resource_name', 'server_group']
         slabels1['values'] = ['read', 'ceilometer', 'device',
                               'disk.device.read.latency',
                               'd965489b7f894cbda89cd2e25bfd85a0',
@@ -227,18 +235,33 @@ class TestPromExporter(base.BaseTestCase):
                               'ns',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
                               'e0d297f5df3b62ec73c8d42b', 'myserver',
-                              'myserver:instance-00000002']
+                              'myserver:instance-00000002', 'none']
         label1 = prom_exporter._gen_labels(self.test_data[0])
         self.assertDictEqual(label1, slabels1)
 
         slabels2 = dict(keys=[], values=[])
-        slabels2['keys'] = ['image', 'publisher', 'type', 'counter',
+        slabels2['keys'] = ['memory', 'publisher', 'type', 'counter',
+                            'project', 'user', 'unit', 'resource',
+                            'vm_instance', 'resource_name',
+                            'resource_name', 'server_group']
+        slabels2['values'] = ['e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
+                              'ceilometer', 'usage', 'memory.usage',
+                              'd965489b7f894cbda89cd2e25bfd85a0',
+                              '6e7d71415cd5401cbe103829c9c5dec2', 'MB',
+                              'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
+                              'e0d297f5df3b62ec73c8d42b',
+                              'myserver', 'myserver:instance-00000002', 'none']
+        label2 = prom_exporter._gen_labels(self.test_data[1])
+        self.assertDictEqual(label2, slabels2)
+
+        slabels3 = dict(keys=[], values=[])
+        slabels3['keys'] = ['image', 'publisher', 'type', 'counter',
                             'project', 'unit', 'resource',
-                            'resource_name']
-        slabels2['values'] = ['f9276c96-8a12-432b-96a1-559d70715f97',
+                            'resource_name', 'server_group']
+        slabels3['values'] = ['f9276c96-8a12-432b-96a1-559d70715f97',
                               'ceilometer', 'size', 'image.size',
                               'd965489b7f894cbda89cd2e25bfd85a0', 'B',
                               'f9276c96-8a12-432b-96a1-559d70715f97',
-                              'cirros2']
-        label2 = prom_exporter._gen_labels(self.test_data[2])
-        self.assertDictEqual(label2, slabels2)
+                              'cirros2', 'server_group123']
+        label3 = prom_exporter._gen_labels(self.test_data[2])
+        self.assertDictEqual(label3, slabels3)
