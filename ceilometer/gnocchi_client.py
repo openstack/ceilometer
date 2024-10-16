@@ -11,12 +11,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from distutils import version
-
 from gnocchiclient import client
 from gnocchiclient import exceptions as gnocchi_exc
 import keystoneauth1.session
 from oslo_log import log
+from oslo_utils import versionutils
 
 from ceilometer import keystone_client
 
@@ -233,16 +232,15 @@ resources_update_operations = [
      }]},
 ]
 
-# NOTE(sileht): We use LooseVersion because pbr can generate invalid
-# StrictVersion like 9.0.1.dev226
-REQUIRED_VERSION = version.LooseVersion("4.2.0")
+
+REQUIRED_VERSION = "4.2.0"
 
 
 def upgrade_resource_types(conf):
     gnocchi = get_gnocchiclient(conf)
 
-    gnocchi_version = version.LooseVersion(gnocchi.build.get())
-    if gnocchi_version < REQUIRED_VERSION:
+    gnocchi_version = gnocchi.build.get()
+    if not versionutils.is_compatible(REQUIRED_VERSION, gnocchi_version):
         raise Exception("required gnocchi version is %s, got %s" %
                         (REQUIRED_VERSION, gnocchi_version))
 
