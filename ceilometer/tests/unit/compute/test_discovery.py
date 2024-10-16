@@ -26,7 +26,6 @@ except ImportError:
 
 from ceilometer.compute import discovery
 from ceilometer.compute.pollsters import util
-from ceilometer.compute.virt.libvirt import utils
 from ceilometer import service
 import ceilometer.tests.base as base
 
@@ -219,14 +218,14 @@ class TestDiscovery(base.BaseTestCase):
         self.client.instance_get_all_by_host.assert_called_once_with(
             self.CONF.host, "2016-01-01T00:00:00+00:00")
 
-    @mock.patch.object(utils, "libvirt")
-    @mock.patch.object(discovery, "libvirt")
-    def test_discovery_with_libvirt(self, libvirt, libvirt2):
+    @testtools.skipUnless(libvirt, "libvirt not available")
+    @mock.patch.object(libvirt, "VIR_DOMAIN_METADATA_ELEMENT", 2)
+    @mock.patch.object(libvirt, "openReadOnly")
+    def test_discovery_with_libvirt(self, openReadOnly):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        libvirt.VIR_DOMAIN_METADATA_ELEMENT = 2
-        libvirt2.openReadOnly.return_value = FakeConn()
+        openReadOnly.return_value = FakeConn()
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
 

@@ -24,11 +24,6 @@ from oslo_config import cfg
 from oslo_log import log
 from oslo_utils import timeutils
 
-try:
-    import libvirt
-except ImportError:
-    libvirt = None
-
 from ceilometer.compute.virt.libvirt import utils as libvirt_utils
 from ceilometer import nova_client
 from ceilometer.polling import plugin_base
