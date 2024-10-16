@@ -19,7 +19,6 @@ import hashlib
 import hmac
 
 from oslo_config import cfg
-from oslo_utils import secretutils
 
 
 OPTS = [
@@ -111,7 +110,7 @@ def verify_signature(message, secret):
             return False
     new_sig = new_sig.encode('ascii')
 
-    return secretutils.constant_time_compare(new_sig, old_sig)
+    return hmac.compare_digest(new_sig, old_sig)
 
 
 def meter_message_from_counter(sample, secret, publisher_id=None):
