@@ -31,15 +31,14 @@ from ceilometer.polling import plugin_base
 OPTS = [
     cfg.StrOpt('instance_discovery_method',
                default='libvirt_metadata',
-               choices=['naive', 'workload_partitioning', 'libvirt_metadata'],
+               choices=[('naive', 'poll nova to get all instances'),
+                        ('workload_partitioning',
+                         'poll nova to get instances of the compute'),
+                        ('libvirt_metadata',
+                         'get instances from libvirt metadata but without '
+                         'instance metadata (recommended)')],
                help="Ceilometer offers many methods to discover the instance "
-                    "running on a compute node: \n"
-                    "* naive: poll nova to get all instances\n"
-                    "* workload_partitioning: poll nova to get instances of "
-                    "the compute\n"
-                    "* libvirt_metadata: get instances from libvirt metadata "
-                    "  but without instance metadata (recommended for Gnocchi "
-                    "  backend"),
+                    "running on a compute node"),
     cfg.IntOpt('resource_update_interval',
                default=0,
                min=0,
