@@ -89,7 +89,7 @@ POLLING_OPTS = [
     cfg.BoolOpt('enable_notifications',
                 default=True,
                 help='Whether the polling service should be sending '
-                     'notifications to RabbitMQ after polling cycles.'),
+                     'notifications after polling cycles.'),
     cfg.BoolOpt('enable_prometheus_exporter',
                 default=False,
                 help='Allow this ceilometer polling instance to '
