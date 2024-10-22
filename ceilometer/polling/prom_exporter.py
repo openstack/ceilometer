@@ -120,24 +120,45 @@ def _gen_labels(sample):
 
     if (sample.get('resource_metadata', '') != '' and
             sample.get('resource_metadata') is not None):
+        resource_metadata = sample['resource_metadata']
 
-        if (sample['resource_metadata'].get('host', '') != ''):
+        if (resource_metadata.get('host', '') != ''):
             labels['keys'].append("vm_instance")
-            labels['values'].append(sample['resource_metadata']['host'])
+            labels['values'].append(resource_metadata['host'])
             index += 1
 
-        if (sample['resource_metadata'].get('display_name', '') != ''):
+        if (resource_metadata.get('display_name', '') != ''):
             labels['keys'].append("resource_name")
-            labels['values'].append(sample['resource_metadata']
-                                    ['display_name'])
+            labels['values'].append(resource_metadata['display_name'])
 
-        if (sample['resource_metadata'].get('name', '') != ''):
+        if (resource_metadata.get('name', '') != ''):
             labels['keys'].append("resource_name")
             if (labels['values'][index] if index < len(labels['values'])
                     else '' != ''):
                 labels['values'].append(labels['values'][index] + ":" +
-                                        sample['resource_metadata']['name'])
+                                        resource_metadata['name'])
             else:
-                labels['values'].append(sample['resource_metadata']['name'])
+                labels['values'].append(resource_metadata['name'])
+
+        # NOTE(jwysogla): The prometheus_client library doesn't support
+        # variable count of labels for the same metric. That's why the
+        # prometheus exporter cannot support custom metric labels added
+        # with the --property metering.<label_key>=<label_value> when
+        # creating a server. This still works with publishers though.
+        # The "server_group" label is used for autoscaling and so it's
+        # the only one getting parsed. To always have the same number
+        # of labels, it's added to all metrics and where there isn't a
+        # value defined, it's substituted with "none".
+        if (resource_metadata.get('user_metadata', '') != '' and
+                resource_metadata['user_metadata']
+                .get('server_group', '') != '' and
+                resource_metadata['user_metadata']
+                .get('server_group') is not None):
+            labels['keys'].append('server_group')
+            labels['values'].append(resource_metadata['user_metadata']
+                                    ['server_group'])
+        else:
+            labels['keys'].append('server_group')
+            labels['values'].append('none')
 
     return labels
