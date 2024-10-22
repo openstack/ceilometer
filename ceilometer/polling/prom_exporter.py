@@ -75,61 +75,50 @@ def _gen_labels(sample):
     labels['keys'].append("type")
     labels['values'].append(ctype)
 
-    if (sample.get('counter_name', '') != '' and
-            sample.get('counter_name') is not None):
+    if sample.get('counter_name'):
         labels['keys'].append("counter")
         labels['values'].append(sample['counter_name'])
 
-    if (sample.get('project_id', '') != '' and
-            sample.get('project_id') is not None):
+    if sample.get('project_id'):
         labels['keys'].append("project")
         labels['values'].append(sample['project_id'])
 
-    if (sample.get('project_name', '') != '' and
-            sample.get('project_name') is not None):
+    if sample.get('project_name'):
         labels['keys'].append("project_name")
         labels['values'].append(sample['project_name'])
 
-    if (sample.get('user_id', '') != '' and
-            sample.get('user_id') is not None):
+    if sample.get('user_id'):
         labels['keys'].append("user")
         labels['values'].append(sample['user_id'])
 
-    if (sample.get('user_name', '') != '' and
-            sample.get('user_name') is not None):
+    if sample.get('user_name'):
         labels['keys'].append("user_name")
         labels['values'].append(sample['user_name'])
 
-    if (sample.get('counter_unit', '') != '' and
-            sample.get('counter_unit') is not None):
+    if sample.get('counter_unit'):
         labels['keys'].append("unit")
         labels['values'].append(sample['counter_unit'])
 
-    if (sample.get('resource_id', '') != '' and
-            sample.get('resource_id') is not None):
+    if sample.get('resource_id'):
         labels['keys'].append("resource")
         labels['values'].append(sample['resource_id'])
 
-    if (sample.get('resource_metadata', '') != '' and
-            sample.get('resource_metadata') is not None):
+    if sample.get('resource_metadata'):
         resource_metadata = sample['resource_metadata']
 
-        if (resource_metadata.get('host', '') != ''):
+        if resource_metadata.get('host'):
             labels['keys'].append("vm_instance")
             labels['values'].append(resource_metadata['host'])
 
-        if (resource_metadata.get('display_name', '') != ''):
+        if resource_metadata.get('display_name'):
+            value = resource_metadata['display_name']
+            if resource_metadata.get('name'):
+                value = ':'.join([value, resource_metadata['name']])
             labels['keys'].append("resource_name")
-            labels['values'].append(resource_metadata['display_name'])
-
-        if (resource_metadata.get('name', '') != ''):
-            if labels['keys'][-1] != 'resource_name':
-                labels['keys'].append("resource_name")
-            if len(labels['keys']) == len(labels['values']):
-                labels['values'][-1] = (labels['values'][-1] + ":" +
-                                        resource_metadata['name'])
-            else:
-                labels['values'].append(resource_metadata['name'])
+            labels['values'].append(value)
+        elif resource_metadata.get('name'):
+            labels['keys'].append("resource_name")
+            labels['values'].append(resource_metadata['name'])
 
         # NOTE(jwysogla): The prometheus_client library doesn't support
         # variable count of labels for the same metric. That's why the
@@ -140,14 +129,10 @@ def _gen_labels(sample):
         # the only one getting parsed. To always have the same number
         # of labels, it's added to all metrics and where there isn't a
         # value defined, it's substituted with "none".
-        if (resource_metadata.get('user_metadata', '') != '' and
-                resource_metadata['user_metadata']
-                .get('server_group', '') != '' and
-                resource_metadata['user_metadata']
-                .get('server_group') is not None):
+        user_metadata = resource_metadata.get('user_metadata', {})
+        if user_metadata.get('server_group'):
             labels['keys'].append('server_group')
-            labels['values'].append(resource_metadata['user_metadata']
-                                    ['server_group'])
+            labels['values'].append(user_metadata['server_group'])
         else:
             labels['keys'].append('server_group')
             labels['values'].append('none')
