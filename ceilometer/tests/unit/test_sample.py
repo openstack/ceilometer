@@ -37,6 +37,21 @@ class TestSample(base.BaseTestCase):
                     'timestamp: 2014-10-29 14:12:15.485877>')
         self.assertEqual(expected, str(self.SAMPLE))
 
+    def test_sample_invalid_type(self):
+        self.assertRaises(
+            ValueError,
+            sample.Sample,
+            name='cpu',
+            type='invalid',
+            unit='ns',
+            volume='1234567',
+            user_id='56c5692032f34041900342503fecab30',
+            project_id='ac9494df2d9d4e709bac378cceabaf23',
+            resource_id='1ca738a1-c49c-4401-8346-5c60ebdb03f4',
+            timestamp=datetime.datetime(2014, 10, 29, 14, 12, 15, 485877),
+            resource_metadata={}
+        )
+
     def test_sample_from_notifications_list(self):
         msg = {
             'event_type': 'sample.create',
@@ -48,7 +63,8 @@ class TestSample(base.BaseTestCase):
             'publisher_id': 'ceilometer.api',
         }
         s = sample.Sample.from_notification(
-            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+            'sample', sample.TYPE_GAUGE, 1.0, '%', 'user', 'project',
+            'res', msg)
         expected = {'event_type': msg['event_type'],
                     'host': msg['publisher_id']}
         self.assertEqual(expected, s.resource_metadata)
@@ -64,7 +80,8 @@ class TestSample(base.BaseTestCase):
             'publisher_id': 'ceilometer.api',
         }
         s = sample.Sample.from_notification(
-            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+            'sample', sample.TYPE_GAUGE, 1.0, '%', 'user', 'project',
+            'res', msg)
         msg['payload']['event_type'] = msg['event_type']
         msg['payload']['host'] = msg['publisher_id']
         self.assertEqual(msg['payload'], s.resource_metadata)
@@ -80,7 +97,8 @@ class TestSample(base.BaseTestCase):
             'publisher_id': 'ceilometer.api',
         }
         s = sample.Sample.from_notification(
-            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+            'sample', sample.TYPE_GAUGE, 1.0, '%', 'user', 'project',
+            'res', msg)
         self.assertEqual('2015-06-19T09:19:35.786893+00:00', s.timestamp)
 
     def test_sample_from_notifications_keep_tz(self):
@@ -94,5 +112,6 @@ class TestSample(base.BaseTestCase):
             'publisher_id': 'ceilometer.api',
         }
         s = sample.Sample.from_notification(
-            'sample', 'type', 1.0, '%', 'user', 'project', 'res', msg)
+            'sample', sample.TYPE_GAUGE, 1.0, '%', 'user', 'project',
+            'res', msg)
         self.assertEqual('2015-06-19T09:19:35.786893+01:00', s.timestamp)

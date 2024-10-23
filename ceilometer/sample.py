@@ -96,6 +96,9 @@ class Sample(object):
                  resource_id, timestamp=None, resource_metadata=None,
                  source=None, id=None, monotonic_time=None,
                  user_name=None, project_name=None):
+        if type not in TYPES:
+            raise ValueError('Unsupported type: %s')
+
         self.name = name
         self.type = type
         self.unit = unit
