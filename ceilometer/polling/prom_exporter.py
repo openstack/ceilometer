@@ -16,6 +16,8 @@
 
 import prometheus_client as prom
 
+from ceilometer import sample as sample_util
+
 CEILOMETER_REGISTRY = prom.CollectorRegistry()
 
 
@@ -28,27 +30,23 @@ def export(prometheus_iface, prometheus_port):
 def collect_metrics(samples):
     for sample in samples:
         name = "ceilometer_" + sample['counter_name'].replace('.', '_')
-        type = sample['counter_type']
-        value = sample['counter_volume']
         labels = _gen_labels(sample)
 
         metric = CEILOMETER_REGISTRY._names_to_collectors.get(name, None)
-        if metric is None:
-            if type == "cumulative":
+
+        if sample['counter_type'] in (sample_util.TYPE_CUMULATIVE,):
+            if metric is None:
                 metric = prom.Counter(name=name, documentation="",
                                       labelnames=labels['keys'],
                                       registry=CEILOMETER_REGISTRY)
-                metric.labels(*labels['values']).inc(value)
-            if type == "gauge" or type == "delta":
+            metric.labels(*labels['values']).inc(sample['counter_volume'])
+
+        else:  # TYPE_GAUGE, TYPE_DELTA
+            if metric is None:
                 metric = prom.Gauge(name=name, documentation="",
                                     labelnames=labels['keys'],
                                     registry=CEILOMETER_REGISTRY)
-                metric.labels(*labels['values']).set(value)
-        else:
-            if type == 'cumulative':
-                metric.labels(*labels['values']).inc(value)
-            elif type == 'gauge' or type == 'delta':
-                metric.labels(*labels['values']).set(value)
+            metric.labels(*labels['values']).set(sample['counter_volume'])
 
 
 def _gen_labels(sample):
