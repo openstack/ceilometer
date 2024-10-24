@@ -83,6 +83,58 @@ class TestPromExporter(base.BaseTestCase):
         },
         {
             'source': 'openstack',
+            'counter_name': 'disk.device.read.latency',
+            'counter_type': 'cumulative',
+            'counter_unit': 'ns',
+            'counter_volume': 232128754,
+            'user_id': '6e7d71415cd5401cbe103829c9c5dec2',
+            'user_name': None,
+            'project_id': 'd965489b7f894cbda89cd2e25bfd85a0',
+            'project_name': None,
+            'resource_id': 'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
+            'timestamp': '2024-06-20T09:32:46.521082',
+            'resource_metadata': {
+                'display_name': 'myserver',
+                'name': 'instance-00000002',
+                'instance_id': 'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
+                'instance_type': 'tiny',
+                'host': 'e0d297f5df3b62ec73c8d42b',
+                'instance_host': 'devstack',
+                'flavor': {
+                    'id': '4af9ac72-5787-4f86-8644-0faa87ce7c83',
+                    'name': 'tiny',
+                    'vcpus': 1,
+                    'ram': 512,
+                    'disk': 1,
+                    'ephemeral': 0,
+                    'swap': 0
+                },
+                'status': 'active',
+                'state': 'running',
+                'task_state': '',
+                'image': {
+                    'id': '71860ed5-f66d-43e0-9514-f1d188106284'
+                },
+                'image_ref': '71860ed5-f66d-43e0-9514-f1d188106284',
+                'image_ref_url': None,
+                'architecture': 'x86_64',
+                'os_type': 'hvm',
+                'vcpus': 1,
+                'memory_mb': 512,
+                'disk_gb': 1,
+                'ephemeral_gb': 0,
+                'root_gb': 1,
+                'disk_name': 'vda',
+                'user_metadata': {
+                    'custom_label': 'custom value'
+                }
+            },
+            'message_id': '078029c7-2ee8-11ef-a915-bd45e2085de4',
+            'monotonic_time': 1819990.112406547,
+            'message_signature': 'f8d9a411b0cd0cb0d34e84'
+        },
+        {
+            'source': 'openstack',
             'counter_name': 'memory.usage',
             'counter_type': 'gauge',
             'counter_unit': 'MB',
@@ -213,6 +265,18 @@ class TestPromExporter(base.BaseTestCase):
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
                          'vm_instance': 'e0d297f5df3b62ec73c8d42b',
                          'server_group': 'none'}
+        sample_dict_3 = {'counter': 'disk.device.read.latency',
+                         'disk': 'read',
+                         'project': 'd965489b7f894cbda89cd2e25bfd85a0',
+                         'publisher': 'ceilometer',
+                         'resource':
+                         'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
+                         'resource_name': 'myserver:instance-00000002',
+                         'type': 'device',
+                         'unit': 'ns',
+                         'user': '6e7d71415cd5401cbe103829c9c5dec2',
+                         'vm_instance': 'e0d297f5df3b62ec73c8d42b',
+                         'server_group': 'none'}
         self.assertEqual(16344576,
                          prom_exporter.CEILOMETER_REGISTRY.
                          get_sample_value('ceilometer_image_size',
@@ -221,6 +285,12 @@ class TestPromExporter(base.BaseTestCase):
                          prom_exporter.CEILOMETER_REGISTRY.
                          get_sample_value('ceilometer_memory_usage',
                                           sample_dict_2))
+        # The value has to be of the second sample, as this is now a Gauge
+        self.assertEqual(232128754,
+                         prom_exporter.CEILOMETER_REGISTRY.
+                         get_sample_value(
+                             'ceilometer_disk_device_read_latency',
+                             sample_dict_3))
 
     def test_gen_labels(self):
         slabels1 = dict(keys=[], values=[])
@@ -251,7 +321,7 @@ class TestPromExporter(base.BaseTestCase):
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
                               'e0d297f5df3b62ec73c8d42b',
                               'myserver:instance-00000002', 'none']
-        label2 = prom_exporter._gen_labels(self.test_data[1])
+        label2 = prom_exporter._gen_labels(self.test_data[2])
         self.assertDictEqual(label2, slabels2)
 
         slabels3 = dict(keys=[], values=[])
@@ -263,5 +333,5 @@ class TestPromExporter(base.BaseTestCase):
                               'd965489b7f894cbda89cd2e25bfd85a0', 'B',
                               'f9276c96-8a12-432b-96a1-559d70715f97',
                               'cirros2', 'server_group123']
-        label3 = prom_exporter._gen_labels(self.test_data[2])
+        label3 = prom_exporter._gen_labels(self.test_data[3])
         self.assertDictEqual(label3, slabels3)
