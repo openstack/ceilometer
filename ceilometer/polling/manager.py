@@ -98,7 +98,11 @@ POLLING_OPTS = [
     cfg.ListOpt('prometheus_listen_addresses',
                 default=["127.0.0.1:9101"],
                 help='A list of ipaddr:port combinations on which '
-                     'the exported metrics will be exposed.')
+                     'the exported metrics will be exposed.'),
+    cfg.BoolOpt('ignore_disabled_projects',
+                default=False,
+                help='Whether the polling service should ignore '
+                     'disabled projects or not.'),
 ]
 
 

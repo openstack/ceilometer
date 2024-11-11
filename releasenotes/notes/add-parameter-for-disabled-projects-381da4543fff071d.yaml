@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The ``[polling] ignore_disabled_projects`` option has been added. This
+    option allows polling agent to only parse enabled projects, to reduce
+    procese time in case many projects are disabled.
