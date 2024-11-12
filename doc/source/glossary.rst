@@ -115,6 +115,5 @@ Glossary
    user
      An OpenStack user.
 
-.. [#] http://en.wikipedia.org/wiki/Ceilometer
 .. [#] https://opendev.org/openstack/oslo.messaging/src/branch/master/oslo_messaging/notify/notifier.py
 .. [#] http://en.wikipedia.org/wiki/Non-repudiation
