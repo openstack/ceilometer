@@ -3,6 +3,7 @@ sources:
     - name: some_pollsters
       interval: 300
       meters:
+        - power.state
         - cpu
         - cpu_l3_cache
         - memory.usage

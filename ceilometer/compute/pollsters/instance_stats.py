@@ -22,6 +22,11 @@ class InstanceStatsPollster(pollsters.GenericComputePollster):
     inspector_method = 'inspect_instance'
 
 
+class PowerStatePollster(InstanceStatsPollster):
+    sample_name = 'power.state'
+    sample_stats_key = 'power_state'
+
+
 class CPUPollster(InstanceStatsPollster):
     sample_name = 'cpu'
     sample_unit = 'ns'
