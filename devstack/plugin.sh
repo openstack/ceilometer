@@ -161,11 +161,7 @@ function configure_gnocchi {
     iniset $GNOCCHI_CONF metricd metric_processing_delay "$GNOCCHI_METRICD_PROCESSING_DELAY"
 
     iniset $GNOCCHI_CONF api auth_mode keystone
-    configure_auth_token_middleware $GNOCCHI_CONF gnocchi $GNOCCHI_AUTH_CACHE_DIR
-
-    sudo mkdir -p $GNOCCHI_AUTH_CACHE_DIR
-    sudo chown $STACK_USER $GNOCCHI_AUTH_CACHE_DIR
-    rm -f $GNOCCHI_AUTH_CACHE_DIR/*
+    configure_keystone_authtoken_middleware $GNOCCHI_CONF gnocchi
 
     gnocchi-upgrade
 
