@@ -296,6 +296,13 @@ function configure_ceilometer {
         # Configure rootwrap for the ipmi agent
         configure_rootwrap ceilometer
     fi
+
+    if [[ "$VIRT_DRIVER" = 'libvirt' ]]; then
+        if ! getent group $LIBVIRT_GROUP >/dev/null; then
+            sudo groupadd $LIBVIRT_GROUP
+        fi
+        add_user_to_group $STACK_USER $LIBVIRT_GROUP
+    fi
 }
 
 # init_ceilometer() - Initialize etc.
@@ -344,14 +351,7 @@ function start_ceilometer {
     # operational keystone if using gnocchi
     run_process ceilometer-anotification "$CEILOMETER_BIN_DIR/ceilometer-agent-notification --config-file $CEILOMETER_CONF"
 
-    # Start the compute agent late to allow time for the notification agent to
-    # fully wake up and connect to the message bus. See bug #1355809
-    if [[ "$VIRT_DRIVER" = 'libvirt' ]]; then
-        run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF" $LIBVIRT_GROUP
-    fi
-    if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
-        run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF"
-    fi
+    run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF"
 }
 
 # stop_ceilometer() - Stop running processes
