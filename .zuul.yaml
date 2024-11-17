@@ -1,7 +1,6 @@
 - job:
     name: grenade-ceilometer
     parent: grenade
-    voting: false
     required-projects:
       - opendev.org/openstack/grenade
       - opendev.org/openstack/ceilometer
