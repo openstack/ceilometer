@@ -20,7 +20,6 @@ import unittest
 
 import fixtures
 import oslo_messaging.conffixture
-from oslo_utils import timeutils
 from oslotest import base
 import yaml
 
@@ -49,32 +48,6 @@ class BaseTestCase(base.BaseTestCase):
         cfgfile.write(yaml.safe_dump(data))
         cfgfile.close()
         return cfgfile.name
-
-    def assertTimestampEqual(self, first, second, msg=None):
-        """Checks that two timestamps are equals.
-
-        This relies on assertAlmostEqual to avoid rounding problem, and only
-        checks up the first microsecond values.
-
-        """
-        return self.assertAlmostEqual(
-            timeutils.delta_seconds(first, second),
-            0.0,
-            places=5)
-
-    def assertIsEmpty(self, obj):
-        try:
-            if len(obj) != 0:
-                self.fail("%s is not empty" % type(obj))
-        except (TypeError, AttributeError):
-            self.fail("%s doesn't have length" % type(obj))
-
-    def assertIsNotEmpty(self, obj):
-        try:
-            if len(obj) == 0:
-                self.fail("%s is empty" % type(obj))
-        except (TypeError, AttributeError):
-            self.fail("%s doesn't have length" % type(obj))
 
     @staticmethod
     def path_get(project_file=None):
