@@ -90,7 +90,7 @@ The following meters are collected for OpenStack Compute.
 |           |       |      |          |          |         | instance         |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Gauge | MB   | instance | Pollster | Libvirt,| Volume of RAM    |
-| usage     |       |      | ID       |          | vSphere,| used by the inst\|
+| usage     |       |      | ID       |          |         | used by the inst\|
 |           |       |      |          |          |         | ance from the    |
 |           |       |      |          |          |         | amount of its    |
 |           |       |      |          |          |         | allocated memory |

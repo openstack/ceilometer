@@ -78,7 +78,6 @@ compute hosts.
 The following is a list of supported hypervisors.
 
 -  `Libvirt supported hypervisors <http://libvirt.org/>`__ such as KVM and QEMU
--  `VMware vSphere <https://www.vmware.com/support/vsphere-hypervisor.html>`__
 
 .. note::
 
