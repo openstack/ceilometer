@@ -107,7 +107,7 @@ function ceilometer_create_accounts {
         get_or_add_user_project_role "ResellerAdmin" "ceilometer" $SERVICE_PROJECT_NAME
     fi
 
-    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]]; then
+    if [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]]; then
         create_service_user "gnocchi"
         local gnocchi_service=$(get_or_create_service "gnocchi" \
             "metric" "OpenStack Metric Service")
@@ -204,7 +204,7 @@ function _ceilometer_configure_storage_backend {
             if [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
                 echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
                 echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/pipeline.yaml
-                ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && configure_gnocchi
+                configure_gnocchi
             elif [ "$CEILOMETER_BACKEND" = 'sg-core' ] ; then
                 echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
                 echo "          - tcp://127.0.0.1:4242" >> $CEILOMETER_CONF_DIR/pipeline.yaml
@@ -293,19 +293,17 @@ function install_ceilometer {
         _ceilometer_prepare_coordination
     fi
 
-    ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]] && install_gnocchi
-
     if [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]]; then
-        extra=gnocchi
+        install_gnocchi
     fi
-    setup_develop $CEILOMETER_DIR $extra
+    setup_develop $CEILOMETER_DIR
     sudo install -d -o $STACK_USER -m 755 $CEILOMETER_CONF_DIR
 }
 
 # start_ceilometer() - Start running processes, including screen
 function start_ceilometer {
 
-    if ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]] ; then
+    if [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]] ; then
         run_process gnocchi-api "$CEILOMETER_BIN_DIR/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
         run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
