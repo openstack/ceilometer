@@ -38,6 +38,7 @@ LOG = log.getLogger(__name__)
 
 class InstanceStats(object):
     fields = [
+        'power_state',             # the power state of the domain
         'cpu_number',              # number: number of CPUs
         'cpu_time',                # time: cumulative CPU time
         'cpu_util',                # util: CPU utilization in percentage

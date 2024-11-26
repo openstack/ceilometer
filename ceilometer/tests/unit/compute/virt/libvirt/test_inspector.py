@@ -78,6 +78,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertEqual(0, stats.power_state)
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(40000, stats.cpu_time)
             self.assertEqual(90112, stats.cpu_l3_cache_usage)

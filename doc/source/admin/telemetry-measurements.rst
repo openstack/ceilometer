@@ -233,6 +233,11 @@ The following meters are collected for OpenStack Compute.
 | ce.write.\| ative | ns   | Disk ID  | Pollster | Libvirt | operations have  |
 | latency   |       |      |          |          |         | taken            |
 +-----------+-------+------+----------+----------+---------+------------------+
+| **Meters added in the Epoxy release**                                       |
++-----------+-------+------+----------+----------+---------+------------------+
+| power.sta\| Gauge | state| instance | Pollster | Libvirt | virDomainState   |
+| te        |       |      | ID       |          |         | of the VM        |
++-----------+-------+------+----------+----------+---------+------------------+
 
 .. note::
 

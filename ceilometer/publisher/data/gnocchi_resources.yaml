@@ -84,6 +84,7 @@ resources:
       memory.bandwidth.total:
       memory.bandwidth.local:
       vcpus:
+      power.state:
       cpu:
         archive_policy_name: ceilometer-low-rate
       cpu_l3_cache:

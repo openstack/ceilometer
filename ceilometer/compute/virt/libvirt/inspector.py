@@ -242,6 +242,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             cpu_time = stats.get('cpu.time')
 
         return virt_inspector.InstanceStats(
+            power_state=domain.info()[0],
             cpu_number=stats.get('vcpu.current'),
             cpu_time=cpu_time,
             memory_usage=memory_used,
