@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Support for Open Contrail has been removed. Because no SDN is supported
+    after the removal, the mechanism to pull metrics from SDN is also removed.
