@@ -18,7 +18,7 @@ from ceilometer import keystone_client
 from ceilometer.polling import plugin_base
 
 SERVICE_OPTS = [
-    cfg.StrOpt('cinder', deprecated_name='cinderv2',
+    cfg.StrOpt('cinder',
                default='volumev3',
                help='Cinder service type.'),
 ]

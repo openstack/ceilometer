@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The deprecated ``[service_types] cinderv2`` option has been removed. Use
+    the ``[service_types] cinder`` option instead.
