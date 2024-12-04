@@ -93,5 +93,4 @@ Telemetry is able to retrieve information from external networking services:
 
 -  SDN controller meters:
 
-   -  `OpenDaylight <https://www.opendaylight.org/>`__
    -  `OpenContrail <http://www.opencontrail.org/>`__
