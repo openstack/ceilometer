@@ -151,36 +151,6 @@ resources_update_operations = [
                                    "max_length": 255,
                                    "required": True}}
      }]},
-    {"desc": "add switch resource type",
-     "type": "create_resource_type",
-     "resource_type": "switch",
-     "data": [{
-         "attributes": {"controller": {"type": "string", "min_length": 0,
-                                       "max_length": 255, "required": True}}
-     }]},
-    {"desc": "add switch_port resource type",
-     "type": "create_resource_type",
-     "resource_type": "switch_port",
-     "data": [{
-         "attributes": {"switch": {"type": "string", "min_length": 0,
-                                   "max_length": 64, "required": True},
-                        "port_number_on_switch": {"type": "number", "min": 0,
-                                                  "max": 4294967295,
-                                                  "required": False},
-                        "neutron_port_id": {"type": "string",
-                                            "min_length": 0,
-                                            "max_length": 255,
-                                            "required": False},
-                        "controller": {"type": "string", "min_length": 0,
-                                       "max_length": 255, "required": True}}
-     }]},
-    {"desc": "add port resource type",
-     "type": "create_resource_type",
-     "resource_type": "port",
-     "data": [{
-         "attributes": {"controller": {"type": "string", "min_length": 0,
-                                       "max_length": 255, "required": True}}
-     }]},
     {"desc": "add volume provider resource type",
      "type": "create_resource_type",
      "resource_type": "volume_provider",

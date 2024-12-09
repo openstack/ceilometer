@@ -84,13 +84,3 @@ The following is a list of supported hypervisors.
 
    For details about hypervisor support in libvirt please see the
    `Libvirt API support matrix <http://libvirt.org/hvsupport.html>`__.
-
-
-Supported networking services
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Telemetry is able to retrieve information from external networking services:
-
--  SDN controller meters:
-
-   -  `OpenContrail <http://www.opencontrail.org/>`__
