@@ -263,7 +263,7 @@ class TestPromExporter(base.BaseTestCase):
                          'type': 'usage',
                          'unit': 'MB',
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
-                         'vm_instance': 'e0d297f5df3b62ec73c8d42b',
+                         'vm_instance': 'devstack',
                          'server_group': 'none'}
         sample_dict_3 = {'counter': 'disk.device.read.latency',
                          'disk': 'read',
@@ -275,7 +275,7 @@ class TestPromExporter(base.BaseTestCase):
                          'type': 'device',
                          'unit': 'ns',
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
-                         'vm_instance': 'e0d297f5df3b62ec73c8d42b',
+                         'vm_instance': 'devstack',
                          'server_group': 'none'}
         self.assertEqual(16344576,
                          prom_exporter.CEILOMETER_REGISTRY.
@@ -304,7 +304,7 @@ class TestPromExporter(base.BaseTestCase):
                               '6e7d71415cd5401cbe103829c9c5dec2',
                               'ns',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
-                              'e0d297f5df3b62ec73c8d42b',
+                              'devstack',
                               'myserver:instance-00000002', 'none']
         label1 = prom_exporter._gen_labels(self.test_data[0])
         self.assertDictEqual(label1, slabels1)
@@ -319,7 +319,7 @@ class TestPromExporter(base.BaseTestCase):
                               'd965489b7f894cbda89cd2e25bfd85a0',
                               '6e7d71415cd5401cbe103829c9c5dec2', 'MB',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
-                              'e0d297f5df3b62ec73c8d42b',
+                              'devstack',
                               'myserver:instance-00000002', 'none']
         label2 = prom_exporter._gen_labels(self.test_data[2])
         self.assertDictEqual(label2, slabels2)
