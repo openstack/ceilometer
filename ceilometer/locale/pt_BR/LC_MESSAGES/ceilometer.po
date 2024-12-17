@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2022-08-22 19:15+0000\n"
+"POT-Creation-Date: 2024-12-09 13:26+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -68,10 +68,6 @@ msgstr "Nenhum plug-in nomeado %(plugin)s disponível para %(name)s"
 
 msgid "Node Manager init failed"
 msgstr "Inicialização do gerenciador de nó com falha"
-
-#, python-format
-msgid "Opencontrail API returned %(status)s %(reason)s"
-msgstr "A API Opencontrail retornou%(status)s%(reason)s"
 
 #, python-format
 msgid ""
