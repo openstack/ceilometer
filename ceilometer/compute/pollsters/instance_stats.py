@@ -82,21 +82,3 @@ class PerfCacheReferencesPollster(InstanceStatsPollster):
 class PerfCacheMissesPollster(InstanceStatsPollster):
     sample_name = 'perf.cache.misses'
     sample_stats_key = 'cache_misses'
-
-
-class MemoryBandwidthTotalPollster(InstanceStatsPollster):
-    sample_name = 'memory.bandwidth.total'
-    sample_unit = 'B/s'
-    sample_stats_key = 'memory_bandwidth_total'
-
-
-class MemoryBandwidthLocalPollster(InstanceStatsPollster):
-    sample_name = 'memory.bandwidth.local'
-    sample_unit = 'B/s'
-    sample_stats_key = 'memory_bandwidth_local'
-
-
-class CPUL3CachePollster(InstanceStatsPollster):
-    sample_name = 'cpu_l3_cache'
-    sample_unit = 'B'
-    sample_stats_key = "cpu_l3_cache_usage"

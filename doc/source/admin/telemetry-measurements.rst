@@ -164,18 +164,6 @@ The following meters are collected for OpenStack Compute.
 +-----------+-------+------+----------+----------+---------+------------------+
 | **Meters added in the Newton release**                                      |
 +-----------+-------+------+----------+----------+---------+------------------+
-| cpu_l3_c\ | Gauge | B    | instance | Pollster | Libvirt | L3 cache used b\ |
-| ache      |       |      | ID       |          |         | y the instance   |
-+-----------+-------+------+----------+----------+---------+------------------+
-| memory.b\ | Gauge | B/s  | instance | Pollster | Libvirt | Total system ba\ |
-| andwidth\ |       |      | ID       |          |         | ndwidth from on\ |
-| .total    |       |      |          |          |         | e level of cache |
-+-----------+-------+------+----------+----------+---------+------------------+
-| memory.b\ | Gauge | B/s  | instance | Pollster | Libvirt | Bandwidth of me\ |
-| andwidth\ |       |      | ID       |          |         | mory traffic fo\ |
-| .local    |       |      |          |          |         | r a memory cont\ |
-|           |       |      |          |          |         | roller           |
-+-----------+-------+------+----------+----------+---------+------------------+
 | perf.cpu\ | Gauge | cyc\ | instance | Pollster | Libvirt | the number of c\ |
 | .cycles   |       | le   | ID       |          |         | pu cycles one i\ |
 |           |       |      |          |          |         | nstruction needs |

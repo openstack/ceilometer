@@ -96,26 +96,3 @@ class TestCPUPollster(base.TestPollsterBase):
         self.assertEqual(1, len(samples))
         self.assertEqual('m1.small',
                          samples[0].resource_metadata['instance_type'])
-
-
-class TestCPUL3CachePollster(base.TestPollsterBase):
-
-    def test_get_samples(self):
-        self._mock_inspect_instance(
-            virt_inspector.InstanceStats(cpu_l3_cache_usage=90112),
-            virt_inspector.InstanceStats(cpu_l3_cache_usage=180224),
-        )
-
-        mgr = manager.AgentManager(0, self.CONF)
-        pollster = instance_stats.CPUL3CachePollster(self.CONF)
-
-        def _verify_cpu_l3_cache_metering(expected_usage):
-            cache = {}
-            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-            self.assertEqual(1, len(samples))
-            self.assertEqual(set(['cpu_l3_cache']),
-                             set([s.name for s in samples]))
-            self.assertEqual(expected_usage, samples[0].volume)
-
-        _verify_cpu_l3_cache_metering(90112)
-        _verify_cpu_l3_cache_metering(180224)

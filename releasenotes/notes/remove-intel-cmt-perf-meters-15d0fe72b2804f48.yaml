@@ -1,0 +1,10 @@
+---
+upgrade:
+  - |
+    The following meters were removed. Nova removed support for Intel CMT
+    perf events in 22.0.0, and these meters can no longer be measured since
+    then.
+
+    - ``cpu_l3_cache_usage``
+    - ``memory_bandwidth_local``
+    - ``memory_bandwidth_total``

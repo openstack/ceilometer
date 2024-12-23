@@ -252,8 +252,5 @@ class LibvirtInspector(virt_inspector.Inspector):
             cpu_cycles=stats.get("perf.cpu_cycles"),
             instructions=stats.get("perf.instructions"),
             cache_references=stats.get("perf.cache_references"),
-            cache_misses=stats.get("perf.cache_misses"),
-            memory_bandwidth_total=stats.get("perf.mbmt"),
-            memory_bandwidth_local=stats.get("perf.mbml"),
-            cpu_l3_cache_usage=stats.get("perf.cmt"),
+            cache_misses=stats.get("perf.cache_misses")
         )

@@ -40,23 +40,18 @@ LOG = log.getLogger(__name__)
 
 class InstanceStats(object):
     fields = [
-        'power_state',             # the power state of the domain
-        'cpu_number',              # number: number of CPUs
-        'cpu_time',                # time: cumulative CPU time
-        'cpu_l3_cache_usage',      # cachesize: Amount of CPU L3 cache used
-        'memory_usage',            # usage: Amount of memory used
-        'memory_resident',         #
-        'memory_swap_in',          # memory swap in
-        'memory_swap_out',         # memory swap out
-        'memory_bandwidth_total',  # total: total system bandwidth from one
-                                   #   level of cache
-        'memory_bandwidth_local',  # local: bandwidth of memory traffic for a
-                                   #   memory controller
-        'cpu_cycles',              # cpu_cycles: the number of cpu cycles one
-                                   #   instruction needs
-        'instructions',            # instructions: the count of instructions
-        'cache_references',        # cache_references: the count of cache hits
-        'cache_misses',            # cache_misses: the count of caches misses
+        'power_state',       # the power state of the domain
+        'cpu_number',        # number: number of CPUs
+        'cpu_time',          # time: cumulative CPU time
+        'memory_usage',      # usage: Amount of memory used
+        'memory_resident',   #
+        'memory_swap_in',    # memory swap in
+        'memory_swap_out',   # memory swap out
+        'cpu_cycles',        # cpu_cycles: the number of cpu cycles one
+                             #   instruction needs
+        'instructions',      # instructions: the count of instructions
+        'cache_references',  # cache_references: the count of cache hits
+        'cache_misses',      # cache_misses: the count of caches misses
     ]
 
     def __init__(self, **kwargs):

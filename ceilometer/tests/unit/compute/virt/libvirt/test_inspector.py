@@ -67,13 +67,10 @@ class TestLibvirtInspection(base.BaseTestCase):
             'vcpu.0.wait': 10000,
             'vcpu.2.time': 10000,
             'vcpu.2.wait': 10000,
-            'perf.cmt': 90112,
             'perf.cpu_cycles': 7259361,
             'perf.instructions': 8815623,
             'perf.cache_references': 74184,
-            'perf.cache_misses': 16737,
-            'perf.mbmt': 1892352,
-            'perf.mbml': 1802240})]
+            'perf.cache_misses': 16737})]
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
@@ -81,13 +78,10 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(0, stats.power_state)
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(40000, stats.cpu_time)
-            self.assertEqual(90112, stats.cpu_l3_cache_usage)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)
             self.assertEqual(5120 / units.Ki, stats.memory_swap_in)
             self.assertEqual(8192 / units.Ki, stats.memory_swap_out)
-            self.assertEqual(1892352, stats.memory_bandwidth_total)
-            self.assertEqual(1802240, stats.memory_bandwidth_local)
             self.assertEqual(7259361, stats.cpu_cycles)
             self.assertEqual(8815623, stats.instructions)
             self.assertEqual(74184, stats.cache_references)
@@ -510,9 +504,6 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
-            self.assertIsNone(stats.cpu_l3_cache_usage)
-            self.assertIsNone(stats.memory_bandwidth_total)
-            self.assertIsNone(stats.memory_bandwidth_local)
             self.assertIsNone(stats.cpu_cycles)
             self.assertIsNone(stats.instructions)
             self.assertIsNone(stats.cache_references)
