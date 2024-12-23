@@ -43,7 +43,6 @@ class InstanceStats(object):
         'power_state',             # the power state of the domain
         'cpu_number',              # number: number of CPUs
         'cpu_time',                # time: cumulative CPU time
-        'cpu_util',                # util: CPU utilization in percentage
         'cpu_l3_cache_usage',      # cachesize: Amount of CPU L3 cache used
         'memory_usage',            # usage: Amount of memory used
         'memory_resident',         #
