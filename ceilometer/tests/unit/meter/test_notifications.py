@@ -17,7 +17,6 @@ from unittest import mock
 import fixtures
 from oslo_cache import core as cache
 from oslo_config import fixture as config_fixture
-from oslo_utils import encodeutils
 from oslo_utils import fileutils
 import yaml
 
@@ -267,7 +266,7 @@ class TestMeterDefinition(test.BaseTestCase):
             self.assertIn("Required fields ['name', 'type', 'event_type',"
                           " 'unit', 'volume', 'resource_id']"
                           " not specified",
-                          encodeutils.exception_to_unicode(e))
+                          str(e))
 
     def test_bad_type_cfg_definition(self):
         cfg = dict(name="test", type="foo", event_type="bar.create",
@@ -277,8 +276,7 @@ class TestMeterDefinition(test.BaseTestCase):
         try:
             notifications.MeterDefinition(cfg, conf, mock.Mock())
         except declarative.DefinitionException as e:
-            self.assertIn("Invalid type foo specified",
-                          encodeutils.exception_to_unicode(e))
+            self.assertIn("Invalid type foo specified", str(e))
 
 
 class CacheConfFixture(config_fixture.Config):
