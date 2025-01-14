@@ -70,7 +70,9 @@ POLLING_OPTS = [
     cfg.IntOpt('batch_size',
                default=50,
                help='Batch size of samples to send to notification agent, '
-                    'Set to 0 to disable'),
+                    'Set to 0 to disable. When prometheus exporter feature '
+                    'is used, this should be largered than maximum number of '
+                    'samples per metric.'),
     cfg.MultiStrOpt('pollsters_definitions_dirs',
                     default=["/etc/ceilometer/pollsters.d"],
                     help="List of directories with YAML files used "

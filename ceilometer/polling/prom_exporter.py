@@ -26,11 +26,21 @@ def export(prometheus_iface, prometheus_port):
 
 
 def collect_metrics(samples):
+    metric_cleared = False
+
     for sample in samples:
         name = "ceilometer_" + sample['counter_name'].replace('.', '_')
         labels = _gen_labels(sample)
 
         metric = CEILOMETER_REGISTRY._names_to_collectors.get(name, None)
+
+        # NOTE: Ungregister the metric at the first iteration to purge stale
+        # samples
+        if not metric_cleared:
+            if metric:
+                CEILOMETER_REGISTRY.unregister(metric)
+                metric = None
+            metric_cleared = True
 
         if metric is None:
             metric = prom.Gauge(name=name, documentation="",

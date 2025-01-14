@@ -28,7 +28,7 @@ COUNTER_SOURCE = 'testsource'
 
 
 class TestPromExporter(base.BaseTestCase):
-    test_data = [
+    test_disk_latency = [
         {
             'source': 'openstack',
             'counter_name': 'disk.device.read.latency',
@@ -132,7 +132,10 @@ class TestPromExporter(base.BaseTestCase):
             'message_id': '078029c7-2ee8-11ef-a915-bd45e2085de4',
             'monotonic_time': 1819990.112406547,
             'message_signature': 'f8d9a411b0cd0cb0d34e84'
-        },
+        }
+    ]
+
+    test_memory_usage = [
         {
             'source': 'openstack',
             'counter_name': 'memory.usage',
@@ -180,7 +183,10 @@ class TestPromExporter(base.BaseTestCase):
             'message_id': '078029bf-2ee8-11ef-a915-bd45e2085de3',
             'monotonic_time': 1819980.131767362,
             'message_signature': 'f8d9a411b0cd0cb0d34e83'
-        },
+        }
+    ]
+
+    test_image_size = [
         {
             'source': 'openstack',
             'counter_name': 'image.size',
@@ -244,7 +250,7 @@ class TestPromExporter(base.BaseTestCase):
         ])
 
     def test_collect_metrics(self):
-        prom_exporter.collect_metrics(self.test_data)
+        prom_exporter.collect_metrics(self.test_image_size)
         sample_dict_1 = {'counter': 'image.size',
                          'image': 'f9276c96-8a12-432b-96a1-559d70715f97',
                          'project': 'd965489b7f894cbda89cd2e25bfd85a0',
@@ -254,6 +260,12 @@ class TestPromExporter(base.BaseTestCase):
                          'type': 'size',
                          'unit': 'B',
                          'server_group': 'server_group123'}
+        self.assertEqual(16344576,
+                         prom_exporter.CEILOMETER_REGISTRY.
+                         get_sample_value('ceilometer_image_size',
+                                          sample_dict_1))
+
+        prom_exporter.collect_metrics(self.test_memory_usage)
         sample_dict_2 = {'counter': 'memory.usage',
                          'memory': 'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
                          'project': 'd965489b7f894cbda89cd2e25bfd85a0',
@@ -265,6 +277,12 @@ class TestPromExporter(base.BaseTestCase):
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
                          'vm_instance': 'devstack',
                          'server_group': 'none'}
+        self.assertEqual(37.98046875,
+                         prom_exporter.CEILOMETER_REGISTRY.
+                         get_sample_value('ceilometer_memory_usage',
+                                          sample_dict_2))
+
+        prom_exporter.collect_metrics(self.test_disk_latency)
         sample_dict_3 = {'counter': 'disk.device.read.latency',
                          'disk': 'read',
                          'project': 'd965489b7f894cbda89cd2e25bfd85a0',
@@ -277,14 +295,6 @@ class TestPromExporter(base.BaseTestCase):
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
                          'vm_instance': 'devstack',
                          'server_group': 'none'}
-        self.assertEqual(16344576,
-                         prom_exporter.CEILOMETER_REGISTRY.
-                         get_sample_value('ceilometer_image_size',
-                                          sample_dict_1))
-        self.assertEqual(37.98046875,
-                         prom_exporter.CEILOMETER_REGISTRY.
-                         get_sample_value('ceilometer_memory_usage',
-                                          sample_dict_2))
         # The value has to be of the second sample, as this is now a Gauge
         self.assertEqual(232128754,
                          prom_exporter.CEILOMETER_REGISTRY.
@@ -306,7 +316,7 @@ class TestPromExporter(base.BaseTestCase):
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
                               'devstack',
                               'myserver:instance-00000002', 'none']
-        label1 = prom_exporter._gen_labels(self.test_data[0])
+        label1 = prom_exporter._gen_labels(self.test_disk_latency[0])
         self.assertDictEqual(label1, slabels1)
 
         slabels2 = dict(keys=[], values=[])
@@ -321,7 +331,7 @@ class TestPromExporter(base.BaseTestCase):
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
                               'devstack',
                               'myserver:instance-00000002', 'none']
-        label2 = prom_exporter._gen_labels(self.test_data[2])
+        label2 = prom_exporter._gen_labels(self.test_memory_usage[0])
         self.assertDictEqual(label2, slabels2)
 
         slabels3 = dict(keys=[], values=[])
@@ -333,5 +343,5 @@ class TestPromExporter(base.BaseTestCase):
                               'd965489b7f894cbda89cd2e25bfd85a0', 'B',
                               'f9276c96-8a12-432b-96a1-559d70715f97',
                               'cirros2', 'server_group123']
-        label3 = prom_exporter._gen_labels(self.test_data[3])
+        label3 = prom_exporter._gen_labels(self.test_image_size[0])
         self.assertDictEqual(label3, slabels3)
