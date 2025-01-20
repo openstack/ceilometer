@@ -38,12 +38,6 @@ class CPUPollster(InstanceStatsPollster):
         return {'cpu_number': c_data.cpu_number}
 
 
-class CPUUtilPollster(InstanceStatsPollster):
-    sample_name = 'cpu_util'
-    sample_unit = '%'
-    sample_stats_key = 'cpu_util'
-
-
 class MemoryUsagePollster(InstanceStatsPollster):
     sample_name = 'memory.usage'
     sample_unit = 'MB'

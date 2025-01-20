@@ -98,29 +98,6 @@ class TestCPUPollster(base.TestPollsterBase):
                          samples[0].resource_metadata['instance_type'])
 
 
-class TestCPUUtilPollster(base.TestPollsterBase):
-
-    def test_get_samples(self):
-        self._mock_inspect_instance(
-            virt_inspector.InstanceStats(cpu_util=40),
-            virt_inspector.InstanceStats(cpu_util=60),
-        )
-
-        mgr = manager.AgentManager(0, self.CONF)
-        pollster = instance_stats.CPUUtilPollster(self.CONF)
-
-        def _verify_cpu_util_metering(expected_util):
-            cache = {}
-            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
-            self.assertEqual(1, len(samples))
-            self.assertEqual(set(['cpu_util']),
-                             set([s.name for s in samples]))
-            self.assertEqual(expected_util, samples[0].volume)
-
-        _verify_cpu_util_metering(40)
-        _verify_cpu_util_metering(60)
-
-
 class TestCPUL3CachePollster(base.TestPollsterBase):
 
     def test_get_samples(self):
