@@ -26,8 +26,10 @@ import ceilometer
 OPTS = [
     cfg.StrOpt('hypervisor_inspector',
                default='libvirt',
-               help='Inspector to use for inspecting the hypervisor layer. '
-                    'Known inspectors are libvirt and vsphere.'),
+               choices=['libvirt'],
+               deprecated_for_removal=True,
+               deprecated_reason='libvirt is the only supported hypervisor',
+               help='Inspector to use for inspecting the hypervisor layer.')
 ]
 
 

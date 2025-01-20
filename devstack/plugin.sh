@@ -93,20 +93,6 @@ function _ceilometer_prepare_coordination {
     fi
 }
 
-# Install the python modules for inspecting nova virt instances
-function _ceilometer_prepare_virt_drivers {
-    # Only install virt drivers if we're running nova compute
-    if is_service_enabled n-cpu ; then
-        # NOTE(tkajinam): pythonN-libvirt is installed using distro
-        # packages in devstack
-
-        if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
-            pip_install_gr oslo.vmware
-        fi
-    fi
-}
-
-
 # Create ceilometer related accounts in Keystone
 function ceilometer_create_accounts {
     # At this time, the /etc/openstack/clouds.yaml is available,
@@ -279,13 +265,6 @@ function configure_ceilometer {
     iniset $CEILOMETER_CONF service_credentials region_name $REGION_NAME
     iniset $CEILOMETER_CONF service_credentials auth_url $KEYSTONE_SERVICE_URI
 
-    if [[ "$VIRT_DRIVER" = 'vsphere' ]]; then
-        iniset $CEILOMETER_CONF DEFAULT hypervisor_inspector vsphere
-        iniset $CEILOMETER_CONF vmware host_ip "$VMWAREAPI_IP"
-        iniset $CEILOMETER_CONF vmware host_username "$VMWAREAPI_USER"
-        iniset $CEILOMETER_CONF vmware host_password "$VMWAREAPI_PASSWORD"
-    fi
-
     _ceilometer_configure_storage_backend
 
     if is_service_enabled ceilometer-aipmi; then
@@ -319,10 +298,6 @@ function install_ceilometer {
 
     ! [[ $DEVSTACK_PLUGINS =~ 'gnocchi' ]] && [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]] && install_gnocchi
 
-    if is_service_enabled ceilometer-acompute ; then
-        _ceilometer_prepare_virt_drivers
-    fi
-
     if [[ "$CEILOMETER_BACKENDS" =~ 'gnocchi' ]]; then
         extra=gnocchi
     fi
@@ -347,7 +322,7 @@ function start_ceilometer {
     # operational keystone if using gnocchi
     run_process ceilometer-anotification "$CEILOMETER_BIN_DIR/ceilometer-agent-notification --config-file $CEILOMETER_CONF"
 
-    run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF"
+    run_process ceilometer-acompute "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces compute --config-file $CEILOMETER_CONF" $LIBVIRT_GROUP
 }
 
 # stop_ceilometer() - Stop running processes

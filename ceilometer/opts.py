@@ -21,7 +21,6 @@ import ceilometer.cmd.polling
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
-import ceilometer.compute.virt.vmware.inspector
 import ceilometer.event.converter
 import ceilometer.image.discovery
 import ceilometer.ipmi.platform.intel_node_manager
@@ -106,8 +105,7 @@ def list_opts():
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,
                          ceilometer.objectstore.swift.SERVICE_OPTS,
-                         ceilometer.volume.discovery.SERVICE_OPTS,)),
-        ('vmware', ceilometer.compute.virt.vmware.inspector.OPTS),
+                         ceilometer.volume.discovery.SERVICE_OPTS,))
     ]
 
 

@@ -1,0 +1,10 @@
+---
+upgrade:
+  - |
+    Support for VMware vSphere has been removed.
+
+deprecations:
+  - |
+    The ``[DEFAULT] hypervisor_inspector`` option has been deprecated, because
+    libvirt is the only supported hypervisor currently. The option will be
+    removed in a future release.
