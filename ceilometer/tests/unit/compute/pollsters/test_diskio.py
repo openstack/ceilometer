@@ -51,7 +51,7 @@ class TestBaseDiskIO(base.TestPollsterBase):
         mgr = manager.AgentManager(0, self.CONF)
         cache = {}
         samples = list(pollster.get_samples(mgr, cache, self.instance))
-        self.assertIsNotEmpty(samples)
+        self.assertNotEqual(samples, [])
         cache_key = pollster.inspector_method
         self.assertIn(cache_key, cache)
         for instance in self.instance:
