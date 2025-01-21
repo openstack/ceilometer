@@ -17,6 +17,7 @@ import socket
 from keystoneauth1 import loading
 from oslo_config import cfg
 
+import ceilometer.alarm.discovery
 import ceilometer.cmd.polling
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
@@ -100,7 +101,8 @@ def list_opts():
         ('rgw_admin_credentials', ceilometer.objectstore.rgw.CREDENTIAL_OPTS),
         ('rgw_client', ceilometer.objectstore.rgw.CLIENT_OPTS),
         ('service_types',
-         itertools.chain(ceilometer.image.discovery.SERVICE_OPTS,
+         itertools.chain(ceilometer.alarm.discovery.SERVICE_OPTS,
+                         ceilometer.image.discovery.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,

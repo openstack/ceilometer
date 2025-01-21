@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Ceilometer is now able to poll the /metrics endpoint in Aodh to get
+    evaluation results metrics.

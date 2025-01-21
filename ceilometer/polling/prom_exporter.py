@@ -136,5 +136,8 @@ def _gen_labels(sample):
         else:
             labels['keys'].append('server_group')
             labels['values'].append('none')
+        if resource_metadata.get('alarm_state', '') != '':
+            labels['keys'].append('state')
+            labels['values'].append(resource_metadata['alarm_state'])
 
     return labels
