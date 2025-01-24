@@ -218,9 +218,6 @@ function _ceilometer_configure_storage_backend {
 
 # Configure Ceilometer
 function configure_ceilometer {
-
-    local conffile
-
     iniset_rpc_backend ceilometer $CEILOMETER_CONF
 
     iniset $CEILOMETER_CONF oslo_messaging_notifications topics "$CEILOMETER_NOTIFICATION_TOPICS"
