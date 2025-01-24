@@ -41,8 +41,8 @@ Supported databases
 ~~~~~~~~~~~~~~~~~~~
 
 The other key external component of Telemetry is the database, where
-events, samples, alarm definitions, and alarms are stored. Each of the data
-models have their own storage service and each support various back ends.
+samples, alarm definitions, and alarms are stored. Each of the data models have
+their own storage service and each support various back ends.
 
 The list of supported base back ends for measurements:
 
@@ -50,20 +50,7 @@ The list of supported base back ends for measurements:
 
 The list of supported base back ends for alarms:
 
--  `MySQL <http://www.mysql.com/>`__
-
--  `PostgreSQL <http://www.postgresql.org/>`__
-
-
-The list of supported base back ends for events:
-
--  `ElasticSearch <https://www.elastic.co/>`__
-
--  `MongoDB <https://www.mongodb.org/>`__
-
--  `MySQL <http://www.mysql.com/>`__
-
--  `PostgreSQL <http://www.postgresql.org/>`__
+-  `aodh <https://docs.openstack.org/aodh/latest/>`__
 
 
 .. _telemetry-supported-hypervisors:
