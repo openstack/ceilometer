@@ -13,6 +13,7 @@
 # under the License.
 
 import collections
+import itertools
 from unittest import mock
 
 import fixtures
@@ -44,10 +45,15 @@ GET_ACCOUNTS = [('tenant-000', ({'x-account-object-count': 10,
                                  },
                                 [{'count': 10,
                                   'bytes': 123123,
-                                  'name': 'my_container'},
+                                  'name': 'my_container',
+                                  'storage_policy': 'Policy-0',
+                                  },
                                  {'count': 0,
                                   'bytes': 0,
-                                  'name': 'new_container'
+                                  'name': 'new_container',
+                                  # NOTE(callumdickinson): No storage policy,
+                                  # to test backwards compatibility with older
+                                  # versions of Swift.
                                   }])),
                 ('tenant-001', ({'x-account-object-count': 0,
                                  'x-account-bytes-used': 0,
@@ -81,15 +87,27 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     # pollsters.
     scenarios = [
         ('storage.objects',
-         {'factory': swift.ObjectsPollster}),
+         {'factory': swift.ObjectsPollster, 'resources': {}}),
         ('storage.objects.size',
-         {'factory': swift.ObjectsSizePollster}),
+         {'factory': swift.ObjectsSizePollster, 'resources': {}}),
         ('storage.objects.containers',
-         {'factory': swift.ObjectsContainersPollster}),
+         {'factory': swift.ObjectsContainersPollster, 'resources': {}}),
         ('storage.containers.objects',
-         {'factory': swift.ContainersObjectsPollster}),
+         {'factory': swift.ContainersObjectsPollster,
+          'resources': {
+              f"{project_id}/{container['name']}": container
+              for project_id, container in itertools.chain.from_iterable(
+                  itertools.product([acc[0]], acc[1][1])
+                  for acc in GET_ACCOUNTS)
+          }}),
         ('storage.containers.objects.size',
-         {'factory': swift.ContainersSizePollster}),
+         {'factory': swift.ContainersSizePollster,
+          'resources': {
+              f"{project_id}/{container['name']}": container
+              for project_id, container in itertools.chain.from_iterable(
+                  itertools.product([acc[0]], acc[1][1])
+                  for acc in GET_ACCOUNTS)
+          }}),
     ]
 
     @staticmethod
@@ -174,6 +192,16 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
                                                      ASSIGNED_TENANTS))
 
         self.assertEqual(2, len(samples), self.pollster.__class__)
+        for resource_id, resource in self.resources.items():
+            for field in getattr(self.pollster, 'FIELDS', []):
+                with self.subTest(f'{resource_id}-{field}'):
+                    sample = next(s for s in samples
+                                  if s.resource_id == resource_id)
+                    if field in resource:
+                        self.assertEqual(resource[field],
+                                         sample.resource_metadata[field])
+                    else:
+                        self.assertIsNone(sample.resource_metadata[field])
 
     def test_get_meter_names(self):
         with fixtures.MockPatchObject(self.factory, '_iter_accounts',

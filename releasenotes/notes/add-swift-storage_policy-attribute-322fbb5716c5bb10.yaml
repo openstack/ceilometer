@@ -1,0 +1,22 @@
+---
+features:
+  - |
+    The ``storage_policy`` resource metadata attribute has been added to the
+    ``swift.containers.objects`` and ``swift.containers.objects.size`` meters,
+    populated from already performed Swift account ``GET`` requests.
+    This functionality requires using a new version of Swift that adds the
+    ``storage_policy`` attribute when listing containers in an account.
+    Ceilometer is backwards compatible with Swift versions that do not
+    provide this functionality, but ``storage_policy`` will be set to
+    ``None`` in samples and Gnocchi resources.
+  - |
+    An optional ``storage_policy`` attribute has been added to the
+    ``swift_account`` Gnocchi resource type, to store the storage policy for
+    Swift containers in Gnocchi. For Swift accounts, ``storage_policy`` will
+    be set to ``None``.
+upgrade:
+  - |
+    To publish the ``storage_policy`` attribute for Swift containers,
+    ``gnocchi_resources.yaml`` will need to be updated to the latest version.
+    Swift in the target OpenStack cloud will also need upgrading to add
+    support for providing the storage policy when listing containers.

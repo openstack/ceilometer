@@ -226,6 +226,8 @@ resources:
       storage.objects.containers:
       storage.containers.objects:
       storage.containers.objects.size:
+    attributes:
+      storage_policy: resource_metadata.storage_policy
 
   - resource_type: volume
     metrics:

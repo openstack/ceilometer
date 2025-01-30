@@ -209,6 +209,15 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}
      }]},
+    {"desc": "add storage_policy to swift_account",
+     "type": "update_attribute_type",
+     "resource_type": "swift_account",
+     "data": [{
+         "op": "add",
+         "path": "/attributes/storage_policy",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": False}  # Only containers have a storage policy
+     }]},
 ]
 
 
