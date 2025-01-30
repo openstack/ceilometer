@@ -1,0 +1,14 @@
+---
+upgrade:
+  - |
+    When using dynamic pollsters to query OpenStack APIs, if the endpoint URL
+    returned by Keystone does not have a trailing slash and ``url_path`` is
+    a relative path, the ``url_path`` configured in the dynamic pollster would
+    replace sections of the endpoint URL instead of being appended to the end
+    of the URL. This behaviour has now been changed so that ``url_path``
+    values that do not start with a ``/`` are always appended to the end of
+    endpoint URLs.
+    This change may require existing dynamic pollsters that rely on this
+    behaviour to be changed, but this allows dynamic pollsters to be added
+    for OpenStack services that append the active project ID to the API
+    endpoint URL (e.g. Trove).

@@ -933,7 +933,10 @@ class PollsterSampleGatherer(object):
             LOG.debug("Cannot eval path [%s] with params [%s],"
                       " using [%s] instead.",
                       url_path, params, url_path)
-        return urlparse.urljoin(endpoint, url_path)
+        return urlparse.urljoin((endpoint
+                                 if endpoint.endswith("/")
+                                 else (endpoint + "/")),
+                                url_path)
 
     def retrieve_entries_from_response(self, response_json, definitions):
         if isinstance(response_json, list):
@@ -1091,7 +1094,10 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         endpoint = self.definitions.configurations['url_path']
         if endpoint == url_path:
             return url_path
-        return urlparse.urljoin(endpoint, url_path)
+        return urlparse.urljoin((endpoint
+                                 if endpoint.endswith("/")
+                                 else (endpoint + "/")),
+                                url_path)
 
     def generate_new_attributes_in_sample(
             self, sample, attribute_key, new_attribute_key):

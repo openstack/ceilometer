@@ -1713,11 +1713,29 @@ class TestDynamicPollster(base.BaseTestCase):
                          list(map(lambda s: s.resource_metadata["flavor.ram"],
                                   samples)))
 
-    def test_get_request_linked_samples_url_no_next_sample(self):
+    def test_get_request_linked_samples_url_endpoint_no_trailing_slash(self):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        base_url = "http://test.com/something_that_we_do_not_care"
+        base_url = (
+            "http://test.com:8779/v1.0/1a2b3c4d5e1a2b3c4d5e1a2b3c4d5e1a"
+        )
+        expected_url = urlparse.urljoin(
+            base_url + "/", self.pollster_definition_only_required_fields[
+                'url_path'])
+
+        kwargs = {'resource': base_url}
+        url = pollster.definitions.sample_gatherer\
+            .get_request_linked_samples_url(
+                kwargs, pollster.definitions.configurations)
+
+        self.assertEqual(expected_url, url)
+
+    def test_get_request_linked_samples_url_endpoint_trailing_slash(self):
+        pollster = dynamic_pollster.DynamicPollster(
+            self.pollster_definition_only_required_fields)
+
+        base_url = "http://test.com:9511/v1/"
         expected_url = urlparse.urljoin(
             base_url, self.pollster_definition_only_required_fields[
                 'url_path'])
