@@ -23,7 +23,6 @@ import threading
 from oslo_config import cfg
 from oslo_log import log
 import oslo_messaging
-from oslo_utils import encodeutils
 from oslo_utils import excutils
 from urllib import parse as urlparse
 
@@ -64,9 +63,7 @@ class DeliveryFailure(Exception):
 
 
 def raise_delivery_failure(exc):
-    excutils.raise_with_cause(DeliveryFailure,
-                              encodeutils.exception_to_unicode(exc),
-                              cause=exc)
+    excutils.raise_with_cause(DeliveryFailure, str(exc), cause=exc)
 
 
 class MessagingPublisher(publisher.ConfigPublisherBase, metaclass=abc.ABCMeta):
