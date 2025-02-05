@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    Added the ``volume_type_id`` attribute to ``volume.size`` notification
+    samples, which stores the ID for the volume type of the given volume.
+  - |
+    Added the ``volume_type_id`` attribute to ``volume`` resources in Gnocchi,
+    which stores the ID for the volume type of the given volume.
+upgrade:
+  - |
+    ``meters.yaml`` has been updated with changes to the ``volume.size``
+    notification meter. If you override this file in your deployment,
+    it needs to be updated.
+  - |
+    ``gnocchi_resources.yaml`` has been updated with changes to the
+    ``volume`` resource type. If you override this file in your deployment,
+    it needs to be updated.

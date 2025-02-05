@@ -130,6 +130,7 @@ metric:
     metadata:
       display_name: $.payload.display_name
       volume_type: $.payload.volume_type
+      volume_type_id: $.payload.volume_type
       image_id: $.payload.glance_metadata[?key=image_id].value
       instance_id: $.payload.volume_attachment[0].server_id
 

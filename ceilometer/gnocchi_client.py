@@ -200,6 +200,15 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}
      }]},
+    {"desc": "add volume_type_id to volume",
+     "type": "update_attribute_type",
+     "resource_type": "volume",
+     "data": [{
+         "op": "add",
+         "path": "/attributes/volume_type_id",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": False}
+     }]},
 ]
 
 

@@ -242,6 +242,7 @@ resources:
     attributes:
       display_name: resource_metadata.(display_name|name)
       volume_type: resource_metadata.volume_type
+      volume_type_id: resource_metadata.volume_type_id
       image_id: resource_metadata.image_id
       instance_id: resource_metadata.instance_id
     event_delete:
