@@ -91,3 +91,20 @@ class PerDeviceDiskWriteLatencyPollster(PerDeviceDiskPollster):
     sample_type = sample.TYPE_CUMULATIVE
     sample_unit = 'ns'
     sample_stats_key = 'wr_total_times'
+
+
+class EphemeralSizePollster(pollsters.InstanceMetadataPollster):
+    sample_name = 'disk.ephemeral.size'
+    sample_unit = 'GB'
+
+    def get_volume(self, instance):
+        return int(instance.flavor['ephemeral'])
+
+
+class RootSizePollster(pollsters.InstanceMetadataPollster):
+    sample_name = 'disk.root.size'
+    sample_unit = 'GB'
+
+    def get_volume(self, instance):
+        return (int(instance.flavor['disk'])
+                - int(instance.flavor['ephemeral']))

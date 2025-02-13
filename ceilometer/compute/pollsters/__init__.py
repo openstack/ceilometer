@@ -170,3 +170,44 @@ class GenericComputePollster(plugin_base.PollsterBase):
                     'Could not get %(name)s events for %(id)s: %(e)s', {
                         'name': self.sample_name, 'id': instance.id, 'e': err},
                     exc_info=True)
+
+
+class InstanceMetadataPollster(plugin_base.PollsterBase):
+    """A base class for implementing a pollster using instance metadata.
+
+    This metadata is originally supplied by Nova, but if
+    instance_discovery_method is set to libvirt_metadata,
+    metadata is fetched from the local libvirt socket,
+    just like with the standard compute pollsters.
+    """
+
+    sample_name = None
+    sample_unit = ''
+    sample_type = sample.TYPE_GAUGE
+
+    @property
+    def default_discovery(self):
+        return 'local_instances'
+
+    def get_resource_id(self, instance):
+        return instance.id
+
+    def get_volume(self, instance):
+        raise ceilometer.NotImplementedError
+
+    def get_additional_metadata(self, instance):
+        return {}
+
+    def get_samples(self, manager, cache, resources):
+        for instance in resources:
+            yield util.make_sample_from_instance(
+                self.conf,
+                instance,
+                name=self.sample_name,
+                unit=self.sample_unit,
+                type=self.sample_type,
+                resource_id=self.get_resource_id(instance),
+                volume=self.get_volume(instance),
+                additional_metadata=self.get_additional_metadata(instance),
+                monotonic_time=now(),
+            )
