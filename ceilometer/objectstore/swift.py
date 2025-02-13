@@ -111,6 +111,14 @@ class _Base(plugin_base.PollsterBase):
                                 'v1/' + reseller_prefix + tenant_id)
 
 
+class _ContainersBase(_Base):
+    FIELDS = ("storage_policy",)
+
+    def _get_resource_metadata(self, container):
+        # NOTE(callumdickinson): Sets value to None if a field is not found.
+        return {f: container.get(f) for f in self.FIELDS}
+
+
 class ObjectsPollster(_Base):
     """Collect the total objects count for each project"""
     def get_samples(self, manager, cache, resources):
@@ -165,7 +173,7 @@ class ObjectsContainersPollster(_Base):
             )
 
 
-class ContainersObjectsPollster(_Base):
+class ContainersObjectsPollster(_ContainersBase):
     """Collect the objects count per container for each project"""
 
     METHOD = 'get'
@@ -184,11 +192,11 @@ class ContainersObjectsPollster(_Base):
                     user_id=None,
                     project_id=tenant,
                     resource_id=tenant + '/' + container['name'],
-                    resource_metadata=None,
+                    resource_metadata=self._get_resource_metadata(container),
                 )
 
 
-class ContainersSizePollster(_Base):
+class ContainersSizePollster(_ContainersBase):
     """Collect the total objects size per container for each project"""
 
     METHOD = 'get'
@@ -207,5 +215,5 @@ class ContainersSizePollster(_Base):
                     user_id=None,
                     project_id=tenant,
                     resource_id=tenant + '/' + container['name'],
-                    resource_metadata=None,
+                    resource_metadata=self._get_resource_metadata(container),
                 )
