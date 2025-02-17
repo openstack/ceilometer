@@ -29,9 +29,7 @@ class VPNServicesDiscovery(_BaseServicesDiscovery):
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
 
-        vpnservices = self.neutron_cli.vpn_get_all()
-        return [i for i in vpnservices
-                if i.get('status', None) != 'error']
+        return self.neutron_cli.vpn_get_all()
 
 
 class IPSecConnectionsDiscovery(_BaseServicesDiscovery):

@@ -41,15 +41,15 @@ class VPNServicesPollster(base.BaseServicesPollster):
         resources = resources or []
 
         for vpn in resources:
-            LOG.debug("VPN : %s" % vpn)
+            LOG.debug("VPN : %s", vpn)
             status = self.get_status_id(vpn['status'])
             if status == -1:
-                # unknown status, skip this sample
-                LOG.warning(_("Unknown status %(stat)s received on vpn "
-                              "%(id)s, skipping sample")
-                            % {'stat': vpn['status'], 'id': vpn['id']})
-                continue
-
+                LOG.warning(
+                    _("Unknown status %(status)s for VPN %(name)s (%(id)s), "
+                      "setting volume to -1") % {
+                        "status": vpn['status'],
+                        "name": vpn['name'],
+                        "id": vpn['id']})
             yield sample.Sample(
                 name='network.services.vpn',
                 type=sample.TYPE_GAUGE,
@@ -90,7 +90,7 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
         resources = resources or []
 
         for conn in resources:
-            LOG.debug("IPSec Connection Info: %s" % conn)
+            LOG.debug("IPSec Connection Info: %s", conn)
 
             yield sample.Sample(
                 name='network.services.vpn.connections',

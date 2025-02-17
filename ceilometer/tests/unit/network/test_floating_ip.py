@@ -39,10 +39,10 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
     def setUp(self):
         super(TestFloatingIPPollster, self).setUp()
         self.pollster = floatingip.FloatingIPPollster(self.CONF)
-        fake_fip = self.fake_get_fip_service()
+        self.fake_fip = self.fake_get_fip_service()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
                                            'fip_get_all',
-                                           return_value=fake_fip))
+                                           return_value=self.fake_fip))
 
     @staticmethod
     def fake_get_fip_service():
@@ -72,31 +72,60 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
                  'fixed_ip_address': '10.0.0.8',
                  'floating_ip_address': '65.79.162.13',
                  'port_id': '67a0d2c7-a397-444c-9d75-d2ac89b6f209',
-                 'id': '90ca27bf-72bc-40c8-9c13-414d564ea367'}]
+                 'id': '90ca27bf-72bc-40c8-9c13-414d564ea367'},
+                {'router_id': 'a27ac630-939f-4e2e-bbc3-09a6b4f19a77',
+                 'status': 'UNKNOWN',
+                 'tenant_id': '54a0gggg50ee4c4396b2f8dc220a2bed57',
+                 'floating_network_id':
+                     '4d0c3f4f-79c7-40ff-9b0d-6e3a396547db',
+                 'fixed_ip_address': '10.0.0.9',
+                 'floating_ip_address': '65.79.162.14',
+                 'port_id': '59cc6efa-7c89-4730-b051-b15f594e6728',
+                 'id': 'a8a11884-7666-4f35-901e-dbb84e7111b5'},
+                {'router_id': '7eb0adde-6c3b-4a77-9714-f718a17afb83',
+                 'status': None,
+                 'tenant_id': '54a0gggg50ee4c4396b2f8dc220a2bed57',
+                 'floating_network_id':
+                     'bd6290e6-b014-4cd3-91f0-7e8a1b4c26ab',
+                 'fixed_ip_address': '10.0.0.10',
+                 'floating_ip_address': '65.79.162.15',
+                 'port_id': 'd3b9436d-4b2b-4832-852b-34df7513c935',
+                 'id': '27c539ca-94ce-42fc-a639-1bf2c8690d76'}]
 
     def test_fip_get_samples(self):
         samples = list(self.pollster.get_samples(
                        self.manager, {},
-                       resources=self.fake_get_fip_service()))
-        self.assertEqual(3, len(samples))
-        for field in self.pollster.FIELDS:
-            self.assertEqual(self.fake_get_fip_service()[0][field],
-                             samples[0].resource_metadata[field])
+                       resources=self.fake_fip))
+        self.assertEqual(len(self.fake_fip), len(samples))
+        self.assertEqual(set(fip['id'] for fip in self.fake_fip),
+                         set(sample.resource_id for sample in samples))
+        samples_dict = {sample.resource_id: sample for sample in samples}
+        for fip in self.fake_fip:
+            sample = samples_dict[fip['id']]
+            for field in self.pollster.FIELDS:
+                self.assertEqual(fip[field],
+                                 sample.resource_metadata[field])
 
     def test_fip_volume(self):
         samples = list(self.pollster.get_samples(
                        self.manager, {},
-                       resources=self.fake_get_fip_service()))
+                       resources=self.fake_fip))
         self.assertEqual(1, samples[0].volume)
+        self.assertEqual(3, samples[1].volume)
+        self.assertEqual(7, samples[2].volume)
+        self.assertEqual(-1, samples[3].volume)
+        self.assertEqual(-1, samples[4].volume)
 
     def test_get_fip_meter_names(self):
         samples = list(self.pollster.get_samples(
                        self.manager, {},
-                       resources=self.fake_get_fip_service()))
+                       resources=self.fake_fip))
         self.assertEqual(set(['ip.floating']),
                          set([s.name for s in samples]))
 
     def test_fip_discovery(self):
         discovered_fips = discovery.FloatingIPDiscovery(
             self.CONF).discover(self.manager)
-        self.assertEqual(3, len(discovered_fips))
+        self.assertEqual(len(self.fake_fip), len(discovered_fips))
+        for fip in self.fake_fip:
+            self.assertIn(fip, discovered_fips)
