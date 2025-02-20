@@ -275,7 +275,7 @@ class TestPromExporter(base.BaseTestCase):
                          'type': 'usage',
                          'unit': 'MB',
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
-                         'vm_instance': 'devstack',
+                         'vm_instance': 'e0d297f5df3b62ec73c8d42b',
                          'server_group': 'none'}
         self.assertEqual(37.98046875,
                          prom_exporter.CEILOMETER_REGISTRY.
@@ -293,7 +293,7 @@ class TestPromExporter(base.BaseTestCase):
                          'type': 'device',
                          'unit': 'ns',
                          'user': '6e7d71415cd5401cbe103829c9c5dec2',
-                         'vm_instance': 'devstack',
+                         'vm_instance': 'e0d297f5df3b62ec73c8d42b',
                          'server_group': 'none'}
         # The value has to be of the second sample, as this is now a Gauge
         self.assertEqual(232128754,
@@ -314,7 +314,7 @@ class TestPromExporter(base.BaseTestCase):
                               '6e7d71415cd5401cbe103829c9c5dec2',
                               'ns',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63-vda',
-                              'devstack',
+                              'e0d297f5df3b62ec73c8d42b',
                               'myserver:instance-00000002', 'none']
         label1 = prom_exporter._gen_labels(self.test_disk_latency[0])
         self.assertDictEqual(label1, slabels1)
@@ -329,7 +329,7 @@ class TestPromExporter(base.BaseTestCase):
                               'd965489b7f894cbda89cd2e25bfd85a0',
                               '6e7d71415cd5401cbe103829c9c5dec2', 'MB',
                               'e536fff6-b20d-4aa5-ac2f-d15ac8b3af63',
-                              'devstack',
+                              'e0d297f5df3b62ec73c8d42b',
                               'myserver:instance-00000002', 'none']
         label2 = prom_exporter._gen_labels(self.test_memory_usage[0])
         self.assertDictEqual(label2, slabels2)

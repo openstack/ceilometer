@@ -104,9 +104,9 @@ def _gen_labels(sample):
     if sample.get('resource_metadata'):
         resource_metadata = sample['resource_metadata']
 
-        if resource_metadata.get('instance_host'):
+        if resource_metadata.get('host'):
             labels['keys'].append("vm_instance")
-            labels['values'].append(resource_metadata['instance_host'])
+            labels['values'].append(resource_metadata['host'])
 
         if resource_metadata.get('display_name'):
             value = resource_metadata['display_name']
