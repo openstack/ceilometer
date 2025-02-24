@@ -217,3 +217,58 @@ class TimedeltaPlugin(TraitPluginBase):
                         )
             return [None]
         return [abs((end_time - start_time).total_seconds())]
+
+
+class MapTraitPlugin(TraitPluginBase):
+    """A trait plugin for mapping one set of values to another."""
+
+    def __init__(self, values=None, default=None, case_sensitive=True, **kw):
+        """Setup map trait.
+
+        :param values: (dict[Any, Any]) Mapping of values to their
+                       desired target values.
+        :param default: (Any) Value to set if no mapping for a value is found.
+        :param case_sensitive: (bool) Perform case-sensitive string lookups.
+        """
+        if not values:
+            raise ValueError(("The 'values' parameter is required "
+                              "for the map trait plugin"))
+        if not isinstance(values, dict):
+            raise ValueError(("The 'values' parameter needs to be a dict "
+                              "for the map trait plugin"))
+        self.case_sensitive = case_sensitive
+        if not self.case_sensitive:
+            self.values = {(k.casefold()
+                            if isinstance(k, str)
+                            else k): v
+                           for k, v in values.items()}
+        else:
+            self.values = dict(values)
+        self.default = default
+        super(MapTraitPlugin, self).__init__(**kw)
+
+    def trait_values(self, match_list):
+        mapped_values = []
+        for match in match_list:
+            key = match[1]
+            folded_key = (
+                key.casefold()
+                if not self.case_sensitive and isinstance(key, str)
+                else key)
+            try:
+                value = self.values[folded_key]
+            except KeyError:
+                LOG.warning(
+                    ('Unknown value %s found when mapping %s, '
+                     'mapping to default value of %s'),
+                    repr(key),
+                    match[0],
+                    repr(self.default))
+                value = self.default
+            else:
+                LOG.debug('Value %s for %s mapped to value %s',
+                          repr(key),
+                          match[0],
+                          repr(value))
+            mapped_values.append(value)
+        return mapped_values

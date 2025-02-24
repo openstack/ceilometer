@@ -113,3 +113,47 @@ class TestBitfieldPlugin(base.BaseTestCase):
         plugin = self.pclass(**self.params)
         value = plugin.trait_values(match_list)
         self.assertEqual(0x412, value[0])
+
+
+class TestMapTraitPlugin(base.BaseTestCase):
+
+    def setUp(self):
+        super(TestMapTraitPlugin, self).setUp()
+        self.pclass = trait_plugins.MapTraitPlugin
+        self.params = dict(values={'ACTIVE': 1, 'ERROR': 2, 3: 4},
+                           default=-1)
+
+    def test_map(self):
+        match_list = [('payload.foo', 'ACTIVE'),
+                      ('payload.bar', 'ERROR'),
+                      ('thingy.boink', 3),
+                      ('thingy.invalid', 999)]
+        plugin = self.pclass(**self.params)
+        value = plugin.trait_values(match_list)
+        self.assertEqual([1, 2, 4, -1], value)
+
+    def test_case_sensitive(self):
+        match_list = [('payload.foo', 'ACTIVE'),
+                      ('payload.bar', 'error'),
+                      ('thingy.boink', 3),
+                      ('thingy.invalid', 999)]
+        plugin = self.pclass(case_sensitive=True, **self.params)
+        value = plugin.trait_values(match_list)
+        self.assertEqual([1, -1, 4, -1], value)
+
+    def test_case_insensitive(self):
+        match_list = [('payload.foo', 'active'),
+                      ('payload.bar', 'ErRoR'),
+                      ('thingy.boink', 3),
+                      ('thingy.invalid', 999)]
+        plugin = self.pclass(case_sensitive=False, **self.params)
+        value = plugin.trait_values(match_list)
+        self.assertEqual([1, 2, 4, -1], value)
+
+    def test_values_undefined(self):
+        self.assertRaises(ValueError, self.pclass)
+
+    def test_values_invalid(self):
+        self.assertRaises(
+            ValueError,
+            lambda: self.pclass(values=[('ACTIVE', 1), ('ERROR', 2), (3, 4)]))
