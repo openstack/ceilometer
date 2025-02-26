@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    The ``disk.ephemeral.size`` meter is now published as a compute pollster,
+    in addition to the existing notification meter.
+  - |
+    The ``disk.root.size`` meter is now published as a compute pollster,
+    in addition to the existing notification meter.

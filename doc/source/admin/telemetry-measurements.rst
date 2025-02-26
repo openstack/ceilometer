@@ -124,10 +124,12 @@ The following meters are collected for OpenStack Compute.
 | .bytes    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.root\| Gauge | GB   | instance | Notific\ | Libvirt | Size of root disk|
-| .size     |       |      | ID       | ation    |         |                  |
+| .size     |       |      | ID       | ation, \ |         |                  |
+|           |       |      |          | Pollster |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.ephe\| Gauge | GB   | instance | Notific\ | Libvirt | Size of ephemeral|
-| meral.size|       |      | ID       | ation    |         | disk             |
+| meral.size|       |      | ID       | ation, \ |         | disk             |
+|           |       |      |          | Pollster |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Gauge | B    | disk ID  | Pollster | Libvirt | The amount of d\ |
 | ice.capa\ |       |      |          |          |         | isk per device   |
