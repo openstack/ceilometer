@@ -66,6 +66,13 @@ class TestLocationMetadata(base.BaseTestCase):
                                     'image': {'id': 1,
                                               'links': [{"rel": "bookmark",
                                                          'href': 2}]},
+                                    'image_meta': {'base_image_ref': 1,
+                                                   'container_format': 'bare',
+                                                   'disk_format': 'raw',
+                                                   'min_disk': '20',
+                                                   'min_ram': '0',
+                                                   'os_distro': 'ubuntu',
+                                                   'os_type': 'linux'},
                                     'hostId': '1234-5678',
                                     'OS-EXT-SRV-ATTR:host': 'host-test',
                                     'flavor': {'name': 'm1.tiny',
@@ -105,6 +112,10 @@ class TestLocationMetadata(base.BaseTestCase):
             'metadata']['metering.autoscale.group'][:256]
         self.assertEqual(expected, user_metadata['autoscale_group'])
         self.assertEqual(1, len(user_metadata))
+        self.assertEqual(self.INSTANCE_PROPERTIES['image']['id'],
+                         md['image_ref'])
+        self.assertEqual(self.INSTANCE_PROPERTIES['image_meta'],
+                         md['image_meta'])
 
     def test_metadata_empty_image(self):
         self.INSTANCE_PROPERTIES['image'] = None
@@ -121,3 +132,29 @@ class TestLocationMetadata(base.BaseTestCase):
         md = util._get_metadata_from_object(self.CONF, self.instance)
         self.assertEqual(1, md['image_ref'])
         self.assertIsNone(md['image_ref_url'])
+
+    def test_metadata_image_meta_volume_image(self):
+        self.INSTANCE_PROPERTIES['image_meta']['base_image_ref'] = ''
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        md = util._get_metadata_from_object(self.CONF, self.instance)
+        self.assertEqual(self.INSTANCE_PROPERTIES['image_meta'],
+                         md['image_meta'])
+
+    def test_metadata_image_meta_volume_no_image(self):
+        self.INSTANCE_PROPERTIES['image_meta'] = {'base_image_ref': ''}
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        md = util._get_metadata_from_object(self.CONF, self.instance)
+        self.assertEqual(self.INSTANCE_PROPERTIES['image_meta'],
+                         md['image_meta'])
+
+    def test_metadata_image_meta_none(self):
+        self.INSTANCE_PROPERTIES['image_meta'] = None
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        md = util._get_metadata_from_object(self.CONF, self.instance)
+        self.assertNotIn('image_meta', md)
+
+    def test_metadata_image_meta_noexist(self):
+        del self.INSTANCE_PROPERTIES['image_meta']
+        self.instance = FauxInstance(**self.INSTANCE_PROPERTIES)
+        md = util._get_metadata_from_object(self.CONF, self.instance)
+        self.assertNotIn('image_meta', md)

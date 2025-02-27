@@ -40,6 +40,16 @@ LIBVIRT_METADATA_XML = """
       <extraSpec name="hw_rng:allowed">true</extraSpec>
     </extraSpecs>
   </flavor>
+  <image uuid="bdaf114a-35e9-4163-accd-226d5944bf11">
+    <containerFormat>bare</containerFormat>
+    <diskFormat>raw</diskFormat>
+    <minDisk>1</minDisk>
+    <minRam>0</minRam>
+    <properties>
+      <property name="os_distro">ubuntu</property>
+      <property name="os_type">linux</property>
+    </properties>
+  </image>
   <owner>
     <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
     <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
@@ -152,6 +162,63 @@ LIBVIRT_METADATA_XML_NO_FLAVOR_EXTRA_SPECS = """
     <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
   </owner>
   <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_FROM_VOLUME_IMAGE = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny" id="eba4213d-3c6c-4b5f-8158-dd0022d71d62">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+    <extraSpecs>
+      <extraSpec name="hw_rng:allowed">true</extraSpec>
+    </extraSpecs>
+  </flavor>
+  <image uuid="">
+    <containerFormat>bare</containerFormat>
+    <diskFormat>raw</diskFormat>
+    <minDisk>1</minDisk>
+    <minRam>0</minRam>
+    <properties>
+      <property name="os_distro">ubuntu</property>
+      <property name="os_type">linux</property>
+    </properties>
+  </image>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_FROM_VOLUME_NO_IMAGE = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny" id="eba4213d-3c6c-4b5f-8158-dd0022d71d62">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+    <extraSpecs>
+      <extraSpec name="hw_rng:allowed">true</extraSpec>
+    </extraSpecs>
+  </flavor>
+  <image uuid="">
+    <properties></properties>
+  </image>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
 </instance>
 """
 
@@ -407,6 +474,33 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual("x86_64", metadata["architecture"])
         self.assertEqual({"server_group": "group1"},
                          metadata["user_metadata"])
+        self.assertEqual({"id"},
+                         set(metadata["image"].keys()))
+        self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
+                         metadata["image"]["id"])
+        self.assertIn("image_meta", metadata)
+        self.assertEqual({"base_image_ref",
+                          "container_format",
+                          "disk_format",
+                          "min_disk",
+                          "min_ram",
+                          "os_distro",
+                          "os_type"},
+                         set(metadata["image_meta"].keys()))
+        self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
+                         metadata["image_meta"]["base_image_ref"])
+        self.assertEqual("bare",
+                         metadata["image_meta"]["container_format"])
+        self.assertEqual("raw",
+                         metadata["image_meta"]["disk_format"])
+        self.assertEqual("1",
+                         metadata["image_meta"]["min_disk"])
+        self.assertEqual("0",
+                         metadata["image_meta"]["min_ram"])
+        self.assertEqual("ubuntu",
+                         metadata["image_meta"]["os_distro"])
+        self.assertEqual("linux",
+                         metadata["image_meta"]["os_type"])
 
     @mock.patch.object(discovery.InstanceDiscovery, "get_server")
     @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
@@ -472,6 +566,11 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual("x86_64", metadata["architecture"])
         self.assertEqual({"server_group": "group1"},
                          metadata["user_metadata"])
+        self.assertEqual({"id"},
+                         set(metadata["image"].keys()))
+        self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
+                         metadata["image"]["id"])
+        self.assertNotIn("image_meta", metadata)
 
     @mock.patch.object(discovery.InstanceDiscovery, "get_server")
     @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
@@ -729,6 +828,85 @@ class TestDiscovery(base.BaseTestCase):
                           "ephemeral": 0,
                           "vcpus": 1},
                          metadata["flavor"])
+
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_from_volume_image(
+            self, mock_libvirt_conn):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[
+                FakeDomain(metadata=LIBVIRT_METADATA_XML_FROM_VOLUME_IMAGE)])
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+        self.assertEqual("a75c2fa5-6c03-45a8-bbf7-b993cfcdec27",
+                         s.resource_id)
+        self.assertEqual("d99c829753f64057bc0f2030da309943",
+                         s.project_id)
+        self.assertEqual("a1f4684e58bd4c88aefd2ecb0783b497",
+                         s.user_id)
+
+        metadata = s.resource_metadata
+        self.assertIsNone(metadata["image"])
+        self.assertIn("image_meta", metadata)
+        self.assertEqual({"base_image_ref",
+                          "container_format",
+                          "disk_format",
+                          "min_disk",
+                          "min_ram",
+                          "os_distro",
+                          "os_type"},
+                         set(metadata["image_meta"].keys()))
+        self.assertEqual("",
+                         metadata["image_meta"]["base_image_ref"])
+        self.assertEqual("bare",
+                         metadata["image_meta"]["container_format"])
+        self.assertEqual("raw",
+                         metadata["image_meta"]["disk_format"])
+        self.assertEqual("1",
+                         metadata["image_meta"]["min_disk"])
+        self.assertEqual("0",
+                         metadata["image_meta"]["min_ram"])
+        self.assertEqual("ubuntu",
+                         metadata["image_meta"]["os_distro"])
+        self.assertEqual("linux",
+                         metadata["image_meta"]["os_type"])
+
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_from_volume_no_image(
+            self, mock_libvirt_conn):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[
+                FakeDomain(
+                    metadata=LIBVIRT_METADATA_XML_FROM_VOLUME_NO_IMAGE)])
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertIsNone(metadata["image"])
+        self.assertIn("image_meta", metadata)
+        self.assertEqual({"base_image_ref"},
+                         set(metadata["image_meta"].keys()))
+        self.assertEqual("",
+                         metadata["image_meta"]["base_image_ref"])
 
     def test_discovery_with_legacy_resource_cache_cleanup(self):
         self.CONF.set_override("instance_discovery_method", "naive",

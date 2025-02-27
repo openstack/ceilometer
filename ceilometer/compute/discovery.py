@@ -217,11 +217,44 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 if extra_specs is not None:
                     flavor["extra_specs"] = extra_specs
 
-                # The image description is partial, but Gnocchi only care about
-                # the id, so we are fine
                 image_xml = metadata_xml.find("./root[@type='image']")
                 image = ({'id': image_xml.attrib['uuid']}
                          if image_xml is not None else None)
+
+                image_meta_xml = metadata_xml.find("./image")
+                if image_meta_xml is not None:
+                    # If the <image> element exists at all, Nova supports
+                    # image_meta in libvirt metadata. Add it to the instance
+                    # attributes even if all the required values are empty.
+                    image_meta = {}
+                    base_image_ref = image_meta_xml.attrib.get("uuid")
+                    if base_image_ref is not None:
+                        image_meta["base_image_ref"] = base_image_ref
+                    # The following properties get special treatment
+                    # because they are set as such in SM_INHERITABLE_KEYS,
+                    # as defined in nova/utils.py.
+                    container_format_xml = image_meta_xml.find(
+                        "./containerFormat")
+                    if container_format_xml is not None:
+                        image_meta["container_format"] = (
+                            container_format_xml.text)
+                    disk_format_xml = image_meta_xml.find("./diskFormat")
+                    if disk_format_xml is not None:
+                        image_meta["disk_format"] = disk_format_xml.text
+                    min_disk_xml = image_meta_xml.find("./minDisk")
+                    if min_disk_xml is not None:
+                        image_meta["min_disk"] = min_disk_xml.text
+                    min_ram_xml = image_meta_xml.find("./minRam")
+                    if min_ram_xml is not None:
+                        image_meta["min_ram"] = min_ram_xml.text
+                    # Get additional properties defined in image_meta.
+                    properties_xml = image_meta_xml.find("./properties")
+                    if properties_xml is not None:
+                        for prop in properties_xml.findall("./property"):
+                            image_meta[prop.attrib["name"]] = prop.text
+                else:
+                    # None for "no image_meta found".
+                    image_meta = None
 
                 # Getting the server metadata requires expensive Nova API
                 # queries, and may potentially contain sensitive user info,
@@ -276,6 +309,8 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 # 'ramdisk_id',
                 # some image detail
             }
+            if image_meta is not None:
+                instance_data["image_meta"] = image_meta
 
             LOG.debug("instance data: %s", instance_data)
             instances.append(NovaLikeServer(**instance_data))
