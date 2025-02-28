@@ -11,7 +11,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import datetime
-import iso8601
 from unittest import mock
 
 import fixtures
@@ -166,8 +165,8 @@ class TestDiscovery(base.BaseTestCase):
         self.useFixture(patch_client)
 
         self.utc_now = mock.MagicMock(
-            return_value=datetime.datetime(2016, 1, 1,
-                                           tzinfo=iso8601.iso8601.UTC))
+            return_value=datetime.datetime(
+                2016, 1, 1, tzinfo=datetime.timezone.utc))
         patch_timeutils = fixtures.MockPatch('oslo_utils.timeutils.utcnow',
                                              self.utc_now)
         self.useFixture(patch_timeutils)
@@ -201,17 +200,17 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("resource_update_interval", 600,
                                group="compute")
         dsc = discovery.InstanceDiscovery(self.CONF)
-        dsc.last_run = datetime.datetime(2016, 1, 1,
-                                         tzinfo=iso8601.iso8601.UTC)
+        dsc.last_run = datetime.datetime(
+            2016, 1, 1, tzinfo=datetime.timezone.utc)
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=5, tzinfo=iso8601.iso8601.UTC)
+            2016, 1, 1, minute=5, tzinfo=datetime.timezone.utc)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
         self.client.instance_get_all_by_host.assert_not_called()
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=20, tzinfo=iso8601.iso8601.UTC)
+            2016, 1, 1, minute=20, tzinfo=datetime.timezone.utc)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(1, len(resources))
         self.assertEqual(1, list(resources)[0].id)
@@ -274,12 +273,12 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual(1, len(resources))
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=20, tzinfo=iso8601.iso8601.UTC)
+            2016, 1, 1, minute=20, tzinfo=datetime.timezone.utc)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(1, len(resources))
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=31, tzinfo=iso8601.iso8601.UTC)
+            2016, 1, 1, minute=31, tzinfo=datetime.timezone.utc)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(1, len(resources))
 
