@@ -95,11 +95,6 @@ function _ceilometer_prepare_coordination {
 
 # Create ceilometer related accounts in Keystone
 function ceilometer_create_accounts {
-    # At this time, the /etc/openstack/clouds.yaml is available,
-    # we could leverage that by setting OS_CLOUD
-    OLD_OS_CLOUD=$OS_CLOUD
-    export OS_CLOUD='devstack-admin'
-
     create_service_user "ceilometer" "admin"
 
     if is_service_enabled swift; then
@@ -117,7 +112,6 @@ function ceilometer_create_accounts {
             "$(gnocchi_service_url)" \
             "$(gnocchi_service_url)"
     fi
-    export OS_CLOUD=$OLD_OS_CLOUD
 }
 
 
