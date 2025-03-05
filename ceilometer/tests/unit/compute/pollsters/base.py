@@ -37,8 +37,13 @@ class TestPollsterBase(base.BaseTestCase):
                 'active')
         setattr(self.instance, 'OS-EXT-STS:task_state', None)
         self.instance.id = 1
-        self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
-                                'ram': 512, 'disk': 20, 'ephemeral': 0}
+        self.instance.flavor = {'name': 'm1.small',
+                                'id': 'eba4213d-3c6c-4b5f-8158-dd0022d71d62',
+                                'vcpus': 1,
+                                'ram': 512,
+                                'disk': 20,
+                                'ephemeral': 0,
+                                'extra_specs': {'hw_rng:allowed': 'true'}}
         self.instance.status = 'active'
         self.instance.metadata = {
             'fqdn': 'vm_fqdn',

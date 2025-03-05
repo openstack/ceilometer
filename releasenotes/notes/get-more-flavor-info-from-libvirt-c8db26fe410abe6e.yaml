@@ -1,0 +1,35 @@
+---
+features:
+  - |
+    When using Nova 2025.2 and later, the flavor ID for an instance is now
+    available from the libvirt domain metadata. Ceilometer now takes advantage
+    of this and populates the flavor ID from metadata instead of querying
+    Nova, when the value is available. If not available from metadata,
+    Ceilometer will fallback to querying Nova API for the flavor ID.
+  - |
+    When using Nova 2025.2 and later, the extra specs for the flavor and
+    instance is running is now available from the libvirt domain metadata.
+    Ceilometer now adds the flavor's extra specs to compute sample metadata
+    when found.
+  - |
+    Added the ``[compute]/fetch_extra_metadata`` configuration option, which
+    allows configuration of whether or not Ceilometer fetches additional
+    compute instance metadata attributes that require Nova API queries.
+    This mainly affects the ``user_metadata`` attributes populated with
+    metering-related values such as the server group an instance is part of.
+    When ``fetch_extra_metadata`` is set to ``False``, Ceilometer Compute
+    Agent will not query Nova API for anything unless absolutely necessary.
+upgrade:
+  - |
+    After Nova has been upgraded to 2025.2 or later, new instances will
+    start providing additional flavor metadata for Ceilometer to use.
+    Instances already running at the time of the upgrade are not updated
+    as part of the process; to update those instances they will need to
+    be cold restarted, cold migrated or shelved-and-unshelved (until this
+    happens, Nova API queries will continue to be performed for those
+    instances).
+deprecations:
+  - |
+    The newly added ``[compute]/fetch_extra_metadata`` option is set to
+    ``True`` by default, but to reduce the amount of load Ceilometer places
+    on Nova this will be changed to ``False`` by default in a future release.
