@@ -61,3 +61,10 @@ class VolumeBackupsDiscovery(_BaseDiscovery):
         """Discover volume resources to monitor."""
 
         return self.client.backups.list(search_opts={'all_tenants': True})
+
+
+class VolumePoolsDiscovery(_BaseDiscovery):
+    def discover(self, manager, param=None):
+        """Discover volume resources to monitor."""
+
+        return self.client.pools.list(detailed=True)

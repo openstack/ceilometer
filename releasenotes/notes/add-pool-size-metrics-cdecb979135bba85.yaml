@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Added the following meters to the central agent to capture these metrics
+    for each storage pool by API.
+
+    - `volume.provider.pool.capacity.total`
+    - `volume.provider.pool.capacity.free`
+    - `volume.provider.pool.capacity.provisioned`
+    - `volume.provider.pool.capacity.virtual_free`
+    - `volume.provider.pool.capacity.allocated`

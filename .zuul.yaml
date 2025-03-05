@@ -5,7 +5,8 @@
     required-projects:
       - opendev.org/openstack/grenade
       - opendev.org/openstack/ceilometer
-      - gnocchixyz/gnocchi
+      - name: gnocchixyz/gnocchi
+        override-checkout: stable/4.6
     vars:
       configure_swap_size: 8192
       grenade_devstack_localrc:

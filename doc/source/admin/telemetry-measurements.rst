@@ -443,22 +443,24 @@ The following meters are collected for OpenStack Block Storage:
 |                    |       |        |          |          | on host         |
 +--------------------+-------+--------+----------+----------+-----------------+
 | volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Total volume    |
-| ol.capacity.total  |       |        | #pool    | tion     | capacity in pool|
+| ol.capacity.total  |       |        | #pool    | tion, Po\| capacity in pool|
+|                    |       |        |          | llster   |                 |
 +--------------------+-------+--------+----------+----------+-----------------+
 | volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Free volume     |
-| ol.capacity.free   |       |        | #pool    | tion     | capacity in pool|
+| ol.capacity.free   |       |        | #pool    | tion, Po\| capacity in pool|
+|                    |       |        |          | llster   |                 |
 +--------------------+-------+--------+----------+----------+-----------------+
 | volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Assigned volume |
-| ol.capacity.alloca\|       |        | #pool    | tion     | capacity in pool|
-| ted                |       |        |          |          | by Cinder       |
+| ol.capacity.alloca\|       |        | #pool    | tion, Po\| capacity in pool|
+| ted                |       |        |          | llster   | by Cinder       |
 +--------------------+-------+--------+----------+----------+-----------------+
 | volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Assigned volume |
-| ol.capacity.provis\|       |        | #pool    | tion     | capacity in pool|
-| ioned              |       |        |          |          |                 |
+| ol.capacity.provis\|       |        | #pool    | tion, Po\| capacity in pool|
+| ioned              |       |        |          | llster   |                 |
 +--------------------+-------+--------+----------+----------+-----------------+
 | volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Virtual free    |
-| ol.capacity.virtua\|       |        | #pool    | tion     | volume capacity |
-| l_free             |       |        |          |          | in pool         |
+| ol.capacity.virtua\|       |        | #pool    | tion, Po\| volume capacity |
+| l_free             |       |        |          | llster   | in pool         |
 +--------------------+-------+--------+----------+----------+-----------------+
 
 OpenStack File Share
