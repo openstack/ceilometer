@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    The ``[polling] tenant_name_discovery`` option has been deprecated in
+    favor of the new ``[polling] identity_name_discovery`` option.

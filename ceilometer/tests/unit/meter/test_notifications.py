@@ -298,7 +298,7 @@ class TestMeterProcessing(test.BaseTestCase):
         dict_conf_fixture.config(expiration_time=600,
                                  backend='oslo_cache.dict',
                                  group='cache')
-        dict_conf_fixture.config(tenant_name_discovery=True, group='polling')
+        dict_conf_fixture.config(identity_name_discovery=True, group='polling')
         self.CONF = dict_conf_fixture.conf
 
         self.path = self.useFixture(fixtures.TempDir()).path

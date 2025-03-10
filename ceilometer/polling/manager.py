@@ -77,7 +77,8 @@ POLLING_OPTS = [
                     default=["/etc/ceilometer/pollsters.d"],
                     help="List of directories with YAML files used "
                          "to created pollsters."),
-    cfg.BoolOpt('tenant_name_discovery',
+    cfg.BoolOpt('identity_name_discovery',
+                deprecated_name='tenant_name_discovery',
                 default=False,
                 help='Identify project and user names from polled samples. '
                      'By default, collecting these values is disabled due '
@@ -179,13 +180,12 @@ class PollingTask(object):
         resource_factory = lambda: Resources(agent_manager)  # noqa: E731
         self.resources = collections.defaultdict(resource_factory)
 
-        self._batch_size = self.manager.conf.polling.batch_size
-
-        self._telemetry_secret = self.manager.conf.publisher.telemetry_secret
-
+        conf = self.manager.conf
+        self._batch_size = conf.polling.batch_size
+        self._telemetry_secret = conf.publisher.telemetry_secret
         self.ks_client = self.manager.keystone
-
-        self._cache = cache_utils.get_client(self.manager.conf)
+        self._name_discovery = conf.polling.identity_name_discovery
+        self._cache = cache_utils.get_client(conf)
 
     def add(self, pollster, source):
         self.pollster_matches[source.name].add(pollster)
@@ -246,10 +246,7 @@ class PollingTask(object):
                         # Note(yuywz): Unify the timestamp of polled samples
                         sample.set_timestamp(polling_timestamp)
 
-                        if (
-                            self.manager.conf.polling.tenant_name_discovery and
-                            self._cache
-                        ):
+                        if self._name_discovery and self._cache:
 
                             # Try to resolve project UUIDs from cache first,
                             # and then keystone

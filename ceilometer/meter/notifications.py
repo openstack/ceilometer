@@ -77,6 +77,8 @@ class MeterDefinition(object):
         self._metadata_attributes = {}
         self._user_meta = None
 
+        self._name_discovery = self.conf.polling.identity_name_discovery
+
         for name in self.SAMPLE_ATTRIBUTES:
             attr_cfg = self.cfg.get(name)
             if attr_cfg:
@@ -170,10 +172,7 @@ class MeterDefinition(object):
                 sample = dict((attributes[idx], value)
                               for idx, value in enumerate(values))
 
-                if (
-                    self.conf.polling.tenant_name_discovery and
-                    self._cache
-                ):
+                if self._name_discovery and self._cache:
                     # populate user_name and project_name fields in the sample
                     # created from notifications
                     if sample['user_id']:
