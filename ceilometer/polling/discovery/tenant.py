@@ -29,13 +29,20 @@ class TenantDiscovery(plugin.DiscoveryBase):
 
     def discover(self, manager, param=None):
         domains = manager.keystone.domains.list()
-        LOG.debug('Found %s keystone domains', len(domains))
+        LOG.debug(f"Found {len(domains)} keystone domains")
 
         tenants = []
         for domain in domains:
             domain_tenants = manager.keystone.projects.list(domain)
-            LOG.debug("Found %s tenants in domain %s", len(domain_tenants),
-                      domain.name)
-            tenants = tenants + domain_tenants
+            if self.conf.polling.ignore_disabled_projects:
+                enabled_tenants = [tenant for tenant in
+                                   domain_tenants if tenant.enabled]
+                LOG.debug(f"Found {len(enabled_tenants)} enabled "
+                          f"tenants in domain {domain.name}")
+                tenants = enabled_tenants + domain_tenants
+            else:
+                LOG.debug(f"Found {len(domain_tenants)} "
+                          f"tenants in domain {domain.name}")
+                tenants = tenants + domain_tenants
 
         return tenants or []
