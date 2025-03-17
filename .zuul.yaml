@@ -19,6 +19,7 @@
         ceilometer-aipmi: true
         ceilometer-anotification: true
     irrelevant-files: &ceilometer-irrelevant-files
+      - ^\.gitreview$
       - ^(test-|)requirements.txt$
       - ^setup.cfg$
       - ^doc/.*$
