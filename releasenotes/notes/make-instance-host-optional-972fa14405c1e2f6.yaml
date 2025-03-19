@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    The ``instance`` resource type has been updated to make the ``host``
+    resource attribute optional. This allows the hypervisor a compute instance
+    is running on to be withheld from Gnocchi's resource metadata, which may
+    be required for security reasons e.g. for public clouds.

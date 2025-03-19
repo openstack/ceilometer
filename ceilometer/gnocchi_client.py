@@ -218,6 +218,15 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}  # Only containers have a storage policy
      }]},
+    {"desc": "make host optional for instance",
+     "type": "update_attribute_type",
+     "resource_type": "instance",
+     "data": [{
+         "op": "add",  # Usually update, the attribute likely already exists
+         "path": "/attributes/host",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": False}  # Allow the hypervisor to be withheld
+     }]},
 ]
 
 
@@ -243,8 +252,15 @@ def upgrade_resource_types(conf):
         if ops['type'] == 'update_attribute_type':
             rt = gnocchi.resource_type.get(name=ops['resource_type'])
             first_op = ops['data'][0]
-            attrib = first_op['path'].replace('/attributes', '')
-            if first_op['op'] == 'add' and attrib in rt['attributes']:
+            attrib = first_op['path'].replace('/attributes/', '')
+            # Options are only used when adding/updating attributes.
+            # Make a shallow copy of the new value type, and remove options
+            # from the copy to make sure it isn't included in checks.
+            value = first_op['value'].copy()
+            value.pop('options', None)
+            if (first_op['op'] == 'add'
+                    and attrib in rt['attributes']
+                    and value == rt['attributes'][attrib]):
                 continue
             if first_op['op'] == 'remove' and attrib not in rt['attributes']:
                 continue
