@@ -243,11 +243,64 @@ class TestPromExporter(base.BaseTestCase):
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
-            call('127.0.0.1', 9101),
-            call('127.0.0.1', 9102),
-            call('::1', 9103),
-            call('localhost', 9104),
+            call('127.0.0.1', 9101, None, None),
+            call('127.0.0.1', 9102, None, None),
+            call('::1', 9103, None, None),
+            call('localhost', 9104, None, None),
         ])
+
+    @mock.patch('ceilometer.polling.prom_exporter.export')
+    def test_export_called_tls_disabled(self, export):
+        CONF = service.prepare_service([], [])
+        CONF.polling.enable_prometheus_exporter = True
+        CONF.polling.prometheus_tls_enable = False
+        CONF.polling.prometheus_tls_certfile = "cert.pem"
+        CONF.polling.prometheus_listen_addresses = [
+            '127.0.0.1:9101',
+            '127.0.0.1:9102',
+            '[::1]:9103',
+            'localhost:9104',
+        ]
+        manager.AgentManager(0, CONF)
+
+        export.assert_has_calls([
+            call('127.0.0.1', 9101, None, None),
+            call('127.0.0.1', 9102, None, None),
+            call('::1', 9103, None, None),
+            call('localhost', 9104, None, None),
+        ])
+
+    @mock.patch('ceilometer.polling.prom_exporter.export')
+    def test_export_called_with_tls(self, export):
+        CONF = service.prepare_service([], [])
+        CONF.polling.enable_prometheus_exporter = True
+        CONF.polling.prometheus_listen_addresses = [
+            '127.0.0.1:9101',
+            '127.0.0.1:9102',
+            '[::1]:9103',
+            'localhost:9104',
+        ]
+        CONF.polling.prometheus_tls_enable = True
+        CONF.polling.prometheus_tls_certfile = "cert.pem"
+        CONF.polling.prometheus_tls_keyfile = "key.pem"
+        manager.AgentManager(0, CONF)
+
+        export.assert_has_calls([
+            call('127.0.0.1', 9101, "cert.pem", "key.pem"),
+            call('127.0.0.1', 9102, "cert.pem", "key.pem"),
+            call('::1', 9103, "cert.pem", "key.pem"),
+            call('localhost', 9104, "cert.pem", "key.pem"),
+        ])
+
+    @mock.patch('ceilometer.polling.prom_exporter.export')
+    def test_export_fails_if_incomplete_tls(self, export):
+        CONF = service.prepare_service([], [])
+        CONF.polling.enable_prometheus_exporter = True
+        CONF.polling.prometheus_listen_addresses = ['127.0.0.1:9101']
+        CONF.polling.prometheus_tls_enable = True
+        CONF.polling.prometheus_tls_certfile = "cert.pem"
+        CONF.polling.prometheus_tls_keyfile = None  # Missing key
+        self.assertRaises(ValueError, manager.AgentManager, 0, CONF)
 
     def test_collect_metrics(self):
         prom_exporter.collect_metrics(self.test_image_size)

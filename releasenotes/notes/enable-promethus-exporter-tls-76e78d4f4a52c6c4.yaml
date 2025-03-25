@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Enhanced the Prometheus exporter to support TLS for exposing metrics securely.

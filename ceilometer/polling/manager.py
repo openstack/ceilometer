@@ -106,6 +106,17 @@ POLLING_OPTS = [
                 default=False,
                 help='Whether the polling service should ignore '
                      'disabled projects or not.'),
+    cfg.BoolOpt('prometheus_tls_enable',
+                default=False,
+                help='Whether it will expose tls metrics or not'),
+    cfg.StrOpt('prometheus_tls_certfile',
+               default=None,
+               help='The certificate file to allow this ceilometer to '
+                    'expose tls scrape endpoints'),
+    cfg.StrOpt('prometheus_tls_keyfile',
+               default=None,
+               help='The private key to allow this ceilometer to '
+                    'expose tls scrape endpoints'),
 ]
 
 
@@ -473,7 +484,20 @@ class AgentManager(cotyledon.Service):
                 address = netutils.parse_host_port(addr)
                 if address[0] is None or address[1] is None:
                     LOG.warning('Ignoring invalid address: %s', addr)
-                prom_exporter.export(address[0], address[1])
+                certfile = self.conf.polling.prometheus_tls_certfile
+                keyfile = self.conf.polling.prometheus_tls_keyfile
+                if self.conf.polling.prometheus_tls_enable:
+                    if not certfile or not keyfile:
+                        raise ValueError(
+                            "Certfile and keyfile must be provided."
+                        )
+                else:
+                    certfile = keyfile = None
+                prom_exporter.export(
+                    address[0],
+                    address[1],
+                    certfile,
+                    keyfile)
 
         self._keystone = None
         self._keystone_last_exception = None
