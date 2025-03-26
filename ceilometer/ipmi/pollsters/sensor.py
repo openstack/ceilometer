@@ -107,6 +107,10 @@ class SensorPollster(plugin_base.PollsterBase):
                 'node': self.conf.host
             }
 
+            extra_metadata = self.get_extra_sensor_metadata(sensor_data)
+            if extra_metadata:
+                metadata.update(extra_metadata)
+
             yield sample.Sample(
                 name='hardware.ipmi.%s' % self.METRIC.lower(),
                 type=sample.TYPE_GAUGE,
@@ -116,6 +120,11 @@ class SensorPollster(plugin_base.PollsterBase):
                 project_id=None,
                 resource_id=resource_id,
                 resource_metadata=metadata)
+
+    def get_extra_sensor_metadata(self, sensor_data):
+        # override get_extra_sensor_metadata to add specific metrics for
+        # each sensor
+        return {}
 
 
 class TemperatureSensorPollster(SensorPollster):
@@ -128,6 +137,16 @@ class CurrentSensorPollster(SensorPollster):
 
 class FanSensorPollster(SensorPollster):
     METRIC = 'Fan'
+
+    def get_extra_sensor_metadata(self, sensor_data):
+        try:
+            return {
+                "maximum_rpm": sensor_data['Normal Maximum'],
+            }
+        except KeyError:
+            # Maximum rpm might not be reported when usage
+            # is reported as percent
+            return {}
 
 
 class VoltageSensorPollster(SensorPollster):

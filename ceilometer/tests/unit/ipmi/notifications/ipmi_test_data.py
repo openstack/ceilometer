@@ -606,6 +606,25 @@ FAN_DATA = {
 }
 
 
+FAN_DATA_PERCENT = {
+    'Fan 1 (0x23)': {
+        'Sensor ID': 'Fan 1 (0x23)',
+        'Entity ID': '7.1 (System Board)',
+        'Sensor Type (Threshold)': 'Fan (0x04)',
+        'Sensor Reading': '47.040 (+/- 0) percent',
+        'Status': 'ok',
+        'Positive Hysteresis': 'Unspecified',
+        'Negative Hysteresis': 'Unspecified',
+        'Minimum sensor range': 'Unspecified',
+        'Maximum sensor range': 'Unspecified',
+        'Event Message Control': 'Global Disable Only',
+        'Readable Thresholds': '',
+        'Settable Thresholds': '',
+        'Assertions Enabled': ''
+    }
+}
+
+
 VOLTAGE_DATA = {
     'Planar 12V (0x18)': {
         'Status': 'ok',
