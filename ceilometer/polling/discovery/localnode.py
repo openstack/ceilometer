@@ -18,4 +18,8 @@ from ceilometer.polling import plugin_base
 class LocalNodeDiscovery(plugin_base.DiscoveryBase):
     def discover(self, manager, param=None):
         """Return local node as resource."""
-        return ['local_host']
+        return [self.conf.host]
+
+    @ property
+    def group_id(self):
+        return "LocalNode-%s" % self.conf.host
