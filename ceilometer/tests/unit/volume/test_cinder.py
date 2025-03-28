@@ -134,6 +134,34 @@ BACKUP_LIST = [
           'size': 1})
 ]
 
+POOL_LIST = [
+    type('VolumePool', (object,),
+         {'name': 'localhost.localdomain@lvmdriver-1#lvmdriver-1',
+          'pool_name': 'lvmdriver-1',
+          'total_capacity_gb': 28.5,
+          'free_capacity_gb': 28.39,
+          'reserved_percentage': 0,
+          'location_info':
+              'LVMVolumeDriver:localhost.localdomain:stack-volumes:thin:0',
+          'QoS_support': False,
+          'provisioned_capacity_gb': 4.0,
+          'max_over_subscription_ratio': 20.0,
+          'thin_provisioning_support': True,
+          'thick_provisioning_support': False,
+          'total_volumes': 3,
+          'filter_function': None,
+          'goodness_function': None,
+          'multiattach': True,
+          'backend_state': 'up',
+          'allocated_capacity_gb': 4,
+          'cacheable': True,
+          'volume_backend_name': 'lvmdriver-1',
+          'storage_protocol': 'iSCSI',
+          'vendor_name': 'Open Source',
+          'driver_version': '3.0.0',
+          'timestamp': '2025-03-21T14:19:02.901750'})
+]
+
 
 class TestVolumeSizePollster(base.BaseTestCase):
     def setUp(self):
@@ -203,3 +231,94 @@ class TestVolumeBackupSizePollster(base.BaseTestCase):
         self.assertEqual(1, volume_backup_size_samples[0].volume)
         self.assertEqual('75a52125-85ff-4a8d-b2aa-580f3b22273f',
                          volume_backup_size_samples[0].resource_id)
+
+
+class TestVolumeProviderPoolCapacityTotalPollster(base.BaseTestCase):
+    def setUp(self):
+        super(TestVolumeProviderPoolCapacityTotalPollster, self).setUp()
+        conf = service.prepare_service([], [])
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeProviderPoolCapacityTotal(conf)
+
+    def test_volume_provider_pool_capacity_total_pollster(self):
+        volume_pool_size_total_samples = list(
+            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+        self.assertEqual(1, len(volume_pool_size_total_samples))
+        self.assertEqual('volume.provider.pool.capacity.total',
+                         volume_pool_size_total_samples[0].name)
+        self.assertEqual(28.5, volume_pool_size_total_samples[0].volume)
+        self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
+                         volume_pool_size_total_samples[0].resource_id)
+
+
+class TestVolumeProviderPoolCapacityFreePollster(base.BaseTestCase):
+    def setUp(self):
+        super(TestVolumeProviderPoolCapacityFreePollster, self).setUp()
+        conf = service.prepare_service([], [])
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeProviderPoolCapacityFree(conf)
+
+    def test_volume_provider_pool_capacity_free_pollster(self):
+        volume_pool_size_free_samples = list(
+            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+        self.assertEqual(1, len(volume_pool_size_free_samples))
+        self.assertEqual('volume.provider.pool.capacity.free',
+                         volume_pool_size_free_samples[0].name)
+        self.assertEqual(28.39, volume_pool_size_free_samples[0].volume)
+        self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
+                         volume_pool_size_free_samples[0].resource_id)
+
+
+class TestVolumeProviderPoolCapacityProvisionedPollster(base.BaseTestCase):
+    def setUp(self):
+        super(TestVolumeProviderPoolCapacityProvisionedPollster, self).setUp()
+        conf = service.prepare_service([], [])
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeProviderPoolCapacityProvisioned(conf)
+
+    def test_volume_provider_pool_capacity_provisioned_pollster(self):
+        volume_pool_size_provisioned_samples = list(
+            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+        self.assertEqual(1, len(volume_pool_size_provisioned_samples))
+        self.assertEqual('volume.provider.pool.capacity.provisioned',
+                         volume_pool_size_provisioned_samples[0].name)
+        self.assertEqual(4.0, volume_pool_size_provisioned_samples[0].volume)
+        self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
+                         volume_pool_size_provisioned_samples[0].resource_id)
+
+
+class TestVolumeProviderPoolCapacityVirtualFreePollster(base.BaseTestCase):
+    def setUp(self):
+        super(TestVolumeProviderPoolCapacityVirtualFreePollster, self).setUp()
+        conf = service.prepare_service([], [])
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeProviderPoolCapacityVirtualFree(conf)
+
+    def test_volume_provider_pool_capacity_virtual_free_pollster(self):
+        volume_pool_size_virtual_free_samples = list(
+            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+        self.assertEqual(1, len(volume_pool_size_virtual_free_samples))
+        self.assertEqual('volume.provider.pool.capacity.virtual_free',
+                         volume_pool_size_virtual_free_samples[0].name)
+        self.assertEqual(566.0,
+                         volume_pool_size_virtual_free_samples[0].volume)
+        self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
+                         volume_pool_size_virtual_free_samples[0].resource_id)
+
+
+class TestVolumeProviderPoolCapacityAllocatedPollster(base.BaseTestCase):
+    def setUp(self):
+        super(TestVolumeProviderPoolCapacityAllocatedPollster, self).setUp()
+        conf = service.prepare_service([], [])
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeProviderPoolCapacityAllocated(conf)
+
+    def test_volume_provider_pool_capacity_allocated_pollster(self):
+        volume_pool_size_allocated_samples = list(
+            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+        self.assertEqual(1, len(volume_pool_size_allocated_samples))
+        self.assertEqual('volume.provider.pool.capacity.allocated',
+                         volume_pool_size_allocated_samples[0].name)
+        self.assertEqual(4, volume_pool_size_allocated_samples[0].volume)
+        self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
+                         volume_pool_size_allocated_samples[0].resource_id)

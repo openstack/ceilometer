@@ -12,6 +12,7 @@
 # under the License.
 """Common code for working with volumes
 """
+import math
 
 from ceilometer.polling import plugin_base
 from ceilometer import sample
@@ -116,4 +117,120 @@ class VolumeBackupSize(_Base):
                     backup, 'os-backup-project-attr:project_id', None),
                 resource_id=backup.id,
                 resource_metadata=self.extract_metadata(backup),
+            )
+
+
+class VolumeProviderPoolCapacityTotal(_Base):
+    @property
+    def default_discovery(self):
+        return 'volume_pools'
+
+    FIELDS = ['pool_name']
+
+    def get_samples(self, manager, cache, resources):
+        for pool in resources:
+            yield sample.Sample(
+                name='volume.provider.pool.capacity.total',
+                type=sample.TYPE_GAUGE,
+                unit='GB',
+                volume=pool.total_capacity_gb,
+                user_id=None,
+                project_id=None,
+                resource_id=pool.name,
+                resource_metadata=self.extract_metadata(pool),
+            )
+
+
+class VolumeProviderPoolCapacityFree(_Base):
+    @property
+    def default_discovery(self):
+        return 'volume_pools'
+
+    FIELDS = ['pool_name']
+
+    def get_samples(self, manager, cache, resources):
+        for pool in resources:
+            yield sample.Sample(
+                name='volume.provider.pool.capacity.free',
+                type=sample.TYPE_GAUGE,
+                unit='GB',
+                volume=pool.free_capacity_gb,
+                user_id=None,
+                project_id=None,
+                resource_id=pool.name,
+                resource_metadata=self.extract_metadata(pool),
+            )
+
+
+class VolumeProviderPoolCapacityProvisioned(_Base):
+    @property
+    def default_discovery(self):
+        return 'volume_pools'
+
+    FIELDS = ['pool_name']
+
+    def get_samples(self, manager, cache, resources):
+        for pool in resources:
+            yield sample.Sample(
+                name='volume.provider.pool.capacity.provisioned',
+                type=sample.TYPE_GAUGE,
+                unit='GB',
+                volume=pool.provisioned_capacity_gb,
+                user_id=None,
+                project_id=None,
+                resource_id=pool.name,
+                resource_metadata=self.extract_metadata(pool),
+            )
+
+
+class VolumeProviderPoolCapacityVirtualFree(_Base):
+    @property
+    def default_discovery(self):
+        return 'volume_pools'
+
+    FIELDS = ['pool_name']
+
+    def get_samples(self, manager, cache, resources):
+        for pool in resources:
+            reserved_size = math.floor(
+                (pool.reserved_percentage / 100) * pool.total_capacity_gb
+            )
+            max_over_subscription_ratio = 1.0
+            if pool.thin_provisioning_support:
+                max_over_subscription_ratio = pool.max_over_subscription_ratio
+            value = (
+                max_over_subscription_ratio *
+                (pool.total_capacity_gb - reserved_size) -
+                pool.provisioned_capacity_gb
+            )
+            yield sample.Sample(
+                name='volume.provider.pool.capacity.virtual_free',
+                type=sample.TYPE_GAUGE,
+                unit='GB',
+                volume=value,
+                user_id=None,
+                project_id=None,
+                resource_id=pool.name,
+                resource_metadata=self.extract_metadata(pool),
+            )
+
+
+class VolumeProviderPoolCapacityAllocated(_Base):
+    @property
+    def default_discovery(self):
+        return 'volume_pools'
+
+    FIELDS = ['pool_name']
+
+    def get_samples(self, manager, cache, resources):
+        for pool in resources:
+            yield sample.Sample(
+                name='volume.provider.pool.capacity.allocated',
+                type=sample.TYPE_GAUGE,
+                unit='GB',
+                volume=pool.allocated_capacity_gb,
+                user_id=None,
+                project_id=None,
+                resource_id=pool.name,
+                resource_metadata=self.extract_metadata(pool),
             )
