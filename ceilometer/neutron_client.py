@@ -49,7 +49,7 @@ def logged(func):
     return with_logging
 
 
-class Client(object):
+class Client:
     """A client which gets information via python-neutronclient."""
 
     def __init__(self, conf):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Copyright 2013 Intel Corp.
 #
@@ -46,7 +45,7 @@ class BasePipelineTestCase(base.BaseTestCase, metaclass=abc.ABCMeta):
             raise Exception()
 
     def setUp(self):
-        super(BasePipelineTestCase, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
         self.test_counter = sample.Sample(

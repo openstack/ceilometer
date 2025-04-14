@@ -133,7 +133,7 @@ def _hex(list=None):
     return 0
 
 
-class NodeManager(object):
+class NodeManager:
     """The python implementation of Intel Node Manager engine using ipmitool
 
     The class implements the engine to read power and temperature of
@@ -150,7 +150,7 @@ class NodeManager(object):
             return cls._instance
         with cls._instance_lock:
             if not cls._instance:
-                cls._instance = super(NodeManager, cls).__new__(
+                cls._instance = super().__new__(
                     cls, *args, **kwargs)
         return cls._instance
 

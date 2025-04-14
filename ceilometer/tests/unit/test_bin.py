@@ -23,7 +23,7 @@ from ceilometer.tests import base
 
 class BinTestCase(base.BaseTestCase):
     def setUp(self):
-        super(BinTestCase, self).setUp()
+        super().setUp()
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n")
         content = content.encode('utf-8')
@@ -32,7 +32,7 @@ class BinTestCase(base.BaseTestCase):
                                                     suffix='.conf')
 
     def tearDown(self):
-        super(BinTestCase, self).tearDown()
+        super().tearDown()
         os.remove(self.tempfile)
 
     def test_upgrade_run(self):
@@ -44,12 +44,12 @@ class BinTestCase(base.BaseTestCase):
 
 class BinSendSampleTestCase(base.BaseTestCase):
     def setUp(self):
-        super(BinSendSampleTestCase, self).setUp()
+        super().setUp()
         pipeline_cfg_file = self.path_get(
             'ceilometer/pipeline/data/pipeline.yaml')
         content = ("[DEFAULT]\n"
                    "transport_url = fake://\n"
-                   "pipeline_cfg_file={0}\n".format(pipeline_cfg_file))
+                   "pipeline_cfg_file={}\n".format(pipeline_cfg_file))
         content = content.encode('utf-8')
 
         self.tempfile = fileutils.write_to_tempfile(content=content,
@@ -57,7 +57,7 @@ class BinSendSampleTestCase(base.BaseTestCase):
                                                     suffix='.conf')
 
     def tearDown(self):
-        super(BinSendSampleTestCase, self).tearDown()
+        super().tearDown()
         os.remove(self.tempfile)
 
     def test_send_counter_run(self):
@@ -70,7 +70,7 @@ class BinSendSampleTestCase(base.BaseTestCase):
 
 class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
     def setUp(self):
-        super(BinCeilometerPollingServiceTestCase, self).setUp()
+        super().setUp()
         self.tempfile = None
         self.subp = None
 
@@ -81,7 +81,7 @@ class BinCeilometerPollingServiceTestCase(base.BaseTestCase):
             except OSError:
                 pass
         os.remove(self.tempfile)
-        super(BinCeilometerPollingServiceTestCase, self).tearDown()
+        super().tearDown()
 
     def test_starting_with_duplication_namespaces(self):
         content = ("[DEFAULT]\n"

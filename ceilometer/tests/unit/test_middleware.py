@@ -68,7 +68,7 @@ HTTP_RESPONSE = {
 class TestNotifications(base.BaseTestCase):
 
     def setUp(self):
-        super(TestNotifications, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF)
 

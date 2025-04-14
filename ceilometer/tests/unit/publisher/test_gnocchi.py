@@ -200,7 +200,7 @@ SNAPSHOT_TRANSFER_ACCEPT_END = models.Event(
 class PublisherTest(base.BaseTestCase):
 
     def setUp(self):
-        super(PublisherTest, self).setUp()
+        super().setUp()
         conf = ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf = self.useFixture(config_fixture.Config(conf))
         self.resource_id = str(uuid.uuid4())
@@ -445,9 +445,9 @@ class MockResponse(mock.NonCallableMock):
                 204: 'Created',
                 409: 'Conflict',
                 }.get(code)
-        super(MockResponse, self).__init__(spec=requests.Response,
-                                           status_code=code,
-                                           text=text)
+        super().__init__(spec=requests.Response,
+                         status_code=code,
+                         text=text)
 
 
 class PublisherWorkflowTest(base.BaseTestCase,
@@ -591,7 +591,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
                                                          workflow_scenarios)
 
     def setUp(self):
-        super(PublisherWorkflowTest, self).setUp()
+        super().setUp()
         conf = ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf = self.useFixture(config_fixture.Config(conf))
         ks_client = mock.Mock()

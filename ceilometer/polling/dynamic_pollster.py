@@ -49,7 +49,7 @@ def validate_sample_type(sample_type):
             % (sample_type, ceilometer_sample.TYPES))
 
 
-class XMLResponseHandler(object):
+class XMLResponseHandler:
     """This response handler converts an XML in string format to a dict"""
 
     @staticmethod
@@ -57,7 +57,7 @@ class XMLResponseHandler(object):
         return xmltodict.parse(response)
 
 
-class JsonResponseHandler(object):
+class JsonResponseHandler:
     """This response handler converts a JSON in string format to a dict"""
 
     @staticmethod
@@ -65,7 +65,7 @@ class JsonResponseHandler(object):
         return json.loads(response)
 
 
-class PlainTextResponseHandler(object):
+class PlainTextResponseHandler:
     """Response handler converts string to a list of dict [{'out'=<string>}]"""
 
     @staticmethod
@@ -102,7 +102,7 @@ def validate_extra_metadata_skip_samples(val):
             " value type: %s." % (val, type(val).__name__))
 
 
-class ResponseHandlerChain(object):
+class ResponseHandlerChain:
     """Tries to convert a string to a dict using the response handlers"""
 
     def __init__(self, response_handlers, **meta):
@@ -132,7 +132,7 @@ class ResponseHandlerChain(object):
             "used handlers [%s]. [%s]." % (response, handlers_str, self.meta))
 
 
-class PollsterDefinitionBuilder(object):
+class PollsterDefinitionBuilder:
 
     def __init__(self, definitions):
         self.definitions = definitions
@@ -166,7 +166,7 @@ class PollsterDefinitionBuilder(object):
                            supported_definitions))
 
 
-class PollsterSampleExtractor(object):
+class PollsterSampleExtractor:
 
     def __init__(self, definitions):
         self.definitions = definitions
@@ -404,7 +404,7 @@ class MultiMetricPollsterSampleExtractor(PollsterSampleExtractor):
         return False
 
 
-class PollsterValueMapper(object):
+class PollsterValueMapper:
 
     def __init__(self, definitions):
         self.definitions = definitions
@@ -442,7 +442,7 @@ class PollsterValueMapper(object):
         return value
 
 
-class PollsterDefinition(object):
+class PollsterDefinition:
     """Represents a dynamic pollster configuration/parameter
 
     It abstract the job of developers when creating or extending parameters,
@@ -500,7 +500,7 @@ class PollsterDefinition(object):
         return val
 
 
-class PollsterDefinitions(object):
+class PollsterDefinitions:
 
     POLLSTER_VALID_NAMES_REGEXP = r"^([\w-]+)(\.[\w-]+)*(\.{[\w-]+})?$"
 
@@ -716,7 +716,7 @@ class MultiMetricPollsterDefinitions(PollsterDefinitions):
     ]
 
     def __init__(self, configurations):
-        super(MultiMetricPollsterDefinitions, self).__init__(configurations)
+        super().__init__(configurations)
         self.sample_extractor = MultiMetricPollsterSampleExtractor(self)
 
     @staticmethod
@@ -736,7 +736,7 @@ class SingleMetricPollsterDefinitions(PollsterDefinitions):
         PollsterDefinition(name='value_attribute', required=True)]
 
     def __init__(self, configurations):
-        super(SingleMetricPollsterDefinitions, self).__init__(configurations)
+        super().__init__(configurations)
 
     def extract_attribute_key(self):
         return self.configurations['value_attribute']
@@ -747,7 +747,7 @@ class SingleMetricPollsterDefinitions(PollsterDefinitions):
             is_field_applicable_to_definition(configurations)
 
 
-class PollsterSampleGatherer(object):
+class PollsterSampleGatherer:
 
     def __init__(self, definitions):
         self.definitions = definitions
@@ -965,7 +965,7 @@ class NonOpenStackApisPollsterDefinition(PollsterDefinitions):
         PollsterDefinition(name='endpoint_type')]
 
     def __init__(self, configurations):
-        super(NonOpenStackApisPollsterDefinition, self).__init__(
+        super().__init__(
             configurations)
         self.sample_gatherer = NonOpenStackApisSamplesGatherer(self)
 
@@ -982,7 +982,7 @@ class HostCommandPollsterDefinition(PollsterDefinitions):
         PollsterDefinition(name='host_command', required=True)]
 
     def __init__(self, configurations):
-        super(HostCommandPollsterDefinition, self).__init__(
+        super().__init__(
             configurations)
         self.sample_gatherer = HostCommandSamplesGatherer(self)
 
@@ -993,7 +993,7 @@ class HostCommandPollsterDefinition(PollsterDefinitions):
 
 class HostCommandSamplesGatherer(PollsterSampleGatherer):
 
-    class Response(object):
+    class Response:
         def __init__(self, text):
             self.text = text
 
@@ -1082,8 +1082,7 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
         return credentials
 
     def create_request_arguments(self, definitions):
-        request_arguments = super(
-            NonOpenStackApisSamplesGatherer, self).create_request_arguments(
+        request_arguments = super().create_request_arguments(
             definitions)
 
         request_arguments.pop("authenticated")
@@ -1111,7 +1110,7 @@ class NonOpenStackApisSamplesGatherer(PollsterSampleGatherer):
             sample[new_attribute_key] = attribute_value
 
 
-class SkippedSample(object):
+class SkippedSample:
     pass
 
 
@@ -1125,7 +1124,7 @@ class DynamicPollster(plugin_base.PollsterBase):
                                         NonOpenStackApisPollsterDefinition,
                                         MultiMetricPollsterDefinitions,
                                         SingleMetricPollsterDefinitions]):
-        super(DynamicPollster, self).__init__(conf)
+        super().__init__(conf)
         self.supported_definitions = supported_definitions
         LOG.debug("%s instantiated with [%s]", __name__,
                   pollster_definitions)

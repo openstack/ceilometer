@@ -26,7 +26,7 @@ SERVICE_OPTS = [
 
 class ImagesDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):
-        super(ImagesDiscovery, self).__init__(conf)
+        super().__init__(conf)
         creds = conf.service_credentials
         self.glance_client = glanceclient.Client(
             version='2',

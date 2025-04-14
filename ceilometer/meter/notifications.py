@@ -41,7 +41,7 @@ OPTS = [
 LOG = log.getLogger(__name__)
 
 
-class MeterDefinition(object):
+class MeterDefinition:
 
     SAMPLE_ATTRIBUTES = ["name", "type", "volume", "unit", "timestamp",
                          "user_id", "project_id", "resource_id"]
@@ -169,8 +169,8 @@ class MeterDefinition(object):
             # NOTE(sileht): Transform the sample with multiple values per
             # attribute into multiple samples with one value per attribute.
             for values in zip(*samples_values):
-                sample = dict((attributes[idx], value)
-                              for idx, value in enumerate(values))
+                sample = {attributes[idx]: value
+                          for idx, value in enumerate(values)}
 
                 if self._name_discovery and self._cache:
                     # populate user_name and project_name fields in the sample
@@ -193,7 +193,7 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
     event_types = []
 
     def __init__(self, conf, publisher):
-        super(ProcessMeterNotifications, self).__init__(conf, publisher)
+        super().__init__(conf, publisher)
         self.definitions = self._load_definitions()
 
     def _load_definitions(self):

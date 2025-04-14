@@ -36,16 +36,16 @@ class TestPerfPollster(base.TestPollsterBase):
 
             samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
-            self.assertEqual(set(['perf.cpu.cycles']),
-                             set([s.name for s in samples]))
+            self.assertEqual({'perf.cpu.cycles'},
+                             {s.name for s in samples})
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_instructions(expected_usage):
             pollster = instance_stats.PerfInstructionsPollster(self.CONF)
             samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
-            self.assertEqual(set(['perf.instructions']),
-                             set([s.name for s in samples]))
+            self.assertEqual({'perf.instructions'},
+                             {s.name for s in samples})
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_cache_references(expected_usage):
@@ -54,8 +54,8 @@ class TestPerfPollster(base.TestPollsterBase):
 
             samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
-            self.assertEqual(set(['perf.cache.references']),
-                             set([s.name for s in samples]))
+            self.assertEqual({'perf.cache.references'},
+                             {s.name for s in samples})
             self.assertEqual(expected_usage, samples[0].volume)
 
         def _check_perf_events_cache_misses(expected_usage):
@@ -63,8 +63,8 @@ class TestPerfPollster(base.TestPollsterBase):
 
             samples = list(pollster.get_samples(mgr, cache, [self.instance]))
             self.assertEqual(1, len(samples))
-            self.assertEqual(set(['perf.cache.misses']),
-                             set([s.name for s in samples]))
+            self.assertEqual({'perf.cache.misses'},
+                             {s.name for s in samples})
             self.assertEqual(expected_usage, samples[0].volume)
 
         _check_perf_events_cpu_cycles(7259361)

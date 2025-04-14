@@ -70,7 +70,7 @@ class TestZaqarPublisher(base.BaseTestCase):
         traits=[], raw={'payload': {'some': 'aa'}}) for i in range(3)]
 
     def setUp(self):
-        super(TestZaqarPublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
     def test_zaqar_publisher_config(self):

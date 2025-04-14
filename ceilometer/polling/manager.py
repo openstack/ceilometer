@@ -126,15 +126,15 @@ def hash_of_set(s):
 
 class PollingException(agent.ConfigException):
     def __init__(self, message, cfg):
-        super(PollingException, self).__init__('Polling', message, cfg)
+        super().__init__('Polling', message, cfg)
 
 
 class HeartBeatException(agent.ConfigException):
     def __init__(self, message, cfg):
-        super(HeartBeatException, self).__init__('Polling', message, cfg)
+        super().__init__('Polling', message, cfg)
 
 
-class Resources(object):
+class Resources:
     def __init__(self, agent_manager):
         self.agent_manager = agent_manager
         self._resources = []
@@ -163,7 +163,7 @@ class Resources(object):
 
     @staticmethod
     def key(source_name, pollster):
-        return '%s-%s' % (source_name, pollster.name)
+        return '{}-{}'.format(source_name, pollster.name)
 
 
 def iter_random(iterable):
@@ -173,7 +173,7 @@ def iter_random(iterable):
     return iter(lst)
 
 
-class PollingTask(object):
+class PollingTask:
     """Polling task for polling samples and notifying.
 
     A polling task can be invoked periodically or only once.
@@ -378,7 +378,7 @@ class PollingTask(object):
 
 class AgentHeartBeatManager(cotyledon.Service):
     def __init__(self, worker_id, conf, namespaces=None, queue=None):
-        super(AgentHeartBeatManager, self).__init__(worker_id)
+        super().__init__(worker_id)
         self.conf = conf
 
         if conf.polling.heartbeat_socket_dir is None:
@@ -403,7 +403,7 @@ class AgentHeartBeatManager(cotyledon.Service):
         try:
             self._sock.bind(self._sock_pth)
             self._sock.listen(1)
-        except socket.error as err:
+        except OSError as err:
             raise HeartBeatException("Failed to open socket file "
                                      f"({self._sock_pth}): {err}", conf)
 
@@ -440,7 +440,7 @@ class AgentHeartBeatManager(cotyledon.Service):
         LOG.debug(f"Reported heartbeat status:\n{out}")
 
     def run(self):
-        super(AgentHeartBeatManager, self).run()
+        super().run()
 
         LOG.debug("Started heartbeat child process.")
 
@@ -466,7 +466,7 @@ class AgentManager(cotyledon.Service):
         namespaces = namespaces or ['compute', 'central']
         group_prefix = conf.polling.partitioning_group_prefix
 
-        super(AgentManager, self).__init__(worker_id)
+        super().__init__(worker_id)
 
         self.conf = conf
         self._queue = queue
@@ -511,7 +511,7 @@ class AgentManager(cotyledon.Service):
         # Compose coordination group prefix.
         # We'll use namespaces as the basement for this partitioning.
         namespace_prefix = '-'.join(sorted(namespaces))
-        self.group_prefix = ('%s-%s' % (namespace_prefix, group_prefix)
+        self.group_prefix = ('{}-{}'.format(namespace_prefix, group_prefix)
                              if group_prefix else namespace_prefix)
 
         if self.conf.polling.enable_notifications:
@@ -666,12 +666,12 @@ class AgentManager(cotyledon.Service):
         )
 
     def _extensions(self, category, agent_ns=None, *args, **kwargs):
-        namespace = ('ceilometer.%s.%s' % (category, agent_ns) if agent_ns
+        namespace = ('ceilometer.{}.{}'.format(category, agent_ns) if agent_ns
                      else 'ceilometer.%s' % category)
         return self._get_ext_mgr(namespace, *args, **kwargs)
 
     def _extensions_from_builder(self, category, agent_ns=None):
-        ns = ('ceilometer.builder.%s.%s' % (category, agent_ns) if agent_ns
+        ns = ('ceilometer.builder.{}.{}'.format(category, agent_ns) if agent_ns
               else 'ceilometer.builder.%s' % category)
         mgr = self._get_ext_mgr(ns, self.conf)
 
@@ -726,7 +726,7 @@ class AgentManager(cotyledon.Service):
                 group_prefix = p.name
                 generated_group_id = eval(p.group_id_coordination_expression)
 
-                group_for_coordination = "%s-%s" % (
+                group_for_coordination = "{}-{}".format(
                     group_prefix, generated_group_id)
                 dynamic_pollster_groups_for_coordination.add(
                     group_for_coordination)
@@ -742,9 +742,9 @@ class AgentManager(cotyledon.Service):
 
         groups.update(dynamic_pollster_groups_for_coordination)
 
-        self.hashrings = dict(
-            (group, self.partition_coordinator.join_partitioned_group(group))
-            for group in groups)
+        self.hashrings = {
+            group: self.partition_coordinator.join_partitioned_group(group)
+            for group in groups}
 
         LOG.debug("Hashrings [%s] created for pollsters definition.",
                   self.hashrings)
@@ -762,7 +762,7 @@ class AgentManager(cotyledon.Service):
         return polling_tasks
 
     def construct_group_id(self, discovery_group_id):
-        return '%s-%s' % (self.group_prefix, discovery_group_id)
+        return '{}-{}'.format(self.group_prefix, discovery_group_id)
 
     def start_polling_tasks(self):
         data = self.setup_polling_tasks()
@@ -786,7 +786,7 @@ class AgentManager(cotyledon.Service):
         utils.spawn_thread(self.polling_periodics.start, allow_empty=True)
 
     def run(self):
-        super(AgentManager, self).run()
+        super().run()
         self.polling_manager = PollingManager(self.conf)
         if self.partition_coordinator:
             self.partition_coordinator.start(start_heart=True)
@@ -797,7 +797,7 @@ class AgentManager(cotyledon.Service):
         self.stop_pollsters_tasks()
         if self.partition_coordinator:
             self.partition_coordinator.stop()
-        super(AgentManager, self).terminate()
+        super().terminate()
 
     def interval_task(self, task):
         # NOTE(sileht): remove the previous keystone client
@@ -938,7 +938,7 @@ class PollingManager(agent.ConfigManagerBase):
         specific pollster to decide how to use it.
 
         """
-        super(PollingManager, self).__init__(conf)
+        super().__init__(conf)
         cfg = self.load_config(conf.polling.cfg_file)
         self.sources = []
         if 'sources' not in cfg:
@@ -958,7 +958,7 @@ class PollingSource(agent.Source):
 
     def __init__(self, cfg):
         try:
-            super(PollingSource, self).__init__(cfg)
+            super().__init__(cfg)
         except agent.SourceException as err:
             raise PollingException(err.msg, cfg)
         try:

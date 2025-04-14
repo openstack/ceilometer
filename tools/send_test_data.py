@@ -137,8 +137,8 @@ def main():
 
     resource_writes = generate_data(conf, send_batch, make_data_args,
                                     **args.__dict__)
-    result_file = "%s/sample-by-resource-%s" % (result_dir,
-                                                random.getrandbits(32))
+    result_file = "{}/sample-by-resource-{}".format(result_dir,
+                                                    random.getrandbits(32))
     with open(result_file, 'w') as f:
         f.write(json.dumps(resource_writes))
     return result_file

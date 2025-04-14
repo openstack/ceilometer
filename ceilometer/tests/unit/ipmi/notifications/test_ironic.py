@@ -39,9 +39,8 @@ class TestNotifications(base.BaseTestCase):
         * metatata with the node id
         """
         processor = ipmi.TemperatureSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.SENSOR_DATA)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.SENSOR_DATA)}
 
         self.assertEqual(10, len(counters),
                          'expected 10 temperature readings')
@@ -65,9 +64,8 @@ class TestNotifications(base.BaseTestCase):
         modulo "current".
         """
         processor = ipmi.CurrentSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.SENSOR_DATA)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.SENSOR_DATA)}
 
         self.assertEqual(1, len(counters), 'expected 1 current reading')
         resource_id = (
@@ -86,9 +84,8 @@ class TestNotifications(base.BaseTestCase):
         modulo "power".
         """
         processor = ipmi.PowerSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.SENSOR_DATA)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.SENSOR_DATA)}
 
         self.assertEqual(1, len(counters), 'expected 1 current reading')
         resource_id = (
@@ -107,9 +104,8 @@ class TestNotifications(base.BaseTestCase):
         modulo "fan".
         """
         processor = ipmi.FanSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.SENSOR_DATA)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.SENSOR_DATA)}
 
         self.assertEqual(12, len(counters), 'expected 12 fan readings')
         resource_id = (
@@ -128,9 +124,8 @@ class TestNotifications(base.BaseTestCase):
         modulo "voltage".
         """
         processor = ipmi.VoltageSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.SENSOR_DATA)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.SENSOR_DATA)}
 
         self.assertEqual(4, len(counters), 'expected 4 volate readings')
         resource_id = (
@@ -145,9 +140,8 @@ class TestNotifications(base.BaseTestCase):
     def test_disabed_skips_metric(self):
         """Test that a meter which a disabled volume is skipped."""
         processor = ipmi.TemperatureSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.SENSOR_DATA)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.SENSOR_DATA)}
 
         self.assertEqual(10, len(counters),
                          'expected 10 temperature readings')
@@ -160,9 +154,8 @@ class TestNotifications(base.BaseTestCase):
 
     def test_empty_payload_no_metrics_success(self):
         processor = ipmi.TemperatureSensorNotification(None, None)
-        counters = dict([(counter.resource_id, counter) for counter in
-                         processor.build_sample(
-                             ipmi_test_data.EMPTY_PAYLOAD)])
+        counters = {counter.resource_id: counter for counter in
+                    processor.build_sample(ipmi_test_data.EMPTY_PAYLOAD)}
 
         self.assertEqual(0, len(counters), 'expected 0 readings')
 

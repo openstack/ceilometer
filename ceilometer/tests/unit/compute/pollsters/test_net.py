@@ -22,7 +22,7 @@ from ceilometer.polling import manager
 from ceilometer.tests.unit.compute.pollsters import base
 
 
-class FauxInstance(object):
+class FauxInstance:
 
     def __init__(self, **kwargs):
         for name, value in kwargs.items():
@@ -38,7 +38,7 @@ class FauxInstance(object):
 class TestNetPollster(base.TestPollsterBase):
 
     def setUp(self):
-        super(TestNetPollster, self).setUp()
+        super().setUp()
         self.vnic0 = virt_inspector.InterfaceStats(
             name='vnet0',
             fref='fa163e71ec6e',
@@ -126,8 +126,8 @@ class TestNetPollster(base.TestPollsterBase):
         pollster = factory(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(3, len(samples))  # one for each nic
-        self.assertEqual(set([expected_name]),
-                         set([s.name for s in samples]))
+        self.assertEqual({expected_name},
+                         {s.name for s in samples})
 
         def _verify_vnic_metering(ip, expected_volume, expected_rid):
             match = [s for s in samples
@@ -142,123 +142,123 @@ class TestNetPollster(base.TestPollsterBase):
             _verify_vnic_metering(ip, volume, rid)
 
     def test_incoming_bytes(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingBytesPollster,
             [('10.0.0.2', 1, self.vnic0.fref),
              ('192.168.0.3', 5, self.vnic1.fref),
              ('192.168.0.4', 9,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.incoming.bytes',
         )
 
     def test_outgoing_bytes(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingBytesPollster,
             [('10.0.0.2', 3, self.vnic0.fref),
              ('192.168.0.3', 7, self.vnic1.fref),
              ('192.168.0.4', 11,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.outgoing.bytes',
         )
 
     def test_incoming_bytes_delta(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingBytesDeltaPollster,
             [('10.0.0.2', 42, self.vnic0.fref),
              ('192.168.0.3', 44, self.vnic1.fref),
              ('192.168.0.4', 46,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.incoming.bytes.delta',
             'delta',
         )
 
     def test_outgoing_bytes_delta(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingBytesDeltaPollster,
             [('10.0.0.2', 43, self.vnic0.fref),
              ('192.168.0.3', 45, self.vnic1.fref),
              ('192.168.0.4', 47,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.outgoing.bytes.delta',
             'delta',
         )
 
     def test_incoming_packets(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingPacketsPollster,
             [('10.0.0.2', 2, self.vnic0.fref),
              ('192.168.0.3', 6, self.vnic1.fref),
              ('192.168.0.4', 10,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.incoming.packets',
         )
 
     def test_outgoing_packets(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingPacketsPollster,
             [('10.0.0.2', 4, self.vnic0.fref),
              ('192.168.0.3', 8, self.vnic1.fref),
              ('192.168.0.4', 12,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.outgoing.packets',
         )
 
     def test_incoming_drops(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingDropPollster,
             [('10.0.0.2', 20, self.vnic0.fref),
              ('192.168.0.3', 24, self.vnic1.fref),
              ('192.168.0.4', 28,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.incoming.packets.drop',
         )
 
     def test_outgoing_drops(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingDropPollster,
             [('10.0.0.2', 22, self.vnic0.fref),
              ('192.168.0.3', 26, self.vnic1.fref),
              ('192.168.0.4', 30,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.outgoing.packets.drop',
         )
 
     def test_incoming_errors(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingErrorsPollster,
             [('10.0.0.2', 21, self.vnic0.fref),
              ('192.168.0.3', 25, self.vnic1.fref),
              ('192.168.0.4', 29,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.incoming.packets.error',
         )
 
     def test_outgoing_errors(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingErrorsPollster,
             [('10.0.0.2', 23, self.vnic0.fref),
              ('192.168.0.3', 27, self.vnic1.fref),
              ('192.168.0.4', 31,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.outgoing.packets.error',
         )
@@ -279,7 +279,7 @@ class TestNetPollster(base.TestPollsterBase):
 class TestNetRatesPollster(base.TestPollsterBase):
 
     def setUp(self):
-        super(TestNetRatesPollster, self).setUp()
+        super().setUp()
         self.vnic0 = virt_inspector.InterfaceRateStats(
             name='vnet0',
             fref='fa163e71ec6e',
@@ -325,8 +325,8 @@ class TestNetRatesPollster(base.TestPollsterBase):
         pollster = factory(self.CONF)
         samples = list(pollster.get_samples(mgr, {}, [self.instance]))
         self.assertEqual(3, len(samples))  # one for each nic
-        self.assertEqual(set([expected_name]),
-                         set([s.name for s in samples]))
+        self.assertEqual({expected_name},
+                         {s.name for s in samples})
 
         def _verify_vnic_metering(ip, expected_volume, expected_rid):
             match = [s for s in samples
@@ -341,25 +341,25 @@ class TestNetRatesPollster(base.TestPollsterBase):
             _verify_vnic_metering(ip, volume, rid)
 
     def test_incoming_bytes_rate(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.IncomingBytesRatePollster,
             [('10.0.0.2', 1, self.vnic0.fref),
              ('192.168.0.3', 3, self.vnic1.fref),
              ('192.168.0.4', 5,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.incoming.bytes.rate',
         )
 
     def test_outgoing_bytes_rate(self):
-        instance_name_id = "%s-%s" % (self.instance.name, self.instance.id)
+        instance_name_id = "{}-{}".format(self.instance.name, self.instance.id)
         self._check_get_samples(
             net.OutgoingBytesRatePollster,
             [('10.0.0.2', 2, self.vnic0.fref),
              ('192.168.0.3', 4, self.vnic1.fref),
              ('192.168.0.4', 6,
-              "%s-%s" % (instance_name_id, self.vnic2.name)),
+              "{}-{}".format(instance_name_id, self.vnic2.name)),
              ],
             'network.outgoing.bytes.rate',
         )

@@ -25,7 +25,7 @@ from ceilometer import service
 class TestNovaClient(base.BaseTestCase):
 
     def setUp(self):
-        super(TestNovaClient, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self._flavors_count = 0
         self._images_count = 0

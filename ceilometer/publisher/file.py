@@ -52,7 +52,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
     """
 
     def __init__(self, conf, parsed_url):
-        super(FilePublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
 
         self.publisher_logger = None
         path = parsed_url.path

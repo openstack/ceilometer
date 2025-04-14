@@ -25,7 +25,7 @@ from ceilometer.tests import base
 class TestPollsterBase(base.BaseTestCase, metaclass=abc.ABCMeta):
 
     def setUp(self):
-        super(TestPollsterBase, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
     def fake_data(self):

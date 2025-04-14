@@ -21,7 +21,7 @@ from oslo_utils import timeutils
 LOG = log.getLogger(__name__)
 
 
-class TraitPluginBase(object, metaclass=abc.ABCMeta):
+class TraitPluginBase(metaclass=abc.ABCMeta):
     """Base class for plugins.
 
     It converts notification fields to Trait values.
@@ -44,7 +44,7 @@ class TraitPluginBase(object, metaclass=abc.ABCMeta):
         :param kw: the parameters specified in the event definitions file.
 
         """
-        super(TraitPluginBase, self).__init__()
+        super().__init__()
 
     @abc.abstractmethod
     def trait_values(self, match_list):
@@ -123,7 +123,7 @@ class SplitterTraitPlugin(TraitPluginBase):
         self.separator = separator
         self.segment = segment
         self.max_split = max_split
-        super(SplitterTraitPlugin, self).__init__(**kw)
+        super().__init__(**kw)
 
     def trait_values(self, match_list):
         return [self._trait_value(match)
@@ -163,7 +163,7 @@ class BitfieldTraitPlugin(TraitPluginBase):
         if flags is None:
             flags = []
         self.flags = flags
-        super(BitfieldTraitPlugin, self).__init__(**kw)
+        super().__init__(**kw)
 
     def trait_values(self, match_list):
         matches = dict(match_list)
@@ -184,7 +184,7 @@ class TimedeltaPluginMissedFields(Exception):
     def __init__(self):
         msg = ('It is required to use two timestamp field with Timedelta '
                'plugin.')
-        super(TimedeltaPluginMissedFields, self).__init__(msg)
+        super().__init__(msg)
 
 
 class TimedeltaPlugin(TraitPluginBase):
@@ -231,11 +231,11 @@ class MapTraitPlugin(TraitPluginBase):
         :param case_sensitive: (bool) Perform case-sensitive string lookups.
         """
         if not values:
-            raise ValueError(("The 'values' parameter is required "
-                              "for the map trait plugin"))
+            raise ValueError("The 'values' parameter is required "
+                             "for the map trait plugin")
         if not isinstance(values, dict):
-            raise ValueError(("The 'values' parameter needs to be a dict "
-                              "for the map trait plugin"))
+            raise ValueError("The 'values' parameter needs to be a dict "
+                             "for the map trait plugin")
         self.case_sensitive = case_sensitive
         if not self.case_sensitive:
             self.values = {(k.casefold()
@@ -245,7 +245,7 @@ class MapTraitPlugin(TraitPluginBase):
         else:
             self.values = dict(values)
         self.default = default
-        super(MapTraitPlugin, self).__init__(**kw)
+        super().__init__(**kw)
 
     def trait_values(self, match_list):
         mapped_values = []

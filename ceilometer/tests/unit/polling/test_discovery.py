@@ -27,7 +27,7 @@ from ceilometer import service
 class TestEndpointDiscovery(base.BaseTestCase):
 
     def setUp(self):
-        super(TestEndpointDiscovery, self).setUp()
+        super().setUp()
         CONF = service.prepare_service([], [])
         CONF.set_override('interface', 'publicURL',
                           group='service_credentials')
@@ -61,7 +61,7 @@ class TestEndpointDiscovery(base.BaseTestCase):
 
 class TestLocalnodeDiscovery(base.BaseTestCase):
     def setUp(self):
-        super(TestLocalnodeDiscovery, self).setUp()
+        super().setUp()
         self.conf = service.prepare_service([], [])
         self.discovery = localnode.LocalNodeDiscovery(self.conf)
         self.manager = mock.MagicMock()
@@ -134,7 +134,7 @@ class TestProjectDiscovery(base.BaseTestCase):
             return []
 
     def setUp(self):
-        super(TestProjectDiscovery, self).setUp()
+        super().setUp()
         CONF = service.prepare_service([], [])
         self.discovery = project.TenantDiscovery(CONF)
         self.prepare_mock_data()

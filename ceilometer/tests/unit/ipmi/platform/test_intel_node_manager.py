@@ -31,7 +31,7 @@ class _Base(base.BaseTestCase, metaclass=abc.ABCMeta):
         """Prepare specific ipmitool as engine for different NM version."""
 
     def setUp(self):
-        super(_Base, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.init_test_engine()
         with mock.patch.object(node_manager.NodeManager, '__new__',
@@ -176,7 +176,7 @@ class TestNonNodeManager(_Base):
 class ParseSDRFileTestCase(base.BaseTestCase):
 
     def setUp(self):
-        super(ParseSDRFileTestCase, self).setUp()
+        super().setUp()
         self.temp_file = tempfile.NamedTemporaryFile().name
 
     def test_parsing_found(self):

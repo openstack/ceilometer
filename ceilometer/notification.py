@@ -89,7 +89,7 @@ class NotificationService(cotyledon.Service):
     NOTIFICATION_NAMESPACE = 'ceilometer.notification.v2'
 
     def __init__(self, worker_id, conf, coordination_id=None):
-        super(NotificationService, self).__init__(worker_id)
+        super().__init__(worker_id)
         self.startup_delay = worker_id
         self.conf = conf
         self.listeners = []
@@ -115,7 +115,7 @@ class NotificationService(cotyledon.Service):
         # Delay startup so workers are jittered
         time.sleep(self.startup_delay)
 
-        super(NotificationService, self).run()
+        super().run()
 
         self.managers = [ext.obj for ext in named.NamedExtensionManager(
             namespace='ceilometer.notification.pipeline',
@@ -165,4 +165,4 @@ class NotificationService(cotyledon.Service):
     def terminate(self):
         self.kill_listeners(self.listeners)
 
-        super(NotificationService, self).terminate()
+        super().terminate()

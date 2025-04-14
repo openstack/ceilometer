@@ -35,7 +35,7 @@ def get_publisher(conf, url, namespace):
     return loaded_driver.driver(conf, parse_result)
 
 
-class ConfigPublisherBase(object, metaclass=abc.ABCMeta):
+class ConfigPublisherBase(metaclass=abc.ABCMeta):
     """Base class for plugins that publish data."""
 
     def __init__(self, conf, parsed_url):

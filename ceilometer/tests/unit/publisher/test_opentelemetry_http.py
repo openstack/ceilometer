@@ -124,7 +124,7 @@ class TestOpentelemetryHttpPublisher(base.BaseTestCase):
                         }]}}]}]}]}
 
     def setUp(self):
-        super(TestOpentelemetryHttpPublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
     def test_post_samples(self):

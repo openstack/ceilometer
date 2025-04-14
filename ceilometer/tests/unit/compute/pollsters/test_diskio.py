@@ -27,7 +27,7 @@ class TestBaseDiskIO(base.TestPollsterBase):
     TYPE = 'cumulative'
 
     def setUp(self):
-        super(TestBaseDiskIO, self).setUp()
+        super().setUp()
         self.instance = self._get_fake_instances()
 
     @staticmethod
@@ -56,7 +56,7 @@ class TestBaseDiskIO(base.TestPollsterBase):
         self.assertIn(cache_key, cache)
         for instance in self.instance:
             self.assertIn(instance.id, cache[cache_key])
-        self.assertEqual(set([name]), set([s.name for s in samples]))
+        self.assertEqual({name}, {s.name for s in samples})
 
         match = [s for s in samples if s.name == name]
         self.assertEqual(len(match), expected_count,
@@ -84,7 +84,7 @@ class TestBaseDiskIO(base.TestPollsterBase):
         for m in match:
             match_dict[m.resource_id] = m
         for instance in self.instance:
-            key = "%s-%s" % (instance.id, expected_device)
+            key = "{}-{}".format(instance.id, expected_device)
             self.assertEqual(expected_volume,
                              match_dict[key].volume)
             self.assertEqual(self.TYPE, match_dict[key].type)
@@ -110,7 +110,7 @@ class TestDiskPollsters(TestBaseDiskIO):
     ]
 
     def setUp(self):
-        super(TestDiskPollsters, self).setUp()
+        super().setUp()
         self.inspector.inspect_disks = mock.Mock(return_value=self.DISKS)
 
     def test_per_disk_read_requests(self):
@@ -175,7 +175,7 @@ class TestDiskInfoPollsters(TestBaseDiskIO):
     TYPE = 'gauge'
 
     def setUp(self):
-        super(TestDiskInfoPollsters, self).setUp()
+        super().setUp()
         self.inspector.inspect_disk_info = mock.Mock(return_value=self.DISKS)
 
     def test_per_disk_capacity(self):

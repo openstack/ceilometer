@@ -20,7 +20,7 @@ from ceilometer import sample
 
 class _Base(plugin_base.PollsterBase):
     def extract_metadata(self, obj):
-        metadata = dict((k, getattr(obj, k)) for k in self.FIELDS)
+        metadata = {k: getattr(obj, k) for k in self.FIELDS}
         if getattr(obj, "volume_image_metadata", None):
             metadata["image_id"] = obj.volume_image_metadata.get("image_id")
         else:

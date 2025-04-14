@@ -32,7 +32,7 @@ class SensorPollster(plugin_base.PollsterBase):
     METRIC = None
 
     def setup_environment(self):
-        super(SensorPollster, self).setup_environment()
+        super().setup_environment()
         self.ipmi = ipmi_sensor.IPMISensor()
         self.polling_failures = 0
 

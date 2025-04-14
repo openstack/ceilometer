@@ -48,7 +48,7 @@ ASSIGNED_TENANTS = [Tenant('tenant-000'), Tenant('tenant-001')]
 class TestManager(manager.AgentManager):
 
     def __init__(self, worker_id, conf):
-        super(TestManager, self).__init__(worker_id, conf)
+        super().__init__(worker_id, conf)
         self._keystone = mock.Mock()
         self._catalog = (self._keystone.session.auth.get_access.
                          return_value.service_catalog)
@@ -86,7 +86,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
                 yield i
 
     def setUp(self):
-        super(TestRgwPollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         conf.set_override('radosgw', 'object-store',
                           group='service_types')
@@ -99,7 +99,7 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
             self.ACCOUNTS = GET_USAGE
 
     def tearDown(self):
-        super(TestRgwPollster, self).tearDown()
+        super().tearDown()
         rgw._Base._ENDPOINT = None
 
     def test_iter_accounts_no_cache(self):
@@ -143,8 +143,8 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))
 
-        self.assertEqual(set([samples[0].name]),
-                         set([s.name for s in samples]))
+        self.assertEqual({samples[0].name},
+                         {s.name for s in samples})
 
     def test_only_poll_assigned(self):
         mock_method = mock.MagicMock()

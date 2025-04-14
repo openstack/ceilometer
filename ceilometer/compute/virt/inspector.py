@@ -38,7 +38,7 @@ LOG = log.getLogger(__name__)
 
 # Named tuple representing instance statistics
 
-class InstanceStats(object):
+class InstanceStats:
     fields = [
         'power_state',       # the power state of the domain
         'cpu_number',        # number: number of CPUs
@@ -143,7 +143,7 @@ DiskInfo = collections.namedtuple('DiskInfo',
 #
 class InspectorException(Exception):
     def __init__(self, message=None):
-        super(InspectorException, self).__init__(message)
+        super().__init__(message)
 
 
 class InstanceNotFoundException(InspectorException):
@@ -160,7 +160,7 @@ class NoDataException(InspectorException):
 
 # Main virt inspector abstraction layering over the hypervisor API.
 #
-class Inspector(object):
+class Inspector:
 
     def __init__(self, conf):
         self.conf = conf

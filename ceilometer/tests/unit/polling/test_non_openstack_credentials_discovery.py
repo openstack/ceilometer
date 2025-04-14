@@ -23,7 +23,7 @@ from ceilometer.polling.discovery.non_openstack_credentials_discovery import \
 
 class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
-    class FakeResponse(object):
+    class FakeResponse:
         status_code = None
         json_object = None
         _content = ""
@@ -34,12 +34,12 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
         def raise_for_status(self):
             raise requests.HTTPError("Mock HTTP error.", response=self)
 
-    class FakeManager(object):
+    class FakeManager:
         def __init__(self, keystone_client_mock):
             self._keystone = keystone_client_mock
 
     def setUp(self):
-        super(TestNonOpenStackCredentialsDiscovery, self).setUp()
+        super().setUp()
 
         self.discovery = NonOpenStackCredentialsDiscovery(None)
 

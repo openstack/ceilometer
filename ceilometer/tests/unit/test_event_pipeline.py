@@ -42,7 +42,7 @@ class EventPipelineTestCase(base.BaseTestCase):
             raise Exception()
 
     def setUp(self):
-        super(EventPipelineTestCase, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
         self.test_event = models.Event(

@@ -66,7 +66,7 @@ def recursive_keypairs(d, separator=':'):
     for name, value in sorted(d.items()):
         if isinstance(value, dict):
             for subname, subvalue in recursive_keypairs(value, separator):
-                yield ('%s%s%s' % (name, separator, subname), subvalue)
+                yield ('{}{}{}'.format(name, separator, subname), subvalue)
         elif isinstance(value, (tuple, list)):
             yield name, decode_unicode(value)
         else:

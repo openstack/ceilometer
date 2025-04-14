@@ -24,8 +24,9 @@ LOG = log.getLogger(__name__)
 
 class DefinitionException(Exception):
     def __init__(self, message, definition_cfg=None):
-        msg = '%s %s: %s' % (self.__class__.__name__, definition_cfg, message)
-        super(DefinitionException, self).__init__(msg)
+        msg = '{} {}: {}'.format(
+            self.__class__.__name__, definition_cfg, message)
+        super().__init__(msg)
         self.brief_message = message
 
 
@@ -58,7 +59,7 @@ class NonOpenStackApisDynamicPollsterException\
     pass
 
 
-class Definition(object):
+class Definition:
     JSONPATH_RW_PARSER = parser.ExtentedJsonPathParser()
     GETTERS_CACHE = {}
 
@@ -123,8 +124,7 @@ class Definition(object):
 
     def _get_path(self, match):
         if match.context is not None:
-            for path_element in self._get_path(match.context):
-                yield path_element
+            yield from self._get_path(match.context)
             yield str(match.path)
 
     def parse(self, obj, return_all_values=False):

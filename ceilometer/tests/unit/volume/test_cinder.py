@@ -50,17 +50,17 @@ VOLUME_LIST = [
           'multiattach': False,
           'source_volid': None,
           'consistencygroup_id': None,
-          u"volume_image_metadata": {
-              u"checksum": u"17d9daa4fb8e20b0f6b7dec0d46fdddf",
-              u"container_format": u"bare",
-              u"disk_format": u"raw",
-              u"hw_disk_bus": u"scsi",
-              u"hw_scsi_model": u"virtio-scsi",
-              u"image_id": u"f0019ee3-523c-45ab-b0b6-3adc529673e7",
-              u"image_name": u"debian-jessie-scsi",
-              u"min_disk": u"0",
-              u"min_ram": u"0",
-              u"size": u"1572864000"
+          "volume_image_metadata": {
+              "checksum": "17d9daa4fb8e20b0f6b7dec0d46fdddf",
+              "container_format": "bare",
+              "disk_format": "raw",
+              "hw_disk_bus": "scsi",
+              "hw_scsi_model": "virtio-scsi",
+              "image_id": "f0019ee3-523c-45ab-b0b6-3adc529673e7",
+              "image_name": "debian-jessie-scsi",
+              "min_disk": "0",
+              "min_ram": "0",
+              "size": "1572864000"
           },
           'os-vol-mig-status-attr:name_id': None,
           'group_id': None,
@@ -89,17 +89,17 @@ SNAPSHOT_LIST = [
           'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
           'metadata': {},
           'created_at': '2016-10-19T07:56:55.000000',
-          u"volume_image_metadata": {
-              u"checksum": u"17d9daa4fb8e20b0f6b7dec0d46fdddf",
-              u"container_format": u"bare",
-              u"disk_format": u"raw",
-              u"hw_disk_bus": u"scsi",
-              u"hw_scsi_model": u"virtio-scsi",
-              u"image_id": u"f0019ee3-523c-45ab-b0b6-3adc529673e7",
-              u"image_name": u"debian-jessie-scsi",
-              u"min_disk": u"0",
-              u"min_ram": u"0",
-              u"size": u"1572864000"
+          "volume_image_metadata": {
+              "checksum": "17d9daa4fb8e20b0f6b7dec0d46fdddf",
+              "container_format": "bare",
+              "disk_format": "raw",
+              "hw_disk_bus": "scsi",
+              "hw_scsi_model": "virtio-scsi",
+              "image_id": "f0019ee3-523c-45ab-b0b6-3adc529673e7",
+              "image_name": "debian-jessie-scsi",
+              "min_disk": "0",
+              "min_ram": "0",
+              "size": "1572864000"
           },
           "group_snapshot_id": None,
           'name': None})
@@ -126,7 +126,7 @@ BACKUP_LIST = [
           'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
           'os-backup-project-attr:project_id':
               '6824974c08974d4db864bbaa6bc08303',
-          'fail_reason': u"",
+          'fail_reason': "",
           'is_incremental': False,
           'metadata': {},
           'user_id': 'be255bd31eb944578000fc762fde6dcf',
@@ -165,7 +165,7 @@ POOL_LIST = [
 
 class TestVolumeSizePollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeSizePollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeSizePollster(conf)
@@ -191,7 +191,7 @@ class TestVolumeSizePollster(base.BaseTestCase):
 
 class TestVolumeSnapshotSizePollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeSnapshotSizePollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeSnapshotSize(conf)
@@ -217,7 +217,7 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
 
 class TestVolumeBackupSizePollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeBackupSizePollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeBackupSize(conf)
@@ -235,7 +235,7 @@ class TestVolumeBackupSizePollster(base.BaseTestCase):
 
 class TestVolumeProviderPoolCapacityTotalPollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeProviderPoolCapacityTotalPollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeProviderPoolCapacityTotal(conf)
@@ -253,7 +253,7 @@ class TestVolumeProviderPoolCapacityTotalPollster(base.BaseTestCase):
 
 class TestVolumeProviderPoolCapacityFreePollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeProviderPoolCapacityFreePollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeProviderPoolCapacityFree(conf)
@@ -271,7 +271,7 @@ class TestVolumeProviderPoolCapacityFreePollster(base.BaseTestCase):
 
 class TestVolumeProviderPoolCapacityProvisionedPollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeProviderPoolCapacityProvisionedPollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeProviderPoolCapacityProvisioned(conf)
@@ -289,7 +289,7 @@ class TestVolumeProviderPoolCapacityProvisionedPollster(base.BaseTestCase):
 
 class TestVolumeProviderPoolCapacityVirtualFreePollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeProviderPoolCapacityVirtualFreePollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeProviderPoolCapacityVirtualFree(conf)
@@ -308,7 +308,7 @@ class TestVolumeProviderPoolCapacityVirtualFreePollster(base.BaseTestCase):
 
 class TestVolumeProviderPoolCapacityAllocatedPollster(base.BaseTestCase):
     def setUp(self):
-        super(TestVolumeProviderPoolCapacityAllocatedPollster, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = cinder.VolumeProviderPoolCapacityAllocated(conf)

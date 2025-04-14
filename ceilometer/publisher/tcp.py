@@ -31,7 +31,7 @@ LOG = log.getLogger(__name__)
 
 class TCPPublisher(publisher.ConfigPublisherBase):
     def __init__(self, conf, parsed_url):
-        super(TCPPublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
         self.inet_addr = netutils.parse_host_port(
             parsed_url.netloc, default_port=4952)
         self.socket = None

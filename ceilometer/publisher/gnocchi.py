@@ -41,7 +41,7 @@ LOG = log.getLogger(__name__)
 EVENT_CREATE, EVENT_UPDATE, EVENT_DELETE = ("create", "update", "delete")
 
 
-class ResourcesDefinition(object):
+class ResourcesDefinition:
 
     MANDATORY_FIELDS = {'resource_type': str,
                         'metrics': (dict, list)}
@@ -142,7 +142,7 @@ class ResourcesDefinition(object):
 
     def event_attributes(self, event):
         attrs = {'type': self.cfg['resource_type']}
-        traits = dict([(trait.name, trait.value) for trait in event.traits])
+        traits = {trait.name: trait.value for trait in event.traits}
         for attr, field in self.cfg.get('event_attributes', {}).items():
             value = traits.get(field)
             if value is not None:
@@ -158,18 +158,18 @@ class LockedDefaultDict(defaultdict):
     """
     def __init__(self, *args, **kwargs):
         self.lock = threading.Lock()
-        super(LockedDefaultDict, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __getitem__(self, key):
         with self.lock:
-            return super(LockedDefaultDict, self).__getitem__(key)
+            return super().__getitem__(key)
 
     def pop(self, key, *args):
         with self.lock:
-            key_lock = super(LockedDefaultDict, self).__getitem__(key)
+            key_lock = super().__getitem__(key)
             if key_lock.acquire(False):
                 try:
-                    super(LockedDefaultDict, self).pop(key, *args)
+                    super().pop(key, *args)
                 finally:
                     key_lock.release()
 
@@ -184,7 +184,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
       gnocchi://?archive_policy=low&filter_project=gnocchi
     """
     def __init__(self, conf, parsed_url):
-        super(GnocchiPublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
         # TODO(jd) allow to override Gnocchi endpoint via the host in the URL
         options = urlparse.parse_qs(parsed_url.query)
 
@@ -198,8 +198,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         self.resources_definition, self.archive_policies_definition = (
             self._load_definitions(conf, archive_policy_override,
                                    resources_definition_file))
-        self.metric_map = dict((metric, rd) for rd in self.resources_definition
-                               for metric in rd.metrics)
+        self.metric_map = {metric: rd for rd in self.resources_definition
+                           for metric in rd.metrics}
 
         timeout = options.get('timeout', [6.05])[-1]
         self._ks_client = keystone_client.get_client(conf)
@@ -436,8 +436,8 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
     @staticmethod
     def _extract_resources_from_error(e, resource_infos):
-        resource_ids = set([r['original_resource_id']
-                            for r in e.message['detail']])
+        resource_ids = {r['original_resource_id']
+                        for r in e.message['detail']}
         return [(resource_infos[rid]['resource_type'],
                  resource_infos[rid]['resource'],
                  resource_infos[rid]['resource_extra'])
@@ -623,4 +623,4 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         except Exception:
             LOG.error("Fail to update the resource %s", resource,
                       exc_info=True)
-        LOG.debug('Resource %s ended at %s' % (resource["id"], ended_at))
+        LOG.debug('Resource {} ended at {}'.format(resource["id"], ended_at))

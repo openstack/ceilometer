@@ -81,7 +81,7 @@ class TestPollsterBuilder(TestPollster):
 
 class TestManager(base.BaseTestCase):
     def setUp(self):
-        super(TestManager, self).setUp()
+        super().setUp()
         self.conf = service.prepare_service([], [])
 
     def test_hash_of_set(self):
@@ -213,7 +213,7 @@ class TestPollsterPollingException(TestPollster):
     polling_failures = 0
 
     def get_samples(self, manager, cache, resources):
-        func = super(TestPollsterPollingException, self).get_samples
+        func = super().get_samples
         sample = func(manager=manager,
                       cache=cache,
                       resources=resources)
@@ -295,7 +295,7 @@ class BaseAgent(base.BaseTestCase):
             self.notified_samples.append(m)
 
     def setUp(self):
-        super(BaseAgent, self).setUp()
+        super().setUp()
         self.notified_samples = []
         self.notifier = mock.Mock()
         self.notifier.sample.side_effect = self.fake_notifier_sample
@@ -333,7 +333,7 @@ class BaseAgent(base.BaseTestCase):
         self.DiscoveryException.params = []
         self.Discovery.resources = []
         self.DiscoveryAnother.resources = []
-        super(BaseAgent, self).tearDown()
+        super().tearDown()
 
     def create_extension_list(self):
         return [extension.Extension('test',
@@ -383,7 +383,7 @@ class BaseAgent(base.BaseTestCase):
 class TestPollingAgent(BaseAgent):
 
     def setUp(self):
-        super(TestPollingAgent, self).setUp()
+        super().setUp()
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
         ks_client = mock.Mock(auth_token='fake_token')
@@ -879,7 +879,7 @@ class TestPollingAgent(BaseAgent):
 class TestPollingAgentPartitioned(BaseAgent):
 
     def setUp(self):
-        super(TestPollingAgentPartitioned, self).setUp()
+        super().setUp()
         self.tempdir = tempfile.mkdtemp()
         self.CONF.set_override("backend_url", "file://%s" % self.tempdir,
                                "coordination")

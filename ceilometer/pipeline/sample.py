@@ -62,7 +62,7 @@ class SampleSource(base.PipelineSource):
     """
 
     def __init__(self, cfg):
-        super(SampleSource, self).__init__(cfg)
+        super().__init__(cfg)
         try:
             self.meters = cfg['meters']
         except KeyError:
@@ -150,7 +150,7 @@ class SamplePipelineManager(base.PipelineManager):
     pm_sink = SampleSink
 
     def __init__(self, conf):
-        super(SamplePipelineManager, self).__init__(
+        super().__init__(
             conf, conf.pipeline_cfg_file)
 
     def get_main_endpoints(self):

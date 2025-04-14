@@ -19,7 +19,7 @@ from ceilometer.tests import base
 class PollingTestCase(base.BaseTestCase):
 
     def setUp(self):
-        super(PollingTestCase, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.poll_cfg = {'sources': [{'name': 'test_source',
                                       'interval': 600,

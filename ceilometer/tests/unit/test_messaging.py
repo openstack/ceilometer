@@ -21,7 +21,7 @@ from ceilometer import service
 
 class MessagingTests(base.BaseTestCase):
     def setUp(self):
-        super(MessagingTests, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.useFixture(oslo_messaging.conffixture.ConfFixture(self.CONF))
 
