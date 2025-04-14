@@ -2,4 +2,4 @@
 features:
   - >
     Ceilometer alarms code is now fully removed from code base.
-    Equivalent functionality is handled by Aodh.  
+    Equivalent functionality is handled by Aodh.

@@ -1,6 +1,6 @@
 ---
 upgrade:
-  - Configuration values can passed in via the querystring of publisher in 
+  - Configuration values can passed in via the querystring of publisher in
     pipeline. For example, rather than setting target, timeout, verify_ssl,
     and batch_mode under [dispatcher_http] section of conf, you can specify
     http://<target>/?verify_ssl=True&batch=True&timeout=10. Use `raw_only=1`
