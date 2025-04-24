@@ -19,10 +19,12 @@ import prometheus_client as prom
 CEILOMETER_REGISTRY = prom.CollectorRegistry()
 
 
-def export(prometheus_iface, prometheus_port):
-    prom.start_http_server(port=prometheus_port,
-                           addr=prometheus_iface,
-                           registry=CEILOMETER_REGISTRY)
+def export(prom_iface, prom_port, tls_cert=None, tls_key=None):
+    prom.start_http_server(port=prom_port,
+                           addr=prom_iface,
+                           registry=CEILOMETER_REGISTRY,
+                           certfile=tls_cert,
+                           keyfile=tls_key)
 
 
 def collect_metrics(samples):
