@@ -38,5 +38,7 @@ class BaseServicesPollster(plugin_base.PollsterBase):
 
     @staticmethod
     def get_status_id(value):
+        if not value:
+            return -1
         status = value.lower()
         return STATUS.get(status, -1)

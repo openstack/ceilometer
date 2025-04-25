@@ -18,6 +18,7 @@
 
 from oslo_log import log
 
+from ceilometer.i18n import _
 from ceilometer.network.services import base
 from ceilometer import sample
 
@@ -41,11 +42,15 @@ class FloatingIPPollster(base.BaseServicesPollster):
     def get_samples(self, manager, cache, resources):
 
         for fip in resources or []:
-            if fip['status'] is None:
-                LOG.warning("Invalid status, skipping IP address %s" %
-                            fip['floating_ip_address'])
-                continue
+            LOG.debug("FLOATING IP : %s", fip)
             status = self.get_status_id(fip['status'])
+            if status == -1:
+                LOG.warning(
+                    _("Unknown status %(status)s for floating IP address "
+                      "%(address)s (%(id)s), setting volume to -1") % {
+                        "status": fip['status'],
+                        "address": fip['floating_ip_address'],
+                        "id": fip['id']})
             yield sample.Sample(
                 name='ip.floating',
                 type=sample.TYPE_GAUGE,

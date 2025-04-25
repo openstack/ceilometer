@@ -1,0 +1,17 @@
+---
+upgrade:
+  - |
+    The ``ip.floating`` and ``network.services.vpn`` pollsters now publish
+    samples for all found floating IPs and VPNs, even if they are known
+    to have an unknown state, when they would previously be dropped.
+    The volume of samples for such floating IPs and VPNs will be set to
+    ``-1``.
+    This improves visibility of floating IPs and VPNs with unknown states,
+    allowing them to be monitored via samples and the Gnocchi metrics,
+    making it easier to discover such resources for troubleshooting.
+    It also moves some of the "business logic" for downstream rating/billing
+    services such as CloudKitty out of Ceilometer itself.
+  - |
+    The ``network.services.vpn`` now publishes samples for VPNs with
+    status ``ERROR``, when they would previously be dropped.
+    The sample volume for VPNs in ``ERROR`` state is ``7``.

@@ -43,15 +43,15 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
     def setUp(self):
         super(TestVPNServicesPollster, self).setUp()
         self.pollster = vpnaas.VPNServicesPollster(self.CONF)
-        fake_vpn = self.fake_get_vpn_service()
+        self.fake_vpn = self.fake_get_vpn_service()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
                                            'vpn_get_all',
-                                           return_value=fake_vpn))
+                                           return_value=self.fake_vpn))
 
     @staticmethod
     def fake_get_vpn_service():
         return [{'status': 'ACTIVE',
-                 'name': 'myvpn',
+                 'name': 'myvpn1',
                  'description': '',
                  'admin_state_up': True,
                  'id': 'fdde3d818-fdcb-fg4b-de7f-6750dc8a9d7a',
@@ -59,7 +59,7 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
                  'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
                  'router_id': 'ade3d818-fdcb-fg4b-de7f-6750dc8a9d7a'},
                 {'status': 'INACTIVE',
-                 'name': 'myvpn',
+                 'name': 'myvpn2',
                  'description': '',
                  'admin_state_up': True,
                  'id': 'cdde3d818-fdcb-fg4b-de7f-6750dc8a9d7a',
@@ -67,7 +67,7 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
                  'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
                  'router_id': 'ade3d818-fdcb-fg4b-de7f-6750dc8a9d7a'},
                 {'status': 'PENDING_CREATE',
-                 'name': 'myvpn',
+                 'name': 'myvpn3',
                  'description': '',
                  'id': 'bdde3d818-fdcb-fg4b-de7f-6750dc8a9d7a',
                  'admin_state_up': True,
@@ -75,49 +75,70 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
                  'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
                  'router_id': 'ade3d818-fdcb-fg4b-de7f-6750dc8a9d7a'},
                 {'status': 'error',
-                 'name': 'myvpn',
+                 'name': 'myvpn4',
                  'description': '',
                  'id': 'edde3d818-fdcb-fg4b-de7f-6750dc8a9d7a',
                  'admin_state_up': False,
                  'subnet_id': 'bbe3d818-bdcb-4e4b-b47f-5650dc8a9d7a',
                  'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
                  'router_id': 'ade3d818-fdcb-fg4b-de7f-6750dc8a9d7a'},
+                {'status': 'UNKNOWN',
+                 'name': 'myvpn5',
+                 'description': '',
+                 'id': '34e6383a-b1ab-4602-b26a-a1ae7b759212',
+                 'admin_state_up': False,
+                 'subnet_id': '8c20bbbf-1409-4bc4-b652-3aeda66746c1',
+                 'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
+                 'router_id': '0e5c9333-2ef5-4c90-9cca-5cc898515da4'},
+                {'status': None,
+                 'name': 'myvpn6',
+                 'description': '',
+                 'id': '6e94ff61-8dea-4154-98f1-4020e4b2cecd',
+                 'admin_state_up': False,
+                 'subnet_id': '5e2a20c3-547a-43e4-90c5-26d32ea42d10',
+                 'tenant_id': 'a4eb9f4938bb418bbc4f8eb31802fefa',
+                 'router_id': '5b14df87-60c1-4fc7-8ad5-7811b2199c7f'},
                 ]
 
     def test_vpn_get_samples(self):
         samples = list(self.pollster.get_samples(
             self.manager, {},
-            resources=self.fake_get_vpn_service()))
-        self.assertEqual(4, len(samples))
-        for field in self.pollster.FIELDS:
-            self.assertEqual(self.fake_get_vpn_service()[0][field],
-                             samples[0].resource_metadata[field])
+            resources=self.fake_vpn))
+        self.assertEqual(len(self.fake_vpn), len(samples))
+        self.assertEqual(set(vpn['id'] for vpn in self.fake_vpn),
+                         set(sample.resource_id for sample in samples))
+        samples_dict = {sample.resource_id: sample for sample in samples}
+        for vpn in self.fake_vpn:
+            sample = samples_dict[vpn['id']]
+            for field in self.pollster.FIELDS:
+                self.assertEqual(vpn[field],
+                                 sample.resource_metadata[field])
 
     def test_vpn_volume(self):
         samples = list(self.pollster.get_samples(
             self.manager, {},
-            resources=self.fake_get_vpn_service()))
+            resources=self.fake_vpn))
         self.assertEqual(1, samples[0].volume)
         self.assertEqual(0, samples[1].volume)
         self.assertEqual(2, samples[2].volume)
+        self.assertEqual(7, samples[3].volume)
+        self.assertEqual(-1, samples[4].volume)
+        self.assertEqual(-1, samples[5].volume)
 
     def test_get_vpn_meter_names(self):
         samples = list(self.pollster.get_samples(
             self.manager, {},
-            resources=self.fake_get_vpn_service()))
+            resources=self.fake_vpn))
         self.assertEqual(set(['network.services.vpn']),
                          set([s.name for s in samples]))
 
     def test_vpn_discovery(self):
         discovered_vpns = discovery.VPNServicesDiscovery(
             self.CONF).discover(self.manager)
-        self.assertEqual(3, len(discovered_vpns))
+        self.assertEqual(len(self.fake_vpn), len(discovered_vpns))
 
         for vpn in self.fake_get_vpn_service():
-            if vpn['status'] == 'error':
-                self.assertNotIn(vpn, discovered_vpns)
-            else:
-                self.assertIn(vpn, discovered_vpns)
+            self.assertIn(vpn, discovered_vpns)
 
 
 class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
