@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    A ``map`` event trait plugin has been added.
+    This allows notification meter attributes to be created
+    by mapping one set of values from an attribute to another
+    set of values defined in the meter definition.
+    Additional options are also available for controlling
+    how to handle edge cases, such as unknown values and
+    case sensitivity.
