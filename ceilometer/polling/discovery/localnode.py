@@ -20,6 +20,6 @@ class LocalNodeDiscovery(plugin_base.DiscoveryBase):
         """Return local node as resource."""
         return [self.conf.host]
 
-    @ property
+    @property
     def group_id(self):
         return "LocalNode-%s" % self.conf.host

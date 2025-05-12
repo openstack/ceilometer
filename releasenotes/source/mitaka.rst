@@ -42,7 +42,7 @@ New Features
 
 .. releasenotes/notes/remove-alarms-4df3cdb4f1fb5faa.yaml @ f24ea44401b8945c9cb8a34b2aedebba3c040691
 
-- Ceilometer alarms code is now fully removed from code base. Equivalent functionality is handled by Aodh.  
+- Ceilometer alarms code is now fully removed from code base. Equivalent functionality is handled by Aodh.
 
 .. releasenotes/notes/remove-cadf-http-f8449ced3d2a29d4.yaml @ 1689e7053f4e7587a2b836035cdfa4fda56667fc
 
