@@ -12,6 +12,5 @@ Note that installation and configuration vary by distribution.
 .. toctree::
    :maxdepth: 1
 
-   install-compute-obs.rst
    install-compute-rdo.rst
    install-compute-ubuntu.rst
