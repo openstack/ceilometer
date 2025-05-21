@@ -41,11 +41,6 @@ class TestHeartBeatManagert(base.BaseTestCase):
         super(TestHeartBeatManagert, self).tearDown()
         shutil.rmtree(self.tmpdir)
 
-    def setup_polling(self, poll_cfg=None):
-        name = self.cfg2file(poll_cfg or self.polling_cfg)
-        self.conf.set_override('cfg_file', name, group='polling')
-        self.mgr.polling_manager = manager.PollingManager(self.conf)
-
     def test_hb_not_configured(self):
         self.assertRaises(manager.HeartBeatException,
                           manager.AgentHeartBeatManager,
