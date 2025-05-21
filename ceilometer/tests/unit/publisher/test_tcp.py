@@ -108,7 +108,7 @@ class TestTCPPublisher(base.BaseTestCase):
         return _fake_socket_create_connection
 
     def setUp(self):
-        super(TestTCPPublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.CONF.publisher.telemetry_secret = 'not-so-secret'
 

@@ -45,7 +45,7 @@ LOG = log.getLogger(__name__)
 
 class TraitDefinition(declarative.Definition):
     def __init__(self, name, trait_cfg, plugin_manager):
-        super(TraitDefinition, self).__init__(name, trait_cfg, plugin_manager)
+        super().__init__(name, trait_cfg, plugin_manager)
         type_name = (trait_cfg.get('type', 'text')
                      if isinstance(trait_cfg, dict) else 'text')
         self.trait_type = models.Trait.get_type_by_name(type_name)
@@ -68,7 +68,7 @@ class TraitDefinition(declarative.Definition):
         return models.Trait(self.name, self.trait_type, value)
 
 
-class EventDefinition(object):
+class EventDefinition:
 
     DEFAULT_TRAITS = dict(
         service=dict(type='text', fields='publisher_id'),
@@ -155,7 +155,7 @@ class EventDefinition(object):
         return event
 
 
-class NotificationEventsConverter(object):
+class NotificationEventsConverter:
     """Notification Event Converter
 
     The NotificationEventsConverter handles the conversion of Notifications

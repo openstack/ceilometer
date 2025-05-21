@@ -26,7 +26,7 @@ SERVICE_OPTS = [
 
 class _BaseDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):
-        super(_BaseDiscovery, self).__init__(conf)
+        super().__init__(conf)
         creds = conf.service_credentials
         # NOTE(mnederlof): We set 3.64 (the maximum for Wallaby) because:
         # we need atleast 3.41 to get user_id on snapshots.

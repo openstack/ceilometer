@@ -23,7 +23,7 @@ from ceilometer.tests import base
 class TestDefinition(base.BaseTestCase):
 
     def setUp(self):
-        super(TestDefinition, self).setUp()
+        super().setUp()
         self.configs = [
             "_field1",
             "_field2|_field3",

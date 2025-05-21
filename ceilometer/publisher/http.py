@@ -71,7 +71,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
     HEADERS = {'Content-type': 'application/json'}
 
     def __init__(self, conf, parsed_url):
-        super(HttpPublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
 
         if not parsed_url.hostname:
             raise ValueError('The hostname of an endpoint for '

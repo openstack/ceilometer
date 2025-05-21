@@ -28,7 +28,7 @@ class FakeLibvirtError(Exception):
     pass
 
 
-class VMInstance(object):
+class VMInstance:
     id = 'ff58e738-12f4-4c58-acde-77617b68da56'
     name = 'instance-00000001'
 
@@ -36,7 +36,7 @@ class VMInstance(object):
 class TestLibvirtInspection(base.BaseTestCase):
 
     def setUp(self):
-        super(TestLibvirtInspection, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
 
         self.instance = VMInstance()
@@ -513,7 +513,7 @@ class TestLibvirtInspection(base.BaseTestCase):
 class TestLibvirtInspectionWithError(base.BaseTestCase):
 
     def setUp(self):
-        super(TestLibvirtInspectionWithError, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.useFixture(fixtures.MonkeyPatch(
             'ceilometer.compute.virt.libvirt.utils.'

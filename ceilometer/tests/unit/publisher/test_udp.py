@@ -107,7 +107,7 @@ class TestUDPPublisher(base.BaseTestCase):
         return _fake_socket_socket
 
     def setUp(self):
-        super(TestUDPPublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.CONF.publisher.telemetry_secret = 'not-so-secret'
 
@@ -143,7 +143,7 @@ class TestUDPPublisher(base.BaseTestCase):
 
     @staticmethod
     def _raise_ioerror(*args):
-        raise IOError
+        raise OSError
 
     def _make_broken_socket(self, family, type):
         udp_socket = mock.Mock()

@@ -68,7 +68,7 @@ OPTS = [
 LOG = log.getLogger(__name__)
 
 
-class NovaLikeServer(object):
+class NovaLikeServer:
     def __init__(self, **kwargs):
         self.id = kwargs.pop('id')
         for k, v in kwargs.items():
@@ -85,7 +85,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
     method = None
 
     def __init__(self, conf):
-        super(InstanceDiscovery, self).__init__(conf)
+        super().__init__(conf)
         if not self.method:
             self.method = conf.compute.instance_discovery_method
 

@@ -150,7 +150,7 @@ usage_json = json.loads(RGW_ADMIN_USAGE)
 class TestRGWAdminClient(base.BaseTestCase):
 
     def setUp(self):
-        super(TestRGWAdminClient, self).setUp()
+        super().setUp()
         self.client = rgw_client.RGWAdminClient('http://127.0.0.1:8080/admin',
                                                 'abcde', 'secret', False)
         self.get_resp = mock.MagicMock()

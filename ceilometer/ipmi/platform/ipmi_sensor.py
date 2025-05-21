@@ -31,7 +31,7 @@ IPMICMD = {"sdr_dump": "sdr dump",
 DICT_TRANSLATE_TEMPLATE = {"translate": 1}
 
 
-class IPMISensor(object):
+class IPMISensor:
     """The python implementation of IPMI sensor using ipmitool
 
     The class implements the IPMI sensor to get various sensor data of
@@ -44,8 +44,8 @@ class IPMISensor(object):
     def __new__(cls, *args, **kwargs):
         """Singleton to avoid duplicated initialization."""
         if not cls._instance:
-            cls._instance = super(IPMISensor, cls).__new__(cls, *args,
-                                                           **kwargs)
+            cls._instance = super().__new__(cls, *args,
+                                            **kwargs)
         return cls._instance
 
     def __init__(self):

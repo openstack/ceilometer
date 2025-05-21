@@ -108,10 +108,10 @@ class SensorNotification(endpoint.SampleEndpoint):
                 # Provide a fallback resource_id in case parts are missing.
                 resource_id = 'missing id'
                 try:
-                    resource_id = '%(nodeid)s-%(sensorid)s' % {
-                        'nodeid': message['payload']['node_uuid'],
-                        'sensorid': transform_id(payload['Sensor ID'])
-                    }
+                    resource_id = '{nodeid}-{sensorid}'.format(
+                        nodeid=message['payload']['node_uuid'],
+                        sensorid=transform_id(payload['Sensor ID'])
+                    )
                 except KeyError as exc:
                     raise InvalidSensorData('missing key in payload: %s' % exc)
 

@@ -37,8 +37,7 @@ class NonOpenStackCredentialsDiscovery(EndpointDiscovery):
         barbican_secret = "No secrets found"
         if not param:
             return [barbican_secret]
-        barbican_endpoints = super(NonOpenStackCredentialsDiscovery,
-                                   self).discover(manager, "key-manager")
+        barbican_endpoints = super().discover(manager, "key-manager")
         if not barbican_endpoints:
             LOG.warning("No Barbican endpoints found to execute the"
                         " credentials discovery process to [%s].",

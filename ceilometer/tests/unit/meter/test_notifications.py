@@ -281,7 +281,7 @@ class TestMeterDefinition(test.BaseTestCase):
 
 class CacheConfFixture(config_fixture.Config):
     def setUp(self):
-        super(CacheConfFixture, self).setUp()
+        super().setUp()
         self.conf = ceilometer_service.\
             prepare_service(argv=[], config_files=[])
         cache.configure(self.conf)
@@ -290,7 +290,7 @@ class CacheConfFixture(config_fixture.Config):
 class TestMeterProcessing(test.BaseTestCase):
 
     def setUp(self):
-        super(TestMeterProcessing, self).setUp()
+        super().setUp()
         self.CONF = ceilometer_service.prepare_service([], [])
         dict_conf_fixture = CacheConfFixture(self.CONF)
         self.useFixture(dict_conf_fixture)

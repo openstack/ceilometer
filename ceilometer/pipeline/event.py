@@ -27,7 +27,7 @@ class EventEndpoint(base.NotificationEndpoint):
     event_types = []
 
     def __init__(self, conf, publisher):
-        super(EventEndpoint, self).__init__(conf, publisher)
+        super().__init__(conf, publisher)
         LOG.debug('Loading event definitions')
         self.event_converter = converter.setup_events(
             conf,
@@ -70,7 +70,7 @@ class EventSource(base.PipelineSource):
     """
 
     def __init__(self, cfg):
-        super(EventSource, self).__init__(cfg)
+        super().__init__(cfg)
         self.events = cfg.get('events')
         try:
             self.check_source_filtering(self.events, 'events')
@@ -105,7 +105,7 @@ class EventPipeline(base.Pipeline):
     def __str__(self):
         # NOTE(gordc): prepend a namespace so we ensure event and sample
         #              pipelines do not have the same name.
-        return 'event:%s' % super(EventPipeline, self).__str__()
+        return 'event:%s' % super().__str__()
 
     def publish_data(self, events):
         if not isinstance(events, list):
@@ -125,7 +125,7 @@ class EventPipelineManager(base.PipelineManager):
     pm_sink = EventSink
 
     def __init__(self, conf):
-        super(EventPipelineManager, self).__init__(
+        super().__init__(
             conf, conf.event_pipeline_cfg_file)
 
     def get_main_endpoints(self):

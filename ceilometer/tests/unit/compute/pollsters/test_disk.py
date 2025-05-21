@@ -52,7 +52,7 @@ class TestDiskPollsterBase(base.TestPollsterBase):
                                             {},
                                             instances or self.instances))
         self.assertGreater(len(samples), 0)
-        self.assertEqual({name}, set(s.name for s in samples),
+        self.assertEqual({name}, {s.name for s in samples},
                          (f"Only samples for meter {name} "
                           "should be published"))
         self.assertEqual(expected_count, len(samples))

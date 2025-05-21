@@ -119,7 +119,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
             event_type='test.test')
 
     def setUp(self):
-        super(TestEventEndpoint, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF)
 

@@ -28,7 +28,7 @@ LOG = log.getLogger(__name__)
 class _Base(plugin_base.PollsterBase, metaclass=abc.ABCMeta):
 
     def setup_environment(self):
-        super(_Base, self).setup_environment()
+        super().setup_environment()
         self.nodemanager = node_manager.NodeManager(self.conf)
         self.polling_failures = 0
 

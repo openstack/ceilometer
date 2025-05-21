@@ -34,7 +34,7 @@ LOG = logging.getLogger(__name__)
 class LibvirtInspector(virt_inspector.Inspector):
 
     def __init__(self, conf):
-        super(LibvirtInspector, self).__init__(conf)
+        super().__init__(conf)
         # NOTE(sileht): create a connection on startup
         self.connection
         self.cache = {}
@@ -95,8 +95,8 @@ class LibvirtInspector(virt_inspector.Inspector):
             if fref is not None:
                 fref = fref.get('filter')
 
-            params = dict((p.get('name').lower(), p.get('value'))
-                          for p in iface.findall('filterref/parameter'))
+            params = {p.get('name').lower(): p.get('value')
+                      for p in iface.findall('filterref/parameter')}
 
             # Extract interface ID
             try:

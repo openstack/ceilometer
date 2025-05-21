@@ -79,7 +79,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
     ]
 
     def setUp(self):
-        super(TestPrometheusPublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
     def test_post_samples(self):
@@ -95,13 +95,14 @@ class TestPrometheusPublisher(base.BaseTestCase):
             publisher.publish_samples(self.sample_data)
 
         data = """# TYPE alpha counter
-alpha{resource_id="%s", user_id="test", project_id="test"} 1
-beta{resource_id="%s", user_id="test", project_id="test"} 3
+alpha{{resource_id="{}", user_id="test", project_id="test"}} 1
+beta{{resource_id="{}", user_id="test", project_id="test"}} 3
 # TYPE gamma gauge
-gamma{resource_id="%s", user_id="test", project_id="test"} 5
+gamma{{resource_id="{}", user_id="test", project_id="test"}} 5
 # TYPE delta_epsilon gauge
-delta_epsilon{resource_id="%s", user_id="test", project_id="test"} 7
-""" % (self.resource_id, self.resource_id, self.resource_id, self.resource_id)
+delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
+""".format(self.resource_id, self.resource_id, self.resource_id,
+           self.resource_id)
 
         expected = [
             mock.call('http://localhost:90/metrics/job/os',
@@ -127,13 +128,14 @@ delta_epsilon{resource_id="%s", user_id="test", project_id="test"} 7
             publisher.publish_samples(self.sample_data)
 
         data = """# TYPE alpha counter
-alpha{resource_id="%s", user_id="test", project_id="test"} 1
-beta{resource_id="%s", user_id="test", project_id="test"} 3
+alpha{{resource_id="{}", user_id="test", project_id="test"}} 1
+beta{{resource_id="{}", user_id="test", project_id="test"}} 3
 # TYPE gamma gauge
-gamma{resource_id="%s", user_id="test", project_id="test"} 5
+gamma{{resource_id="{}", user_id="test", project_id="test"}} 5
 # TYPE delta_epsilon gauge
-delta_epsilon{resource_id="%s", user_id="test", project_id="test"} 7
-""" % (self.resource_id, self.resource_id, self.resource_id, self.resource_id)
+delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
+""".format(self.resource_id, self.resource_id, self.resource_id,
+           self.resource_id)
 
         expected = [
             mock.call('https://localhost:90/metrics/job/os',

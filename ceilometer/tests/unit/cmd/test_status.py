@@ -21,7 +21,7 @@ from ceilometer.tests import base
 class TestUpgradeChecks(base.BaseTestCase):
 
     def setUp(self):
-        super(TestUpgradeChecks, self).setUp()
+        super().setUp()
         self.cmd = status.Checks()
 
     def test__sample_check(self):

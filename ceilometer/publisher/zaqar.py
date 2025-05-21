@@ -43,7 +43,7 @@ class ZaqarPublisher(publisher.ConfigPublisherBase):
     configuration.
     """
     def __init__(self, conf, parsed_url):
-        super(ZaqarPublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         self.queue_name = options.get('queue', [None])[0]
         if not self.queue_name:

@@ -50,8 +50,9 @@ class ConverterBase(base.BaseTestCase):
 
     def assertHasTrait(self, event, name, value=None, dtype=None):
         traits = [trait for trait in event.traits if trait.name == name]
-        self.assertGreater(len(traits), 0,
-                           "Trait %s not found in event %s" % (name, event))
+        self.assertGreater(
+            len(traits), 0,
+            "Trait {} not found in event {}".format(name, event))
         trait = traits[0]
         if value is not None:
             self.assertEqual(value, trait.value)
@@ -70,7 +71,7 @@ class ConverterBase(base.BaseTestCase):
         traits = [trait for trait in event.traits if trait.name == name]
         self.assertEqual(
             len(traits), 0,
-            "Extra Trait %s found in event %s" % (name, event))
+            "Extra Trait {} found in event {}".format(name, event))
 
     def assertHasDefaultTraits(self, event):
         text = models.Trait.TEXT_TYPE
@@ -86,13 +87,13 @@ class ConverterBase(base.BaseTestCase):
 
     def assertPathsEqual(self, path1, path2):
         self.assertTrue(self._cmp_tree(path1, path2),
-                        'JSONPaths not equivalent %s %s' % (path1, path2))
+                        'JSONPaths not equivalent {} {}'.format(path1, path2))
 
 
 class TestTraitDefinition(ConverterBase):
 
     def setUp(self):
-        super(TestTraitDefinition, self).setUp()
+        super().setUp()
         self.n1 = self._create_test_notification(
             "test.thing",
             "uuid-for-notif-0001",
@@ -361,7 +362,7 @@ class TestTraitDefinition(ConverterBase):
 class TestEventDefinition(ConverterBase):
 
     def setUp(self):
-        super(TestEventDefinition, self).setUp()
+        super().setUp()
 
         self.traits_cfg = {
             'instance_id': {
@@ -572,7 +573,7 @@ class TestEventDefinition(ConverterBase):
 class TestNotificationConverter(ConverterBase):
 
     def setUp(self):
-        super(TestNotificationConverter, self).setUp()
+        super().setUp()
         self.CONF = ceilometer_service.prepare_service([], [])
         self.valid_event_def1 = [{
             'event_type': 'compute.instance.create.*',

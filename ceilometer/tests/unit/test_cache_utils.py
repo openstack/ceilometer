@@ -23,7 +23,7 @@ from oslotest import base
 
 class CacheConfFixture(config_fixture.Config):
     def setUp(self):
-        super(CacheConfFixture, self).setUp()
+        super().setUp()
         self.conf = ceilometer_service.\
             prepare_service(argv=[], config_files=[])
         cache.configure(self.conf)
@@ -31,7 +31,7 @@ class CacheConfFixture(config_fixture.Config):
 
 class TestOsloCache(base.BaseTestCase):
     def setUp(self):
-        super(TestOsloCache, self).setUp()
+        super().setUp()
 
         conf = ceilometer_service.prepare_service(argv=[], config_files=[])
 

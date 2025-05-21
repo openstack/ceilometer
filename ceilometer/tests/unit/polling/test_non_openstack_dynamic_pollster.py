@@ -93,10 +93,10 @@ def fake_sample_multi_metric(self, **kwargs):
 
 
 class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
-    class FakeManager(object):
+    class FakeManager:
         _keystone = None
 
-    class FakeResponse(object):
+    class FakeResponse:
         status_code = None
         json_object = None
 
@@ -107,7 +107,7 @@ class TestNonOpenStackApisDynamicPollster(base.BaseTestCase):
             raise requests.HTTPError("Mock HTTP error.", response=self)
 
     def setUp(self):
-        super(TestNonOpenStackApisDynamicPollster, self).setUp()
+        super().setUp()
         self.pollster_definition_only_openstack_required_single_metric = {
             'name': "test-pollster", 'sample_type': "gauge", 'unit': "test",
             'value_attribute': "volume", "endpoint_type": "type",

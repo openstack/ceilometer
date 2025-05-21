@@ -20,7 +20,7 @@ from ceilometer.event import trait_plugins
 class TestSplitterPlugin(base.BaseTestCase):
 
     def setUp(self):
-        super(TestSplitterPlugin, self).setUp()
+        super().setUp()
         self.pclass = trait_plugins.SplitterTraitPlugin
 
     def test_split(self):
@@ -67,7 +67,7 @@ class TestSplitterPlugin(base.BaseTestCase):
 class TestBitfieldPlugin(base.BaseTestCase):
 
     def setUp(self):
-        super(TestBitfieldPlugin, self).setUp()
+        super().setUp()
         self.pclass = trait_plugins.BitfieldTraitPlugin
         self.init = 0
         self.params = dict(initial_bitfield=self.init,
@@ -118,7 +118,7 @@ class TestBitfieldPlugin(base.BaseTestCase):
 class TestMapTraitPlugin(base.BaseTestCase):
 
     def setUp(self):
-        super(TestMapTraitPlugin, self).setUp()
+        super().setUp()
         self.pclass = trait_plugins.MapTraitPlugin
         self.params = dict(values={'ACTIVE': 1, 'ERROR': 2, 3: 4},
                            default=-1)

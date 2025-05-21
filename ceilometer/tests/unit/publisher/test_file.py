@@ -68,7 +68,7 @@ class TestFilePublisher(base.BaseTestCase):
     ]
 
     def setUp(self):
-        super(TestFilePublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
     def test_file_publisher_maxbytes(self):
@@ -105,7 +105,7 @@ class TestFilePublisher(base.BaseTestCase):
                                         handler.backupCount])
         # Test the content is corrected saved in the file
         self.assertTrue(os.path.exists(name))
-        with open(name, 'r') as f:
+        with open(name) as f:
             content = f.read()
         for sample_item in self.test_data:
             self.assertIn(sample_item.id, content)
@@ -137,7 +137,7 @@ class TestFilePublisher(base.BaseTestCase):
                                         handler.baseFilename,
                                         handler.backupCount])
         self.assertTrue(os.path.exists(name))
-        with open(name, 'r') as f:
+        with open(name) as f:
             content = f.readlines()
 
         self.assertEqual(len(self.test_data), len(content))

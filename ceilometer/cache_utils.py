@@ -27,7 +27,7 @@ CACHE_DURATION = 600
 LOG = log.getLogger(__name__)
 
 
-class CacheClient(object):
+class CacheClient:
     def __init__(self, region, conf):
         self.region = region
         self.conf = conf

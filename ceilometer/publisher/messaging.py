@@ -58,7 +58,7 @@ NOTIFIER_OPTS = [
 
 class DeliveryFailure(Exception):
     def __init__(self, message=None, cause=None):
-        super(DeliveryFailure, self).__init__(message)
+        super().__init__(message)
         self.cause = cause
 
 
@@ -69,7 +69,7 @@ def raise_delivery_failure(exc):
 class MessagingPublisher(publisher.ConfigPublisherBase, metaclass=abc.ABCMeta):
 
     def __init__(self, conf, parsed_url):
-        super(MessagingPublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         # the value of options is a list of url param values
         # only take care of the latest one if the option
@@ -225,7 +225,7 @@ class NotifierPublisher(MessagingPublisher):
     """
 
     def __init__(self, conf, parsed_url, default_topic):
-        super(NotifierPublisher, self).__init__(conf, parsed_url)
+        super().__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)
         topics = options.pop('topic', [default_topic])
         driver = options.pop('driver', ['rabbit'])[0]
@@ -255,11 +255,11 @@ class NotifierPublisher(MessagingPublisher):
 
 class SampleNotifierPublisher(NotifierPublisher):
     def __init__(self, conf, parsed_url):
-        super(SampleNotifierPublisher, self).__init__(
+        super().__init__(
             conf, parsed_url, conf.publisher_notifier.metering_topic)
 
 
 class EventNotifierPublisher(NotifierPublisher):
     def __init__(self, conf, parsed_url):
-        super(EventNotifierPublisher, self).__init__(
+        super().__init__(
             conf, parsed_url, conf.publisher_notifier.event_topic)

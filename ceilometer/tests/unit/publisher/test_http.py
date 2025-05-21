@@ -74,7 +74,7 @@ class TestHttpPublisher(base.BaseTestCase):
         traits=[], raw={'payload': {'some': 'aa'}}) for i in range(3)]
 
     def setUp(self):
-        super(TestHttpPublisher, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
     def test_http_publisher_config(self):

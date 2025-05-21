@@ -27,7 +27,7 @@ from ceilometer import service
 class _BaseTestVPNPollster(base.BaseTestCase):
 
     def setUp(self):
-        super(_BaseTestVPNPollster, self).setUp()
+        super().setUp()
         self.addCleanup(mock.patch.stopall)
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
@@ -41,7 +41,7 @@ class _BaseTestVPNPollster(base.BaseTestCase):
 class TestVPNServicesPollster(_BaseTestVPNPollster):
 
     def setUp(self):
-        super(TestVPNServicesPollster, self).setUp()
+        super().setUp()
         self.pollster = vpnaas.VPNServicesPollster(self.CONF)
         self.fake_vpn = self.fake_get_vpn_service()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
@@ -105,8 +105,8 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
             self.manager, {},
             resources=self.fake_vpn))
         self.assertEqual(len(self.fake_vpn), len(samples))
-        self.assertEqual(set(vpn['id'] for vpn in self.fake_vpn),
-                         set(sample.resource_id for sample in samples))
+        self.assertEqual({vpn['id'] for vpn in self.fake_vpn},
+                         {sample.resource_id for sample in samples})
         samples_dict = {sample.resource_id: sample for sample in samples}
         for vpn in self.fake_vpn:
             sample = samples_dict[vpn['id']]
@@ -129,8 +129,8 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
         samples = list(self.pollster.get_samples(
             self.manager, {},
             resources=self.fake_vpn))
-        self.assertEqual(set(['network.services.vpn']),
-                         set([s.name for s in samples]))
+        self.assertEqual({'network.services.vpn'},
+                         {s.name for s in samples})
 
     def test_vpn_discovery(self):
         discovered_vpns = discovery.VPNServicesDiscovery(
@@ -144,7 +144,7 @@ class TestVPNServicesPollster(_BaseTestVPNPollster):
 class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
 
     def setUp(self):
-        super(TestIPSecConnectionsPollster, self).setUp()
+        super().setUp()
         self.pollster = vpnaas.IPSecConnectionsPollster(self.CONF)
         fake_conns = self.fake_get_ipsec_connections()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
@@ -188,8 +188,8 @@ class TestIPSecConnectionsPollster(_BaseTestVPNPollster):
         samples = list(self.pollster.get_samples(
             self.manager, {},
             resources=self.fake_get_ipsec_connections()))
-        self.assertEqual(set(['network.services.vpn.connections']),
-                         set([s.name for s in samples]))
+        self.assertEqual({'network.services.vpn.connections'},
+                         {s.name for s in samples})
 
     def test_conns_discovery(self):
         discovered_conns = discovery.IPSecConnectionsDiscovery(

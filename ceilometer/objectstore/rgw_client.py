@@ -28,7 +28,7 @@ class RGWAdminAPIFailed(Exception):
     pass
 
 
-class RGWAdminClient(object):
+class RGWAdminClient:
     Bucket = namedtuple('Bucket', 'name, num_objects, size')
 
     def __init__(self, endpoint, access_key, secret_key, implicit_tenants):
@@ -39,7 +39,7 @@ class RGWAdminClient(object):
         self.implicit_tenants = implicit_tenants
 
     def _make_request(self, path, req_params):
-        uri = "{0}/{1}".format(self.endpoint, path)
+        uri = "{}/{}".format(self.endpoint, path)
         r = requests.get(uri, params=req_params,
                          auth=S3Auth(self.access_key, self.secret,
                                      self.hostname)
@@ -80,4 +80,4 @@ class RGWAdminClient(object):
         req_params = {"uid": rgw_uid}
         json_data = self._make_request(path, req_params)
         usage_data = json_data["summary"]
-        return sum((it["total"]["ops"] for it in usage_data))
+        return sum(it["total"]["ops"] for it in usage_data)

@@ -29,7 +29,7 @@ class ConfigException(Exception):
         self.cfg = cfg
 
     def __str__(self):
-        return '%s %s: %s' % (self.cfg_type, self.cfg, self.msg)
+        return '{} {}: {}'.format(self.cfg_type, self.cfg, self.msg)
 
 
 class SourceException(Exception):
@@ -38,10 +38,10 @@ class SourceException(Exception):
         self.cfg = cfg
 
     def __str__(self):
-        return 'Source definition invalid: %s (%s)' % (self.msg, self.cfg)
+        return 'Source definition invalid: {} ({})'.format(self.msg, self.cfg)
 
 
-class ConfigManagerBase(object):
+class ConfigManagerBase:
     """Base class for managing configuration file refresh"""
 
     def __init__(self, conf):
@@ -65,7 +65,7 @@ class ConfigManagerBase(object):
         return conf
 
 
-class Source(object):
+class Source:
     """Represents a generic source"""
 
     def __init__(self, cfg):

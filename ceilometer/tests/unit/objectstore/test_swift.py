@@ -71,7 +71,7 @@ ASSIGNED_TENANTS = [Tenant('tenant-000'), Tenant('tenant-001')]
 class TestManager(manager.AgentManager):
 
     def __init__(self, worker_id, conf):
-        super(TestManager, self).__init__(worker_id, conf)
+        super().__init__(worker_id, conf)
         self._keystone = mock.MagicMock()
         self._keystone_last_exception = None
         self._service_catalog = (self._keystone.session.auth.
@@ -121,7 +121,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
                 yield i
 
     def setUp(self):
-        super(TestSwiftPollster, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
@@ -132,7 +132,7 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
             self.ACCOUNTS = GET_ACCOUNTS
 
     def tearDown(self):
-        super(TestSwiftPollster, self).tearDown()
+        super().tearDown()
         swift._Base._ENDPOINT = None
 
     def test_iter_accounts_no_cache(self):
@@ -209,8 +209,8 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))
 
-        self.assertEqual(set([samples[0].name]),
-                         set([s.name for s in samples]))
+        self.assertEqual({samples[0].name},
+                         {s.name for s in samples})
 
     def test_only_poll_assigned(self):
         mock_method = mock.MagicMock()

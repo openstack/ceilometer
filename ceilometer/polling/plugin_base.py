@@ -44,7 +44,7 @@ class PollsterPermanentError(Exception):
         self.fail_res_list = resources
 
 
-class PollsterBase(object, metaclass=abc.ABCMeta):
+class PollsterBase(metaclass=abc.ABCMeta):
     """Base class for plugins that support the polling API."""
 
     def setup_environment(self):
@@ -56,7 +56,7 @@ class PollsterBase(object, metaclass=abc.ABCMeta):
         pass
 
     def __init__(self, conf):
-        super(PollsterBase, self).__init__()
+        super().__init__()
         self.conf = conf
         try:
             self.setup_environment()
@@ -123,7 +123,7 @@ class PollsterBase(object, metaclass=abc.ABCMeta):
         return extensions
 
 
-class DiscoveryBase(object, metaclass=abc.ABCMeta):
+class DiscoveryBase(metaclass=abc.ABCMeta):
     KEYSTONE_REQUIRED_FOR_SERVICE = None
     """Service type required in keystone catalog to works"""
 

@@ -40,10 +40,10 @@ LOG = log.getLogger(__name__)
 
 class PipelineException(agent.ConfigException):
     def __init__(self, message, cfg):
-        super(PipelineException, self).__init__('Pipeline', message, cfg)
+        super().__init__('Pipeline', message, cfg)
 
 
-class PublishContext(object):
+class PublishContext:
     def __init__(self, pipelines):
         self.pipelines = pipelines or []
 
@@ -63,7 +63,7 @@ class PipelineSource(agent.Source):
 
     def __init__(self, cfg):
         try:
-            super(PipelineSource, self).__init__(cfg)
+            super().__init__(cfg)
         except agent.SourceException as err:
             raise PipelineException(err.msg, cfg)
         try:
@@ -80,11 +80,11 @@ class PipelineSource(agent.Source):
         for sink in self.sinks:
             if sink not in sinks:
                 raise PipelineException(
-                    "Dangling sink %s from source %s" % (sink, self),
+                    "Dangling sink {} from source {}".format(sink, self),
                     self.cfg)
 
 
-class Sink(object):
+class Sink:
     """Represents a sink for the transformation and publication of data.
 
     Each sink config is concerned *only* with the transformation rules
@@ -135,7 +135,7 @@ class Sink(object):
         """Flush data after all events have been injected to pipeline."""
 
 
-class Pipeline(object, metaclass=abc.ABCMeta):
+class Pipeline(metaclass=abc.ABCMeta):
     """Represents a coupling between a sink and a corresponding source."""
 
     def __init__(self, conf, source, sink):
@@ -146,7 +146,7 @@ class Pipeline(object, metaclass=abc.ABCMeta):
 
     def __str__(self):
         return (self.source.name if self.source.name == self.sink.name
-                else '%s:%s' % (self.source.name, self.sink.name))
+                else '{}:{}'.format(self.source.name, self.sink.name))
 
     def flush(self):
         self.sink.flush()
@@ -164,7 +164,7 @@ class Pipeline(object, metaclass=abc.ABCMeta):
         """Attribute to filter on. Pass if no partitioning."""
 
 
-class PublisherManager(object):
+class PublisherManager:
     def __init__(self, conf, purpose):
         self._loaded_publishers = {}
         self._conf = conf
@@ -229,7 +229,7 @@ class PipelineManager(agent.ConfigManagerBase):
         Publisher's name is plugin name in setup.cfg
 
         """
-        super(PipelineManager, self).__init__(conf)
+        super().__init__(conf)
         cfg = self.load_config(cfg_file)
         self.pipelines = []
         if not ('sources' in cfg and 'sinks' in cfg):
@@ -304,14 +304,14 @@ class PipelineManager(agent.ConfigManagerBase):
         pass
 
 
-class NotificationEndpoint(object):
+class NotificationEndpoint:
     """Base Endpoint for plugins that support the notification API."""
 
     event_types = []
     """List of strings to filter messages on."""
 
     def __init__(self, conf, publisher):
-        super(NotificationEndpoint, self).__init__()
+        super().__init__()
         # NOTE(gordc): this is filter rule used by oslo.messaging to dispatch
         # messages to an endpoint.
         if self.event_types:

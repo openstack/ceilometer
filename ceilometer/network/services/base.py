@@ -34,7 +34,7 @@ class BaseServicesPollster(plugin_base.PollsterBase):
     FIELDS = []
 
     def extract_metadata(self, metric):
-        return dict((k, metric[k]) for k in self.FIELDS)
+        return {k: metric[k] for k in self.FIELDS}
 
     @staticmethod
     def get_status_id(value):

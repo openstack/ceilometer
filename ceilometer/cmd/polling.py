@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Copyright 2014-2015 OpenStack Foundation
 #
@@ -32,13 +31,13 @@ LOG = log.getLogger(__name__)
 
 class MultiChoicesOpt(cfg.Opt):
     def __init__(self, name, choices=None, **kwargs):
-        super(MultiChoicesOpt, self).__init__(
+        super().__init__(
             name, type=DeduplicatedCfgList(choices), **kwargs)
         self.choices = choices
 
     def _get_argparse_kwargs(self, group, **kwargs):
         """Extends the base argparse keyword dict for multi choices options."""
-        kwargs = super(MultiChoicesOpt, self)._get_argparse_kwargs(group)
+        kwargs = super()._get_argparse_kwargs(group)
         kwargs['nargs'] = '+'
         choices = kwargs.get('choices', self.choices)
         if choices:
@@ -48,11 +47,11 @@ class MultiChoicesOpt(cfg.Opt):
 
 class DeduplicatedCfgList(cfg.types.List):
     def __init__(self, choices=None, **kwargs):
-        super(DeduplicatedCfgList, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.choices = choices or []
 
     def __call__(self, *args, **kwargs):
-        result = super(DeduplicatedCfgList, self).__call__(*args, **kwargs)
+        result = super().__call__(*args, **kwargs)
         result_set = set(result)
         if len(result) != len(result_set):
             LOG.warning("Duplicated values: %s found in CLI options, "

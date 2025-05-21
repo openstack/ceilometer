@@ -23,7 +23,7 @@ from ceilometer import service
 class TestNeutronClient(base.BaseTestCase):
 
     def setUp(self):
-        super(TestNeutronClient, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.nc = neutron_client.Client(self.CONF)
         self.nc.lb_version = 'v1'

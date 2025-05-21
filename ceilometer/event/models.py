@@ -20,7 +20,7 @@ def serialize_dt(value):
     return value.isoformat() if hasattr(value, 'isoformat') else value
 
 
-class Model(object):
+class Model:
     """Base class for storage API models."""
 
     def __init__(self, **kwds):

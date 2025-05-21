@@ -22,7 +22,7 @@ from ceilometer.event import trait_plugins
 class TestTimedeltaPlugin(base.BaseTestCase):
 
     def setUp(self):
-        super(TestTimedeltaPlugin, self).setUp()
+        super().setUp()
         self.plugin = trait_plugins.TimedeltaPlugin()
 
     def test_timedelta_transformation(self):

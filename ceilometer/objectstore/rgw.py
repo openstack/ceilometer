@@ -52,7 +52,7 @@ class _Base(plugin_base.PollsterBase):
     _ENDPOINT = None
 
     def __init__(self, conf):
-        super(_Base, self).__init__(conf)
+        super().__init__(conf)
         self.access_key = self.conf.rgw_admin_credentials.access_key
         self.secret = self.conf.rgw_admin_credentials.secret_key
         self.implicit_tenants = self.conf.rgw_client.implicit_tenants

@@ -28,7 +28,7 @@ from ceilometer import service
 class _BaseTestFloatingIPPollster(base.BaseTestCase):
 
     def setUp(self):
-        super(_BaseTestFloatingIPPollster, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
         plugin_base._get_keystone = mock.Mock()
@@ -37,7 +37,7 @@ class _BaseTestFloatingIPPollster(base.BaseTestCase):
 class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
 
     def setUp(self):
-        super(TestFloatingIPPollster, self).setUp()
+        super().setUp()
         self.pollster = floatingip.FloatingIPPollster(self.CONF)
         self.fake_fip = self.fake_get_fip_service()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
@@ -97,8 +97,8 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
                        self.manager, {},
                        resources=self.fake_fip))
         self.assertEqual(len(self.fake_fip), len(samples))
-        self.assertEqual(set(fip['id'] for fip in self.fake_fip),
-                         set(sample.resource_id for sample in samples))
+        self.assertEqual({fip['id'] for fip in self.fake_fip},
+                         {sample.resource_id for sample in samples})
         samples_dict = {sample.resource_id: sample for sample in samples}
         for fip in self.fake_fip:
             sample = samples_dict[fip['id']]
@@ -120,8 +120,8 @@ class TestFloatingIPPollster(_BaseTestFloatingIPPollster):
         samples = list(self.pollster.get_samples(
                        self.manager, {},
                        resources=self.fake_fip))
-        self.assertEqual(set(['ip.floating']),
-                         set([s.name for s in samples]))
+        self.assertEqual({'ip.floating'},
+                         {s.name for s in samples})
 
     def test_fip_discovery(self):
         discovered_fips = discovery.FloatingIPDiscovery(

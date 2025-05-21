@@ -80,7 +80,7 @@ LIBVIRT_MANUAL_INSTANCE_DESC_XML = """
 """
 
 
-class FakeDomain(object):
+class FakeDomain:
     def state(self):
         return [1, 2]
 
@@ -97,12 +97,12 @@ class FakeDomain(object):
         return LIBVIRT_METADATA_XML
 
 
-class FakeConn(object):
+class FakeConn:
     def listAllDomains(self):
         return [FakeDomain()]
 
 
-class FakeManualInstanceDomain(object):
+class FakeManualInstanceDomain:
     def state(self):
         return [1, 2]
 
@@ -124,7 +124,7 @@ class FakeManualInstanceDomain(object):
             "metadata not found: Requested metadata element is not present")
 
 
-class FakeManualInstanceConn(object):
+class FakeManualInstanceConn:
     def listAllDomains(self):
         return [FakeManualInstanceDomain()]
 
@@ -135,7 +135,7 @@ class FakeManualInstanceConn(object):
 class TestDiscovery(base.BaseTestCase):
 
     def setUp(self):
-        super(TestDiscovery, self).setUp()
+        super().setUp()
 
         self.instance = mock.MagicMock()
         self.instance.name = 'instance-00000001'

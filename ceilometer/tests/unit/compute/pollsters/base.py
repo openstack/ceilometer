@@ -25,7 +25,7 @@ import ceilometer.tests.base as base
 class TestPollsterBase(base.BaseTestCase):
 
     def setUp(self):
-        super(TestPollsterBase, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
 
         self.inspector = mock.Mock()

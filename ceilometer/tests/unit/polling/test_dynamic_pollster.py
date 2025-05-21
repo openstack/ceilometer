@@ -33,7 +33,7 @@ REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit',
                             'url_path']
 
 
-class SampleGenerator(object):
+class SampleGenerator:
 
     def __init__(self, samples_dict, turn_to_list=False):
         self.turn_to_list = turn_to_list
@@ -66,7 +66,7 @@ class SampleGenerator(object):
 class PagedSamplesGenerator(SampleGenerator):
 
     def __init__(self, samples_dict, dict_name, page_link_name):
-        super(PagedSamplesGenerator, self).__init__(samples_dict)
+        super().__init__(samples_dict)
         self.dict_name = dict_name
         self.page_link_name = page_link_name
         self.response = {}
@@ -105,7 +105,7 @@ class PagedSamplesGeneratorHttpRequestMock(PagedSamplesGenerator):
 
 
 class TestDynamicPollster(base.BaseTestCase):
-    class FakeResponse(object):
+    class FakeResponse:
         status_code = None
         json_object = None
         _text = None
@@ -120,12 +120,12 @@ class TestDynamicPollster(base.BaseTestCase):
         def raise_for_status(self):
             raise requests.HTTPError("Mock HTTP error.", response=self)
 
-    class FakeManager(object):
+    class FakeManager:
         def __init__(self, keystone=None):
             self._keystone = keystone
 
     def setUp(self):
-        super(TestDynamicPollster, self).setUp()
+        super().setUp()
         self.pollster_definition_only_required_fields = {
             'name': "test-pollster", 'sample_type': "gauge", 'unit': "test",
             'value_attribute': "volume", 'endpoint_type': "test",

@@ -23,7 +23,7 @@ from ceilometer.polling import manager
 from ceilometer import service
 
 
-class FauxInstance(object):
+class FauxInstance:
 
     def __init__(self, **kwds):
         for name, value in kwds.items():
@@ -44,7 +44,7 @@ class TestLocationMetadata(base.BaseTestCase):
     def setUp(self):
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
-        super(TestLocationMetadata, self).setUp()
+        super().setUp()
 
         # Mimics an instance returned from nova api call
         self.INSTANCE_PROPERTIES = {'name': 'display name',

@@ -40,8 +40,8 @@ class TestMemoryPollster(base.TestPollsterBase):
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(expected_count, len(samples))
             if expected_count > 0:
-                self.assertEqual(set(['memory.usage']),
-                                 set([s.name for s in samples]))
+                self.assertEqual({'memory.usage'},
+                                 {s.name for s in samples})
                 self.assertEqual(expected_memory_mb, samples[0].volume)
             else:
                 self.assertEqual(expected_warnings, mylog.warning.call_count)
@@ -82,8 +82,8 @@ class TestResidentMemoryPollster(base.TestPollsterBase):
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(expected_count, len(samples))
             if expected_count > 0:
-                self.assertEqual(set(['memory.resident']),
-                                 set([s.name for s in samples]))
+                self.assertEqual({'memory.resident'},
+                                 {s.name for s in samples})
                 self.assertEqual(expected_resident_memory_mb,
                                  samples[0].volume)
             else:
@@ -113,8 +113,8 @@ class TestMemorySwapPollster(base.TestPollsterBase):
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
-            self.assertEqual(set(['memory.swap.in']),
-                             set([s.name for s in samples]))
+            self.assertEqual({'memory.swap.in'},
+                             {s.name for s in samples})
             self.assertEqual(expected_swap_in, samples[0].volume)
 
         def _check_memory_swap_out(expected_swap_out):
@@ -122,8 +122,8 @@ class TestMemorySwapPollster(base.TestPollsterBase):
 
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(1, len(samples))
-            self.assertEqual(set(['memory.swap.out']),
-                             set([s.name for s in samples]))
+            self.assertEqual({'memory.swap.out'},
+                             {s.name for s in samples})
             self.assertEqual(expected_swap_out, samples[0].volume)
 
         _check_memory_swap_in(1.0)

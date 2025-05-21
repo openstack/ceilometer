@@ -46,7 +46,7 @@ class GenericComputePollster(plugin_base.PollsterBase):
     inspector_method = None
 
     def setup_environment(self):
-        super(GenericComputePollster, self).setup_environment()
+        super().setup_environment()
         self.inspector = GenericComputePollster._get_inspector(self.conf)
 
     @staticmethod

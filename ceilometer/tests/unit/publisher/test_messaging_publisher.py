@@ -97,7 +97,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
     ]
 
     def setUp(self):
-        super(BasePublisherTestCase, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF)
 
@@ -201,7 +201,7 @@ class TestPublisher(testscenarios.testcase.WithScenarios,
     ]
 
     def setUp(self):
-        super(TestPublisher, self).setUp()
+        super().setUp()
         self.topic = (self.CONF.publisher_notifier.event_topic
                       if self.pub_func == 'publish_events' else
                       self.CONF.publisher_notifier.metering_topic)

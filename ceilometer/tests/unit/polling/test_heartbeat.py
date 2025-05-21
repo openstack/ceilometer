@@ -29,7 +29,7 @@ from ceilometer.tests import base
 
 class TestHeartBeatManagert(base.BaseTestCase):
     def setUp(self):
-        super(TestHeartBeatManagert, self).setUp()
+        super().setUp()
         self.conf = service.prepare_service([], [])
         self.tmpdir = tempfile.mkdtemp()
 
@@ -38,7 +38,7 @@ class TestHeartBeatManagert(base.BaseTestCase):
                                         queue=self.queue)
 
     def tearDown(self):
-        super(TestHeartBeatManagert, self).tearDown()
+        super().tearDown()
         shutil.rmtree(self.tmpdir)
 
     def setup_polling(self, poll_cfg=None):

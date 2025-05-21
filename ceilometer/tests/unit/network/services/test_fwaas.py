@@ -27,7 +27,7 @@ from ceilometer import service
 class _BaseTestFWPollster(base.BaseTestCase):
 
     def setUp(self):
-        super(_BaseTestFWPollster, self).setUp()
+        super().setUp()
         self.addCleanup(mock.patch.stopall)
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
@@ -41,7 +41,7 @@ class _BaseTestFWPollster(base.BaseTestCase):
 class TestFirewallPollster(_BaseTestFWPollster):
 
     def setUp(self):
-        super(TestFirewallPollster, self).setUp()
+        super().setUp()
         self.pollster = fwaas.FirewallPollster(self.CONF)
         fake_fw = self.fake_get_fw_service()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
@@ -101,8 +101,8 @@ class TestFirewallPollster(_BaseTestFWPollster):
         samples = list(self.pollster.get_samples(
             self.manager, {},
             resources=self.fake_get_fw_service()))
-        self.assertEqual(set(['network.services.firewall']),
-                         set([s.name for s in samples]))
+        self.assertEqual({'network.services.firewall'},
+                         {s.name for s in samples})
 
     def test_vpn_discovery(self):
         discovered_fws = discovery.FirewallDiscovery(
@@ -119,7 +119,7 @@ class TestFirewallPollster(_BaseTestFWPollster):
 class TestIPSecConnectionsPollster(_BaseTestFWPollster):
 
     def setUp(self):
-        super(TestIPSecConnectionsPollster, self).setUp()
+        super().setUp()
         self.pollster = fwaas.FirewallPolicyPollster(self.CONF)
         fake_fw_policy = self.fake_get_fw_policy()
         self.useFixture(fixtures.MockPatch('ceilometer.neutron_client.Client.'
@@ -161,8 +161,8 @@ class TestIPSecConnectionsPollster(_BaseTestFWPollster):
         samples = list(self.pollster.get_samples(
             self.manager, {},
             resources=self.fake_get_fw_policy()))
-        self.assertEqual(set(['network.services.firewall.policy']),
-                         set([s.name for s in samples]))
+        self.assertEqual({'network.services.firewall.policy'},
+                         {s.name for s in samples})
 
     def test_fw_policy_discovery(self):
         discovered_policy = discovery.FirewallPolicyDiscovery(

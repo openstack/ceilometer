@@ -35,7 +35,7 @@ class FirewallPollster(base.BaseServicesPollster):
               ]
 
     def __init__(self, conf):
-        super(FirewallPollster, self).__init__(conf)
+        super().__init__(conf)
 
         warnings.warn('Support for Neutron FWaaS has been deprecated '
                       'and will be removed in a future release.',
@@ -82,7 +82,7 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
               ]
 
     def __init__(self, conf):
-        super(FirewallPolicyPollster, self).__init__(conf)
+        super().__init__(conf)
 
         warnings.warn('Support for Neutron FWaaS has been deprecated '
                       'and will be removed in a future release.',

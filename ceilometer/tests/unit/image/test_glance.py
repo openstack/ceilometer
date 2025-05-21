@@ -83,7 +83,7 @@ IMAGE_LIST = [
 
 class TestImagePollsterPageSize(base.BaseTestCase):
     def setUp(self):
-        super(TestImagePollsterPageSize, self).setUp()
+        super().setUp()
         conf = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, conf)
         self.pollster = glance.ImageSizePollster(conf)

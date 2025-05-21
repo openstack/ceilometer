@@ -48,23 +48,23 @@ def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
     limit = conf.reserved_metadata_length
     user_metadata = {}
     for prefix in conf.reserved_metadata_namespace:
-        md = dict(
-            (k[len(prefix):].replace('.', '_'),
-             v[:limit] if isinstance(v, str) else v)
+        md = {
+            k[len(prefix):].replace('.', '_'):
+            v[:limit] if isinstance(v, str) else v
             for k, v in src_metadata.items()
             if (k.startswith(prefix) and
                 k[len(prefix):].replace('.', '_') not in dest_metadata)
-        )
+        }
         user_metadata.update(md)
 
     for metadata_key in conf.reserved_metadata_keys:
-        md = dict(
-            (k.replace('.', '_'),
-             v[:limit] if isinstance(v, str) else v)
+        md = {
+            k.replace('.', '_'):
+            v[:limit] if isinstance(v, str) else v
             for k, v in src_metadata.items()
             if (k == metadata_key and
                 k.replace('.', '_') not in dest_metadata)
-        )
+        }
         user_metadata.update(md)
 
     if user_metadata:
@@ -89,7 +89,7 @@ def add_reserved_user_metadata(conf, src_metadata, dest_metadata):
 # Timestamp: when the sample has been read
 # Resource metadata: various metadata
 # id: an uuid of a sample, can be taken from API  when post sample via API
-class Sample(object):
+class Sample:
     SOURCE_DEFAULT = "openstack"
 
     def __init__(self, name, type, unit, volume, user_id, project_id,
@@ -118,7 +118,7 @@ class Sample(object):
         return copy.copy(self.__dict__)
 
     def __repr__(self):
-        return '<name: %s, volume: %s, resource_id: %s, timestamp: %s>' % (
+        return '<name: {}, volume: {}, resource_id: {}, timestamp: {}>'.format(
             self.name, self.volume, self.resource_id, self.timestamp)
 
     @classmethod

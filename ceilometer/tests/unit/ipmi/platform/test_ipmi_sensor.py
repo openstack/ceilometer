@@ -24,7 +24,7 @@ from ceilometer.tests.unit.ipmi.platform import fake_utils
 class TestIPMISensor(base.BaseTestCase):
 
     def setUp(self):
-        super(TestIPMISensor, self).setUp()
+        super().setUp()
 
         ipmitool.ipmi = mock.Mock(side_effect=fake_utils.execute_with_nm_v2)
         self.ipmi = ipmi_sensor.IPMISensor()
@@ -33,7 +33,7 @@ class TestIPMISensor(base.BaseTestCase):
     def tearDownClass(cls):
         # reset inited to force an initialization of singleton for next test
         ipmi_sensor.IPMISensor()._inited = False
-        super(TestIPMISensor, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_read_sensor_temperature(self):
         sensors = self.ipmi.read_sensor_any('Temperature')
@@ -105,7 +105,7 @@ class TestIPMISensor(base.BaseTestCase):
 class TestNonIPMISensor(base.BaseTestCase):
 
     def setUp(self):
-        super(TestNonIPMISensor, self).setUp()
+        super().setUp()
 
         ipmitool.ipmi = mock.Mock(side_effect=fake_utils.execute_without_ipmi)
         self.ipmi = ipmi_sensor.IPMISensor()
@@ -114,7 +114,7 @@ class TestNonIPMISensor(base.BaseTestCase):
     def tearDownClass(cls):
         # reset inited to force an initialization of singleton for next test
         ipmi_sensor.IPMISensor()._inited = False
-        super(TestNonIPMISensor, cls).tearDownClass()
+        super().tearDownClass()
 
     def test_read_sensor_temperature(self):
         sensors = self.ipmi.read_sensor_any('Temperature')

@@ -58,7 +58,7 @@ class PrometheusPublisher(http.HttpPublisher):
             curated_sname = s.name.replace(".", "_")
 
             if metric_type and curated_sname not in doc_done:
-                data += "# TYPE %s %s\n" % (curated_sname, metric_type)
+                data += "# TYPE {} {}\n".format(curated_sname, metric_type)
                 doc_done.add(curated_sname)
 
             # NOTE(sileht): prometheus pushgateway doesn't allow to push

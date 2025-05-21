@@ -87,7 +87,7 @@ class BaseNotificationTest(tests_base.BaseTestCase):
 class TestNotification(BaseNotificationTest):
 
     def setUp(self):
-        super(TestNotification, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF)
         self.srv = notification.NotificationService(0, self.CONF)
@@ -126,7 +126,7 @@ class TestNotification(BaseNotificationTest):
         self.addCleanup(self.srv.terminate)
         self.assertEqual(2, len(self.srv.managers))
         logger.error.assert_called_with(
-            'Could not load the following pipelines: %s', set(['bad']))
+            'Could not load the following pipelines: %s', {'bad'})
 
 
 class BaseRealNotification(BaseNotificationTest):
@@ -169,7 +169,7 @@ class BaseRealNotification(BaseNotificationTest):
         return ev_pipeline_cfg_file
 
     def setUp(self):
-        super(BaseRealNotification, self).setUp()
+        super().setUp()
         self.CONF = service.prepare_service([], [])
         self.setup_messaging(self.CONF, 'nova')
 
@@ -199,7 +199,7 @@ class BaseRealNotification(BaseNotificationTest):
                     len(self.publisher.events) >= self.expected_events):
                 break
 
-        resources = list(set(s.resource_id for s in self.publisher.samples))
+        resources = list({s.resource_id for s in self.publisher.samples})
         self.assertEqual(self.expected_samples, len(self.publisher.samples))
         self.assertEqual(self.expected_events, len(self.publisher.events))
         self.assertEqual(["9f9d01b9-4a58-4271-9e27-398b21ab20d1"], resources)
@@ -208,7 +208,7 @@ class BaseRealNotification(BaseNotificationTest):
 class TestRealNotification(BaseRealNotification):
 
     def setUp(self):
-        super(TestRealNotification, self).setUp()
+        super().setUp()
         self.srv = notification.NotificationService(0, self.CONF)
 
     @mock.patch('ceilometer.publisher.test.TestPublisher')
