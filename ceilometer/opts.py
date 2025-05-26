@@ -23,7 +23,6 @@ import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
 import ceilometer.event.converter
 import ceilometer.image.discovery
-import ceilometer.ipmi.platform.intel_node_manager
 import ceilometer.ipmi.pollsters
 import ceilometer.keystone_client
 import ceilometer.meter.notifications
@@ -87,9 +86,7 @@ def list_opts():
                 'single instance of that service is running.')
         ]),
         ('event', ceilometer.event.converter.OPTS),
-        ('ipmi',
-         itertools.chain(ceilometer.ipmi.platform.intel_node_manager.OPTS,
-                         ceilometer.ipmi.pollsters.OPTS)),
+        ('ipmi', ceilometer.ipmi.pollsters.OPTS),
         ('meter', ceilometer.meter.notifications.OPTS),
         ('notification',
          itertools.chain(ceilometer.notification.OPTS,

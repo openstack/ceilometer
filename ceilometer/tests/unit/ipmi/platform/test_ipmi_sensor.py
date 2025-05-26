@@ -26,7 +26,7 @@ class TestIPMISensor(base.BaseTestCase):
     def setUp(self):
         super().setUp()
 
-        ipmitool.ipmi = mock.Mock(side_effect=fake_utils.execute_with_nm_v2)
+        ipmitool.ipmi = mock.Mock(side_effect=fake_utils.execute)
         self.ipmi = ipmi_sensor.IPMISensor()
 
     @classmethod

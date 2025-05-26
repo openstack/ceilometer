@@ -97,39 +97,14 @@ class TestManager(base.BaseTestCase):
                                    queue=multiprocessing.Queue())
         self.assertIsNotNone(list(mgr.extensions))
 
-    # Test plugin load behavior based on Node Manager pollsters.
-    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
-                mock.Mock(return_value=None))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(return_value=None))
     def test_load_normal_plugins(self):
         mgr = manager.AgentManager(0, self.conf, namespaces=['ipmi'],
                                    queue=multiprocessing.Queue())
-        # 8 pollsters for Node Manager
-        self.assertEqual(13, len(mgr.extensions))
-
-    # Skip loading pollster upon ExtensionLoadError
-    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
-                mock.Mock(side_effect=plugin_base.ExtensionLoadError(
-                    'NodeManager not supported on host')))
-    @mock.patch('ceilometer.polling.manager.LOG')
-    def test_load_failed_plugins(self, LOG):
-        # Here we additionally check that namespaces will be converted to the
-        # list if param was not set as a list.
-        manager.AgentManager(0, self.conf, namespaces='ipmi',
-                             queue=multiprocessing.Queue())
-        err_msg = 'Skip loading extension for %s: %s'
-        pollster_names = [
-            'power', 'temperature', 'outlet_temperature',
-            'airflow', 'cups', 'cpu_util', 'mem_util', 'io_util']
-        calls = [mock.call(err_msg, 'hardware.ipmi.node.%s' % n,
-                           'NodeManager not supported on host')
-                 for n in pollster_names]
-        LOG.debug.assert_has_calls(calls=calls[:2], any_order=True)
+        self.assertEqual(5, len(mgr.extensions))
 
     # Skip loading pollster upon ImportError
-    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
-                mock.Mock(side_effect=ImportError))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(side_effect=ImportError))
     @mock.patch('ceilometer.polling.manager.LOG')
@@ -141,8 +116,6 @@ class TestManager(base.BaseTestCase):
             'No valid pollsters can be loaded from %s namespaces', namespaces)
 
     # Exceptions other than ExtensionLoadError are propagated
-    @mock.patch('ceilometer.ipmi.pollsters.node._Base.__init__',
-                mock.Mock(side_effect=PollingException))
     @mock.patch('ceilometer.ipmi.pollsters.sensor.SensorPollster.__init__',
                 mock.Mock(side_effect=PollingException))
     def test_load_exceptional_plugins(self):

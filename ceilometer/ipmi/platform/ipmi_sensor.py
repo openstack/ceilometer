@@ -18,8 +18,7 @@ from ceilometer.i18n import _
 from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.ipmi.platform import ipmitool
 
-IPMICMD = {"sdr_dump": "sdr dump",
-           "sdr_info": "sdr info",
+IPMICMD = {"sdr_info": "sdr info",
            "sensor_dump": "sdr -v",
            "sensor_dump_temperature": "sdr -v type Temperature",
            "sensor_dump_current": "sdr -v type Current",

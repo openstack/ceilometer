@@ -49,11 +49,6 @@ class TestPollsterBase(base.BaseTestCase, metaclass=abc.ABCMeta):
         nm.read_cups_index.side_effect = self.fake_data
         nm.read_cups_utilization.side_effect = self.fake_data
         nm.read_sensor_any.side_effect = self.fake_sensor_data
-        # We should mock the pollster first before initialize the Manager
-        # so that we don't trigger the sudo in pollsters' __init__().
-        self.useFixture(fixtures.MockPatch(
-            'ceilometer.ipmi.platform.intel_node_manager.NodeManager',
-            return_value=nm))
 
         self.useFixture(fixtures.MockPatch(
             'ceilometer.ipmi.platform.ipmi_sensor.IPMISensor',

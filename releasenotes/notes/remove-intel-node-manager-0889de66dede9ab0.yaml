@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Support for Intel Node Manager was removed.

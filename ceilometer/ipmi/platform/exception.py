@@ -14,9 +14,5 @@
 #    under the License.
 
 
-class NodeManagerException(Exception):
-    pass
-
-
 class IPMIException(Exception):
     pass

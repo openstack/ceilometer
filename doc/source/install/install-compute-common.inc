@@ -60,7 +60,7 @@ Configure Compute to poll IPMI meters
 .. note::
 
   To enable IPMI meters, ensure IPMITool is installed and the host supports
-  Intel Node Manager.
+  IPMI.
 
 * Edit the ``/etc/sudoers`` file and include:
 

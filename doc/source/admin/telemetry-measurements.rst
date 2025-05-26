@@ -341,51 +341,6 @@ The following IPMI sensor meters are recorded:
    Guide <https://docs.openstack.org/ironic/latest/install/index.html>`__
    for the Bare metal service.
 
-
-Besides generic IPMI sensor data, the following Intel Node Manager
-meters are recorded from capable platform:
-
-+---------------------+-------+------+----------+----------+------------------+
-| Name                | Type  | Unit | Resource | Origin   | Note             |
-+=====================+=======+======+==========+==========+==================+
-| **Meters added in the Mitaka release or earlier**                           |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | W    | host ID  | Pollster | Current power    |
-| .power              |       |      |          |          | of the system    |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | C    | host ID  | Pollster | Current tempera\ |
-| .temperature        |       |      |          |          | ture of the      |
-|                     |       |      |          |          | system           |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | C    | host ID  | Pollster | Inlet temperatu\ |
-| .inlet_temperature  |       |      |          |          | re of the system |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | C    | host ID  | Pollster | Outlet temperat\ |
-| .outlet_temperature |       |      |          |          | ure of the system|
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | CFM  | host ID  | Pollster | Volumetric airf\ |
-| .airflow            |       |      |          |          | low of the syst\ |
-|                     |       |      |          |          | em, expressed as |
-|                     |       |      |          |          | 1/10th of CFM    |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | CUPS | host ID  | Pollster | CUPS(Compute Us\ |
-| .cups               |       |      |          |          | age Per Second)  |
-|                     |       |      |          |          | index data of the|
-|                     |       |      |          |          | system           |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | %    | host ID  | Pollster | CPU CUPS utiliz\ |
-| .cpu_util           |       |      |          |          | ation of the     |
-|                     |       |      |          |          | system           |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | %    | host ID  | Pollster | Memory CUPS      |
-| .mem_util           |       |      |          |          | utilization of   |
-|                     |       |      |          |          | the system       |
-+---------------------+-------+------+----------+----------+------------------+
-| hardware.ipmi.node\ | Gauge | %    | host ID  | Pollster | IO CUPS          |
-| .io_util            |       |      |          |          | utilization of   |
-|                     |       |      |          |          | the system       |
-+---------------------+-------+------+----------+----------+------------------+
-
 OpenStack Image service
 ~~~~~~~~~~~~~~~~~~~~~~~
 

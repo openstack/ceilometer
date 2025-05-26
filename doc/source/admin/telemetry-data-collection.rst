@@ -310,10 +310,9 @@ An IPMI agent instance could be installed on each and every compute node
 with IPMI support, except when the node is managed by the Bare metal
 service and the ``conductor.send_sensor_data`` option is set to ``true``
 in the Bare metal service. It is no harm to install this agent on a
-compute node without IPMI or Intel Node Manager support, as the agent
-checks for the hardware and if none is available, returns empty data. It
-is suggested that you install the IPMI agent only on an IPMI capable
-node for performance reasons.
+compute node without IPMI support, as the agent checks for the hardware and
+if IPMI support is not available, returns empty data. It is suggested that you
+install the IPMI agent only on an IPMI capable node for performance reasons.
 
 The list of collected meters can be found in
 :ref:`telemetry-bare-metal-service`.
