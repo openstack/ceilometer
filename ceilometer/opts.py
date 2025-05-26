@@ -44,10 +44,8 @@ OPTS = [
     cfg.HostAddressOpt('host',
                        default=socket.gethostname(),
                        sample_default='<your_hostname>',
-                       help='Name of this node, which must be valid in an '
-                       'AMQP key. Can be an opaque identifier. For ZeroMQ '
-                       'only, must be a valid host name, FQDN, or IP '
-                       'address.'),
+                       help='Hostname, FQDN or IP address of this host. '
+                            'Must be valid within AMQP key.'),
     cfg.IntOpt('http_timeout',
                default=600,
                help='Timeout seconds for HTTP requests. Set it to None to '
