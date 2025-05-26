@@ -48,6 +48,8 @@ OPTS = [
                             'Must be valid within AMQP key.'),
     cfg.IntOpt('http_timeout',
                default=600,
+               deprecated_for_removal=True,
+               deprecated_reason='This option has no effect',
                help='Timeout seconds for HTTP requests. Set it to None to '
                     'disable timeout.'),
     cfg.IntOpt('max_parallel_requests',
