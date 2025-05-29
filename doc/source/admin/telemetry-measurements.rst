@@ -589,3 +589,19 @@ The following meters are collected for FWaaS:
 | ices.firewal\ |       | ll_pol\ |            |           | firewall policy  |
 | l.policy      |       | icy     |            |           |                  |
 +---------------+-------+---------+------------+-----------+------------------+
+
+Openstack alarming
+~~~~~~~~~~~~~~~~~~
+
+The following meters are collected for Aodh:
+
++---------------+-------+---------+------------+-----------+------------------+
+| Name          | Type  | Unit    | Resource   | Origin    | Note             |
++===============+=======+=========+============+===========+==================+
+| **Meters added in the Flamingo release**                                    |
++---------------+-------+---------+------------+-----------+------------------+
+| alarm.evalua\ | Gauge | evalua\ | alarm ID   | Pollster  | Total count of   |
+| tion_result   |       | tion_r\ |            |           | evaluation       |
+|               |       | esult\_\|            |           | results for each |
+|               |       | count   |            |           | alarm            |
++---------------+-------+---------+------------+-----------+------------------+
