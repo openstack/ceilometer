@@ -14,7 +14,6 @@
 # under the License.
 """Tests for ceilometer/publisher/opentelemetry.py"""
 
-import datetime
 import json
 import time
 from unittest import mock
@@ -33,7 +32,7 @@ from ceilometer import service
 class TestOpentelemetryHttpPublisher(base.BaseTestCase):
 
     resource_id = str(uuid.uuid4())
-    format_time = datetime.datetime.utcnow().isoformat()
+    format_time = timeutils.utcnow().isoformat()
     sample_data = [
         sample.Sample(
             name='alpha',

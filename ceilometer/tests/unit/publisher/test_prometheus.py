@@ -18,6 +18,7 @@ import datetime
 from unittest import mock
 import uuid
 
+from oslo_utils import timeutils
 from oslotest import base
 import requests
 from urllib import parse as urlparse
@@ -40,7 +41,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id=resource_id,
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -51,7 +52,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id=resource_id,
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(

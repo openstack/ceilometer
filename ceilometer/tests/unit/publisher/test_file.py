@@ -15,13 +15,13 @@
 """Tests for ceilometer/publisher/file.py
 """
 
-import datetime
 import json
 import logging.handlers
 import os
 import tempfile
 
 from oslo_utils import netutils
+from oslo_utils import timeutils
 from oslotest import base
 
 from ceilometer.publisher import file
@@ -40,7 +40,7 @@ class TestFilePublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -51,7 +51,7 @@ class TestFilePublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -62,7 +62,7 @@ class TestFilePublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
     ]

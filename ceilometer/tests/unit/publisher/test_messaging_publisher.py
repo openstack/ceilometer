@@ -13,13 +13,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 """Tests for ceilometer/publisher/messaging.py"""
-import datetime
 from unittest import mock
 import uuid
 
 import oslo_messaging
 from oslo_messaging._drivers import impl_kafka as kafka_driver
 from oslo_utils import netutils
+from oslo_utils import timeutils
 import testscenarios.testcase
 
 from ceilometer.event import models as event
@@ -33,7 +33,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
     test_event_data = [
         event.Event(message_id=uuid.uuid4(),
                     event_type='event_%d' % i,
-                    generated=datetime.datetime.utcnow(),
+                    generated=timeutils.utcnow(),
                     traits=[], raw={})
         for i in range(0, 5)
     ]
@@ -47,7 +47,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -58,7 +58,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -69,7 +69,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -80,7 +80,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -91,7 +91,7 @@ class BasePublisherTestCase(tests_base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
     ]

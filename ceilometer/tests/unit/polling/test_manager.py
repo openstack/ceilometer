@@ -25,6 +25,7 @@ from unittest import mock
 
 import fixtures
 from keystoneauth1 import exceptions as ka_exceptions
+from oslo_utils import timeutils
 from stevedore import extension
 
 from ceilometer.compute import discovery as nova_discover
@@ -48,7 +49,7 @@ def default_test_data(name='test'):
         user_id='test',
         project_id='test',
         resource_id='test_run_tasks',
-        timestamp=datetime.datetime.utcnow().isoformat(),
+        timestamp=timeutils.utcnow().isoformat(),
         resource_metadata={'name': 'Pollster'})
 
 
@@ -169,7 +170,7 @@ class BatchTestPollster(TestPollster):
         self.resources.extend(resources)
         for resource in resources:
             c = copy.deepcopy(self.test_data)
-            c.timestamp = datetime.datetime.utcnow().isoformat()
+            c.timestamp = timeutils.utcnow().isoformat()
             c.resource_id = resource
             c.resource_metadata['resource'] = resource
             yield c

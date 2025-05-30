@@ -14,11 +14,11 @@
 # under the License.
 """Tests for ceilometer/publisher/udp.py"""
 
-import datetime
 from unittest import mock
 
 import msgpack
 from oslo_utils import netutils
+from oslo_utils import timeutils
 from oslotest import base
 
 from ceilometer.publisher import udp
@@ -40,7 +40,7 @@ class TestUDPPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
             source=COUNTER_SOURCE,
         ),
@@ -52,7 +52,7 @@ class TestUDPPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
             source=COUNTER_SOURCE,
         ),
@@ -64,7 +64,7 @@ class TestUDPPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
             source=COUNTER_SOURCE,
         ),
@@ -76,7 +76,7 @@ class TestUDPPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
             source=COUNTER_SOURCE,
         ),
@@ -88,7 +88,7 @@ class TestUDPPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id='test_run_tasks',
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
             source=COUNTER_SOURCE,
         ),
