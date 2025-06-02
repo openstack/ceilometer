@@ -15,6 +15,7 @@ import datetime
 from unittest import mock
 import uuid
 
+from oslo_utils import timeutils
 from oslotest import base
 from urllib import parse as urlparse
 
@@ -37,7 +38,7 @@ class TestZaqarPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id=resource_id,
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -48,7 +49,7 @@ class TestZaqarPublisher(base.BaseTestCase):
             user_id='test',
             project_id='test',
             resource_id=resource_id,
-            timestamp=datetime.datetime.utcnow().isoformat(),
+            timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
         ),
         sample.Sample(
@@ -66,7 +67,7 @@ class TestZaqarPublisher(base.BaseTestCase):
 
     event_data = [event.Event(
         message_id=str(uuid.uuid4()), event_type='event_%d' % i,
-        generated=datetime.datetime.utcnow().isoformat(),
+        generated=timeutils.utcnow().isoformat(),
         traits=[], raw={'payload': {'some': 'aa'}}) for i in range(3)]
 
     def setUp(self):

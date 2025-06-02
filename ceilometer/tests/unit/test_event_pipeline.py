@@ -11,11 +11,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import datetime
 import traceback
 import uuid
 
 import fixtures
+from oslo_utils import timeutils
 
 from ceilometer.event import models
 from ceilometer.pipeline import base as pipeline
@@ -48,7 +48,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         self.test_event = models.Event(
             message_id=uuid.uuid4(),
             event_type='a',
-            generated=datetime.datetime.utcnow(),
+            generated=timeutils.utcnow(),
             traits=[
                 models.Trait('t_text', 1, 'text_trait'),
                 models.Trait('t_int', 2, 'int_trait'),
@@ -61,7 +61,7 @@ class EventPipelineTestCase(base.BaseTestCase):
         self.test_event2 = models.Event(
             message_id=uuid.uuid4(),
             event_type='b',
-            generated=datetime.datetime.utcnow(),
+            generated=timeutils.utcnow(),
             traits=[
                 models.Trait('t_text', 1, 'text_trait'),
                 models.Trait('t_int', 2, 'int_trait'),

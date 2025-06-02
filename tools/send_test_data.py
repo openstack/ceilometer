@@ -30,6 +30,7 @@ import uuid
 
 import make_test_data
 import oslo_messaging
+from oslo_utils import timeutils
 
 from ceilometer import messaging
 from ceilometer.publisher import utils
@@ -52,9 +53,9 @@ def get_notifier(conf):
 def generate_data(conf, send_batch, make_data_args, samples_count,
                   batch_size, resources_count, topic):
     make_data_args.interval = 1
-    make_data_args.start = (datetime.datetime.utcnow() -
+    make_data_args.start = (timeutils.utcnow() -
                             datetime.timedelta(minutes=samples_count))
-    make_data_args.end = datetime.datetime.utcnow()
+    make_data_args.end = timeutils.utcnow()
 
     make_data_args.resource_id = None
     resources_list = [str(uuid.uuid4())
