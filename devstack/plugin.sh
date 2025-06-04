@@ -71,14 +71,7 @@ function _ceilometer_install_redis {
     else
         # This will fail (correctly) where a redis package is unavailable
         install_package redis
-        if is_suse; then
-            # opensuse intsall multi-instance version of redis
-            # and admin is expected to install the required conf
-            cp /etc/redis/default.conf.example /etc/redis/default.conf
-            restart_service redis@default
-        else
-            restart_service redis
-        fi
+        restart_service redis
     fi
 
     pip_install_gr redis
