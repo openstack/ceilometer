@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixed `bug #2113768 <https://bugs.launchpad.net/ceilometer/+bug/2113768>`__ where
+    the Libvirt inspector did not catch exceptions thrown when calling interfaceStats
+    function on a domain.
