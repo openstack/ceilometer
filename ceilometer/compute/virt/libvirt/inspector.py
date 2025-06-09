@@ -114,7 +114,13 @@ class LibvirtInspector(virt_inspector.Inspector):
             params['interfaceid'] = interfaceid
             params['bridge'] = bridge
 
-            dom_stats = domain.interfaceStats(name)
+            try:
+                dom_stats = domain.interfaceStats(name)
+            except libvirt.libvirtError as ex:
+                LOG.warning(_("Error from libvirt when running instanceStats, "
+                              "This may not be harmful, but please check : "
+                              "%(ex)s") % {'ex': ex})
+                continue
 
             # Retrieve previous values
             prev = self.cache.get(name)
