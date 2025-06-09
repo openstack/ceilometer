@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    [`bug 2113903 <https://bugs.launchpad.net/ceilometer/+bug/2113903>`_]
+    Fix volume provider pool capacity metrics for ceph backend.
