@@ -88,6 +88,7 @@ function _ceilometer_prepare_coordination {
 
 # Create ceilometer related accounts in Keystone
 function ceilometer_create_accounts {
+    local gnocchi_service
     create_service_user "ceilometer" "admin"
 
     if is_service_enabled swift; then
@@ -97,8 +98,7 @@ function ceilometer_create_accounts {
 
     if [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]]; then
         create_service_user "gnocchi"
-        local gnocchi_service=$(get_or_create_service "gnocchi" \
-            "metric" "OpenStack Metric Service")
+        gnocchi_service=$(get_or_create_service "gnocchi" "metric" "OpenStack Metric Service")
         get_or_create_endpoint $gnocchi_service \
             "$REGION_NAME" \
             "$(gnocchi_service_url)" \
@@ -186,8 +186,7 @@ function _ceilometer_configure_storage_backend {
         head -n -1 $CEILOMETER_CONF_DIR/event_pipeline.yaml > $CEILOMETER_CONF_DIR/tmp ; mv $CEILOMETER_CONF_DIR/tmp $CEILOMETER_CONF_DIR/event_pipeline.yaml
 
         BACKENDS=$(echo $CEILOMETER_BACKENDS | tr "," "\n")
-        for CEILOMETER_BACKEND in ${BACKENDS[@]}
-        do
+        for CEILOMETER_BACKEND in ${BACKENDS[@]}; do
             if [ "$CEILOMETER_BACKEND" = 'gnocchi' ] ; then
                 echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/event_pipeline.yaml
                 echo "          - gnocchi://?archive_policy=${GNOCCHI_ARCHIVE_POLICY}&filter_project=service" >> $CEILOMETER_CONF_DIR/pipeline.yaml
