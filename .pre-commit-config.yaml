@@ -32,3 +32,9 @@ repos:
     hooks:
       - id: pyupgrade
         args: [--py3-only]
+  - repo: https://github.com/openstack/bashate
+    rev: 2.1.1
+    hooks:
+      - id: bashate
+        args: ['-v', '-iE006']
+        exclude: '.tox/.*'
