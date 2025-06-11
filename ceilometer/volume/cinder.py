@@ -125,8 +125,6 @@ class VolumeProviderPoolCapacityTotal(_Base):
     def default_discovery(self):
         return 'volume_pools'
 
-    FIELDS = ['pool_name']
-
     def get_samples(self, manager, cache, resources):
         for pool in resources:
             yield sample.Sample(
@@ -137,7 +135,9 @@ class VolumeProviderPoolCapacityTotal(_Base):
                 user_id=None,
                 project_id=None,
                 resource_id=pool.name,
-                resource_metadata=self.extract_metadata(pool),
+                resource_metadata={
+                    "pool_name": getattr(pool, "pool_name", None)
+                }
             )
 
 
@@ -145,8 +145,6 @@ class VolumeProviderPoolCapacityFree(_Base):
     @property
     def default_discovery(self):
         return 'volume_pools'
-
-    FIELDS = ['pool_name']
 
     def get_samples(self, manager, cache, resources):
         for pool in resources:
@@ -158,7 +156,9 @@ class VolumeProviderPoolCapacityFree(_Base):
                 user_id=None,
                 project_id=None,
                 resource_id=pool.name,
-                resource_metadata=self.extract_metadata(pool),
+                resource_metadata={
+                    "pool_name": getattr(pool, "pool_name", None)
+                }
             )
 
 
@@ -167,20 +167,21 @@ class VolumeProviderPoolCapacityProvisioned(_Base):
     def default_discovery(self):
         return 'volume_pools'
 
-    FIELDS = ['pool_name']
-
     def get_samples(self, manager, cache, resources):
         for pool in resources:
-            yield sample.Sample(
-                name='volume.provider.pool.capacity.provisioned',
-                type=sample.TYPE_GAUGE,
-                unit='GB',
-                volume=pool.provisioned_capacity_gb,
-                user_id=None,
-                project_id=None,
-                resource_id=pool.name,
-                resource_metadata=self.extract_metadata(pool),
-            )
+            if getattr(pool, 'provisioned_capacity_gb', None):
+                yield sample.Sample(
+                    name='volume.provider.pool.capacity.provisioned',
+                    type=sample.TYPE_GAUGE,
+                    unit='GB',
+                    volume=pool.provisioned_capacity_gb,
+                    user_id=None,
+                    project_id=None,
+                    resource_id=pool.name,
+                    resource_metadata={
+                        "pool_name": getattr(pool, "pool_name", None)
+                    }
+                )
 
 
 class VolumeProviderPoolCapacityVirtualFree(_Base):
@@ -188,39 +189,40 @@ class VolumeProviderPoolCapacityVirtualFree(_Base):
     def default_discovery(self):
         return 'volume_pools'
 
-    FIELDS = ['pool_name']
-
     def get_samples(self, manager, cache, resources):
         for pool in resources:
-            reserved_size = math.floor(
-                (pool.reserved_percentage / 100) * pool.total_capacity_gb
-            )
-            max_over_subscription_ratio = 1.0
-            if pool.thin_provisioning_support:
-                max_over_subscription_ratio = pool.max_over_subscription_ratio
-            value = (
-                max_over_subscription_ratio *
-                (pool.total_capacity_gb - reserved_size) -
-                pool.provisioned_capacity_gb
-            )
-            yield sample.Sample(
-                name='volume.provider.pool.capacity.virtual_free',
-                type=sample.TYPE_GAUGE,
-                unit='GB',
-                volume=value,
-                user_id=None,
-                project_id=None,
-                resource_id=pool.name,
-                resource_metadata=self.extract_metadata(pool),
-            )
+            if getattr(pool, 'provisioned_capacity_gb', None):
+                reserved_size = math.floor(
+                    (pool.reserved_percentage / 100) * pool.total_capacity_gb
+                )
+                max_over_subscription_ratio = 1.0
+                if pool.thin_provisioning_support:
+                    max_over_subscription_ratio = float(
+                        pool.max_over_subscription_ratio
+                    )
+                value = (
+                    max_over_subscription_ratio *
+                    (pool.total_capacity_gb - reserved_size) -
+                    pool.provisioned_capacity_gb
+                )
+                yield sample.Sample(
+                    name='volume.provider.pool.capacity.virtual_free',
+                    type=sample.TYPE_GAUGE,
+                    unit='GB',
+                    volume=value,
+                    user_id=None,
+                    project_id=None,
+                    resource_id=pool.name,
+                    resource_metadata={
+                        "pool_name": getattr(pool, "pool_name", None)
+                    }
+                )
 
 
 class VolumeProviderPoolCapacityAllocated(_Base):
     @property
     def default_discovery(self):
         return 'volume_pools'
-
-    FIELDS = ['pool_name']
 
     def get_samples(self, manager, cache, resources):
         for pool in resources:
@@ -232,5 +234,7 @@ class VolumeProviderPoolCapacityAllocated(_Base):
                 user_id=None,
                 project_id=None,
                 resource_id=pool.name,
-                resource_metadata=self.extract_metadata(pool),
+                resource_metadata={
+                    "pool_name": getattr(pool, "pool_name", None)
+                }
             )

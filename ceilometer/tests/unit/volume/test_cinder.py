@@ -159,7 +159,28 @@ POOL_LIST = [
           'storage_protocol': 'iSCSI',
           'vendor_name': 'Open Source',
           'driver_version': '3.0.0',
-          'timestamp': '2025-03-21T14:19:02.901750'})
+          'timestamp': '2025-03-21T14:19:02.901750'}),
+    type('VolumePool', (object,),
+         {'name': 'cinder-3ceee-volume-ceph-0@ceph#ceph',
+          'vendor_name': 'Open Source',
+          'driver_version': '1.3.0',
+          'storage_protocol': 'ceph',
+          'total_capacity_gb': 85.0,
+          'free_capacity_gb': 85.0,
+          'reserved_percentage': 0,
+          'multiattach': True,
+          'thin_provisioning_support': True,
+          'max_over_subscription_ratio': '20.0',
+          'location_info':
+          'ceph:/etc/ceph/ceph.conf:a94b63c4e:openstack:volumes',
+          'backend_state': 'up',
+          'qos_support': True,
+          'volume_backend_name': 'ceph',
+          'replication_enabled': False,
+          'allocated_capacity_gb': 1,
+          'filter_function': None,
+          'goodness_function': None,
+          'timestamp': '2025-06-09T13:29:43.286226'})
 ]
 
 
@@ -243,12 +264,19 @@ class TestVolumeProviderPoolCapacityTotalPollster(base.BaseTestCase):
     def test_volume_provider_pool_capacity_total_pollster(self):
         volume_pool_size_total_samples = list(
             self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
-        self.assertEqual(1, len(volume_pool_size_total_samples))
+        self.assertEqual(2, len(volume_pool_size_total_samples))
+
         self.assertEqual('volume.provider.pool.capacity.total',
                          volume_pool_size_total_samples[0].name)
         self.assertEqual(28.5, volume_pool_size_total_samples[0].volume)
         self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
                          volume_pool_size_total_samples[0].resource_id)
+
+        self.assertEqual('volume.provider.pool.capacity.total',
+                         volume_pool_size_total_samples[1].name)
+        self.assertEqual(85.0, volume_pool_size_total_samples[1].volume)
+        self.assertEqual('cinder-3ceee-volume-ceph-0@ceph#ceph',
+                         volume_pool_size_total_samples[1].resource_id)
 
 
 class TestVolumeProviderPoolCapacityFreePollster(base.BaseTestCase):
@@ -261,12 +289,19 @@ class TestVolumeProviderPoolCapacityFreePollster(base.BaseTestCase):
     def test_volume_provider_pool_capacity_free_pollster(self):
         volume_pool_size_free_samples = list(
             self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
-        self.assertEqual(1, len(volume_pool_size_free_samples))
+        self.assertEqual(2, len(volume_pool_size_free_samples))
+
         self.assertEqual('volume.provider.pool.capacity.free',
                          volume_pool_size_free_samples[0].name)
         self.assertEqual(28.39, volume_pool_size_free_samples[0].volume)
         self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
                          volume_pool_size_free_samples[0].resource_id)
+
+        self.assertEqual('volume.provider.pool.capacity.free',
+                         volume_pool_size_free_samples[1].name)
+        self.assertEqual(85.0, volume_pool_size_free_samples[1].volume)
+        self.assertEqual('cinder-3ceee-volume-ceph-0@ceph#ceph',
+                         volume_pool_size_free_samples[1].resource_id)
 
 
 class TestVolumeProviderPoolCapacityProvisionedPollster(base.BaseTestCase):
@@ -316,9 +351,16 @@ class TestVolumeProviderPoolCapacityAllocatedPollster(base.BaseTestCase):
     def test_volume_provider_pool_capacity_allocated_pollster(self):
         volume_pool_size_allocated_samples = list(
             self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
-        self.assertEqual(1, len(volume_pool_size_allocated_samples))
+        self.assertEqual(2, len(volume_pool_size_allocated_samples))
+
         self.assertEqual('volume.provider.pool.capacity.allocated',
                          volume_pool_size_allocated_samples[0].name)
         self.assertEqual(4, volume_pool_size_allocated_samples[0].volume)
         self.assertEqual('localhost.localdomain@lvmdriver-1#lvmdriver-1',
                          volume_pool_size_allocated_samples[0].resource_id)
+
+        self.assertEqual('volume.provider.pool.capacity.allocated',
+                         volume_pool_size_allocated_samples[1].name)
+        self.assertEqual(1, volume_pool_size_allocated_samples[1].volume)
+        self.assertEqual('cinder-3ceee-volume-ceph-0@ceph#ceph',
+                         volume_pool_size_allocated_samples[1].resource_id)
