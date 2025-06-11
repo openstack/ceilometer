@@ -89,18 +89,6 @@ SNAPSHOT_LIST = [
           'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
           'metadata': {},
           'created_at': '2016-10-19T07:56:55.000000',
-          "volume_image_metadata": {
-              "checksum": "17d9daa4fb8e20b0f6b7dec0d46fdddf",
-              "container_format": "bare",
-              "disk_format": "raw",
-              "hw_disk_bus": "scsi",
-              "hw_scsi_model": "virtio-scsi",
-              "image_id": "f0019ee3-523c-45ab-b0b6-3adc529673e7",
-              "image_name": "debian-jessie-scsi",
-              "min_disk": "0",
-              "min_ram": "0",
-              "size": "1572864000"
-          },
           "group_snapshot_id": None,
           'name': None})
 ]
@@ -231,9 +219,6 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
                          volume_snapshot_size_samples[0].project_id)
         self.assertEqual('b1ea6783-f952-491e-a4ed-23a6a562e1cf',
                          volume_snapshot_size_samples[0].resource_id)
-        self.assertEqual('f0019ee3-523c-45ab-b0b6-3adc529673e7',
-                         volume_snapshot_size_samples[0].resource_metadata
-                         ["image_id"])
 
 
 class TestVolumeBackupSizePollster(base.BaseTestCase):

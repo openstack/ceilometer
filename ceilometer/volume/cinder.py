@@ -19,17 +19,10 @@ from ceilometer import sample
 
 
 class _Base(plugin_base.PollsterBase):
+    FIELDS = []
+
     def extract_metadata(self, obj):
-        metadata = {k: getattr(obj, k) for k in self.FIELDS}
-        if getattr(obj, "volume_image_metadata", None):
-            metadata["image_id"] = obj.volume_image_metadata.get("image_id")
-        else:
-            metadata["image_id"] = None
-        if getattr(obj, "attachments", None):
-            metadata["instance_id"] = obj.attachments[0]["server_id"]
-        else:
-            metadata["instance_id"] = None
-        return metadata
+        return {k: getattr(obj, k) for k in self.FIELDS}
 
 
 class VolumeSizePollster(_Base):
@@ -47,6 +40,21 @@ class VolumeSizePollster(_Base):
               'attachments',
               'snapshot_id',
               'source_volid']
+
+    def extract_metadata(self, obj):
+        metadata = super().extract_metadata(obj)
+
+        if getattr(obj, "volume_image_metadata", None):
+            metadata["image_id"] = obj.volume_image_metadata.get("image_id")
+        else:
+            metadata["image_id"] = None
+
+        if obj.attachments:
+            metadata["instance_id"] = obj.attachments[0]["server_id"]
+        else:
+            metadata["instance_id"] = None
+
+        return metadata
 
     def get_samples(self, manager, cache, resources):
         for volume in resources:
@@ -120,7 +128,14 @@ class VolumeBackupSize(_Base):
             )
 
 
-class VolumeProviderPoolCapacityTotal(_Base):
+class _VolumeProviderPoolBase(_Base):
+    def extract_metadata(self, obj):
+        metadata = super().extract_metadata(obj)
+        metadata['pool_name'] = getattr(obj, "pool_name", None)
+        return metadata
+
+
+class VolumeProviderPoolCapacityTotal(_VolumeProviderPoolBase):
     @property
     def default_discovery(self):
         return 'volume_pools'
@@ -135,13 +150,11 @@ class VolumeProviderPoolCapacityTotal(_Base):
                 user_id=None,
                 project_id=None,
                 resource_id=pool.name,
-                resource_metadata={
-                    "pool_name": getattr(pool, "pool_name", None)
-                }
+                resource_metadata=self.extract_metadata(pool)
             )
 
 
-class VolumeProviderPoolCapacityFree(_Base):
+class VolumeProviderPoolCapacityFree(_VolumeProviderPoolBase):
     @property
     def default_discovery(self):
         return 'volume_pools'
@@ -156,13 +169,11 @@ class VolumeProviderPoolCapacityFree(_Base):
                 user_id=None,
                 project_id=None,
                 resource_id=pool.name,
-                resource_metadata={
-                    "pool_name": getattr(pool, "pool_name", None)
-                }
+                resource_metadata=self.extract_metadata(pool)
             )
 
 
-class VolumeProviderPoolCapacityProvisioned(_Base):
+class VolumeProviderPoolCapacityProvisioned(_VolumeProviderPoolBase):
     @property
     def default_discovery(self):
         return 'volume_pools'
@@ -178,13 +189,11 @@ class VolumeProviderPoolCapacityProvisioned(_Base):
                     user_id=None,
                     project_id=None,
                     resource_id=pool.name,
-                    resource_metadata={
-                        "pool_name": getattr(pool, "pool_name", None)
-                    }
+                    resource_metadata=self.extract_metadata(pool)
                 )
 
 
-class VolumeProviderPoolCapacityVirtualFree(_Base):
+class VolumeProviderPoolCapacityVirtualFree(_VolumeProviderPoolBase):
     @property
     def default_discovery(self):
         return 'volume_pools'
@@ -213,13 +222,11 @@ class VolumeProviderPoolCapacityVirtualFree(_Base):
                     user_id=None,
                     project_id=None,
                     resource_id=pool.name,
-                    resource_metadata={
-                        "pool_name": getattr(pool, "pool_name", None)
-                    }
+                    resource_metadata=self.extract_metadata(pool)
                 )
 
 
-class VolumeProviderPoolCapacityAllocated(_Base):
+class VolumeProviderPoolCapacityAllocated(_VolumeProviderPoolBase):
     @property
     def default_discovery(self):
         return 'volume_pools'
@@ -234,7 +241,5 @@ class VolumeProviderPoolCapacityAllocated(_Base):
                 user_id=None,
                 project_id=None,
                 resource_id=pool.name,
-                resource_metadata={
-                    "pool_name": getattr(pool, "pool_name", None)
-                }
+                resource_metadata=self.extract_metadata(pool)
             )
