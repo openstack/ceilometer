@@ -117,8 +117,14 @@ class FakeManualInstanceDomain:
         # elements like: '<nova:instance
         #  xmlns:nova="http://openstack.org/xmlns/libvirt/nova/1.0">'
         # When invoke get metadata method, raise libvirtError.
-        raise libvirt.libvirtError(
+        e = libvirt.libvirtError(
             "metadata not found: Requested metadata element is not present")
+
+        def fake_error_code(*args, **kwargs):
+            return libvirt.VIR_ERR_NO_DOMAIN_METADATA
+
+        e.get_error_code = fake_error_code
+        raise e
 
 
 class FakeManualInstanceConn:
