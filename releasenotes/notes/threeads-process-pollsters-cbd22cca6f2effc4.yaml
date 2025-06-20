@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Introduce ``threads_to_process_pollsters`` to enable operators to define
+    the number of pollsters that can be executed in parallel inside a
+    polling task.

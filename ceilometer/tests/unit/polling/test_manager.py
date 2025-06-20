@@ -254,10 +254,13 @@ class BaseAgent(base.BaseTestCase):
     class DiscoveryException(TestDiscoveryException):
         params = []
 
-    def setup_polling(self, poll_cfg=None):
+    def setup_polling(self, poll_cfg=None, override_conf=None):
         name = self.cfg2file(poll_cfg or self.polling_cfg)
-        self.CONF.set_override('cfg_file', name, group='polling')
-        self.mgr.polling_manager = manager.PollingManager(self.CONF)
+
+        conf_to_use = override_conf or self.CONF
+
+        conf_to_use.set_override('cfg_file', name, group='polling')
+        self.mgr.polling_manager = manager.PollingManager(conf_to_use)
 
     def create_manager(self):
         queue = multiprocessing.Queue()
@@ -688,15 +691,40 @@ class TestPollingAgent(BaseAgent):
         ])
 
     @mock.patch('ceilometer.polling.manager.LOG')
+    def test_polling_and_notify_with_resources_with_threads(self, log_mock):
+        conf_to_use = self.CONF
+        conf_to_use.set_override(
+            'threads_to_process_pollsters', 4, group='polling')
+
+        self.setup_polling(override_conf=conf_to_use)
+
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
+        polling_task.poll_and_notify()
+
+        log_mock.info.assert_has_calls([
+            mock.call('Polling pollster %(poll)s in the context of %(src)s',
+                      {'poll': 'test', 'src': 'test_polling'}),
+            mock.call('Finished polling pollster %(poll)s in the context '
+                      'of %(src)s', {'poll': 'test', 'src': 'test_polling'})
+        ])
+        log_mock.debug.assert_has_calls([
+            mock.call('Polster heartbeat update: test')
+        ])
+
+        # Even though we enabled 4 threads, we have only one metric configured.
+        # Therefore, there should be only one call here.
+        self.assertEqual(1, polling_task.manager.notifier.sample.call_count)
+
+    @mock.patch('ceilometer.polling.manager.LOG')
     def test_skip_polling_and_notify_with_no_resources(self, LOG):
         self.polling_cfg['sources'][0]['resources'] = []
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         pollster = list(polling_task.pollster_matches['test_polling'])[0]
         polling_task.poll_and_notify()
-        LOG.debug.assert_called_with(
-            'Skip pollster %(name)s, no %(p_context)s resources found this '
-            'cycle', {'name': pollster.name, 'p_context': ''})
+        LOG.debug.assert_has_calls([mock.call(
+            'Skip pollster %(name)s, no %(p_context)s resources found '
+            'this cycle', {'name': pollster.name, 'p_context': ''})])
 
     @mock.patch('ceilometer.polling.manager.LOG')
     def test_skip_polling_polled_resources(self, LOG):
@@ -709,9 +737,9 @@ class TestPollingAgent(BaseAgent):
         self.setup_polling()
         polling_task = list(self.mgr.setup_polling_tasks().values())[0]
         polling_task.poll_and_notify()
-        LOG.debug.assert_called_with(
-            'Skip pollster %(name)s, no %(p_context)s resources found this '
-            'cycle', {'name': 'test', 'p_context': 'new'})
+        LOG.debug.assert_has_calls([mock.call(
+            'Skip pollster %(name)s, no %(p_context)s resources found '
+            'this cycle', {'name': 'test', 'p_context': 'new'})])
 
     @mock.patch('oslo_utils.timeutils.utcnow')
     def test_polling_samples_timestamp(self, mock_utc):
