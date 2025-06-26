@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Support for pollster builder has been deprecated, because ceilometer no
+    longer provides any built-in pollster builder now.
