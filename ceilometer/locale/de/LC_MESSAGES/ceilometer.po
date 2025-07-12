@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-02-06 09:18+0000\n"
+"POT-Creation-Date: 2025-07-04 09:56+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -87,9 +87,6 @@ msgstr "Ungültiger Typ %s angegeben"
 msgid "No plugin named %(plugin)s available for %(name)s"
 msgstr "Kein Plug-in mit dem Namen %(plugin)s verfügbar für %(name)s."
 
-msgid "Node Manager init failed"
-msgstr "Initialisierung von Knoten-Manager fehlgeschlagen"
-
 #, python-format
 msgid ""
 "Parse error in JSONPath specification '%(jsonpath)s' for %(name)s: %(err)s"
@@ -103,10 +100,6 @@ msgstr "Plug-in angegeben, aber kein Plug-in-Name für %s angegeben."
 #, python-format
 msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
 msgstr "Polling von %(mtr)s-Sensor %(cnt)s Mal fehlgeschlagen!"
-
-#, python-format
-msgid "Polling %(name)s failed for %(cnt)s times!"
-msgstr "Polling von %(name)s  %(cnt)s Mal fehlgeschlagen!"
 
 #, python-format
 msgid "Pollster for %s is disabled!"
@@ -152,12 +145,6 @@ msgstr "Beispiel kann nicht über UDP gesendet werden"
 msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
 msgstr ""
 "Unbekannten Status %(stat)s erhalten für Firewall %(id)s; Beispiel wird "
-"übersprungen"
-
-#, python-format
-msgid "Unknown status %(stat)s received on vpn %(id)s, skipping sample"
-msgstr ""
-"Unbekannten Status %(stat)s erhalten für VPN %(id)s; Beispiel wird "
 "übersprungen"
 
 msgid "Wrong sensor type"
