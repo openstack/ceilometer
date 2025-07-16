@@ -63,9 +63,6 @@ CEILOMETER_CACHE_URL=${CEILOMETER_CACHE_URL:-redis://localhost:6379}
 
 CEILOMETER_EVENT_ALARM=${CEILOMETER_EVENT_ALARM:-False}
 
-# Set up default directories for middleware
-GITDIR["ceilometermiddleware"]=$DEST/ceilometermiddleware
-
 # Get rid of this before done.
 # Tell emacs to use shell-script-mode
 ## Local variables:
