@@ -24,8 +24,7 @@ Install Gnocchi
 
    .. code-block:: console
 
-      # dnf install openstack-gnocchi-api openstack-gnocchi-metricd \
-        python3-gnocchiclient
+      # dnf install gnocchi-api gnocchi-metricd python3-gnocchiclient
 
    .. note::
 
@@ -58,10 +57,8 @@ Finalize Gnocchi installation
 
    .. code-block:: console
 
-      # systemctl enable openstack-gnocchi-api.service \
-        openstack-gnocchi-metricd.service
-      # systemctl start openstack-gnocchi-api.service \
-        openstack-gnocchi-metricd.service
+      # systemctl enable gnocchi-api.service gnocchi-metricd.service
+      # systemctl start gnocchi-api.service gnocchi-metricd.service
 
 Install and configure components
 --------------------------------
