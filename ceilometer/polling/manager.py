@@ -549,17 +549,24 @@ class AgentManager(cotyledon.Service):
         # be passed
         extensions = (self._extensions('poll', namespace, self.conf).extensions
                       for namespace in namespaces)
+        extensions = list(itertools.chain(*list(extensions)))
+
         # get the extensions from pollster builder
         extensions_fb = (self._extensions_from_builder('poll', namespace)
                          for namespace in namespaces)
+        extensions_fb = list(itertools.chain(*list(extensions_fb)))
+
+        # NOTE(tkajinam): Remove this after 2026.1 release
+        if extensions_fb:
+            LOG.warning('Support for pollster build has been deprecated')
 
         # Create dynamic pollsters
         extensions_dynamic_pollsters = self.create_dynamic_pollsters(
             namespaces)
+        extensions_dynamic_pollsters = list(extensions_dynamic_pollsters)
 
-        self.extensions = list(itertools.chain(*list(extensions))) + list(
-            itertools.chain(*list(extensions_fb))) + list(
-            extensions_dynamic_pollsters)
+        self.extensions = (
+            extensions + extensions_fb + extensions_dynamic_pollsters)
 
         if not self.extensions:
             LOG.warning('No valid pollsters can be loaded from %s '
