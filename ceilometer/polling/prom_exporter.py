@@ -140,4 +140,13 @@ def _gen_labels(sample):
             labels['keys'].append('state')
             labels['values'].append(resource_metadata['alarm_state'])
 
+        if resource_metadata.get('flavor'):
+            flavor = resource_metadata.get('flavor')
+            if flavor.get('id'):
+                labels['keys'].append("flavor_id")
+                labels['values'].append(flavor['id'])
+            if flavor.get('name'):
+                labels['keys'].append("flavor_name")
+                labels['values'].append(flavor['name'])
+
     return labels
