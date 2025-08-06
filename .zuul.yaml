@@ -19,6 +19,8 @@
         ceilometer-acentral: true
         ceilometer-aipmi: true
         ceilometer-anotification: true
+      tempest_test_regex: '\[.*\bsmoke\b.*\]|^(telemetry_tempest_plugin)'
+      tox_envlist: all
     irrelevant-files: &ceilometer-irrelevant-files
       - ^\.gitreview$
       - ^(test-|)requirements.txt$
