@@ -24,7 +24,6 @@ from ceilometer import keystone_client
 from ceilometer import messaging
 from ceilometer import opts
 from ceilometer import sample
-from ceilometer import utils
 from ceilometer import version
 
 
@@ -53,7 +52,6 @@ def prepare_service(argv=None, config_files=None, conf=None):
     keystone_client.post_register_keystoneauth_opts(conf)
 
     log.setup(conf, 'ceilometer')
-    utils.setup_root_helper(conf)
     sample.setup(conf)
 
     gmr_opts.set_defaults(conf)
