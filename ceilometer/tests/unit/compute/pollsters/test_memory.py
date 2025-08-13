@@ -25,6 +25,47 @@ class TestMemoryPollster(base.TestPollsterBase):
 
     def test_get_samples(self):
         self._mock_inspect_instance(
+            virt_inspector.InstanceStats(memory_available=1024.0),
+            virt_inspector.InstanceStats(memory_available=2048.0),
+            virt_inspector.InstanceStats(),
+            virt_inspector.InstanceShutOffException(),
+        )
+
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.MemoryPollster(self.CONF)
+
+        @mock.patch('ceilometer.compute.pollsters.LOG')
+        def _verify_memory_metering(expected_count, expected_memory_mb,
+                                    expected_warnings, mylog):
+            samples = list(pollster.get_samples(mgr, {}, [self.instance]))
+            self.assertEqual(expected_count, len(samples))
+            if expected_count > 0:
+                self.assertEqual({'memory'},
+                                 {s.name for s in samples})
+                self.assertEqual(expected_memory_mb, samples[0].volume)
+            else:
+                self.assertEqual(expected_warnings, mylog.warning.call_count)
+            self.assertEqual(0, mylog.exception.call_count)
+
+        _verify_memory_metering(1, 1024.0, 0)
+        _verify_memory_metering(1, 2048.0, 0)
+        _verify_memory_metering(0, 0, 1)
+        _verify_memory_metering(0, 0, 0)
+
+    def test_get_samples_with_empty_stats(self):
+
+        self._mock_inspect_instance(virt_inspector.NoDataException())
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.MemoryPollster(self.CONF)
+
+        def all_samples():
+            return list(pollster.get_samples(mgr, {}, [self.instance]))
+
+
+class TestMemoryUsagePollster(base.TestPollsterBase):
+
+    def test_get_samples(self):
+        self._mock_inspect_instance(
             virt_inspector.InstanceStats(memory_usage=1.0),
             virt_inspector.InstanceStats(memory_usage=2.0),
             virt_inspector.InstanceStats(),
@@ -35,8 +76,8 @@ class TestMemoryPollster(base.TestPollsterBase):
         pollster = instance_stats.MemoryUsagePollster(self.CONF)
 
         @mock.patch('ceilometer.compute.pollsters.LOG')
-        def _verify_memory_metering(expected_count, expected_memory_mb,
-                                    expected_warnings, mylog):
+        def _verify_memory_usage_metering(expected_count, expected_memory_mb,
+                                          expected_warnings, mylog):
             samples = list(pollster.get_samples(mgr, {}, [self.instance]))
             self.assertEqual(expected_count, len(samples))
             if expected_count > 0:
@@ -47,10 +88,10 @@ class TestMemoryPollster(base.TestPollsterBase):
                 self.assertEqual(expected_warnings, mylog.warning.call_count)
             self.assertEqual(0, mylog.exception.call_count)
 
-        _verify_memory_metering(1, 1.0, 0)
-        _verify_memory_metering(1, 2.0, 0)
-        _verify_memory_metering(0, 0, 1)
-        _verify_memory_metering(0, 0, 0)
+        _verify_memory_usage_metering(1, 1.0, 0)
+        _verify_memory_usage_metering(1, 2.0, 0)
+        _verify_memory_usage_metering(0, 0, 1)
+        _verify_memory_usage_metering(0, 0, 0)
 
     def test_get_samples_with_empty_stats(self):
 

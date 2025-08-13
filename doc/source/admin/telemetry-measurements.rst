@@ -86,8 +86,8 @@ The following meters are collected for OpenStack Compute.
 | **Meters added in the Mitaka release or earlier**                           |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory    | Gauge | MB   | instance | Notific\ | Libvirt | Volume of RAM    |
-|           |       |      | ID       | ation    |         | allocated to the |
-|           |       |      |          |          |         | instance         |
+|           |       |      | ID       | ation, \ |         | allocated to the |
+|           |       |      |          | Pollster |         | instance         |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Gauge | MB   | instance | Pollster | Libvirt,| Volume of RAM    |
 | usage     |       |      | ID       |          |         | used by the inst\|
