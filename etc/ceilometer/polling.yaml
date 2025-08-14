@@ -3,6 +3,7 @@ sources:
     - name: some_pollsters
       interval: 300
       meters:
+        - power.state
         - cpu
         - memory.usage
         - network.incoming.bytes
