@@ -1,7 +1,0 @@
----
-issues:
-  - |
-    Enabling the ``power.state`` meter is known to cause duplicate and
-    potentially conflicting measures during migration operations such as
-    live-migration, cold-migration and resize. Due to this problem the meter
-    has been removed from the sample `polling.yaml` file.
