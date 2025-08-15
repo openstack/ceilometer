@@ -96,3 +96,30 @@ class TestCPUPollster(base.TestPollsterBase):
         self.assertEqual(1, len(samples))
         self.assertEqual('m1.small',
                          samples[0].resource_metadata['instance_type'])
+
+
+class TestVCPUsPollster(base.TestPollsterBase):
+
+    def test_get_samples(self):
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(cpu_time=1 * (10 ** 6), cpu_number=1),
+            virt_inspector.InstanceStats(cpu_time=3 * (10 ** 6), cpu_number=1),
+            # cpu_time resets on instance restart
+            virt_inspector.InstanceStats(cpu_time=2 * (10 ** 6), cpu_number=2),
+        )
+
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.VCPUsPollster(self.CONF)
+
+        def _verify_cpu_metering(expected_cpu_number):
+            cache = {}
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual({'vcpus'}, {s.name for s in samples})
+            self.assertEqual(expected_cpu_number, samples[0].volume)
+            # ensure elapsed time between polling cycles is non-zero
+            time.sleep(0.001)
+
+        _verify_cpu_metering(1)
+        _verify_cpu_metering(1)
+        _verify_cpu_metering(2)

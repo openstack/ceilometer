@@ -104,8 +104,8 @@ The following meters are collected for OpenStack Compute.
 |           | lative|      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | vcpus     | Gauge | vcpu | instance | Notific\ | Libvirt | Number of virtual|
-|           |       |      | ID       | ation    |         | CPUs allocated to|
-|           |       |      |          |          |         | the instance     |
+|           |       |      | ID       | ation, \ |         | CPUs allocated to|
+|           |       |      |          | Pollster |         | the instance     |
 +-----------+-------+------+----------+----------+---------+------------------+
 | disk.dev\ | Cumu\ | req\ | disk ID  | Pollster | Libvirt | Number of read   |
 | ice.read\ | lative| uest |          |          |         | requests         |
