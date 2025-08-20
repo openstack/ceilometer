@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import errno
 from oslo_config import cfg
 from oslo_log import log as logging
 import tenacity
@@ -105,11 +106,17 @@ def refresh_libvirt_connection(conf, klass):
 def is_disconnection_exception(e):
     if not libvirt:
         return False
-    return (isinstance(e, libvirt.libvirtError)
-            and e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
-                                       libvirt.VIR_ERR_INTERNAL_ERROR)
-            and e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
-                                         libvirt.VIR_FROM_RPC))
+    if not isinstance(e, libvirt.libvirtError):
+        return False
+    is_libvirt_error = (
+        e.get_error_code() in (libvirt.VIR_ERR_SYSTEM_ERROR,
+                               libvirt.VIR_ERR_INTERNAL_ERROR)
+        and e.get_error_domain() in (libvirt.VIR_FROM_REMOTE,
+                                     libvirt.VIR_FROM_RPC))
+    is_system_error = (
+        e.get_error_domain() == libvirt.VIR_FROM_RPC
+        and e.get_error_code() == errno.EPIPE)
+    return is_libvirt_error or is_system_error
 
 
 retry_on_disconnect = tenacity.retry(
