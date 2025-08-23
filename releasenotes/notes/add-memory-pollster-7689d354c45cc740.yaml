@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The ``memory`` meter now has measures published by a compute pollster,
+    in addition to the existing notification meter.

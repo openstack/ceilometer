@@ -78,6 +78,7 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(0, stats.power_state)
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(40000, stats.cpu_time)
+            self.assertEqual(51200 / units.Ki, stats.memory_available)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)
             self.assertEqual(5120 / units.Ki, stats.memory_swap_in)
@@ -465,6 +466,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertIsNone(stats.memory_available)
             self.assertIsNone(stats.memory_usage)
             self.assertIsNone(stats.memory_resident)
             self.assertIsNone(stats.memory_swap_in)
@@ -486,6 +488,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertEqual(76800 / units.Ki, stats.memory_available)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)
             self.assertEqual(5120 / units.Ki, stats.memory_swap_in)

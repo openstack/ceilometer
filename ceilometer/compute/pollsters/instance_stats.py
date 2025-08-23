@@ -44,6 +44,12 @@ class VCPUsPollster(InstanceStatsPollster):
     sample_stats_key = 'cpu_number'
 
 
+class MemoryPollster(InstanceStatsPollster):
+    sample_name = 'memory'
+    sample_unit = 'MB'
+    sample_stats_key = 'memory_available'
+
+
 class MemoryUsagePollster(InstanceStatsPollster):
     sample_name = 'memory.usage'
     sample_unit = 'MB'
