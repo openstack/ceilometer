@@ -201,6 +201,7 @@ metric:
       flavor_name: $.payload.instance_type
       display_name: $.payload.display_name
       image_ref: $.payload.image_meta.base_image_ref
+      image_meta: $.payload.image_meta
       launched_at: $.payload.launched_at
       created_at: $.payload.created_at
       deleted_at: $.payload.deleted_at

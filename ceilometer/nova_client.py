@@ -128,6 +128,17 @@ class Client:
             ameta = image_metadata.get(attr) if image_metadata else default
             setattr(instance, attr, ameta)
 
+        if image:
+            image_meta = {"base_image_ref": iid}
+            # Notifications and libvirt XML metadata return all
+            # image_meta values as strings. Do the same here.
+            image_meta.update((k, str(v))
+                              for k, v in image.items()
+                              if k not in ('id', 'name', 'metadata'))
+        else:
+            image_meta = {}
+        instance.image_meta = image_meta
+
     @logged
     def instance_get_all_by_host(self, hostname, since=None):
         """Returns list of instances on particular host.

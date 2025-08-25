@@ -59,6 +59,8 @@ def _get_metadata_from_object(conf, instance):
         metadata['image'] = None
         metadata['image_ref'] = None
         metadata['image_ref_url'] = None
+    if hasattr(instance, 'image_meta') and instance.image_meta:
+        metadata['image_meta'] = instance.image_meta
 
     for name in INSTANCE_PROPERTIES:
         if hasattr(instance, name):

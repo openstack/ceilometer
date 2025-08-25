@@ -22,6 +22,12 @@ from ceilometer import nova_client
 from ceilometer import service
 
 
+class FauxImage(dict):
+
+    def __getattr__(self, key):
+        return self[key]
+
+
 class TestNovaClient(base.BaseTestCase):
 
     def setUp(self):
@@ -51,24 +57,33 @@ class TestNovaClient(base.BaseTestCase):
 
     def fake_images_get(self, *args, **kwargs):
         self._images_count += 1
-        a = mock.MagicMock()
-        a.id = args[0]
+        image_id = args[0]
         image_details = {
-            1: ('ubuntu-12.04-x86', dict(kernel_id=11, ramdisk_id=21)),
-            2: ('centos-5.4-x64', dict(kernel_id=12, ramdisk_id=22)),
-            3: ('rhel-6-x64', None),
-            4: ('rhel-6-x64', dict()),
-            5: ('rhel-6-x64', dict(kernel_id=11)),
-            6: ('rhel-6-x64', dict(ramdisk_id=21))
+            # NOTE(callumdickinson): Real image IDs are UUIDs, not integers,
+            # so the actual code runs assuming the IDs are strings.
+            1: ('ubuntu-12.04-x86',
+                dict(kernel_id=11, ramdisk_id=21),
+                dict(container_format='bare',
+                     disk_format='raw',
+                     min_disk=1,
+                     min_ram=0,
+                     os_distro='ubuntu',
+                     os_type='linux')),
+            2: ('centos-5.4-x64', dict(kernel_id=12, ramdisk_id=22), dict()),
+            3: ('rhel-6-x64', None, dict()),
+            4: ('rhel-6-x64', dict(), dict()),
+            5: ('rhel-6-x64', dict(kernel_id=11), dict()),
+            6: ('rhel-6-x64', dict(ramdisk_id=21), dict()),
         }
 
-        if a.id in image_details:
-            a.name = image_details[a.id][0]
-            a.metadata = image_details[a.id][1]
+        if image_id in image_details:
+            return FauxImage(
+                id=image_id,
+                name=image_details[image_id][0],
+                metadata=image_details[image_id][1],
+                **image_details[image_id][2])
         else:
             raise glanceclient.exc.HTTPNotFound('foobar')
-
-        return a
 
     @staticmethod
     def fake_servers_list(*args, **kwargs):
@@ -151,6 +166,14 @@ class TestNovaClient(base.BaseTestCase):
         self.assertEqual('m1.tiny', instance.flavor['name'])
         self.assertEqual(11, instance.kernel_id)
         self.assertEqual(21, instance.ramdisk_id)
+        self.assertEqual({'base_image_ref': 1,
+                          'container_format': 'bare',
+                          'disk_format': 'raw',
+                          'min_disk': '1',
+                          'min_ram': '0',
+                          'os_distro': 'ubuntu',
+                          'os_type': 'linux'},
+                         instance.image_meta)
 
     def test_with_flavor_and_image_unknown_image(self):
         instances = self.fake_servers_list_unknown_image()
@@ -160,6 +183,7 @@ class TestNovaClient(base.BaseTestCase):
         self.assertNotEqual(instance.flavor['name'], 'unknown-id-666')
         self.assertIsNone(instance.kernel_id)
         self.assertIsNone(instance.ramdisk_id)
+        self.assertEqual({}, instance.image_meta)
 
     def test_with_flavor_and_image_unknown_flavor(self):
         instances = self.fake_servers_list_unknown_flavor()
@@ -172,6 +196,14 @@ class TestNovaClient(base.BaseTestCase):
         self.assertNotEqual(instance.image['name'], 'unknown-id-666')
         self.assertEqual(11, instance.kernel_id)
         self.assertEqual(21, instance.ramdisk_id)
+        self.assertEqual({'base_image_ref': 1,
+                          'container_format': 'bare',
+                          'disk_format': 'raw',
+                          'min_disk': '1',
+                          'min_ram': '0',
+                          'os_distro': 'ubuntu',
+                          'os_type': 'linux'},
+                         instance.image_meta)
 
     def test_with_flavor_and_image_none_metadata(self):
         instances = self.fake_servers_list_image_missing_metadata(3)

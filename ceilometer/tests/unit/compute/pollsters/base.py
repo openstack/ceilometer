@@ -49,6 +49,15 @@ class TestPollsterBase(base.BaseTestCase):
             'fqdn': 'vm_fqdn',
             'metering.stack': '2cadc4b4-8789-123c-b4eg-edd2f0a9c128',
             'project_cos': 'dev'}
+        self.instance.image = {'id': '0ff4d118-4947-49e6-963a-7a28e65f3f11'}
+        self.instance.image_meta = {
+            'base_image_ref': self.instance.image['id'],
+            'container_format': 'bare',
+            'disk_format': 'raw',
+            'min_disk': '1',
+            'min_ram': '0',
+            'os_distro': 'ubuntu',
+            'os_type': 'linux'}
 
         self.useFixture(fixtures.MockPatch(
             'ceilometer.compute.virt.inspector.get_hypervisor_inspector',

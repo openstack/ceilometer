@@ -1,0 +1,23 @@
+---
+features:
+  - |
+    The ``image_meta`` metadata structure for compute meters was
+    formerly only available via the notification meters. When using
+    Nova 2025.2 Flamingo or later, ``image_meta`` is now also supplied by
+    the compute pollsters. This is now possible due to the addition of
+    the relevant metadata to the libvirt guest XML.
+  - |
+    The built-in ``meters.yaml`` has been updated to publish the
+    ``image_meta`` metadata attribute for compute notification meter
+    samples by default.
+upgrade:
+  - |
+    ``meters.yaml`` has been updated to add ``image_meta`` to compute meter
+    samples by default.
+  - |
+    In order for the new image metadata attributes to start being populated
+    from libvirt metadata in pollster samples, Nova must be upgraded to
+    2025.2 Flamingo or later (older versions are still backwards compatible,
+    but the new attributes will not be available via pollster samples).
+    Existing instances will need to be shelved-and-unshelved or cold migrated
+    for the metadata to be populated.
