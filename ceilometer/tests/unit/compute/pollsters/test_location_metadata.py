@@ -69,11 +69,15 @@ class TestLocationMetadata(base.BaseTestCase):
                                     'hostId': '1234-5678',
                                     'OS-EXT-SRV-ATTR:host': 'host-test',
                                     'flavor': {'name': 'm1.tiny',
-                                               'id': 1,
+                                               'id': ('eba4213d-3c6c-'
+                                                      '4b5f-8158-'
+                                                      'dd0022d71d62'),
                                                'disk': 20,
                                                'ram': 512,
                                                'vcpus': 2,
-                                               'ephemeral': 0},
+                                               'ephemeral': 0,
+                                               'extra_specs': {
+                                                   'hw_rng:allowed': 'true'}},
                                     'metadata': {'metering.autoscale.group':
                                                  'X' * 512,
                                                  'metering.ephemeral_gb': 42}}

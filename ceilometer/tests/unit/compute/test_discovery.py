@@ -10,6 +10,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+import argparse
 import datetime
 from unittest import mock
 
@@ -28,7 +30,117 @@ LIBVIRT_METADATA_XML = """
   <package version="14.0.0"/>
   <name>test.dom.com</name>
   <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny" id="eba4213d-3c6c-4b5f-8158-dd0022d71d62">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+    <extraSpecs>
+      <extraSpec name="hw_rng:allowed">true</extraSpec>
+    </extraSpecs>
+  </flavor>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+  <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_OLD = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
   <flavor name="m1.tiny">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+  </flavor>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+  <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_EMPTY_FLAVOR_ID = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny" id="">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+    <extraSpecs>
+      <extraSpec name="hw_rng:allowed">true</extraSpec>
+    </extraSpecs>
+  </flavor>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+  <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_NO_FLAVOR_ID = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+    <extraSpecs>
+      <extraSpec name="hw_rng:allowed">true</extraSpec>
+    </extraSpecs>
+  </flavor>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+  <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_EMPTY_FLAVOR_EXTRA_SPECS = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny" id="eba4213d-3c6c-4b5f-8158-dd0022d71d62">
+    <memory>512</memory>
+    <disk>1</disk>
+    <swap>0</swap>
+    <ephemeral>0</ephemeral>
+    <vcpus>1</vcpus>
+    <extraSpecs></extraSpecs>
+  </flavor>
+  <owner>
+    <user uuid="a1f4684e58bd4c88aefd2ecb0783b497">admin</user>
+    <project uuid="d99c829753f64057bc0f2030da309943">admin</project>
+  </owner>
+  <root type="image" uuid="bdaf114a-35e9-4163-accd-226d5944bf11"/>
+</instance>
+"""
+
+LIBVIRT_METADATA_XML_NO_FLAVOR_EXTRA_SPECS = """
+<instance>
+  <package version="14.0.0"/>
+  <name>test.dom.com</name>
+  <creationTime>2016-11-16 07:35:06</creationTime>
+  <flavor name="m1.tiny" id="eba4213d-3c6c-4b5f-8158-dd0022d71d62">
     <memory>512</memory>
     <disk>1</disk>
     <swap>0</swap>
@@ -75,6 +187,10 @@ LIBVIRT_MANUAL_INSTANCE_DESC_XML = """
 
 
 class FakeDomain:
+    def __init__(self, desc=None, metadata=None):
+        self._desc = desc or LIBVIRT_DESC_XML
+        self._metadata = metadata or LIBVIRT_METADATA_XML
+
     def state(self):
         return [1, 2]
 
@@ -85,15 +201,18 @@ class FakeDomain:
         return "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27"
 
     def XMLDesc(self):
-        return LIBVIRT_DESC_XML
+        return self._desc
 
     def metadata(self, flags, url):
-        return LIBVIRT_METADATA_XML
+        return self._metadata
 
 
 class FakeConn:
+    def __init__(self, domains=None):
+        self._domains = domains or [FakeDomain()]
+
     def listAllDomains(self):
-        return [FakeDomain()]
+        return list(self._domains)
 
     def isAlive(self):
         return True
@@ -149,8 +268,13 @@ class TestDiscovery(base.BaseTestCase):
         # FIXME(sileht): This is wrong, this should be a uuid
         # The internal id of nova can't be retrieved via API or notification
         self.instance.id = 1
-        self.instance.flavor = {'name': 'm1.small', 'id': 2, 'vcpus': 1,
-                                'ram': 512, 'disk': 20, 'ephemeral': 0}
+        self.instance.flavor = {'name': 'm1.small',
+                                'id': 'eba4213d-3c6c-4b5f-8158-dd0022d71d62',
+                                'vcpus': 1,
+                                'ram': 512,
+                                'disk': 20,
+                                'ephemeral': 0,
+                                'extra_specs': {'hw_rng:allowed': 'true'}}
         self.instance.status = 'active'
         self.instance.metadata = {
             'fqdn': 'vm_fqdn',
@@ -220,15 +344,25 @@ class TestDiscovery(base.BaseTestCase):
         self.client.instance_get_all_by_host.assert_called_once_with(
             self.CONF.host, "2016-01-01T00:00:00+00:00")
 
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
     @mock.patch("ceilometer.compute.virt.libvirt.utils."
                 "refresh_libvirt_connection")
-    def test_discovery_with_libvirt(self, mock_libvirt_conn):
+    def test_discovery_with_libvirt(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
         mock_libvirt_conn.return_value = FakeConn()
+        mock_get_server.return_value = argparse.Namespace(
+            metadata={"metering.server_group": "group1"})
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_called_with(
+            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
 
         self.assertEqual(1, len(resources))
         r = list(resources)[0]
@@ -254,6 +388,15 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual("a75c2fa5-6c03-45a8-bbf7-b993cfcdec27",
                          metadata["instance_id"])
         self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1,
+                          "extra_specs": {"hw_rng:allowed": "true"}},
+                         metadata["flavor"])
         self.assertEqual(
             "4d0bc931ea7f0513da2efd9acb4cf3a273c64b7bcc544e15c070e662",
             metadata["host"])
@@ -262,6 +405,330 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual("running", metadata["state"])
         self.assertEqual("hvm", metadata["os_type"])
         self.assertEqual("x86_64", metadata["architecture"])
+        self.assertEqual({"server_group": "group1"},
+                         metadata["user_metadata"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_old(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(metadata=LIBVIRT_METADATA_XML_OLD)])
+        mock_get_server.return_value = argparse.Namespace(
+            flavor={"id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62"},
+            metadata={"metering.server_group": "group1"})
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_called_with(
+            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+        self.assertEqual("a75c2fa5-6c03-45a8-bbf7-b993cfcdec27",
+                         s.resource_id)
+        self.assertEqual("d99c829753f64057bc0f2030da309943",
+                         s.project_id)
+        self.assertEqual("a1f4684e58bd4c88aefd2ecb0783b497",
+                         s.user_id)
+
+        metadata = s.resource_metadata
+        self.assertEqual(1, metadata["vcpus"])
+        self.assertEqual(512, metadata["memory_mb"])
+        self.assertEqual(1, metadata["disk_gb"])
+        self.assertEqual(0, metadata["ephemeral_gb"])
+        self.assertEqual(1, metadata["root_gb"])
+        self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
+                         metadata["image_ref"])
+        self.assertEqual("test.dom.com", metadata["display_name"])
+        self.assertEqual("instance-00000001", metadata["name"])
+        self.assertEqual("a75c2fa5-6c03-45a8-bbf7-b993cfcdec27",
+                         metadata["instance_id"])
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1},
+                         metadata["flavor"])
+        self.assertEqual(
+            "4d0bc931ea7f0513da2efd9acb4cf3a273c64b7bcc544e15c070e662",
+            metadata["host"])
+        self.assertEqual(self.CONF.host, metadata["instance_host"])
+        self.assertEqual("active", metadata["status"])
+        self.assertEqual("running", metadata["state"])
+        self.assertEqual("hvm", metadata["os_type"])
+        self.assertEqual("x86_64", metadata["architecture"])
+        self.assertEqual({"server_group": "group1"},
+                         metadata["user_metadata"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_no_extra_metadata(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn()
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_not_called()
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertNotIn("user_metadata", metadata)
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_empty_flavor_id_get_by_flavor(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(
+                metadata=LIBVIRT_METADATA_XML_EMPTY_FLAVOR_ID)])
+        mock_get_flavor_id.return_value = (
+            "eba4213d-3c6c-4b5f-8158-dd0022d71d62")
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_called_with("m1.tiny")
+        mock_get_server.assert_not_called()
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1,
+                          "extra_specs": {"hw_rng:allowed": "true"}},
+                         metadata["flavor"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_empty_flavor_id_get_by_server(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", True, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(
+                metadata=LIBVIRT_METADATA_XML_EMPTY_FLAVOR_ID)])
+        mock_get_server.return_value = argparse.Namespace(
+            flavor={"id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62"},
+            metadata={})
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_called_with(
+            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1,
+                          "extra_specs": {"hw_rng:allowed": "true"}},
+                         metadata["flavor"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_no_flavor_id_get_by_flavor(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(metadata=LIBVIRT_METADATA_XML_NO_FLAVOR_ID)])
+        mock_get_flavor_id.return_value = (
+            "eba4213d-3c6c-4b5f-8158-dd0022d71d62")
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_called_with("m1.tiny")
+        mock_get_server.assert_not_called()
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1,
+                          "extra_specs": {"hw_rng:allowed": "true"}},
+                         metadata["flavor"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_no_flavor_id_get_by_server(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", True, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(metadata=LIBVIRT_METADATA_XML_NO_FLAVOR_ID)])
+        mock_get_server.return_value = argparse.Namespace(
+            flavor={"id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62"},
+            metadata={})
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_called_with(
+            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1,
+                          "extra_specs": {"hw_rng:allowed": "true"}},
+                         metadata["flavor"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_empty_flavor_extra_specs(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(
+                metadata=LIBVIRT_METADATA_XML_EMPTY_FLAVOR_EXTRA_SPECS)])
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_not_called()
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1,
+                          "extra_specs": {}},
+                         metadata["flavor"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_no_flavor_extra_specs(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(
+                metadata=LIBVIRT_METADATA_XML_NO_FLAVOR_EXTRA_SPECS)])
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_not_called()
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual("m1.tiny", metadata["instance_type"])
+        self.assertEqual({"name": "m1.tiny",
+                          "id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62",
+                          "ram": 512,
+                          "disk": 1,
+                          "swap": 0,
+                          "ephemeral": 0,
+                          "vcpus": 1},
+                         metadata["flavor"])
 
     def test_discovery_with_legacy_resource_cache_cleanup(self):
         self.CONF.set_override("instance_discovery_method", "naive",
@@ -300,6 +767,25 @@ class TestDiscovery(base.BaseTestCase):
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
+
+    def test_get_flavor_id(self):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        fake_flavor = argparse.Namespace(
+            id="eba4213d-3c6c-4b5f-8158-dd0022d71d62")
+        self.client.nova_client.flavors.find.return_value = fake_flavor
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        self.assertEqual(fake_flavor.id, dsc.get_flavor_id("m1.tiny"))
+
+    def test_get_flavor_id_notfound(self):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.client.nova_client.flavors.find.side_effect = (
+            exceptions.NotFound(404))
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        self.assertIsNone(dsc.get_flavor_id("m1.tiny"))
 
     def test_get_server(self):
         self.client.nova_client = mock.MagicMock()

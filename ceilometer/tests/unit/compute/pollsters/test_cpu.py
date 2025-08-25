@@ -65,6 +65,8 @@ class TestCPUPollster(base.TestPollsterBase):
         self.assertEqual('active', samples[0].resource_metadata['status'])
         self.assertEqual('active', samples[0].resource_metadata['state'])
         self.assertIsNone(samples[0].resource_metadata['task_state'])
+        self.assertEqual(self.instance.flavor,
+                         samples[0].resource_metadata['flavor'])
 
     def test_get_reserved_metadata_with_keys(self):
         self.CONF.set_override('reserved_metadata_keys', ['fqdn'])

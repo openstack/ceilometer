@@ -62,7 +62,18 @@ OPTS = [
                     "The minimum should be the value of the config option "
                     "of resource_update_interval. This option is only used "
                     "for agent polling to Nova API, so it will work only "
-                    "when 'instance_discovery_method' is set to 'naive'.")
+                    "when 'instance_discovery_method' is set to 'naive'."),
+    cfg.BoolOpt('fetch_extra_metadata',
+                default=True,
+                help="Whether or not additional instance attributes that "
+                     "require Nova API queries should be fetched. Currently "
+                     "the only value that requires fetching from Nova API is "
+                     "'metadata', the attribute storing user-configured "
+                     "server metadata, which is used to fill out some "
+                     "optional fields such as the server group of an "
+                     "instance. fetch_extra_metadata is currently set to "
+                     "True by default, but to reduce the load on Nova API "
+                     "this will be changed to False in a future release."),
 ]
 
 LOG = log.getLogger(__name__)
@@ -93,7 +104,8 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
         self.expiration_time = conf.compute.resource_update_interval
         self.cache_expiry = conf.compute.resource_cache_expiry
         if self.method == "libvirt_metadata":
-            # 4096 instances on a compute should be enough :)
+            # 4096 resources on a compute should be enough :)
+            self._flavor_id_cache = cachetools.LRUCache(4096)
             self._server_cache = cachetools.LRUCache(4096)
         else:
             self.lock = threading.Lock()
@@ -119,8 +131,49 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             return int(elem.text)
         return 0
 
+    def _get_flavor_id(self, flavor_xml, instance_id):
+        flavor_name = flavor_xml.attrib["name"]
+        # Flavor ID is available in libvirt metadata from 2025.2 onwards.
+        flavor_id = flavor_xml.attrib.get("id")
+        if flavor_id:
+            return flavor_id
+        # If not found in libvirt metadata, fallback to API queries.
+        # If we already have the server metadata get the flavor ID from there.
+        if self.conf.compute.fetch_extra_metadata:
+            server = self.get_server(instance_id)
+            if server:
+                return server.flavor["id"]
+        # If server metadata is not otherwise fetched, or the query failed,
+        # query just the flavor for better cache hit rates.
+        return (self.get_flavor_id(flavor_name) or flavor_name)
+
+    def _get_flavor_extra_specs(self, flavor_xml):
+        # Extra specs are available in libvirt metadata from 2025.2 onwards.
+        # Note that this checks for existence of the element, not whether
+        # or not it is empty, as it *can* exist but have nothing set in it.
+        extra_specs = flavor_xml.find("./extraSpecs")
+        if extra_specs is not None:
+            return {
+                extra_spec.attrib["name"]: extra_spec.text
+                for extra_spec in extra_specs.findall("./extraSpec")}
+        # If not found in libvirt metadata, return None to signify
+        # "not fetched", as we don't support performing additional
+        # API queries just for the extra specs.
+        return None
+
+    @cachetools.cachedmethod(operator.attrgetter('_flavor_id_cache'))
+    def get_flavor_id(self, name):
+        LOG.debug("Querying metadata for flavor %s from Nova API", name)
+        try:
+            return self.nova_cli.nova_client.flavors.find(
+                name=name,
+                is_public=None).id
+        except exceptions.NotFound:
+            return None
+
     @cachetools.cachedmethod(operator.attrgetter('_server_cache'))
     def get_server(self, uuid):
+        LOG.debug("Querying metadata for instance %s from Nova API", uuid)
         try:
             return self.nova_cli.nova_client.servers.get(uuid)
         except exceptions.NotFound:
@@ -130,6 +183,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
     def discover_libvirt_polling(self, manager, param=None):
         instances = []
         for domain in self.connection.listAllDomains():
+            instance_id = domain.UUIDString()
             xml_string = libvirt_utils.instance_metadata(domain)
             if xml_string is None:
                 continue
@@ -137,15 +191,6 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
             full_xml = etree.fromstring(domain.XMLDesc())
             os_type_xml = full_xml.find("./os/type")
             metadata_xml = etree.fromstring(xml_string)
-
-            # TODO(sileht, jwysogla): We don't have the flavor ID
-            # and server metadata here. We currently poll nova to get
-            # the flavor ID, but storing the
-            # flavor_id doesn't have any sense because the flavor description
-            # can change over the time, we should store the detail of the
-            # flavor. this is why nova doesn't put the id in the libvirt
-            # metadata. I think matadata field could be eventually added to
-            # the libvirt matadata created by nova.
 
             try:
                 flavor_xml = metadata_xml.find(
@@ -158,11 +203,10 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                     "./name").text
                 instance_arch = os_type_xml.attrib["arch"]
 
-                server = self.get_server(domain.UUIDString())
-                flavor_id = (server.flavor["id"] if server is not None
-                             else flavor_xml.attrib["name"])
+                extra_specs = self._get_flavor_extra_specs(flavor_xml)
+
                 flavor = {
-                    "id": flavor_id,
+                    "id": self._get_flavor_id(flavor_xml, instance_id),
                     "name": flavor_xml.attrib["name"],
                     "vcpus": self._safe_find_int(flavor_xml, "vcpus"),
                     "ram": self._safe_find_int(flavor_xml, "memory"),
@@ -170,18 +214,28 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                     "ephemeral": self._safe_find_int(flavor_xml, "ephemeral"),
                     "swap": self._safe_find_int(flavor_xml, "swap"),
                 }
+                if extra_specs is not None:
+                    flavor["extra_specs"] = extra_specs
 
                 # The image description is partial, but Gnocchi only care about
                 # the id, so we are fine
                 image_xml = metadata_xml.find("./root[@type='image']")
                 image = ({'id': image_xml.attrib['uuid']}
                          if image_xml is not None else None)
-                metadata = server.metadata if server is not None else {}
+
+                # Getting the server metadata requires expensive Nova API
+                # queries, and may potentially contain sensitive user info,
+                # so it is only fetched when configured to do so.
+                if self.conf.compute.fetch_extra_metadata:
+                    server = self.get_server(instance_id)
+                    metadata = server.metadata if server is not None else {}
+                else:
+                    metadata = {}
             except AttributeError:
                 LOG.error(
                     "Fail to get domain uuid %s metadata: "
                     "metadata was missing expected attributes",
-                    domain.UUIDString())
+                    instance_id)
                 continue
 
             dom_state = domain.state()[0]
@@ -194,7 +248,7 @@ class InstanceDiscovery(plugin_base.DiscoveryBase):
                 (project_id + self.conf.host).encode('utf-8')).hexdigest()
 
             instance_data = {
-                "id": domain.UUIDString(),
+                "id": instance_id,
                 "name": instance_name,
                 "flavor": flavor,
                 "image": image,
