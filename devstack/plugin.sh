@@ -140,7 +140,7 @@ function configure_gnocchi {
 
     rm -f "$GNOCCHI_UWSGI_FILE"
 
-    write_uwsgi_config "$GNOCCHI_UWSGI_FILE" "$CEILOMETER_BIN_DIR/gnocchi-api" "/metric"
+    write_uwsgi_config "$GNOCCHI_UWSGI_FILE" "$GNOCCHI_WSGI" "/metric" "" "gnocchi"
 
     if [ -n "$GNOCCHI_COORDINATOR_URL" ]; then
         iniset $GNOCCHI_CONF coordination_url "$GNOCCHI_COORDINATOR_URL"
