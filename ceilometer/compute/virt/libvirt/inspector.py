@@ -207,11 +207,14 @@ class LibvirtInspector(virt_inspector.Inspector):
     def inspect_instance(self, instance, duration=None):
         domain = self._get_domain_not_shut_off_or_raise(instance)
 
+        memory_actual = None
         memory_available = None
         memory_used = memory_resident = None
         memory_swap_in = memory_swap_out = None
         memory_stats = domain.memoryStats()
         # Stat provided from libvirt is in KB, converting it to MB.
+        if 'actual' in memory_stats:
+            memory_actual = memory_stats['actual'] / units.Ki
         if 'available' in memory_stats:
             memory_available = memory_stats['available'] / units.Ki
         if 'usable' in memory_stats and 'available' in memory_stats:
@@ -254,6 +257,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             power_state=domain.info()[0],
             cpu_number=stats.get('vcpu.current'),
             cpu_time=cpu_time,
+            memory_actual=memory_actual,
             memory_available=memory_available,
             memory_usage=memory_used,
             memory_resident=memory_resident,

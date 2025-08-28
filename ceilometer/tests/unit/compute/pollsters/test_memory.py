@@ -25,8 +25,8 @@ class TestMemoryPollster(base.TestPollsterBase):
 
     def test_get_samples(self):
         self._mock_inspect_instance(
-            virt_inspector.InstanceStats(memory_available=1024.0),
-            virt_inspector.InstanceStats(memory_available=2048.0),
+            virt_inspector.InstanceStats(memory_actual=1024.0),
+            virt_inspector.InstanceStats(memory_actual=2048.0),
             virt_inspector.InstanceStats(),
             virt_inspector.InstanceShutOffException(),
         )

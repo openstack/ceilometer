@@ -52,7 +52,8 @@ class TestLibvirtInspection(base.BaseTestCase):
     def test_inspect_instance_stats(self):
         domain = mock.Mock()
         domain.info.return_value = (0, 0, 0, 2, 999999)
-        domain.memoryStats.return_value = {'available': 51200,
+        domain.memoryStats.return_value = {'actual': 54400,
+                                           'available': 51200,
                                            'unused': 25600,
                                            'rss': 30000,
                                            'swap_in': 5120,
@@ -78,6 +79,7 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(0, stats.power_state)
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(40000, stats.cpu_time)
+            self.assertEqual(54400 / units.Ki, stats.memory_actual)
             self.assertEqual(51200 / units.Ki, stats.memory_available)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)
@@ -466,6 +468,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertIsNone(stats.memory_actual)
             self.assertIsNone(stats.memory_available)
             self.assertIsNone(stats.memory_usage)
             self.assertIsNone(stats.memory_resident)
@@ -475,7 +478,8 @@ class TestLibvirtInspection(base.BaseTestCase):
     def test_inspect_memory_with_usable(self):
         domain = mock.Mock()
         domain.info.return_value = (0, 0, 0, 2, 999999)
-        domain.memoryStats.return_value = {'available': 76800,
+        domain.memoryStats.return_value = {'actual': 80000,
+                                           'available': 76800,
                                            'rss': 30000,
                                            'swap_in': 5120,
                                            'swap_out': 8192,
@@ -488,6 +492,7 @@ class TestLibvirtInspection(base.BaseTestCase):
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
             stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertEqual(80000 / units.Ki, stats.memory_actual)
             self.assertEqual(76800 / units.Ki, stats.memory_available)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
             self.assertEqual(30000 / units.Ki, stats.memory_resident)

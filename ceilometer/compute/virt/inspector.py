@@ -43,7 +43,8 @@ class InstanceStats:
         'power_state',       # the power state of the domain
         'cpu_number',        # number: number of CPUs
         'cpu_time',          # time: cumulative CPU time
-        'memory_available',  # available: Amount of allocated memory
+        'memory_actual',     # actual: Amount of allocated memory
+        'memory_available',  # available: Amount of usable memory
         'memory_usage',      # usage: Amount of memory used
         'memory_resident',   #
         'memory_swap_in',    # memory swap in
