@@ -228,6 +228,14 @@ The following meters are collected for OpenStack Compute.
 | power.sta\| Gauge | state| instance | Pollster | Libvirt | virDomainState   |
 | te        |       |      | ID       |          |         | of the VM        |
 +-----------+-------+------+----------+----------+---------+------------------+
+| **Meters added in the Flamingo release**                                    |
++-----------+-------+------+----------+----------+---------+------------------+
+| memory.\  | Gauge | MB   | instance | Pollster | Libvirt | Volume of RAM    |
+| available |       |      | ID       |          |         | available to the |
+|           |       |      |          |          |         | instance as seen |
+|           |       |      |          |          |         | from within the  |
+|           |       |      |          |          |         | instance         |
++-----------+-------+------+----------+----------+---------+------------------+
 
 .. note::
 

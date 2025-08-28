@@ -5,6 +5,7 @@ sources:
       meters:
         - power.state
         - cpu
+        - memory.available
         - memory.usage
         - network.incoming.bytes
         - network.incoming.packets

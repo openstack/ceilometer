@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Added a new ``memory.available`` compute pollster metric, for tracking the
+    amount of memory available within the instance, as seen by the instance.
+    This can be combined with ``memory.usage`` in Gnocchi aggregate queries to
+    get memory usage for an instance as a percentage.

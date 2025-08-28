@@ -50,6 +50,12 @@ class MemoryPollster(InstanceStatsPollster):
     sample_stats_key = 'memory_actual'
 
 
+class MemoryAvailablePollster(InstanceStatsPollster):
+    sample_name = 'memory.available'
+    sample_unit = 'MB'
+    sample_stats_key = 'memory_available'
+
+
 class MemoryUsagePollster(InstanceStatsPollster):
     sample_name = 'memory.usage'
     sample_unit = 'MB'
