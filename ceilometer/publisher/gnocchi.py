@@ -292,14 +292,14 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                         domain_id=domain.id)
                 except ka_exceptions.NotFound:
                     LOG.warning('Filtered project [%s] not found in keystone, '
-                                'ignoring the filter_project option' %
+                                'ignoring the filter_project option',
                                 self.filter_project)
 
                     self.filter_project = None
                     return None
                 except Exception:
-                    LOG.exception('Failed to retrieve filtered project [%s].'
-                                  % self.filter_project)
+                    LOG.exception('Failed to retrieve filtered project [%s].',
+                                  self.filter_project)
                     raise
                 self._gnocchi_project_id = project.id
                 LOG.debug("Filtered project [%s] found with ID [%s].",
@@ -376,7 +376,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                 rd = self.metric_map.get(metric_name)
                 if rd is None:
                     if metric_name not in self._already_logged_metric_names:
-                        LOG.warning("metric %s is not handled by Gnocchi" %
+                        LOG.warning("metric %s is not handled by Gnocchi",
                                     metric_name)
                         self._already_logged_metric_names.add(metric_name)
                     continue
@@ -623,4 +623,5 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         except Exception:
             LOG.error("Fail to update the resource %s", resource,
                       exc_info=True)
-        LOG.debug('Resource {} ended at {}'.format(resource["id"], ended_at))
+        LOG.debug('Resource %(resource_id)s ended at %(ended_at)s',
+                  {'resource_id': resource["id"], 'ended_at': ended_at})

@@ -90,7 +90,7 @@ class EventSink(base.Sink):
                     p.publish_events(events)
                 except Exception:
                     LOG.error("Pipeline %(pipeline)s: %(status)s "
-                              "after error from publisher %(pub)s" %
+                              "after error from publisher %(pub)s",
                               {'pipeline': self,
                                'status': 'Continue' if
                                self.multi_publish else 'Exit', 'pub': p},

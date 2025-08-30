@@ -105,12 +105,11 @@ class GenericComputePollster(plugin_base.PollsterBase):
 
     def _stats_to_sample(self, instance, stats, polled_time):
         volume = getattr(stats, self.sample_stats_key)
-        LOG.debug("%(instance_id)s/%(name)s volume: "
-                  "%(volume)s" % {
-                      'name': self.sample_name,
-                      'instance_id': instance.id,
-                      'volume': (volume if volume is not None
-                                 else 'Unavailable')})
+        LOG.debug(
+            "%(instance_id)s/%(name)s volume: %(volume)s",
+            {'name': self.sample_name,
+             'instance_id': instance.id,
+             'volume': (volume if volume is not None else 'Unavailable')})
 
         if volume is None:
             raise NoVolumeException()
@@ -142,7 +141,7 @@ class GenericComputePollster(plugin_base.PollsterBase):
                 # FIXME(sileht): This should be a removed... but I will
                 # not change the test logic for now
                 LOG.warning("%(name)s statistic in not available for "
-                            "instance %(instance_id)s" %
+                            "instance %(instance_id)s",
                             {'name': self.sample_name,
                              'instance_id': instance.id})
             except virt_inspector.InstanceNotFoundException as err:

@@ -263,14 +263,15 @@ class NotificationEventsConverter:
                 break
 
         if edef is None:
-            msg = (_('Dropping Notification %(type)s (uuid:%(msgid)s)')
-                   % dict(type=event_type, msgid=message_id))
             if self.conf.event.drop_unmatched_notifications:
-                LOG.debug(msg)
+                msg_level = log.DEBUG
             else:
                 # If drop_unmatched_notifications is False, this should
                 # never happen. (mdragon)
-                LOG.error(msg)
+                msg_level = log.ERROR
+            LOG.log(msg_level,
+                    'Dropping Notification %(type)s (uuid:%(msgid)s)',
+                    dict(type=event_type, msgid=message_id))
             return None
 
         return edef.to_event(priority, notification_body)

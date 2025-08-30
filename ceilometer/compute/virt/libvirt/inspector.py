@@ -117,9 +117,10 @@ class LibvirtInspector(virt_inspector.Inspector):
             try:
                 dom_stats = domain.interfaceStats(name)
             except libvirt.libvirtError as ex:
-                LOG.warning(_("Error from libvirt when running instanceStats, "
-                              "This may not be harmful, but please check : "
-                              "%(ex)s") % {'ex': ex})
+                LOG.warning("Error from libvirt when running instanceStats, "
+                            "This may not be harmful, but please check : "
+                            "%(ex)s",
+                            {'ex': ex})
                 continue
 
             # Retrieve previous values
@@ -139,8 +140,8 @@ class LibvirtInspector(virt_inspector.Inspector):
                 if tx_delta < 0:
                     tx_delta = dom_stats[4]
             else:
-                LOG.debug('No delta meter predecessor for %s / %s' %
-                          (instance.id, name))
+                LOG.debug('No delta meter predecessor for %s / %s',
+                          instance.id, name)
                 rx_delta = 0
                 tx_delta = 0
 
@@ -183,9 +184,9 @@ class LibvirtInspector(virt_inspector.Inspector):
             except libvirt.libvirtError as ex:
                 # raised error even if lock is acquired while live migration,
                 # even it looks normal.
-                LOG.warning(_("Error from libvirt while checking blockStats, "
-                              "This may not be harmful, but please check : "
-                              "%(ex)s") % {'ex': ex})
+                LOG.warning("Error from libvirt while checking blockStats, "
+                            "This may not be harmful, but please check : "
+                            "%(ex)s", {'ex': ex})
                 pass
 
     @libvirt_utils.retry_on_disconnect

@@ -21,7 +21,6 @@ from oslo_log import log
 import oslo_messaging
 from stevedore import named
 
-from ceilometer.i18n import _
 from ceilometer import messaging
 
 
@@ -109,7 +108,7 @@ class NotificationService(cotyledon.Service):
 
     @staticmethod
     def _log_missing_pipeline(names):
-        LOG.error(_('Could not load the following pipelines: %s'), names)
+        LOG.error('Could not load the following pipelines: %s', names)
 
     def run(self):
         # Delay startup so workers are jittered

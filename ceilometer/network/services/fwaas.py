@@ -17,7 +17,6 @@ import warnings
 
 from oslo_log import log
 
-from ceilometer.i18n import _
 from ceilometer.network.services import base
 from ceilometer import sample
 
@@ -49,13 +48,13 @@ class FirewallPollster(base.BaseServicesPollster):
         resources = resources or []
 
         for fw in resources:
-            LOG.debug("Firewall : %s" % fw)
+            LOG.debug("Firewall : %s", fw)
             status = self.get_status_id(fw['status'])
             if status == -1:
                 # unknown status, skip this sample
-                LOG.warning(_("Unknown status %(stat)s received on fw %(id)s,"
-                            "skipping sample") % {'stat': fw['status'],
-                                                  'id': fw['id']})
+                LOG.warning("Unknown status %(stat)s received on fw %(id)s,"
+                            "skipping sample",
+                            {'stat': fw['status'], 'id': fw['id']})
                 continue
 
             yield sample.Sample(
@@ -96,7 +95,7 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
         resources = resources or []
 
         for fw in resources:
-            LOG.debug("Firewall Policy: %s" % fw)
+            LOG.debug("Firewall Policy: %s", fw)
 
             yield sample.Sample(
                 name='network.services.firewall.policy',

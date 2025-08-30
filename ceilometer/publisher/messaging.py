@@ -26,7 +26,6 @@ import oslo_messaging
 from oslo_utils import excutils
 from urllib import parse as urlparse
 
-from ceilometer.i18n import _
 from ceilometer import messaging
 from ceilometer import publisher
 from ceilometer.publisher import utils
@@ -88,8 +87,8 @@ class MessagingPublisher(publisher.ConfigPublisherBase, metaclass=abc.ABCMeta):
         if self.policy in ['default', 'queue', 'drop']:
             LOG.info('Publishing policy set to %s', self.policy)
         else:
-            LOG.warning(_('Publishing policy is unknown (%s) force to '
-                          'default'), self.policy)
+            LOG.warning('Publishing policy is unknown (%s) force to default',
+                        self.policy)
             self.policy = 'default'
 
         self.retry = 1 if self.policy in ['queue', 'drop'] else None
@@ -142,8 +141,8 @@ class MessagingPublisher(publisher.ConfigPublisherBase, metaclass=abc.ABCMeta):
         if queue_length > self.max_queue_length > 0:
             count = queue_length - self.max_queue_length
             self.local_queue = self.local_queue[count:]
-            LOG.warning(_("Publisher max local_queue length is exceeded, "
-                        "dropping %d oldest samples") % count)
+            LOG.warning("Publisher max local_queue length is exceeded, "
+                        "dropping %d oldest samples", count)
 
     def _process_queue(self, queue, policy):
         current_retry = 0
@@ -154,12 +153,12 @@ class MessagingPublisher(publisher.ConfigPublisherBase, metaclass=abc.ABCMeta):
             except DeliveryFailure:
                 data = sum([len(m) for __, m in queue])
                 if policy == 'queue':
-                    LOG.warning(_("Failed to publish %d datapoints, queue "
-                                  "them"), data)
+                    LOG.warning("Failed to publish %d datapoints, queue them",
+                                data)
                     return queue
                 elif policy == 'drop':
-                    LOG.warning(_("Failed to publish %d datapoints, "
-                                "dropping them"), data)
+                    LOG.warning("Failed to publish %d datapoints, "
+                                "dropping them", data)
                     return []
                 current_retry += 1
                 if current_retry >= self.max_retry:

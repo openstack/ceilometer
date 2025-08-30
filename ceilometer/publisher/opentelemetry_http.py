@@ -122,7 +122,7 @@ class OpentelemetryHttpPublisher(http.HttpPublisher):
             return [self.get_data_points_model(
                 sample.timestamp, attributes, sample.volume)]
         except Exception as e:
-            LOG.warning("Get data point error, %s" % e)
+            LOG.warning("Get data point error, %s", e)
             return []
 
     def get_opentelemetry_model(self, sample):

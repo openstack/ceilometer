@@ -432,8 +432,8 @@ class PollingTask:
             self.resources[key].blacklist.extend(err.fail_res_list)
         except Exception as err:
             LOG.error(
-                'Continue after error from %(name)s: %(error)s'
-                % ({'name': pollster.name, 'error': err}),
+                'Continue after error from %(name)s: %(error)s',
+                {'name': pollster.name, 'error': err},
                 exc_info=True)
 
     def _send_notification(self, samples):

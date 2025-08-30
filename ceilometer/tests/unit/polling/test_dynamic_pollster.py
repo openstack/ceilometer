@@ -1274,7 +1274,7 @@ class TestDynamicPollster(base.BaseTestCase):
                 samples_list.append(s)
         except RuntimeError as e:
             LOG.debug("Generator threw a StopIteration "
-                      "and we need to catch it [%s]." % e)
+                      "and we need to catch it [%s].", e)
 
         self.assertEqual(0, len(samples_list))
 

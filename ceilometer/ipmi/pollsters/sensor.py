@@ -14,7 +14,6 @@
 
 from oslo_log import log
 
-from ceilometer.i18n import _
 from ceilometer.ipmi.notifications import ironic as parser
 from ceilometer.ipmi.platform import exception as ipmiexcept
 from ceilometer.ipmi.platform import ipmi_sensor
@@ -64,12 +63,11 @@ class SensorPollster(plugin_base.PollsterBase):
             stats = self.ipmi.read_sensor_any(self.METRIC)
         except ipmiexcept.IPMIException:
             self.polling_failures += 1
-            LOG.warning(_(
-                'Polling %(mtr)s sensor failed for %(cnt)s times!')
-                % ({'mtr': self.METRIC,
-                    'cnt': self.polling_failures}))
+            LOG.warning(
+                'Polling %(mtr)s sensor failed for %(cnt)s times!',
+                {'mtr': self.METRIC, 'cnt': self.polling_failures})
             if 0 <= self.conf.ipmi.polling_retry < self.polling_failures:
-                LOG.warning(_('Pollster for %s is disabled!') % self.METRIC)
+                LOG.warning('Pollster for %s is disabled!', self.METRIC)
                 raise plugin_base.PollsterPermanentError(resources)
             else:
                 return

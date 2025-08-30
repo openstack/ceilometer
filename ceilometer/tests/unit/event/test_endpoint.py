@@ -168,7 +168,8 @@ class TestEventEndpoint(tests_base.BaseTestCase):
             self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
             exception_mock = mock_logger.error
             self.assertIn('Exit after error from publisher',
-                          exception_mock.call_args_list[0][0][0])
+                          exception_mock.call_args_list[0][0][0] %
+                          exception_mock.call_args_list[0][0][1])
 
     def test_message_to_event_bad_event_multi_publish(self):
 
@@ -188,4 +189,5 @@ class TestEventEndpoint(tests_base.BaseTestCase):
             self.assertEqual(oslo_messaging.NotificationResult.HANDLED, ret)
             exception_mock = mock_logger.error
             self.assertIn('Continue after error from publisher',
-                          exception_mock.call_args_list[0][0][0])
+                          exception_mock.call_args_list[0][0][0] %
+                          exception_mock.call_args_list[0][0][1])
