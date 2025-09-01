@@ -36,15 +36,15 @@ class ConverterBase(base.BaseTestCase):
                     )
 
     def assertIsValidEvent(self, event, notification):
-        self.assertIsNot(
-            None, event,
+        self.assertIsNotNone(
+            event,
             "Notification dropped unexpectedly:"
             " %s" % str(notification))
         self.assertIsInstance(event, models.Event)
 
     def assertIsNotValidEvent(self, event, notification):
-        self.assertIs(
-            None, event,
+        self.assertIsNone(
+            event,
             "Notification NOT dropped when expected to be dropped:"
             " %s" % str(notification))
 

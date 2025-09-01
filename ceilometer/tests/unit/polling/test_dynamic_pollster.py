@@ -1254,7 +1254,7 @@ class TestDynamicPollster(base.BaseTestCase):
             self.pollster_definition_only_required_fields)
         samples = pollster.get_samples(None, None, None)
 
-        self.assertEqual(None, next(samples))
+        self.assertIsNone(next(samples))
 
     @mock.patch('ceilometer.polling.dynamic_pollster.'
                 'PollsterSampleGatherer.execute_request_get_samples')

@@ -993,4 +993,4 @@ class TestDiscovery(base.BaseTestCase):
         dsc = discovery.InstanceDiscovery(self.CONF)
 
         ret_server = dsc.get_server(uuid)
-        self.assertEqual(None, ret_server)
+        self.assertIsNone(ret_server)
