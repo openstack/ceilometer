@@ -22,7 +22,6 @@ from oslo_log import log
 from oslo_utils import netutils
 
 import ceilometer
-from ceilometer.i18n import _
 from ceilometer import publisher
 from ceilometer.publisher import utils
 
@@ -72,7 +71,7 @@ class UDPPublisher(publisher.ConfigPublisherBase):
                 self.socket.sendto(msgpack.dumps(msg, use_bin_type=True),
                                    (self.host, self.port))
             except Exception as e:
-                LOG.warning(_("Unable to send sample over UDP"))
+                LOG.warning("Unable to send sample over UDP")
                 LOG.exception(e)
 
     def publish_events(self, events):

@@ -146,7 +146,7 @@ class SensorNotification(endpoint.SampleEndpoint):
 
             except InvalidSensorData as exc:
                 LOG.warning(
-                    'invalid sensor data for %(resource)s: %(error)s' %
+                    'invalid sensor data for %(resource)s: %(error)s',
                     dict(resource=resource_id, error=exc)
                 )
                 continue

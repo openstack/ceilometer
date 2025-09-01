@@ -345,7 +345,8 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(2, len(self.handler.definitions))
         args, kwargs = LOG.error.call_args_list[0]
         self.assertEqual("Error loading meter definition: %s", args[0])
-        self.assertTrue(args[1].endswith("Invalid type bad_type specified"))
+        self.assertTrue(
+            str(args[1]).endswith("Invalid type bad_type specified"))
 
     def test_jsonpath_values_parsed(self):
         cfg = yaml.dump(
@@ -687,8 +688,10 @@ class TestMeterProcessing(test.BaseTestCase):
         self._load_meter_def_file(cfg)
         c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
-        LOG.warning.assert_called_with('Only 0 fetched meters contain '
-                                       '"volume" field instead of 2.')
+        log_called_args = LOG.warning.call_args_list
+        self.assertEqual(
+            'Only 0 fetched meters contain "volume" field instead of 2.',
+            log_called_args[0][0][0] % log_called_args[0][0][1])
 
     @mock.patch('ceilometer.meter.notifications.LOG')
     def test_multi_meter_payload_invalid_short(self, LOG):
@@ -706,8 +709,10 @@ class TestMeterProcessing(test.BaseTestCase):
         self._load_meter_def_file(cfg)
         c = list(self.handler.build_sample(event))
         self.assertEqual(0, len(c))
-        LOG.warning.assert_called_with('Only 1 fetched meters contain '
-                                       '"volume" field instead of 2.')
+        log_called_args = LOG.warning.call_args_list
+        self.assertEqual(
+            'Only 1 fetched meters contain "volume" field instead of 2.',
+            log_called_args[0][0][0] % log_called_args[0][0][1])
 
     def test_arithmetic_expr_meter(self):
         cfg = yaml.dump(
@@ -910,4 +915,5 @@ class TestMeterProcessing(test.BaseTestCase):
             self.assertIn(s.as_dict()['name'], expected_names)
         args, kwargs = LOG.error.call_args_list[0]
         self.assertEqual("Error loading meter definition: %s", args[0])
-        self.assertTrue(args[1].endswith("Invalid type bad_type specified"))
+        self.assertTrue(
+            str(args[1]).endswith("Invalid type bad_type specified"))

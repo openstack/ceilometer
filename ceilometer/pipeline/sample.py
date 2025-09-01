@@ -43,10 +43,10 @@ class SampleEndpoint(base.NotificationEndpoint):
                           message, self.publisher, priority, self)
                 with self.publisher as p:
                     p(list(self.build_sample(message)))
-            except Exception as e:
-                LOG.error('Fail to process notification message [%s]'
-                          % message, exc_info=True)
-                raise e
+            except Exception:
+                LOG.error('Fail to process notification message [%s]',
+                          message, exc_info=True)
+                raise
 
     def build_sample(notification):
         """Build sample from provided notification."""
@@ -90,8 +90,8 @@ class SampleSink(base.Sink):
                     p.publish_samples(samples)
                 except Exception:
                     LOG.error("Pipeline %(pipeline)s: Continue after "
-                              "error from publisher %(pub)s"
-                              % {'pipeline': self, 'pub': p},
+                              "error from publisher %(pub)s",
+                              {'pipeline': self, 'pub': p},
                               exc_info=True)
 
     @staticmethod
@@ -108,10 +108,10 @@ class SamplePipeline(base.Pipeline):
             LOG.warning(
                 'metering data %(counter_name)s for %(resource_id)s '
                 '@ %(timestamp)s has no volume (volume: None), the sample will'
-                ' be dropped'
-                % {'counter_name': s.name,
-                   'resource_id': s.resource_id,
-                   'timestamp': s.timestamp if s.timestamp else 'NO TIMESTAMP'}
+                ' be dropped',
+                {'counter_name': s.name,
+                 'resource_id': s.resource_id,
+                 'timestamp': s.timestamp if s.timestamp else 'NO TIMESTAMP'}
             )
             return False
         if not isinstance(volume, (int, float)):
@@ -121,12 +121,12 @@ class SamplePipeline(base.Pipeline):
                 LOG.warning(
                     'metering data %(counter_name)s for %(resource_id)s '
                     '@ %(timestamp)s has volume which is not a number '
-                    '(volume: %(counter_volume)s), the sample will be dropped'
-                    % {'counter_name': s.name,
-                       'resource_id': s.resource_id,
-                       'timestamp': (
-                           s.timestamp if s.timestamp else 'NO TIMESTAMP'),
-                       'counter_volume': volume}
+                    '(volume: %(counter_volume)s), the sample will be dropped',
+                    {'counter_name': s.name,
+                     'resource_id': s.resource_id,
+                     'timestamp': (
+                         s.timestamp if s.timestamp else 'NO TIMESTAMP'),
+                     'counter_volume': volume}
                 )
                 return False
         return True

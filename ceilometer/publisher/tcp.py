@@ -22,7 +22,6 @@ from oslo_log import log
 from oslo_utils import netutils
 
 import ceilometer
-from ceilometer.i18n import _
 from ceilometer import publisher
 from ceilometer.publisher import utils
 
@@ -42,17 +41,17 @@ class TCPPublisher(publisher.ConfigPublisherBase):
             self.socket = socket.create_connection(self.inet_addr)
             return True
         except socket.gaierror:
-            LOG.error(_("Unable to resolv the remote %(host)s") %
+            LOG.error("Unable to resolv the remote %(host)s",
                       {'host': self.inet_addr[0],
                        'port': self.inet_addr[1]})
         except TimeoutError:
-            LOG.error(_("Unable to connect to the remote endpoint "
-                        "%(host)s:%(port)d. The connection timed out.") %
+            LOG.error("Unable to connect to the remote endpoint "
+                      "%(host)s:%(port)d. The connection timed out.",
                       {'host': self.inet_addr[0],
                        'port': self.inet_addr[1]})
         except ConnectionRefusedError:
-            LOG.error(_("Unable to connect to the remote endpoint "
-                        "%(host)s:%(port)d. Connection refused.") %
+            LOG.error("Unable to connect to the remote endpoint "
+                      "%(host)s:%(port)d. Connection refused.",
                       {'host': self.inet_addr[0],
                        'port': self.inet_addr[1]})
         return False
@@ -78,15 +77,15 @@ class TCPPublisher(publisher.ConfigPublisherBase):
                     self.socket.send(msg_len + encoded_msg)
                     continue
                 except OSError:
-                    LOG.warning(_("Unable to send sample over TCP, trying "
-                                  "to reconnect and resend the message"))
+                    LOG.warning("Unable to send sample over TCP, trying "
+                                "to reconnect and resend the message")
             if self.connect_socket():
                 try:
                     self.socket.send(msg_len + encoded_msg)
                     continue
                 except OSError:
                     pass
-            LOG.error(_("Unable to reconnect and resend sample over TCP"))
+            LOG.error("Unable to reconnect and resend sample over TCP")
             # NOTE (jokke): We do not handle exceptions in the calling code
             # so raising the exception from here needs quite a bit more work.
             # Same time we don't want to spam the retry messages as it's

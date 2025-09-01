@@ -145,7 +145,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
 
         self.session.mount(self.target, adapters.HTTPAdapter(**kwargs))
 
-        LOG.debug('HttpPublisher for endpoint %s is initialized!' %
+        LOG.debug('HttpPublisher for endpoint %s is initialized!',
                   self.target)
 
     @staticmethod
@@ -153,7 +153,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
         try:
             return cast(params.pop(name)[-1]) if cast else params.pop(name)[-1]
         except (ValueError, TypeError, KeyError):
-            LOG.debug('Default value %(value)s is used for %(name)s' %
+            LOG.debug('Default value %(value)s is used for %(name)s',
                       {'value': default_value, 'name': name})
             return default_value
 
@@ -180,7 +180,7 @@ class HttpPublisher(publisher.ConfigPublisherBase):
                       self.target, res.status_code)
         except requests.exceptions.HTTPError:
             LOG.exception('Status Code: %(code)s. '
-                          'Failed to dispatch message: %(data)s' %
+                          'Failed to dispatch message: %(data)s',
                           {'code': res.status_code, 'data': data})
 
     def publish_samples(self, samples):

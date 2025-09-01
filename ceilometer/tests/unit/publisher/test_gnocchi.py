@@ -339,9 +339,11 @@ class PublisherTest(base.BaseTestCase):
     def test_activity_gnocchi_project_not_found(self, logger):
         self.ks_client.projects.find.side_effect = ka_exceptions.NotFound
         self._do_test_activity_filter(2)
-        logger.warning.assert_called_with(
+        log_called_args = logger.warning.call_args_list
+        self.assertEqual(
             'Filtered project [service] not found in keystone, ignoring the '
-            'filter_project option')
+            'filter_project option',
+            log_called_args[0][0][0] % log_called_args[0][0][1])
 
     @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '._get_gnocchi_client')

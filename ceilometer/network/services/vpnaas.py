@@ -15,7 +15,6 @@
 
 from oslo_log import log
 
-from ceilometer.i18n import _
 from ceilometer.network.services import base
 from ceilometer import sample
 
@@ -45,11 +44,11 @@ class VPNServicesPollster(base.BaseServicesPollster):
             status = self.get_status_id(vpn['status'])
             if status == -1:
                 LOG.warning(
-                    _("Unknown status %(status)s for VPN %(name)s (%(id)s), "
-                      "setting volume to -1") % {
-                        "status": vpn['status'],
-                        "name": vpn['name'],
-                        "id": vpn['id']})
+                    "Unknown status %(status)s for VPN %(name)s (%(id)s), "
+                    "setting volume to -1",
+                    {"status": vpn['status'],
+                     "name": vpn['name'],
+                     "id": vpn['id']})
             yield sample.Sample(
                 name='network.services.vpn',
                 type=sample.TYPE_GAUGE,

@@ -172,7 +172,7 @@ class TestNotifications(base.BaseTestCase):
             'invalid sensor data for '
             'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad-pci_riser_1_temp_(0x33): '
             "missing 'Sensor Reading' in payload",
-            messages[0]
+            messages[0] % messages[1]
         )
 
     @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
@@ -188,7 +188,7 @@ class TestNotifications(base.BaseTestCase):
             'invalid sensor data for '
             'f4982fd2-2f2b-4bb5-9aff-48aac801d1ad-pci_riser_1_temp_(0x33): '
             'unable to parse sensor reading: some bad stuff',
-            messages[0]
+            messages[0] % messages[1]
         )
 
     @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
@@ -208,7 +208,7 @@ class TestNotifications(base.BaseTestCase):
         self.assertEqual(
             'invalid sensor data for missing id: missing key in payload: '
             "'node_uuid'",
-            messages[0]
+            messages[0] % messages[1]
         )
 
     @mock.patch('ceilometer.ipmi.notifications.ironic.LOG')
@@ -224,5 +224,5 @@ class TestNotifications(base.BaseTestCase):
         self.assertEqual(
             'invalid sensor data for missing id: missing key in payload: '
             "'Sensor ID'",
-            messages[0]
+            messages[0] % messages[1]
         )

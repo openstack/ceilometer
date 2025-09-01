@@ -196,12 +196,11 @@ class BasePipelineTestCase(base.BaseTestCase, metaclass=abc.ABCMeta):
 
         LOG.warning.assert_called_once_with(
             'metering data %(counter_name)s for %(resource_id)s '
-            '@ %(timestamp)s has no volume (volume: %(counter_volume)s), the '
-            'sample will be dropped'
-            % {'counter_name': test_s.name,
-               'resource_id': test_s.resource_id,
-               'timestamp': test_s.timestamp,
-               'counter_volume': test_s.volume})
+            '@ %(timestamp)s has no volume (volume: None), the '
+            'sample will be dropped',
+            {'counter_name': test_s.name,
+             'resource_id': test_s.resource_id,
+             'timestamp': test_s.timestamp})
 
         self.assertEqual(0, len(publisher.samples))
 
@@ -230,11 +229,11 @@ class BasePipelineTestCase(base.BaseTestCase, metaclass=abc.ABCMeta):
         LOG.warning.assert_called_once_with(
             'metering data %(counter_name)s for %(resource_id)s '
             '@ %(timestamp)s has volume which is not a number '
-            '(volume: %(counter_volume)s), the sample will be dropped'
-            % {'counter_name': test_s.name,
-               'resource_id': test_s.resource_id,
-               'timestamp': test_s.timestamp,
-               'counter_volume': test_s.volume})
+            '(volume: %(counter_volume)s), the sample will be dropped',
+            {'counter_name': test_s.name,
+             'resource_id': test_s.resource_id,
+             'timestamp': test_s.timestamp,
+             'counter_volume': test_s.volume})
 
         self.assertEqual(0, len(publisher.samples))
 

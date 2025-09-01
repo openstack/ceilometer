@@ -161,9 +161,8 @@ class MeterDefinition:
                     nb = (0 if nb_values == 1 and values[0] is None
                           else nb_values)
                     LOG.warning('Only %(nb)d fetched meters contain '
-                                '"%(name)s" field instead of %(total)d.' %
-                                dict(name=name, nb=nb,
-                                     total=nb_samples))
+                                '"%(name)s" field instead of %(total)d.',
+                                dict(name=name, nb=nb, total=nb_samples))
                     return
 
             # NOTE(sileht): Transform the sample with multiple values per
@@ -212,14 +211,13 @@ class ProcessMeterNotifications(endpoint.SampleEndpoint):
             for meter_cfg in reversed(meters_cfg['metric']):
                 if meter_cfg.get('name') in definitions:
                     # skip duplicate meters
-                    LOG.warning("Skipping duplicate meter definition %s"
-                                % meter_cfg)
+                    LOG.warning("Skipping duplicate meter definition %s",
+                                meter_cfg)
                     continue
                 try:
                     md = MeterDefinition(meter_cfg, self.conf, plugin_manager)
                 except declarative.DefinitionException as e:
-                    errmsg = "Error loading meter definition: %s"
-                    LOG.error(errmsg, str(e))
+                    LOG.error("Error loading meter definition: %s", e)
                 else:
                     definitions[meter_cfg['name']] = md
         return definitions.values()

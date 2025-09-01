@@ -114,11 +114,10 @@ class SplitterTraitPlugin(TraitPluginBase):
         """
         LOG.warning('split plugin is deprecated, '
                     'add ".`split(%(sep)s, %(segment)d, '
-                    '%(max_split)d)`" to your jsonpath instead' %
+                    '%(max_split)d)`" to your jsonpath instead',
                     dict(sep=separator,
                          segment=segment,
-                         max_split=(-1 if max_split is None
-                                    else max_split)))
+                         max_split=(-1 if max_split is None else max_split)))
 
         self.separator = separator
         self.segment = segment
@@ -212,9 +211,8 @@ class TimedeltaPlugin(TraitPluginBase):
         except Exception as err:
             LOG.warning('Failed to parse date from set fields, both '
                         'fields %(start)s and %(end)s must be datetime: '
-                        '%(err)s' %
-                        dict(start=start[0], end=end[0], err=err)
-                        )
+                        '%(err)s',
+                        dict(start=start[0], end=end[0], err=err))
             return [None]
         return [abs((end_time - start_time).total_seconds())]
 
