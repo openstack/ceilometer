@@ -98,7 +98,7 @@ def create_heartbeat_service(worker_id, conf, queue=None):
 def main():
     sm = cotyledon.ServiceManager()
     conf = _prepare_config()
-    priv_context.init(root_helper=shlex.split(utils._get_root_helper()))
+    priv_context.init(root_helper=shlex.split(utils.get_root_helper(conf)))
     oslo_config_glue.setup(sm, conf)
 
     if conf.polling.heartbeat_socket_dir is not None:

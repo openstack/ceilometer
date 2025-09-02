@@ -23,24 +23,16 @@ import threading
 from oslo_config import cfg
 from oslo_utils import timeutils
 
-ROOTWRAP_CONF = "/etc/ceilometer/rootwrap.conf"
-
 OPTS = [
     cfg.StrOpt('rootwrap_config',
-               default=ROOTWRAP_CONF,
+               default='/etc/ceilometer/rootwrap.conf',
                help='Path to the rootwrap configuration file to '
                     'use for running commands as root'),
 ]
 
 
-def _get_root_helper():
-    global ROOTWRAP_CONF
-    return 'sudo ceilometer-rootwrap %s' % ROOTWRAP_CONF
-
-
-def setup_root_helper(conf):
-    global ROOTWRAP_CONF
-    ROOTWRAP_CONF = conf.rootwrap_config
+def get_root_helper(conf):
+    return 'sudo ceilometer-rootwrap %s' % conf.rootwrap_config
 
 
 def spawn_thread(target, *args, **kwargs):
