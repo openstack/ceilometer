@@ -58,8 +58,7 @@ Adding Support for GMRs to New Executables
 
 Adding support for a *GMR* to a given executable is fairly easy.
 
-First import the module (currently residing in oslo-incubator), as well as the
-Ceilometer version module:
+First import the module, as well as the Ceilometer version module:
 
 .. code-block:: python
 
