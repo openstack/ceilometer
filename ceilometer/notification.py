@@ -55,8 +55,7 @@ OPTS = [
                min=1,
                deprecated_group='DEFAULT',
                deprecated_name='notification_workers',
-               help='Number of workers for notification service, '
-               'default value is 1.'),
+               help='Number of workers for notification service.'),
     cfg.MultiStrOpt('pipelines',
                     default=['meter', 'event'],
                     help="Select which pipeline managers to enable to "
