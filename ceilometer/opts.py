@@ -113,6 +113,7 @@ def list_keystoneauth_opts():
     # for the password plugin that handles keystone v2 and v3 API
     # with discovery. But other options are possible.
     return [('service_credentials', itertools.chain(
+        loading.get_session_conf_options(),
         loading.get_auth_common_conf_options(),
         loading.get_auth_plugin_conf_options('password'),
         ceilometer.keystone_client.CLI_OPTS
