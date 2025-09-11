@@ -227,6 +227,24 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}  # Allow the hypervisor to be withheld
      }]},
+    {"desc": "make container_format optional for image",
+     "type": "update_attribute_type",
+     "resource_type": "image",
+     "data": [{
+         "op": "add",  # Usually update, the attribute likely already exists
+         "path": "/attributes/container_format",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": False}  # This can be null in certain cases
+     }]},
+    {"desc": "make disk_format optional for image",
+     "type": "update_attribute_type",
+     "resource_type": "image",
+     "data": [{
+         "op": "add",  # Usually update, the attribute likely already exists
+         "path": "/attributes/disk_format",
+         "value": {"type": "string", "min_length": 0, "max_length": 255,
+                   "required": False}  # This can be null in certain cases
+     }]},
 ]
 
 

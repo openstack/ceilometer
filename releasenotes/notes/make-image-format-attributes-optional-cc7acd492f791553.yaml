@@ -1,0 +1,8 @@
+---
+upgrade:
+  - |
+    The ``container_format`` and ``disk_format`` attributes have been made
+    optional for ``image`` resources in Gnocchi. This fixes an issue where
+    image resources would fail to be created in Gnocchi because
+    ``container_format`` and ``disk_format`` are set to ``null`` (which is
+    possible on images that haven't had data uploaded to them yet).
