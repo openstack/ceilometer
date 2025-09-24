@@ -406,3 +406,33 @@ class TestPromExporter(base.BaseTestCase):
                               'cirros2', 'server_group123']
         label3 = prom_exporter._gen_labels(self.test_image_size[0])
         self.assertDictEqual(label3, slabels3)
+
+    @mock.patch.object(prom_exporter.CEILOMETER_REGISTRY, 'unregister')
+    def test_purge_stale_metrics_existing_metric(self, mock_unregister):
+        mock_metric = mock.MagicMock()
+        prom_exporter.CEILOMETER_REGISTRY._names_to_collectors = {
+            'ceilometer_test_metric': mock_metric
+        }
+
+        prom_exporter.purge_stale_metrics('test.metric')
+
+        mock_unregister.assert_called_once_with(mock_metric)
+
+    @mock.patch.object(prom_exporter.CEILOMETER_REGISTRY, 'unregister')
+    def test_purge_stale_metrics_no_existing_metric(self, mock_unregister):
+        prom_exporter.CEILOMETER_REGISTRY._names_to_collectors = {}
+
+        prom_exporter.purge_stale_metrics('nonexistent.metric')
+
+        mock_unregister.assert_not_called()
+
+    @mock.patch.object(prom_exporter.CEILOMETER_REGISTRY, 'unregister')
+    def test_purge_stale_metrics_name_transformation(self, mock_unregister):
+        mock_metric = mock.MagicMock()
+        prom_exporter.CEILOMETER_REGISTRY._names_to_collectors = {
+            'ceilometer_cpu_util': mock_metric
+        }
+
+        prom_exporter.purge_stale_metrics('cpu.util')
+
+        mock_unregister.assert_called_once_with(mock_metric)

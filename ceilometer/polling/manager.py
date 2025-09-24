@@ -312,6 +312,9 @@ class PollingTask:
                     polling_resources.append(x)
         poll_history[pollster.name] = history
 
+        if self.manager.conf.polling.enable_prometheus_exporter:
+            prom_exporter.purge_stale_metrics(pollster.name)
+
         # If no resources, skip for this pollster
         if not polling_resources:
             p_context = 'new' if history else ''

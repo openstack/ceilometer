@@ -28,27 +28,29 @@ def export(prom_iface, prom_port, tls_cert=None, tls_key=None):
 
 
 def collect_metrics(samples):
-    metric_cleared = False
-
     for sample in samples:
         name = "ceilometer_" + sample['counter_name'].replace('.', '_')
         labels = _gen_labels(sample)
 
         metric = CEILOMETER_REGISTRY._names_to_collectors.get(name, None)
 
-        # NOTE: Ungregister the metric at the first iteration to purge stale
-        # samples
-        if not metric_cleared:
-            if metric:
-                CEILOMETER_REGISTRY.unregister(metric)
-                metric = None
-            metric_cleared = True
-
         if metric is None:
             metric = prom.Gauge(name=name, documentation="",
                                 labelnames=labels['keys'],
                                 registry=CEILOMETER_REGISTRY)
         metric.labels(*labels['values']).set(sample['counter_volume'])
+
+
+def purge_stale_metrics(pollster):
+    metric_cleared = False
+
+    metric_name = "ceilometer_" + pollster.replace('.', '_')
+    metric = CEILOMETER_REGISTRY._names_to_collectors.get(metric_name, None)
+    if not metric_cleared:
+        if metric:
+            CEILOMETER_REGISTRY.unregister(metric)
+            metric = None
+        metric_cleared = True
 
 
 def _gen_labels(sample):
