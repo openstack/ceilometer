@@ -33,42 +33,42 @@ metric:
   - name: 'volume.provider.capacity.total'
     event_type: 'capacity.backend.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.total
     resource_id: $.payload.name_to_id
 
   - name: 'volume.provider.capacity.free'
     event_type: 'capacity.backend.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.free
     resource_id: $.payload.name_to_id
 
   - name: 'volume.provider.capacity.allocated'
     event_type: 'capacity.backend.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.allocated
     resource_id: $.payload.name_to_id
 
   - name: 'volume.provider.capacity.provisioned'
     event_type: 'capacity.backend.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.provisioned
     resource_id: $.payload.name_to_id
 
   - name: 'volume.provider.capacity.virtual_free'
     event_type: 'capacity.backend.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.virtual_free
     resource_id: $.payload.name_to_id
 
   - name: 'volume.provider.pool.capacity.total'
     event_type: 'capacity.pool.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.total
     resource_id: $.payload.name_to_id
     metadata: &provider_pool_meta
@@ -77,7 +77,7 @@ metric:
   - name: 'volume.provider.pool.capacity.free'
     event_type: 'capacity.pool.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.free
     resource_id: $.payload.name_to_id
     metadata:
@@ -86,7 +86,7 @@ metric:
   - name: 'volume.provider.pool.capacity.allocated'
     event_type: 'capacity.pool.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.allocated
     resource_id: $.payload.name_to_id
     metadata:
@@ -95,7 +95,7 @@ metric:
   - name: 'volume.provider.pool.capacity.provisioned'
     event_type: 'capacity.pool.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.provisioned
     resource_id: $.payload.name_to_id
     metadata:
@@ -104,7 +104,7 @@ metric:
   - name: 'volume.provider.pool.capacity.virtual_free'
     event_type: 'capacity.pool.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.virtual_free
     resource_id: $.payload.name_to_id
     metadata:
@@ -122,7 +122,7 @@ metric:
       - 'volume.update.*'
       - 'volume.manage.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.size
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
@@ -141,7 +141,7 @@ metric:
       - 'snapshot.delete.*'
       - 'snapshot.manage.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.volume_size
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
@@ -156,7 +156,7 @@ metric:
       - 'backup.delete.*'
       - 'backup.restore.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.size
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
@@ -189,7 +189,7 @@ metric:
   - name: 'memory'
     event_type: &instance_events compute.instance.(?!create.start|update).*
     type: 'gauge'
-    unit: 'MB'
+    unit: 'MiB'
     volume: $.payload.memory_mb
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
@@ -234,7 +234,7 @@ metric:
   - name: 'disk.root.size'
     event_type: *instance_events
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.root_gb
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
@@ -246,7 +246,7 @@ metric:
   - name: 'disk.ephemeral.size'
     event_type: *instance_events
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.ephemeral_gb
     user_id: $.payload.user_id
     project_id: $.payload.tenant_id
@@ -436,7 +436,7 @@ metric:
       - 'share.extend.*'
       - 'share.shrink.*'
     type: 'gauge'
-    unit: 'GB'
+    unit: 'GiB'
     volume: $.payload.size
     user_id: $.payload.user_id
     project_id: $.payload.project_id

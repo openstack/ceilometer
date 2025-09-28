@@ -206,7 +206,7 @@ class PublisherTest(base.BaseTestCase):
         self.resource_id = str(uuid.uuid4())
         self.samples = [sample.Sample(
             name='disk.root.size',
-            unit='GB',
+            unit='GiB',
             type=sample.TYPE_GAUGE,
             volume=2,
             user_id='test_user',
@@ -223,7 +223,7 @@ class PublisherTest(base.BaseTestCase):
             ),
             sample.Sample(
                 name='disk.root.size',
-                unit='GB',
+                unit='GiB',
                 type=sample.TYPE_GAUGE,
                 volume=2,
                 user_id='test_user',
@@ -367,7 +367,7 @@ class PublisherTest(base.BaseTestCase):
     def test_unhandled_meter(self, fake_batch):
         samples = [sample.Sample(
             name='unknown.meter',
-            unit='GB',
+            unit='GiB',
             type=sample.TYPE_GAUGE,
             volume=2,
             user_id='test_user',
@@ -389,7 +389,7 @@ class PublisherTest(base.BaseTestCase):
         samples = [
             sample.Sample(
                 name='unknown.meter',
-                unit='GB',
+                unit='GiB',
                 type=sample.TYPE_GAUGE,
                 volume=2,
                 user_id='test_user',
@@ -400,7 +400,7 @@ class PublisherTest(base.BaseTestCase):
                 resource_metadata={}),
             sample.Sample(
                 name='unknown.meter',
-                unit='GB',
+                unit='GiB',
                 type=sample.TYPE_GAUGE,
                 volume=2,
                 user_id='test_user',
@@ -497,7 +497,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
             sample=sample.Sample(
                 resource_id=str(uuid.uuid4()) + "_foobar",
                 name='disk.root.size',
-                unit='GB',
+                unit='GiB',
                 type=sample.TYPE_GAUGE,
                 volume=2,
                 user_id='test_user',
@@ -513,7 +513,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
             ),
             metric_attributes={
                 "archive_policy_name": "ceilometer-low",
-                "unit": "GB",
+                "unit": "GiB",
                 "measures": [{
                     'timestamp': '2012-05-08 20:23:48.028195',
                     'value': 2

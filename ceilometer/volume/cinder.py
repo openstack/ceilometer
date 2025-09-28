@@ -61,7 +61,7 @@ class VolumeSizePollster(_Base):
             yield sample.Sample(
                 name='volume.size',
                 type=sample.TYPE_GAUGE,
-                unit='GB',
+                unit='GiB',
                 volume=volume.size,
                 user_id=volume.user_id,
                 project_id=getattr(volume,
@@ -89,7 +89,7 @@ class VolumeSnapshotSize(_Base):
             yield sample.Sample(
                 name='volume.snapshot.size',
                 type=sample.TYPE_GAUGE,
-                unit='GB',
+                unit='GiB',
                 volume=snapshot.size,
                 user_id=snapshot.user_id,
                 project_id=getattr(
@@ -118,7 +118,7 @@ class VolumeBackupSize(_Base):
             yield sample.Sample(
                 name='volume.backup.size',
                 type=sample.TYPE_GAUGE,
-                unit='GB',
+                unit='GiB',
                 volume=backup.size,
                 user_id=backup.user_id,
                 project_id=getattr(
@@ -145,7 +145,7 @@ class VolumeProviderPoolCapacityTotal(_VolumeProviderPoolBase):
             yield sample.Sample(
                 name='volume.provider.pool.capacity.total',
                 type=sample.TYPE_GAUGE,
-                unit='GB',
+                unit='GiB',
                 volume=pool.total_capacity_gb,
                 user_id=None,
                 project_id=None,
@@ -164,7 +164,7 @@ class VolumeProviderPoolCapacityFree(_VolumeProviderPoolBase):
             yield sample.Sample(
                 name='volume.provider.pool.capacity.free',
                 type=sample.TYPE_GAUGE,
-                unit='GB',
+                unit='GiB',
                 volume=pool.free_capacity_gb,
                 user_id=None,
                 project_id=None,
@@ -184,7 +184,7 @@ class VolumeProviderPoolCapacityProvisioned(_VolumeProviderPoolBase):
                 yield sample.Sample(
                     name='volume.provider.pool.capacity.provisioned',
                     type=sample.TYPE_GAUGE,
-                    unit='GB',
+                    unit='GiB',
                     volume=pool.provisioned_capacity_gb,
                     user_id=None,
                     project_id=None,
@@ -217,7 +217,7 @@ class VolumeProviderPoolCapacityVirtualFree(_VolumeProviderPoolBase):
                 yield sample.Sample(
                     name='volume.provider.pool.capacity.virtual_free',
                     type=sample.TYPE_GAUGE,
-                    unit='GB',
+                    unit='GiB',
                     volume=value,
                     user_id=None,
                     project_id=None,
@@ -236,7 +236,7 @@ class VolumeProviderPoolCapacityAllocated(_VolumeProviderPoolBase):
             yield sample.Sample(
                 name='volume.provider.pool.capacity.allocated',
                 type=sample.TYPE_GAUGE,
-                unit='GB',
+                unit='GiB',
                 volume=pool.allocated_capacity_gb,
                 user_id=None,
                 project_id=None,

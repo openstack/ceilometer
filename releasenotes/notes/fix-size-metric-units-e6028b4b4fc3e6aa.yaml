@@ -1,0 +1,40 @@
+---
+upgrade:
+  - |
+    The reported units for the following metrics were changed from ``MB`` and
+    ``GB`` to ``MiB`` and ``GiB`` respectively, as the metrics are actually
+    in **mebibytes**/**gibibytes**:
+
+    * ``memory``/``memory.*``
+    * ``disk.root.size``
+    * ``disk.ephemeral.size``
+    * ``volume.size``
+    * ``volume.snapshot.size``/``snapshot.size``
+    * ``volume.backup.size``/``backup.size``
+    * ``volume.provider.capacity.*``/``volume.provider.pool.capacity.*``
+    * ``manila.share.size``
+
+    Following the upgrade, the storage backends Ceilometer publishes to will
+    go through an intermediary period where metrics using both the old and
+    new units will exist at the same time:
+
+    * In Gnocchi, newly created metrics will set ``unit`` to the newer values.
+      Existing metrics on existing resources, however, will not have their
+      unit updated automatically. They will need to be changed manually,
+      if required.
+    * In Prometheus, the ``unit`` label will change for the above metrics,
+      causing Prometheus to treat them as separate metrics (though with
+      otherwise identical labels) for non-aggregated queries. These separate
+      metrics will co-exist until the old metrics expire, but the overlap
+      between the old and new metrics should be small unless your query
+      window is wide. If you perform any PromQL queries overlapping the
+      changeover period that **must** have a single metric per resource,
+      you could use aggregations like ``max without (unit) (...)`` to
+      take into account this change.
+
+    Regarding the values of the metrics themselves, please note that the
+    **actual values have not changed**, only the reported unit names.
+    There is no action needed unless you are converting the metrics to
+    other units (or referencing the reported units in some way), in which
+    case we would recommend double checking that the values are being
+    handled correctly.

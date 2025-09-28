@@ -46,38 +46,38 @@ class VCPUsPollster(InstanceStatsPollster):
 
 class MemoryPollster(InstanceStatsPollster):
     sample_name = 'memory'
-    sample_unit = 'MB'
+    sample_unit = 'MiB'
     sample_stats_key = 'memory_actual'
 
 
 class MemoryAvailablePollster(InstanceStatsPollster):
     sample_name = 'memory.available'
-    sample_unit = 'MB'
+    sample_unit = 'MiB'
     sample_stats_key = 'memory_available'
 
 
 class MemoryUsagePollster(InstanceStatsPollster):
     sample_name = 'memory.usage'
-    sample_unit = 'MB'
+    sample_unit = 'MiB'
     sample_stats_key = 'memory_usage'
 
 
 class MemoryResidentPollster(InstanceStatsPollster):
     sample_name = 'memory.resident'
-    sample_unit = 'MB'
+    sample_unit = 'MiB'
     sample_stats_key = 'memory_resident'
 
 
 class MemorySwapInPollster(InstanceStatsPollster):
     sample_name = 'memory.swap.in'
-    sample_unit = 'MB'
+    sample_unit = 'MiB'
     sample_stats_key = 'memory_swap_in'
     sample_type = sample.TYPE_CUMULATIVE
 
 
 class MemorySwapOutPollster(InstanceStatsPollster):
     sample_name = 'memory.swap.out'
-    sample_unit = 'MB'
+    sample_unit = 'MiB'
     sample_stats_key = 'memory_swap_out'
     sample_type = sample.TYPE_CUMULATIVE
 

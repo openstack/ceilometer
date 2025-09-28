@@ -213,7 +213,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         memory_used = memory_resident = None
         memory_swap_in = memory_swap_out = None
         memory_stats = domain.memoryStats()
-        # Stat provided from libvirt is in KB, converting it to MB.
+        # Stat provided from libvirt is in KiB, converting it to MiB.
         if 'actual' in memory_stats:
             memory_actual = memory_stats['actual'] / units.Ki
         if 'available' in memory_stats:

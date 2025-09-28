@@ -85,17 +85,17 @@ The following meters are collected for OpenStack Compute.
 +===========+=======+======+==========+==========+=========+==================+
 | **Meters added in the Mitaka release or earlier**                           |
 +-----------+-------+------+----------+----------+---------+------------------+
-| memory    | Gauge | MB   | instance | Notific\ | Libvirt | Volume of RAM    |
+| memory    | Gauge | MiB  | instance | Notific\ | Libvirt | Volume of RAM    |
 |           |       |      | ID       | ation, \ |         | allocated to the |
 |           |       |      |          | Pollster |         | instance         |
 +-----------+-------+------+----------+----------+---------+------------------+
-| memory.\  | Gauge | MB   | instance | Pollster | Libvirt,| Volume of RAM    |
+| memory.\  | Gauge | MiB  | instance | Pollster | Libvirt | Volume of RAM    |
 | usage     |       |      | ID       |          |         | used by the inst\|
 |           |       |      |          |          |         | ance from the    |
 |           |       |      |          |          |         | amount of its    |
 |           |       |      |          |          |         | allocated memory |
 +-----------+-------+------+----------+----------+---------+------------------+
-| memory.r\ | Gauge | MB   | instance | Pollster | Libvirt | Volume of RAM u\ |
+| memory.r\ | Gauge | MiB  | instance | Pollster | Libvirt | Volume of RAM u\ |
 | esident   |       |      | ID       |          |         | sed by the inst\ |
 |           |       |      |          |          |         | ance on the phy\ |
 |           |       |      |          |          |         | sical machine    |
@@ -123,11 +123,11 @@ The following meters are collected for OpenStack Compute.
 | ice.write\| lative|      |          |          |         |                  |
 | .bytes    |       |      |          |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.root\| Gauge | GB   | instance | Notific\ | Libvirt | Size of root disk|
+| disk.root\| Gauge | GiB  | instance | Notific\ | Libvirt | Size of root disk|
 | .size     |       |      | ID       | ation, \ |         |                  |
 |           |       |      |          | Pollster |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
-| disk.ephe\| Gauge | GB   | instance | Notific\ | Libvirt | Size of ephemeral|
+| disk.ephe\| Gauge | GiB  | instance | Notific\ | Libvirt | Size of ephemeral|
 | meral.size|       |      | ID       | ation, \ |         | disk             |
 |           |       |      |          | Pollster |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
@@ -206,11 +206,11 @@ The following meters are collected for OpenStack Compute.
 | **Meters added in the Pike release**                                        |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Cumul\|      |          |          |         |                  |
-| swap.in   | ative | MB   | instance | Pollster | Libvirt | Memory swap in   |
+| swap.in   | ative | MiB  | instance | Pollster | Libvirt | Memory swap in   |
 |           |       |      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | memory.\  | Cumul\|      |          |          |         |                  |
-| swap.out  | ative | MB   | instance | Pollster | Libvirt | Memory swap out  |
+| swap.out  | ative | MiB  | instance | Pollster | Libvirt | Memory swap out  |
 |           |       |      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
 | **Meters added in the Queens release**                                      |
@@ -230,7 +230,7 @@ The following meters are collected for OpenStack Compute.
 +-----------+-------+------+----------+----------+---------+------------------+
 | **Meters added in the Flamingo release**                                    |
 +-----------+-------+------+----------+----------+---------+------------------+
-| memory.\  | Gauge | MB   | instance | Pollster | Libvirt | Volume of RAM    |
+| memory.\  | Gauge | MiB  | instance | Pollster | Libvirt | Volume of RAM    |
 | available |       |      | ID       |          |         | available to the |
 |           |       |      |          |          |         | instance as seen |
 |           |       |      |          |          |         | from within the  |
@@ -380,48 +380,48 @@ The following meters are collected for OpenStack Block Storage:
 +====================+=======+========+==========+==========+=================+
 | **Meters added in the Mitaka release or earlier**                           |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.size        | Gauge | GB     | volume ID| Notifica\| Size of the vol\|
+| volume.size        | Gauge | GiB    | volume ID| Notifica\| Size of the vol\|
 |                    |       |        |          | tion     | ume             |
 +--------------------+-------+--------+----------+----------+-----------------+
-| snapshot.size      | Gauge | GB     | snapshot | Notifica\| Size of the sna\|
+| snapshot.size      | Gauge | GiB    | snapshot | Notifica\| Size of the sna\|
 |                    |       |        | ID       | tion     | pshot           |
 +--------------------+-------+--------+----------+----------+-----------------+
 | **Meters added in the Queens release**                                      |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Total volume    |
+| volume.provider.ca\| Gauge | GiB    | hostname | Notifica\| Total volume    |
 | pacity.total       |       |        |          | tion     | capacity on host|
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Free volume     |
+| volume.provider.ca\| Gauge | GiB    | hostname | Notifica\| Free volume     |
 | pacity.free        |       |        |          | tion     | capacity on host|
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Assigned volume |
+| volume.provider.ca\| Gauge | GiB    | hostname | Notifica\| Assigned volume |
 | pacity.allocated   |       |        |          | tion     | capacity on host|
 |                    |       |        |          |          | by Cinder       |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Assigned volume |
+| volume.provider.ca\| Gauge | GiB    | hostname | Notifica\| Assigned volume |
 | pacity.provisioned |       |        |          | tion     | capacity on host|
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.ca\| Gauge | GB     | hostname | Notifica\| Virtual free    |
+| volume.provider.ca\| Gauge | GiB    | hostname | Notifica\| Virtual free    |
 | pacity.virtual_free|       |        |          | tion     | volume capacity |
 |                    |       |        |          |          | on host         |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Total volume    |
+| volume.provider.po\| Gauge | GiB    | hostname\| Notifica\| Total volume    |
 | ol.capacity.total  |       |        | #pool    | tion, Po\| capacity in pool|
 |                    |       |        |          | llster   |                 |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Free volume     |
+| volume.provider.po\| Gauge | GiB    | hostname\| Notifica\| Free volume     |
 | ol.capacity.free   |       |        | #pool    | tion, Po\| capacity in pool|
 |                    |       |        |          | llster   |                 |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Assigned volume |
+| volume.provider.po\| Gauge | GiB    | hostname\| Notifica\| Assigned volume |
 | ol.capacity.alloca\|       |        | #pool    | tion, Po\| capacity in pool|
 | ted                |       |        |          | llster   | by Cinder       |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Assigned volume |
+| volume.provider.po\| Gauge | GiB    | hostname\| Notifica\| Assigned volume |
 | ol.capacity.provis\|       |        | #pool    | tion, Po\| capacity in pool|
 | ioned              |       |        |          | llster   |                 |
 +--------------------+-------+--------+----------+----------+-----------------+
-| volume.provider.po\| Gauge | GB     | hostname\| Notifica\| Virtual free    |
+| volume.provider.po\| Gauge | GiB    | hostname\| Notifica\| Virtual free    |
 | ol.capacity.virtua\|       |        | #pool    | tion, Po\| volume capacity |
 | l_free             |       |        |          | llster   | in pool         |
 +--------------------+-------+--------+----------+----------+-----------------+
@@ -436,7 +436,7 @@ The following meters are collected for OpenStack File Share:
 +====================+=======+========+==========+==========+=================+
 | **Meters added in the Pike release**                                        |
 +--------------------+-------+--------+----------+----------+-----------------+
-| manila.share.size  | Gauge | GB     | share ID | Notifica\| Size of the fil\|
+| manila.share.size  | Gauge | GiB    | share ID | Notifica\| Size of the fil\|
 |                    |       |        |          | tion     | e share         |
 +--------------------+-------+--------+----------+----------+-----------------+
 

@@ -95,7 +95,7 @@ class PerDeviceDiskWriteLatencyPollster(PerDeviceDiskPollster):
 
 class EphemeralSizePollster(pollsters.InstanceMetadataPollster):
     sample_name = 'disk.ephemeral.size'
-    sample_unit = 'GB'
+    sample_unit = 'GiB'
 
     def get_volume(self, instance):
         return int(instance.flavor['ephemeral'])
@@ -103,7 +103,7 @@ class EphemeralSizePollster(pollsters.InstanceMetadataPollster):
 
 class RootSizePollster(pollsters.InstanceMetadataPollster):
     sample_name = 'disk.root.size'
-    sample_unit = 'GB'
+    sample_unit = 'GiB'
 
     def get_volume(self, instance):
         return (int(instance.flavor['disk'])

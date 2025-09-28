@@ -87,7 +87,7 @@ A standard meter definition looks like:
      - name: 'meter name'
        event_type: 'event name'
        type: 'type of meter eg: gauge, cumulative or delta'
-       unit: 'name of unit eg: MB'
+       unit: 'name of unit eg: MiB'
        volume: 'path to a measurable value eg: $.payload.size'
        resource_id: 'path to resource id eg: $.payload.id'
        project_id: 'path to project id eg: $.payload.owner'
