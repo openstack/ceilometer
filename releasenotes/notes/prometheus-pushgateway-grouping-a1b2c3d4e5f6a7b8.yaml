@@ -1,0 +1,14 @@
+---
+features:
+  - |
+    The Prometheus Pushgateway publisher now supports grouping labels in the
+    URL path. When grouping labels are present after the job segment (e.g.
+    ``prometheus://gateway/metrics/job/ceilometer/instance/myhost``), a single
+    push is performed preserving operator-defined grouping. Without grouping
+    labels, metrics are pushed per resource using ``resource_id`` as the
+    grouping label to avoid overwriting time series across resources.
+fixes:
+  - |
+    Metric names containing hyphens are now sanitized to underscores before
+    being pushed to the Prometheus Pushgateway, matching Prometheus naming
+    requirements.
