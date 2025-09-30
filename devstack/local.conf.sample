@@ -4,8 +4,6 @@
 #RECLONE=True
 #FORCE=True
 #OFFLINE=True
-#USE_PYTHON3=True
-#PYTHON3_VERSION=3.8
 # HOST_IP shoudl be set to an ip that is present on the host
 # e.g. the ip of eth0. This will be used to bind api endpoints and horizon.
 HOST_IP=<hostip>
