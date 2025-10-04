@@ -115,9 +115,9 @@ function install_gnocchi {
         # to the global git repo list and ensure its cloned as the current user
         # not as root.
         git_clone ${GNOCCHI_REPO} ${GNOCCHI_DIR} ${GNOCCHI_BRANCH}
-        pip_install -e ${GNOCCHI_DIR}[redis,${DATABASE_TYPE},keystone] uwsgi
+        pip_install -e ${GNOCCHI_DIR}[redis,${DATABASE_TYPE},keystone]
     else
-        pip_install gnocchi[redis,${DATABASE_TYPE},keystone] uwsgi
+        pip_install gnocchi[redis,${DATABASE_TYPE},keystone]
     fi
 }
 
@@ -290,7 +290,7 @@ function install_ceilometer {
 function start_ceilometer {
 
     if [[ "$CEILOMETER_BACKENDS" =~ "gnocchi" ]] ; then
-        run_process gnocchi-api "$CEILOMETER_BIN_DIR/uwsgi --ini $GNOCCHI_UWSGI_FILE" ""
+        run_process gnocchi-api "$(which uwsgi) --ini $GNOCCHI_UWSGI_FILE" ""
         run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
         $CEILOMETER_BIN_DIR/ceilometer-upgrade
