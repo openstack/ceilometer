@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       # Replaces or checks mixed line ending
@@ -8,7 +8,7 @@ repos:
         args: ['--fix', 'lf']
         exclude: '.*\.(svg)$'
       # Forbid files which have a UTF-8 byte-order marker
-      - id: check-byte-order-marker
+      - id: fix-byte-order-marker
       # Checks that non-binary executables have a proper shebang
       - id: check-executables-have-shebangs
       # Check for files that contain merge conflict strings.
@@ -24,11 +24,11 @@ repos:
       - id: hacking
         additional_dependencies: []
   - repo: https://github.com/PyCQA/doc8
-    rev: v1.1.2
+    rev: v2.0.0
     hooks:
       - id: doc8
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.18.0
+    rev: v3.20.0
     hooks:
       - id: pyupgrade
         args: [--py3-only]
