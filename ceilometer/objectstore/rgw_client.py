@@ -39,7 +39,7 @@ class RGWAdminClient:
         self.implicit_tenants = implicit_tenants
 
     def _make_request(self, path, req_params):
-        uri = "{}/{}".format(self.endpoint, path)
+        uri = f"{self.endpoint}/{path}"
         r = requests.get(uri, params=req_params,
                          auth=S3Auth(self.access_key, self.secret,
                                      self.hostname)

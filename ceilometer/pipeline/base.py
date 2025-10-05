@@ -80,7 +80,7 @@ class PipelineSource(agent.Source):
         for sink in self.sinks:
             if sink not in sinks:
                 raise PipelineException(
-                    "Dangling sink {} from source {}".format(sink, self),
+                    f"Dangling sink {sink} from source {self}",
                     self.cfg)
 
 
@@ -146,7 +146,7 @@ class Pipeline(metaclass=abc.ABCMeta):
 
     def __str__(self):
         return (self.source.name if self.source.name == self.sink.name
-                else '{}:{}'.format(self.source.name, self.sink.name))
+                else f'{self.source.name}:{self.sink.name}')
 
     def flush(self):
         self.sink.flush()

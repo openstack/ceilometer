@@ -29,7 +29,7 @@ class ConfigException(Exception):
         self.cfg = cfg
 
     def __str__(self):
-        return '{} {}: {}'.format(self.cfg_type, self.cfg, self.msg)
+        return f'{self.cfg_type} {self.cfg}: {self.msg}'
 
 
 class SourceException(Exception):
@@ -38,7 +38,7 @@ class SourceException(Exception):
         self.cfg = cfg
 
     def __str__(self):
-        return 'Source definition invalid: {} ({})'.format(self.msg, self.cfg)
+        return f'Source definition invalid: {self.msg} ({self.cfg})'
 
 
 class ConfigManagerBase:

@@ -178,7 +178,7 @@ class Resources:
 
     @staticmethod
     def key(source_name, pollster):
-        return '{}-{}'.format(source_name, pollster.name)
+        return f'{source_name}-{pollster.name}'
 
 
 def iter_random(iterable):
@@ -592,7 +592,7 @@ class AgentManager(cotyledon.Service):
         # Compose coordination group prefix.
         # We'll use namespaces as the basement for this partitioning.
         namespace_prefix = '-'.join(sorted(namespaces))
-        self.group_prefix = ('{}-{}'.format(namespace_prefix, group_prefix)
+        self.group_prefix = (f'{namespace_prefix}-{group_prefix}'
                              if group_prefix else namespace_prefix)
 
         if self.conf.polling.enable_notifications:
@@ -747,12 +747,12 @@ class AgentManager(cotyledon.Service):
         )
 
     def _extensions(self, category, agent_ns=None, *args, **kwargs):
-        namespace = ('ceilometer.{}.{}'.format(category, agent_ns) if agent_ns
+        namespace = (f'ceilometer.{category}.{agent_ns}' if agent_ns
                      else 'ceilometer.%s' % category)
         return self._get_ext_mgr(namespace, *args, **kwargs)
 
     def _extensions_from_builder(self, category, agent_ns=None):
-        ns = ('ceilometer.builder.{}.{}'.format(category, agent_ns) if agent_ns
+        ns = (f'ceilometer.builder.{category}.{agent_ns}' if agent_ns
               else 'ceilometer.builder.%s' % category)
         mgr = self._get_ext_mgr(ns, self.conf)
 
@@ -843,7 +843,7 @@ class AgentManager(cotyledon.Service):
         return polling_tasks
 
     def construct_group_id(self, discovery_group_id):
-        return '{}-{}'.format(self.group_prefix, discovery_group_id)
+        return f'{self.group_prefix}-{discovery_group_id}'
 
     def start_polling_tasks(self):
         data = self.setup_polling_tasks()

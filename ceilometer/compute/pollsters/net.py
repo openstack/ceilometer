@@ -38,7 +38,7 @@ class NetworkPollster(pollsters.GenericComputePollster):
             return stats.fref
         else:
             instance_name = util.instance_name(instance)
-            return "{}-{}-{}".format(instance_name, instance.id, stats.name)
+            return f"{instance_name}-{instance.id}-{stats.name}"
 
 
 class IncomingBytesPollster(NetworkPollster):
