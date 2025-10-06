@@ -1,4 +1,3 @@
-coverage>=4.4.1 # Apache-2.0
 fixtures>=3.0.0 # Apache-2.0/BSD
 oslo.messaging[kafka]>=8.0.0 # Apache-2.0
 oslotest>=3.8.0 # Apache-2.0
