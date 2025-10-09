@@ -11,30 +11,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import glanceclient
-from oslo_config import cfg
+import openstack
 
 from ceilometer import keystone_client
 from ceilometer.polling import plugin_base
-
-SERVICE_OPTS = [
-    cfg.StrOpt('glance',
-               default='image',
-               help='Glance service type.'),
-]
 
 
 class ImagesDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):
         super().__init__(conf)
         creds = conf.service_credentials
-        self.glance_client = glanceclient.Client(
-            version='2',
+        self.image_client = openstack.connection.Connection(
+            image_api_version='2',
             session=keystone_client.get_session(conf),
             region_name=creds.region_name,
-            interface=creds.interface,
-            service_type=conf.service_types.glance)
+            image_interface=creds.interface)
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
-        return self.glance_client.images.list()
+        return self.image_client.image.images()

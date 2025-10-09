@@ -103,7 +103,6 @@ def list_opts():
         ('service_types',
          itertools.chain(ceilometer.alarm.discovery.SERVICE_OPTS,
                          ceilometer.designate_client.SERVICE_OPTS,
-                         ceilometer.image.discovery.SERVICE_OPTS,
                          ceilometer.manila_client.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,

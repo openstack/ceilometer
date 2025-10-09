@@ -14,8 +14,8 @@
 from unittest import mock
 
 import fixtures
-import glanceclient
 import novaclient
+import openstack
 from oslotest import base
 
 from ceilometer import nova_client
@@ -35,12 +35,14 @@ class TestNovaClient(base.BaseTestCase):
         self.CONF = service.prepare_service([], [])
         self._flavors_count = 0
         self._images_count = 0
-        self.nv = nova_client.Client(self.CONF)
+        # Mock the openstack.connection.Connection to avoid auth issues
+        with mock.patch('openstack.connection.Connection'):
+            self.nv = nova_client.Client(self.CONF)
         self.useFixture(fixtures.MockPatchObject(
             self.nv.nova_client.flavors, 'get',
             side_effect=self.fake_flavors_get))
         self.useFixture(fixtures.MockPatchObject(
-            self.nv.glance_client.images, 'get',
+            self.nv.image_client.image, 'get_image',
             side_effect=self.fake_images_get))
 
     def fake_flavors_get(self, *args, **kwargs):
@@ -61,29 +63,38 @@ class TestNovaClient(base.BaseTestCase):
         image_details = {
             # NOTE(callumdickinson): Real image IDs are UUIDs, not integers,
             # so the actual code runs assuming the IDs are strings.
-            1: ('ubuntu-12.04-x86',
-                dict(kernel_id=11, ramdisk_id=21),
-                dict(container_format='bare',
-                     disk_format='raw',
-                     min_disk=1,
-                     min_ram=0,
-                     os_distro='ubuntu',
-                     os_type='linux')),
-            2: ('centos-5.4-x64', dict(kernel_id=12, ramdisk_id=22), dict()),
-            3: ('rhel-6-x64', None, dict()),
-            4: ('rhel-6-x64', dict(), dict()),
-            5: ('rhel-6-x64', dict(kernel_id=11), dict()),
-            6: ('rhel-6-x64', dict(ramdisk_id=21), dict()),
+            1: dict(name='ubuntu-12.04-x86',
+                    kernel_id=11,
+                    ramdisk_id=21,
+                    container_format='bare',
+                    disk_format='raw',
+                    min_disk=1,
+                    min_ram=0,
+                    os_distro='ubuntu',
+                    os_type='linux'),
+            2: dict(name='centos-5.4-x64',
+                    kernel_id=12,
+                    ramdisk_id=22),
+            3: dict(name='rhel-6-x64',
+                    kernel_id=None,
+                    ramdisk_id=None),
+            4: dict(name='rhel-6-x64',
+                    kernel_id=None,
+                    ramdisk_id=None),
+            5: dict(name='rhel-6-x64',
+                    kernel_id=11,
+                    ramdisk_id=None),
+            6: dict(name='rhel-6-x64',
+                    kernel_id=None,
+                    ramdisk_id=21),
         }
 
         if image_id in image_details:
             return FauxImage(
                 id=image_id,
-                name=image_details[image_id][0],
-                metadata=image_details[image_id][1],
-                **image_details[image_id][2])
+                **image_details[image_id])
         else:
-            raise glanceclient.exc.HTTPNotFound('foobar')
+            raise openstack.exceptions.NotFoundException('foobar')
 
     @staticmethod
     def fake_servers_list(*args, **kwargs):

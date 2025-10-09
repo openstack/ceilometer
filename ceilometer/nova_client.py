@@ -13,10 +13,10 @@
 
 import functools
 
-import glanceclient
 import novaclient
 from novaclient import api_versions
 from novaclient import client as nova_client
+import openstack
 from oslo_config import cfg
 from oslo_log import log
 
@@ -62,12 +62,11 @@ class Client:
             endpoint_type=creds.interface,
             service_type=conf.service_types.nova)
 
-        self.glance_client = glanceclient.Client(
-            version='2',
+        self.image_client = openstack.connection.Connection(
+            image_api_version='2',
             session=ks_session,
             region_name=creds.region_name,
-            interface=creds.interface,
-            service_type=conf.service_types.glance)
+            image_interface=creds.interface)
 
     def _with_flavor_and_image(self, instances):
         flavor_cache = {}
@@ -112,8 +111,8 @@ class Client:
             image = cache.get(iid)
         else:
             try:
-                image = self.glance_client.images.get(iid)
-            except glanceclient.exc.HTTPNotFound:
+                image = self.image_client.image.get_image(iid)
+            except openstack.exceptions.NotFoundException:
                 image = None
             cache[iid] = image
 
@@ -122,10 +121,9 @@ class Client:
 
         instance.image['name'] = (
             getattr(image, 'name') if image else 'unknown-id-%s' % iid)
-        image_metadata = getattr(image, 'metadata', None)
 
         for attr, default in attr_defaults:
-            ameta = image_metadata.get(attr) if image_metadata else default
+            ameta = getattr(image, attr, default) if image else default
             setattr(instance, attr, ameta)
 
         if image:
@@ -134,7 +132,8 @@ class Client:
             # image_meta values as strings. Do the same here.
             image_meta.update((k, str(v))
                               for k, v in image.items()
-                              if k not in ('id', 'name', 'metadata'))
+                              if k not in ('id', 'name', 'metadata',
+                                           'kernel_id', 'ramdisk_id'))
         else:
             image_meta = {}
         instance.image_meta = image_meta

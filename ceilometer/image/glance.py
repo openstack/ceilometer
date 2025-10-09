@@ -37,7 +37,7 @@ class _Base(plugin_base.PollsterBase):
                 "disk_format",
                 "updated_at",
                 "min_disk",
-                "protected",
+                "is_protected",
                 "checksum",
                 "min_ram",
                 "tags",

@@ -38,7 +38,7 @@ IMAGE_LIST = [
           'checksum': 'eb9139e4942121f22bbc2afc0400b2a4',
           'created_at': '2016-06-20T13: 34: 40Z',
           'disk_format': 'ami',
-          'protected': False,
+          'is_protected': False,
           'schema': '/v2/schemas/image'}),
     type('Image', (object,),
          {'status': 'active',
@@ -57,7 +57,7 @@ IMAGE_LIST = [
           'checksum': 'be575a2b939972276ef675752936977f',
           'created_at': '2016-06-20T13: 34: 37Z',
           'disk_format': 'ari',
-          'protected': False,
+          'is_protected': False,
           'schema': '/v2/schemas/image'}),
     type('Image', (object,),
          {'status': 'active',
@@ -76,7 +76,7 @@ IMAGE_LIST = [
           'checksum': '8a40c862b5735975d82605c1dd395796',
           'created_at': '2016-06-20T13: 34: 35Z',
           'disk_format': 'aki',
-          'protected': False,
+          'is_protected': False,
           'schema': '/v2/schemas/image'}),
 ]
 
