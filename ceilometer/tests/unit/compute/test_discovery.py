@@ -16,13 +16,30 @@ import datetime
 from unittest import mock
 
 import fixtures
-import libvirt
 from novaclient import exceptions
 
 from ceilometer.compute import discovery
 from ceilometer.compute.pollsters import util
 from ceilometer import service
 from ceilometer.tests import base
+
+
+# Mock libvirt constants and exceptions to avoid libvirt dependency
+VIR_ERR_NO_DOMAIN_METADATA = 80
+
+
+class FakeLibvirtError(Exception):
+    """Fake exception to replace libvirt.libvirtError in tests."""
+    def __init__(self, message, error_code=None, error_domain=None):
+        super().__init__(message)
+        self._error_code = error_code
+        self._error_domain = error_domain
+
+    def get_error_code(self):
+        return self._error_code
+
+    def get_error_domain(self):
+        return self._error_domain
 
 
 LIBVIRT_METADATA_XML = """
@@ -303,14 +320,9 @@ class FakeManualInstanceDomain:
         # elements like: '<nova:instance
         #  xmlns:nova="http://openstack.org/xmlns/libvirt/nova/1.0">'
         # When invoke get metadata method, raise libvirtError.
-        e = libvirt.libvirtError(
-            "metadata not found: Requested metadata element is not present")
-
-        def fake_error_code(*args, **kwargs):
-            return libvirt.VIR_ERR_NO_DOMAIN_METADATA
-
-        e.get_error_code = fake_error_code
-        raise e
+        raise FakeLibvirtError(
+            "metadata not found: Requested metadata element is not present",
+            VIR_ERR_NO_DOMAIN_METADATA)
 
 
 class FakeManualInstanceConn:
@@ -367,6 +379,14 @@ class TestDiscovery(base.BaseTestCase):
 
         self.CONF = service.prepare_service([], [])
         self.CONF.set_override('host', 'test')
+
+        # Add a mocked Libvirt, so we don't have to rely on python-libvirt
+        # being installed only for testing
+        self.libvirt = mock.MagicMock()
+        self.libvirt.libvirtError = FakeLibvirtError
+        patch_libvirt = fixtures.MockPatch(
+            'ceilometer.compute.virt.libvirt.utils.libvirt', self.libvirt)
+        self.useFixture(patch_libvirt)
 
     def test_normal_discovery(self):
         self.CONF.set_override("instance_discovery_method",
