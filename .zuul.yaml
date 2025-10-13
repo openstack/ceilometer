@@ -21,7 +21,9 @@
       tempest_test_regex: '\[.*\bsmoke\b.*\]|^(telemetry_tempest_plugin)'
       tox_envlist: all
     irrelevant-files: &ceilometer-irrelevant-files
+      - ^\.gitignore$
       - ^\.gitreview$
+      - ^\.pre-commit-config\.yaml$
       - ^(test-|)requirements.txt$
       - ^setup.cfg$
       - ^doc/.*$
@@ -29,6 +31,8 @@
       - ^releasenotes/.*$
       - ^ceilometer/locale/.*$
       - ^ceilometer/tests/.*$
+      - ^tools/.*$
+      - ^tox.ini$
 
 - project:
     queue: telemetry
