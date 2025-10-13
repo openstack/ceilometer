@@ -84,7 +84,7 @@ class TestBaseDiskIO(base.TestPollsterBase):
         for m in match:
             match_dict[m.resource_id] = m
         for instance in self.instance:
-            key = "{}-{}".format(instance.id, expected_device)
+            key = f"{instance.id}-{expected_device}"
             self.assertEqual(expected_volume,
                              match_dict[key].volume)
             self.assertEqual(self.TYPE, match_dict[key].type)

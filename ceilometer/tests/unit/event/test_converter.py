@@ -52,7 +52,7 @@ class ConverterBase(base.BaseTestCase):
         traits = [trait for trait in event.traits if trait.name == name]
         self.assertGreater(
             len(traits), 0,
-            "Trait {} not found in event {}".format(name, event))
+            f"Trait {name} not found in event {event}")
         trait = traits[0]
         if value is not None:
             self.assertEqual(value, trait.value)
@@ -71,7 +71,7 @@ class ConverterBase(base.BaseTestCase):
         traits = [trait for trait in event.traits if trait.name == name]
         self.assertEqual(
             len(traits), 0,
-            "Extra Trait {} found in event {}".format(name, event))
+            f"Extra Trait {name} found in event {event}")
 
     def assertHasDefaultTraits(self, event):
         text = models.Trait.TEXT_TYPE
@@ -87,7 +87,7 @@ class ConverterBase(base.BaseTestCase):
 
     def assertPathsEqual(self, path1, path2):
         self.assertTrue(self._cmp_tree(path1, path2),
-                        'JSONPaths not equivalent {} {}'.format(path1, path2))
+                        f'JSONPaths not equivalent {path1} {path2}')
 
 
 class TestTraitDefinition(ConverterBase):

@@ -23,7 +23,7 @@ class PerDeviceDiskPollster(pollsters.GenericComputePollster):
 
     @staticmethod
     def get_resource_id(instance, stats):
-        return "{}-{}".format(instance.id, stats.device)
+        return f"{instance.id}-{stats.device}"
 
     @staticmethod
     def get_additional_metadata(instance, stats):
