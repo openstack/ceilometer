@@ -154,7 +154,7 @@ class TestRGWAdminClient(base.BaseTestCase):
         self.client = rgw_client.RGWAdminClient('http://127.0.0.1:8080/admin',
                                                 'abcde', 'secret', False)
         self.get_resp = mock.MagicMock()
-        self.get = mock.patch('requests.get',
+        self.get = mock.patch('requests.request',
                               return_value=self.get_resp).start()
 
     def test_make_request_exception(self):
@@ -180,8 +180,9 @@ class TestRGWAdminClient(base.BaseTestCase):
                     'buckets': bucket_list}
         self.assertEqual(expected, actual)
         self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('foo',
-                         self.get.call_args_list[0][1]['params']['uid'])
+        self.assertEqual('http://127.0.0.1:8080/admin/bucket?'
+                         'uid=foo&stats=true',
+                         self.get.call_args_list[0][0][1])
 
     def test_get_buckets_implicit_tenants(self):
         self.get_resp.status_code = 200
@@ -195,8 +196,9 @@ class TestRGWAdminClient(base.BaseTestCase):
                     'buckets': bucket_list}
         self.assertEqual(expected, actual)
         self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('foo$foo',
-                         self.get.call_args_list[0][1]['params']['uid'])
+        self.assertEqual('http://127.0.0.1:8080/admin/bucket?'
+                         'uid=foo$foo&stats=true',
+                         self.get.call_args_list[0][0][1])
 
     def test_get_usage(self):
         self.get_resp.status_code = 200
@@ -205,8 +207,8 @@ class TestRGWAdminClient(base.BaseTestCase):
         expected = 7
         self.assertEqual(expected, actual)
         self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('foo',
-                         self.get.call_args_list[0][1]['params']['uid'])
+        self.assertEqual('http://127.0.0.1:8080/admin/usage?uid=foo',
+                         self.get.call_args_list[0][0][1])
 
     def test_get_usage_implicit_tenants(self):
         self.get_resp.status_code = 200
@@ -216,5 +218,5 @@ class TestRGWAdminClient(base.BaseTestCase):
         expected = 7
         self.assertEqual(expected, actual)
         self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('foo$foo',
-                         self.get.call_args_list[0][1]['params']['uid'])
+        self.assertEqual('http://127.0.0.1:8080/admin/usage?uid=foo$foo',
+                         self.get.call_args_list[0][0][1])

@@ -16,8 +16,7 @@
 
 from collections import namedtuple
 
-from awsauth import S3Auth
-import requests
+from awscurl import awscurl
 
 from urllib import parse as urlparse
 
@@ -40,15 +39,37 @@ class RGWAdminClient:
 
     def _make_request(self, path, req_params):
         uri = f"{self.endpoint}/{path}"
-        r = requests.get(uri, params=req_params,
-                         auth=S3Auth(self.access_key, self.secret,
-                                     self.hostname)
-                         )
+        if req_params:
+            uri = f"{uri}?"
+            # Append req_params content to the uri
+            for i, (key, value) in enumerate(req_params.items()):
+                if i == len(req_params) - 1:
+                    uri = uri + key + "=" + value
+                else:
+                    uri = uri + key + "=" + value + "&"
+
+        # Data to be sent with request POST type,
+        # otherwise provide an empty string
+        data = ""
+        service = "s3"
+        method = "GET"
+        # Default region, in the case of radosgw either set
+        # the value to your zonegroup name or keep the default region.
+        # With a single Ceph zone-group, there's no need to customize
+        # this value.
+        region = "us-east-1"
+        headers = {'Accept': 'application/json'}
+
+        r = awscurl.make_request(method, service, region, uri, headers, data,
+                                 self.access_key, self.secret, None, False,
+                                 False)
 
         if r.status_code != 200:
             raise RGWAdminAPIFailed(
                 _('RGW AdminOps API returned %(status)s %(reason)s') %
                 {'status': r.status_code, 'reason': r.reason})
+        if not r.text:
+            return {}
 
         return r.json()
 
