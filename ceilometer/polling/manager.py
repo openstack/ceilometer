@@ -849,7 +849,7 @@ class AgentManager(cotyledon.Service):
         data = self.setup_polling_tasks()
 
         # Don't start useless threads if no task will run
-        if not data:
+        if not data or len(data) == 0:
             return
 
         # One thread per polling tasks is enough
