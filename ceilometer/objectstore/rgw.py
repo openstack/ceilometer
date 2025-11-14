@@ -44,6 +44,11 @@ CLIENT_OPTS = [
     cfg.BoolOpt('implicit_tenants',
                 default=False,
                 help='Whether RGW uses implicit tenants or not.'),
+    cfg.StrOpt('rgw_service_name',
+               default=None,
+               sample_default='ceph',
+               help='Service name for object store endpoint. '
+                    'If left to None, will use [service_types]/radosgw.'),
 ]
 
 
@@ -68,9 +73,21 @@ class _Base(plugin_base.PollsterBase):
     @staticmethod
     def _get_endpoint(conf, ksclient):
         # we store the endpoint as a base class attribute, so keystone is
-        # only ever called once, also we assume that in a single deployment
-        # we may be only deploying `radosgw` or `swift` as the object-store
-        if _Base._ENDPOINT is None and conf.service_types.radosgw:
+        # only ever called once.
+        if _Base._ENDPOINT is None and conf.rgw_client.rgw_service_name:
+            try:
+                creds = conf.service_credentials
+                # Use the service_name to target the endpoint.
+                # There are cases where both 'radosgw' and 'swift' are used.
+                rgw_url = keystone_client.get_service_catalog(
+                    ksclient).url_for(
+                        service_name=conf.rgw_client.rgw_service_name,
+                        interface=creds.interface,
+                        region_name=creds.region_name)
+                _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
+            except exceptions.EndpointNotFound:
+                LOG.debug("Radosgw endpoint not found")
+        elif _Base._ENDPOINT is None and conf.service_types.radosgw:
             try:
                 creds = conf.service_credentials
                 rgw_url = keystone_client.get_service_catalog(
@@ -81,6 +98,7 @@ class _Base(plugin_base.PollsterBase):
                 _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
             except exceptions.EndpointNotFound:
                 LOG.debug("Radosgw endpoint not found")
+        LOG.debug(f"Using endpoint {_Base._ENDPOINT} for radosgw connections")
         return _Base._ENDPOINT
 
     def _iter_accounts(self, ksclient, cache, tenants):
