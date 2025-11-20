@@ -2,6 +2,9 @@
 Ceilometer
 ==========
 
+.. image:: https://governance.openstack.org/tc/badges/ceilometer.svg
+
+.. Change things from this point on
 
 --------
 Overview
