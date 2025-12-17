@@ -63,11 +63,9 @@ class _Base(plugin_base.PollsterBase):
         if _Base._ENDPOINT is None:
             try:
                 creds = conf.service_credentials
-                _Base._ENDPOINT = keystone_client.get_service_catalog(
-                    ksclient).url_for(
-                        service_type=conf.service_types.swift,
-                        interface=creds.interface,
-                        region_name=creds.region_name)
+                _Base._ENDPOINT = keystone_client.url_for(
+                    ksclient, service_type=conf.service_types.swift,
+                    interface=creds.interface, region_name=creds.region_name)
             except exceptions.EndpointNotFound as e:
                 LOG.info("Swift endpoint not found: %s", e)
         return _Base._ENDPOINT

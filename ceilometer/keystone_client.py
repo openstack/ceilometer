@@ -51,6 +51,22 @@ def get_service_catalog(client):
     return client.session.auth.get_access(client.session).service_catalog
 
 
+def url_for(
+        client, service_type=None, service_name=None,
+        interface=None, region_name=None):
+    return get_service_catalog(client).url_for(
+        service_type=service_type, service_name=service_name,
+        interface=interface, region_name=region_name)
+
+
+def get_urls(
+        client, service_type=None, service_name=None,
+        interface=None, region_name=None):
+    return get_service_catalog(client).get_urls(
+        service_type=service_type, service_name=service_name,
+        interface=interface, region_name=region_name)
+
+
 def get_auth_token(client):
     return client.session.auth.get_access(client.session).auth_token
 
