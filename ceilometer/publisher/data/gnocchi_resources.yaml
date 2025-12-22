@@ -300,3 +300,16 @@ resources:
       status: resource_metadata.status
       availability_zone: resource_metadata.availability_zone
       protocol: resource_metadata.protocol
+
+  - resource_type: loadbalancer
+    metrics:
+      loadbalancer.operating:
+      loadbalancer.provisioning:
+    attributes:
+      name: resource_metadata.name
+      availability_zone: resource_metadata.availability_zone
+      vip_address: resource_metadata.vip_address
+      provider: resource_metadata.provider
+    event_delete: octavia.loadbalancer.delete.end
+    event_attributes:
+      id: resource_id

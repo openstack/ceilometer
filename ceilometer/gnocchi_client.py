@@ -245,6 +245,21 @@ resources_update_operations = [
          "value": {"type": "string", "min_length": 0, "max_length": 255,
                    "required": False}  # This can be null in certain cases
      }]},
+    {"desc": "add loadbalancer resource type",
+     "type": "create_resource_type",
+     "resource_type": "loadbalancer",
+     "data": [{
+         "attributes": {
+             "name": {"type": "string", "min_length": 0,
+                      "max_length": 255, "required": False},
+             "availability_zone": {"type": "string", "min_length": 0,
+                                   "max_length": 255, "required": False},
+             "vip_address": {"type": "string", "min_length": 0,
+                             "max_length": 255, "required": False},
+             "provider": {"type": "string", "min_length": 0,
+                          "max_length": 255, "required": False}
+         }
+     }]},
 ]
 
 

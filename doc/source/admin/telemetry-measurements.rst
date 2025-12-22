@@ -598,6 +598,25 @@ The following meters are collected for FWaaS:
 | l.policy      |       | icy     |            |           |                  |
 +---------------+-------+---------+------------+-----------+------------------+
 
+Octavia Load Balancer
+~~~~~~~~~~~~~~~~~~~~~
+
+The following meters are collected for Octavia Load Balancer:
+
++---------------+-------+---------+------------+-----------+------------------+
+| Name          | Type  | Unit    | Resource   | Origin    | Note             |
++===============+=======+=========+============+===========+==================+
+| **Meters added in the Gazpacho release**                                    |
++---------------+-------+---------+------------+-----------+------------------+
+| loadbalancer\ | Gauge | status  | lb ID      | Pollster  | Operating status |
+| .operating    |       |         |            |           | of a load        |
+|               |       |         |            |           | balancer         |
++---------------+-------+---------+------------+-----------+------------------+
+| loadbalancer\ | Gauge | status  | lb ID      | Pollster  | Provisioning     |
+| .provisioning |       |         |            |           | status of a load |
+|               |       |         |            |           | balancer         |
++---------------+-------+---------+------------+-----------+------------------+
+
 Openstack alarming
 ~~~~~~~~~~~~~~~~~~
 

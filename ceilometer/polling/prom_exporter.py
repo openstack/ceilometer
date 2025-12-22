@@ -142,6 +142,12 @@ def _gen_labels(sample):
             labels['keys'].append('state')
             labels['values'].append(resource_metadata['alarm_state'])
 
+        # Add availability_zone for loadbalancer metrics
+        if sample.get('counter_name', '').startswith('loadbalancer'):
+            labels['keys'].append('availability_zone')
+            az = resource_metadata.get('availability_zone')
+            labels['values'].append(az if az else '')
+
         if resource_metadata.get('flavor'):
             flavor = resource_metadata.get('flavor')
             if flavor.get('id'):
