@@ -63,11 +63,6 @@ class Client:
         self.client = clientv20.Client(**params)
 
     @logged
-    def port_get_all(self):
-        resp = self.client.list_ports()
-        return resp.get('ports')
-
-    @logged
     def vpn_get_all(self):
         resp = self.client.list_vpnservices()
         return resp.get('vpnservices')
