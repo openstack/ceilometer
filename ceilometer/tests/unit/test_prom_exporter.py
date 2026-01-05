@@ -233,13 +233,13 @@ class TestPromExporter(base.BaseTestCase):
     @mock.patch('ceilometer.polling.prom_exporter.export')
     def test_export_called(self, export):
         CONF = service.prepare_service([], [])
-        CONF.polling.enable_prometheus_exporter = True
-        CONF.polling.prometheus_listen_addresses = [
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_listen_addresses', [
             '127.0.0.1:9101',
             '127.0.0.1:9102',
             '[::1]:9103',
             'localhost:9104',
-        ]
+        ], group='polling')
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
@@ -252,15 +252,16 @@ class TestPromExporter(base.BaseTestCase):
     @mock.patch('ceilometer.polling.prom_exporter.export')
     def test_export_called_tls_disabled(self, export):
         CONF = service.prepare_service([], [])
-        CONF.polling.enable_prometheus_exporter = True
-        CONF.polling.prometheus_tls_enable = False
-        CONF.polling.prometheus_tls_certfile = "cert.pem"
-        CONF.polling.prometheus_listen_addresses = [
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_tls_enable', False, group='polling')
+        CONF.set_override('prometheus_tls_certfile', "cert.pem",
+                          group='polling')
+        CONF.set_override('prometheus_listen_addresses', [
             '127.0.0.1:9101',
             '127.0.0.1:9102',
             '[::1]:9103',
             'localhost:9104',
-        ]
+        ], group='polling')
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
@@ -273,16 +274,18 @@ class TestPromExporter(base.BaseTestCase):
     @mock.patch('ceilometer.polling.prom_exporter.export')
     def test_export_called_with_tls(self, export):
         CONF = service.prepare_service([], [])
-        CONF.polling.enable_prometheus_exporter = True
-        CONF.polling.prometheus_listen_addresses = [
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_listen_addresses', [
             '127.0.0.1:9101',
             '127.0.0.1:9102',
             '[::1]:9103',
             'localhost:9104',
-        ]
-        CONF.polling.prometheus_tls_enable = True
-        CONF.polling.prometheus_tls_certfile = "cert.pem"
-        CONF.polling.prometheus_tls_keyfile = "key.pem"
+        ], group='polling')
+        CONF.set_override('prometheus_tls_enable', True, group='polling')
+        CONF.set_override('prometheus_tls_certfile', "cert.pem",
+                          group='polling')
+        CONF.set_override('prometheus_tls_keyfile', "key.pem",
+                          group='polling')
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
@@ -295,11 +298,13 @@ class TestPromExporter(base.BaseTestCase):
     @mock.patch('ceilometer.polling.prom_exporter.export')
     def test_export_fails_if_incomplete_tls(self, export):
         CONF = service.prepare_service([], [])
-        CONF.polling.enable_prometheus_exporter = True
-        CONF.polling.prometheus_listen_addresses = ['127.0.0.1:9101']
-        CONF.polling.prometheus_tls_enable = True
-        CONF.polling.prometheus_tls_certfile = "cert.pem"
-        CONF.polling.prometheus_tls_keyfile = None  # Missing key
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_listen_addresses',
+                          ['127.0.0.1:9101'], group='polling')
+        CONF.set_override('prometheus_tls_enable', True, group='polling')
+        CONF.set_override('prometheus_tls_certfile', "cert.pem",
+                          group='polling')
+        # prometheus_tls_keyfile defaults to None (missing key)
         self.assertRaises(ValueError, manager.AgentManager, 0, CONF)
 
     def test_collect_metrics(self):
