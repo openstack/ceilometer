@@ -1,0 +1,5 @@
+---
+other:
+  - |
+    Support for Neutron FWaaS has been un-deprecated, because FWaaS project
+    was restored and is now maintained.
