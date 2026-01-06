@@ -24,12 +24,15 @@ LOG = log.getLogger(__name__)
 class VPNServicesPollster(base.BaseServicesPollster):
     """Pollster to capture VPN status samples."""
 
-    FIELDS = ['admin_state_up',
+    FIELDS = ['is_admin_state_up',
               'description',
               'name',
               'status',
               'subnet_id',
-              'router_id'
+              'router_id',
+              'flavor_id',
+              'external_v4_ip',
+              'external_v6_ip',
               ]
 
     @property
@@ -55,7 +58,7 @@ class VPNServicesPollster(base.BaseServicesPollster):
                 unit='vpnservice',
                 volume=status,
                 user_id=None,
-                project_id=vpn['tenant_id'],
+                project_id=vpn.get('project_id') or vpn.get('tenant_id'),
                 resource_id=vpn['id'],
                 resource_metadata=self.extract_metadata(vpn)
             )
@@ -69,16 +72,16 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
               'peer_address',
               'peer_id',
               'peer_cidrs',
+              'peer_ep_group_id',
               'psk',
               'initiator',
               'ikepolicy_id',
-              'dpd',
               'ipsecpolicy_id',
               'vpnservice_id',
               'mtu',
-              'admin_state_up',
+              'is_admin_state_up',
               'status',
-              'tenant_id'
+              'project_id'
               ]
 
     @property
@@ -97,7 +100,7 @@ class IPSecConnectionsPollster(base.BaseServicesPollster):
                 unit='ipsec_site_connection',
                 volume=1,
                 user_id=None,
-                project_id=conn['tenant_id'],
+                project_id=conn.get('project_id') or conn.get('tenant_id'),
                 resource_id=conn['id'],
                 resource_metadata=self.extract_metadata(conn)
             )
