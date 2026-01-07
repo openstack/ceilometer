@@ -42,12 +42,12 @@ class FirewallPollster(base.BaseServicesPollster):
             LOG.debug("Firewall : %s", fw)
             status = self.get_status_id(fw['status'])
             if status == -1:
-                # unknown status, skip this sample
-                LOG.warning("Unknown status %(stat)s received on fw %(id)s,"
-                            "skipping sample",
-                            {'stat': fw['status'], 'id': fw['id']})
-                continue
-
+                LOG.warning(
+                    "Unknown status %(status)s for firewall %(name)s "
+                    "(%(id)s), setting volume to -1",
+                    {"status": fw['status'],
+                     "name": fw['name'],
+                     "id": fw['id']})
             yield sample.Sample(
                 name='network.services.firewall',
                 type=sample.TYPE_GAUGE,
