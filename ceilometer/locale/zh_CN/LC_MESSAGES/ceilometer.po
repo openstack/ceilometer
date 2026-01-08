@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,10 +28,6 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0\n"
 "Generated-By: Babel 2.2.0\n"
 "X-Generator: Zanata 4.3.3\n"
-
-#, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "正在丢弃通知%(type)s (uuid:%(msgid)s)"
 
 #, python-format
 msgid ""
@@ -47,14 +43,6 @@ msgid ""
 "is SHUTOFF."
 msgstr ""
 "为虚拟机<name=%(name)s, id=%(id)s>获取监控数据失败了，虚拟机状态为SHUTOFF"
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "发布%d个数据点时失败，正在将其丢弃"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr "发布%d个数据点时失败，将其入队"
 
 #, python-format
 msgid ""
@@ -80,23 +68,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "指定了插件，但未对 %s 提供插件名"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "拉取%(mtr)s传感器失败了%(cnt)s次！"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "%s的采集器被禁用"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr "发布的数据量超过本地队列最大长度，正在丢弃最老的%d个数据"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "未知的发布策略(%s)，强制使用默认策略"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps接口返回%(status)s %(reason)s"
 
@@ -107,13 +78,6 @@ msgstr "必填项%s没有填写"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s 需要字段“fields”"
-
-msgid "Unable to send sample over UDP"
-msgstr "无法通过UDP发送采样"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "从fw %(id)s收到未知的状态%(stat)s，跳过该采样数据"
 
 msgid "Wrong sensor type"
 msgstr "错误的传感器类型"

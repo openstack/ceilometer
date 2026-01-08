@@ -26,7 +26,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -37,10 +37,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: French\n"
-
-#, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "Suppression du %(type)s de notification (uuid:%(msgid)s)"
 
 #, python-format
 msgid ""
@@ -57,16 +53,6 @@ msgid ""
 msgstr ""
 "Echec de l'inspection des données de l'instance <name=%(name)s, id=%(id)s>. "
 "Le domaine est à l'état SHUTOFF (INTERRUPTION)."
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "Echec de la publication des points de données %d. Suppression en cours"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr ""
-"Echec de la publication des points de données %d. Mettez-les en file "
-"d'attente"
 
 #, python-format
 msgid ""
@@ -96,25 +82,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "Plugin spécifié, mais aucun nom de plugin n'est fourni pour %s"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "L'interrogation du capteur %(mtr)s a échoué %(cnt)s fois !"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "Le pollster pour %s est désactivé !"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr ""
-"La longueur maximale de local_queue du diffuseur est dépassée, suppression "
-"des %d échantillons les plus anciens"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "La politique de publication est inconnue (%s) forcé le défaut"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "L'API AdminOps RGW a renvoyé %(status)s %(reason)s"
 
@@ -125,13 +92,6 @@ msgstr "Champ requis %s non spécifiée"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Le champ 'fields' est requis pour  %s"
-
-msgid "Unable to send sample over UDP"
-msgstr "Impossible d'envoyer l'échantillon en UDP"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "Etat %(stat)s inconnu reçu sur le pare-feu %(id)s, échantillon ignoré"
 
 msgid "Wrong sensor type"
 msgstr "Type de détecteur incorrect"

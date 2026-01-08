@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,22 +22,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Russian\n"
-
-#, python-format
-msgid "Could not load the following pipelines: %s"
-msgstr "Не удалось загрузить следующие цепочки: %s"
-
-#, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "Удаление уведомления %(type)s (uuid:%(msgid)s)"
-
-#, python-format
-msgid ""
-"Error from libvirt while checking blockStats, This may not be harmful, but "
-"please check : %(ex)s"
-msgstr ""
-"Ошибка в libvirt при проверке blockStats, Это может быть нормальным, но, "
-"пожалуйста, проверьте : %(ex)s"
 
 #, python-format
 msgid ""
@@ -62,14 +46,6 @@ msgid ""
 msgstr ""
 "Не удалось проверить статистику инстанса %(instance_uuid)s, не удалось "
 "получить информацию от libvirt: %(error)s"
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "Не удалось опубликовать %d точек данных, выполняется их удаление"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr "Не удалось опубликовать %d точек данных, создайте для них очередь"
 
 #, python-format
 msgid ""
@@ -102,25 +78,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "Указан модуль, но не передано имя модуля для %s"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "%(cnt)s-кратный сбой датчика опроса %(mtr)s!"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "Опрашивающий объект для %s выключен!"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr ""
-"Превышена максимальная длина local_queue публикатора, удаление %d самых "
-"старых образцов"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "Стратегия публикации неизвестна (%s). По умолчанию принудительная"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "Функция API RGW AdminOps вернула %(status)s %(reason)s"
 
@@ -142,14 +99,6 @@ msgstr "Тестовая проверка"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Поле 'fields' является обязательным для %s"
-
-msgid "Unable to send sample over UDP"
-msgstr "Не удалось отправить образец по UDP"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr ""
-"В fw %(id)s получено неизвестное состояние %(stat)s,пример пропускается"
 
 msgid "Wrong sensor type"
 msgstr "Неверный тип датчика"

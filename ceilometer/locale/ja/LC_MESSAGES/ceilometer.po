@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Japanese\n"
-
-#, fuzzy, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "通知 %(type)s を除去しています (uuid:%(msgid)s)"
 
 #, python-format
 msgid ""
@@ -40,14 +36,6 @@ msgid ""
 msgstr ""
 "インスタンス <name=%(name)s, id=%(id)s> のデータを検査できませんでした。ドメ"
 "イン状態は SHUTOFF です。"
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "%d データポイントの公開に失敗しました。これらは廃棄されます"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr "%d データポイントの公開に失敗しました。これらをキューに入れてください"
 
 #, python-format
 msgid ""
@@ -77,25 +65,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "プラグインが指定されていますが、%s にプラグイン名が提供されていません"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "センサー %(mtr)s のポーリングが %(cnt)s 回失敗しました"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "%s の pollster が無効になっています"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr ""
-"パブリッシャー local_queue 最大長を超えました。古い方から %d 個のサンプルを除"
-"去します"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "パブリッシュポリシーが不明です (%s)。強制的にデフォルトに設定されます"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API から %(status)s %(reason)s が返されました"
 
@@ -106,15 +75,6 @@ msgstr "必須フィールド %s が指定されていません"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s にはフィールド 'fields' が必要です"
-
-msgid "Unable to send sample over UDP"
-msgstr "UDP 経由でサンプルを送信できません"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr ""
-"ファイアウォール %(id)s で不明な状態 %(stat)s を受信しました。サンプルをス"
-"キップします"
 
 msgid "Wrong sensor type"
 msgstr "センサー種別が正しくありません"

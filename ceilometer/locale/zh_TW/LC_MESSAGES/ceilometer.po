@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Chinese (Taiwan)\n"
-
-#, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "正在捨棄通知 %(type)s（UUID：%(msgid)s）"
 
 #, python-format
 msgid ""
@@ -38,14 +34,6 @@ msgid ""
 "Failed to inspect data of instance <name=%(name)s, id=%(id)s>, domain state "
 "is SHUTOFF."
 msgstr "無法檢查實例 <名稱=%(name)s，ID=%(id)s> 的資料，網域狀態為 SHUTOFF。"
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "無法發佈 %d 個資料點，正在捨棄它們"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr "無法發佈 %d 個資料點，正在將它們排入佇列"
 
 #, python-format
 msgid ""
@@ -71,23 +59,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "已指定外掛程式，但卻未向 %s 提供外掛程式名稱"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "輪詢 %(mtr)s 感應器已失敗 %(cnt)s 次！"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "已停用 %s 的 Pollster！"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr "已超出發佈者 local_queue 長度上限，正在捨棄 %d 個最舊的樣本"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "發佈原則不明 (%s)，強制設為預設值"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API 傳回了 %(status)s %(reason)s"
 
@@ -98,13 +69,6 @@ msgstr "未指定必要欄位 %s"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s 需要欄位「欄位」"
-
-msgid "Unable to send sample over UDP"
-msgstr "無法透過 UDP 來傳送樣本"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "在防火牆 %(id)s 上接收到不明狀態 %(stat)s，正在跳過範例"
 
 msgid "Wrong sensor type"
 msgstr "感應器類型錯誤"

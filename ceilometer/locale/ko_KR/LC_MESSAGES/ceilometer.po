@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -25,14 +25,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Korean (South Korea)\n"
-
-#, python-format
-msgid "Could not load the following pipelines: %s"
-msgstr "다음 파이프라인을 로드할 수 없음: %s"
-
-#, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "알림 %(type)s 삭제 중(uuid:%(msgid)s)"
 
 #, python-format
 msgid ""
@@ -49,14 +41,6 @@ msgid ""
 msgstr ""
 "인스턴스 <이름=%(name)s, id=%(id)s>의 데이터 검사 실패, 도메인 상태가 SHUTOFF"
 "입니다."
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "%d 데이터포인트 공개 실패. 이를 삭제하는 중"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr "%d 데이터포인트 공개 실패. 이를 큐에 대기시킴"
 
 #, python-format
 msgid ""
@@ -89,23 +73,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "플러그인이 지정되지 않았지만, %s에 플러그인 이름이 제공되지 않음"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "폴링 %(mtr)s 센서가 %(cnt)s번 실패했습니다!"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "%s의 의견조사자가 사용 안함으로 설정되어 있습니다!"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr "공개자 최대 local_queue 길이가 초과됨. %d 가장 오래된 샘플 삭제 중"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr "공개 정책을 알 수 없음(%s). 기본값으로 강제 설정함"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "RGW AdminOps API가 %(status)s %(reason)s을(를) 리턴함"
 
@@ -119,14 +86,6 @@ msgstr "샘플 체크"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "%s에 'fields' 필드 필요"
-
-msgid "Unable to send sample over UDP"
-msgstr "UDP를 통해 샘플을 전송할 수 없음"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr ""
-"fw %(id)s에서 알 수 없는 상태 %(stat)s이(가) 수신됨. 샘플을 건너뛰는 중"
 
 msgid "Wrong sensor type"
 msgstr "잘못된 센서 유형"

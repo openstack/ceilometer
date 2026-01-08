@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ceilometer VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2025-07-04 09:56+0000\n"
+"POT-Creation-Date: 2026-01-06 08:12+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,10 +20,6 @@ msgstr ""
 "Generated-By: Babel 2.0\n"
 "X-Generator: Zanata 4.3.3\n"
 "Language-Team: Italian\n"
-
-#, python-format
-msgid "Dropping Notification %(type)s (uuid:%(msgid)s)"
-msgstr "Eliminazione della notifica %(type)s (uuid:%(msgid)s)"
 
 #, python-format
 msgid ""
@@ -40,14 +36,6 @@ msgid ""
 msgstr ""
 "Impossibile ispezionare i dati dell'istanza  <name=%(name)s, id=%(id)s>, "
 "stato dominio SHUTOFF."
-
-#, python-format
-msgid "Failed to publish %d datapoints, dropping them"
-msgstr "Impossibile pubblicare %d datapoint, eliminati"
-
-#, python-format
-msgid "Failed to publish %d datapoints, queue them"
-msgstr "Impossibile pubblicare %d datapoint, inseriti in coda"
 
 #, python-format
 msgid ""
@@ -78,27 +66,6 @@ msgid "Plugin specified, but no plugin name supplied for %s"
 msgstr "Plug-in specificato, ma nessun nome di plug-in fornito per %s"
 
 #, python-format
-msgid "Polling %(mtr)s sensor failed for %(cnt)s times!"
-msgstr "Polling del sensore %(mtr)s non riuscito per %(cnt)s volte!"
-
-#, python-format
-msgid "Pollster for %s is disabled!"
-msgstr "Pollster per %s disabilitato!"
-
-#, python-format
-msgid ""
-"Publisher max local_queue length is exceeded, dropping %d oldest samples"
-msgstr ""
-"La lunghezza local_queue massima del publisher è stata superata, "
-"eliminazione di esempi %d meno recenti"
-
-#, python-format
-msgid "Publishing policy is unknown (%s) force to default"
-msgstr ""
-"La politica di pubblicazione è sconosciuta (%s), applicazione del valore "
-"predefinito"
-
-#, python-format
 msgid "RGW AdminOps API returned %(status)s %(reason)s"
 msgstr "L'API RGW AdminOps ha restituito %(status)s %(reason)s"
 
@@ -109,13 +76,6 @@ msgstr "Campo richiesto %s non specificato"
 #, python-format
 msgid "The field 'fields' is required for %s"
 msgstr "Il campo 'fields' è obbligatorio per %s"
-
-msgid "Unable to send sample over UDP"
-msgstr "Impossibile inviare l'esempio su UDP"
-
-#, python-format
-msgid "Unknown status %(stat)s received on fw %(id)s,skipping sample"
-msgstr "Stato non conosciuto %(stat)s ricevuto su fw %(id)s,ignorare l'esempio"
 
 msgid "Wrong sensor type"
 msgstr "Tipo di sensore errato"
