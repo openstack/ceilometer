@@ -1,0 +1,12 @@
+---
+upgrade:
+  - |
+    The ``network.services.firewall`` pollster now publishes samples for all
+    found firewalls, even if they are known to have an unknown state, when
+    they would previously be dropped. The volume of samples for such firewalls
+    will be set to ``-1``. This improves visibility of firewalls with unknown
+    states, allowing them to be monitored via samples and the
+    Gnocchi/Prometheus metrics, making it easier to discover such resources
+    for troubleshooting. It also moves some of the "business logic" for
+    downstream rating/billing services such as CloudKitty out of Ceilometer
+    itself.
