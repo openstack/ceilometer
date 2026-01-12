@@ -7,7 +7,9 @@
 
         publishers:
             # set address of Gnocchi
-            # + filter out Gnocchi-related activity meters (Swift driver)
+            # + filter out Gnocchi-related activity meters (Swift driver),
+            #   or use enable_filter_project=false to disable filtering
+            #   if not required
             # + set default archive policy
             - gnocchi://?filter_project=service&archive_policy=low
 

@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Filtering out metrics from the Gnocchi service project in the Gnocchi
+    publisher can now be disabled using the ``enable_filter_project``
+    publisher option, e.g. ``gnocchi://?enable_filter_project=false``
+    (``true`` by default). This ensures that the Gnocchi service project
+    always has metrics published to Gnocchi itself, which is usually the
+    desired behaviour when the Swift storage driver is not being used
+    (filtering should be **enabled** when using the Swift storage driver,
+    to eliminate feedback loops during metric generation).
