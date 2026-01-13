@@ -318,8 +318,14 @@ class PublisherTest(base.BaseTestCase):
                 '._if_not_cached', mock.Mock())
     @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '.batch_measures')
-    def _do_test_activity_filter(self, expected_measures, fake_batch):
-        url = netutils.urlsplit("gnocchi://")
+    def _do_test_activity_filter(self,
+                                 expected_measures,
+                                 fake_batch,
+                                 params=None):
+        url_str = "gnocchi://"
+        if params:
+            url_str += "?" + "&".join(f"{k}={v}" for k, v in params.items())
+        url = netutils.urlsplit(url_str)
         d = gnocchi.GnocchiPublisher(self.conf.conf, url)
         d._already_checked_archive_policies = True
         d.publish_samples(self.samples)
@@ -344,6 +350,19 @@ class PublisherTest(base.BaseTestCase):
             'Filtered project [service] not found in keystone, ignoring the '
             'filter_project option',
             log_called_args[0][0][0] % log_called_args[0][0][1])
+
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
+    def test_activity_gnocchi_project_filter_disabled(self, logger):
+        self.samples[0].project_id = (
+            'a2d42c23-d518-46b6-96ab-3fba2e146859')
+        self._do_test_activity_filter(
+            2,
+            params={"enable_filter_project": "false"})
+        self.assertIn(
+            mock.call("Filtering Gnocchi project is disabled, "
+                      "ignoring filter_project option"),
+            logger.debug.call_args_list,
+        )
 
     @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
                 '._get_gnocchi_client')
