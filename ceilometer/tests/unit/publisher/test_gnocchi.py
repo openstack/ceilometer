@@ -458,6 +458,13 @@ class PublisherTest(base.BaseTestCase):
             "Update event received on unexisting resource (%s), ignore it.",
             self.resource_id)
 
+    def test_stable_resource_attributes_hash(self):
+        url = netutils.urlsplit("gnocchi://")
+        publisher = gnocchi.GnocchiPublisher(self.conf.conf, url)
+        attributes = {'hello': 'world', 'foo': 'bar'}
+        hash = publisher._hash_resource(attributes)
+        self.assertEqual(hash, publisher._hash_resource(attributes))
+
 
 class MockResponse(mock.NonCallableMock):
     def __init__(self, code):

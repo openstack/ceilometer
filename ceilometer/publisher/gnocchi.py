@@ -14,6 +14,7 @@
 # under the License.
 from collections import defaultdict
 import fnmatch
+import hashlib
 import itertools
 import json
 import operator
@@ -541,7 +542,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
     @staticmethod
     def _hash_resource(resource):
-        return hash(tuple(i for i in resource.items() if i[0] != 'metrics'))
+        data = {k: v for k, v in resource.items() if k != 'metrics'}
+        payload = json.dumps(data, sort_keys=True, separators=(',', ':'))
+        return hashlib.blake2b(payload.encode(), digest_size=16).hexdigest()
 
     def _resource_cache_diff(self, key, attribute_hash):
         cached_hash = self.cache.get(key)

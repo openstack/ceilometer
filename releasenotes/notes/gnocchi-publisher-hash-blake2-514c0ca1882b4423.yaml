@@ -1,0 +1,13 @@
+---
+features:
+  - |
+    The hashing algorithm for the resource attributes cache in the Gnocchi
+    publisher has been changed to BLAKE2 to provide a deterministic and low
+    collision risk hash that is stable between processes, hosts and restarts.
+upgrade:
+  - |
+    The default hashing for the resource attributes cache in the Gnocchi publisher
+    has been changed from the builtin Python hash function to using the BLAKE2
+    algorithm, this will cause the cache for attributes for Gnocchi resources
+    to be rebuild that can cause a temporary higher load on the Gnocchi API due
+    to more resource update requests.
