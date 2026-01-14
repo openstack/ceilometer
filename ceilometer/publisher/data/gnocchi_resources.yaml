@@ -313,3 +313,18 @@ resources:
     event_delete: octavia.loadbalancer.delete.end
     event_attributes:
       id: resource_id
+
+  - resource_type: dns_zone
+    metrics:
+      dns.zone.status:
+      dns.zone.recordsets:
+      dns.zone.ttl:
+      dns.zone.serial:
+    attributes:
+      zone_name: resource_metadata.name
+      email: resource_metadata.email
+      zone_type: resource_metadata.type
+      pool_id: resource_metadata.pool_id
+    event_delete: dns.zone.delete
+    event_attributes:
+      id: resource_id

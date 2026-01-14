@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Add Designate DNS zone metrics polling support. This includes a new
+    dns_zone resource type for Gnocchi and the following meters:
+    ``dns.zone.status`` (zone status as numeric value),
+    ``dns.zone.recordsets`` (number of recordsets in a zone),
+    ``dns.zone.ttl`` (zone TTL value), and
+    ``dns.zone.serial`` (zone serial number).
+    A new discovery plugin ``dns_zones`` is also added to discover
+    DNS zones from Designate across all projects.
