@@ -32,6 +32,7 @@ import ceilometer.notification
 import ceilometer.nova_client
 import ceilometer.objectstore.rgw
 import ceilometer.objectstore.swift
+import ceilometer.octavia_client
 import ceilometer.pipeline.base
 import ceilometer.polling.manager
 import ceilometer.publisher.messaging
@@ -104,6 +105,7 @@ def list_opts():
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,
                          ceilometer.objectstore.swift.SERVICE_OPTS,
+                         ceilometer.octavia_client.SERVICE_OPTS,
                          ceilometer.volume.discovery.SERVICE_OPTS,))
     ]
 

@@ -606,6 +606,30 @@
       fields: payload.observer.id
     observer_typeURI:
       fields: payload.observer.typeURI
+- event_type: 'octavia.loadbalancer.*'
+  traits:
+    resource_id:
+      fields: payload.loadbalancer_id
+    project_id:
+      fields: payload.project_id
+    name:
+      fields: payload.name
+    description:
+      fields: payload.description
+    admin_state_up:
+      fields: payload.admin_state_up
+    availability_zone:
+      fields: payload.availability_zone
+    vip_address:
+      fields: payload.vip_address
+    vip_network_id:
+      fields: payload.vip_network_id
+    vip_port_id:
+      fields: payload.vip_port_id
+    vip_qos_policy_id:
+      fields: payload.vip_qos_policy_id
+    vip_subnet_id:
+      fields: payload.vip_subnet_id
 - event_type: 'alarm.*'
   traits:
     id:

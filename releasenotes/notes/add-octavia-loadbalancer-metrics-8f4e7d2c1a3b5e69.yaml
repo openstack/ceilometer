@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    Ceilometer now supports polling Octavia load balancer metrics using
+    openstacksdk. Two new meters are available:
+
+    * ``loadbalancer.operating``: Reports the operating status of load
+      balancers (ONLINE=1, DRAINING=2, OFFLINE=3, DEGRADED=4, ERROR=5,
+      NO_MONITOR=6, unknown=-1).
+
+    * ``loadbalancer.provisioning``: Reports the provisioning status of load
+      balancers (ACTIVE=1, DELETED=2, ERROR=3, PENDING_CREATE=4,
+      PENDING_UPDATE=5, PENDING_DELETE=6, unknown=-1).
+
+    A new ``loadbalancer`` resource type has been added to
+    gnocchi_resources.yaml to enable publishing these metrics to Gnocchi.

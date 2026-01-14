@@ -39,3 +39,4 @@ prometheus-client>=0.20.0 # Apache-2.0
 aodhclient>=3.8.0 # Apache-2.0
 awscurl>=0.36 # MIT
 botocore>=1.20.0 # Apache-2.0
+openstacksdk>=4.6.0 # Apache-2.0
