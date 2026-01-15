@@ -74,27 +74,22 @@ class _Base(plugin_base.PollsterBase):
     def _get_endpoint(conf, ksclient):
         # we store the endpoint as a base class attribute, so keystone is
         # only ever called once.
-        if _Base._ENDPOINT is None and conf.rgw_client.rgw_service_name:
+        if _Base._ENDPOINT is None:
+            service_type = conf.service_types.radosgw
+            service_name = conf.rgw_client.rgw_service_name
+
+            if service_type is None and service_name is None:
+                raise RuntimeError(
+                    "Required config not found, need either "
+                    "rgw_client.rgw_service_name or service_types.radosgw")
             try:
-                creds = conf.service_credentials
                 # Use the service_name to target the endpoint.
                 # There are cases where both 'radosgw' and 'swift' are used.
                 rgw_url = keystone_client.url_for(
                     ksclient,
-                    service_name=conf.rgw_client.rgw_service_name,
-                    interface=creds.interface,
-                    region_name=creds.region_name)
-                _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
-            except exceptions.EndpointNotFound:
-                LOG.debug("Radosgw endpoint not found")
-        elif _Base._ENDPOINT is None and conf.service_types.radosgw:
-            try:
-                creds = conf.service_credentials
-                rgw_url = keystone_client.url_for(
-                    ksclient,
-                    service_type=conf.service_types.radosgw,
-                    interface=creds.interface,
-                    region_name=creds.region_name)
+                    service_type=service_type, service_name=service_name,
+                    interface=conf.service_credentials.interface,
+                    region_name=conf.service_credentials.region_name)
                 _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
             except exceptions.EndpointNotFound:
                 LOG.debug("Radosgw endpoint not found")
