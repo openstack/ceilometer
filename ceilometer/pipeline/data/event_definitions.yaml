@@ -464,6 +464,53 @@
     audit_period_ending:
       type: datetime
       fields: payload.audit_period_ending
+- event_type: ['dns.zone.create', 'dns.zone.update', 'dns.zone.delete']
+  traits: &dns_zone_traits
+    resource_id:
+      fields: payload.id
+    project_id:
+      fields: payload.tenant_id
+    name:
+      fields: payload.name
+    description:
+      fields: payload.description
+    action:
+      fields: payload.action
+    created_at:
+      type: datetime
+      fields: payload.created_at
+    email:
+      fields: payload.email
+    expire:
+      fields: payload.expire
+    pool_id:
+      fields: payload.pool_id
+    refresh:
+      fields: payload.refresh
+    retry:
+      fields: payload.retry
+    serial:
+      fields: payload.serial
+    status:
+      fields: payload.status
+    ttl:
+      fields: payload.ttl
+    type:
+      fields: payload.type
+    updated_at:
+      type: datetime
+      fields: payload.updated_at
+    version:
+      fields: payload.version
+- event_type: dns.zone.exists
+  traits:
+    <<: *dns_zone_traits
+    audit_period_beginning:
+      type: datetime
+      fields: payload.audit_period_beginning
+    audit_period_ending:
+      type: datetime
+      fields: payload.audit_period_ending
 - event_type: trove.*
   traits: &trove_base_traits
     instance_type:

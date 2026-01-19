@@ -617,6 +617,32 @@ The following meters are collected for Octavia Load Balancer:
 |               |       |         |            |           | balancer         |
 +---------------+-------+---------+------------+-----------+------------------+
 
+Designate DNS
+~~~~~~~~~~~~~
+
+The following meters are collected for Designate DNS:
+
++---------------+-------+---------+------------+-----------+------------------+
+| Name          | Type  | Unit    | Resource   | Origin    | Note             |
++===============+=======+=========+============+===========+==================+
+| **Meters added in the Gazpacho release**                                    |
++---------------+-------+---------+------------+-----------+------------------+
+| dns.zone.sta\ | Gauge | status  | zone ID    | Pollster  | Status of a DNS  |
+| tus           |       |         |            |           | zone (1=ACTIVE,  |
+|               |       |         |            |           | 2=PENDING,       |
+|               |       |         |            |           | 3=ERROR)         |
++---------------+-------+---------+------------+-----------+------------------+
+| dns.zone.rec\ | Gauge | record\ | zone ID    | Pollster  | Number of record\|
+| ordsets       |       | set     |            |           | sets in a DNS    |
+|               |       |         |            |           | zone             |
++---------------+-------+---------+------------+-----------+------------------+
+| dns.zone.ttl  | Gauge | second  | zone ID    | Pollster  | TTL value of a   |
+|               |       |         |            |           | DNS zone         |
++---------------+-------+---------+------------+-----------+------------------+
+| dns.zone.ser\ | Gauge | serial  | zone ID    | Pollster  | Serial number of |
+| ial           |       |         |            |           | a DNS zone       |
++---------------+-------+---------+------------+-----------+------------------+
+
 Openstack alarming
 ~~~~~~~~~~~~~~~~~~
 

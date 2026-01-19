@@ -260,6 +260,21 @@ resources_update_operations = [
                           "max_length": 255, "required": False}
          }
      }]},
+    {"desc": "add dns_zone resource type",
+     "type": "create_resource_type",
+     "resource_type": "dns_zone",
+     "data": [{
+         "attributes": {
+             "zone_name": {"type": "string", "min_length": 0,
+                           "max_length": 255, "required": False},
+             "email": {"type": "string", "min_length": 0,
+                       "max_length": 255, "required": False},
+             "zone_type": {"type": "string", "min_length": 0,
+                           "max_length": 255, "required": False},
+             "pool_id": {"type": "string", "min_length": 0,
+                         "max_length": 255, "required": False}
+         }
+     }]},
 ]
 
 

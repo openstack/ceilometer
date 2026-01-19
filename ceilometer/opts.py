@@ -22,6 +22,7 @@ import ceilometer.cmd.polling
 import ceilometer.compute.discovery
 import ceilometer.compute.virt.inspector
 import ceilometer.compute.virt.libvirt.utils
+import ceilometer.designate_client
 import ceilometer.event.converter
 import ceilometer.image.discovery
 import ceilometer.ipmi.pollsters
@@ -100,6 +101,7 @@ def list_opts():
         ('rgw_client', ceilometer.objectstore.rgw.CLIENT_OPTS),
         ('service_types',
          itertools.chain(ceilometer.alarm.discovery.SERVICE_OPTS,
+                         ceilometer.designate_client.SERVICE_OPTS,
                          ceilometer.image.discovery.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
