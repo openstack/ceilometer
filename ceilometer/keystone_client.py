@@ -15,10 +15,14 @@
 
 import os
 
+from keystoneauth1 import exceptions as ka_exc
 from keystoneauth1 import loading as ka_loading
 from keystoneclient.v3 import client as ks_client_v3
 from openstack import connection
 from oslo_config import cfg
+
+from ceilometer import exceptions as ceilo_exc
+
 
 DEFAULT_GROUP = "service_credentials"
 
@@ -59,12 +63,17 @@ class Client:
             arguments are forwarded to the underlying ``find`` call.
         :returns: A single ``keystoneclient.v3.projects.Project`` resource
             object whose attributes match all supplied filters.
-        :raises keystoneauth1.exceptions.NotFound: if no project matches
+        :raises ceilometer.exceptions.NotFound: if no project matches
             the filters.
-        :raises keystoneclient.exceptions.NoUniqueMatch: if more than one
+        :raises ceilometer.exceptions.NoUniqueMatch: if more than one
             project matches the filters.
         """
-        return self.projects.find(**kwargs)
+        try:
+            return self.projects.find(**kwargs)
+        except ka_exc.NotFound as e:
+            raise ceilo_exc.NotFound(e.message, e.details)
+        except ks_client_v3.exceptions.NoUniqueMatch as e:
+            raise ceilo_exc.NoUniqueMatch(e.message)
 
     def list_projects(self, domain, **filters):
         """List projects within a domain, with optional attribute filters.
@@ -93,12 +102,17 @@ class Client:
             underlying ``find`` call.
         :returns: A single ``keystoneclient.v3.domains.Domain`` resource object
             whose attributes match all supplied filters.
-        :raises keystoneauth1.exceptions.NotFound: if no domain matches
+        :raises ceilometer.exceptions.NotFound: if no domain matches
             the filters.
-        :raises keystoneclient.exceptions.NoUniqueMatch: if more than one
+        :raises ceilometer.exceptions.NoUniqueMatch: if more than one
             domain matches the filters.
         """
-        return self.domains.find(**kwargs)
+        try:
+            return self.domains.find(**kwargs)
+        except ka_exc.NotFound as e:
+            raise ceilo_exc.NotFound(e.message, e.details)
+        except ks_client_v3.exceptions.NoUniqueMatch as e:
+            raise ceilo_exc.NoUniqueMatch(e.message)
 
     def list_domains(self, **filters):
         """List all domains, with optional attribute filters.
