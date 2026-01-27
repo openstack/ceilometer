@@ -294,6 +294,7 @@ resources:
   - resource_type: manila_share
     metrics:
       manila.share.size:
+      manila.share.status:
     attributes:
       name: resource_metadata.name
       host: resource_metadata.host

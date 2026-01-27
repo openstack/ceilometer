@@ -437,7 +437,13 @@ The following meters are collected for OpenStack File Share:
 | **Meters added in the Pike release**                                        |
 +--------------------+-------+--------+----------+----------+-----------------+
 | manila.share.size  | Gauge | GiB    | share ID | Notifica\| Size of the fil\|
-|                    |       |        |          | tion     | e share         |
+|                    |       |        |          | tion, Po\| e share         |
+|                    |       |        |          | llster   |                 |
++--------------------+-------+--------+----------+----------+-----------------+
+| **Meters added in the Gazpacho release**                                    |
++--------------------+-------+--------+----------+----------+-----------------+
+| manila.share.\     | Gauge | status | share ID | Pollster | Numeric status  |
+| status             |       |        |          |          | of the share    |
 +--------------------+-------+--------+----------+----------+-----------------+
 
 .. _telemetry-object-storage-meter:

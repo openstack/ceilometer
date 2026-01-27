@@ -27,6 +27,7 @@ import ceilometer.event.converter
 import ceilometer.image.discovery
 import ceilometer.ipmi.pollsters
 import ceilometer.keystone_client
+import ceilometer.manila_client
 import ceilometer.meter.notifications
 import ceilometer.neutron_client
 import ceilometer.notification
@@ -103,6 +104,7 @@ def list_opts():
          itertools.chain(ceilometer.alarm.discovery.SERVICE_OPTS,
                          ceilometer.designate_client.SERVICE_OPTS,
                          ceilometer.image.discovery.SERVICE_OPTS,
+                         ceilometer.manila_client.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,

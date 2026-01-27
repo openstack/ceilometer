@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Added Manila shared file system metrics polling via openstacksdk.
+    New metrics:
+
+    * ``manila.share.status`` - Numeric status of the share
+    * ``manila.share.size`` - Size of the share in GiB (polling-based)
+
+    These metrics complement the existing notification-based
+    ``manila.share.size`` metric with polling support.
