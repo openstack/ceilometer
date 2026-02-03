@@ -293,7 +293,9 @@ function start_ceilometer {
         run_process gnocchi-api "$(which uwsgi) --ini $GNOCCHI_UWSGI_FILE" ""
         run_process gnocchi-metricd "$CEILOMETER_BIN_DIR/gnocchi-metricd --config-file $GNOCCHI_CONF"
         wait_for_service 30 "$(gnocchi_service_url)"
-        $CEILOMETER_BIN_DIR/ceilometer-upgrade
+        if is_service_enabled gnocchi-api; then
+            $CEILOMETER_BIN_DIR/ceilometer-upgrade
+        fi
     fi
 
     run_process ceilometer-acentral "$CEILOMETER_BIN_DIR/ceilometer-polling --polling-namespaces central --config-file $CEILOMETER_CONF"
