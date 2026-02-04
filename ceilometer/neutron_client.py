@@ -14,8 +14,8 @@
 
 import functools
 
-from neutronclient.common import exceptions
-from neutronclient.v2_0 import client as clientv20
+from openstack import connection
+from openstack import exceptions as os_exc
 from oslo_config import cfg
 from oslo_log import log
 
@@ -31,12 +31,13 @@ LOG = log.getLogger(__name__)
 
 
 def logged(func):
+    """Decorator to log exceptions from openstacksdk calls."""
 
     @functools.wraps(func)
     def with_logging(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except exceptions.NeutronClientException as e:
+        except os_exc.HttpException as e:
             if e.status_code == 404:
                 LOG.warning("The resource could not be found.")
             else:
@@ -50,9 +51,13 @@ def logged(func):
 
 
 class Client:
-    """A client which gets information via python-neutronclient."""
+    """A client which gets information via openstacksdk."""
 
     def __init__(self, conf):
+        """Initialize the Neutron client using openstacksdk.
+
+        :param conf: Oslo config object with service credentials.
+        """
         creds = conf.service_credentials
         params = {
             'session': keystone_client.get_session(conf),
@@ -60,29 +65,32 @@ class Client:
             'region_name': creds.region_name,
             'service_type': conf.service_types.neutron,
         }
-        self.client = clientv20.Client(**params)
+        self.conn = connection.Connection(conf=conf, **params)
 
     @logged
     def vpn_get_all(self):
-        resp = self.client.list_vpnservices()
-        return resp.get('vpnservices')
+        """Get all VPN services."""
+        return [vpn.to_dict() for vpn in self.conn.network.vpn_services()]
 
     @logged
     def ipsec_site_connections_get_all(self):
-        resp = self.client.list_ipsec_site_connections()
-        return resp.get('ipsec_site_connections')
+        """Get all IPSec site connections."""
+        return [conn.to_dict()
+                for conn in self.conn.network.vpn_ipsec_site_connections()]
 
     @logged
     def firewall_get_all(self):
-        resp = self.client.list_firewalls()
-        return resp.get('firewalls')
+        """Get all firewall groups (FWaaS v2)."""
+        return [fw.to_dict()
+                for fw in self.conn.network.firewall_groups()]
 
     @logged
     def fw_policy_get_all(self):
-        resp = self.client.list_firewall_policies()
-        return resp.get('firewall_policies')
+        """Get all firewall policies."""
+        return [policy.to_dict()
+                for policy in self.conn.network.firewall_policies()]
 
     @logged
     def fip_get_all(self):
-        fips = self.client.list_floatingips()['floatingips']
-        return fips
+        """Get all floating IPs."""
+        return [fip.to_dict() for fip in self.conn.network.ips()]

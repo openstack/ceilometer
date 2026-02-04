@@ -22,13 +22,14 @@ LOG = log.getLogger(__name__)
 
 
 class FirewallPollster(base.BaseServicesPollster):
-    """Pollster to capture firewalls status samples."""
+    """Pollster to capture firewall group status samples (FWaaS v2)."""
 
     FIELDS = ['admin_state_up',
               'description',
               'name',
               'status',
-              'firewall_policy_id',
+              'ingress_firewall_policy_id',
+              'egress_firewall_policy_id',
               ]
 
     @property
@@ -54,7 +55,7 @@ class FirewallPollster(base.BaseServicesPollster):
                 unit='firewall',
                 volume=status,
                 user_id=None,
-                project_id=fw['tenant_id'],
+                project_id=fw.get('project_id') or fw.get('tenant_id'),
                 resource_id=fw['id'],
                 resource_metadata=self.extract_metadata(fw)
             )
@@ -87,7 +88,7 @@ class FirewallPolicyPollster(base.BaseServicesPollster):
                 unit='firewall_policy',
                 volume=1,
                 user_id=None,
-                project_id=fw['tenant_id'],
+                project_id=fw.get('project_id') or fw.get('tenant_id'),
                 resource_id=fw['id'],
                 resource_metadata=self.extract_metadata(fw)
             )
