@@ -102,14 +102,14 @@ def list_opts():
         ('rgw_client', ceilometer.objectstore.rgw.CLIENT_OPTS),
         ('service_types',
          itertools.chain(ceilometer.alarm.discovery.SERVICE_OPTS,
+                         ceilometer.cinder_client.SERVICE_OPTS,
                          ceilometer.designate_client.SERVICE_OPTS,
                          ceilometer.manila_client.SERVICE_OPTS,
                          ceilometer.neutron_client.SERVICE_OPTS,
                          ceilometer.nova_client.SERVICE_OPTS,
                          ceilometer.objectstore.rgw.SERVICE_OPTS,
                          ceilometer.objectstore.swift.SERVICE_OPTS,
-                         ceilometer.octavia_client.SERVICE_OPTS,
-                         ceilometer.volume.discovery.SERVICE_OPTS,))
+                         ceilometer.octavia_client.SERVICE_OPTS,))
     ]
 
 

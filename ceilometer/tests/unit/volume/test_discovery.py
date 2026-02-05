@@ -55,7 +55,7 @@ class TestVolumeDiscovery(_BaseDiscoveryTestCase):
         self.assertEqual(fakes.VOLUME_LIST, resources)
 
     def test_discover_empty(self):
-        self.discovery.client.volumes.list = mock.Mock(
+        self.discovery.client._client.volumes.list = mock.Mock(
             return_value=[])
 
         resources = self.discovery.discover(self.manager)
@@ -64,8 +64,8 @@ class TestVolumeDiscovery(_BaseDiscoveryTestCase):
 
     def test_discover_calls_list_volumes_with_all_tenants(self):
         with mock.patch.object(
-            self.discovery.client.volumes, 'list',
-            wraps=self.discovery.client.volumes.list
+            self.discovery.client._client.volumes, 'list',
+            wraps=self.discovery.client._client.volumes.list
         ) as spy:
 
             self.discovery.discover(self.manager)
@@ -73,7 +73,7 @@ class TestVolumeDiscovery(_BaseDiscoveryTestCase):
             spy.assert_called_once_with(search_opts={'all_tenants': True})
 
     def test_discover_propagates_exception(self):
-        self.discovery.client.volumes.list = (
+        self.discovery.client._client.volumes.list = (
             self.cinder_client_exception)
 
         self.assertRaises(
@@ -93,7 +93,7 @@ class TestVolumeSnapshotsDiscovery(_BaseDiscoveryTestCase):
         self.assertEqual(fakes.SNAPSHOT_LIST, resources)
 
     def test_discover_empty(self):
-        self.discovery.client.volume_snapshots.list = mock.Mock(
+        self.discovery.client._client.volume_snapshots.list = mock.Mock(
             return_value=[])
 
         resources = self.discovery.discover(self.manager)
@@ -102,8 +102,8 @@ class TestVolumeSnapshotsDiscovery(_BaseDiscoveryTestCase):
 
     def test_discover_calls_list_snapshots_with_all_tenants(self):
         with mock.patch.object(
-            self.discovery.client.volume_snapshots, 'list',
-            wraps=self.discovery.client.volume_snapshots.list
+            self.discovery.client._client.volume_snapshots, 'list',
+            wraps=self.discovery.client._client.volume_snapshots.list
         ) as spy:
             self.discovery.discover(self.manager)
 
@@ -111,7 +111,7 @@ class TestVolumeSnapshotsDiscovery(_BaseDiscoveryTestCase):
 
     def test_discover_propagates_exception(self):
         with mock.patch.object(
-                self.discovery.client.volume_snapshots, 'list',
+                self.discovery.client._client.volume_snapshots, 'list',
                 side_effect=cinder_exceptions.ClientException(500)):
 
             self.discovery = discovery.VolumeSnapshotsDiscovery(self.CONF)
@@ -133,7 +133,7 @@ class TestVolumeBackupsDiscovery(_BaseDiscoveryTestCase):
         self.assertEqual(fakes.BACKUP_LIST, resources)
 
     def test_discover_empty(self):
-        self.discovery.client.backups.list = mock.Mock(return_value=[])
+        self.discovery.client._client.backups.list = mock.Mock(return_value=[])
 
         resources = self.discovery.discover(self.manager)
 
@@ -141,8 +141,8 @@ class TestVolumeBackupsDiscovery(_BaseDiscoveryTestCase):
 
     def test_discover_calls_list_backups_with_all_tenants(self):
         with mock.patch.object(
-                self.discovery.client.backups, 'list',
-                wraps=self.discovery.client.backups.list) as spy:
+                self.discovery.client._client.backups, 'list',
+                wraps=self.discovery.client._client.backups.list) as spy:
 
             self.discovery.discover(self.manager)
 
@@ -150,7 +150,7 @@ class TestVolumeBackupsDiscovery(_BaseDiscoveryTestCase):
                 search_opts={'all_tenants': True})
 
     def test_discover_propagates_exception(self):
-        self.discovery.client.backups.list = (
+        self.discovery.client._client.backups.list = (
             self.cinder_client_exception)
 
         self.assertRaises(
@@ -170,7 +170,7 @@ class TestVolumePoolsDiscovery(_BaseDiscoveryTestCase):
         self.assertEqual(fakes.POOL_LIST, resources)
 
     def test_discover_empty(self):
-        self.discovery.client.pools.list = mock.Mock(return_value=[])
+        self.discovery.client._client.pools.list = mock.Mock(return_value=[])
 
         resources = self.discovery.discover(self.manager)
 
@@ -178,8 +178,8 @@ class TestVolumePoolsDiscovery(_BaseDiscoveryTestCase):
 
     def test_discover_calls_list_pools_with_detailed_true(self):
         with mock.patch.object(
-            self.discovery.client.pools, 'list',
-            wraps=self.discovery.client.pools.list
+            self.discovery.client._client.pools, 'list',
+            wraps=self.discovery.client._client.pools.list
         ) as spy:
 
             self.discovery.discover(self.manager)
@@ -187,7 +187,7 @@ class TestVolumePoolsDiscovery(_BaseDiscoveryTestCase):
             spy.assert_called_once_with(detailed=True)
 
     def test_discover_propagates_exception(self):
-        self.discovery.client.pools.list = (
+        self.discovery.client._client.pools.list = (
             self.cinder_client_exception)
 
         self.assertRaises(
@@ -207,7 +207,7 @@ class TestVolumeServicesDiscovery(_BaseDiscoveryTestCase):
         self.assertEqual(fakes.SERVICE_LIST, resources)
 
     def test_discover_empty(self):
-        self.discovery.client.services.list = mock.Mock(
+        self.discovery.client._client.services.list = mock.Mock(
             return_value=[])
 
         resources = self.discovery.discover(self.manager)
@@ -216,8 +216,8 @@ class TestVolumeServicesDiscovery(_BaseDiscoveryTestCase):
 
     def test_discover_calls_list_services_with_no_args(self):
         with mock.patch.object(
-            self.discovery.client.services, 'list',
-            wraps=self.discovery.client.services.list
+            self.discovery.client._client.services, 'list',
+            wraps=self.discovery.client._client.services.list
         ) as spy:
 
             self.discovery.discover(self.manager)
@@ -225,7 +225,7 @@ class TestVolumeServicesDiscovery(_BaseDiscoveryTestCase):
             spy.assert_called_once_with()
 
     def test_discover_propagates_exception(self):
-        self.discovery.client.services.list = (
+        self.discovery.client._client.services.list = (
             self.cinder_client_exception)
 
         self.assertRaises(
