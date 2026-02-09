@@ -88,7 +88,7 @@ class ResourcesDefinition:
                 extra["archive_policy_name"] = archive_policy_override
 
             # NOTE(sileht): For backward compat, this is after the override to
-            # preserve the wierd previous behavior. We don't really care as we
+            # preserve the weird previous behavior. We don't really care as we
             # deprecate it.
             if 'archive_policy' in self.cfg:
                 LOG.warning("archive_policy '%s' for a resource-type (%s) is "

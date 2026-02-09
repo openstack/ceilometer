@@ -4,7 +4,7 @@
 #RECLONE=True
 #FORCE=True
 #OFFLINE=True
-# HOST_IP shoudl be set to an ip that is present on the host
+# HOST_IP should be set to an ip that is present on the host
 # e.g. the ip of eth0. This will be used to bind api endpoints and horizon.
 HOST_IP=<hostip>
 
@@ -24,12 +24,12 @@ SERVICE_PASSWORD=$ADMIN_PASSWORD
 LOGFILE=$DEST/logs/stack.sh.log
 LOGDAYS=2
 
-# the plugin line order matters but the placment in the file does not
+# the plugin line order matters but the placement in the file does not
 enable_plugin aodh https://opendev.org/openstack/aodh
 enable_plugin ceilometer https://opendev.org/openstack/ceilometer.git
 
 # Gnocchi settings
-# Gnocchi is optional but can be enbaled by uncommenting CEILOMETER_BACKEND
+# Gnocchi is optional but can be enabled by uncommenting CEILOMETER_BACKEND
 CEILOMETER_BACKEND=gnocchi
 
 # if gnocchi is not in LIBS_FROM_GIT it will install from pypi.

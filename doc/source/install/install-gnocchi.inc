@@ -69,7 +69,7 @@
 
    * In the ``[storage]`` section, configure location to store metric data.
      In this case, we will store it to the local file system. See Gnocchi
-     documenation for a list of more durable and performant drivers:
+     documentation for a list of more durable and performant drivers:
 
      .. code-block:: ini
 

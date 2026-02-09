@@ -139,11 +139,11 @@ class TestOpentelemetryHttpPublisher(base.BaseTestCase):
                                return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
-        datas = []
+        data = []
         for s in self.sample_data:
-            datas.append(self._make_fake_json(s, self.format_time))
+            data.append(self._make_fake_json(s, self.format_time))
         expected = []
-        for d in datas:
+        for d in data:
             expected.append(mock.call('http://localhost:4318/v1/metrics',
                                       auth=None,
                                       cert=None,
@@ -167,11 +167,11 @@ class TestOpentelemetryHttpPublisher(base.BaseTestCase):
                                return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
-        datas = []
+        data = []
         for s in self.sample_data:
-            datas.append(self._make_fake_json(s, self.format_time))
+            data.append(self._make_fake_json(s, self.format_time))
         expected = []
-        for d in datas:
+        for d in data:
             expected.append(mock.call('https://localhost:4318/v1/metrics',
                                       auth=None,
                                       cert=None,

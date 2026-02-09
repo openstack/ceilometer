@@ -18,7 +18,7 @@ New Features
 
 .. releasenotes/notes/configurable-data-collector-e247aadbffb85243.yaml @ f24ea44401b8945c9cb8a34b2aedebba3c040691
 
-- [`bug 1480333 <https://bugs.launchpad.net/ceilometer/+bug/1480333>`_] Support ability to configure collector to capture events or meters mutally exclusively, rather than capturing both always.
+- [`bug 1480333 <https://bugs.launchpad.net/ceilometer/+bug/1480333>`_] Support ability to configure collector to capture events or meters mutually exclusively, rather than capturing both always.
 
 .. releasenotes/notes/cors-support-70c33ba1f6825a7b.yaml @ c5895d2c6efc6676679e6973c06b85c0c3a10585
 
@@ -74,7 +74,7 @@ Known Issues
 
 .. releasenotes/notes/support-lbaasv2-polling-c830dd49bcf25f64.yaml @ e6fa0a84d1f7a326881f3587718f1df743b8585f
 
-- Neutron API is not designed to be polled against. When polling against Neutron is enabled, Ceilometer's polling agents may generage a significant load against the Neutron API. It is recommended that a dedicated API be enabled for polling while Neutron's API is improved to handle polling.
+- Neutron API is not designed to be polled against. When polling against Neutron is enabled, Ceilometer's polling agents may generate a significant load against the Neutron API. It is recommended that a dedicated API be enabled for polling while Neutron's API is improved to handle polling.
 
 
 Upgrade Notes
@@ -198,7 +198,7 @@ Bug Fixes
 
 .. releasenotes/notes/skip-duplicate-meter-def-0420164f6a95c50c.yaml @ 0c6f11cf88bf1a13a723879de46ec616678d2e0b
 
-- [`bug 1536498 <https://bugs.launchpad.net/ceilometer/+bug/1536498>`_] Patch to fix duplicate meter definitions causing duplicate samples. If a duplicate is found, log a warning and skip the meter definition. Note that the first occurance of a meter will be used and any following duplicates will be skipped from processing.
+- [`bug 1536498 <https://bugs.launchpad.net/ceilometer/+bug/1536498>`_] Patch to fix duplicate meter definitions causing duplicate samples. If a duplicate is found, log a warning and skip the meter definition. Note that the first occurrence of a meter will be used and any following duplicates will be skipped from processing.
 
 .. releasenotes/notes/sql-query-optimisation-ebb2233f7a9b5d06.yaml @ f24ea44401b8945c9cb8a34b2aedebba3c040691
 

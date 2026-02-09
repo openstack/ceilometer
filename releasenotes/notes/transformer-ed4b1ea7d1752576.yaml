@@ -7,4 +7,4 @@ deprecations:
     rating is already computed in Gnocchi today.
   - |
     Pipeline Partitioning is also deprecated. This was only useful to
-    workaround of some issues that tranformers has.
+    workaround of some issues that transformers has.
