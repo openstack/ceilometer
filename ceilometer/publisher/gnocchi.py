@@ -158,6 +158,7 @@ class LockedDefaultDict(defaultdict):
     Dictionary only deletes if nothing is accessing dict and nothing is holding
     lock to be deleted. If both cases are not true, it will skip delete.
     """
+
     def __init__(self, *args, **kwargs):
         self.lock = threading.Lock()
         super().__init__(*args, **kwargs)
@@ -189,6 +190,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
 
       gnocchi://?enable_filter_project=false
     """
+
     def __init__(self, conf, parsed_url):
         super().__init__(conf, parsed_url)
         # TODO(jd) allow to override Gnocchi endpoint via the host in the URL

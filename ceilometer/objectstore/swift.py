@@ -119,6 +119,7 @@ class _ContainersBase(_Base):
 
 class ObjectsPollster(_Base):
     """Collect the total objects count for each project"""
+
     def get_samples(self, manager, cache, resources):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
@@ -137,6 +138,7 @@ class ObjectsPollster(_Base):
 
 class ObjectsSizePollster(_Base):
     """Collect the total objects size of each project"""
+
     def get_samples(self, manager, cache, resources):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
@@ -155,6 +157,7 @@ class ObjectsSizePollster(_Base):
 
 class ObjectsContainersPollster(_Base):
     """Collect the container count for each project"""
+
     def get_samples(self, manager, cache, resources):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,

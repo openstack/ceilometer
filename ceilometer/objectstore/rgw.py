@@ -179,7 +179,7 @@ class ObjectsSizePollster(_Base):
                 project_id=tenant,
                 resource_id=tenant,
                 resource_metadata=None,
-                )
+            )
 
 
 class ObjectsPollster(_Base):
@@ -197,7 +197,7 @@ class ObjectsPollster(_Base):
                 project_id=tenant,
                 resource_id=tenant,
                 resource_metadata=None,
-                )
+            )
 
 
 class ObjectsContainersPollster(_Base):
@@ -213,7 +213,7 @@ class ObjectsContainersPollster(_Base):
                 project_id=tenant,
                 resource_id=tenant,
                 resource_metadata=None,
-                )
+            )
 
 
 class UsagePollster(_Base):
@@ -232,4 +232,4 @@ class UsagePollster(_Base):
                 project_id=tenant,
                 resource_id=tenant,
                 resource_metadata=None,
-                )
+            )

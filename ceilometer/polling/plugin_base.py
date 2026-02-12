@@ -27,6 +27,7 @@ class ExtensionLoadError(Exception):
     to setup required HW/SW dependency. Any exception from it would be
     propagated as ExtensionLoadError, then skip loading this pollster.
     """
+
     def __init__(self, msg=None):
         self.msg = msg
 

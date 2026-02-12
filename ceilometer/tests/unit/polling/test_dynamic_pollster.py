@@ -1442,7 +1442,7 @@ class TestDynamicPollster(base.BaseTestCase):
                 "bytes_sent": 273793180,
                 "ops": 119690,
                 "successful_ops": 119682
-            },
+        },
             "user":
                 " 00ab8d7e76fc4$00ab8d7e76fc45a37776732"
         }
@@ -1493,7 +1493,7 @@ class TestDynamicPollster(base.BaseTestCase):
                     "bytes_sent": 2141912,
                     "ops": 102,
                     "successful_ops": 106
-                },
+            },
                 "user": "test-user"}]
         return multi_metric_sample_list
 
