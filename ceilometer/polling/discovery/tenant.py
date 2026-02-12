@@ -28,21 +28,29 @@ class TenantDiscovery(plugin.DiscoveryBase):
     """
 
     def discover(self, manager, param=None):
-        domains = manager.keystone.domains.list()
-        LOG.debug(f"Found {len(domains)} keystone domains")
+        filters = {}
+        # When ignore_disabled_projects is enabled, add a filter
+        # to the Keystone API queries so that only enabled projects,
+        # and projects in enabled domains, are returned.
+        if self.conf.polling.ignore_disabled_projects:
+            filters["enabled"] = True
+
+        domains = manager.keystone.domains.list(**filters)
+        LOG.debug(
+            "Found %i %sKeystone domains",
+            len(domains),
+            "enabled " if self.conf.polling.ignore_disabled_projects else "")
 
         tenants = []
+        projects_log_message = (
+            "Found %i enabled projects in domain %s"
+            if self.conf.polling.ignore_disabled_projects
+            else "Found %i projects in domain %s")
         for domain in domains:
-            domain_tenants = manager.keystone.projects.list(domain)
-            if self.conf.polling.ignore_disabled_projects:
-                enabled_tenants = [tenant for tenant in
-                                   domain_tenants if tenant.enabled]
-                LOG.debug(f"Found {len(enabled_tenants)} enabled "
-                          f"tenants in domain {domain.name}")
-                tenants = enabled_tenants + domain_tenants
-            else:
-                LOG.debug(f"Found {len(domain_tenants)} "
-                          f"tenants in domain {domain.name}")
-                tenants = tenants + domain_tenants
+            domain_projects = manager.keystone.projects.list(
+                domain,
+                **filters)
+            LOG.debug(projects_log_message, len(domain_projects), domain.name)
+            tenants.extend(domain_projects)
 
-        return tenants or []
+        return tenants

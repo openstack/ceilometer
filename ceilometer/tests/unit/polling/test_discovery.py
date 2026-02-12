@@ -125,7 +125,7 @@ class TestProjectDiscovery(base.BaseTestCase):
         self.default_domain_projects = [project_admin, project_service]
         self.heat_domain_projects = [project_demo]
 
-    def side_effect(self, domain=None):
+    def side_effect(self, domain=None, **kwargs):
         if not domain or domain.name == 'Default':
             return self.default_domain_projects
         elif domain.name == 'heat':
@@ -135,8 +135,8 @@ class TestProjectDiscovery(base.BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        CONF = service.prepare_service([], [])
-        self.discovery = project.TenantDiscovery(CONF)
+        self.CONF = service.prepare_service([], [])
+        self.discovery = project.TenantDiscovery(self.CONF)
         self.prepare_mock_data()
         self.manager = mock.MagicMock()
         self.manager.keystone.projects.list.side_effect = self.side_effect
@@ -145,4 +145,19 @@ class TestProjectDiscovery(base.BaseTestCase):
         self.manager.keystone.domains.list.return_value = self.domains
         result = self.discovery.discover(self.manager)
         self.assertEqual(len(result), 3)
-        self.assertEqual(self.manager.keystone.projects.list.call_count, 2)
+        self.manager.keystone.domains.list.assert_called_once_with()
+        self.assertEqual(
+            self.manager.keystone.projects.list.mock_calls,
+            [mock.call(domain) for domain in self.domains])
+
+    def test_project_discovery_ignore_disabled_projects(self):
+        self.CONF.set_override("ignore_disabled_projects",
+                               True, group="polling")
+        self.manager.keystone.domains.list.return_value = self.domains
+        result = self.discovery.discover(self.manager)
+        self.assertEqual(len(result), 3)
+        self.manager.keystone.domains.list.assert_called_once_with(
+            enabled=True)
+        self.assertEqual(
+            self.manager.keystone.projects.list.mock_calls,
+            [mock.call(domain, enabled=True) for domain in self.domains])
