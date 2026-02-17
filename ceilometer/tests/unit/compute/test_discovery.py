@@ -1007,10 +1007,15 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual({'metering.server_group': 'group1'},
                          ret_server.metadata)
 
-        # test raise NotFound exception
+    def test_get_server_notfound(self):
+        self.client.nova_client = mock.MagicMock()
+        self.client.nova_client.servers = mock.MagicMock()
+
         self.client.nova_client.servers.get = mock.MagicMock(
             side_effect=exceptions.NotFound(404))
         dsc = discovery.InstanceDiscovery(self.CONF)
+
+        uuid = '123456'
 
         ret_server = dsc.get_server(uuid)
         self.assertIsNone(ret_server)
