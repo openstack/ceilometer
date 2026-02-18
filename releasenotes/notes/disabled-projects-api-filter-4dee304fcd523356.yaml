@@ -1,0 +1,14 @@
+---
+features:
+  - |
+    When ``[polling]/ignore_disabled_projects`` is enabled, project filtering
+    is now performed server-side using API filters. This improves the
+    performance of project discovery (used by the Swift object storage pollsters),
+    particularly when Keystone has a lot of disabled projects (e.g. retained for
+    record-keeping purposes, since deleting projects in Keystone removes them
+    completely).
+upgrade:
+  - |
+    When ``[polling]/ignore_disabled_projects`` is enabled, projects that are
+    part of disabled domains are also ignored, regardless of whether or not
+    the projects inside those domains are marked as disabled.
