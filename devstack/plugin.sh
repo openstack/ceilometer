@@ -239,14 +239,8 @@ function configure_ceilometer {
 
     # The compute and central agents need these credentials in order to
     # call out to other services' public APIs.
-    iniset $CEILOMETER_CONF service_credentials auth_type password
-    iniset $CEILOMETER_CONF service_credentials user_domain_id default
-    iniset $CEILOMETER_CONF service_credentials project_domain_id default
-    iniset $CEILOMETER_CONF service_credentials project_name $SERVICE_PROJECT_NAME
-    iniset $CEILOMETER_CONF service_credentials username ceilometer
-    iniset $CEILOMETER_CONF service_credentials password $SERVICE_PASSWORD
+    configure_keystoneauth $CEILOMETER_CONF ceilometer service_credentials
     iniset $CEILOMETER_CONF service_credentials region_name $REGION_NAME
-    iniset $CEILOMETER_CONF service_credentials auth_url $KEYSTONE_SERVICE_URI
 
     _ceilometer_configure_storage_backend
 
