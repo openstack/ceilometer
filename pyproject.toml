@@ -1,3 +1,8 @@
 [build-system]
 requires = ["pbr>=6.0.0", "setuptools>=64.0.0"]
 build-backend = "pbr.build"
+
+[tool.codespell]
+skip = "*.po,*.js,*.css,*.html,*.svg,HACKING.py,*hacking*,*build*,*_static*,doc/dictionary.txt,*.pyc,*.inv,*.gz,*.jpg,*.png,*.vsd,*.graffle,*.json,*telemetry-measurements.rst"
+count = true
+quiet-level = 4

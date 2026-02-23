@@ -10,7 +10,7 @@ features:
     instance attributes) are no longer part of the samples created by the
     agent. But when Gnocchi is used as backend, this is not an issue since
     Gnocchi doesn't store resource metadata aside of the measurements. And the
-    missing informations are still retrieved through the Nova notifications
+    missing information is still retrieved through the Nova notifications
     and will fully update the resource information in Gnocchi.
 upgrade:
   - If you are using Gnocchi as backend it's strongly

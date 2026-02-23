@@ -29,9 +29,9 @@ class _BaseDiscovery(plugin_base.DiscoveryBase):
         super().__init__(conf)
         creds = conf.service_credentials
         # NOTE(mnederlof): We set 3.64 (the maximum for Wallaby) because:
-        # we need atleast 3.41 to get user_id on snapshots.
-        # we need atleast 3.56 for user_id and project_id on backups.
-        # we need atleast 3.63 for volume_type_id on volumes.
+        # we need at least 3.41 to get user_id on snapshots.
+        # we need at least 3.56 for user_id and project_id on backups.
+        # we need at least 3.63 for volume_type_id on volumes.
         self.client = cinder_client.Client(
             version='3.64',
             session=keystone_client.get_session(conf),

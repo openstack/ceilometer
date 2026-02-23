@@ -47,7 +47,7 @@ class FilePublisher(publisher.ConfigPublisherBase):
     File path is required for this publisher to work properly. If max_bytes
     or backup_count is missing, FileHandler will be used to save the metering
     data. If max_bytes and backup_count are present, RotatingFileHandler will
-    be used to save the metering data. The json argument is used to explicitely
+    be used to save the metering data. The json argument is used to explicitly
     ask ceilometer to write json into the file.
     """
 

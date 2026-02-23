@@ -65,7 +65,7 @@ OPTS = [
 
 
 def list_opts():
-    # FIXME(sileht): readd pollster namespaces in the generated configfile
+    # FIXME(sileht): re-add pollster namespaces in the generated configfile
     # This have been removed due to a recursive import issue
     return [
         ('DEFAULT',

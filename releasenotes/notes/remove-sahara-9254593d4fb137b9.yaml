@@ -5,5 +5,5 @@ upgrade:
     option has been updated and ``sahara`` is no longer included by default.
 
   - |
-    The default event definiton has been updated and no longer includes
+    The default event definition has been updated and no longer includes
     events for sahara.

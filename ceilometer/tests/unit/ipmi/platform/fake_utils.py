@@ -30,7 +30,7 @@ def init_sensor_agent(parameter=''):
 
 def execute(*cmd, **kwargs):
 
-    datas = {
+    data = {
         test_data.sdr_info_cmd: test_data.sdr_info,
         test_data.read_sensor_temperature_cmd: test_data.sensor_temperature,
         test_data.read_sensor_voltage_cmd: test_data.sensor_voltage,
@@ -39,7 +39,7 @@ def execute(*cmd, **kwargs):
     }
 
     cmd_str = "".join(cmd)
-    return datas[cmd_str]
+    return data[cmd_str]
 
 
 def execute_without_ipmi(*cmd, **kwargs):
