@@ -29,11 +29,10 @@ class EndpointDiscovery(plugin.DiscoveryBase):
     """
 
     def discover(self, manager, param=None):
-        endpoints = keystone_client.get_service_catalog(
-            manager.keystone).get_urls(
-                service_type=param,
-                interface=self.conf.service_credentials.interface,
-                region_name=self.conf.service_credentials.region_name)
+        endpoints = keystone_client.get_urls(
+            manager.keystone, service_type=param,
+            interface=self.conf.service_credentials.interface,
+            region_name=self.conf.service_credentials.region_name)
         if not endpoints:
             LOG.warning('No endpoints found for service %s',
                         "<all services>" if param is None else param)

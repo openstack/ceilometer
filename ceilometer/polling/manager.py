@@ -947,9 +947,8 @@ class AgentManager(cotyledon.Service):
                         service_type = getattr(
                             self.conf.service_types,
                             discoverer.KEYSTONE_REQUIRED_FOR_SERVICE)
-                        if not keystone_client.\
-                                get_service_catalog(self.keystone).\
-                                get_endpoints(service_type=service_type):
+                        if not keystone_client.url_for(
+                                self.keystone, service_type=service_type):
                             LOG.warning(
                                 'Skipping %(name)s, %(service_type)s service '
                                 'is not registered in keystone',
