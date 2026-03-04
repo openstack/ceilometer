@@ -544,7 +544,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
     def _hash_resource(resource):
         data = {k: v for k, v in resource.items() if k != 'metrics'}
         payload = json.dumps(data, sort_keys=True, separators=(',', ':'))
-        return hashlib.blake2b(payload.encode(), digest_size=16).hexdigest()
+        return hashlib.blake2b(
+            payload.encode(), usedforsecurity=False
+        ).hexdigest()
 
     def _resource_cache_diff(self, key, attribute_hash):
         cached_hash = self.cache.get(key)
