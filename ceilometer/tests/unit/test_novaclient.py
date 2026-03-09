@@ -33,20 +33,17 @@ class TestNovaClient(base.BaseTestCase):
     def setUp(self):
         super().setUp()
         self.CONF = service.prepare_service([], [])
-        self._flavors_count = 0
-        self._images_count = 0
         # Mock the openstack.connection.Connection to avoid auth issues
         with mock.patch('openstack.connection.Connection'):
             self.nv = nova_client.Client(self.CONF)
-        self.useFixture(fixtures.MockPatchObject(
+        self.mock_get_flavor = self.useFixture(fixtures.MockPatchObject(
             self.nv.nova_client.flavors, 'get',
             side_effect=self.fake_flavors_get))
-        self.useFixture(fixtures.MockPatchObject(
+        self.mock_get_image = self.useFixture(fixtures.MockPatchObject(
             self.nv.image_client.image, 'get_image',
             side_effect=self.fake_images_get))
 
     def fake_flavors_get(self, *args, **kwargs):
-        self._flavors_count += 1
         a = mock.MagicMock()
         a.id = args[0]
         if a.id == 1:
@@ -58,7 +55,6 @@ class TestNovaClient(base.BaseTestCase):
         return a
 
     def fake_images_get(self, *args, **kwargs):
-        self._images_count += 1
         image_id = args[0]
         image_details = {
             # NOTE(callumdickinson): Real image IDs are UUIDs, not integers,
@@ -247,21 +243,21 @@ class TestNovaClient(base.BaseTestCase):
     def test_with_flavor_and_image_no_cache(self):
         results = self.nv._with_flavor_and_image(self.fake_servers_list())
         self.assertEqual(2, len(results))
-        self.assertEqual(2, self._flavors_count)
-        self.assertEqual(2, self._images_count)
+        self.assertEqual(2, self.mock_get_flavor.mock.call_count)
+        self.assertEqual(2, self.mock_get_image.mock.call_count)
 
     def test_with_flavor_and_image_cache(self):
         results = self.nv._with_flavor_and_image(self.fake_servers_list() * 2)
         self.assertEqual(4, len(results))
-        self.assertEqual(2, self._flavors_count)
-        self.assertEqual(2, self._images_count)
+        self.assertEqual(2, self.mock_get_flavor.mock.call_count)
+        self.assertEqual(2, self.mock_get_image.mock.call_count)
 
     def test_with_flavor_and_image_unknown_image_cache(self):
         instances = self.fake_servers_list_unknown_image()
         results = self.nv._with_flavor_and_image(instances * 2)
         self.assertEqual(2, len(results))
-        self.assertEqual(1, self._flavors_count)
-        self.assertEqual(1, self._images_count)
+        self.assertEqual(1, self.mock_get_flavor.mock.call_count)
+        self.assertEqual(1, self.mock_get_image.mock.call_count)
         for instance in results:
             self.assertEqual('unknown-id-666', instance.image['name'])
             self.assertNotEqual(instance.flavor['name'], 'unknown-id-666')
