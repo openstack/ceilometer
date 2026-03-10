@@ -27,6 +27,29 @@ DEFAULT_GROUP = "service_credentials"
 OVERRIDABLE_GROUPS = ['gnocchi', 'zaqar']
 
 
+class Client:
+    """Client for retrieving keystone resources.
+
+    Accesses Projects and Domains from keystone service.
+    """
+
+    def __init__(self, session, **kwargs):
+        """Instantiate a Client that can access keystone.
+
+        :param session: A ``keystoneauth1.session.Session`` instance used for
+            all HTTP communication.
+        :param kwargs: Additional keyword arguments forwarded verbatim to
+            ``keystoneclient.v3.client.Client`` (e.g. ``interface``,
+            ``region_name``).
+
+        """
+        self._ks_client = ks_client_v3.Client(
+            session=session, **kwargs)
+        self.domains = self._ks_client.domains
+        self.projects = self._ks_client.projects
+        self.session = session
+
+
 def get_session(conf, requests_session=None, group=None, timeout=None):
     """Get a ceilometer service credentials auth session."""
     group = group or DEFAULT_GROUP
@@ -57,9 +80,10 @@ def get_connection(
 def get_client(conf, requests_session=None, group=DEFAULT_GROUP):
     """Return a client for keystone v3 endpoint."""
     session = get_session(conf, requests_session=requests_session, group=group)
-    return ks_client_v3.Client(session=session,
-                               interface=conf[group].interface,
-                               region_name=conf[group].region_name)
+
+    return Client(session=session,
+                  interface=conf[group].interface,
+                  region_name=conf[group].region_name)
 
 
 def get_service_catalog(client):
