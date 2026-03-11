@@ -30,6 +30,7 @@ VIR_ERR_NO_DOMAIN_METADATA = 80
 
 class FakeLibvirtError(Exception):
     """Fake exception to replace libvirt.libvirtError in tests."""
+
     def __init__(self, message, error_code=None, error_domain=None):
         super().__init__(message)
         self._error_code = error_code

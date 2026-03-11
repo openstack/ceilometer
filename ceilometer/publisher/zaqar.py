@@ -42,6 +42,7 @@ class ZaqarPublisher(publisher.ConfigPublisherBase):
     The credentials to access Zaqar must be set in the [zaqar] section in the
     configuration.
     """
+
     def __init__(self, conf, parsed_url):
         super().__init__(conf, parsed_url)
         options = urlparse.parse_qs(parsed_url.query)

@@ -2,6 +2,12 @@
 requires = ["pbr>=6.0.0", "setuptools>=64.0.0"]
 build-backend = "pbr.build"
 
+[tool.autopep8]
+aggressive = 3
+in-place = true
+recursive = true
+ignore = ["E731"]
+
 [tool.codespell]
 skip = "*.po,*.js,*.css,*.html,*.svg,HACKING.py,*hacking*,*build*,*_static*,doc/dictionary.txt,*.pyc,*.inv,*.gz,*.jpg,*.png,*.vsd,*.graffle,*.json,*telemetry-measurements.rst"
 count = true

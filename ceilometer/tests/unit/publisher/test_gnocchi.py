@@ -219,8 +219,8 @@ class PublisherTest(base.BaseTestCase):
                 'image_ref': 'imageref!',
                 'instance_flavor_id': 1234,
                 'display_name': 'myinstance',
-                }
-            ),
+            }
+        ),
             sample.Sample(
                 name='disk.root.size',
                 unit='GiB',
@@ -237,7 +237,7 @@ class PublisherTest(base.BaseTestCase):
                     'instance_flavor_id': 1234,
                     'display_name': 'myinstance',
                 },
-            ),
+        ),
         ]
 
         ks_client = mock.Mock(auth_token='fake_token')

@@ -142,6 +142,7 @@ class SplitterTraitPlugin(TraitPluginBase):
 
 class BitfieldTraitPlugin(TraitPluginBase):
     """Plugin to set flags on a bitfield."""
+
     def __init__(self, initial_bitfield=0, flags=None, **kw):
         """Setup bitfield trait.
 

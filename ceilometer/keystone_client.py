@@ -27,7 +27,6 @@ OVERRIDABLE_GROUPS = ['gnocchi', 'zaqar']
 
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
-
     """Get a ceilometer service credentials auth session."""
     group = group or DEFAULT_GROUP
     auth_plugin = ka_loading.load_auth_from_conf_options(conf, group)
