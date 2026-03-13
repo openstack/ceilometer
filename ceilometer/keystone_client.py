@@ -49,6 +49,23 @@ class Client:
         self.projects = self._ks_client.projects
         self.session = session
 
+    def find_project(self, **kwargs):
+        """Find a single project matching the given attribute filters.
+
+        Delegates to ``keystoneclient.v3.projects.ProjectManager.find``.
+
+        :param kwargs: Attribute filters used to locate the project, e.g.
+            ``name='myproject'``, ``domain_id='<uuid>'``. All keyword
+            arguments are forwarded to the underlying ``find`` call.
+        :returns: A single ``keystoneclient.v3.projects.Project`` resource
+            object whose attributes match all supplied filters.
+        :raises keystoneauth1.exceptions.NotFound: if no project matches
+            the filters.
+        :raises keystoneclient.exceptions.NoUniqueMatch: if more than one
+            project matches the filters.
+        """
+        return self.projects.find(**kwargs)
+
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
     """Get a ceilometer service credentials auth session."""
