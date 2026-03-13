@@ -34,6 +34,8 @@ from ceilometer.publisher import gnocchi
 from ceilometer import sample
 from ceilometer import service as ceilometer_service
 from ceilometer.tests import base
+from ceilometer.tests.unit import fakes
+
 
 load_tests = testscenarios.load_tests_apply_scenarios
 
@@ -240,19 +242,17 @@ class PublisherTest(base.BaseTestCase):
         ),
         ]
 
-        ks_client = mock.Mock(auth_token='fake_token')
-        ks_client.projects.find.return_value = mock.Mock(
-            name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
-        self.useFixture(fixtures.MockPatch(
+        # class-level mock; use .return_value to swap the instance per-test
+        self.mock_ks = self.useFixture(fixtures.MockPatch(
             'keystoneclient.v3.client.Client',
-            return_value=ks_client))
+            return_value=fakes.FakeKeystoneClient(
+                projects=[fakes.PROJECT_SERVICE]))).mock
         self.useFixture(fixtures.MockPatch(
             'gnocchiclient.v1.client.Client',
             return_value=mock.Mock()))
         self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_session',
             return_value=mock.Mock()))
-        self.ks_client = ks_client
 
     def test_config_load(self):
         url = netutils.urlsplit("gnocchi://")
@@ -343,7 +343,7 @@ class PublisherTest(base.BaseTestCase):
 
     @mock.patch('ceilometer.publisher.gnocchi.LOG')
     def test_activity_gnocchi_project_not_found(self, logger):
-        self.ks_client.projects.find.side_effect = ka_exceptions.NotFound
+        self.mock_ks.return_value = fakes.FakeKeystoneClient(projects=[])
         self._do_test_activity_filter(2)
         log_called_args = logger.warning.call_args_list
         self.assertEqual(
@@ -622,16 +622,13 @@ class PublisherWorkflowTest(base.BaseTestCase,
         super().setUp()
         conf = ceilometer_service.prepare_service(argv=[], config_files=[])
         self.conf = self.useFixture(config_fixture.Config(conf))
-        ks_client = mock.Mock()
-        ks_client.projects.find.return_value = mock.Mock(
-            name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
-        self.useFixture(fixtures.MockPatch(
+        self.mock_ks = self.useFixture(fixtures.MockPatch(
             'keystoneclient.v3.client.Client',
-            return_value=ks_client))
+            return_value=fakes.FakeKeystoneClient(
+                projects=[fakes.PROJECT_SERVICE]))).mock
         self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_session',
-            return_value=ks_client))
-        self.ks_client = ks_client
+            return_value=mock.Mock()))
 
     @mock.patch('gnocchiclient.v1.client.Client')
     def test_delete_event_workflow(self, fakeclient_cls):
