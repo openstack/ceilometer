@@ -371,7 +371,7 @@ class TestPollingAgent(BaseAgent):
             name='admin', id='c0c935468e654d5a8baae1a08adf4dfb'
         )
         self.useFixture(fixtures.MockPatch(
-            'ceilometer.keystone_client.get_client',
+            'keystoneclient.v3.client.Client',
             return_value=ks_client))
         self.ks_client = ks_client
         self.setup_polling()
