@@ -872,10 +872,13 @@ class PublisherWorkflowTest(base.BaseTestCase,
                           1, 1)
             )
 
-        if self.patchable_attributes:
+        update_attributes = {**self.postable_attributes,
+                             **self.patchable_attributes}
+        del update_attributes["user_id"]  # Only user_id is not updated.
+        if self.patchable_attributes != update_attributes:
             expected_calls.append(mock.call.resource.update(
                 self.resource_type, resource_id,
-                self.patchable_attributes))
+                update_attributes))
             if self.update_resource_fail:
                 fakeclient.resource.update.side_effect = [Exception('boom!')]
             else:
@@ -891,9 +894,9 @@ class PublisherWorkflowTest(base.BaseTestCase,
         if (self.post_measure_fail
                 or self.create_resource_fail
                 or self.retry_post_measures_fail
-                or (self.update_resource_fail and self.patchable_attributes)):
+                or (self.update_resource_fail and update_attributes)):
 
-            if self.update_resource_fail and self.patchable_attributes:
+            if self.update_resource_fail and update_attributes:
                 logger.error.assert_called_with(
                     'Unexpected exception updating resource type [%s] with '
                     'ID [%s] for resource data [%s]: [%s].', resource_type,

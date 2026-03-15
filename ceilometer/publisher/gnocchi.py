@@ -411,11 +411,19 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     gnocchi_data[resource_id] = {
                         'resource_type': rd.cfg['resource_type'],
                         'resource': {"id": resource_id,
-                                     "user_id": sample.user_id,
-                                     "project_id": sample.project_id}}
+                                     "user_id": sample.user_id}}
 
+                # NOTE(callumdickinson): project_id is added to resource_extra
+                # because the project that owns the resource can change (e.g.
+                # transferred volumes), and we want this reflected in Gnocchi.
+                # user_id is not treated this way because it is not always
+                # available on all samples for a given metric, and because in
+                # some cases updating it would cause resource updates to occur
+                # every time a new user performs a request against a resource.
                 gnocchi_data[resource_id].setdefault(
-                    "resource_extra", {}).update(rd.sample_attributes(sample))
+                    "resource_extra", {}).update({
+                        "project_id": sample.project_id,
+                        **rd.sample_attributes(sample)})
                 measures.setdefault(resource_id, {}).setdefault(
                     metric_name,
                     {"measures": [],

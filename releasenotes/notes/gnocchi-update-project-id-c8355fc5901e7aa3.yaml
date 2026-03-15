@@ -1,0 +1,13 @@
+---
+upgrade:
+  - |
+    If resource metadata caching is enabled in Ceilometer Notification Agent,
+    the Gnocchi resource metadata cache will be invalidated and refreshed upon
+    upgrading due to the fix for updating resource project IDs.
+fixes:
+  - |
+    An issue has been fixed where when publishing resource metadata changes to
+    Gnocchi, the project ID field was not updated when changed (e.g. when
+    transferring volumes from one project to another). Any existing resources
+    that have changed ownership since being added to Gnocchi will have their
+    ``project_id`` attribute updated to the correct value.
