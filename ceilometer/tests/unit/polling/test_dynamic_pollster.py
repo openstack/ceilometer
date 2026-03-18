@@ -24,7 +24,7 @@ from urllib import parse as urlparse
 from ceilometer import declarative
 from ceilometer.polling import dynamic_pollster
 from ceilometer import sample
-from oslotest import base
+from ceilometer.tests import base
 
 LOG = logging.getLogger(__name__)
 

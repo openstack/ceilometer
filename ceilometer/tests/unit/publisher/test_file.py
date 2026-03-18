@@ -22,11 +22,11 @@ import tempfile
 
 from oslo_utils import netutils
 from oslo_utils import timeutils
-from oslotest import base
 
 from ceilometer.publisher import file
 from ceilometer import sample
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class TestFilePublisher(base.BaseTestCase):

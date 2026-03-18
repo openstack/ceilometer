@@ -15,9 +15,8 @@
 import json
 from unittest import mock
 
-from oslotest import base
-
 from ceilometer.objectstore import rgw_client
+from ceilometer.tests import base
 
 
 RGW_ADMIN_BUCKETS = '''

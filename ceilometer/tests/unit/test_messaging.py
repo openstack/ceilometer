@@ -13,10 +13,10 @@
 # under the License.
 
 import oslo_messaging.conffixture
-from oslotest import base
 
 from ceilometer import messaging
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class MessagingTests(base.BaseTestCase):

@@ -19,12 +19,12 @@ from unittest import mock
 import msgpack
 from oslo_utils import netutils
 from oslo_utils import timeutils
-from oslotest import base
 
 from ceilometer.publisher.tcp import TCPPublisher
 from ceilometer.publisher import utils
 from ceilometer import sample
 from ceilometer import service
+from ceilometer.tests import base
 
 
 COUNTER_SOURCE = 'testsource'

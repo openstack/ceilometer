@@ -16,13 +16,13 @@
 from unittest import mock
 
 import fixtures
-from oslotest import base
 
 from ceilometer.network import floatingip
 from ceilometer.network.services import discovery
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class _BaseTestFloatingIPPollster(base.BaseTestCase):

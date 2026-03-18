@@ -16,12 +16,12 @@ from unittest import mock
 
 import fixtures
 from oslo_utils import units
-from oslotest import base
 
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import inspector as libvirt_inspector
 from ceilometer.compute.virt.libvirt import utils
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class FakeLibvirtError(Exception):

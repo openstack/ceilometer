@@ -13,12 +13,12 @@
 # under the License.
 from unittest import mock
 
-from oslotest import base
 import requests
 
 from ceilometer.polling.discovery.endpoint import EndpointDiscovery
 from ceilometer.polling.discovery.non_openstack_credentials_discovery import \
     NonOpenStackCredentialsDiscovery
+from ceilometer.tests import base
 
 
 class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):

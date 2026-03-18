@@ -14,10 +14,9 @@
 
 from unittest import mock
 
-from oslotest import base
-
 from ceilometer.ipmi.platform import ipmi_sensor
 from ceilometer.privsep import ipmitool
+from ceilometer.tests import base
 from ceilometer.tests.unit.ipmi.platform import fake_utils
 
 

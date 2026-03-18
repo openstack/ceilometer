@@ -16,11 +16,11 @@
 """Tests for the compute pollsters.
 """
 
-from oslotest import base
 
 from ceilometer.compute.pollsters import util
 from ceilometer.polling import manager
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class FauxInstance:

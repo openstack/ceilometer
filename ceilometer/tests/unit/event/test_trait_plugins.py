@@ -12,9 +12,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from oslotest import base
 
 from ceilometer.event import trait_plugins
+from ceilometer.tests import base
 
 
 class TestSplitterPlugin(base.BaseTestCase):

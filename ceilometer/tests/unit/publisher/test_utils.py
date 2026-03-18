@@ -16,9 +16,8 @@
 """
 import json
 
-from oslotest import base
-
 from ceilometer.publisher import utils
+from ceilometer.tests import base
 
 
 class TestSignature(base.BaseTestCase):

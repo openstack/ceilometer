@@ -13,13 +13,13 @@
 from unittest import mock
 
 import fixtures
-from oslotest import base
 
 from ceilometer.load_balancer import discovery
 from ceilometer.load_balancer import octavia
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class FakeLoadBalancer:

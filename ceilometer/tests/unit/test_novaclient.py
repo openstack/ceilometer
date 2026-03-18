@@ -16,10 +16,10 @@ from unittest import mock
 import fixtures
 import novaclient
 import openstack
-from oslotest import base
 
 from ceilometer import nova_client
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class FauxImage(dict):

@@ -15,10 +15,10 @@
 
 from ceilometer import cache_utils
 from ceilometer import service as ceilometer_service
+from ceilometer.tests import base
 from oslo_cache.backends import dictionary
 from oslo_cache import core as cache
 from oslo_config import fixture as config_fixture
-from oslotest import base
 
 
 class CacheConfFixture(config_fixture.Config):

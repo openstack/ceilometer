@@ -15,13 +15,13 @@
 from unittest import mock
 
 import fixtures
-from oslotest import base
 
 from ceilometer.network.services import discovery
 from ceilometer.network.services import fwaas
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class _BaseTestFWPollster(base.BaseTestCase):

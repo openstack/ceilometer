@@ -14,9 +14,8 @@
 # under the License.
 from unittest import mock
 
-from oslotest import base
-
 from ceilometer.event import trait_plugins
+from ceilometer.tests import base
 
 
 class TestTimedeltaPlugin(base.BaseTestCase):
