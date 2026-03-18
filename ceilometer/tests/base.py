@@ -19,15 +19,31 @@ import tempfile
 import unittest
 
 import fixtures
+from oslo_config import cfg
+from oslo_log import log
 import oslo_messaging.conffixture
 from oslotest import base
 import yaml
 
 import ceilometer
 from ceilometer import messaging
+from ceilometer.tests import fixtures as ceilo_fixtures
+
+CONF = cfg.CONF
+try:
+    log.register_options(CONF)
+except cfg.ArgsAlreadyParsedError:
+    pass
+CONF.set_override('use_stderr', False)
 
 
 class BaseTestCase(base.BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        if os.environ.get('OS_LOG_CAPTURE') in ('True', 'true', '1', 'yes'):
+            self.stdlog = self.useFixture(ceilo_fixtures.StandardLogging())
+        self.addCleanup(CONF.reset)
+
     def setup_messaging(self, conf, exchange=None):
         self.useFixture(oslo_messaging.conffixture.ConfFixture(conf))
         conf.set_override("notification_driver", ["messaging"])
