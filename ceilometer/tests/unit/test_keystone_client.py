@@ -740,9 +740,18 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
             return_value=self.fake_ks))
         self.client = keystone_client.Client(session=mock.Mock())
 
+    def assertReturnsListOfType(self, result_list, expected_type):
+        """Assert that the result_list is filled with items of expected_type.
+
+        Used to assert the right types are returned from the Client
+        """
+        for r in result_list:
+            self.assertIsInstance(r, expected_type)
+
     def test_find_project(self):
         result = self.client.find_project(name='admin')
-        self.assertEqual(fakes.PROJECT_ADMIN, result)
+        self.assertIsInstance(result, keystone_client.Project)
+        self.assertEqual(fakes.PROJECT_ADMIN_ceilo, result)
 
     def test_find_project_not_found(self):
         self.assertRaises(
@@ -785,23 +794,27 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def test_list_projects(self):
         result = self.client.list_projects(fakes.DOMAIN_DEFAULT)
+        self.assertReturnsListOfType(result, keystone_client.Project)
         self.assertEqual(
-            [fakes.PROJECT_ADMIN, fakes.PROJECT_SERVICE,
-                fakes.PROJECT_DISABLED],
+            [fakes.PROJECT_ADMIN_ceilo, fakes.PROJECT_SERVICE_ceilo,
+                fakes.PROJECT_DISABLED_ceilo],
             result)
 
     def test_list_projects_domain_id(self):
         result = self.client.list_projects(fakes.DOMAIN_DEFAULT.id)
 
         self.assertEqual(
-            [fakes.PROJECT_ADMIN, fakes.PROJECT_SERVICE,
-                fakes.PROJECT_DISABLED],
+            [fakes.PROJECT_ADMIN_ceilo, fakes.PROJECT_SERVICE_ceilo,
+                fakes.PROJECT_DISABLED_ceilo],
             result)
 
     def test_list_projects_filter_enabled(self):
-        result = self.client.list_projects(
-            fakes.DOMAIN_DEFAULT.id, enabled=True)
-        self.assertEqual([fakes.PROJECT_ADMIN, fakes.PROJECT_SERVICE], result)
+        result = self.client.list_projects(fakes.DOMAIN_DEFAULT, enabled=True)
+
+        self.assertReturnsListOfType(result, keystone_client.Project)
+        self.assertEqual(
+            [fakes.PROJECT_ADMIN_ceilo, fakes.PROJECT_SERVICE_ceilo],
+            result)
 
     def test_list_projects_no_match(self):
         # Use a domain that none of the projects belong to
@@ -810,7 +823,8 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def test_find_domain(self):
         result = self.client.find_domain(name='Default')
-        self.assertEqual(fakes.DOMAIN_DEFAULT, result)
+        self.assertIsInstance(result, keystone_client.Domain)
+        self.assertEqual(fakes.DOMAIN_DEFAULT_ceilo, result)
 
     def test_find_domain_not_found(self):
         self.assertRaises(
@@ -853,17 +867,23 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def test_list_domains(self):
         result = self.client.list_domains()
-        self.assertEqual(self.domains, result)
+        self.assertReturnsListOfType(result, keystone_client.Domain)
+        self.assertEqual(
+            [fakes.DOMAIN_HEAT_ceilo, fakes.DOMAIN_DEFAULT_ceilo,
+                fakes.DOMAIN_DISABLED_ceilo],
+            result)
 
     def test_list_domains_filter_by_name(self):
         result = self.client.list_domains(name='Default')
-        self.assertEqual([fakes.DOMAIN_DEFAULT], result)
+
+        self.assertEqual([fakes.DOMAIN_DEFAULT_ceilo], result)
 
     def test_list_domains_filter_enabled(self):
         result = self.client.list_domains(enabled=True)
-        self.assertIn(fakes.DOMAIN_DEFAULT, result)
-        self.assertIn(fakes.DOMAIN_HEAT, result)
-        self.assertNotIn(fakes.DOMAIN_DISABLED, result)
+        self.assertReturnsListOfType(result, keystone_client.Domain)
+        self.assertIn(fakes.DOMAIN_DEFAULT_ceilo, result)
+        self.assertIn(fakes.DOMAIN_HEAT_ceilo, result)
+        self.assertNotIn(fakes.DOMAIN_DISABLED_ceilo, result)
 
     def test_list_domains_no_match(self):
         result = self.client.list_domains(name='NonExistent')

@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import dataclasses
 import os
 
 from keystoneauth1 import exceptions as ka_exc
@@ -29,6 +30,46 @@ DEFAULT_GROUP = "service_credentials"
 # List of group that can set auth_section to use a different
 # credentials section
 OVERRIDABLE_GROUPS = ['gnocchi', 'zaqar']
+
+
+@dataclasses.dataclass(frozen=True)
+class Project:
+    id: str
+    name: str
+    domain_id: str
+    is_enabled: bool
+    description: str = ''
+    parent_id: str | None = None
+    is_domain: bool = False
+
+    @classmethod
+    def from_ksclient(cls, ks_project):
+        return cls(
+            id=ks_project.id,
+            name=ks_project.name,
+            domain_id=ks_project.domain_id,
+            is_enabled=ks_project.enabled,
+            description=getattr(ks_project, 'description', None) or '',
+            parent_id=getattr(ks_project, 'parent_id', None),
+            is_domain=getattr(ks_project, 'is_domain', False),
+        )
+
+
+@dataclasses.dataclass(frozen=True)
+class Domain:
+    id: str
+    name: str
+    is_enabled: bool
+    description: str = ''
+
+    @classmethod
+    def from_ksclient(cls, ks_domain):
+        return cls(
+            id=ks_domain.id,
+            name=ks_domain.name,
+            is_enabled=ks_domain.enabled,
+            description=getattr(ks_domain, 'description', None) or '',
+        )
 
 
 class Client:
@@ -61,7 +102,7 @@ class Client:
         :param kwargs: Attribute filters used to locate the project, e.g.
             ``name='myproject'``, ``domain_id='<uuid>'``. All keyword
             arguments are forwarded to the underlying ``find`` call.
-        :returns: A single ``keystoneclient.v3.projects.Project`` resource
+        :returns: A single ``Project`` resource
             object whose attributes match all supplied filters.
         :raises ceilometer.exceptions.NotFound: if no project matches
             the filters.
@@ -69,7 +110,8 @@ class Client:
             project matches the filters.
         """
         try:
-            return self.projects.find(**kwargs)
+            project = self.projects.find(**kwargs)
+            return Project.from_ksclient(project)
         except ka_exc.NotFound as e:
             raise ceilo_exc.NotFound(e.message, e.details)
         except ks_client_v3.exceptions.NoUniqueMatch as e:
@@ -90,7 +132,8 @@ class Client:
             objects belonging to the given domain. Returns an empty list when
             no projects match.
         """
-        return self.projects.list(domain, **filters)
+        projects = self.projects.list(domain, **filters)
+        return [Project.from_ksclient(p) for p in projects]
 
     def find_domain(self, **kwargs):
         """Find a single domain matching the given attribute filters.
@@ -108,7 +151,9 @@ class Client:
             domain matches the filters.
         """
         try:
-            return self.domains.find(**kwargs)
+            domain = self.domains.find(**kwargs)
+            return Domain.from_ksclient(domain)
+
         except ka_exc.NotFound as e:
             raise ceilo_exc.NotFound(e.message, e.details)
         except ks_client_v3.exceptions.NoUniqueMatch as e:
@@ -125,7 +170,8 @@ class Client:
         :returns: A list of ``keystoneclient.v3.domains.Domain`` resource
             objects.  Returns an empty list when no domains match.
         """
-        return self.domains.list(**filters)
+        return [Domain.from_ksclient(d)
+                for d in self.domains.list(**filters)]
 
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
