@@ -100,6 +100,19 @@ class Client:
         """
         return self.domains.find(**kwargs)
 
+    def list_domains(self, **filters):
+        """List all domains, with optional attribute filters.
+
+        Delegates to ``keystoneclient.v3.domains.DomainManager.list``.
+
+        :param filters: Optional keyword arguments forwarded to
+            ``DomainManager.list`` as query filters, e.g. ``enabled=True``
+            to restrict results to enabled domains.
+        :returns: A list of ``keystoneclient.v3.domains.Domain`` resource
+            objects.  Returns an empty list when no domains match.
+        """
+        return self.domains.list(**filters)
+
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
     """Get a ceilometer service credentials auth session."""

@@ -733,9 +733,9 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        domains = fakes.DEFAULT_DOMAINS + [fakes.DOMAIN_DISABLED]
+        self.domains = fakes.DEFAULT_DOMAINS + [fakes.DOMAIN_DISABLED]
 
-        self.fake_ks = fakes.FakeKeystoneClient(domains=domains)
+        self.fake_ks = fakes.FakeKeystoneClient(domains=self.domains)
         self.useFixture(fixtures.MockPatch(
             'keystoneclient.v3.client.Client',
             return_value=self.fake_ks))
@@ -851,3 +851,21 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
             "ClientException",
             client.find_domain,
             name='Default')
+
+    def test_list_domains(self):
+        result = self.client.list_domains()
+        self.assertEqual(self.domains, result)
+
+    def test_list_domains_filter_by_name(self):
+        result = self.client.list_domains(name='Default')
+        self.assertEqual([fakes.DOMAIN_DEFAULT], result)
+
+    def test_list_domains_filter_enabled(self):
+        result = self.client.list_domains(enabled=True)
+        self.assertIn(fakes.DOMAIN_DEFAULT, result)
+        self.assertIn(fakes.DOMAIN_HEAT, result)
+        self.assertNotIn(fakes.DOMAIN_DISABLED, result)
+
+    def test_list_domains_no_match(self):
+        result = self.client.list_domains(name='NonExistent')
+        self.assertEqual([], result)
