@@ -15,13 +15,13 @@ from unittest import mock
 import fixtures
 from openstack.dns.v2 import recordset
 from openstack.dns.v2 import zone
-from oslotest import base
 
 from ceilometer.dns import designate
 from ceilometer.dns import discovery
 from ceilometer.polling import manager
 from ceilometer.polling import plugin_base
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class _BaseTestDNSPollster(base.BaseTestCase):

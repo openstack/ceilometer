@@ -16,12 +16,11 @@
 
 from unittest import mock
 
-from oslotest import base
-
 from ceilometer.polling.discovery import endpoint
 from ceilometer.polling.discovery import localnode
 from ceilometer.polling.discovery import tenant as project
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class TestEndpointDiscovery(base.BaseTestCase):

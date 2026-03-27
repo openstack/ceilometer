@@ -16,10 +16,9 @@
 
 from unittest import mock
 
-from oslotest import base
-
 from ceilometer.ipmi.notifications import ironic as ipmi
 from ceilometer import sample
+from ceilometer.tests import base
 from ceilometer.tests.unit.ipmi.notifications import ipmi_test_data
 
 

@@ -16,13 +16,13 @@ from unittest import mock
 import uuid
 
 from oslo_utils import timeutils
-from oslotest import base
 from urllib import parse as urlparse
 
 from ceilometer.event import models as event
 from ceilometer.publisher import zaqar
 from ceilometer import sample
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class TestZaqarPublisher(base.BaseTestCase):

@@ -19,7 +19,6 @@ from unittest import mock
 import uuid
 
 from oslo_utils import timeutils
-from oslotest import base
 import requests
 from urllib import parse as urlparse
 
@@ -27,6 +26,7 @@ from ceilometer.event import models as event
 from ceilometer.publisher import http
 from ceilometer import sample
 from ceilometer import service
+from ceilometer.tests import base
 
 
 class TestHttpPublisher(base.BaseTestCase):

@@ -15,10 +15,10 @@
 from unittest import mock
 
 from openstack import exceptions as os_exc
-from oslotest import base
 
 from ceilometer import neutron_client
 from ceilometer import service
+from ceilometer.tests import base
 from ceilometer.tests.unit import fakes
 
 

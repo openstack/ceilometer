@@ -17,13 +17,13 @@ from unittest import mock
 
 import fixtures
 from keystoneauth1 import exceptions
-from oslotest import base
 import testscenarios.testcase
 
 from ceilometer.objectstore import rgw
 from ceilometer.objectstore import rgw_client
 from ceilometer.polling import manager
 from ceilometer import service
+from ceilometer.tests import base
 
 bucket_list1 = [rgw_client.RGWAdminClient.Bucket('somefoo1', 10, 7)]
 bucket_list2 = [rgw_client.RGWAdminClient.Bucket('somefoo2', 2, 9)]

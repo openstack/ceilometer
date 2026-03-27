@@ -19,7 +19,6 @@ import json
 import sys
 from unittest import mock
 
-from oslotest import base
 import requests
 from urllib import parse as urlparse
 
@@ -32,6 +31,7 @@ from ceilometer.polling.dynamic_pollster import \
 from ceilometer.polling.dynamic_pollster import NonOpenStackApisSamplesGatherer
 from ceilometer.polling.dynamic_pollster import PollsterSampleGatherer
 from ceilometer.polling.dynamic_pollster import SingleMetricPollsterDefinitions
+from ceilometer.tests import base
 
 
 REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit', 'value_attribute',

@@ -18,13 +18,13 @@ from unittest import mock
 
 import fixtures
 from keystoneauth1 import exceptions
-from oslotest import base
 from swiftclient import client as swift_client
 import testscenarios.testcase
 
 from ceilometer.objectstore import swift
 from ceilometer.polling import manager
 from ceilometer import service
+from ceilometer.tests import base
 
 HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                                  'x-account-bytes-used': 321321321,

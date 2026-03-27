@@ -14,14 +14,13 @@
 # under the License.
 """Tests for ceilometer/polling/prom_exporter.py"""
 
-from oslotest import base
-
 from unittest import mock
 from unittest.mock import call
 
 from ceilometer.polling import manager
 from ceilometer.polling import prom_exporter
 from ceilometer import service
+from ceilometer.tests import base
 
 
 COUNTER_SOURCE = 'testsource'
