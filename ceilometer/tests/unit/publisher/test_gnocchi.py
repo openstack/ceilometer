@@ -244,7 +244,7 @@ class PublisherTest(base.BaseTestCase):
         ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
         self.useFixture(fixtures.MockPatch(
-            'ceilometer.keystone_client.get_client',
+            'keystoneclient.v3.client.Client',
             return_value=ks_client))
         self.useFixture(fixtures.MockPatch(
             'gnocchiclient.v1.client.Client',
@@ -626,7 +626,7 @@ class PublisherWorkflowTest(base.BaseTestCase,
         ks_client.projects.find.return_value = mock.Mock(
             name='gnocchi', id='a2d42c23-d518-46b6-96ab-3fba2e146859')
         self.useFixture(fixtures.MockPatch(
-            'ceilometer.keystone_client.get_client',
+            'keystoneclient.v3.client.Client',
             return_value=ks_client))
         self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_session',
