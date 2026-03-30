@@ -14,7 +14,6 @@
 
 from unittest import mock
 
-import fixtures
 from keystoneauth1.access import service_catalog
 from keystoneauth1.exceptions import catalog as catalog_exceptions
 from oslo_config import cfg
@@ -250,12 +249,7 @@ class TestKeystoneClient(base.BaseTestCase):
             group=keystone_client.DEFAULT_GROUP,
             region_name="expected_region")
 
-        mock_ks = mock.Mock(wraps=fakes.FakeKeystoneClient(
-            domains=[], projects=[]))
-
-        mock_ks_cls = self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v3.client.Client',
-            return_value=mock_ks))
+        self.setup_connection(domains=[], projects=[])
 
         result = keystone_client.get_client(conf.conf)
 
@@ -264,10 +258,11 @@ class TestKeystoneClient(base.BaseTestCase):
             self.CONF,
             requests_session=None,
             group=keystone_client.DEFAULT_GROUP)
-        mock_ks_cls.mock.assert_called_once_with(
+        self.fake_conn_class_mock.assert_called_once_with(
             session=mock_get_session.return_value,
-            interface="internal",
-            region_name="expected_region")
+            service_types={"identity"},
+            interface='internal',
+            region_name='expected_region')
 
     def test_get_service_catalog(self):
         mock_client = mock.Mock()
@@ -291,9 +286,11 @@ class TestKeystoneClient(base.BaseTestCase):
 
         result = keystone_client.get_service_catalog(client)
 
+        client.session.auth.get_access.assert_called_once_with(client.session)
         mock_session.auth.get_access.assert_called_once_with(mock_session)
         self.assertEqual(
-            result, mock_session.auth.get_access.return_value.service_catalog)
+            result,
+            client.session.auth.get_access.return_value.service_catalog)
 
     def test_get_auth_token_with_real_client(self):
         mock_session = mock.Mock()
@@ -301,9 +298,10 @@ class TestKeystoneClient(base.BaseTestCase):
 
         result = keystone_client.get_auth_token(client)
 
-        mock_session.auth.get_access.assert_called_once_with(mock_session)
+        client.session.auth.get_access.assert_called_once_with(client.session)
         self.assertEqual(
-            result, mock_session.auth.get_access.return_value.auth_token)
+            result,
+            mock_session.auth.get_access.return_value.auth_token)
 
     @mock.patch(
         'ceilometer.keystone_client.get_service_catalog', autospec=True)
@@ -732,12 +730,9 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.domains = fakes.DEFAULT_DOMAINS + [fakes.DOMAIN_DISABLED]
+        domains_sdk = fakes.DEFAULT_DOMAINS_sdk + [fakes.DOMAIN_DISABLED_sdk]
+        self.setup_connection(domains=domains_sdk)
 
-        self.fake_ks = fakes.FakeKeystoneClient(domains=self.domains)
-        self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v3.client.Client',
-            return_value=self.fake_ks))
         self.client = keystone_client.Client(session=mock.Mock())
 
     def assertReturnsListOfType(self, result_list, expected_type):
@@ -768,24 +763,22 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
                 "No Project matching {'name': 'nonexistant'}.")
 
     def test_find_project_no_unique_match(self):
-        fake_ks = fakes.FakeKeystoneClient(
+        self.setup_connection(
             domains=[],
-            projects=[fakes.PROJECT_ADMIN, fakes.PROJECT_ADMIN])
-        with mock.patch('keystoneclient.v3.client.Client',
-                        return_value=fake_ks):
-            client = keystone_client.Client(session=mock.Mock())
+            projects=[fakes.PROJECT_ADMIN_sdk, fakes.PROJECT_ADMIN_sdk])
+        client = keystone_client.Client(session=mock.Mock())
+
         self.assertRaises(
             ceilo_exc.NoUniqueMatch,
             client.find_project,
             name='admin')
 
     def test_find_project_no_unique_match_message(self):
-        fake_ks = fakes.FakeKeystoneClient(
+        self.setup_connection(
             domains=[],
-            projects=[fakes.PROJECT_ADMIN, fakes.PROJECT_ADMIN])
-        with mock.patch('keystoneclient.v3.client.Client',
-                        return_value=fake_ks):
-            client = keystone_client.Client(session=mock.Mock())
+            projects=[fakes.PROJECT_ADMIN_sdk, fakes.PROJECT_ADMIN_sdk])
+        client = keystone_client.Client(session=mock.Mock())
+
         self.assertRaisesRegex(
             ceilo_exc.NoUniqueMatch,
             "ClientException",
@@ -793,7 +786,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
             name='admin')
 
     def test_list_projects(self):
-        result = self.client.list_projects(fakes.DOMAIN_DEFAULT)
+        result = self.client.list_projects(fakes.DOMAIN_DEFAULT_ceilo)
         self.assertReturnsListOfType(result, keystone_client.Project)
         self.assertEqual(
             [fakes.PROJECT_ADMIN_ceilo, fakes.PROJECT_SERVICE_ceilo,
@@ -801,7 +794,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
             result)
 
     def test_list_projects_domain_id(self):
-        result = self.client.list_projects(fakes.DOMAIN_DEFAULT.id)
+        result = self.client.list_projects(fakes.DOMAIN_DEFAULT_ceilo.id)
 
         self.assertEqual(
             [fakes.PROJECT_ADMIN_ceilo, fakes.PROJECT_SERVICE_ceilo,
@@ -809,7 +802,8 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
             result)
 
     def test_list_projects_filter_enabled(self):
-        result = self.client.list_projects(fakes.DOMAIN_DEFAULT, enabled=True)
+        result = self.client.list_projects(
+            fakes.DOMAIN_DEFAULT_ceilo, enabled=True)
 
         self.assertReturnsListOfType(result, keystone_client.Project)
         self.assertEqual(
@@ -818,7 +812,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def test_list_projects_no_match(self):
         # Use a domain that none of the projects belong to
-        result = self.client.list_projects(fakes.DOMAIN_DISABLED)
+        result = self.client.list_projects(fakes.DOMAIN_DISABLED_ceilo)
         self.assertEqual([], result)
 
     def test_find_domain(self):
@@ -841,24 +835,20 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
                 "No Domain matching {'name': 'nonexistant'}.")
 
     def test_find_domain_no_unique_match(self):
-        fake_ks = fakes.FakeKeystoneClient(
-            domains=[fakes.DOMAIN_DEFAULT, fakes.DOMAIN_DEFAULT],
+        self.setup_connection(
+            domains=[fakes.DOMAIN_DEFAULT_sdk, fakes.DOMAIN_DEFAULT_sdk],
             projects=[])
-        with mock.patch('keystoneclient.v3.client.Client',
-                        return_value=fake_ks):
-            client = keystone_client.Client(session=mock.Mock())
+        client = keystone_client.Client(session=mock.Mock())
         self.assertRaises(
             ceilo_exc.NoUniqueMatch,
             client.find_domain,
             name='Default')
 
     def test_find_domain_no_unique_match_message(self):
-        fake_ks = fakes.FakeKeystoneClient(
-            domains=[fakes.DOMAIN_DEFAULT, fakes.DOMAIN_DEFAULT],
+        self.setup_connection(
+            domains=[fakes.DOMAIN_DEFAULT_sdk, fakes.DOMAIN_DEFAULT_sdk],
             projects=[])
-        with mock.patch('keystoneclient.v3.client.Client',
-                        return_value=fake_ks):
-            client = keystone_client.Client(session=mock.Mock())
+        client = keystone_client.Client(session=mock.Mock())
         self.assertRaisesRegex(
             ceilo_exc.NoUniqueMatch,
             "ClientException",

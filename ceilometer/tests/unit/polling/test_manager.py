@@ -279,10 +279,8 @@ class BaseAgent(base.BaseTestCase):
         self.notifier.sample.side_effect = self.fake_notifier_sample
         self.useFixture(fixtures.MockPatch('oslo_messaging.Notifier',
                                            return_value=self.notifier))
-        self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v3.client.Client',
-            return_value=fakes.FakeKeystoneClient()))
 
+        self.setup_connection(projects=[fakes.PROJECT_ADMIN_sdk])
         self.CONF = service.prepare_service([], [])
         self.CONF.set_override(
             'cfg_file',
@@ -366,9 +364,6 @@ class TestPollingAgent(BaseAgent):
         super().setUp()
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
-        self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v3.client.Client',
-            return_value=fakes.FakeKeystoneClient()))
         self.setup_polling()
 
     @mock.patch('ceilometer.polling.manager.PollingManager')
