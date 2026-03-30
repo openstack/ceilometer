@@ -17,6 +17,7 @@ import functools
 import os
 import tempfile
 import unittest
+from unittest import mock
 
 import fixtures
 from oslo_config import cfg
@@ -28,6 +29,7 @@ import yaml
 import ceilometer
 from ceilometer import messaging
 from ceilometer.tests import fixtures as ceilo_fixtures
+from ceilometer.tests.unit import fakes
 
 CONF = cfg.CONF
 try:
@@ -43,6 +45,23 @@ class BaseTestCase(base.BaseTestCase):
         if os.environ.get('OS_LOG_CAPTURE') in ('True', 'true', '1', 'yes'):
             self.stdlog = self.useFixture(ceilo_fixtures.StandardLogging())
         self.addCleanup(CONF.reset)
+        _fix = self.useFixture(ceilo_fixtures.FakeConnectionFixture())
+        self.fake_conn = _fix.fake_conn
+        self.fake_conn_class_mock = _fix.connection_class_mock
+
+    def setup_connection(self, **kwargs):
+        """Convenience method to allow re-defining the fake connection members
+
+        Used if the default Connection is not sufficient for testing
+        e.g. if you need some resources empty, or want duplicates to force a
+        particular behaviour in the test.
+        """
+        self.fake_conn = mock.Mock(wraps=fakes.FakeConnection(**kwargs))
+        # This should be called before any code-under-test is run, but just in
+        # case someone calls setup_connection mid-test, resetting the mock
+        # prevents confusing AssertionErrors when checking the call count.
+        self.fake_conn_class_mock.reset_mock()
+        self.fake_conn_class_mock.return_value = self.fake_conn
 
     def setup_messaging(self, conf, exchange=None):
         self.useFixture(oslo_messaging.conffixture.ConfFixture(conf))

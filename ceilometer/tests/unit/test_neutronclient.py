@@ -19,7 +19,6 @@ from openstack import exceptions as os_exc
 from ceilometer import neutron_client
 from ceilometer import service
 from ceilometer.tests import base
-from ceilometer.tests.unit import fakes
 
 
 class TestNeutronClient(base.BaseTestCase):
@@ -29,13 +28,6 @@ class TestNeutronClient(base.BaseTestCase):
         super().setUp()
         self.CONF = service.prepare_service([], [])
 
-        self.mock_connection = mock.patch(
-            'openstack.connection.Connection',
-            autospec=True, return_value=fakes.FakeConnection())
-        self.mock_conn_class = self.mock_connection.start()
-        self.addCleanup(self.mock_connection.stop)
-
-        # Create the client (uses mocked Connection)
         self.nc = neutron_client.Client(self.CONF)
 
     def test_fip_get_all(self):

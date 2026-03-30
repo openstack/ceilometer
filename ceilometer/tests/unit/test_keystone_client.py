@@ -22,7 +22,6 @@ from oslo_config import fixture as config_fixture
 from ceilometer import keystone_client
 from ceilometer import service as ceilo_service
 from ceilometer.tests import base
-import openstack
 
 CONF = cfg.CONF
 
@@ -177,24 +176,21 @@ class TestKeystoneClient(base.BaseTestCase):
         self.assertIsInstance(session, FakeSession)
 
     @mock.patch('ceilometer.keystone_client.get_session', autospec=True)
-    @mock.patch('openstack.connection.Connection', autospec=True)
-    def test_get_connection(self, mock_connection, mock_get_session):
+    def test_get_connection(self, mock_get_session):
         actual_conn = keystone_client.get_connection(self.CONF)
 
         mock_get_session.assert_called_once_with(
             self.CONF,
             requests_session=None,
             group=keystone_client.DEFAULT_GROUP)
-        mock_connection.assert_called_once_with(
+        self.fake_conn_class_mock.assert_called_once_with(
             session=mock_get_session.return_value,
             oslo_conf=self.CONF,
             service_types={"identity"})
-        self.assertEqual(actual_conn, mock_connection.return_value)
+        self.assertEqual(actual_conn, self.fake_conn)
 
     @mock.patch('ceilometer.keystone_client.get_session', autospec=True)
-    @mock.patch('openstack.connection.Connection', autospec=True)
-    def test_get_connection_service_type(
-            self, mock_connection, mock_get_session):
+    def test_get_connection_service_type(self, mock_get_session):
         actual_conn = keystone_client.get_connection(
             self.CONF, service_type="other_service_type")
 
@@ -202,16 +198,14 @@ class TestKeystoneClient(base.BaseTestCase):
             self.CONF,
             requests_session=None,
             group=keystone_client.DEFAULT_GROUP)
-        mock_connection.assert_called_once_with(
+        self.fake_conn_class_mock.assert_called_once_with(
             session=mock_get_session.return_value,
             oslo_conf=self.CONF,
             service_types={"other_service_type"})
-        self.assertEqual(actual_conn, mock_connection.return_value)
+        self.assertEqual(actual_conn, self.fake_conn)
 
     @mock.patch('ceilometer.keystone_client.get_session', autospec=True)
-    @mock.patch('openstack.connection.Connection', autospec=True)
-    def test_get_connection_existing_session(
-            self, mock_connection, mock_get_session):
+    def test_get_connection_existing_session(self, mock_get_session):
         mock_session = mock.Mock()
 
         actual_conn = keystone_client.get_connection(
@@ -221,16 +215,14 @@ class TestKeystoneClient(base.BaseTestCase):
             self.CONF,
             requests_session=mock_session,
             group=keystone_client.DEFAULT_GROUP)
-        mock_connection.assert_called_once_with(
+        self.fake_conn_class_mock.assert_called_once_with(
             session=mock_get_session.return_value,
             oslo_conf=self.CONF,
             service_types={"identity"})
-        self.assertEqual(actual_conn, mock_connection.return_value)
+        self.assertEqual(actual_conn, self.fake_conn)
 
     @mock.patch('ceilometer.keystone_client.get_session', autospec=True)
-    @mock.patch('openstack.connection.Connection', autospec=True)
-    def test_get_connection_new_group(
-            self, mock_connection, mock_get_session):
+    def test_get_connection_new_group(self, mock_get_session):
 
         actual_conn = keystone_client.get_connection(
             self.CONF, group="some_group")
@@ -239,11 +231,11 @@ class TestKeystoneClient(base.BaseTestCase):
             self.CONF,
             requests_session=None,
             group="some_group")
-        mock_connection.assert_called_once_with(
+        self.fake_conn_class_mock.assert_called_once_with(
             session=mock_get_session.return_value,
             oslo_conf=self.CONF,
             service_types={"identity"})
-        self.assertEqual(actual_conn, mock_connection.return_value)
+        self.assertEqual(actual_conn, self.fake_conn)
 
     @mock.patch('keystoneclient.v3.client.Client', autospec=True)
     @mock.patch('ceilometer.keystone_client.get_session', autospec=True)
@@ -696,15 +688,14 @@ class TestKeystoneClient(base.BaseTestCase):
         self.assertEqual(result, 'auth_token')
 
     def test_get_auth_token_from_openstacksdk_connection(self):
-        mock_connection = mock.Mock(spec=openstack.connection.Connection)
-        mock_connection.session = mock.Mock()
+        self.fake_conn.session = mock.Mock()
         mock_access = mock.Mock()
         mock_access.auth_token = 'my_connection_auth_token'
-        mock_connection.session.auth.get_access.return_value = mock_access
+        self.fake_conn.session.auth.get_access.return_value = mock_access
 
-        result = keystone_client.get_auth_token(mock_connection)
+        result = keystone_client.get_auth_token(self.fake_conn)
 
-        mock_connection.session.auth.get_access.assert_called_once_with(
-            mock_connection.session)
+        self.fake_conn.session.auth.get_access.assert_called_once_with(
+            self.fake_conn.session)
         self.assertIsInstance(result, str)
         self.assertEqual(result, 'my_connection_auth_token')

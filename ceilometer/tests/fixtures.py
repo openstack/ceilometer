@@ -17,8 +17,55 @@
 
 import logging as std_logging
 import os
+from unittest import mock
 
 import fixtures
+
+from ceilometer.tests.unit import fakes
+
+
+class FakeConnectionFixture(fixtures.Fixture):
+    """Patches openstack.connection.Connection to return a FakeConnection spy.
+
+    Attributes:
+        fake_conn: mock.Mock wrapping the FakeConnection instance. Use this
+            to assert on calls made by the code under test, e.g.
+            ``fix.fake_conn.list_projects.assert_called_once_with(...)``
+        connection_class_mock: the mock of the Connection class itself (the
+            patched callable). Use to assert the constructor was called with
+            expected args, e.g.
+            ``fix.connection_class_mock.assert_called_once_with(session=...)``
+
+    Usage::
+
+        fix = self.useFixture(ceilo_fixtures.FakeConnectionFixture(
+            projects=[fakes.PROJECT_ADMIN_sdk]))
+        fix.fake_conn.list_projects.assert_called_once_with(...)
+        fix.connection_class_mock.assert_called_once_with(
+            session=..., oslo_conf=..., service_types=...)
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self._kwargs = kwargs
+
+    def _setUp(self):
+        """Patch Connection and set up return values.
+
+        The Connection class is mocked with autospec=True, so that the
+        constructor is validated at test time. This means if the code ever
+        calls Connection(badkwarg=...) or if the SDK changes
+        Connection.__init__'s signature, there'll be a TypeError rather than a
+        silently passing test.
+        """
+        self.fake_conn = mock.Mock(wraps=fakes.FakeConnection(**self._kwargs))
+        patcher = mock.patch(
+            'openstack.connection.Connection',
+            return_value=self.fake_conn,
+            autospec=True
+        )
+        self.connection_class_mock = patcher.start()
+        self.addCleanup(patcher.stop)
 
 
 class NullHandler(std_logging.Handler):
