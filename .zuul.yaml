@@ -5,7 +5,7 @@
       - opendev.org/openstack/grenade
       - opendev.org/openstack/ceilometer
       - name: gnocchixyz/gnocchi
-        override-checkout: stable/4.6
+        override-checkout: stable/4.7
     vars:
       configure_swap_size: 8192
       grenade_devstack_localrc:
