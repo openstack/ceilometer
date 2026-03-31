@@ -17,6 +17,7 @@ import os
 
 from keystoneauth1 import loading as ka_loading
 from keystoneclient.v3 import client as ks_client_v3
+from openstack import connection
 from oslo_config import cfg
 
 DEFAULT_GROUP = "service_credentials"
@@ -35,6 +36,22 @@ def get_session(conf, requests_session=None, group=None, timeout=None):
         kwargs['timeout'] = timeout
     session = ka_loading.load_session_from_conf_options(conf, group, **kwargs)
     return session
+
+
+def get_connection(
+        conf, service_type="identity",
+        requests_session=None, group=DEFAULT_GROUP):
+    """Get an openstacksdk connection to interact with openstack services."""
+    sess = get_session(
+        conf, requests_session=requests_session, group=group)
+
+    # https://github.com/openstack/nova/blob/master/nova/utils.py#L905
+    conn = connection.Connection(
+        session=sess,
+        oslo_conf=conf,
+        service_types={service_type}
+    )
+    return conn
 
 
 def get_client(conf, trust_id=None, requests_session=None,
@@ -67,6 +84,8 @@ def get_urls(
 
 
 def get_auth_token(client):
+    # NOTE: client.session.get_token() can be used for both
+    # keystoneclient.v3.client.Client and openstack.connection.Connection
     return client.session.auth.get_access(client.session).auth_token
 
 
