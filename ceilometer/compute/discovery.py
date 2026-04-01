@@ -64,16 +64,19 @@ OPTS = [
                     "for agent polling to Nova API, so it will work only "
                     "when 'instance_discovery_method' is set to 'naive'."),
     cfg.BoolOpt('fetch_extra_metadata',
-                default=True,
+                default=False,
                 help="Whether or not additional instance attributes that "
                      "require Nova API queries should be fetched. Currently "
                      "the only value that requires fetching from Nova API is "
                      "'metadata', the attribute storing user-configured "
                      "server metadata, which is used to fill out some "
                      "optional fields such as the server group of an "
-                     "instance. fetch_extra_metadata is currently set to "
-                     "True by default, but to reduce the load on Nova API "
-                     "this will be changed to False in a future release."),
+                     "instance. When using Gnocchi this does not need to be "
+                     "enabled in most cases as notification meters also "
+                     "populate these fields in Gnocchi resources. When using "
+                     "Prometheus you may want to enable this if you need "
+                     "this metadata set on all samples (e.g. queries by "
+                     "server group, Aodh alarms or Heat auto-scaling)."),
 ]
 
 LOG = log.getLogger(__name__)
