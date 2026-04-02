@@ -266,7 +266,6 @@ class TestKeystoneClient(base.BaseTestCase):
             group=keystone_client.DEFAULT_GROUP)
         mock_ks_client.assert_called_once_with(
             session=mock_get_session.return_value,
-            trust_id=None,
             interface="internal",
             region_name="expected_region")
         self.assertEqual(result, mock_client)
