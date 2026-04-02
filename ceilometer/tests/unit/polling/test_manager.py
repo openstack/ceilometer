@@ -367,9 +367,6 @@ class TestPollingAgent(BaseAgent):
         ks_client.projects.get.return_value = mock.Mock(
             name='admin', id='4465ecd1438b4d23a866cf8447387a7b'
         )
-        ks_client.users.get.return_value = mock.Mock(
-            name='admin', id='c0c935468e654d5a8baae1a08adf4dfb'
-        )
         self.useFixture(fixtures.MockPatch(
             'keystoneclient.v3.client.Client',
             return_value=ks_client))
