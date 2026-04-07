@@ -315,6 +315,15 @@ resources:
     event_attributes:
       id: resource_id
 
+  - resource_type: volume_service
+    metrics:
+      volume.service.health:
+    attributes:
+      host: resource_metadata.host
+      binary: resource_metadata.binary
+      zone: resource_metadata.zone
+      status: resource_metadata.status
+
   - resource_type: dns_zone
     metrics:
       dns.zone.status:

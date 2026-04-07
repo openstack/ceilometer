@@ -68,3 +68,10 @@ class VolumePoolsDiscovery(_BaseDiscovery):
         """Discover volume resources to monitor."""
 
         return self.client.pools.list(detailed=True)
+
+
+class VolumeServicesDiscovery(_BaseDiscovery):
+    def discover(self, manager, param=None):
+        """Discover cinder service resources to monitor."""
+
+        return self.client.services.list()

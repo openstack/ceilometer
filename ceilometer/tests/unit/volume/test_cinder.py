@@ -171,6 +171,27 @@ POOL_LIST = [
           'timestamp': '2025-06-09T13:29:43.286226'})
 ]
 
+SERVICE_LIST = [
+    type('Service', (object,),
+         {'binary': 'cinder-volume',
+          'host': 'devstack',
+          'zone': 'nova',
+          'status': 'enabled',
+          'state': 'up'}),
+    type('Service', (object,),
+         {'binary': 'cinder-scheduler',
+          'host': 'devstack',
+          'zone': 'nova',
+          'status': 'enabled',
+          'state': 'up'}),
+    type('Service', (object,),
+         {'binary': 'cinder-backup',
+          'host': 'devstack',
+          'zone': 'nova',
+          'status': 'enabled',
+          'state': 'down'}),
+]
+
 
 class TestVolumeSizePollster(base.BaseTestCase):
     def setUp(self):
@@ -349,3 +370,55 @@ class TestVolumeProviderPoolCapacityAllocatedPollster(base.BaseTestCase):
         self.assertEqual(1, volume_pool_size_allocated_samples[1].volume)
         self.assertEqual('cinder-3ceee-volume-ceph-0@ceph#ceph',
                          volume_pool_size_allocated_samples[1].resource_id)
+
+
+class TestVolumeServiceHealthPollster(base.BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        conf = service.prepare_service([], [])
+        self.manager = manager.AgentManager(0, conf)
+        self.pollster = cinder.VolumeServiceHealthPollster(conf)
+
+    def test_volume_service_health_pollster(self):
+        samples = list(
+            self.pollster.get_samples(
+                self.manager, {}, resources=SERVICE_LIST))
+        self.assertEqual(3, len(samples))
+
+        self.assertEqual('volume.service.health', samples[0].name)
+        self.assertEqual(1, samples[0].volume)
+        self.assertEqual('cinder-volume@devstack',
+                         samples[0].resource_id)
+        self.assertEqual('cinder-volume',
+                         samples[0].resource_metadata['binary'])
+        self.assertEqual('nova',
+                         samples[0].resource_metadata['zone'])
+
+        self.assertEqual('volume.service.health', samples[1].name)
+        self.assertEqual(1, samples[1].volume)
+        self.assertEqual('cinder-scheduler@devstack',
+                         samples[1].resource_id)
+        self.assertEqual('cinder-scheduler',
+                         samples[1].resource_metadata['binary'])
+
+        self.assertEqual('volume.service.health', samples[2].name)
+        self.assertEqual(0, samples[2].volume)
+        self.assertEqual('cinder-backup@devstack',
+                         samples[2].resource_id)
+        self.assertEqual('cinder-backup',
+                         samples[2].resource_metadata['binary'])
+
+    def test_volume_service_health_unknown_state(self):
+        bad_service = [
+            type('Service', (object,),
+                 {'binary': 'cinder-volume',
+                  'host': 'devstack',
+                  'zone': 'nova',
+                  'status': 'enabled',
+                  'state': 'unknown'}),
+        ]
+        self.assertRaises(
+            ValueError,
+            list,
+            self.pollster.get_samples(
+                self.manager, {}, resources=bad_service))

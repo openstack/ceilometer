@@ -275,6 +275,21 @@ resources_update_operations = [
                          "max_length": 255, "required": False}
          }
      }]},
+    {"desc": "add volume_service resource type",
+     "type": "create_resource_type",
+     "resource_type": "volume_service",
+     "data": [{
+         "attributes": {
+             "host": {"type": "string", "min_length": 0,
+                      "max_length": 255, "required": False},
+             "binary": {"type": "string", "min_length": 0,
+                        "max_length": 255, "required": False},
+             "zone": {"type": "string", "min_length": 0,
+                      "max_length": 255, "required": False},
+             "status": {"type": "string", "min_length": 0,
+                        "max_length": 255, "required": False}
+         }
+     }]},
 ]
 
 

@@ -17,6 +17,11 @@ import math
 from ceilometer.polling import plugin_base
 from ceilometer import sample
 
+SERVICE_STATE = {
+    'up': 1,
+    'down': 0,
+}
+
 
 class _Base(plugin_base.PollsterBase):
     FIELDS = []
@@ -242,4 +247,31 @@ class VolumeProviderPoolCapacityAllocated(_VolumeProviderPoolBase):
                 project_id=None,
                 resource_id=pool.name,
                 resource_metadata=self.extract_metadata(pool)
+            )
+
+
+class VolumeServiceHealthPollster(_Base):
+    @property
+    def default_discovery(self):
+        return 'volume_services'
+
+    FIELDS = ['binary', 'host', 'zone', 'status']
+
+    def get_samples(self, manager, cache, resources):
+        for svc in resources:
+            svc_state = getattr(svc, 'state', '').lower()
+            if svc_state not in SERVICE_STATE:
+                raise ValueError(
+                    f"Unknown service state '{svc_state}' for "
+                    f"{svc.binary}@{svc.host}")
+            state = SERVICE_STATE[svc_state]
+            yield sample.Sample(
+                name='volume.service.health',
+                type=sample.TYPE_GAUGE,
+                unit='health',
+                volume=state,
+                user_id=None,
+                project_id=None,
+                resource_id=f'{svc.binary}@{svc.host}',
+                resource_metadata=self.extract_metadata(svc),
             )
