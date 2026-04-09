@@ -30,12 +30,14 @@ class RGWAdminAPIFailed(Exception):
 class RGWAdminClient:
     Bucket = namedtuple('Bucket', 'name, num_objects, size')
 
-    def __init__(self, endpoint, access_key, secret_key, implicit_tenants):
+    def __init__(self, endpoint, access_key, secret_key, implicit_tenants,
+                 verify=True):
         self.access_key = access_key
         self.secret = secret_key
         self.endpoint = endpoint
         self.hostname = urlparse.urlparse(endpoint).netloc
         self.implicit_tenants = implicit_tenants
+        self.verify = verify
 
     def _make_request(self, path, req_params):
         uri = f"{self.endpoint}/{path}"
@@ -62,7 +64,7 @@ class RGWAdminClient:
 
         r = awscurl.make_request(method, service, region, uri, headers, data,
                                  self.access_key, self.secret, None, False,
-                                 False)
+                                 self.verify)
 
         if r.status_code != 200:
             raise RGWAdminAPIFailed(

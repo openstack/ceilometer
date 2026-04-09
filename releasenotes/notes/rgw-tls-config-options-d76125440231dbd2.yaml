@@ -1,0 +1,23 @@
+---
+features:
+  - |
+    Added ``insecure`` and ``cafile`` configuration options to the
+    ``[rgw_client]`` section for controlling HTTPS certificate verification
+    when connecting to the Ceph RGW Admin API. The ``insecure`` option
+    disables certificate verification, and ``cafile`` specifies a PEM
+    encoded Certificate Authority to use instead of the system CA bundle.
+    Previously, RGW Admin API connections always skipped certificate
+    verification.
+deprecations:
+  - |
+    The ``[rgw_client] insecure`` option currently defaults to ``True`` to
+    preserve backward compatibility. This will be changed to ``False`` in a
+    future release. Deployments using HTTPS for RGW should set ``insecure``
+    to ``False`` and configure ``cafile`` if a custom CA is needed.
+security:
+  - |
+    The RGW Admin API client previously hardcoded ``verify=False``,
+    unconditionally skipping HTTPS certificate verification. New
+    ``[rgw_client] insecure`` and ``[rgw_client] cafile`` options allow
+    operators to enable proper certificate verification for RGW
+    connections.

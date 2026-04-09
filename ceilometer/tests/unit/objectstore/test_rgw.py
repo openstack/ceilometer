@@ -184,3 +184,40 @@ class TestRgwPollster(testscenarios.testcase.WithScenarios,
                                                      ASSIGNED_TENANTS))
 
         self.assertEqual(0, len(samples))
+
+
+class TestRgwPollsterTLS(base.BaseTestCase):
+    """Tests for the RGW pollster TLS configuration options."""
+
+    def setUp(self):
+        super().setUp()
+        self.conf = service.prepare_service([], [])
+        self.conf.set_override('radosgw', 'object-store',
+                               group='service_types')
+
+    def test_verify_default_insecure(self):
+        """Default insecure=True should set verify=False."""
+        pollster = rgw.ObjectsPollster(self.conf)
+        self.assertFalse(pollster.verify)
+
+    def test_verify_insecure_false(self):
+        """insecure=False with no cafile should set verify=True."""
+        self.conf.set_override('insecure', False, group='rgw_client')
+        pollster = rgw.ObjectsPollster(self.conf)
+        self.assertTrue(pollster.verify)
+
+    def test_verify_cafile(self):
+        """insecure=False with cafile should set verify to the path."""
+        self.conf.set_override('insecure', False, group='rgw_client')
+        self.conf.set_override('cafile', '/path/to/ca.pem',
+                               group='rgw_client')
+        pollster = rgw.ObjectsPollster(self.conf)
+        self.assertEqual('/path/to/ca.pem', pollster.verify)
+
+    def test_verify_insecure_overrides_cafile(self):
+        """insecure=True should set verify=False even if cafile is set."""
+        self.conf.set_override('insecure', True, group='rgw_client')
+        self.conf.set_override('cafile', '/path/to/ca.pem',
+                               group='rgw_client')
+        pollster = rgw.ObjectsPollster(self.conf)
+        self.assertFalse(pollster.verify)
