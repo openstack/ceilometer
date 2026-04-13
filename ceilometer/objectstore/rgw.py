@@ -49,6 +49,18 @@ CLIENT_OPTS = [
                sample_default='ceph',
                help='Service name for object store endpoint. '
                     'If left to None, will use [service_types]/radosgw.'),
+    cfg.BoolOpt('insecure',
+                default=True,
+                help='Disable HTTPS certificate verification for RGW '
+                     'Admin API connections. insecure is currently set '
+                     'to True by default, but to encourage secure '
+                     'connections this will be changed to False in a '
+                     'future release.'),
+    cfg.StrOpt('cafile',
+               default=None,
+               help='PEM encoded Certificate Authority to use when '
+                    'verifying HTTPS connections to the RGW Admin API. '
+                    'If not set, the system CA bundle is used.'),
 ]
 
 
@@ -61,6 +73,12 @@ class _Base(plugin_base.PollsterBase):
         self.access_key = self.conf.rgw_admin_credentials.access_key
         self.secret = self.conf.rgw_admin_credentials.secret_key
         self.implicit_tenants = self.conf.rgw_client.implicit_tenants
+        if self.conf.rgw_client.insecure:
+            self.verify = False
+        elif self.conf.rgw_client.cafile:
+            self.verify = self.conf.rgw_client.cafile
+        else:
+            self.verify = True
 
     @property
     def default_discovery(self):
@@ -112,7 +130,8 @@ class _Base(plugin_base.PollsterBase):
             rgw_client = c_rgw_client.RGWAdminClient(endpoint,
                                                      self.access_key,
                                                      self.secret,
-                                                     self.implicit_tenants)
+                                                     self.implicit_tenants,
+                                                     self.verify)
         except ImportError:
             raise plugin_base.PollsterPermanentError(tenants)
 

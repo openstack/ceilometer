@@ -219,3 +219,34 @@ class TestRGWAdminClient(base.BaseTestCase):
         self.assertEqual(1, len(self.get.call_args_list))
         self.assertEqual('http://127.0.0.1:8080/admin/usage?uid=foo$foo',
                          self.get.call_args_list[0][0][1])
+
+    def test_verify_default(self):
+        client = rgw_client.RGWAdminClient(
+            'http://127.0.0.1:8080/admin', 'key', 'secret', False)
+        self.assertTrue(client.verify)
+
+    def test_verify_false(self):
+        client = rgw_client.RGWAdminClient(
+            'http://127.0.0.1:8080/admin', 'key', 'secret', False,
+            verify=False)
+        self.assertFalse(client.verify)
+
+    def test_verify_cafile(self):
+        client = rgw_client.RGWAdminClient(
+            'http://127.0.0.1:8080/admin', 'key', 'secret', False,
+            verify='/path/to/ca.pem')
+        self.assertEqual('/path/to/ca.pem', client.verify)
+
+    def test_verify_passed_to_make_request(self):
+        client = rgw_client.RGWAdminClient(
+            'http://127.0.0.1:8080/admin', 'key', 'secret', False,
+            verify='/path/to/ca.pem')
+        self.get_resp.status_code = 200
+        self.get_resp.json.return_value = buckets_json
+        with mock.patch('awscurl.awscurl.make_request',
+                        return_value=self.get_resp) as mock_req:
+            client._make_request('bucket', {'uid': 'foo', 'stats': 'true'})
+            mock_req.assert_called_once()
+            # verify is the 11th positional arg (index 10)
+            self.assertEqual('/path/to/ca.pem',
+                             mock_req.call_args[0][10])
