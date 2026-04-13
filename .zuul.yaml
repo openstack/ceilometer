@@ -29,6 +29,7 @@
       - ^doc/.*$
       - ^.*\.rst$
       - ^releasenotes/.*$
+      - ^ceilometer/hacking/.*$
       - ^ceilometer/locale/.*$
       - ^ceilometer/tests/.*$
       - ^tools/.*$
