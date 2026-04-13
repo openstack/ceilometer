@@ -1,0 +1,22 @@
+---
+upgrade:
+  - |
+    The ``[compute]/fetch_extra_metadata`` configuration option, introduced in
+    the 2025.2 Flamingo release, allows configuring whether or not instance
+    user metadata is fetched by compute pollsters via Nova API queries. This
+    is used, for example, to fetch the ``metering.server_group`` metadata
+    attribute, which sets the ``server_group`` attribute on Gnocchi resources.
+
+    ``[compute]/fetch_extra_metadata`` was previously set to ``True`` by
+    default. To reduce load on Nova API, as of the 2026.2 Hibiscus release
+    this option is now set to ``False`` by default.
+
+    If you are using Gnocchi and you require user metadata for some attributes
+    (e.g. ``server_group``), enabling this option should not be necessary in
+    most cases as the notification meters will already set these on resources,
+    even without compute pollsters fetching them.
+
+    If you use Prometheus and want this metadata included with all samples
+    (e.g. for querying metrics by server group, Aodh alarms or Heat
+    auto-scaling), you should explicitly enable this option by setting
+    ``[compute]/fetch_extra_metadata`` to ``True`` in ``ceilometer.conf``.

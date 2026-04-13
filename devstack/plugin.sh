@@ -209,6 +209,8 @@ function configure_ceilometer {
     iniset $CEILOMETER_CONF oslo_messaging_notifications topics "$CEILOMETER_NOTIFICATION_TOPICS"
     iniset $CEILOMETER_CONF DEFAULT debug "$ENABLE_DEBUG_LOG_LEVEL"
 
+    iniset $CEILOMETER_CONF compute fetch_extra_metadata $CEILOMETER_COMPUTE_FETCH_EXTRA_METADATA
+
     if [[ -n "$CEILOMETER_COORDINATION_URL" ]]; then
         iniset $CEILOMETER_CONF coordination backend_url $CEILOMETER_COORDINATION_URL
         iniset $CEILOMETER_CONF notification workers $API_WORKERS

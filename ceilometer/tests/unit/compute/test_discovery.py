@@ -443,14 +443,11 @@ class TestDiscovery(base.BaseTestCase):
                                "libvirt_metadata",
                                group="compute")
         mock_libvirt_conn.return_value = FakeConn()
-        mock_get_server.return_value = argparse.Namespace(
-            metadata={"metering.server_group": "group1"})
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
 
         mock_get_flavor_id.assert_not_called()
-        mock_get_server.assert_called_with(
-            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
+        mock_get_server.assert_not_called()
 
         self.assertEqual(1, len(resources))
         r = list(resources)[0]
@@ -493,8 +490,7 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual("running", metadata["state"])
         self.assertEqual("hvm", metadata["os_type"])
         self.assertEqual("x86_64", metadata["architecture"])
-        self.assertEqual({"server_group": "group1"},
-                         metadata["user_metadata"])
+        self.assertNotIn("user_metadata", metadata)
         self.assertEqual({"id"},
                          set(metadata["image"].keys()))
         self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
@@ -535,15 +531,13 @@ class TestDiscovery(base.BaseTestCase):
                                group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[FakeDomain(metadata=LIBVIRT_METADATA_XML_OLD)])
-        mock_get_server.return_value = argparse.Namespace(
-            flavor={"id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62"},
-            metadata={"metering.server_group": "group1"})
+        mock_get_flavor_id.return_value = (
+            "eba4213d-3c6c-4b5f-8158-dd0022d71d62")
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
 
-        mock_get_flavor_id.assert_not_called()
-        mock_get_server.assert_called_with(
-            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
+        mock_get_flavor_id.assert_called_with("m1.tiny")
+        mock_get_server.assert_not_called()
 
         self.assertEqual(1, len(resources))
         r = list(resources)[0]
@@ -585,8 +579,7 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual("running", metadata["state"])
         self.assertEqual("hvm", metadata["os_type"])
         self.assertEqual("x86_64", metadata["architecture"])
-        self.assertEqual({"server_group": "group1"},
-                         metadata["user_metadata"])
+        self.assertNotIn("user_metadata", metadata)
         self.assertEqual({"id"},
                          set(metadata["image"].keys()))
         self.assertEqual("bdaf114a-35e9-4163-accd-226d5944bf11",
@@ -597,19 +590,22 @@ class TestDiscovery(base.BaseTestCase):
     @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
     @mock.patch("ceilometer.compute.virt.libvirt.utils."
                 "refresh_libvirt_connection")
-    def test_discovery_with_libvirt_no_extra_metadata(
+    def test_discovery_with_libvirt_fetch_extra_metadata(
             self, mock_libvirt_conn,
             mock_get_flavor_id, mock_get_server):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
+        self.CONF.set_override("fetch_extra_metadata", True, group="compute")
         mock_libvirt_conn.return_value = FakeConn()
+        mock_get_server.return_value = argparse.Namespace(
+            metadata={"metering.server_group": "group1"})
         dsc = discovery.InstanceDiscovery(self.CONF)
         resources = dsc.discover(mock.MagicMock())
 
         mock_get_flavor_id.assert_not_called()
-        mock_get_server.assert_not_called()
+        mock_get_server.assert_called_with(
+            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
 
         self.assertEqual(1, len(resources))
         r = list(resources)[0]
@@ -617,7 +613,40 @@ class TestDiscovery(base.BaseTestCase):
                                            "carrot", 1)
 
         metadata = s.resource_metadata
-        self.assertNotIn("user_metadata", metadata)
+        self.assertEqual({"server_group": "group1"},
+                         metadata["user_metadata"])
+
+    @mock.patch.object(discovery.InstanceDiscovery, "get_server")
+    @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
+    @mock.patch("ceilometer.compute.virt.libvirt.utils."
+                "refresh_libvirt_connection")
+    def test_discovery_with_libvirt_fetch_extra_metadata_old(
+            self, mock_libvirt_conn,
+            mock_get_flavor_id, mock_get_server):
+        self.CONF.set_override("instance_discovery_method",
+                               "libvirt_metadata",
+                               group="compute")
+        self.CONF.set_override("fetch_extra_metadata", True, group="compute")
+        mock_libvirt_conn.return_value = FakeConn(
+            domains=[FakeDomain(metadata=LIBVIRT_METADATA_XML_OLD)])
+        mock_get_server.return_value = argparse.Namespace(
+            flavor={"id": "eba4213d-3c6c-4b5f-8158-dd0022d71d62"},
+            metadata={"metering.server_group": "group1"})
+        dsc = discovery.InstanceDiscovery(self.CONF)
+        resources = dsc.discover(mock.MagicMock())
+
+        mock_get_flavor_id.assert_not_called()
+        mock_get_server.assert_called_with(
+            "a75c2fa5-6c03-45a8-bbf7-b993cfcdec27")
+
+        self.assertEqual(1, len(resources))
+        r = list(resources)[0]
+        s = util.make_sample_from_instance(self.CONF, r, "metric", "delta",
+                                           "carrot", 1)
+
+        metadata = s.resource_metadata
+        self.assertEqual({"server_group": "group1"},
+                         metadata["user_metadata"])
 
     @mock.patch.object(discovery.InstanceDiscovery, "get_server")
     @mock.patch.object(discovery.InstanceDiscovery, "get_flavor_id")
@@ -629,7 +658,6 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[FakeDomain(
                 metadata=LIBVIRT_METADATA_XML_EMPTY_FLAVOR_ID)])
@@ -709,7 +737,6 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[FakeDomain(metadata=LIBVIRT_METADATA_XML_NO_FLAVOR_ID)])
         mock_get_flavor_id.return_value = (
@@ -787,7 +814,6 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[FakeDomain(
                 metadata=LIBVIRT_METADATA_XML_EMPTY_FLAVOR_EXTRA_SPECS)])
@@ -824,7 +850,6 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[FakeDomain(
                 metadata=LIBVIRT_METADATA_XML_NO_FLAVOR_EXTRA_SPECS)])
@@ -857,7 +882,6 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[
                 FakeDomain(metadata=LIBVIRT_METADATA_XML_FROM_VOLUME_IMAGE)])
@@ -908,7 +932,6 @@ class TestDiscovery(base.BaseTestCase):
         self.CONF.set_override("instance_discovery_method",
                                "libvirt_metadata",
                                group="compute")
-        self.CONF.set_override("fetch_extra_metadata", False, group="compute")
         mock_libvirt_conn.return_value = FakeConn(
             domains=[
                 FakeDomain(

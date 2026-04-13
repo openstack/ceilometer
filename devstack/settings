@@ -51,6 +51,12 @@ CEILOMETER_ALARM_AGGREGATION_METHOD=${CEILOMETER_ALARM_AGGREGATION_METHOD:-rate:
 CEILOMETER_ALARM_METRIC_NAME=${CEILOMETER_ALARM_METRIC_NAME:-cpu}
 CEILOMETER_ALARM_THRESHOLD=${CEILOMETER_ALARM_THRESHOLD:-10000000}
 
+# NOTE(callumdickinson): Enable/disable fetching extra metadata from Nova API.
+# This is disabled by default in Ceilometer itself to reduce Nova API load when
+# this metadata is not required, but for the Telemetry Tempest Plugin's Prometheus
+# auto-scaling tests to pass we enable it by default in DevStack.
+CEILOMETER_COMPUTE_FETCH_EXTRA_METADATA=${CEILOMETER_COMPUTE_FETCH_EXTRA_METADATA:-true}
+
 # To enable OSprofiler change value of this variable to "notifications,profiler"
 CEILOMETER_NOTIFICATION_TOPICS=${CEILOMETER_NOTIFICATION_TOPICS:-notifications}
 
