@@ -35,7 +35,7 @@ class TenantDiscovery(plugin.DiscoveryBase):
         if self.conf.polling.ignore_disabled_projects:
             filters["enabled"] = True
 
-        domains = manager.keystone.domains.list(**filters)
+        domains = manager.keystone.list_domains(**filters)
         LOG.debug(
             "Found %i %sKeystone domains",
             len(domains),
@@ -47,7 +47,7 @@ class TenantDiscovery(plugin.DiscoveryBase):
             if self.conf.polling.ignore_disabled_projects
             else "Found %i projects in domain %s")
         for domain in domains:
-            domain_projects = manager.keystone.projects.list(
+            domain_projects = manager.keystone.list_projects(
                 domain,
                 **filters)
             LOG.debug(projects_log_message, len(domain_projects), domain.name)
