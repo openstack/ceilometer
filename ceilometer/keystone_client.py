@@ -66,6 +66,23 @@ class Client:
         """
         return self.projects.find(**kwargs)
 
+    def list_projects(self, domain, **filters):
+        """List projects within a domain, with optional attribute filters.
+
+        Delegates to ``keystoneclient.v3.projects.ProjectManager.list``.
+
+        :param domain: The domain whose projects should be returned. Accepts
+            either a domain ID string or a
+            ``keystoneclient.v3.domains.Domain`` object.
+        :param filters: Optional keyword arguments used as additional query
+            filters, e.g. ``enabled=True`` to restrict results to enabled
+            projects.
+        :returns: A list of ``keystoneclient.v3.projects.Project`` resource
+            objects belonging to the given domain. Returns an empty list when
+            no projects match.
+        """
+        return self.projects.list(domain, **filters)
+
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
     """Get a ceilometer service credentials auth session."""

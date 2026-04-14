@@ -783,3 +783,28 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
             "ClientException",
             client.find_project,
             name='admin')
+
+    def test_list_projects(self):
+        result = self.client.list_projects(fakes.DOMAIN_DEFAULT)
+        self.assertEqual(
+            [fakes.PROJECT_ADMIN, fakes.PROJECT_SERVICE,
+                fakes.PROJECT_DISABLED],
+            result)
+
+    def test_list_projects_domain_id(self):
+        result = self.client.list_projects(fakes.DOMAIN_DEFAULT.id)
+
+        self.assertEqual(
+            [fakes.PROJECT_ADMIN, fakes.PROJECT_SERVICE,
+                fakes.PROJECT_DISABLED],
+            result)
+
+    def test_list_projects_filter_enabled(self):
+        result = self.client.list_projects(
+            fakes.DOMAIN_DEFAULT.id, enabled=True)
+        self.assertEqual([fakes.PROJECT_ADMIN, fakes.PROJECT_SERVICE], result)
+
+    def test_list_projects_no_match(self):
+        # Use a domain that none of the projects belong to
+        result = self.client.list_projects(fakes.DOMAIN_DISABLED)
+        self.assertEqual([], result)
