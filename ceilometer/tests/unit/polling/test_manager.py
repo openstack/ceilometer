@@ -279,8 +279,10 @@ class BaseAgent(base.BaseTestCase):
         self.notifier.sample.side_effect = self.fake_notifier_sample
         self.useFixture(fixtures.MockPatch('oslo_messaging.Notifier',
                                            return_value=self.notifier))
-        self.useFixture(fixtures.MockPatch('keystoneclient.v2_0.client.Client',
-                                           return_value=mock.Mock()))
+        self.useFixture(fixtures.MockPatch(
+            'keystoneclient.v3.client.Client',
+            return_value=fakes.FakeKeystoneClient()))
+
         self.CONF = service.prepare_service([], [])
         self.CONF.set_override(
             'cfg_file',
@@ -759,9 +761,6 @@ class TestPollingAgent(BaseAgent):
 
     def test_when_keystone_fail(self):
         """Test for bug 1316532."""
-        self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v2_0.client.Client',
-            side_effect=ka_exceptions.ClientException))
         poll_cfg = {
             'sources': [{
                 'name': "test_keystone",
@@ -775,6 +774,13 @@ class TestPollingAgent(BaseAgent):
         }
         self.setup_polling(poll_cfg)
         polling_tasks = self.mgr.setup_polling_tasks()
+        # Reset the cached keystone client so the next access re-initialises,
+        # then override the v3 mock to simulate keystone becoming unavailable.
+        self.mgr._keystone = None
+        self.mgr._keystone_last_exception = None
+        self.useFixture(fixtures.MockPatch(
+            'keystoneclient.v3.client.Client',
+            side_effect=ka_exceptions.ClientException))
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
