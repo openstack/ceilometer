@@ -21,6 +21,7 @@ from ceilometer.polling.discovery import localnode
 from ceilometer.polling.discovery import tenant as project
 from ceilometer import service
 from ceilometer.tests import base
+from ceilometer.tests.unit import fakes
 
 
 class TestEndpointDiscovery(base.BaseTestCase):
@@ -73,92 +74,31 @@ class TestLocalnodeDiscovery(base.BaseTestCase):
 
 
 class TestProjectDiscovery(base.BaseTestCase):
-    def prepare_mock_data(self):
-        domain_heat = mock.MagicMock()
-        domain_heat.id = '2f42ab40b7ad4140815ef830d816a16c'
-        domain_heat.name = 'heat'
-        domain_heat.enabled = True
-        domain_heat.links = {
-            'self': 'http://192.168.1.1/identity/v3/domains/'
-                    '2f42ab40b7ad4140815ef830d816a16c'}
-
-        domain_default = mock.MagicMock()
-        domain_default.id = 'default'
-        domain_default.name = 'Default'
-        domain_default.enabled = True
-        domain_default.links = {
-            'self': 'http://192.168.1.1/identity/v3/domains/default'}
-
-        project_admin = mock.MagicMock()
-        project_admin.id = '2ce92449a23145ef9c539f3327960ce3'
-        project_admin.name = 'admin'
-        project_admin.parent_id = 'default'
-        project_admin.domain_id = 'default'
-        project_admin.is_domain = False
-        project_admin.enabled = True
-        project_admin.links = {
-            'self': 'http://192.168.4.46/identity/v3/projects/'
-                    '2ce92449a23145ef9c539f3327960ce3'},
-
-        project_service = mock.MagicMock()
-        project_service.id = '9bf93b86bca04e3b815f86a5de083adc'
-        project_service.name = 'service'
-        project_service.parent_id = 'default'
-        project_service.domain_id = 'default'
-        project_service.is_domain = False
-        project_service.enabled = True
-        project_service.links = {
-            'self': 'http://192.168.4.46/identity/v3/projects/'
-                    '9bf93b86bca04e3b815f86a5de083adc'}
-
-        project_demo = mock.MagicMock()
-        project_demo.id = '57d96b9af18d43bb9d047f436279b0be'
-        project_demo.name = 'demo'
-        project_demo.parent_id = 'default'
-        project_demo.domain_id = 'default'
-        project_demo.is_domain = False
-        project_demo.enabled = True
-        project_demo.links = {
-            'self': 'http://192.168.4.46/identity/v3/projects/'
-                    '57d96b9af18d43bb9d047f436279b0be'}
-
-        self.domains = [domain_heat, domain_default]
-        self.default_domain_projects = [project_admin, project_service]
-        self.heat_domain_projects = [project_demo]
-
-    def side_effect(self, domain=None, **kwargs):
-        if not domain or domain.name == 'Default':
-            return self.default_domain_projects
-        elif domain.name == 'heat':
-            return self.heat_domain_projects
-        else:
-            return []
 
     def setUp(self):
         super().setUp()
         self.CONF = service.prepare_service([], [])
+
         self.discovery = project.TenantDiscovery(self.CONF)
-        self.prepare_mock_data()
         self.manager = mock.MagicMock()
-        self.manager.keystone.projects.list.side_effect = self.side_effect
+        # Wrap FakeKeystoneClient so that we can check the expected calls
+        self.manager.keystone = mock.Mock(wraps=fakes.FakeKeystoneClient())
 
     def test_project_discovery(self):
-        self.manager.keystone.domains.list.return_value = self.domains
         result = self.discovery.discover(self.manager)
-        self.assertEqual(len(result), 3)
+        self.assertEqual(len(result), 4)
         self.manager.keystone.domains.list.assert_called_once_with()
         self.assertEqual(
             self.manager.keystone.projects.list.mock_calls,
-            [mock.call(domain) for domain in self.domains])
+            [mock.call(d) for d in fakes.DEFAULT_DOMAINS])
 
     def test_project_discovery_ignore_disabled_projects(self):
         self.CONF.set_override("ignore_disabled_projects",
                                True, group="polling")
-        self.manager.keystone.domains.list.return_value = self.domains
         result = self.discovery.discover(self.manager)
         self.assertEqual(len(result), 3)
         self.manager.keystone.domains.list.assert_called_once_with(
             enabled=True)
         self.assertEqual(
             self.manager.keystone.projects.list.mock_calls,
-            [mock.call(domain, enabled=True) for domain in self.domains])
+            [mock.call(d, enabled=True) for d in fakes.DEFAULT_DOMAINS])

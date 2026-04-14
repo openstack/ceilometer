@@ -38,6 +38,7 @@ from ceilometer.polling import plugin_base
 from ceilometer import sample
 from ceilometer import service
 from ceilometer.tests import base
+from ceilometer.tests.unit import fakes
 
 
 def default_test_data(name='test'):
@@ -363,14 +364,9 @@ class TestPollingAgent(BaseAgent):
         super().setUp()
         self.mgr = self.create_manager()
         self.mgr.extensions = self.create_extension_list()
-        ks_client = mock.Mock(auth_token='fake_token')
-        ks_client.projects.get.return_value = mock.Mock(
-            name='admin', id='4465ecd1438b4d23a866cf8447387a7b'
-        )
         self.useFixture(fixtures.MockPatch(
             'keystoneclient.v3.client.Client',
-            return_value=ks_client))
-        self.ks_client = ks_client
+            return_value=fakes.FakeKeystoneClient()))
         self.setup_polling()
 
     @mock.patch('ceilometer.polling.manager.PollingManager')

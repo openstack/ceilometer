@@ -12,11 +12,130 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from keystoneauth1 import exceptions as ka_exceptions
+from keystoneclient import exceptions as ks_exceptions
+from keystoneclient.v3 import domains as ks_domains
+from keystoneclient.v3 import projects as ks_projects
 from openstack.network.v2 import firewall_group as sdk_firewall_group
 from openstack.network.v2 import firewall_policy as sdk_firewall_policy
 from openstack.network.v2 import floating_ip as sdk_floating_ip
 from openstack.network.v2 import vpn_ipsec_site_connection as sdk_ipsec_conn
 from openstack.network.v2 import vpn_service as sdk_vpn_service
+
+
+DOMAIN_DEFAULT = ks_domains.Domain(manager=None, info={
+    'id': 'default', 'name': 'Default', 'enabled': True})
+
+DOMAIN_HEAT = ks_domains.Domain(manager=None, info={
+    'id': '2f42ab40b7ad4140815ef830d816a16c', 'name': 'heat', 'enabled': True,
+})
+
+DOMAIN_DISABLED = ks_domains.Domain(manager=None, info={
+    'id': 'disabled-domain', 'name': 'Disabled', 'enabled': False})
+
+PROJECT_ADMIN = ks_projects.Project(manager=None, info={
+    'id': '2ce92449a23145ef9c539f3327960ce3', 'name': 'admin',
+    'parent_id': 'default', 'domain_id': 'default', 'is_domain': False,
+    'enabled': True})
+
+PROJECT_SERVICE = ks_projects.Project(manager=None, info={
+    'id': 'a2d42c23-d518-46b6-96ab-3fba2e146859', 'name': 'service',
+    'parent_id': 'default', 'domain_id': 'default', 'is_domain': False,
+    'enabled': True})
+
+PROJECT_DEMO = ks_projects.Project(manager=None, info={
+    'id': '57d96b9af18d43bb9d047f436279b0be', 'name': 'demo',
+    'parent_id': 'default',
+    'domain_id': '2f42ab40b7ad4140815ef830d816a16c',
+    'is_domain': False, 'enabled': True})
+
+PROJECT_DISABLED = ks_projects.Project(manager=None, info={
+    'id': 'disabled-project', 'name': 'disabled',
+    'parent_id': 'default', 'domain_id': 'default', 'is_domain': False,
+    'enabled': False})
+
+
+DEFAULT_PROJECTS = [
+    PROJECT_ADMIN, PROJECT_SERVICE, PROJECT_DEMO, PROJECT_DISABLED]
+DEFAULT_DOMAINS = [DOMAIN_HEAT, DOMAIN_DEFAULT]
+
+
+class FakeDomainManager:
+    """Fake keystoneclient DomainManager."""
+
+    def __init__(self, domains=None):
+        self._domains = domains if domains is not None else []
+
+    def list(self, **filters):
+        if not filters:
+            return self._domains
+        return [d for d in self._domains
+                if all(getattr(d, k, None) == v for k, v in filters.items())]
+
+    def find(self, name=None, **kwargs):
+        filters = dict(kwargs)
+        if name is not None:
+            filters['name'] = name
+        found = self.list(**filters)
+        if len(found) > 1:
+            raise ks_exceptions.NoUniqueMatch
+        if found:
+            return found[0]
+        raise ka_exceptions.NotFound(
+            404, "No Domain matching %s." % filters)
+
+
+class FakeProjectManager:
+    """Fake keystoneclient ProjectManager."""
+
+    def __init__(self, projects=None):
+        self._projects = projects if projects is not None else []
+
+    def list(self, domain=None, **filters):
+        if domain is None and filters == {}:
+            return self._projects
+
+        projects = self._projects
+        if domain:
+            domain_id = getattr(domain, 'id', domain)
+            projects = [p for p in projects if p.domain_id == domain_id]
+
+        if filters:
+            for k, v in filters.items():
+                projects = [p for p in projects if getattr(p, k, None) == v]
+
+        return projects
+
+    def find(self, name=None, domain_id=None, **kwargs):
+        filters = dict(kwargs)
+        if name is not None:
+            filters['name'] = name
+        found = self.list(domain_id, **filters)
+        if len(found) > 1:
+            raise ks_exceptions.NoUniqueMatch
+        if found:
+            return found[0]
+        raise ka_exceptions.NotFound(
+            404, "No Project matching %s." % filters)
+
+
+class FakeKeystoneClient:
+    """Fake keystoneclient.v3.client.Client for testing."""
+
+    def __init__(self, projects=None, domains=None):
+        if projects is None:
+            projects = DEFAULT_PROJECTS
+        if domains is None:
+            domains = DEFAULT_DOMAINS
+        self.auth_token = 'fake_token'
+        self.projects = FakeProjectManager(projects)
+        self.domains = FakeDomainManager(domains)
+        self.session = None
+
+
+#####################
+# SDK Fakes
+#####################
 
 
 class FakeSDKNetworkClient:
