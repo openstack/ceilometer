@@ -83,6 +83,23 @@ class Client:
         """
         return self.projects.list(domain, **filters)
 
+    def find_domain(self, **kwargs):
+        """Find a single domain matching the given attribute filters.
+
+        Delegates to ``keystoneclient.v3.domains.DomainManager.find``.
+
+        :param kwargs: Attribute filters used to locate the domain, e.g.
+            ``name='Default'``.  All keyword arguments are forwarded to the
+            underlying ``find`` call.
+        :returns: A single ``keystoneclient.v3.domains.Domain`` resource object
+            whose attributes match all supplied filters.
+        :raises keystoneauth1.exceptions.NotFound: if no domain matches
+            the filters.
+        :raises keystoneclient.exceptions.NoUniqueMatch: if more than one
+            domain matches the filters.
+        """
+        return self.domains.find(**kwargs)
+
 
 def get_session(conf, requests_session=None, group=None, timeout=None):
     """Get a ceilometer service credentials auth session."""

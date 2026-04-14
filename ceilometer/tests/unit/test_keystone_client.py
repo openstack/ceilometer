@@ -808,3 +808,46 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
         # Use a domain that none of the projects belong to
         result = self.client.list_projects(fakes.DOMAIN_DISABLED)
         self.assertEqual([], result)
+
+    def test_find_domain(self):
+        result = self.client.find_domain(name='Default')
+        self.assertEqual(fakes.DOMAIN_DEFAULT, result)
+
+    def test_find_domain_not_found(self):
+        self.assertRaises(
+            ka_exceptions.NotFound,
+            self.client.find_domain,
+            name='nonexistent')
+
+    def test_find_domain_not_found_message(self):
+        try:
+            self.client.find_domain(name='nonexistant')
+        except ka_exceptions.NotFound as e:
+            self.assertEqual(
+                e.details,
+                "No Domain matching {'name': 'nonexistant'}.")
+
+    def test_find_domain_no_unique_match(self):
+        fake_ks = fakes.FakeKeystoneClient(
+            domains=[fakes.DOMAIN_DEFAULT, fakes.DOMAIN_DEFAULT],
+            projects=[])
+        with mock.patch('keystoneclient.v3.client.Client',
+                        return_value=fake_ks):
+            client = keystone_client.Client(session=mock.Mock())
+        self.assertRaises(
+            ks_exceptions.NoUniqueMatch,
+            client.find_domain,
+            name='Default')
+
+    def test_find_domain_no_unique_match_message(self):
+        fake_ks = fakes.FakeKeystoneClient(
+            domains=[fakes.DOMAIN_DEFAULT, fakes.DOMAIN_DEFAULT],
+            projects=[])
+        with mock.patch('keystoneclient.v3.client.Client',
+                        return_value=fake_ks):
+            client = keystone_client.Client(session=mock.Mock())
+        self.assertRaisesRegex(
+            ks_exceptions.NoUniqueMatch,
+            "ClientException",
+            client.find_domain,
+            name='Default')
