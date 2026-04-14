@@ -16,7 +16,9 @@ from unittest import mock
 
 import fixtures
 from keystoneauth1.access import service_catalog
+from keystoneauth1 import exceptions as ka_exceptions
 from keystoneauth1.exceptions import catalog as catalog_exceptions
+from keystoneclient import exceptions as ks_exceptions
 from oslo_config import cfg
 from oslo_config import fixture as config_fixture
 
@@ -725,3 +727,59 @@ class TestKeystoneClient(base.BaseTestCase):
             self.fake_conn.session)
         self.assertIsInstance(result, str)
         self.assertEqual(result, 'my_connection_auth_token')
+
+
+class TestKeystoneClientClientClass(base.BaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        domains = fakes.DEFAULT_DOMAINS + [fakes.DOMAIN_DISABLED]
+
+        self.fake_ks = fakes.FakeKeystoneClient(domains=domains)
+        self.useFixture(fixtures.MockPatch(
+            'keystoneclient.v3.client.Client',
+            return_value=self.fake_ks))
+        self.client = keystone_client.Client(session=mock.Mock())
+
+    def test_find_project(self):
+        result = self.client.find_project(name='admin')
+        self.assertEqual(fakes.PROJECT_ADMIN, result)
+
+    def test_find_project_not_found(self):
+        self.assertRaises(
+            ka_exceptions.NotFound,
+            self.client.find_project,
+            name='nonexistent')
+
+    def test_find_project_not_found_message(self):
+        try:
+            self.client.find_project(name='nonexistant')
+        except ka_exceptions.NotFound as e:
+            self.assertEqual(
+                e.details,
+                "No Project matching {'name': 'nonexistant'}.")
+
+    def test_find_project_no_unique_match(self):
+        fake_ks = fakes.FakeKeystoneClient(
+            domains=[],
+            projects=[fakes.PROJECT_ADMIN, fakes.PROJECT_ADMIN])
+        with mock.patch('keystoneclient.v3.client.Client',
+                        return_value=fake_ks):
+            client = keystone_client.Client(session=mock.Mock())
+        self.assertRaises(
+            ks_exceptions.NoUniqueMatch,
+            client.find_project,
+            name='admin')
+
+    def test_find_project_no_unique_match_message(self):
+        fake_ks = fakes.FakeKeystoneClient(
+            domains=[],
+            projects=[fakes.PROJECT_ADMIN, fakes.PROJECT_ADMIN])
+        with mock.patch('keystoneclient.v3.client.Client',
+                        return_value=fake_ks):
+            client = keystone_client.Client(session=mock.Mock())
+        self.assertRaisesRegex(
+            ks_exceptions.NoUniqueMatch,
+            "ClientException",
+            client.find_project,
+            name='admin')
