@@ -16,6 +16,9 @@
 
 from unittest import mock
 
+import fixtures
+
+from ceilometer import keystone_client as ceilo_ks_client
 from ceilometer.polling.discovery import endpoint
 from ceilometer.polling.discovery import localnode
 from ceilometer.polling.discovery import tenant as project
@@ -82,7 +85,13 @@ class TestProjectDiscovery(base.BaseTestCase):
         self.discovery = project.TenantDiscovery(self.CONF)
         self.manager = mock.MagicMock()
         # Wrap FakeKeystoneClient so that we can check the expected calls
-        self.manager.keystone = mock.Mock(wraps=fakes.FakeKeystoneClient())
+        fake_ks = mock.Mock(wraps=fakes.FakeKeystoneClient())
+
+        self.useFixture(fixtures.MockPatch(
+            'keystoneclient.v3.client.Client',
+            return_value=fake_ks))
+
+        self.manager.keystone = ceilo_ks_client.Client(session=mock.Mock())
 
     def test_project_discovery(self):
         result = self.discovery.discover(self.manager)

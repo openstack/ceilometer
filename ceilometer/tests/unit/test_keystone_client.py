@@ -14,6 +14,7 @@
 
 from unittest import mock
 
+import fixtures
 from keystoneauth1.access import service_catalog
 from keystoneauth1.exceptions import catalog as catalog_exceptions
 from oslo_config import cfg
@@ -22,6 +23,7 @@ from oslo_config import fixture as config_fixture
 from ceilometer import keystone_client
 from ceilometer import service as ceilo_service
 from ceilometer.tests import base
+from ceilometer.tests.unit import fakes
 
 CONF = cfg.CONF
 
@@ -237,30 +239,34 @@ class TestKeystoneClient(base.BaseTestCase):
             service_types={"identity"})
         self.assertEqual(actual_conn, self.fake_conn)
 
-    @mock.patch('keystoneclient.v3.client.Client', autospec=True)
     @mock.patch('ceilometer.keystone_client.get_session', autospec=True)
-    def test_get_client(self, mock_get_session, mock_ks_client):
+    def test_get_client(self, mock_get_session):
         mock_session = FakeSession()
         mock_get_session.return_value = mock_session
-        mock_client = mock.Mock()
-        mock_ks_client.return_value = mock_client
         conf = self.useFixture(config_fixture.Config(self.CONF))
         conf.config(group=keystone_client.DEFAULT_GROUP, interface="internal")
         conf.config(
             group=keystone_client.DEFAULT_GROUP,
             region_name="expected_region")
 
+        mock_ks = mock.Mock(wraps=fakes.FakeKeystoneClient(
+            domains=[], projects=[]))
+
+        mock_ks_cls = self.useFixture(fixtures.MockPatch(
+            'keystoneclient.v3.client.Client',
+            return_value=mock_ks))
+
         result = keystone_client.get_client(conf.conf)
 
+        self.assertIsInstance(result, keystone_client.Client)
         mock_get_session.assert_called_once_with(
             self.CONF,
             requests_session=None,
             group=keystone_client.DEFAULT_GROUP)
-        mock_ks_client.assert_called_once_with(
+        mock_ks_cls.mock.assert_called_once_with(
             session=mock_get_session.return_value,
             interface="internal",
             region_name="expected_region")
-        self.assertEqual(result, mock_client)
 
     def test_get_service_catalog(self):
         mock_client = mock.Mock()
@@ -277,6 +283,26 @@ class TestKeystoneClient(base.BaseTestCase):
         mock_client.session.auth.get_access.assert_called_once_with(
             mock_client.session)
         self.assertEqual(result, mock_catalog)
+
+    def test_get_service_catalog_with_real_client(self):
+        mock_session = mock.Mock()
+        client = keystone_client.Client(session=mock_session)
+
+        result = keystone_client.get_service_catalog(client)
+
+        mock_session.auth.get_access.assert_called_once_with(mock_session)
+        self.assertEqual(
+            result, mock_session.auth.get_access.return_value.service_catalog)
+
+    def test_get_auth_token_with_real_client(self):
+        mock_session = mock.Mock()
+        client = keystone_client.Client(session=mock_session)
+
+        result = keystone_client.get_auth_token(client)
+
+        mock_session.auth.get_access.assert_called_once_with(mock_session)
+        self.assertEqual(
+            result, mock_session.auth.get_access.return_value.auth_token)
 
     @mock.patch(
         'ceilometer.keystone_client.get_service_catalog', autospec=True)
