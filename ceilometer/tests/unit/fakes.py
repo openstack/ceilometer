@@ -25,6 +25,7 @@ from openstack.network.v2 import firewall_policy as sdk_firewall_policy
 from openstack.network.v2 import floating_ip as sdk_floating_ip
 from openstack.network.v2 import vpn_ipsec_site_connection as sdk_ipsec_conn
 from openstack.network.v2 import vpn_service as sdk_vpn_service
+from openstack.shared_file_system.v2 import share as sdk_share
 
 from ceilometer import keystone_client
 
@@ -285,6 +286,78 @@ ZONE_UNKNOWN_STATUS = zone.Zone(
 )
 
 
+SHARE_1 = sdk_share.Share(
+    connection=None,
+    id='share-1-uuid',
+    name='my-share-1',
+    availability_zone='az-1',
+    share_protocol='NFS',
+    share_type='default',
+    share_network_id='network-1-uuid',
+    status='available',
+    host='host-1',
+    is_public=False,
+    size=100,
+    project_id='tenant-1-uuid',
+)
+
+SHARE_2 = sdk_share.Share(
+    connection=None,
+    id='share-2-uuid',
+    name='my-share-2',
+    availability_zone='az-2',
+    share_protocol='CIFS',
+    share_type='default',
+    share_network_id='network-2-uuid',
+    status='creating',
+    host='host-2',
+    is_public=True,
+    size=50,
+    project_id='tenant-2-uuid',
+)
+
+SHARE_3 = sdk_share.Share(
+    connection=None,
+    id='share-3-uuid',
+    name='my-share-3',
+    availability_zone=None,
+    share_protocol='NFS',
+    share_type='default',
+    share_network_id='network-3-uuid',
+    status='error',
+    host='host-3',
+    is_public=False,
+    size=200,
+    project_id='tenant-1-uuid',
+)
+
+SHARE_UNKNOWN_STATUS = sdk_share.Share(
+    connection=None,
+    id='share-unknown-uuid',
+    name='my-share-unknown',
+    availability_zone=None,
+    share_protocol='NFS',
+    share_type='default',
+    share_network_id='network-unknown-uuid',
+    status='UNKNOWN_STATUS',
+    host='host-unknown',
+    is_public=False,
+    size=100,
+    project_id='tenant-1-uuid',
+)
+
+
+class FakeSDKManilaClient:
+
+    default_shares = [SHARE_1, SHARE_2, SHARE_3]
+
+    def __init__(self, shares=None):
+        self._shares = shares if shares is not None else self.default_shares
+
+    def shares(self, all_projects=True):
+        return iter(self._shares)
+
+
 class FakeSDKDesignateClient:
 
     default_recordsets = [RECORDSET_1, RECORDSET_2]
@@ -382,7 +455,7 @@ class FakeConnection:
     """Fake connection object for testing."""
 
     def __init__(self, session=None, domains=None, projects=None,
-                 zones=None, recordsets=None):
+                 zones=None, recordsets=None, shares=None):
         """Initialize FakeConnection.
 
         :param projects: Optional list of SDK Project objects. Defaults to the
@@ -393,9 +466,12 @@ class FakeConnection:
             FakeSDKDesignateClient.
         :param recordsets: Optional list of SDK RecordSet objects. Passed to
             FakeSDKDesignateClient.
+        :param shares: Optional list of SDK Share objects. Passed to
+            FakeSDKManilaClient.
         """
 
         self.dns = FakeSDKDesignateClient(zones=zones, recordsets=recordsets)
+        self.shared_file_system = FakeSDKManilaClient(shares=shares)
         self.network = FakeSDKNetworkClient()
         self.session = session or FakeSession()
         # Don't use a short-circuit or here. The explicit check for None is

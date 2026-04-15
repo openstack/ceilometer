@@ -12,14 +12,12 @@
 # under the License.
 from unittest import mock
 
-import fixtures
-from openstack.shared_file_system.v2 import share
-
 from ceilometer.polling import manager
 from ceilometer import service
 from ceilometer.share import discovery
 from ceilometer.share import manila
 from ceilometer.tests import base
+from ceilometer.tests.unit import fakes
 
 
 class _BaseTestSharePollster(base.BaseTestCase):
@@ -28,56 +26,7 @@ class _BaseTestSharePollster(base.BaseTestCase):
         super().setUp()
         self.addCleanup(mock.patch.stopall)
         self.CONF = service.prepare_service([], [])
-        # Mock the openstack.connection.Connection to avoid auth issues
-        with mock.patch('openstack.connection.Connection'):
-            self.manager = manager.AgentManager(0, self.CONF)
-
-    @staticmethod
-    def fake_get_shares():
-        return [
-            share.Share(
-                connection=None,
-                id='share-1-uuid',
-                name='my-share-1',
-                availability_zone='az-1',
-                share_protocol='NFS',
-                share_type='default',
-                share_network_id='network-1-uuid',
-                status='available',
-                host='host-1',
-                is_public=False,
-                size=100,
-                project_id='tenant-1-uuid',
-            ),
-            share.Share(
-                connection=None,
-                id='share-2-uuid',
-                name='my-share-2',
-                availability_zone='az-2',
-                share_protocol='CIFS',
-                share_type='default',
-                share_network_id='network-2-uuid',
-                status='creating',
-                host='host-2',
-                is_public=True,
-                size=50,
-                project_id='tenant-2-uuid',
-            ),
-            share.Share(
-                connection=None,
-                id='share-3-uuid',
-                name='my-share-3',
-                availability_zone=None,
-                share_protocol='NFS',
-                share_type='default',
-                share_network_id='network-3-uuid',
-                status='error',
-                host='host-3',
-                is_public=False,
-                size=200,
-                project_id='tenant-1-uuid',
-            ),
-        ]
+        self.manager = manager.AgentManager(0, self.CONF)
 
 
 class TestShareStatusPollster(_BaseTestSharePollster):
@@ -85,17 +34,13 @@ class TestShareStatusPollster(_BaseTestSharePollster):
     def setUp(self):
         super().setUp()
         self.pollster = manila.ShareStatusPollster(self.CONF)
-        fake_shares = self.fake_get_shares()
-        self.useFixture(fixtures.MockPatch(
-            'ceilometer.manila_client.Client.shares_list',
-            return_value=fake_shares))
+        self.shares = fakes.FakeSDKManilaClient.default_shares
 
     def test_share_get_samples(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=self.fake_get_shares()))
+            self.manager, {}, resources=self.shares))
 
-        self.assertEqual(len(self.fake_get_shares()), len(samples))
+        self.assertEqual(len(self.shares), len(samples))
         # Verify metadata fields are correctly extracted
         self.assertEqual('my-share-1', samples[0].resource_metadata['name'])
         self.assertEqual('az-1',
@@ -106,8 +51,7 @@ class TestShareStatusPollster(_BaseTestSharePollster):
 
     def test_share_status_volume(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=self.fake_get_shares()))
+            self.manager, {}, resources=self.shares))
 
         # available = 1, creating = 2, error = 4
         self.assertEqual(1, samples[0].volume)
@@ -116,16 +60,14 @@ class TestShareStatusPollster(_BaseTestSharePollster):
 
     def test_get_share_meter_names(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=self.fake_get_shares()))
+            self.manager, {}, resources=self.shares))
         self.assertEqual({'manila.share.status'},
                          {s.name for s in samples})
 
     def test_share_discovery(self):
-        with mock.patch('openstack.connection.Connection'):
-            discovered_shares = discovery.ShareDiscovery(
-                self.CONF).discover(self.manager)
-        self.assertEqual(len(self.fake_get_shares()),
+        discovered_shares = discovery.ShareDiscovery(
+            self.CONF).discover(self.manager)
+        self.assertEqual(len(fakes.FakeSDKManilaClient.default_shares),
                          len(list(discovered_shares)))
 
 
@@ -134,19 +76,18 @@ class TestShareSizePollster(_BaseTestSharePollster):
     def setUp(self):
         super().setUp()
         self.pollster = manila.ShareSizePollster(self.CONF)
+        self.shares = fakes.FakeSDKManilaClient.default_shares
 
     def test_share_size_volume(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=self.fake_get_shares()))
+            self.manager, {}, resources=self.shares))
         self.assertEqual(100, samples[0].volume)
         self.assertEqual(50, samples[1].volume)
         self.assertEqual(200, samples[2].volume)
 
     def test_get_share_meter_names(self):
         samples = list(self.pollster.get_samples(
-            self.manager, {},
-            resources=self.fake_get_shares()))
+            self.manager, {}, resources=self.shares))
         self.assertEqual({'manila.share.size'},
                          {s.name for s in samples})
 
@@ -155,21 +96,7 @@ class TestSharePollsterUnknownStatus(_BaseTestSharePollster):
 
     def test_unknown_share_status(self):
         pollster = manila.ShareStatusPollster(self.CONF)
-        fake_share = share.Share(
-            connection=None,
-            id='share-unknown-uuid',
-            name='my-share-unknown',
-            availability_zone=None,
-            share_protocol='NFS',
-            share_type='default',
-            share_network_id='network-unknown-uuid',
-            status='UNKNOWN_STATUS',
-            host='host-unknown',
-            is_public=False,
-            size=100,
-            project_id='tenant-1-uuid',
-        )
         samples = list(pollster.get_samples(
-            self.manager, {}, resources=[fake_share]))
+            self.manager, {}, resources=[fakes.SHARE_UNKNOWN_STATUS]))
         self.assertEqual(1, len(samples))
         self.assertEqual(-1, samples[0].volume)
