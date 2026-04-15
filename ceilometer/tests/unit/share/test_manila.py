@@ -16,7 +16,6 @@ import fixtures
 from openstack.shared_file_system.v2 import share
 
 from ceilometer.polling import manager
-from ceilometer.polling import plugin_base
 from ceilometer import service
 from ceilometer.share import discovery
 from ceilometer.share import manila
@@ -32,11 +31,6 @@ class _BaseTestSharePollster(base.BaseTestCase):
         # Mock the openstack.connection.Connection to avoid auth issues
         with mock.patch('openstack.connection.Connection'):
             self.manager = manager.AgentManager(0, self.CONF)
-        plugin_base._get_keystone = mock.Mock()
-        catalog = (plugin_base._get_keystone.session.auth.get_access.
-                   return_value.service_catalog)
-        catalog.get_endpoints = mock.MagicMock(
-            return_value={'sharev2': mock.ANY})
 
     @staticmethod
     def fake_get_shares():
