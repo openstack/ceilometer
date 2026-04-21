@@ -32,6 +32,7 @@ from urllib import parse as urlparse
 
 from ceilometer import cache_utils
 from ceilometer import declarative
+from ceilometer import exceptions as ceilo_exc
 from ceilometer import gnocchi_client
 from ceilometer.i18n import _
 from ceilometer import keystone_client
@@ -305,12 +306,12 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                         "as `self.filter_project` is None.")
                     return None
                 try:
-                    domain = self._ks_client.domains.find(
+                    domain = self._ks_client.find_domain(
                         name=self.filter_domain)
-                    project = self._ks_client.projects.find(
+                    project = self._ks_client.find_project(
                         name=self.filter_project,
                         domain_id=domain.id)
-                except ka_exceptions.NotFound:
+                except ceilo_exc.NotFound:
                     LOG.warning('Filtered project [%s] not found in keystone, '
                                 'ignoring the filter_project option',
                                 self.filter_project)
