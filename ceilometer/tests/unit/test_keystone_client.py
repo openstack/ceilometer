@@ -16,12 +16,11 @@ from unittest import mock
 
 import fixtures
 from keystoneauth1.access import service_catalog
-from keystoneauth1 import exceptions as ka_exceptions
 from keystoneauth1.exceptions import catalog as catalog_exceptions
-from keystoneclient import exceptions as ks_exceptions
 from oslo_config import cfg
 from oslo_config import fixture as config_fixture
 
+from ceilometer import exceptions as ceilo_exc
 from ceilometer import keystone_client
 from ceilometer import service as ceilo_service
 from ceilometer.tests import base
@@ -747,14 +746,14 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def test_find_project_not_found(self):
         self.assertRaises(
-            ka_exceptions.NotFound,
+            ceilo_exc.NotFound,
             self.client.find_project,
             name='nonexistent')
 
     def test_find_project_not_found_message(self):
         try:
             self.client.find_project(name='nonexistant')
-        except ka_exceptions.NotFound as e:
+        except ceilo_exc.NotFound as e:
             self.assertEqual(
                 e.details,
                 "No Project matching {'name': 'nonexistant'}.")
@@ -767,7 +766,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
                         return_value=fake_ks):
             client = keystone_client.Client(session=mock.Mock())
         self.assertRaises(
-            ks_exceptions.NoUniqueMatch,
+            ceilo_exc.NoUniqueMatch,
             client.find_project,
             name='admin')
 
@@ -779,7 +778,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
                         return_value=fake_ks):
             client = keystone_client.Client(session=mock.Mock())
         self.assertRaisesRegex(
-            ks_exceptions.NoUniqueMatch,
+            ceilo_exc.NoUniqueMatch,
             "ClientException",
             client.find_project,
             name='admin')
@@ -815,14 +814,14 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
 
     def test_find_domain_not_found(self):
         self.assertRaises(
-            ka_exceptions.NotFound,
+            ceilo_exc.NotFound,
             self.client.find_domain,
             name='nonexistent')
 
     def test_find_domain_not_found_message(self):
         try:
             self.client.find_domain(name='nonexistant')
-        except ka_exceptions.NotFound as e:
+        except ceilo_exc.NotFound as e:
             self.assertEqual(
                 e.details,
                 "No Domain matching {'name': 'nonexistant'}.")
@@ -835,7 +834,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
                         return_value=fake_ks):
             client = keystone_client.Client(session=mock.Mock())
         self.assertRaises(
-            ks_exceptions.NoUniqueMatch,
+            ceilo_exc.NoUniqueMatch,
             client.find_domain,
             name='Default')
 
@@ -847,7 +846,7 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
                         return_value=fake_ks):
             client = keystone_client.Client(session=mock.Mock())
         self.assertRaisesRegex(
-            ks_exceptions.NoUniqueMatch,
+            ceilo_exc.NoUniqueMatch,
             "ClientException",
             client.find_domain,
             name='Default')
