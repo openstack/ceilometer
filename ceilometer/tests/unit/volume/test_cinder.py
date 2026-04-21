@@ -14,183 +14,8 @@
 from ceilometer.polling import manager
 from ceilometer import service
 import ceilometer.tests.base as base
+from ceilometer.tests.unit import fakes
 from ceilometer.volume import cinder
-
-VOLUME_LIST = [
-    type('Volume', (object,),
-         {'migration_status': None,
-          'attachments': [
-              {'server_id': '1ae69721-d071-4156-a2bd-b11bb43ec2e3',
-               'attachment_id': 'f903d95e-f999-4a34-8be7-119eadd9bb4f',
-               'attached_at': '2016-07-14T03:55:57.000000',
-               'host_name': None,
-               'volume_id': 'd94c18fb-b680-4912-9741-da69ee83c94f',
-               'device': '/dev/vdb',
-               'id': 'd94c18fb-b680-4912-9741-da69ee83c94f'}],
-          'links': [{
-              'href': 'http://fake_link3',
-              'rel': 'self'},
-              {
-                  'href': 'http://fake_link4',
-                  'rel': 'bookmark'}],
-          'availability_zone': 'nova',
-          'os-vol-host-attr:host': 'test@lvmdriver-1#lvmdriver-1',
-          'encrypted': False,
-          'updated_at': '2016-07-14T03:55:57.000000',
-          'replication_status': 'disabled',
-          'snapshot_id': None,
-          'id': 'd94c18fb-b680-4912-9741-da69ee83c94f',
-          'size': 1,
-          'user_id': 'be255bd31eb944578000fc762fde6dcf',
-          'os-vol-tenant-attr:tenant_id': '6824974c08974d4db864bbaa6bc08303',
-          'os-vol-mig-status-attr:migstat': None,
-          'metadata': {'readonly': 'False', 'attached_mode': 'rw'},
-          'status': 'in-use',
-          'description': None,
-          'multiattach': False,
-          'source_volid': None,
-          'consistencygroup_id': None,
-          "volume_image_metadata": {
-              "checksum": "17d9daa4fb8e20b0f6b7dec0d46fdddf",
-              "container_format": "bare",
-              "disk_format": "raw",
-              "hw_disk_bus": "scsi",
-              "hw_scsi_model": "virtio-scsi",
-              "image_id": "f0019ee3-523c-45ab-b0b6-3adc529673e7",
-              "image_name": "debian-jessie-scsi",
-              "min_disk": "0",
-              "min_ram": "0",
-              "size": "1572864000"
-          },
-          'os-vol-mig-status-attr:name_id': None,
-          'group_id': None,
-          'provider_id': None,
-          'shared_targets': False,
-          'service_uuid': '2f6b5a18-0cd5-4421-b97e-d2c3e85ed758',
-          'cluster_name': None,
-          'volume_type_id': '65a9f65a-4696-4435-a09d-bc44d797c529',
-          'name': None,
-          'bootable': 'false',
-          'created_at': '2016-06-23T08:27:45.000000',
-          'volume_type': 'lvmdriver-1'})
-]
-
-SNAPSHOT_LIST = [
-    type('VolumeSnapshot', (object,),
-         {'status': 'available',
-          'os-extended-snapshot-attributes:progress': '100%',
-          'description': None,
-          'os-extended-snapshot-attributes:project_id':
-              '6824974c08974d4db864bbaa6bc08303',
-          'size': 1,
-          'user_id': 'be255bd31eb944578000fc762fde6dcf',
-          'updated_at': '2016-10-19T07:56:55.000000',
-          'id': 'b1ea6783-f952-491e-a4ed-23a6a562e1cf',
-          'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
-          'metadata': {},
-          'created_at': '2016-10-19T07:56:55.000000',
-          "group_snapshot_id": None,
-          'name': None})
-]
-
-BACKUP_LIST = [
-    type('VolumeBackup', (object,),
-         {'status': 'available',
-          'object_count': 0,
-          'container': None,
-          'name': None,
-          'links': [{
-              'href': 'http://fake_urla',
-              'rel': 'self'}, {
-              'href': 'http://fake_urlb',
-              'rel': 'bookmark'}],
-          'availability_zone': 'nova',
-          'created_at': '2016-10-19T06:55:23.000000',
-          'snapshot_id': None,
-          'updated_at': '2016-10-19T06:55:23.000000',
-          'data_timestamp': '2016-10-19T06:55:23.000000',
-          'description': None,
-          'has_dependent_backups': False,
-          'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
-          'os-backup-project-attr:project_id':
-              '6824974c08974d4db864bbaa6bc08303',
-          'fail_reason': "",
-          'is_incremental': False,
-          'metadata': {},
-          'user_id': 'be255bd31eb944578000fc762fde6dcf',
-          'id': '75a52125-85ff-4a8d-b2aa-580f3b22273f',
-          'size': 1})
-]
-
-POOL_LIST = [
-    type('VolumePool', (object,),
-         {'name': 'localhost.localdomain@lvmdriver-1#lvmdriver-1',
-          'pool_name': 'lvmdriver-1',
-          'total_capacity_gb': 28.5,
-          'free_capacity_gb': 28.39,
-          'reserved_percentage': 0,
-          'location_info':
-              'LVMVolumeDriver:localhost.localdomain:stack-volumes:thin:0',
-          'QoS_support': False,
-          'provisioned_capacity_gb': 4.0,
-          'max_over_subscription_ratio': 20.0,
-          'thin_provisioning_support': True,
-          'thick_provisioning_support': False,
-          'total_volumes': 3,
-          'filter_function': None,
-          'goodness_function': None,
-          'multiattach': True,
-          'backend_state': 'up',
-          'allocated_capacity_gb': 4,
-          'cacheable': True,
-          'volume_backend_name': 'lvmdriver-1',
-          'storage_protocol': 'iSCSI',
-          'vendor_name': 'Open Source',
-          'driver_version': '3.0.0',
-          'timestamp': '2025-03-21T14:19:02.901750'}),
-    type('VolumePool', (object,),
-         {'name': 'cinder-3ceee-volume-ceph-0@ceph#ceph',
-          'vendor_name': 'Open Source',
-          'driver_version': '1.3.0',
-          'storage_protocol': 'ceph',
-          'total_capacity_gb': 85.0,
-          'free_capacity_gb': 85.0,
-          'reserved_percentage': 0,
-          'multiattach': True,
-          'thin_provisioning_support': True,
-          'max_over_subscription_ratio': '20.0',
-          'location_info':
-          'ceph:/etc/ceph/ceph.conf:a94b63c4e:openstack:volumes',
-          'backend_state': 'up',
-          'qos_support': True,
-          'volume_backend_name': 'ceph',
-          'replication_enabled': False,
-          'allocated_capacity_gb': 1,
-          'filter_function': None,
-          'goodness_function': None,
-          'timestamp': '2025-06-09T13:29:43.286226'})
-]
-
-SERVICE_LIST = [
-    type('Service', (object,),
-         {'binary': 'cinder-volume',
-          'host': 'devstack',
-          'zone': 'nova',
-          'status': 'enabled',
-          'state': 'up'}),
-    type('Service', (object,),
-         {'binary': 'cinder-scheduler',
-          'host': 'devstack',
-          'zone': 'nova',
-          'status': 'enabled',
-          'state': 'up'}),
-    type('Service', (object,),
-         {'binary': 'cinder-backup',
-          'host': 'devstack',
-          'zone': 'nova',
-          'status': 'enabled',
-          'state': 'down'}),
-]
 
 
 class TestVolumeSizePollster(base.BaseTestCase):
@@ -202,7 +27,8 @@ class TestVolumeSizePollster(base.BaseTestCase):
 
     def test_volume_size_pollster(self):
         volume_size_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=VOLUME_LIST))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.VOLUME_LIST))
         self.assertEqual(1, len(volume_size_samples))
         self.assertEqual('volume.size', volume_size_samples[0].name)
         self.assertEqual(1, volume_size_samples[0].volume)
@@ -229,7 +55,7 @@ class TestVolumeSnapshotSizePollster(base.BaseTestCase):
     def test_volume_snapshot_size_pollster(self):
         volume_snapshot_size_samples = list(
             self.pollster.get_samples(
-                self.manager, {}, resources=SNAPSHOT_LIST))
+                self.manager, {}, resources=fakes.SNAPSHOT_LIST))
         self.assertEqual(1, len(volume_snapshot_size_samples))
         self.assertEqual('volume.snapshot.size',
                          volume_snapshot_size_samples[0].name)
@@ -251,7 +77,8 @@ class TestVolumeBackupSizePollster(base.BaseTestCase):
 
     def test_volume_backup_size_pollster(self):
         volume_backup_size_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=BACKUP_LIST))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.BACKUP_LIST))
         self.assertEqual(1, len(volume_backup_size_samples))
         self.assertEqual('volume.backup.size',
                          volume_backup_size_samples[0].name)
@@ -269,8 +96,10 @@ class TestVolumeProviderPoolCapacityTotalPollster(base.BaseTestCase):
 
     def test_volume_provider_pool_capacity_total_pollster(self):
         volume_pool_size_total_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
-        self.assertEqual(2, len(volume_pool_size_total_samples))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.POOL_LIST))
+        self.assertEqual(len(fakes.POOL_LIST),
+                         len(volume_pool_size_total_samples))
 
         self.assertEqual('volume.provider.pool.capacity.total',
                          volume_pool_size_total_samples[0].name)
@@ -294,8 +123,10 @@ class TestVolumeProviderPoolCapacityFreePollster(base.BaseTestCase):
 
     def test_volume_provider_pool_capacity_free_pollster(self):
         volume_pool_size_free_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
-        self.assertEqual(2, len(volume_pool_size_free_samples))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.POOL_LIST))
+        self.assertEqual(len(fakes.POOL_LIST),
+                         len(volume_pool_size_free_samples))
 
         self.assertEqual('volume.provider.pool.capacity.free',
                          volume_pool_size_free_samples[0].name)
@@ -319,7 +150,8 @@ class TestVolumeProviderPoolCapacityProvisionedPollster(base.BaseTestCase):
 
     def test_volume_provider_pool_capacity_provisioned_pollster(self):
         volume_pool_size_provisioned_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.POOL_LIST))
         self.assertEqual(1, len(volume_pool_size_provisioned_samples))
         self.assertEqual('volume.provider.pool.capacity.provisioned',
                          volume_pool_size_provisioned_samples[0].name)
@@ -337,7 +169,8 @@ class TestVolumeProviderPoolCapacityVirtualFreePollster(base.BaseTestCase):
 
     def test_volume_provider_pool_capacity_virtual_free_pollster(self):
         volume_pool_size_virtual_free_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.POOL_LIST))
         self.assertEqual(1, len(volume_pool_size_virtual_free_samples))
         self.assertEqual('volume.provider.pool.capacity.virtual_free',
                          volume_pool_size_virtual_free_samples[0].name)
@@ -356,8 +189,10 @@ class TestVolumeProviderPoolCapacityAllocatedPollster(base.BaseTestCase):
 
     def test_volume_provider_pool_capacity_allocated_pollster(self):
         volume_pool_size_allocated_samples = list(
-            self.pollster.get_samples(self.manager, {}, resources=POOL_LIST))
-        self.assertEqual(2, len(volume_pool_size_allocated_samples))
+            self.pollster.get_samples(
+                self.manager, {}, resources=fakes.POOL_LIST))
+        self.assertEqual(len(fakes.POOL_LIST),
+                         len(volume_pool_size_allocated_samples))
 
         self.assertEqual('volume.provider.pool.capacity.allocated',
                          volume_pool_size_allocated_samples[0].name)
@@ -382,8 +217,8 @@ class TestVolumeServiceHealthPollster(base.BaseTestCase):
     def test_volume_service_health_pollster(self):
         samples = list(
             self.pollster.get_samples(
-                self.manager, {}, resources=SERVICE_LIST))
-        self.assertEqual(3, len(samples))
+                self.manager, {}, resources=fakes.SERVICE_LIST))
+        self.assertEqual(len(fakes.SERVICE_LIST), len(samples))
 
         self.assertEqual('volume.service.health', samples[0].name)
         self.assertEqual(1, samples[0].volume)
