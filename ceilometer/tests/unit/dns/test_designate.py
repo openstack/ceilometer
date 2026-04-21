@@ -19,7 +19,6 @@ from openstack.dns.v2 import zone
 from ceilometer.dns import designate
 from ceilometer.dns import discovery
 from ceilometer.polling import manager
-from ceilometer.polling import plugin_base
 from ceilometer import service
 from ceilometer.tests import base
 
@@ -33,11 +32,6 @@ class _BaseTestDNSPollster(base.BaseTestCase):
         # Mock the openstack.connection.Connection to avoid auth issues
         with mock.patch('openstack.connection.Connection'):
             self.manager = manager.AgentManager(0, self.CONF)
-        plugin_base._get_keystone = mock.Mock()
-        catalog = (plugin_base._get_keystone.session.auth.get_access.
-                   return_value.service_catalog)
-        catalog.get_endpoints = mock.MagicMock(
-            return_value={'dns': mock.ANY})
 
     @staticmethod
     def fake_get_zones():

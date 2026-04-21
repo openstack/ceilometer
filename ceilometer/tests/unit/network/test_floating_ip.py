@@ -13,14 +13,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from unittest import mock
-
 import fixtures
 
 from ceilometer.network import floatingip
 from ceilometer.network.services import discovery
 from ceilometer.polling import manager
-from ceilometer.polling import plugin_base
 from ceilometer import service
 from ceilometer.tests import base
 
@@ -31,7 +28,6 @@ class _BaseTestFloatingIPPollster(base.BaseTestCase):
         super().setUp()
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
-        plugin_base._get_keystone = mock.Mock()
 
 
 class TestFloatingIPPollster(_BaseTestFloatingIPPollster):

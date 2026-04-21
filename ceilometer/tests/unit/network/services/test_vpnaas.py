@@ -19,7 +19,6 @@ import fixtures
 from ceilometer.network.services import discovery
 from ceilometer.network.services import vpnaas
 from ceilometer.polling import manager
-from ceilometer.polling import plugin_base
 from ceilometer import service
 from ceilometer.tests import base
 
@@ -31,11 +30,6 @@ class _BaseTestVPNPollster(base.BaseTestCase):
         self.addCleanup(mock.patch.stopall)
         self.CONF = service.prepare_service([], [])
         self.manager = manager.AgentManager(0, self.CONF)
-        plugin_base._get_keystone = mock.Mock()
-        catalog = (plugin_base._get_keystone.session.auth.get_access.
-                   return_value.service_catalog)
-        catalog.get_endpoints = mock.MagicMock(
-            return_value={'network': mock.ANY})
 
 
 class TestVPNServicesPollster(_BaseTestVPNPollster):
