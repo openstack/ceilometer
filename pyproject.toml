@@ -12,3 +12,48 @@ ignore = ["E731"]
 skip = "*.po,*.js,*.css,*.html,*.svg,HACKING.py,*hacking*,*build*,*_static*,doc/dictionary.txt,*.pyc,*.inv,*.gz,*.jpg,*.png,*.vsd,*.graffle,*.json,*telemetry-measurements.rst"
 count = true
 quiet-level = 4
+
+[tool.ruff]
+line-length = 79
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    # mcabe complexity checks
+    "C90",
+    # multiple-imports-on-one-line, module-import-not-at-top-of-file
+    "E4",
+    # line-too-long, redundant-backslash
+    "E5",
+    "E7",
+    "E9",
+    # pyflakes
+    "F",
+    "W",
+]
+external = ["H"]
+ignore = [
+    # we only use asserts for type narrowing
+    "S101",
+    # we do not use random number geneerators for crypto
+    "S311",
+    # S104 Possible binding to all interfaces
+    "S104",
+    # S105 Possible hardcoded password assigned to variable"
+    "S105",
+    # S106 Possible hardcoded password assigned to argument
+    "S106",
+    # S110 `try`-`except`-`pass` detected, consider logging the exception
+    "S110",
+    # UP031 % format — defer f-string migration to a later pass
+    "UP031",
+    # UP032 f-string — defer migration to a later pass
+    "UP032",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"doc/*" = ["E501"]
+
+[tool.ruff.lint.mccabe]
+# Flag errors (`C901`) whenever the complexity level exceeds 25.
+max-complexity = 25
