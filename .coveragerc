@@ -2,6 +2,7 @@
 branch = True
 source = ceilometer
 omit = ceilometer/tests/*
+dynamic_context = test_function
 
 [report]
 ignore_errors = True
