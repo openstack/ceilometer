@@ -52,7 +52,7 @@ bug that had no unit test, a new passing unit test should be added. If a
 submitted bug fix does have a unit test, be sure to add a new one that fails
 without the patch and passes with the patch.
 
-All unittest classes must ultimately inherit from testtools.TestCase.
+All unittest classes must ultimately inherit from oslotest.base.BaseTestCase.
 
 All setUp and tearDown methods must upcall using the super() method.
 tearDown methods should be avoided and addCleanup calls should be preferred.
