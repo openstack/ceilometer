@@ -425,6 +425,12 @@ The following meters are collected for OpenStack Block Storage:
 | ol.capacity.virtua\|       |        | #pool    | tion, Po\| volume capacity |
 | l_free             |       |        |          | llster   | in pool         |
 +--------------------+-------+--------+----------+----------+-----------------+
+| **Meters added in the Hibiscus release**                                    |
++--------------------+-------+--------+----------+----------+-----------------+
+| volume.service.he\ | Gauge | health | binary@  | Pollster | Health of cinder|
+| alth               |       |        | host     |          | service (1=up,  |
+|                    |       |        |          |          | 0=down)         |
++--------------------+-------+--------+----------+----------+-----------------+
 
 OpenStack File Share
 ~~~~~~~~~~~~~~~~~~~~~~

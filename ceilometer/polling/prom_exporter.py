@@ -148,6 +148,13 @@ def _gen_labels(sample):
             az = resource_metadata.get('availability_zone')
             labels['values'].append(az if az else '')
 
+        # Add binary, zone, status for volume service health metrics
+        if sample.get('counter_name', '') == 'volume.service.health':
+            for label in ('binary', 'zone', 'status'):
+                value = resource_metadata.get(label, '')
+                labels['keys'].append(label)
+                labels['values'].append(value if value else '')
+
         if resource_metadata.get('flavor'):
             flavor = resource_metadata.get('flavor')
             if flavor.get('id'):

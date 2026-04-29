@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Added ``volume.service.health`` meter to the central agent to monitor
+    the health of Cinder services (volume, scheduler, backup) by polling
+    the Cinder services API. The metric value is 1 (up) or 0 (down),
+    with binary, host, and zone as resource metadata.
