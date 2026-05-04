@@ -99,7 +99,7 @@ class TestProjectDiscovery(base.BaseTestCase):
         self.manager.keystone.domains.list.assert_called_once_with()
         self.assertEqual(
             self.manager.keystone.projects.list.mock_calls,
-            [mock.call(d) for d in fakes.DEFAULT_DOMAINS])
+            [mock.call(d) for d in fakes.DEFAULT_DOMAINS_ceilo])
 
     def test_project_discovery_ignore_disabled_projects(self):
         self.CONF.set_override("ignore_disabled_projects",
@@ -110,4 +110,4 @@ class TestProjectDiscovery(base.BaseTestCase):
             enabled=True)
         self.assertEqual(
             self.manager.keystone.projects.list.mock_calls,
-            [mock.call(d, enabled=True) for d in fakes.DEFAULT_DOMAINS])
+            [mock.call(d, enabled=True) for d in fakes.DEFAULT_DOMAINS_ceilo])
