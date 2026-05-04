@@ -23,6 +23,13 @@ from urllib import parse as urlparse
 from ceilometer.i18n import _
 
 
+# Default region, in the case of radosgw either set
+# the value to your zonegroup name or keep the default region.
+# With a single Ceph zone-group, there's no need to customize
+# this value.
+_DEFAULT_REGION = "us-east-1"
+
+
 class RGWAdminAPIFailed(Exception):
     pass
 
@@ -44,19 +51,8 @@ class RGWAdminClient:
         if req_params:
             uri = f"{uri}?{urlparse.urlencode(req_params)}"
 
-        # Data to be sent with request POST type,
-        # otherwise provide an empty string
-        data = ""
-        service = "s3"
-        method = "GET"
-        # Default region, in the case of radosgw either set
-        # the value to your zonegroup name or keep the default region.
-        # With a single Ceph zone-group, there's no need to customize
-        # this value.
-        region = "us-east-1"
-        headers = {'Accept': 'application/json'}
-
-        r = awscurl.make_request(method, service, region, uri, headers, data,
+        r = awscurl.make_request("GET", "s3", _DEFAULT_REGION, uri,
+                                 {'Accept': 'application/json'}, "",
                                  self.access_key, self.secret, None, False,
                                  self.verify)
 
