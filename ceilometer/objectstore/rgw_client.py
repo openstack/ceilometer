@@ -42,13 +42,7 @@ class RGWAdminClient:
     def _make_request(self, path, req_params):
         uri = f"{self.endpoint}/{path}"
         if req_params:
-            uri = f"{uri}?"
-            # Append req_params content to the uri
-            for i, (key, value) in enumerate(req_params.items()):
-                if i == len(req_params) - 1:
-                    uri = uri + key + "=" + value
-                else:
-                    uri = uri + key + "=" + value + "&"
+            uri = f"{uri}?{urlparse.urlencode(req_params)}"
 
         # Data to be sent with request POST type,
         # otherwise provide an empty string
