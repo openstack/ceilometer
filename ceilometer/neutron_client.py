@@ -61,7 +61,7 @@ class Client:
         creds = conf.service_credentials
         params = {
             'session': keystone_client.get_session(conf),
-            'endpoint_type': creds.interface,
+            'interface': creds.interface,
             'region_name': creds.region_name,
             'service_type': conf.service_types.neutron,
         }
