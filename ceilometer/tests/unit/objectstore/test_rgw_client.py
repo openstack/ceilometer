@@ -152,25 +152,25 @@ class TestRGWAdminClient(base.BaseTestCase):
         super().setUp()
         self.client = rgw_client.RGWAdminClient('http://127.0.0.1:8080/admin',
                                                 'abcde', 'secret', False)
-        self.get_resp = mock.MagicMock()
-        self.get = mock.patch('requests.request',
-                              return_value=self.get_resp).start()
+        self.resp = mock.MagicMock()
+        self.make_request = mock.patch('awscurl.awscurl.make_request',
+                                       return_value=self.resp).start()
 
     def test_make_request_exception(self):
-        self.get_resp.status_code = 403
+        self.resp.status_code = 403
         self.assertRaises(rgw_client.RGWAdminAPIFailed,
                           self.client._make_request,
                           *('foo', {}))
 
     def test_make_request(self):
-        self.get_resp.status_code = 200
-        self.get_resp.json.return_value = buckets_json
+        self.resp.status_code = 200
+        self.resp.json.return_value = buckets_json
         actual = self.client._make_request('foo', [])
         self.assertEqual(buckets_json, actual)
 
     def test_get_buckets(self):
-        self.get_resp.status_code = 200
-        self.get_resp.json.return_value = buckets_json
+        self.resp.status_code = 200
+        self.resp.json.return_value = buckets_json
         actual = self.client.get_bucket('foo')
         bucket_list = [rgw_client.RGWAdminClient.Bucket('somefoo', 1000, 1000),
                        rgw_client.RGWAdminClient.Bucket('somefoo31', 1, 42),
@@ -178,14 +178,15 @@ class TestRGWAdminClient(base.BaseTestCase):
         expected = {'num_buckets': 2, 'size': 1042, 'num_objects': 1001,
                     'buckets': bucket_list}
         self.assertEqual(expected, actual)
-        self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('http://127.0.0.1:8080/admin/bucket?'
-                         'uid=foo&stats=true',
-                         self.get.call_args_list[0][0][1])
+        self.make_request.assert_called_once_with(
+            'GET', 's3', 'us-east-1',
+            'http://127.0.0.1:8080/admin/bucket?uid=foo&stats=true',
+            {'Accept': 'application/json'}, '',
+            'abcde', 'secret', None, False, True)
 
     def test_get_buckets_implicit_tenants(self):
-        self.get_resp.status_code = 200
-        self.get_resp.json.return_value = buckets_json
+        self.resp.status_code = 200
+        self.resp.json.return_value = buckets_json
         self.client.implicit_tenants = True
         actual = self.client.get_bucket('foo')
         bucket_list = [rgw_client.RGWAdminClient.Bucket('somefoo', 1000, 1000),
@@ -194,31 +195,36 @@ class TestRGWAdminClient(base.BaseTestCase):
         expected = {'num_buckets': 2, 'size': 1042, 'num_objects': 1001,
                     'buckets': bucket_list}
         self.assertEqual(expected, actual)
-        self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('http://127.0.0.1:8080/admin/bucket?'
-                         'uid=foo$foo&stats=true',
-                         self.get.call_args_list[0][0][1])
+        self.make_request.assert_called_once_with(
+            'GET', 's3', 'us-east-1',
+            'http://127.0.0.1:8080/admin/bucket?uid=foo$foo&stats=true',
+            {'Accept': 'application/json'}, '',
+            'abcde', 'secret', None, False, True)
 
     def test_get_usage(self):
-        self.get_resp.status_code = 200
-        self.get_resp.json.return_value = usage_json
+        self.resp.status_code = 200
+        self.resp.json.return_value = usage_json
         actual = self.client.get_usage('foo')
         expected = 7
         self.assertEqual(expected, actual)
-        self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('http://127.0.0.1:8080/admin/usage?uid=foo',
-                         self.get.call_args_list[0][0][1])
+        self.make_request.assert_called_once_with(
+            'GET', 's3', 'us-east-1',
+            'http://127.0.0.1:8080/admin/usage?uid=foo',
+            {'Accept': 'application/json'}, '',
+            'abcde', 'secret', None, False, True)
 
     def test_get_usage_implicit_tenants(self):
-        self.get_resp.status_code = 200
-        self.get_resp.json.return_value = usage_json
+        self.resp.status_code = 200
+        self.resp.json.return_value = usage_json
         self.client.implicit_tenants = True
         actual = self.client.get_usage('foo')
         expected = 7
         self.assertEqual(expected, actual)
-        self.assertEqual(1, len(self.get.call_args_list))
-        self.assertEqual('http://127.0.0.1:8080/admin/usage?uid=foo$foo',
-                         self.get.call_args_list[0][0][1])
+        self.make_request.assert_called_once_with(
+            'GET', 's3', 'us-east-1',
+            'http://127.0.0.1:8080/admin/usage?uid=foo$foo',
+            {'Accept': 'application/json'}, '',
+            'abcde', 'secret', None, False, True)
 
     def test_verify_default(self):
         client = rgw_client.RGWAdminClient(
@@ -241,10 +247,10 @@ class TestRGWAdminClient(base.BaseTestCase):
         client = rgw_client.RGWAdminClient(
             'http://127.0.0.1:8080/admin', 'key', 'secret', False,
             verify='/path/to/ca.pem')
-        self.get_resp.status_code = 200
-        self.get_resp.json.return_value = buckets_json
+        self.resp.status_code = 200
+        self.resp.json.return_value = buckets_json
         with mock.patch('awscurl.awscurl.make_request',
-                        return_value=self.get_resp) as mock_req:
+                        return_value=self.resp) as mock_req:
             client._make_request('bucket', {'uid': 'foo', 'stats': 'true'})
             mock_req.assert_called_once()
             # verify is the 11th positional arg (index 10)
