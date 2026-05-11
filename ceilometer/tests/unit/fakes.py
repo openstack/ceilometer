@@ -16,6 +16,8 @@ from keystoneauth1 import exceptions as ka_exceptions
 from keystoneclient import exceptions as ks_exceptions
 from keystoneclient.v3 import domains as ks_domains
 from keystoneclient.v3 import projects as ks_projects
+from openstack.dns.v2 import recordset
+from openstack.dns.v2 import zone
 from openstack.identity.v3 import domain as sdk_domain
 from openstack.identity.v3 import project as sdk_project
 from openstack.network.v2 import firewall_group as sdk_firewall_group
@@ -204,6 +206,101 @@ class FakeKeystoneClient:
 # SDK Fakes
 #####################
 
+RECORDSET_1 = recordset.Recordset(
+    connection=None,
+    id='rs-1-uuid',
+    name='www.example.com.',
+    type='A',
+    records=['192.168.1.1'],
+    ttl=3600,
+)
+
+RECORDSET_2 = recordset.Recordset(
+    connection=None,
+    id='rs-2-uuid',
+    name='mail.example.com.',
+    type='MX',
+    records=['10 mail.example.com.'],
+    ttl=3600,
+)
+
+ZONE_1 = zone.Zone(
+    connection=None,
+    id='zone-1-uuid',
+    name='example.com.',
+    email='admin@example.com',
+    ttl=3600,
+    description='Example zone',
+    type='PRIMARY',
+    status='ACTIVE',
+    action='NONE',
+    serial=1234567890,
+    pool_id='pool-1',
+    project_id='tenant-1-uuid',
+)
+
+ZONE_2 = zone.Zone(
+    connection=None,
+    id='zone-2-uuid',
+    name='test.org.',
+    email='admin@test.org',
+    ttl=7200,
+    description='Test zone',
+    type='PRIMARY',
+    status='PENDING',
+    action='CREATE',
+    serial=1234567891,
+    pool_id='pool-1',
+    project_id='tenant-2-uuid',
+)
+
+ZONE_3 = zone.Zone(
+    connection=None,
+    id='zone-3-uuid',
+    name='error.net.',
+    email='admin@error.net',
+    ttl=1800,
+    description='Error zone',
+    type='PRIMARY',
+    status='ERROR',
+    action='UPDATE',
+    serial=1234567892,
+    pool_id='pool-2',
+    project_id='tenant-1-uuid',
+)
+
+ZONE_UNKNOWN_STATUS = zone.Zone(
+    connection=None,
+    id='zone-unknown-uuid',
+    name='unknown.com.',
+    email='admin@unknown.com',
+    ttl=3600,
+    description='Unknown zone',
+    type='PRIMARY',
+    status='UNKNOWN_STATUS',
+    action='NONE',
+    serial=1234567893,
+    pool_id='pool-1',
+    project_id='tenant-1-uuid',
+)
+
+
+class FakeSDKDesignateClient:
+
+    default_recordsets = [RECORDSET_1, RECORDSET_2]
+    default_zones = [ZONE_1, ZONE_2, ZONE_3]
+
+    def __init__(self, zones=None, recordsets=None):
+        self._zones = zones if zones is not None else self.default_zones
+        self._recordsets = (recordsets if recordsets is not None
+                            else self.default_recordsets)
+
+    def zones(self, all_projects=True):
+        return iter(self._zones)
+
+    def recordsets(self, zone, all_projects=True):
+        return iter(self._recordsets)
+
 
 class FakeSession:
     """Minimal fake for keystoneauth1.session.Session.
@@ -284,15 +381,21 @@ class FakeSDKNetworkClient:
 class FakeConnection:
     """Fake connection object for testing."""
 
-    def __init__(self, session=None, domains=None, projects=None):
+    def __init__(self, session=None, domains=None, projects=None,
+                 zones=None, recordsets=None):
         """Initialize FakeConnection.
 
         :param projects: Optional list of SDK Project objects. Defaults to the
             class-level SDK_PROJECT_* fixtures.
         :param domains: Optional list of SDK Domain objects. Defaults to the
             class-level DOMAIN_* fixtures.
+        :param zones: Optional list of SDK Zone objects. Passed to
+            FakeSDKDesignateClient.
+        :param recordsets: Optional list of SDK RecordSet objects. Passed to
+            FakeSDKDesignateClient.
         """
 
+        self.dns = FakeSDKDesignateClient(zones=zones, recordsets=recordsets)
         self.network = FakeSDKNetworkClient()
         self.session = session or FakeSession()
         # Don't use a short-circuit or here. The explicit check for None is
