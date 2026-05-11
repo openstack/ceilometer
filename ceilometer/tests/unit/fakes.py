@@ -20,6 +20,7 @@ from openstack.dns.v2 import recordset
 from openstack.dns.v2 import zone
 from openstack.identity.v3 import domain as sdk_domain
 from openstack.identity.v3 import project as sdk_project
+from openstack.load_balancer.v2 import load_balancer as sdk_load_balancer
 from openstack.network.v2 import firewall_group as sdk_firewall_group
 from openstack.network.v2 import firewall_policy as sdk_firewall_policy
 from openstack.network.v2 import floating_ip as sdk_floating_ip
@@ -286,6 +287,103 @@ ZONE_UNKNOWN_STATUS = zone.Zone(
 )
 
 
+LB_1 = sdk_load_balancer.LoadBalancer(
+    connection=None,
+    id='lb-1-uuid',
+    name='my-lb-1',
+    availability_zone='az-1',
+    vip_address='192.168.1.10',
+    vip_port_id='port-1-uuid',
+    provisioning_status='ACTIVE',
+    operating_status='ONLINE',
+    provider='amphora',
+    flavor_id='flavor-1',
+    project_id='tenant-1-uuid',
+)
+
+LB_2 = sdk_load_balancer.LoadBalancer(
+    connection=None,
+    id='lb-2-uuid',
+    name='my-lb-2',
+    availability_zone='az-2',
+    vip_address='192.168.1.11',
+    vip_port_id='port-2-uuid',
+    provisioning_status='PENDING_UPDATE',
+    operating_status='OFFLINE',
+    provider='amphora',
+    flavor_id='flavor-1',
+    project_id='tenant-2-uuid',
+)
+
+LB_3 = sdk_load_balancer.LoadBalancer(
+    connection=None,
+    id='lb-3-uuid',
+    name='my-lb-3',
+    availability_zone=None,
+    vip_address='192.168.1.12',
+    vip_port_id='port-3-uuid',
+    provisioning_status='ERROR',
+    operating_status='ERROR',
+    provider='amphora',
+    flavor_id='flavor-1',
+    project_id='tenant-1-uuid',
+)
+
+LB_4 = sdk_load_balancer.LoadBalancer(
+    connection=None,
+    id='lb-4-uuid',
+    name='my-lb-4',
+    availability_zone='az-1',
+    vip_address='192.168.1.13',
+    vip_port_id='port-4-uuid',
+    provisioning_status='PENDING_DELETE',
+    operating_status='DEGRADED',
+    provider='amphora',
+    flavor_id='flavor-1',
+    project_id='tenant-1-uuid',
+)
+
+LB_UNKNOWN_OPERATING_STATUS = sdk_load_balancer.LoadBalancer(
+    connection=None,
+    id='lb-unknown-uuid',
+    name='my-lb-unknown',
+    availability_zone=None,
+    vip_address='192.168.1.99',
+    vip_port_id='port-unknown-uuid',
+    provisioning_status='ACTIVE',
+    operating_status='UNKNOWN_STATUS',
+    provider='amphora',
+    flavor_id='flavor-1',
+    project_id='tenant-1-uuid',
+)
+
+LB_UNKNOWN_PROVISIONING_STATUS = sdk_load_balancer.LoadBalancer(
+    connection=None,
+    id='lb-unknown-uuid',
+    name='my-lb-unknown',
+    availability_zone=None,
+    vip_address='192.168.1.99',
+    vip_port_id='port-unknown-uuid',
+    provisioning_status='UNKNOWN_STATUS',
+    operating_status='ONLINE',
+    provider='amphora',
+    flavor_id='flavor-1',
+    project_id='tenant-1-uuid',
+)
+
+
+class FakeSDKOctaviaClient:
+
+    default_load_balancers = [LB_1, LB_2, LB_3, LB_4]
+
+    def __init__(self, load_balancers=None):
+        self._load_balancers = (load_balancers if load_balancers is not None
+                                else self.default_load_balancers)
+
+    def load_balancers(self):
+        return iter(self._load_balancers)
+
+
 SHARE_1 = sdk_share.Share(
     connection=None,
     id='share-1-uuid',
@@ -455,7 +553,8 @@ class FakeConnection:
     """Fake connection object for testing."""
 
     def __init__(self, session=None, domains=None, projects=None,
-                 zones=None, recordsets=None, shares=None):
+                 zones=None, recordsets=None, shares=None,
+                 load_balancers=None):
         """Initialize FakeConnection.
 
         :param projects: Optional list of SDK Project objects. Defaults to the
@@ -468,10 +567,14 @@ class FakeConnection:
             FakeSDKDesignateClient.
         :param shares: Optional list of SDK Share objects. Passed to
             FakeSDKManilaClient.
+        :param load_balancers: Optional list of SDK LoadBalancer objects.
+            Passed to FakeSDKOctaviaClient.
         """
 
         self.dns = FakeSDKDesignateClient(zones=zones, recordsets=recordsets)
         self.shared_file_system = FakeSDKManilaClient(shares=shares)
+        self.load_balancer = FakeSDKOctaviaClient(
+            load_balancers=load_balancers)
         self.network = FakeSDKNetworkClient()
         self.session = session or FakeSession()
         # Don't use a short-circuit or here. The explicit check for None is
