@@ -12,6 +12,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+
+from cinderclient.v3 import pools as cinder_pools
+from cinderclient.v3 import services as cinder_services
+from cinderclient.v3 import volume_backups as cinder_backups
+from cinderclient.v3 import volume_snapshots as cinder_snapshots
+from cinderclient.v3 import volumes as cinder_volumes
 from keystoneauth1 import exceptions as ka_exceptions
 from keystoneclient import exceptions as ks_exceptions
 from keystoneclient.v3 import domains as ks_domains
@@ -680,3 +686,239 @@ class FakeConnection:
             wrong during the OpenStack API call.
         """
         return self.search_domains(filters=filters)
+
+
+#####################
+# Cinder Fakes
+#####################
+
+VOLUME = cinder_volumes.Volume(manager=None, info={
+    'migration_status': None,
+    'attachments': [
+        {'server_id': '1ae69721-d071-4156-a2bd-b11bb43ec2e3',
+         'attachment_id': 'f903d95e-f999-4a34-8be7-119eadd9bb4f',
+         'attached_at': '2016-07-14T03:55:57.000000',
+         'host_name': None,
+         'volume_id': 'd94c18fb-b680-4912-9741-da69ee83c94f',
+         'device': '/dev/vdb',
+         'id': 'd94c18fb-b680-4912-9741-da69ee83c94f'}],
+    'links': [
+        {'href': 'http://fake_link3', 'rel': 'self'},
+        {'href': 'http://fake_link4', 'rel': 'bookmark'}],
+    'availability_zone': 'nova',
+    'os-vol-host-attr:host': 'test@lvmdriver-1#lvmdriver-1',
+    'encrypted': False,
+    'updated_at': '2016-07-14T03:55:57.000000',
+    'replication_status': 'disabled',
+    'snapshot_id': None,
+    'id': 'd94c18fb-b680-4912-9741-da69ee83c94f',
+    'size': 1,
+    'user_id': 'be255bd31eb944578000fc762fde6dcf',
+    'os-vol-tenant-attr:tenant_id': '6824974c08974d4db864bbaa6bc08303',
+    'os-vol-mig-status-attr:migstat': None,
+    'metadata': {'readonly': 'False', 'attached_mode': 'rw'},
+    'status': 'in-use',
+    'description': None,
+    'multiattach': False,
+    'source_volid': None,
+    'consistencygroup_id': None,
+    'volume_image_metadata': {
+        'checksum': '17d9daa4fb8e20b0f6b7dec0d46fdddf',
+        'container_format': 'bare',
+        'disk_format': 'raw',
+        'hw_disk_bus': 'scsi',
+        'hw_scsi_model': 'virtio-scsi',
+        'image_id': 'f0019ee3-523c-45ab-b0b6-3adc529673e7',
+        'image_name': 'debian-jessie-scsi',
+        'min_disk': '0',
+        'min_ram': '0',
+        'size': '1572864000',
+    },
+    'os-vol-mig-status-attr:name_id': None,
+    'group_id': None,
+    'provider_id': None,
+    'shared_targets': False,
+    'service_uuid': '2f6b5a18-0cd5-4421-b97e-d2c3e85ed758',
+    'cluster_name': None,
+    'volume_type_id': '65a9f65a-4696-4435-a09d-bc44d797c529',
+    'name': None,
+    'bootable': 'false',
+    'created_at': '2016-06-23T08:27:45.000000',
+    'volume_type': 'lvmdriver-1',
+})
+SNAPSHOT = cinder_snapshots.Snapshot(manager=None, info={
+    'status': 'available',
+    'os-extended-snapshot-attributes:progress': '100%',
+    'description': None,
+    'os-extended-snapshot-attributes:project_id':
+        '6824974c08974d4db864bbaa6bc08303',
+    'size': 1,
+    'user_id': 'be255bd31eb944578000fc762fde6dcf',
+    'updated_at': '2016-10-19T07:56:55.000000',
+    'id': 'b1ea6783-f952-491e-a4ed-23a6a562e1cf',
+    'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
+    'metadata': {},
+    'created_at': '2016-10-19T07:56:55.000000',
+    'group_snapshot_id': None,
+    'name': None,
+})
+BACKUP = cinder_backups.VolumeBackup(manager=None, info={
+    'status': 'available',
+    'object_count': 0,
+    'container': None,
+    'name': None,
+    'links': [
+        {'href': 'http://fake_urla', 'rel': 'self'},
+        {'href': 'http://fake_urlb', 'rel': 'bookmark'}],
+    'availability_zone': 'nova',
+    'created_at': '2016-10-19T06:55:23.000000',
+    'snapshot_id': None,
+    'updated_at': '2016-10-19T06:55:23.000000',
+    'data_timestamp': '2016-10-19T06:55:23.000000',
+    'description': None,
+    'has_dependent_backups': False,
+    'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
+    'os-backup-project-attr:project_id': '6824974c08974d4db864bbaa6bc08303',
+    'fail_reason': '',
+    'is_incremental': False,
+    'metadata': {},
+    'user_id': 'be255bd31eb944578000fc762fde6dcf',
+    'id': '75a52125-85ff-4a8d-b2aa-580f3b22273f',
+    'size': 1,
+})
+POOL_LVM = cinder_pools.Pool(manager=None, info={
+    'name': 'localhost.localdomain@lvmdriver-1#lvmdriver-1',
+    'pool_name': 'lvmdriver-1',
+    'total_capacity_gb': 28.5,
+    'free_capacity_gb': 28.39,
+    'reserved_percentage': 0,
+    'location_info':
+        'LVMVolumeDriver:localhost.localdomain:stack-volumes:thin:0',
+    'QoS_support': False,
+    'provisioned_capacity_gb': 4.0,
+    'max_over_subscription_ratio': 20.0,
+    'thin_provisioning_support': True,
+    'thick_provisioning_support': False,
+    'total_volumes': 3,
+    'filter_function': None,
+    'goodness_function': None,
+    'multiattach': True,
+    'backend_state': 'up',
+    'allocated_capacity_gb': 4,
+    'cacheable': True,
+    'volume_backend_name': 'lvmdriver-1',
+    'storage_protocol': 'iSCSI',
+    'vendor_name': 'Open Source',
+    'driver_version': '3.0.0',
+    'timestamp': '2025-03-21T14:19:02.901750',
+})
+
+POOL_CEPH = cinder_pools.Pool(manager=None, info={
+    'name': 'cinder-3ceee-volume-ceph-0@ceph#ceph',
+    'vendor_name': 'Open Source',
+    'driver_version': '1.3.0',
+    'storage_protocol': 'ceph',
+    'total_capacity_gb': 85.0,
+    'free_capacity_gb': 85.0,
+    'reserved_percentage': 0,
+    'multiattach': True,
+    'thin_provisioning_support': True,
+    'max_over_subscription_ratio': '20.0',
+    'location_info':
+        'ceph:/etc/ceph/ceph.conf:a94b63c4e:openstack:volumes',
+    'backend_state': 'up',
+    'QoS_support': True,
+    'volume_backend_name': 'ceph',
+    'replication_enabled': False,
+    'allocated_capacity_gb': 1,
+    'filter_function': None,
+    'goodness_function': None,
+    'timestamp': '2025-06-09T13:29:43.286226',
+})
+SERVICE_CINDER_VOLUME = cinder_services.Service(manager=None, info={
+    'binary': 'cinder-volume',
+    'host': 'devstack',
+    'zone': 'nova',
+    'status': 'enabled',
+    'state': 'up'})
+SERVICE_CINDER_SCHED = cinder_services.Service(manager=None, info={
+    'binary': 'cinder-scheduler',
+    'host': 'devstack',
+    'zone': 'nova',
+    'status': 'enabled',
+    'state': 'up'})
+SERVICE_CINDER_BACKUP = cinder_services.Service(manager=None, info={
+    'binary': 'cinder-backup',
+    'host': 'devstack',
+    'zone': 'nova',
+    'status': 'enabled',
+    'state': 'down'})
+
+VOLUME_LIST = [VOLUME]
+SNAPSHOT_LIST = [SNAPSHOT]
+BACKUP_LIST = [BACKUP]
+POOL_LIST = [POOL_LVM, POOL_CEPH]
+SERVICE_LIST = [
+    SERVICE_CINDER_VOLUME, SERVICE_CINDER_SCHED, SERVICE_CINDER_BACKUP]
+
+
+class FakeVolumeManager:
+    """Fake cinderclient VolumeManager."""
+
+    def __init__(self, volumes=None):
+        self._volumes = volumes if volumes is not None else VOLUME_LIST
+
+    def list(self, search_opts=None):
+        return self._volumes
+
+
+class FakeSnapshotManager:
+    """Fake cinderclient SnapshotManager."""
+
+    def __init__(self, snapshots=None):
+        self._snapshots = snapshots if snapshots is not None else SNAPSHOT_LIST
+
+    def list(self, search_opts=None):
+        return self._snapshots
+
+
+class FakeBackupManager:
+    """Fake cinderclient BackupManager."""
+
+    def __init__(self, backups=None):
+        self._backups = backups if backups is not None else BACKUP_LIST
+
+    def list(self, search_opts=None):
+        return self._backups
+
+
+class FakePoolManager:
+    """Fake cinderclient PoolManager."""
+
+    def __init__(self, pools=None):
+        self._pools = pools if pools is not None else POOL_LIST
+
+    def list(self, detailed=False):
+        return self._pools
+
+
+class FakeServiceManager:
+    """Fake cinderclient ServiceManager."""
+
+    def __init__(self, services=None):
+        self._services = services if services is not None else SERVICE_LIST
+
+    def list(self):
+        return self._services
+
+
+class FakeCinderClient:
+    """Fake cinderclient.client.Client for testing."""
+
+    def __init__(self, volumes=None, snapshots=None, backups=None, pools=None,
+                 services=None):
+        self.volumes = FakeVolumeManager(volumes)
+        self.volume_snapshots = FakeSnapshotManager(snapshots)
+        self.backups = FakeBackupManager(backups)
+        self.pools = FakePoolManager(pools)
+        self.services = FakeServiceManager(services)
