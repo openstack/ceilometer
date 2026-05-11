@@ -197,7 +197,7 @@ class TestRGWAdminClient(base.BaseTestCase):
         self.assertEqual(expected, actual)
         self.make_request.assert_called_once_with(
             'GET', 's3', 'us-east-1',
-            'http://127.0.0.1:8080/admin/bucket?uid=foo$foo&stats=true',
+            'http://127.0.0.1:8080/admin/bucket?uid=foo%24foo&stats=true',
             {'Accept': 'application/json'}, '',
             'abcde', 'secret', None, False, True)
 
@@ -222,7 +222,7 @@ class TestRGWAdminClient(base.BaseTestCase):
         self.assertEqual(expected, actual)
         self.make_request.assert_called_once_with(
             'GET', 's3', 'us-east-1',
-            'http://127.0.0.1:8080/admin/usage?uid=foo$foo',
+            'http://127.0.0.1:8080/admin/usage?uid=foo%24foo',
             {'Accept': 'application/json'}, '',
             'abcde', 'secret', None, False, True)
 
