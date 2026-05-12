@@ -78,5 +78,5 @@ Finalize installation
 
    .. code-block:: console
 
-      # service ceilometer-agent-central restart
-      # service ceilometer-agent-notification restart
+      # systemctl restart ceilometer-agent-central
+      # systemctl restart ceilometer-agent-notification

@@ -23,11 +23,11 @@ Finalize installation
 
    .. code-block:: console
 
-      # service ceilometer-agent-compute restart
-      # service ceilometer-agent-ipmi restart (optional)
+      # systemctl restart ceilometer-agent-compute
+      # systemctl restart ceilometer-agent-ipmi (optional)
 
 #. Restart the Compute service:
 
    .. code-block:: console
 
-      # service nova-compute restart
+      # systemctl restart nova-compute

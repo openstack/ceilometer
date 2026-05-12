@@ -24,4 +24,4 @@ Finalize installation
 
   .. code-block:: console
 
-     # service neutron-server restart
+     # systemctl restart neutron-server
