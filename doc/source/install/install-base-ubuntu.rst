@@ -56,8 +56,8 @@ Finalize Gnocchi installation
 
    .. code-block:: console
 
-      # service gnocchi-api restart
-      # service gnocchi-metricd restart
+      # systemctl restart apache2
+      # systemctl restart gnocchi-metricd
 
 Install and configure components
 --------------------------------
