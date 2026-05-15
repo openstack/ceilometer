@@ -31,11 +31,11 @@ Finalize installation
 
    .. code-block:: console
 
-      # service cinder-api restart
-      # service cinder-scheduler restart
+      # systemctl restart cinder-api
+      # systemctl restart cinder-scheduler
 
 #. Restart the Block Storage services on the storage nodes:
 
    .. code-block:: console
 
-      # service cinder-volume restart
+      # systemctl restart cinder-volume

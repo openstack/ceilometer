@@ -28,4 +28,4 @@ Finalize installation
 
   .. code-block:: console
 
-     # service swift-proxy restart
+     # systemctl restart swift-proxy

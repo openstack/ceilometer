@@ -24,6 +24,6 @@ Finalize installation
 
   .. code-block:: console
 
-     # service heat-api restart
-     # service heat-api-cfn restart
-     # service heat-engine restart
+     # systemctl restart heat-api
+     # systemctl restart heat-api-cfn
+     # systemctl restart heat-engine

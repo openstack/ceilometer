@@ -34,4 +34,4 @@ Finalize installation
 
   .. code-block:: console
 
-     # service glance-api restart
+     # systemctl restart glance-api
