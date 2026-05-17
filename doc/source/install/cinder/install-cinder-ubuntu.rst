@@ -31,7 +31,7 @@ Finalize installation
 
    .. code-block:: console
 
-      # systemctl restart cinder-api
+      # systemctl restart apache2
       # systemctl restart cinder-scheduler
 
 #. Restart the Block Storage services on the storage nodes:
