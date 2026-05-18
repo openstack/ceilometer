@@ -16,9 +16,7 @@
 import dataclasses
 import os
 
-from keystoneauth1 import exceptions as ka_exc
 from keystoneauth1 import loading as ka_loading
-from keystoneclient.v3 import client as ks_client_v3
 from openstack import connection
 from oslo_config import cfg
 
@@ -54,6 +52,18 @@ class Project:
             is_domain=getattr(ks_project, 'is_domain', False),
         )
 
+    @classmethod
+    def from_openstacksdk(cls, sdk_project):
+        return cls(
+            id=sdk_project.id,
+            name=sdk_project.name,
+            domain_id=sdk_project.domain_id,
+            is_enabled=sdk_project.is_enabled,
+            description=sdk_project.description or '',
+            parent_id=sdk_project.parent_id,
+            is_domain=sdk_project.is_domain,
+        )
+
 
 @dataclasses.dataclass(frozen=True)
 class Domain:
@@ -71,6 +81,15 @@ class Domain:
             description=getattr(ks_domain, 'description', None) or '',
         )
 
+    @classmethod
+    def from_openstacksdk(cls, sdk_domain):
+        return cls(
+            id=sdk_domain.id,
+            name=sdk_domain.name,
+            is_enabled=sdk_domain.is_enabled,
+            description=sdk_domain.description or '',
+        )
+
 
 class Client:
     """Client for retrieving keystone resources.
@@ -84,24 +103,27 @@ class Client:
         :param session: A ``keystoneauth1.session.Session`` instance used for
             all HTTP communication.
         :param kwargs: Additional keyword arguments forwarded verbatim to
-            ``keystoneclient.v3.client.Client`` (e.g. ``interface``,
+            ``openstack.connection.Connection`` (e.g. ``interface``,
             ``region_name``).
 
         """
-        self._ks_client = ks_client_v3.Client(
-            session=session, **kwargs)
-        self.domains = self._ks_client.domains
-        self.projects = self._ks_client.projects
+
+        self._connection = connection.Connection(
+            session=session,
+            service_types={"identity"},
+            **kwargs
+        )
         self.session = session
 
     def find_project(self, **kwargs):
         """Find a single project matching the given attribute filters.
 
-        Delegates to ``keystoneclient.v3.projects.ProjectManager.find``.
+        Delegates to the OpenStack SDK connection via
+        ``search_projects(name_or_id, filters, domain_id)``.
 
         :param kwargs: Attribute filters used to locate the project, e.g.
             ``name='myproject'``, ``domain_id='<uuid>'``. All keyword
-            arguments are forwarded to the underlying ``find`` call.
+            arguments are forwarded to the underlying SDK call.
         :returns: A single ``Project`` resource
             object whose attributes match all supplied filters.
         :raises ceilometer.exceptions.NotFound: if no project matches
@@ -109,69 +131,77 @@ class Client:
         :raises ceilometer.exceptions.NoUniqueMatch: if more than one
             project matches the filters.
         """
-        try:
-            project = self.projects.find(**kwargs)
-            return Project.from_ksclient(project)
-        except ka_exc.NotFound as e:
-            raise ceilo_exc.NotFound(e.message, e.details)
-        except ks_client_v3.exceptions.NoUniqueMatch as e:
-            raise ceilo_exc.NoUniqueMatch(e.message)
+        filters = dict(**kwargs)
+        name_or_id = filters.pop('id', None)
+        if name_or_id is None:
+            name_or_id = filters.pop('name', None)
+        domain_id = filters.pop('domain_id', None)
+        project = self._connection.search_projects(
+            name_or_id=name_or_id,
+            filters=filters or None,
+            domain_id=domain_id)
+
+        if len(project) > 1:
+            raise ceilo_exc.NoUniqueMatch("ClientException")
+        if len(project) == 0:
+            raise ceilo_exc.NotFound(
+                "No matching resources found",
+                f"No Project matching {dict(**kwargs)}.")
+        return Project.from_openstacksdk(project[0])
 
     def list_projects(self, domain, **filters):
         """List projects within a domain, with optional attribute filters.
 
-        Delegates to ``keystoneclient.v3.projects.ProjectManager.list``.
-
         :param domain: The domain whose projects should be returned. Accepts
-            either a domain ID string or a
-            ``keystoneclient.v3.domains.Domain`` object.
+            either a domain ID string or a :class:`Domain` object.
         :param filters: Optional keyword arguments used as additional query
             filters, e.g. ``enabled=True`` to restrict results to enabled
             projects.
-        :returns: A list of ``keystoneclient.v3.projects.Project`` resource
-            objects belonging to the given domain. Returns an empty list when
-            no projects match.
+        :returns: A list of :class:`Project` objects belonging to the given
+            domain. Returns an empty list when no projects match.
         """
-        projects = self.projects.list(domain, **filters)
-        return [Project.from_ksclient(p) for p in projects]
+        # domain can be a string.
+        domain_id = getattr(domain, 'id', domain)
+        projects = self._connection.list_projects(
+            domain_id=domain_id, filters=filters or None)
+        return [Project.from_openstacksdk(p) for p in projects]
 
     def find_domain(self, **kwargs):
         """Find a single domain matching the given attribute filters.
 
-        Delegates to ``keystoneclient.v3.domains.DomainManager.find``.
-
         :param kwargs: Attribute filters used to locate the domain, e.g.
-            ``name='Default'``.  All keyword arguments are forwarded to the
-            underlying ``find`` call.
-        :returns: A single ``keystoneclient.v3.domains.Domain`` resource object
-            whose attributes match all supplied filters.
+            ``name='Default'``.
+        :returns: A single :class:`Domain` object whose attributes match all
+            supplied filters.
         :raises ceilometer.exceptions.NotFound: if no domain matches
             the filters.
         :raises ceilometer.exceptions.NoUniqueMatch: if more than one
             domain matches the filters.
         """
-        try:
-            domain = self.domains.find(**kwargs)
-            return Domain.from_ksclient(domain)
-
-        except ka_exc.NotFound as e:
-            raise ceilo_exc.NotFound(e.message, e.details)
-        except ks_client_v3.exceptions.NoUniqueMatch as e:
-            raise ceilo_exc.NoUniqueMatch(e.message)
+        filters = dict(**kwargs)
+        name_or_id = filters.pop('id', None)
+        if name_or_id is None:
+            name_or_id = filters.pop('name', None)
+        domains = self._connection.search_domains(
+            name_or_id=name_or_id, filters=filters or None)
+        if len(domains) > 1:
+            raise ceilo_exc.NoUniqueMatch("ClientException")
+        if len(domains) == 0:
+            raise ceilo_exc.NotFound(
+                "No matching resources found",
+                f"No Domain matching {dict(kwargs)}.")
+        return Domain.from_openstacksdk(domains[0])
 
     def list_domains(self, **filters):
         """List all domains, with optional attribute filters.
 
-        Delegates to ``keystoneclient.v3.domains.DomainManager.list``.
-
-        :param filters: Optional keyword arguments forwarded to
-            ``DomainManager.list`` as query filters, e.g. ``enabled=True``
-            to restrict results to enabled domains.
-        :returns: A list of ``keystoneclient.v3.domains.Domain`` resource
-            objects.  Returns an empty list when no domains match.
+        :param filters: Optional keyword arguments used as query filters,
+            e.g. ``enabled=True`` to restrict results to enabled domains.
+        :returns: A list of :class:`Domain` objects.
         """
-        return [Domain.from_ksclient(d)
-                for d in self.domains.list(**filters)]
+        return [Domain.from_openstacksdk(d)
+                for d in self._connection.list_domains(
+                    filters=filters or None)]
 
 
 def get_session(conf, requests_session=None, group=None, timeout=None):

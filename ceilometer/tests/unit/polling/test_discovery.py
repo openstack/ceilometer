@@ -16,8 +16,6 @@
 
 from unittest import mock
 
-import fixtures
-
 from ceilometer import keystone_client as ceilo_ks_client
 from ceilometer.polling.discovery import endpoint
 from ceilometer.polling.discovery import localnode
@@ -81,33 +79,28 @@ class TestProjectDiscovery(base.BaseTestCase):
     def setUp(self):
         super().setUp()
         self.CONF = service.prepare_service([], [])
-
         self.discovery = project.TenantDiscovery(self.CONF)
         self.manager = mock.MagicMock()
-        # Wrap FakeKeystoneClient so that we can check the expected calls
-        fake_ks = mock.Mock(wraps=fakes.FakeKeystoneClient())
-
-        self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v3.client.Client',
-            return_value=fake_ks))
 
         self.manager.keystone = ceilo_ks_client.Client(session=mock.Mock())
 
     def test_project_discovery(self):
         result = self.discovery.discover(self.manager)
         self.assertEqual(len(result), 4)
-        self.manager.keystone.domains.list.assert_called_once_with()
+        self.fake_conn.list_domains.assert_called_once_with(filters=None)
         self.assertEqual(
-            self.manager.keystone.projects.list.mock_calls,
-            [mock.call(d) for d in fakes.DEFAULT_DOMAINS_ceilo])
+            self.fake_conn.list_projects.mock_calls,
+            [mock.call(domain_id=d.id, filters=None)
+                for d in fakes.DEFAULT_DOMAINS_ceilo])
 
     def test_project_discovery_ignore_disabled_projects(self):
         self.CONF.set_override("ignore_disabled_projects",
                                True, group="polling")
         result = self.discovery.discover(self.manager)
         self.assertEqual(len(result), 3)
-        self.manager.keystone.domains.list.assert_called_once_with(
-            enabled=True)
+        self.fake_conn.list_domains.assert_called_once_with(
+            filters={'enabled': True})
         self.assertEqual(
-            self.manager.keystone.projects.list.mock_calls,
-            [mock.call(d, enabled=True) for d in fakes.DEFAULT_DOMAINS_ceilo])
+            self.fake_conn.list_projects.mock_calls,
+            [mock.call(domain_id=d.id, filters={'enabled': True})
+             for d in fakes.DEFAULT_DOMAINS_ceilo])
