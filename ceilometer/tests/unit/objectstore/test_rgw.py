@@ -221,3 +221,22 @@ class TestRgwPollsterTLS(base.BaseTestCase):
                                group='rgw_client')
         pollster = rgw.ObjectsPollster(self.conf)
         self.assertFalse(pollster.verify)
+
+    def test_tls_versions_from_config(self):
+        self.conf.set_override('tls_min_version', '1.2', group='rgw_client')
+        self.conf.set_override('tls_max_version', '1.3', group='rgw_client')
+        pollster = rgw.ObjectsPollster(self.conf)
+        self.assertEqual('1.2', pollster.tls_min_version)
+        self.assertEqual('1.3', pollster.tls_max_version)
+
+    def test_tls_versions_default_unset(self):
+        """Unset tls_*_version options use awscurl defaults (None)."""
+        pollster = rgw.ObjectsPollster(self.conf)
+        self.assertIsNone(pollster.tls_min_version)
+        self.assertIsNone(pollster.tls_max_version)
+
+    def test_none_tls_min_version_set(self):
+        with self.assertRaisesRegex(
+                ValueError,
+                r"Valid values are \[1.2, 1.3\], but found ''"):
+            self.conf.set_override('tls_min_version', '', group='rgw_client')

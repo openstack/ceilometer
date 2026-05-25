@@ -182,7 +182,7 @@ class TestRGWAdminClient(base.BaseTestCase):
             'GET', 's3', 'us-east-1',
             'http://127.0.0.1:8080/admin/bucket?uid=foo&stats=true',
             {'Accept': 'application/json'}, '',
-            'abcde', 'secret', None, False, True)
+            'abcde', 'secret', None, False, True, tls_min=None, tls_max=None)
 
     def test_get_buckets_implicit_tenants(self):
         self.resp.status_code = 200
@@ -199,7 +199,7 @@ class TestRGWAdminClient(base.BaseTestCase):
             'GET', 's3', 'us-east-1',
             'http://127.0.0.1:8080/admin/bucket?uid=foo%24foo&stats=true',
             {'Accept': 'application/json'}, '',
-            'abcde', 'secret', None, False, True)
+            'abcde', 'secret', None, False, True, tls_min=None, tls_max=None)
 
     def test_get_usage(self):
         self.resp.status_code = 200
@@ -211,7 +211,7 @@ class TestRGWAdminClient(base.BaseTestCase):
             'GET', 's3', 'us-east-1',
             'http://127.0.0.1:8080/admin/usage?uid=foo',
             {'Accept': 'application/json'}, '',
-            'abcde', 'secret', None, False, True)
+            'abcde', 'secret', None, False, True, tls_min=None, tls_max=None)
 
     def test_get_usage_implicit_tenants(self):
         self.resp.status_code = 200
@@ -224,7 +224,7 @@ class TestRGWAdminClient(base.BaseTestCase):
             'GET', 's3', 'us-east-1',
             'http://127.0.0.1:8080/admin/usage?uid=foo%24foo',
             {'Accept': 'application/json'}, '',
-            'abcde', 'secret', None, False, True)
+            'abcde', 'secret', None, False, True, tls_min=None, tls_max=None)
 
     def test_verify_default(self):
         client = rgw_client.RGWAdminClient(
@@ -256,3 +256,27 @@ class TestRGWAdminClient(base.BaseTestCase):
             # verify is the 11th positional arg (index 10)
             self.assertEqual('/path/to/ca.pem',
                              mock_req.call_args[0][10])
+
+    def test_tls_version_defaults(self):
+        client = rgw_client.RGWAdminClient(
+            'http://127.0.0.1:8080/admin', 'key', 'secret', False)
+        self.assertIsNone(client.tls_min_version)
+        self.assertIsNone(client.tls_max_version)
+
+    def test_tls_versions_passed_to_make_request(self):
+        client = rgw_client.RGWAdminClient(
+            'http://127.0.0.1:8080/admin', 'key', 'secret', False,
+            verify=True, tls_min_version='1.2', tls_max_version='1.3')
+        self.resp.status_code = 200
+        self.resp.json.return_value = buckets_json
+        with mock.patch('awscurl.awscurl.make_request',
+                        return_value=self.resp) as mock_req:
+            client._make_request('bucket', {'uid': 'foo', 'stats': 'true'})
+            mock_req.assert_called_once_with(
+                'GET', 's3', 'us-east-1',
+                'http://127.0.0.1:8080/admin/bucket?uid=foo&stats=true',
+                {'Accept': 'application/json'}, '',
+                'key', 'secret', None, False,
+                True,
+                tls_min='1.2',
+                tls_max='1.3')
