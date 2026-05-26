@@ -24,10 +24,9 @@ if [[ "$CEILOMETER_BACKENDS" =~ "sg-core" ]]; then
     enable_service sg-core
 fi
 
-
-GNOCCHI_DIR=${GNOCCHI_DIR:-${DEST}/gnocchi}
-GNOCCHI_BRANCH=${GNOCCHI_BRANCH:-"master"}
-GNOCCHI_REPO=${GNOCCHI_REPO:-https://github.com/gnocchixyz/gnocchi}
+GITDIR["gnocchi"]=${GNOCCHI_DIR:-${DEST}/gnocchi}
+GITBRANCH["gnocchi"]=${GNOCCHI_BRANCH:-"master"}
+GITREPO["gnocchi"]=${GNOCCHI_REPO:-https://github.com/gnocchixyz/gnocchi}
 # Gnocchi default archive_policy for Ceilometer
 if [ -n "$GNOCCHI_ARCHIVE_POLICY_TEMPEST" ]; then
     GNOCCHI_ARCHIVE_POLICY=$GNOCCHI_ARCHIVE_POLICY_TEMPEST
