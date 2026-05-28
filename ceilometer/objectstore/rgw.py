@@ -26,6 +26,8 @@ from ceilometer import sample
 
 LOG = log.getLogger(__name__)
 
+TLS_VERSION_CHOICES = ['1.2', '1.3']
+
 SERVICE_OPTS = [
     cfg.StrOpt('radosgw',
                help='Radosgw service type.'),
@@ -61,6 +63,16 @@ CLIENT_OPTS = [
                help='PEM encoded Certificate Authority to use when '
                     'verifying HTTPS connections to the RGW Admin API. '
                     'If not set, the system CA bundle is used.'),
+    cfg.StrOpt('tls_min_version',
+               default=None,
+               choices=TLS_VERSION_CHOICES,
+               help='Minimum TLS protocol version for RGW Admin API '
+                    'connections. If unset, awscurl default applies.'),
+    cfg.StrOpt('tls_max_version',
+               default=None,
+               choices=TLS_VERSION_CHOICES,
+               help='Maximum TLS protocol version for RGW Admin API '
+                    'connections. If unset, awscurl default applies.'),
 ]
 
 
@@ -79,6 +91,8 @@ class _Base(plugin_base.PollsterBase):
             self.verify = self.conf.rgw_client.cafile
         else:
             self.verify = True
+        self.tls_min_version = self.conf.rgw_client.tls_min_version
+        self.tls_max_version = self.conf.rgw_client.tls_max_version
 
     @property
     def default_discovery(self):
@@ -131,7 +145,9 @@ class _Base(plugin_base.PollsterBase):
                                                      self.access_key,
                                                      self.secret,
                                                      self.implicit_tenants,
-                                                     self.verify)
+                                                     self.verify,
+                                                     self.tls_min_version,
+                                                     self.tls_max_version)
         except ImportError:
             raise plugin_base.PollsterPermanentError(tenants)
 

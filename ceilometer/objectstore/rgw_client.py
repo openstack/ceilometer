@@ -38,13 +38,15 @@ class RGWAdminClient:
     Bucket = namedtuple('Bucket', 'name, num_objects, size')
 
     def __init__(self, endpoint, access_key, secret_key, implicit_tenants,
-                 verify=True):
+                 verify=True, tls_min_version=None, tls_max_version=None):
         self.access_key = access_key
         self.secret = secret_key
         self.endpoint = endpoint
         self.hostname = urlparse.urlparse(endpoint).netloc
         self.implicit_tenants = implicit_tenants
         self.verify = verify
+        self.tls_min_version = tls_min_version
+        self.tls_max_version = tls_max_version
 
     def _make_request(self, path, req_params):
         uri = f"{self.endpoint}/{path}"
@@ -54,7 +56,9 @@ class RGWAdminClient:
         r = awscurl.make_request("GET", "s3", _DEFAULT_REGION, uri,
                                  {'Accept': 'application/json'}, "",
                                  self.access_key, self.secret, None, False,
-                                 self.verify)
+                                 self.verify,
+                                 tls_min=self.tls_min_version,
+                                 tls_max=self.tls_max_version)
 
         if r.status_code != 200:
             raise RGWAdminAPIFailed(

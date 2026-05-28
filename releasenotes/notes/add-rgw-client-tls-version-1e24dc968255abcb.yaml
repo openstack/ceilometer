@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Added ``tls_min_version`` and ``tls_max_version`` options to the
+    ``[rgw_client]`` section to control the TLS protocol versions used
+    for HTTPS connections to the Ceph RGW Admin API.
