@@ -167,17 +167,18 @@ class HttpPublisher(publisher.ConfigPublisherBase):
             return
         self._do_post(json.dumps(data))
 
-    def _do_post(self, data):
+    def _do_post(self, data, sub_path=None):
+        target = self.target + sub_path if sub_path else self.target
         LOG.trace('Message: %s', data)
         try:
-            res = self.session.post(self.target, data=data,
+            res = self.session.post(target, data=data,
                                     headers=self.HEADERS, timeout=self.timeout,
                                     auth=self.client_auth,
                                     cert=self.client_cert,
                                     verify=self.verify_ssl)
             res.raise_for_status()
             LOG.debug('Message posting to %s: status code %d.',
-                      self.target, res.status_code)
+                      target, res.status_code)
         except requests.exceptions.HTTPError:
             LOG.exception('Status Code: %(code)s. '
                           'Failed to dispatch message: %(data)s',

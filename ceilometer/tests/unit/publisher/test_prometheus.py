@@ -105,15 +105,18 @@ delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
 """.format(self.resource_id, self.resource_id, self.resource_id,
            self.resource_id)
 
+        rid_q = urlparse.quote(self.resource_id, safe='')
         expected = [
-            mock.call('http://localhost:90/metrics/job/os',
-                      auth=None,
-                      cert=None,
-                      data=data,
-                      headers={'Content-type': 'plain/text'},
-                      timeout=5,
-                      verify=True)
-        ]
+            mock.call(
+                'http://localhost:90/metrics/job/os/resource_id/%s' %
+                rid_q,
+                auth=None,
+                cert=None,
+                data=data,
+                headers={
+                    'Content-type': 'plain/text'},
+                timeout=5,
+                verify=True)]
         self.assertEqual(expected, m_req.mock_calls)
 
     def test_post_samples_ssl(self):
@@ -138,13 +141,64 @@ delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
 """.format(self.resource_id, self.resource_id, self.resource_id,
            self.resource_id)
 
+        rid_q = urlparse.quote(self.resource_id, safe='')
         expected = [
-            mock.call('https://localhost:90/metrics/job/os',
-                      auth=None,
-                      cert=None,
-                      data=data,
-                      headers={'Content-type': 'plain/text'},
-                      timeout=5,
-                      verify=True)
-        ]
+            mock.call(
+                'https://localhost:90/metrics/job/os/resource_id/%s' %
+                rid_q,
+                auth=None,
+                cert=None,
+                data=data,
+                headers={
+                    'Content-type': 'plain/text'},
+                timeout=5,
+                verify=True)]
         self.assertEqual(expected, m_req.mock_calls)
+
+    def test_post_samples_with_grouping(self):
+        """When grouping labels are in the URL path, a single POST is made."""
+        parsed_url = urlparse.urlparse(
+            'prometheus://localhost:90/metrics/job/os/instance/myhost')
+        publisher = prometheus.PrometheusPublisher(self.CONF, parsed_url)
+        self.assertTrue(publisher._has_grouping)
+
+        res = requests.Response()
+        res.status_code = 200
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
+            publisher.publish_samples(self.sample_data)
+
+        self.assertEqual(1, len(m_req.mock_calls))
+        call_url = m_req.call_args[0][0]
+        self.assertEqual(
+            'http://localhost:90/metrics/job/os/instance/myhost', call_url)
+        self.assertNotIn('/resource_id/', call_url)
+
+    def test_metric_name_hyphen_sanitized(self):
+        """Hyphens in metric names must be replaced with underscores."""
+        hyphen_sample = [
+            sample.Sample(
+                name='some-metric-name',
+                type=sample.TYPE_GAUGE,
+                unit='',
+                volume=42,
+                user_id='test',
+                project_id='test',
+                resource_id=self.resource_id,
+                timestamp=timeutils.utcnow().isoformat(),
+                resource_metadata={},
+            ),
+        ]
+        parsed_url = urlparse.urlparse(
+            'prometheus://localhost:90/metrics/job/os')
+        publisher = prometheus.PrometheusPublisher(self.CONF, parsed_url)
+
+        res = requests.Response()
+        res.status_code = 200
+        with mock.patch.object(requests.Session, 'post',
+                               return_value=res) as m_req:
+            publisher.publish_samples(hyphen_sample)
+
+        posted_data = m_req.call_args[1]['data']
+        self.assertIn('some_metric_name', posted_data)
+        self.assertNotIn('some-metric-name', posted_data)

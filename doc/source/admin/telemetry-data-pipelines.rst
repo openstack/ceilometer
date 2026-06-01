@@ -166,6 +166,35 @@ interval.
 
 You can read more `here <https://github.com/prometheus/pushgateway#about-timestamps>`__
 
+Push semantics and grouping
+---------------------------
+
+The Prometheus Pushgateway stores metrics per "group" defined by the job name
+and optional grouping labels that are embedded in the URL path after the job
+segment. When a metric family (i.e. all time series sharing the same metric
+name) is pushed again to the same group, the Pushgateway replaces that entire
+family with the one contained in the current payload.
+
+Ceilometer often pushes metrics in subsets per poll. To prevent a later push of
+the same metric name from replacing time series belonging to other resources,
+the Ceilometer Prometheus publisher applies the following behavior:
+
+- If your pipeline URL already contains grouping labels (e.g.
+  ``/metrics/job/openstack-telemetry/region/r1``), the publisher respects them
+  and sends a single push to that group.
+- If your pipeline URL only specifies the job (i.e.
+  ``/metrics/job/openstack-telemetry`` with no grouping labels), the publisher
+  automatically pushes per resource and appends a grouping label using the
+  resource identifier, effectively pushing to
+  ``/metrics/job/<job>/resource_id/<UUID>``. This isolates the pushes for each
+  resource so that subsequent pushes of the same metric name do not override
+  series for other resources.
+
+If you prefer an alternative grouping strategy (e.g., by region or cell), you
+can explicitly include the desired grouping labels in the pipeline URL path,
+such as:
+``prometheus://pushgateway:9091/metrics/job/openstack-telemetry/region/r1``.
+
 Due to this, this is not recommended to use this publisher for billing purpose
 as timestamps in Prometheus will not be exact.
 

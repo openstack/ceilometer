@@ -13,8 +13,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from oslo_log import log
+from urllib import parse as urlparse
+
 from ceilometer.publisher import http
 from ceilometer import sample
+
+LOG = log.getLogger(__name__)
 
 
 class PrometheusPublisher(http.HttpPublisher):
@@ -32,9 +37,48 @@ class PrometheusPublisher(http.HttpPublisher):
             publishers:
                 - prometheus://mypushgateway/metrics/job/ceilometer
 
+    Notes about grouping labels:
+    - Prometheus Pushgateway groups metrics by a set of grouping labels that
+      appear in the URL path after the job segment.
+    - Without grouping labels, pushing a metric family again will replace all
+      time series of that metric name within the group. To avoid overrides when
+      multiple pushes contain the same metric name with different label sets,
+      this publisher, if no grouping labels are configured in the URL, will
+      push per resource (using `resource_id` as grouping label in the path).
+    - If grouping labels are already present in the path, they are preserved,
+      and a single push is performed, leaving grouping control to the operator.
+
     """
 
     HEADERS = {'Content-type': 'plain/text'}
+
+    def __init__(self, conf, parsed_url):
+        path = parsed_url.path or ''
+        self._has_grouping = False
+        if path.startswith('/metrics/job/'):
+            segments = [seg for seg in path.split('/') if seg]
+            # segments: ['metrics', 'job', '<job>', <optional grouping...>]
+            self._has_grouping = len(segments) > 3
+        super().__init__(conf, parsed_url)
+
+    @staticmethod
+    def _sample_to_text(s, doc_done):
+        # NOTE(sileht): delta can't be converted into prometheus data
+        # format so don't set the metric type for it
+        metric_type = None
+        if s.type == sample.TYPE_CUMULATIVE:
+            metric_type = "counter"
+        elif s.type == sample.TYPE_GAUGE:
+            metric_type = "gauge"
+        curated_sname = s.name.replace(".", "_").replace("-", "_")
+        lines = []
+        if metric_type and curated_sname not in doc_done:
+            lines.append(f"# TYPE {curated_sname} {metric_type}\n")
+            doc_done.add(curated_sname)
+        lines.append('%s{resource_id="%s", user_id="%s", project_id="%s"}'
+                     ' %s\n' % (curated_sname, s.resource_id, s.user_id,
+                                s.project_id, s.volume))
+        return "".join(lines)
 
     def publish_samples(self, samples):
         """Send a metering message for publishing
@@ -44,38 +88,25 @@ class PrometheusPublisher(http.HttpPublisher):
         if not samples:
             return
 
-        data = ""
-        doc_done = set()
+        if self._has_grouping:
+            doc_done = set()
+            data = "".join(self._sample_to_text(s, doc_done) for s in samples)
+            self._do_post(data)
+            return
+
+        payloads = {}
+        doc_done_by_res = {}
         for s in samples:
-            # NOTE(sileht): delta can't be converted into prometheus data
-            # format so don't set the metric type for it
-            metric_type = None
-            if s.type == sample.TYPE_CUMULATIVE:
-                metric_type = "counter"
-            elif s.type == sample.TYPE_GAUGE:
-                metric_type = "gauge"
+            rid = s.resource_id
+            if rid not in payloads:
+                payloads[rid] = []
+                doc_done_by_res[rid] = set()
+            payloads[rid].append(self._sample_to_text(s, doc_done_by_res[rid]))
 
-            curated_sname = s.name.replace(".", "_")
-
-            if metric_type and curated_sname not in doc_done:
-                data += f"# TYPE {curated_sname} {metric_type}\n"
-                doc_done.add(curated_sname)
-
-            # NOTE(sileht): prometheus pushgateway doesn't allow to push
-            # timestamp_ms
-            #
-            # timestamp_ms = (
-            #     s.get_iso_timestamp().replace(tzinfo=None) -
-            #     datetime.utcfromtimestamp(0)
-            # ).total_seconds() * 1000
-            # data += '%s{resource_id="%s"} %s %d\n' % (
-            #     curated_sname, s.resource_id, s.volume, timestamp_ms)
-
-            data += '%s{resource_id="%s", user_id="%s", project_id="%s"}' \
-                ' %s\n' % (curated_sname, s.resource_id, s.user_id,
-                           s.project_id, s.volume)
-
-        self._do_post(data)
+        for rid, chunks in payloads.items():
+            rid_q = urlparse.quote(str(rid), safe='')
+            self._do_post("".join(chunks),
+                          sub_path='/resource_id/' + rid_q)
 
     @staticmethod
     def publish_events(events):
