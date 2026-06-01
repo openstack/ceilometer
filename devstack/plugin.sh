@@ -156,23 +156,6 @@ function cleanup_ceilometer {
     sudo rmdir "$CEILOMETER_CONF_DIR"
 }
 
-# Set configuration for cache backend.
-# NOTE(cdent): This currently only works for redis. Still working
-# out how to express the other backends.
-function _ceilometer_configure_cache_backend {
-    iniset $CEILOMETER_CONF cache enabled True
-    iniset $CEILOMETER_CONF cache backend $CEILOMETER_CACHE_BACKEND
-
-    inidelete $CEILOMETER_CONF cache backend_argument
-    iniadd $CEILOMETER_CONF cache backend_argument url:$CEILOMETER_CACHE_URL
-    iniadd $CEILOMETER_CONF cache backend_argument distributed_lock:True
-    if [[ "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" ]]; then
-        iniadd $CEILOMETER_CONF cache backend_argument db:0
-        iniadd $CEILOMETER_CONF cache backend_argument redis_expiration_time:600
-    fi
-}
-
-
 # Set configuration for storage backend.
 function _ceilometer_configure_storage_backend {
     # delete any "," characters used for delimiting individual backends before checking for "none"
@@ -213,9 +196,9 @@ function configure_ceilometer {
         iniset $CEILOMETER_CONF notification workers $API_WORKERS
     fi
 
-    if [[ -n "$CEILOMETER_CACHE_BACKEND" ]]; then
-        _ceilometer_configure_cache_backend
-    fi
+    iniset $CEILOMETER_CONF cache enabled $CEILOMETER_ENABLE_CACHE
+    iniset $CEILOMETER_CONF cache backend $CACHE_BACKEND
+    iniset $CEILOMETER_CONF cache memcache_servers $MEMCACHE_SERVERS
 
     # Install the policy file and declarative configuration files to
     # the conf dir.
