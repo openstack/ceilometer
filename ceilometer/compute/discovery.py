@@ -63,6 +63,12 @@ OPTS = [
                     "of resource_update_interval. This option is only used "
                     "for agent polling to Nova API, so it will work only "
                     "when 'instance_discovery_method' is set to 'naive'."),
+    cfg.BoolOpt('report_stopped_instance_metrics',
+                default=False,
+                help="Report a minimal set of metrics (power.state, vcpus, "
+                     "memory, disk.device.capacity, disk.device.usage) for "
+                     "stopped (SHUTOFF) instances. Only works with the "
+                     "'libvirt_metadata' instance discovery method."),
     cfg.BoolOpt('fetch_extra_metadata',
                 default=False,
                 help="Whether or not additional instance attributes that "

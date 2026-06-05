@@ -111,7 +111,7 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(999999, stats.cpu_time)
 
-    def test_inspect_cpus_with_domain_shutoff(self):
+    def test_inspect_instance_with_domain_shutoff(self):
         domain = mock.Mock()
         domain.info.return_value = (5, 0, 0, 2, 999999)
         conn = mock.Mock()
@@ -122,6 +122,31 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertRaises(virt_inspector.InstanceShutOffException,
                               self.inspector.inspect_instance,
                               self.instance, None)
+
+    def test_inspect_instance_with_domain_shutoff_reporting_enabled(self):
+        self.inspector.conf.set_override(
+            'report_stopped_instance_metrics', True, group='compute')
+        domain = mock.Mock()
+        domain.info.return_value = (5, 2097152, 0, 2, 0)
+        conn = mock.Mock()
+        conn.lookupByUUIDString.return_value = domain
+
+        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
+                        'refresh_libvirt_connection', return_value=conn):
+            stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertEqual(5, stats.power_state)
+            self.assertEqual(2, stats.cpu_number)
+            self.assertEqual(2097152 / units.Ki, stats.memory_actual)
+            self.assertIsNone(stats.cpu_time)
+            self.assertIsNone(stats.memory_available)
+            self.assertIsNone(stats.memory_usage)
+            self.assertIsNone(stats.memory_resident)
+            self.assertIsNone(stats.memory_swap_in)
+            self.assertIsNone(stats.memory_swap_out)
+            self.assertIsNone(stats.cpu_cycles)
+            self.assertIsNone(stats.instructions)
+            self.assertIsNone(stats.cache_references)
+            self.assertIsNone(stats.cache_misses)
 
     def test_inspect_vnics(self):
         dom_xml = """
@@ -352,6 +377,42 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, disks[0].allocation)
             self.assertEqual(3, disks[0].physical)
 
+    def test_inspect_disk_info_with_domain_shutoff(self):
+        self.inspector.conf.set_override(
+            'report_stopped_instance_metrics', True, group='compute')
+        dom_xml = """
+             <domain type='kvm'>
+                 <devices>
+                     <disk type='file' device='disk'>
+                         <driver name='qemu' type='qcow2' cache='none'/>
+                         <source file='/path/instance-00000001/disk'/>
+                         <target dev='vda' bus='virtio'/>
+                         <alias name='virtio-disk0'/>
+                         <address type='pci' domain='0x0000' bus='0x00'
+                                  slot='0x04' function='0x0'/>
+                     </disk>
+                 </devices>
+             </domain>
+        """
+        domain = mock.Mock()
+        domain.XMLDesc.return_value = dom_xml
+        domain.blockInfo.return_value = (10737418240, 2147483648, 3221225472,
+                                         -1)
+        domain.info.return_value = (5, 0, 0, 2, 0)
+        conn = mock.Mock()
+        conn.lookupByUUIDString.return_value = domain
+
+        with mock.patch('ceilometer.compute.virt.libvirt.utils.'
+                        'refresh_libvirt_connection', return_value=conn):
+            disks = list(self.inspector.inspect_disk_info(
+                self.instance, None))
+
+            self.assertEqual(1, len(disks))
+            self.assertEqual('vda', disks[0].device)
+            self.assertEqual(10737418240, disks[0].capacity)
+            self.assertEqual(2147483648, disks[0].allocation)
+            self.assertEqual(3221225472, disks[0].physical)
+
     def test_inspect_disk_info_network_type(self):
         dom_xml = """
              <domain type='kvm'>
@@ -445,17 +506,23 @@ class TestLibvirtInspection(base.BaseTestCase):
 
             self.assertEqual(0, len(disks))
 
-    def test_inspect_memory_usage_with_domain_shutoff(self):
+    def test_inspect_memory_with_domain_shutoff(self):
+        self.inspector.conf.set_override(
+            'report_stopped_instance_metrics', True, group='compute')
         domain = mock.Mock()
-        domain.info.return_value = (5, 0, 51200, 2, 999999)
+        domain.info.return_value = (5, 524288, 51200, 4, 0)
         conn = mock.Mock()
         conn.lookupByUUIDString.return_value = domain
 
         with mock.patch('ceilometer.compute.virt.libvirt.utils.'
                         'refresh_libvirt_connection', return_value=conn):
-            self.assertRaises(virt_inspector.InstanceShutOffException,
-                              self.inspector.inspect_instance,
-                              self.instance, None)
+            stats = self.inspector.inspect_instance(self.instance, None)
+            self.assertEqual(5, stats.power_state)
+            self.assertEqual(4, stats.cpu_number)
+            self.assertEqual(524288 / units.Ki, stats.memory_actual)
+            self.assertIsNone(stats.memory_usage)
+            self.assertIsNone(stats.memory_available)
+            self.assertIsNone(stats.memory_resident)
 
     def test_inspect_memory_with_empty_stats(self):
         domain = mock.Mock()
