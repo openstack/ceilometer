@@ -81,7 +81,7 @@ function _ceilometer_install_redis {
 function _ceilometer_prepare_coordination {
     if echo $CEILOMETER_COORDINATION_URL | grep -q '^memcached:'; then
         install_package memcached
-    elif [[ "${CEILOMETER_COORDINATOR_URL%%:*}" == "redis" || "${CEILOMETER_CACHE_BACKEND##*.}" == "redis" || "${CEILOMETER_BACKENDS}" =~ "gnocchi" ]]; then
+    elif [[ "${CEILOMETER_COORDINATION_URL%%:*}" == "redis" || "${CACHE_BACKEND##*.}" == "redis" || "${CEILOMETER_BACKENDS}" =~ "gnocchi" ]]; then
         _ceilometer_install_redis
     fi
 }
