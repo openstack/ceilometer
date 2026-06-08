@@ -11,48 +11,28 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from cinderclient import client as cinder_client
-from oslo_config import cfg
-
-from ceilometer import keystone_client
+from ceilometer import cinder_client
 from ceilometer.polling import plugin_base
-
-SERVICE_OPTS = [
-    cfg.StrOpt('cinder',
-               default='volumev3',
-               help='Cinder service type.'),
-]
 
 
 class _BaseDiscovery(plugin_base.DiscoveryBase):
     def __init__(self, conf):
         super().__init__(conf)
-        creds = conf.service_credentials
-        # NOTE(mnederlof): We set 3.64 (the maximum for Wallaby) because:
-        # we need at least 3.41 to get user_id on snapshots.
-        # we need at least 3.56 for user_id and project_id on backups.
-        # we need at least 3.63 for volume_type_id on volumes.
-        self.client = cinder_client.Client(
-            version='3.64',
-            session=keystone_client.get_session(conf),
-            region_name=creds.region_name,
-            interface=creds.interface,
-            service_type=conf.service_types.cinder
-        )
+        self.client = cinder_client.Client(conf)
 
 
 class VolumeDiscovery(_BaseDiscovery):
     def discover(self, manager, param=None):
         """Discover volume resources to monitor."""
 
-        return self.client.volumes.list(search_opts={'all_tenants': True})
+        return self.client.list_volumes(search_opts={'all_tenants': True})
 
 
 class VolumeSnapshotsDiscovery(_BaseDiscovery):
     def discover(self, manager, param=None):
         """Discover snapshot resources to monitor."""
 
-        return self.client.volume_snapshots.list(
+        return self.client.list_volume_snapshots(
             search_opts={'all_tenants': True})
 
 
@@ -60,18 +40,18 @@ class VolumeBackupsDiscovery(_BaseDiscovery):
     def discover(self, manager, param=None):
         """Discover volume resources to monitor."""
 
-        return self.client.backups.list(search_opts={'all_tenants': True})
+        return self.client.list_backups(search_opts={'all_tenants': True})
 
 
 class VolumePoolsDiscovery(_BaseDiscovery):
     def discover(self, manager, param=None):
         """Discover volume resources to monitor."""
 
-        return self.client.pools.list(detailed=True)
+        return self.client.list_pools(detailed=True)
 
 
 class VolumeServicesDiscovery(_BaseDiscovery):
     def discover(self, manager, param=None):
         """Discover cinder service resources to monitor."""
 
-        return self.client.services.list()
+        return self.client.list_services()
