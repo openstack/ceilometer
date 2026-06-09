@@ -27,12 +27,6 @@ OPTS = [
                default='change this for valid signing',
                help='Secret value for signing messages. Set value empty if '
                     'signing is not required to avoid computational overhead.',
-               deprecated_opts=[cfg.DeprecatedOpt("metering_secret",
-                                                  "DEFAULT"),
-                                cfg.DeprecatedOpt("metering_secret",
-                                                  "publisher_rpc"),
-                                cfg.DeprecatedOpt("metering_secret",
-                                                  "publisher")]
                ),
 ]
 
