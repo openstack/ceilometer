@@ -65,8 +65,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
         EndpointDiscovery.discover = original_discover_method
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_discover_error_response(self, client_mock):
+    def test_discover_error_response(self):
         def discover_mock(self, manager, param=None):
             return ["barbican_url"]
 
@@ -81,6 +80,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
             return_value.status_code = http_status_code
             return_value.json_object = {}
 
+            client_mock = mock.Mock()
             client_mock.session.get.return_value = return_value
 
             exception = self.assertRaises(
@@ -93,8 +93,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
 
         EndpointDiscovery.discover = original_discover_method
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_discover_response_ok(self, client_mock):
+    def test_discover_response_ok(self):
         discover_mock = mock.MagicMock()
         discover_mock.return_value = ["barbican_url"]
 
@@ -106,6 +105,7 @@ class TestNonOpenStackCredentialsDiscovery(base.BaseTestCase):
         return_value.json_object = {}
         return_value._content = "content"
 
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         fake_manager = self.FakeManager(client_mock)
