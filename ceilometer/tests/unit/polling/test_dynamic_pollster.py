@@ -161,8 +161,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(pollster_definition, pollster.pollster_definitions)
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_skip_samples_with_linked_samples(self, keystone_mock):
+    def test_skip_samples_with_linked_samples(self):
         generator = PagedSamplesGeneratorHttpRequestMock(samples_dict={
             'volume': SampleGenerator(samples_dict={
                 'name': ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
@@ -177,6 +176,7 @@ class TestDynamicPollster(base.BaseTestCase):
             'marker=f6': 3
         }, 2)
 
+        keystone_mock = mock.Mock()
         keystone_mock.session.get.side_effect = generator.mock_request
         fake_manager = self.FakeManager(keystone=keystone_mock)
 
@@ -283,8 +283,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual("endpoint:test", pollster.definitions.sample_gatherer
                          .default_discovery)
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_get_samples_empty_response(self, client_mock):
+    def test_execute_request_get_samples_empty_response(self):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
@@ -292,6 +291,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return_value.status_code = requests.codes.ok
         return_value.json_object = {}
 
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         samples = pollster.definitions.sample_gatherer. \
@@ -301,9 +301,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(0, len(samples))
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_get_samples_response_non_empty(
-            self, client_mock):
+    def test_execute_request_get_samples_response_non_empty(self):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
@@ -311,6 +309,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return_value.status_code = requests.codes.ok
         return_value.json_object = {"firstElement": [{}, {}, {}]}
 
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         samples = pollster.definitions.sample_gatherer. \
@@ -320,9 +319,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(3, len(samples))
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_json_response_handler(
-            self, client_mock):
+    def test_execute_request_json_response_handler(self):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
@@ -330,6 +327,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return_value.status_code = requests.codes.ok
         return_value._text = '{"test": [1,2,3]}'
 
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         samples = pollster.definitions.sample_gatherer. \
@@ -339,9 +337,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(3, len(samples))
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_xml_response_handler(
-            self, client_mock):
+    def test_execute_request_xml_response_handler(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         definitions['response_handlers'] = ['xml']
@@ -350,6 +346,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return_value = self.FakeResponse()
         return_value.status_code = requests.codes.ok
         return_value._text = '<test>123</test>'
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         samples = pollster.definitions.sample_gatherer. \
@@ -359,9 +356,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(3, len(samples))
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_xml_json_response_handler(
-            self, client_mock):
+    def test_execute_request_xml_json_response_handler(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         definitions['response_handlers'] = ['xml', 'json']
@@ -370,6 +365,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return_value = self.FakeResponse()
         return_value.status_code = requests.codes.ok
         return_value._text = '<test>123</test>'
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         samples = pollster.definitions.sample_gatherer. \
@@ -388,9 +384,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(4, len(samples))
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_extra_metadata_fields_cache_disabled(
-            self, client_mock):
+    def test_execute_request_extra_metadata_fields_cache_disabled(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         extra_metadata_fields = {
@@ -453,6 +447,7 @@ class TestDynamicPollster(base.BaseTestCase):
                 return return_value7777
             return return_value
 
+        client_mock = mock.Mock()
         client_mock.session.get.side_effect = get
         manager = mock.Mock
         manager._keystone = client_mock
@@ -471,9 +466,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(9, len(samples))
         self.assertEqual(10, n_calls)
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_extra_metadata_fields_cache_enabled(
-            self, client_mock):
+    def test_execute_request_extra_metadata_fields_cache_enabled(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         extra_metadata_fields = {
@@ -536,6 +529,7 @@ class TestDynamicPollster(base.BaseTestCase):
                 return return_value7777
             return return_value
 
+        client_mock = mock.Mock()
         client_mock.session.get.side_effect = get
         manager = mock.Mock
         manager._keystone = client_mock
@@ -554,9 +548,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertEqual(9, len(samples))
         self.assertEqual(4, n_calls)
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_extra_metadata_fields(
-            self, client_mock):
+    def test_execute_request_extra_metadata_fields(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         extra_metadata_fields = [{
@@ -698,6 +690,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
             return return_value
 
+        client_mock = mock.Mock()
         client_mock.session.get = get
         manager = mock.Mock
         manager._keystone = client_mock
@@ -733,9 +726,7 @@ class TestDynamicPollster(base.BaseTestCase):
                           'meta': 'm3',
                           'project_meta': 'META3'})
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_extra_metadata_fields_skip(
-            self, client_mock):
+    def test_execute_request_extra_metadata_fields_skip(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         extra_metadata_fields = [{
@@ -864,6 +855,7 @@ class TestDynamicPollster(base.BaseTestCase):
 
             return return_value
 
+        client_mock = mock.Mock()
         client_mock.session.get = get
         manager = mock.Mock
         manager._keystone = client_mock
@@ -898,9 +890,7 @@ class TestDynamicPollster(base.BaseTestCase):
                           'project_name': 'project4',
                           'to_skip': 'skip4'})
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_extra_metadata_fields_different_requests(
-            self, client_mock):
+    def test_execute_request_extra_metadata_fields_different_requests(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
 
@@ -942,6 +932,7 @@ class TestDynamicPollster(base.BaseTestCase):
         def get(url, *args, **kwargs):
             return return_value
 
+        client_mock = mock.Mock()
         client_mock.session.get = get
         manager = mock.Mock
         manager._keystone = client_mock
@@ -971,9 +962,7 @@ class TestDynamicPollster(base.BaseTestCase):
                          {'project_id2': 7777,
                           'project_name2': 'project2'})
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_xml_json_response_handler_invalid_response(
-            self, client_mock):
+    def test_execute_request_xml_json_response_handler_invalid_response(self):
         definitions = copy.deepcopy(
             self.pollster_definition_only_required_fields)
         definitions['response_handlers'] = ['xml', 'json']
@@ -982,6 +971,7 @@ class TestDynamicPollster(base.BaseTestCase):
         return_value = self.FakeResponse()
         return_value.status_code = requests.codes.ok
         return_value._text = 'Invalid response'
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         with self.assertLogs('ceilometer.polling.dynamic_pollster',
@@ -1077,15 +1067,14 @@ class TestDynamicPollster(base.BaseTestCase):
                          "It must be a list. Provided value type: str",
                          str(exception))
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_execute_request_get_samples_exception_on_request(
-            self, client_mock):
+    def test_execute_request_get_samples_exception_on_request(self):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
         return_value = self.FakeResponse()
         return_value.status_code = requests.codes.bad
 
+        client_mock = mock.Mock()
         client_mock.session.get.return_value = return_value
 
         exception = self.assertRaises(requests.HTTPError,
@@ -1671,8 +1660,7 @@ class TestDynamicPollster(base.BaseTestCase):
         self.assertIn("authenticated", request_args)
         self.assertTrue(request_args["authenticated"])
 
-    @mock.patch('keystoneclient.v2_0.client.Client')
-    def test_metadata_nested_objects(self, keystone_mock):
+    def test_metadata_nested_objects(self):
         generator = PagedSamplesGeneratorHttpRequestMock(samples_dict={
             'flavor': [{"name": "a", "ram": 1}, {"name": "b", "ram": 2},
                        {"name": "c", "ram": 3}, {"name": "d", "ram": 4},
@@ -1688,6 +1676,7 @@ class TestDynamicPollster(base.BaseTestCase):
             'marker=f6': 3
         }, 2)
 
+        keystone_mock = mock.Mock()
         keystone_mock.session.get.side_effect = generator.mock_request
         fake_manager = self.FakeManager(keystone=keystone_mock)
 
