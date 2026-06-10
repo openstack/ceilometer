@@ -835,6 +835,64 @@ POOL_CEPH = cinder_pools.Pool(manager=None, info={
     'goodness_function': None,
     'timestamp': '2025-06-09T13:29:43.286226',
 })
+
+POOL_ZERO_ALLOCATED_CAPACITY = cinder_pools.Pool(manager=None, info={
+    'name': 'localhost.localdomain@lvmdriver-1#lvmdriver-1',
+    'allocated_capacity_gb': 0,
+})
+POOL_NO_CAPABILITIES = cinder_pools.Pool(manager=None, info={
+    'name': 'localhost.localdomain@lvmdriver-1#lvmdriver-1',
+})
+
+# Test fixture for VirtualFree pollster when provisioned_capacity_gb is
+# missing. The pollster uses getattr(pool, 'provisioned_capacity_gb', None)
+# as a guard, so pools missing this attribute are silently skipped
+# (yield no samples).
+POOL_NO_PROVISIONED_CAPACITY = cinder_pools.Pool(manager=None, info={
+    'name': 'localhost.localdomain@lvmdriver-2#lvmdriver-2',
+    'pool_name': 'lvmdriver-2',
+    'total_capacity_gb': 28.5,
+    'free_capacity_gb': 28.39,
+    'reserved_percentage': 0,
+    'max_over_subscription_ratio': 20.0,
+    'thin_provisioning_support': True,
+    'allocated_capacity_gb': 4,
+})
+
+# Test fixture for VirtualFree pollster when thin_provisioning_support is
+# missing. When provisioned_capacity_gb IS set but thin_provisioning_support
+# is missing, the pollster attempts to access the attribute and raises
+# AttributeError.
+POOL_NO_THIN_PROVISIONING = cinder_pools.Pool(manager=None, info={
+    'name': 'localhost.localdomain@lvmdriver-3#lvmdriver-3',
+    'pool_name': 'lvmdriver-3',
+    'total_capacity_gb': 28.5,
+    'free_capacity_gb': 28.39,
+    'reserved_percentage': 0,
+    'provisioned_capacity_gb': 4.0,
+    'max_over_subscription_ratio': 20.0,
+    'allocated_capacity_gb': 4,
+})
+
+# Test fixture for VirtualFree pollster with thick provisioning.
+# When thin_provisioning_support=False, max_over_subscription_ratio defaults to
+# 1.0 in the calculation: 1.0 * (28.5 - 0) - 4.0 = 24.5 virtual free capacity.
+POOL_THICK_PROVISIONING = cinder_pools.Pool(manager=None, info={
+    'name': 'localhost.localdomain@lvmdriver-4#lvmdriver-4',
+    'pool_name': 'lvmdriver-4',
+    'total_capacity_gb': 28.5,
+    'free_capacity_gb': 28.39,
+    'reserved_percentage': 0,
+    'provisioned_capacity_gb': 4.0,
+    'max_over_subscription_ratio': 20.0,
+    'thin_provisioning_support': False,
+    'allocated_capacity_gb': 4,
+})
+
+# Test fixture for VirtualFree pollster when reserved_percentage is not set
+POOL_NO_RESERVED_PERCENTAGE = cinder_pools.Pool(manager=None, info={
+    'name': 'mypool', 'provisioned_capacity_gb': 100, })
+
 SERVICE_CINDER_VOLUME = cinder_services.Service(manager=None, info={
     'binary': 'cinder-volume',
     'host': 'devstack',
