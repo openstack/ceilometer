@@ -203,7 +203,8 @@ class PollingTask:
 
         # we relate the static resources and per-source discovery to
         # each combination of pollster and matching source
-        resource_factory = lambda: Resources(agent_manager)  # noqa: E731
+        def resource_factory():
+            return Resources(agent_manager)
         self.resources = collections.defaultdict(resource_factory)
 
         conf = self.manager.conf

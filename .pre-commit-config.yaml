@@ -32,11 +32,6 @@ repos:
     rev: v2.0.0
     hooks:
       - id: doc8
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
-    hooks:
-      - id: pyupgrade
-        args: [--py310-plus]
   - repo: https://github.com/openstack/bashate
     rev: 2.1.1
     hooks:
@@ -48,3 +43,11 @@ repos:
     hooks:
       - id: codespell
         args: ['--ignore-words=doc/dictionary.txt']
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.7
+    hooks:
+      - id: ruff-check
+        args: ['--fix', '--unsafe-fixes', '--show-fixes'] #--diff']
+      # Add this after submitting a commit for ruff check, then one that fixes linting, then one to move autopep to after this.
+      #- id: ruff-format
