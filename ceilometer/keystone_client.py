@@ -41,18 +41,6 @@ class Project:
     is_domain: bool = False
 
     @classmethod
-    def from_ksclient(cls, ks_project):
-        return cls(
-            id=ks_project.id,
-            name=ks_project.name,
-            domain_id=ks_project.domain_id,
-            is_enabled=ks_project.enabled,
-            description=getattr(ks_project, 'description', None) or '',
-            parent_id=getattr(ks_project, 'parent_id', None),
-            is_domain=getattr(ks_project, 'is_domain', False),
-        )
-
-    @classmethod
     def from_openstacksdk(cls, sdk_project):
         return cls(
             id=sdk_project.id,
@@ -71,15 +59,6 @@ class Domain:
     name: str
     is_enabled: bool
     description: str = ''
-
-    @classmethod
-    def from_ksclient(cls, ks_domain):
-        return cls(
-            id=ks_domain.id,
-            name=ks_domain.name,
-            is_enabled=ks_domain.enabled,
-            description=getattr(ks_domain, 'description', None) or '',
-        )
 
     @classmethod
     def from_openstacksdk(cls, sdk_domain):
@@ -261,8 +240,6 @@ def get_urls(
 
 
 def get_auth_token(client):
-    # NOTE: client.session.get_token() can be used for both
-    # keystoneclient.v3.client.Client and openstack.connection.Connection
     return client.session.auth.get_access(client.session).auth_token
 
 
