@@ -123,7 +123,7 @@ class TestFanPercentSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(1, float(47.04), self.CONF.host)
+        self._verify_metering(1, 47.04, self.CONF.host)
 
 
 class TestCurrentSensorPollster(base.TestPollsterBase):
@@ -137,7 +137,7 @@ class TestCurrentSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(1, float(0.800), self.CONF.host)
+        self._verify_metering(1, 0.800, self.CONF.host)
 
 
 class TestVoltageSensorPollster(base.TestPollsterBase):
@@ -151,7 +151,7 @@ class TestVoltageSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(4, float(3.309), self.CONF.host)
+        self._verify_metering(4, 3.309, self.CONF.host)
 
 
 class TestPowerSensorPollster(base.TestPollsterBase):
@@ -165,4 +165,4 @@ class TestPowerSensorPollster(base.TestPollsterBase):
     def test_get_samples(self):
         self._test_get_samples()
 
-        self._verify_metering(1, int(154), self.CONF.host)
+        self._verify_metering(1, 154, self.CONF.host)
