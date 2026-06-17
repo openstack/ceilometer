@@ -61,23 +61,24 @@ class LibvirtInspector(virt_inspector.Inspector):
         except Exception as ex:
             raise virt_inspector.InspectorException(str(ex))
 
-    def _get_domain_not_shut_off_or_raise(self, instance):
+    def _get_domain(self, instance, raise_if_shutoff):
         instance_name = util.instance_name(instance)
         domain = self._lookup_by_uuid(instance)
 
-        state = domain.info()[0]
-        if state == libvirt.VIR_DOMAIN_SHUTOFF:
-            msg = _('Failed to inspect data of instance '
-                    '<name=%(name)s, id=%(id)s>, '
-                    'domain state is SHUTOFF.') % {
-                'name': instance_name, 'id': instance.id}
-            raise virt_inspector.InstanceShutOffException(msg)
+        if raise_if_shutoff:
+            state = domain.info()[0]
+            if state == libvirt.VIR_DOMAIN_SHUTOFF:
+                msg = _('Failed to inspect data of instance '
+                        '<name=%(name)s, id=%(id)s>, '
+                        'domain state is SHUTOFF.') % {
+                    'name': instance_name, 'id': instance.id}
+                raise virt_inspector.InstanceShutOffException(msg)
 
         return domain
 
     @libvirt_utils.retry_on_disconnect
     def inspect_vnics(self, instance, duration):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
+        domain = self._get_domain(instance, True)
 
         tree = etree.fromstring(domain.XMLDesc(0))
         for iface in tree.findall('devices/interface'):
@@ -169,7 +170,7 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     @libvirt_utils.retry_on_disconnect
     def inspect_disks(self, instance, duration):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
+        domain = self._get_domain(instance, True)
         for device in self._get_disk_devices(domain):
             try:
                 block_stats = domain.blockStats(device)
@@ -191,7 +192,8 @@ class LibvirtInspector(virt_inspector.Inspector):
 
     @libvirt_utils.retry_on_disconnect
     def inspect_disk_info(self, instance, duration):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
+        domain = self._get_domain(
+            instance, not self.conf.compute.report_stopped_instance_metrics)
         for device in self._get_disk_devices(domain):
             block_info = domain.blockInfo(device)
             # if vm mount cdrom, libvirt will align by 4K bytes, capacity may
@@ -206,7 +208,18 @@ class LibvirtInspector(virt_inspector.Inspector):
     @libvirt_utils.raise_nodata_if_unsupported
     @libvirt_utils.retry_on_disconnect
     def inspect_instance(self, instance, duration=None):
-        domain = self._get_domain_not_shut_off_or_raise(instance)
+        domain = self._get_domain(
+            instance, not self.conf.compute.report_stopped_instance_metrics)
+
+        if self.conf.compute.report_stopped_instance_metrics:
+            dom_info = domain.info()
+            state = dom_info[0]
+            if state == libvirt.VIR_DOMAIN_SHUTOFF:
+                return virt_inspector.InstanceStats(
+                    power_state=state,
+                    cpu_number=dom_info[3],
+                    memory_actual=dom_info[1] / units.Ki,
+                )
 
         memory_actual = None
         memory_available = None

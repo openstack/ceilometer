@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    A new ``[compute] report_stopped_instance_metrics`` option (disabled by
+    default) allows the libvirt compute pollster to report a minimal set
+    of metrics for stopped (SHUTOFF) VMs: ``power.state``, ``vcpus``,
+    ``memory``, ``disk.device.capacity``, and ``disk.device.usage``.
+    Runtime metrics (such as ``cpu``, ``memory.usage``,
+    ``memory.resident``, network and disk I/O stats) are never reported
+    for stopped VMs. Shelved-offloaded VMs are not affected as Nova
+    removes their libvirt domain entirely.

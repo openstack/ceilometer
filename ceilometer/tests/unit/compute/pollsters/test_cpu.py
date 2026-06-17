@@ -129,3 +129,46 @@ class TestVCPUsPollster(base.TestPollsterBase):
         _verify_cpu_metering(1)
         _verify_cpu_metering(1)
         _verify_cpu_metering(2)
+
+    def test_get_samples_shutoff(self):
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(power_state=5, cpu_number=4,
+                                         memory_actual=2048.0),
+        )
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.VCPUsPollster(self.CONF)
+        cache = {}
+        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+        self.assertEqual(1, len(samples))
+        self.assertEqual('vcpus', samples[0].name)
+        self.assertEqual(4, samples[0].volume)
+
+
+class TestPowerStatePollster(base.TestPollsterBase):
+
+    def test_get_samples_shutoff(self):
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(power_state=5, cpu_number=2,
+                                         memory_actual=1024.0),
+        )
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.PowerStatePollster(self.CONF)
+        cache = {}
+        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+        self.assertEqual(1, len(samples))
+        self.assertEqual('power.state', samples[0].name)
+        self.assertEqual(5, samples[0].volume)
+
+
+class TestCPUPollsterShutoff(base.TestPollsterBase):
+
+    def test_get_samples_shutoff_no_cpu_time(self):
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(power_state=5, cpu_number=2,
+                                         memory_actual=1024.0),
+        )
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.CPUPollster(self.CONF)
+        cache = {}
+        samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+        self.assertEqual(0, len(samples))
