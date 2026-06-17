@@ -83,7 +83,9 @@ class FilePublisher(publisher.ConfigPublisherBase):
             path, encoding='utf8', maxBytes=max_bytes,
             backupCount=backup_count)
 
-        self.publisher_logger = logging.Logger('publisher.file')
+        # (tkajinam) We need a independent logger, so explicitly create
+        # a new instance, rather than using getLogger.
+        self.publisher_logger = logging.Logger('publisher.file')  # noqa: LOG001
         self.publisher_logger.propagate = False
         self.publisher_logger.setLevel(logging.INFO)
         rfh.setLevel(logging.INFO)
