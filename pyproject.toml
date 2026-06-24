@@ -29,6 +29,7 @@ select = [
     "E9",
     # pyflakes
     "F",
+    "LOG",
     "W",
 ]
 external = ["H"]
