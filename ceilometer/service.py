@@ -40,9 +40,9 @@ def prepare_service(argv=None, config_files=None, conf=None):
                            group=None if group == "DEFAULT" else group)
     keystone_client.register_keystoneauth_opts(conf)
     log.register_options(conf)
-    log_levels = (conf.default_log_levels +
-                  ['futurist=INFO', 'keystoneclient=INFO',
-                   'openstack=INFO'])
+    log_levels = (
+        log.get_default_log_levels() +
+        ['futurist=INFO', 'keystoneclient=INFO', 'openstack=INFO'])
     log.set_defaults(default_log_levels=log_levels)
 
     conf(argv[1:], project='ceilometer', validate_default_values=True,
