@@ -24,7 +24,7 @@ import tempfile
 from unittest import mock
 
 import fixtures
-from keystoneauth1 import exceptions as ka_exceptions
+from openstack import exceptions as sdk_exceptions
 from oslo_utils import timeutils
 from stevedore import extension
 
@@ -180,7 +180,7 @@ class BatchTestPollster(TestPollster):
 class TestPollsterKeystone(TestPollster):
     def get_samples(self, manager, cache, resources):
         # Just try to use keystone, that will raise an exception
-        manager.keystone.projects.list()
+        manager.keystone.list_projects()
 
 
 class TestPollsterPollingException(TestPollster):
@@ -774,8 +774,8 @@ class TestPollingAgent(BaseAgent):
         self.mgr._keystone = None
         self.mgr._keystone_last_exception = None
         self.useFixture(fixtures.MockPatch(
-            'keystoneclient.v3.client.Client',
-            side_effect=ka_exceptions.ClientException))
+            'openstack.connection.Connection',
+            side_effect=sdk_exceptions.HttpException))
         self.mgr.interval_task(list(polling_tasks.values())[0])
         self.assertFalse(self.PollsterKeystone.samples)
         self.assertFalse(self.notified_samples)
