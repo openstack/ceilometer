@@ -28,6 +28,8 @@ class EndpointDiscovery(plugin.DiscoveryBase):
     at once.
     """
 
+    instance_group_id = None
+
     def discover(self, manager, param=None):
         endpoints = keystone_client.get_urls(
             manager.keystone, service_type=param,
@@ -38,3 +40,10 @@ class EndpointDiscovery(plugin.DiscoveryBase):
                         "<all services>" if param is None else param)
             return []
         return endpoints
+
+    @property
+    def group_id(self):
+        if self.instance_group_id:
+            return self.instance_group_id
+
+        return super().group_id

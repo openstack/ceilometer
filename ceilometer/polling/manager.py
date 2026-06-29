@@ -49,6 +49,10 @@ from ceilometer.polling import prom_exporter
 from ceilometer.publisher import utils as publisher_utils
 from ceilometer import utils
 
+from ceilometer.polling.discovery.endpoint import EndpointDiscovery
+from ceilometer.polling.discovery.non_openstack_credentials_discovery\
+    import NonOpenStackCredentialsDiscovery
+
 LOG = log.getLogger(__name__)
 
 POLLING_OPTS = [
@@ -532,6 +536,15 @@ class AgentHeartBeatManager(cotyledon.Service):
             executor.submit(_read_queue)
             executor.submit(_report_status)
 
+class DynamicDiscoveryHolder:
+    """Dynamic Discovery Holder
+
+    This class implements a POPO, which is used to store the dynamic name
+    of the discovery and its instance.
+    """
+
+    name = "Discovery name"
+    obj = None
 
 class AgentManager(cotyledon.Service):
 
@@ -577,7 +590,13 @@ class AgentManager(cotyledon.Service):
         discoveries = (self._extensions('discover', namespace,
                                         self.conf).extensions
                        for namespace in namespaces)
-        self.discoveries = list(itertools.chain(*list(discoveries)))
+
+        dynamic_pollster_discoveries = \
+            self.create_dynamic_pollster_discoveries(
+                extensions_dynamic_pollsters)
+
+        self.discoveries = list(
+            itertools.chain(*list(discoveries))) + dynamic_pollster_discoveries
         self.polling_periodics = None
 
         self.hashrings = None
@@ -622,6 +641,33 @@ class AgentManager(cotyledon.Service):
 
         self._keystone = None
         self._keystone_last_exception = None
+
+    def create_dynamic_pollster_discoveries(
+            self, extensions_dynamic_pollsters):
+        dynamic_pollster_discoveries = []
+        for edp in extensions_dynamic_pollsters:
+            pollster_discovery_method = edp.default_discovery
+            discovery_type = pollster_discovery_method.split(":")[0]
+            if discovery_type == "barbican":
+                pollster_discoverer = NonOpenStackCredentialsDiscovery(
+                    self.conf)
+            elif discovery_type == "endpoint":
+                pollster_discoverer = EndpointDiscovery(self.conf)
+            else:
+                continue
+
+            pollster_discoverer.instance_group_id = pollster_discovery_method
+
+            popo = DynamicDiscoveryHolder()
+            popo.name = pollster_discovery_method
+            popo.obj = pollster_discoverer
+
+            LOG.debug("Instantiated dynamic pollster discovery [%s] under name"
+                      " [%s] with discovery object [%s]", popo,
+                      pollster_discovery_method, pollster_discoverer)
+
+            dynamic_pollster_discoveries.append(popo)
+        return dynamic_pollster_discoveries
 
     def heartbeat(self, name, timestamp):
         """Send heartbeat data if the agent is configured to do so."""
@@ -925,11 +971,20 @@ class AgentManager(cotyledon.Service):
         s = urlparse.urlparse(url)
         return (s.scheme or s.path), (s.netloc + s.path if s.scheme else None)
 
-    def _discoverer(self, name):
+    def _discoverer(self, name, full_qualified_discovery_url = None):
+        discover_found = None
+        if full_qualified_discovery_url:
+            for d in self.discoveries:
+                if d.name == full_qualified_discovery_url:
+                    discover_found = d.obj
+
+        if discover_found:
+            return discover_found
+
         for d in self.discoveries:
             if d.name == name:
-                return d.obj
-        return None
+                discover_found = d.obj
+        return discover_found
 
     def discover(self, discovery=None, discovery_cache=None):
         resources = []
@@ -939,7 +994,8 @@ class AgentManager(cotyledon.Service):
                 resources.extend(discovery_cache[url])
                 continue
             name, param = self._parse_discoverer(url)
-            discoverer = self._discoverer(name)
+            discoverer = self._discoverer(
+                name, full_qualified_discovery_url = url)
             if discoverer:
                 try:
                     if discoverer.KEYSTONE_REQUIRED_FOR_SERVICE:
