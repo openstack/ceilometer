@@ -33,6 +33,24 @@ REQUIRED_POLLSTER_FIELDS = ['name', 'sample_type', 'unit',
                             'url_path']
 
 
+class FakeResponse:
+    def __init__(self, status_code=requests.codes.ok, json_object=None,
+                 text=None):
+        self.status_code = status_code
+        self.json_object = json_object
+        self._text = text
+
+    @property
+    def text(self):
+        return self._text or json.dumps(self.json_object)
+
+    def json(self):
+        return self.json_object
+
+    def raise_for_status(self):
+        raise requests.HTTPError("Mock HTTP error.", response=self)
+
+
 class SampleGenerator:
 
     def __init__(self, samples_dict, turn_to_list=False):
@@ -97,29 +115,13 @@ class PagedSamplesGenerator(SampleGenerator):
 class PagedSamplesGeneratorHttpRequestMock(PagedSamplesGenerator):
 
     def mock_request(self, url, **kwargs):
-        return_value = TestDynamicPollster.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value.json_object = self.response[url]
+        return_value = FakeResponse(
+            json_object=self.response[url])
 
         return return_value
 
 
 class TestDynamicPollster(base.BaseTestCase):
-    class FakeResponse:
-        status_code = None
-        json_object = None
-        _text = None
-
-        @property
-        def text(self):
-            return self._text or json.dumps(self.json_object)
-
-        def json(self):
-            return self.json_object
-
-        def raise_for_status(self):
-            raise requests.HTTPError("Mock HTTP error.", response=self)
-
     class FakeManager:
         def __init__(self, keystone=None):
             self._keystone = keystone
@@ -287,12 +289,9 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value.json_object = {}
-
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            json_object={})
 
         samples = pollster.definitions.sample_gatherer. \
             execute_request_get_samples(
@@ -305,12 +304,9 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value.json_object = {"firstElement": [{}, {}, {}]}
-
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            json_object={"firstElement": [{}, {}, {}]})
 
         samples = pollster.definitions.sample_gatherer. \
             execute_request_get_samples(
@@ -323,12 +319,9 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '{"test": [1,2,3]}'
-
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            text='{"test": [1,2,3]}')
 
         samples = pollster.definitions.sample_gatherer. \
             execute_request_get_samples(
@@ -343,11 +336,9 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['response_handlers'] = ['xml']
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '<test>123</test>'
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            text='<test>123</test>')
 
         samples = pollster.definitions.sample_gatherer. \
             execute_request_get_samples(
@@ -362,11 +353,9 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['response_handlers'] = ['xml', 'json']
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '<test>123</test>'
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            text='<test>123</test>')
 
         samples = pollster.definitions.sample_gatherer. \
             execute_request_get_samples(
@@ -375,7 +364,8 @@ class TestDynamicPollster(base.BaseTestCase):
 
         self.assertEqual(3, len(samples))
 
-        return_value._text = '{"test": [1,2,3,4]}'
+        client_mock.session.get.return_value = FakeResponse(
+            text='{"test": [1,2,3,4]}')
 
         samples = pollster.definitions.sample_gatherer. \
             execute_request_get_samples(
@@ -398,9 +388,7 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['extra_metadata_fields'] = extra_metadata_fields
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '''
+        return_value = FakeResponse(text='''
                     {"projects": [
                         {"project_id": 9999, "name": "project1"},
                         {"project_id": 8888, "name": "project2"},
@@ -412,31 +400,25 @@ class TestDynamicPollster(base.BaseTestCase):
                         {"project_id": 8888, "name": "project2"},
                         {"project_id": 7777, "name": "project3"}]
                     }
-                '''
+                ''')
 
-        return_value9999 = self.FakeResponse()
-        return_value9999.status_code = requests.codes.ok
-        return_value9999._text = '''
+        return_value9999 = FakeResponse(text='''
                     {"project":
                         {"project_id": 9999, "name": "project1"}
                     }
-                '''
+                ''')
 
-        return_value8888 = self.FakeResponse()
-        return_value8888.status_code = requests.codes.ok
-        return_value8888._text = '''
+        return_value8888 = FakeResponse(text='''
                     {"project":
                         {"project_id": 8888, "name": "project2"}
                     }
-                '''
+                ''')
 
-        return_value7777 = self.FakeResponse()
-        return_value7777.status_code = requests.codes.ok
-        return_value7777._text = '''
+        return_value7777 = FakeResponse(text='''
                     {"project":
                         {"project_id": 7777, "name": "project3"}
                     }
-                '''
+                ''')
 
         def get(url, *args, **kwargs):
             if '9999' in url:
@@ -480,9 +462,7 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['extra_metadata_fields'] = extra_metadata_fields
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '''
+        return_value = FakeResponse(text='''
                     {"projects": [
                         {"project_id": 9999, "name": "project1"},
                         {"project_id": 8888, "name": "project2"},
@@ -494,31 +474,25 @@ class TestDynamicPollster(base.BaseTestCase):
                         {"project_id": 8888, "name": "project8"},
                         {"project_id": 7777, "name": "project9"}]
                     }
-                '''
+                ''')
 
-        return_value9999 = self.FakeResponse()
-        return_value9999.status_code = requests.codes.ok
-        return_value9999._text = '''
+        return_value9999 = FakeResponse(text='''
                     {"project":
                         {"project_id": 9999, "name": "project1"}
                     }
-                '''
+                ''')
 
-        return_value8888 = self.FakeResponse()
-        return_value8888.status_code = requests.codes.ok
-        return_value8888._text = '''
+        return_value8888 = FakeResponse(text='''
                     {"project":
                         {"project_id": 8888, "name": "project2"}
                     }
-                '''
+                ''')
 
-        return_value7777 = self.FakeResponse()
-        return_value7777.status_code = requests.codes.ok
-        return_value7777._text = '''
+        return_value7777 = FakeResponse(text='''
                     {"project":
                         {"project_id": 7777, "name": "project3"}
                     }
-                '''
+                ''')
 
         def get(url, *args, **kwargs):
             if '9999' in url:
@@ -577,96 +551,76 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['extra_metadata_fields'] = extra_metadata_fields
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '''
+        return_value = FakeResponse(text='''
                     {"projects": [
                         {"project_id": 9999, "name": "project1"},
                         {"project_id": 8888, "name": "project2"},
                         {"project_id": 7777, "name": "project3"}]
                     }
-                '''
+                ''')
 
-        return_value9999 = self.FakeResponse()
-        return_value9999.status_code = requests.codes.ok
-        return_value9999._text = '''
+        return_value9999 = FakeResponse(text='''
                     {"project":
                         {"project_id": 9999, "name": "project1",
                         "meta": "m1"}
                     }
-                '''
+                ''')
 
-        return_value8888 = self.FakeResponse()
-        return_value8888.status_code = requests.codes.ok
-        return_value8888._text = '''
+        return_value8888 = FakeResponse(text='''
                     {"project":
                         {"project_id": 8888, "name": "project2",
                         "meta": "m2"}
                     }
-                '''
+                ''')
 
-        return_value7777 = self.FakeResponse()
-        return_value7777.status_code = requests.codes.ok
-        return_value7777._text = '''
+        return_value7777 = FakeResponse(text='''
                     {"project":
                         {"project_id": 7777, "name": "project3",
                         "meta": "m3"}
                     }
-                '''
+                ''')
 
-        return_valueP1 = self.FakeResponse()
-        return_valueP1.status_code = requests.codes.ok
-        return_valueP1._text = '''
+        return_valueP1 = FakeResponse(text='''
                     {"project":
                         {"project_id": 7777, "name": "p1",
                         "meta": null}
                     }
-                '''
+                ''')
 
-        return_valueP2 = self.FakeResponse()
-        return_valueP2.status_code = requests.codes.ok
-        return_valueP2._text = '''
+        return_valueP2 = FakeResponse(text='''
                     {"project":
                         {"project_id": 7777, "name": "p2",
                         "meta": null}
                     }
-                '''
+                ''')
 
-        return_valueP3 = self.FakeResponse()
-        return_valueP3.status_code = requests.codes.ok
-        return_valueP3._text = '''
+        return_valueP3 = FakeResponse(text='''
                     {"project":
                         {"project_id": 7777, "name": "p3",
                         "meta": null}
                     }
-                '''
+                ''')
 
-        return_valueM1 = self.FakeResponse()
-        return_valueM1.status_code = requests.codes.ok
-        return_valueM1._text = '''
+        return_valueM1 = FakeResponse(text='''
                     {"project":
                         {"project_id": "META1", "name": "p3",
                         "meta": null}
                     }
-                '''
+                ''')
 
-        return_valueM2 = self.FakeResponse()
-        return_valueM2.status_code = requests.codes.ok
-        return_valueM2._text = '''
+        return_valueM2 = FakeResponse(text='''
                     {"project":
                         {"project_id": "META2", "name": "p3",
                         "meta": null}
                     }
-                '''
+                ''')
 
-        return_valueM3 = self.FakeResponse()
-        return_valueM3.status_code = requests.codes.ok
-        return_valueM3._text = '''
+        return_valueM3 = FakeResponse(text='''
                     {"project":
                         {"project_id": "META3", "name": "p3",
                         "meta": null}
                     }
-                '''
+                ''')
 
         def get(url, *args, **kwargs):
             if '9999' in url:
@@ -756,9 +710,7 @@ class TestDynamicPollster(base.BaseTestCase):
         }]
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '''
+        return_value = FakeResponse(text='''
                         {"projects": [
                             {"project_id": 9999, "p_name": "project1",
                             "to_skip": "skip1"},
@@ -769,71 +721,55 @@ class TestDynamicPollster(base.BaseTestCase):
                             {"project_id": 6666, "p_name": "project4",
                             "to_skip": "skip4"}]
                         }
-                    '''
+                    ''')
 
-        return_value9999 = self.FakeResponse()
-        return_value9999.status_code = requests.codes.ok
-        return_value9999._text = '''
+        return_value9999 = FakeResponse(text='''
                         {"project":
                             {"project_id": 9999, "name": "project1"}
                         }
-                    '''
+                    ''')
 
-        return_value8888 = self.FakeResponse()
-        return_value8888.status_code = requests.codes.ok
-        return_value8888._text = '''
+        return_value8888 = FakeResponse(text='''
                         {"project":
                             {"project_id": 8888, "name": "project2"}
                         }
-                    '''
+                    ''')
 
-        return_value7777 = self.FakeResponse()
-        return_value7777.status_code = requests.codes.ok
-        return_value7777._text = '''
+        return_value7777 = FakeResponse(text='''
                         {"project":
                             {"project_id": 7777, "name": "project3"}
                         }
-                    '''
+                    ''')
 
-        return_value6666 = self.FakeResponse()
-        return_value6666.status_code = requests.codes.ok
-        return_value6666._text = '''
+        return_value6666 = FakeResponse(text='''
                         {"project":
                             {"project_id": 6666, "name": "project4"}
                         }
-                    '''
+                    ''')
 
-        return_valueP1 = self.FakeResponse()
-        return_valueP1.status_code = requests.codes.ok
-        return_valueP1._text = '''
+        return_valueP1 = FakeResponse(text='''
                         {"project":
                             {"project_id": 7777, "name": "p1"}
                         }
-                    '''
+                    ''')
 
-        return_valueP2 = self.FakeResponse()
-        return_valueP2.status_code = requests.codes.ok
-        return_valueP2._text = '''
+        return_valueP2 = FakeResponse(text='''
                         {"project":
                             {"project_id": 7777, "name": "p2"}
                         }
-                    '''
+                    ''')
 
-        return_valueP3 = self.FakeResponse()
-        return_valueP3.status_code = requests.codes.ok
-        return_valueP3._text = '''
+        return_valueP3 = FakeResponse(text='''
                         {"project":
                             {"project_id": 7777, "name": "p3"}
                         }
-                    '''
+                    ''')
 
-        return_valueP4 = self.FakeResponse()
-        return_valueP4.status_code = requests.codes.ok
-        return_valueP4._text = '''
+        return_valueP4 = FakeResponse(text='''
                         {"project":
                             {"project_id": 6666, "name": "p4"}
                         }
-                    '''
+                    ''')
 
         def get(url, *args, **kwargs):
             if '9999' in url:
@@ -919,15 +855,13 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['extra_metadata_fields'] = extra_metadata_fields
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = '''
+        return_value = FakeResponse(text='''
                     {"projects": [
                         {"project_id": 9999, "name": "project1"},
                         {"project_id": 8888, "name": "project2"},
                         {"project_id": 7777, "name": "project3"}]
                     }
-                '''
+                ''')
 
         def get(url, *args, **kwargs):
             return return_value
@@ -968,11 +902,9 @@ class TestDynamicPollster(base.BaseTestCase):
         definitions['response_handlers'] = ['xml', 'json']
         pollster = dynamic_pollster.DynamicPollster(definitions)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.ok
-        return_value._text = 'Invalid response'
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            text='Invalid response')
 
         with self.assertLogs('ceilometer.polling.dynamic_pollster',
                              level='DEBUG') as logs:
@@ -1071,11 +1003,9 @@ class TestDynamicPollster(base.BaseTestCase):
         pollster = dynamic_pollster.DynamicPollster(
             self.pollster_definition_only_required_fields)
 
-        return_value = self.FakeResponse()
-        return_value.status_code = requests.codes.bad
-
         client_mock = mock.Mock()
-        client_mock.session.get.return_value = return_value
+        client_mock.session.get.return_value = FakeResponse(
+            status_code=requests.codes.bad)
 
         exception = self.assertRaises(requests.HTTPError,
                                       pollster.definitions.sample_gatherer.
