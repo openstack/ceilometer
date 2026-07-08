@@ -52,6 +52,7 @@ INSTANCE_DELETE_START = models.Event(
             models.Trait('root_gb', 2, 0),
             models.Trait('ephemeral_gb', 2, 0),
             models.Trait('instance_type_id', 2, '2'),
+            models.Trait('instance_flavor_id', 1, '2'),
             models.Trait('vcpus', 2, 1),
             models.Trait('memory_mb', 2, 512),
             models.Trait(
@@ -79,6 +80,7 @@ INSTANCE_CREATE_END = models.Event(
             models.Trait('root_gb', 2, 0),
             models.Trait('ephemeral_gb', 2, 0),
             models.Trait('instance_type_id', 2, '2'),
+            models.Trait('instance_flavor_id', 1, '2'),
             models.Trait('vcpus', 2, 1),
             models.Trait('memory_mb', 2, 512),
             models.Trait(
