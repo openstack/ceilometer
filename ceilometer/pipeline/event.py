@@ -58,7 +58,7 @@ class EventEndpoint(base.NotificationEndpoint):
             except Exception:
                 if not self.conf.notification.ack_on_event_error:
                     return oslo_messaging.NotificationResult.REQUEUE
-                LOG.error('Fail to process a notification', exc_info=True)
+                LOG.exception('Fail to process a notification')
         return oslo_messaging.NotificationResult.HANDLED
 
 
@@ -89,12 +89,11 @@ class EventSink(base.Sink):
                 try:
                     p.publish_events(events)
                 except Exception:
-                    LOG.error("Pipeline %(pipeline)s: %(status)s "
-                              "after error from publisher %(pub)s",
-                              {'pipeline': self,
-                               'status': 'Continue' if
-                               self.multi_publish else 'Exit', 'pub': p},
-                              exc_info=True)
+                    LOG.exception("Pipeline %(pipeline)s: %(status)s "
+                                  "after error from publisher %(pub)s",
+                                  {'pipeline': self,
+                                   'status': 'Continue' if
+                                   self.multi_publish else 'Exit', 'pub': p})
                     if not self.multi_publish:
                         raise
 

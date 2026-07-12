@@ -28,6 +28,7 @@ select = [
     "E9",
     # pyflakes
     "F",
+    "G",
     "LOG",
     "UP",
     "W",

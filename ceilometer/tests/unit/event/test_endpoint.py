@@ -166,7 +166,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         with mock.patch("ceilometer.pipeline.event.LOG") as mock_logger:
             ret = self.endpoint.process_notifications('info', [message])
             self.assertEqual(oslo_messaging.NotificationResult.REQUEUE, ret)
-            exception_mock = mock_logger.error
+            exception_mock = mock_logger.exception
             self.assertIn('Exit after error from publisher',
                           exception_mock.call_args_list[0][0][0] %
                           exception_mock.call_args_list[0][0][1])
@@ -187,7 +187,7 @@ class TestEventEndpoint(tests_base.BaseTestCase):
         with mock.patch("ceilometer.pipeline.event.LOG") as mock_logger:
             ret = self.endpoint.process_notifications('info', [message])
             self.assertEqual(oslo_messaging.NotificationResult.HANDLED, ret)
-            exception_mock = mock_logger.error
+            exception_mock = mock_logger.exception
             self.assertIn('Continue after error from publisher',
                           exception_mock.call_args_list[0][0][0] %
                           exception_mock.call_args_list[0][0][1])

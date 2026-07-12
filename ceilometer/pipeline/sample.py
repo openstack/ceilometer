@@ -44,8 +44,8 @@ class SampleEndpoint(base.NotificationEndpoint):
                 with self.publisher as p:
                     p(list(self.build_sample(message)))
             except Exception:
-                LOG.error('Fail to process notification message [%s]',
-                          message, exc_info=True)
+                LOG.exception('Fail to process notification message [%s]',
+                              message)
                 raise
 
     def build_sample(notification):
@@ -89,10 +89,9 @@ class SampleSink(base.Sink):
                 try:
                     p.publish_samples(samples)
                 except Exception:
-                    LOG.error("Pipeline %(pipeline)s: Continue after "
-                              "error from publisher %(pub)s",
-                              {'pipeline': self, 'pub': p},
-                              exc_info=True)
+                    LOG.exception("Pipeline %(pipeline)s: Continue after "
+                                  "error from publisher %(pub)s",
+                                  {'pipeline': self, 'pub': p})
 
     @staticmethod
     def flush():

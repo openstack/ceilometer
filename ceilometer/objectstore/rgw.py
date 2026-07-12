@@ -125,7 +125,7 @@ class _Base(plugin_base.PollsterBase):
                 _Base._ENDPOINT = urlparse.urljoin(rgw_url, '/admin')
             except exceptions.EndpointNotFound:
                 LOG.debug("Radosgw endpoint not found")
-        LOG.debug(f"Using endpoint {_Base._ENDPOINT} for radosgw connections")
+        LOG.debug("Using endpoint %s for radosgw connections", _Base._ENDPOINT)
         return _Base._ENDPOINT
 
     def _iter_accounts(self, ksclient, cache, tenants):

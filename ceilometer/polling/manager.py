@@ -435,10 +435,9 @@ class PollingTask:
                      source=source_name))
             self.resources[key].blacklist.extend(err.fail_res_list)
         except Exception as err:
-            LOG.error(
+            LOG.exception(
                 'Continue after error from %(name)s: %(error)s',
-                {'name': pollster.name, 'error': err},
-                exc_info=True)
+                {'name': pollster.name, 'error': err})
 
     def _send_notification(self, samples):
         if self.manager.conf.polling.enable_notifications:
@@ -482,8 +481,8 @@ class AgentHeartBeatManager(cotyledon.Service):
             raise HeartBeatException("Failed to open socket file "
                                      f"({self._sock_pth}): {err}", conf)
 
-        LOG.info("Starting heartbeat child service. Listening"
-                 f" on {self._sock_pth}")
+        LOG.info("Starting heartbeat child service. Listening on %s",
+                 self._sock_pth)
 
     def _delete_socket(self):
         try:
@@ -500,19 +499,18 @@ class AgentHeartBeatManager(cotyledon.Service):
         hb = self._queue.get()
         with self._lock:
             self._status[hb['pollster']] = hb['timestamp']
-        LOG.debug(f"Updated heartbeat for {hb['pollster']} "
-                  f"({hb['timestamp']})")
+        LOG.debug("Updated heartbeat for %s %s",
+                  hb['pollster'], hb['timestamp'])
 
     def _send_heartbeat(self):
         s, addr = self._sock.accept()
-        LOG.debug("Heartbeat status report requested "
-                  f"at {self._sock_pth}")
+        LOG.debug("Heartbeat status report requested at %s", self._sock_pth)
         with self._lock:
             out = '\n'.join([f"{k} {v}"
                              for k, v in self._status.items()])
         s.sendall(out.encode('utf-8'))
         s.close()
-        LOG.debug(f"Reported heartbeat status:\n{out}")
+        LOG.debug("Reported heartbeat status:\n%s", out)
 
     def run(self):
         super().run()
@@ -634,9 +632,9 @@ class AgentManager(cotyledon.Service):
                     'pollster': name
                 }
                 self._queue.put_nowait(hb)
-                LOG.debug(f"Polster heartbeat update: {name}")
+                LOG.debug("Polster heartbeat update: %s", name)
             except queue.Full:
-                LOG.warning(f"Heartbeat queue full. Update failed: {hb}")
+                LOG.warning("Heartbeat queue full. Update failed: %s", hb)
 
     def create_dynamic_pollsters(self, namespaces):
         """Creates dynamic pollsters

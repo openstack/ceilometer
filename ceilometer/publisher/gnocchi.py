@@ -276,8 +276,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                     archive_policy_override,
                     plugin_manager))
             except Exception:
-                LOG.error("Failed to load resource due to error",
-                          exc_info=True)
+                LOG.exception("Failed to load resource due to error")
         return resource_defs, data.get("archive_policies", [])
 
     def ensures_archives_policies(self):
@@ -443,9 +442,9 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                       "for gnocchi data [%s]: [%s].", measures, gnocchi_data,
                       str(e))
         except Exception as e:
-            LOG.error("Unexpected exception while pushing measures [%s] for "
-                      "gnocchi data [%s]: [%s].", measures, gnocchi_data,
-                      str(e), exc_info=True)
+            LOG.exception(
+                "Unexpected exception while pushing measures [%s] for "
+                "gnocchi data [%s]: [%s].", measures, gnocchi_data, str(e))
 
         for info in gnocchi_data.values():
             resource = info["resource"]
@@ -462,10 +461,10 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
                           resource_type, resource.get('id'), resource_extra,
                           str(e))
             except Exception as e:
-                LOG.error("Unexpected exception updating resource type [%s] "
-                          "with ID [%s] for resource data [%s]: [%s].",
-                          resource_type, resource.get('id'), resource_extra,
-                          str(e), exc_info=True)
+                LOG.exception(
+                    "Unexpected exception updating resource type [%s] "
+                    "with ID [%s] for resource data [%s]: [%s].",
+                    resource_type, resource.get('id'), resource_extra, str(e))
 
     @staticmethod
     def _extract_resources_from_error(e, resource_infos):
@@ -623,18 +622,16 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             LOG.debug("Create event received on existing resource (%s), "
                       "ignore it.", resource['id'])
         except Exception:
-            LOG.error("Failed to create resource %s", resource,
-                      exc_info=True)
+            LOG.exception("Failed to create resource %s", resource)
 
     def _search_resource(self, resource_type, query):
         try:
             return self._gnocchi.resource.search(
                 resource_type, json.loads(query))
         except Exception:
-            LOG.error("Fail to search resource type %(resource_type)s "
-                      "with '%(query)s'",
-                      {'resource_type': resource_type, 'query': query},
-                      exc_info=True)
+            LOG.exception("Fail to search resource type %(resource_type)s "
+                          "with '%(query)s'",
+                          {'resource_type': resource_type, 'query': query})
         return []
 
     def _set_update_attributes(self, resource):
@@ -647,8 +644,7 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             LOG.debug("Update event received on unexisting resource (%s), "
                       "ignore it.", resource_id)
         except Exception:
-            LOG.error("Fail to update the resource %s", resource,
-                      exc_info=True)
+            LOG.exception("Fail to update the resource %s", resource)
 
     def _set_ended_at(self, resource, ended_at):
         try:
@@ -658,7 +654,6 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
             LOG.debug("Delete event received on unexisting resource (%s), "
                       "ignore it.", resource['id'])
         except Exception:
-            LOG.error("Fail to update the resource %s", resource,
-                      exc_info=True)
+            LOG.exception("Fail to update the resource %s", resource)
         LOG.debug('Resource %(resource_id)s ended at %(ended_at)s',
                   {'resource_id': resource["id"], 'ended_at': ended_at})

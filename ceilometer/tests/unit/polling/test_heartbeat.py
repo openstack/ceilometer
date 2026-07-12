@@ -55,8 +55,8 @@ class TestHeartBeatManagert(base.BaseTestCase):
                                group='polling')
         manager.AgentHeartBeatManager(0, self.conf, namespaces='compute',
                                       queue=self.queue)
-        calls = [mock.call("Starting heartbeat child service. Listening"
-                           f" on {self.tmpdir}/ceilometer-compute.socket")]
+        calls = [mock.call("Starting heartbeat child service. Listening on %s",
+                           f"{self.tmpdir}/ceilometer-compute.socket")]
         LOG.info.assert_has_calls(calls)
 
     @mock.patch('ceilometer.polling.manager.LOG')
@@ -70,7 +70,7 @@ class TestHeartBeatManagert(base.BaseTestCase):
         self.queue.put_nowait({'timestamp': timestamp, 'pollster': 'test'})
 
         hb._update_status()
-        calls = [mock.call(f"Updated heartbeat for test ({timestamp})")]
+        calls = [mock.call("Updated heartbeat for %s %s", "test", timestamp)]
         LOG.debug.assert_has_calls(calls)
 
     @mock.patch('ceilometer.polling.manager.LOG')
@@ -100,9 +100,8 @@ class TestHeartBeatManagert(base.BaseTestCase):
 
             # test status report
             hb._send_heartbeat()
-            calls = [mock.call("Heartbeat status report requested "
-                               f"at {self.tmpdir}/ceilometer-central.socket"),
-                     mock.call("Reported heartbeat status:\n"
-                               f"test1 {timestamp}\n"
-                               f"test2 {timestamp}")]
+            calls = [mock.call("Heartbeat status report requested at %s",
+                               f"{self.tmpdir}/ceilometer-central.socket"),
+                     mock.call("Reported heartbeat status:\n%s",
+                               f"test1 {timestamp}\ntest2 {timestamp}")]
             LOG.debug.assert_has_calls(calls)

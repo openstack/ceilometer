@@ -122,8 +122,7 @@ class Sink:
             try:
                 self.publishers.append(publisher_manager.get(p))
             except Exception:
-                LOG.error("Unable to load publisher %s", p,
-                          exc_info=True)
+                LOG.exception("Unable to load publisher %s", p)
 
         self.multi_publish = True if len(self.publishers) > 1 else False
 

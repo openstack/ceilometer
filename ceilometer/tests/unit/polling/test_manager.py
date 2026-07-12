@@ -677,7 +677,7 @@ class TestPollingAgent(BaseAgent):
                       'of %(src)s', {'poll': 'test', 'src': 'test_polling'})
         ])
         LOG.debug.assert_has_calls([
-            mock.call('Polster heartbeat update: test')
+            mock.call('Polster heartbeat update: %s', 'test')
         ])
 
     @mock.patch('ceilometer.polling.manager.LOG')
@@ -698,7 +698,7 @@ class TestPollingAgent(BaseAgent):
                       'of %(src)s', {'poll': 'test', 'src': 'test_polling'})
         ])
         log_mock.debug.assert_has_calls([
-            mock.call('Polster heartbeat update: test')
+            mock.call('Polster heartbeat update: %s', 'test')
         ])
 
         # Even though we enabled 4 threads, we have only one metric configured.

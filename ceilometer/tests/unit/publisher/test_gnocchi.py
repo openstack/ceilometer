@@ -306,7 +306,7 @@ class PublisherTest(base.BaseTestCase):
             url = netutils.urlsplit(
                 "gnocchi://?resources_definition_file=" + temp)
             d = gnocchi.GnocchiPublisher(self.conf.conf, url)
-            self.assertTrue(mylog.error.called)
+            self.assertTrue(mylog.exception.called)
             self.assertEqual(0, len(d.resources_definition))
 
     @mock.patch('ceilometer.publisher.gnocchi.GnocchiPublisher'
@@ -886,15 +886,15 @@ class PublisherWorkflowTest(base.BaseTestCase,
                 or (self.update_resource_fail and update_attributes)):
 
             if self.update_resource_fail and update_attributes:
-                logger.error.assert_called_with(
+                logger.exception.assert_called_with(
                     'Unexpected exception updating resource type [%s] with '
                     'ID [%s] for resource data [%s]: [%s].', resource_type,
-                    resource_id, mock.ANY, 'boom!', exc_info=True)
+                    resource_id, mock.ANY, 'boom!')
             else:
-                logger.error.assert_called_with(
+                logger.exception.assert_called_with(
                     'Unexpected exception while pushing measures [%s] for '
                     'gnocchi data [%s]: [%s].', expected_measures_in_log,
-                    mock.ANY, 'boom!', exc_info=True)
+                    mock.ANY, 'boom!')
         else:
             self.assertEqual(0, logger.error.call_count)
         self.assertEqual(expected_calls, fakeclient.mock_calls)

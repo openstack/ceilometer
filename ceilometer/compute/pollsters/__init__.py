@@ -165,10 +165,9 @@ class GenericComputePollster(plugin_base.PollsterBase):
                            'pollster': self.__class__.__name__})
                 raise plugin_base.PollsterPermanentError(resources)
             except Exception as err:
-                LOG.error(
+                LOG.exception(
                     'Could not get %(name)s events for %(id)s: %(e)s', {
-                        'name': self.sample_name, 'id': instance.id, 'e': err},
-                    exc_info=True)
+                        'name': self.sample_name, 'id': instance.id, 'e': err})
 
 
 class InstanceMetadataPollster(plugin_base.PollsterBase):
