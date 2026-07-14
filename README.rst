@@ -34,7 +34,7 @@ Launchpad Projects
 
 Code Repository
 ---------------
-- Server: https://github.com/openstack/ceilometer
+- Server: https://opendev.org/openstack/ceilometer
 
 Bug Tracking
 ------------
