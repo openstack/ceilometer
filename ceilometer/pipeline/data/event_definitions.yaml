@@ -34,6 +34,8 @@
       fields: payload.vcpus
     instance_type_id:
       fields: payload.instance_type_id
+    instance_flavor_id:
+      fields: payload.instance_flavor_id
     instance_type:
       fields: payload.instance_type
     state:
