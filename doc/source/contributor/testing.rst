@@ -27,17 +27,17 @@ run through tox_.
 2. Run the unit and code-style tests::
 
    $ cd /opt/stack/ceilometer
-   $ tox -e py27,pep8
+   $ tox -e py3,pep8
 
-As tox is a wrapper around testr, it also accepts the same flags as testr.
-See the `testr documentation`_ for details about these additional flags.
+As tox is a wrapper around stestr, it also accepts the same flags as stestr.
+See the `stestr documentation`_ for details about these additional flags.
 
-.. _testr documentation: https://testrepository.readthedocs.org/en/latest/MANUAL.html
+.. _stestr documentation: https://stestr.readthedocs.io/en/latest/
 
-Use a double hyphen to pass options to testr. For example, to run only tests
+Use a double hyphen to pass options to stestr. For example, to run only tests
 under tests/unit/image::
 
-  $ tox -e py27 -- image
+  $ tox -e py3 -- image
 
 To debug tests (ie. break into pdb debugger), you can use ''debug'' tox
 environment. Here's an example, passing the name of a test since you'll
@@ -46,6 +46,6 @@ normally only want to run the test that hits your breakpoint::
   $ tox -e debug ceilometer.tests.unit.test_bin
 
 For reference, the ``debug`` tox environment implements the instructions
-here: https://wiki.openstack.org/wiki/Testr#Debugging_.28pdb.29_Tests
+here: https://docs.openstack.org/oslotest/latest/user/debugging.html
 
 .. _tox: https://tox.readthedocs.io/en/latest/
