@@ -498,6 +498,48 @@ IMAGE_UBUNTU = openstack.image.v2.image.Image(
     id="a1f4684e-58bd-4c88-aefd-2ecb0783b497",
 )
 
+IMAGE_1 = openstack.image.v2.image.Image(
+    connection=None,
+    id=1, name='ubuntu-12.04-x86',
+    kernel_id=11, ramdisk_id=21,
+    disk_format='qcow2', container_format='bare',
+    min_disk=1, min_ram=0, os_distro='ubuntu', os_type='linux')
+
+IMAGE_2 = openstack.image.v2.image.Image(
+    connection=None,
+    id=2, name='rhel-6-x64',
+    kernel_id=12, ramdisk_id=22,
+    disk_format='qcow2', container_format='bare',
+    min_disk=0, min_ram=0)
+
+IMAGE_MISSING_METADATA = openstack.image.v2.image.Image(
+    connection=None,
+    id=3, name='rhel-6-x64',
+    kernel_id=None, ramdisk_id=None,
+    disk_format='qcow2', container_format='bare',
+    min_disk=0, min_ram=0)
+
+IMAGE_MISSING_KERNEL_RAMDISK = openstack.image.v2.image.Image(
+    connection=None,
+    id=4, name='rhel-6-x64',
+    kernel_id=None, ramdisk_id=None,
+    disk_format='qcow2', container_format='bare',
+    min_disk=0, min_ram=0)
+
+IMAGE_MISSING_RAMDISK = openstack.image.v2.image.Image(
+    connection=None,
+    id=5, name='rhel-6-x64-missing-ramdisk',
+    kernel_id=11, ramdisk_id=None,
+    disk_format='qcow2', container_format='bare',
+    min_disk=0, min_ram=0)
+
+IMAGE_MISSING_KERNEL = openstack.image.v2.image.Image(
+    connection=None,
+    id=6, name='rhel-6-x64-missing-kernel',
+    kernel_id=None, ramdisk_id=21,
+    disk_format='qcow2', container_format='bare',
+    min_disk=0, min_ram=0)
+
 IMAGE_FEDORA = openstack.image.v2.image.Image(
     connection=None,
     name="Fedora-Cloud-Base-37-1.7.x86_64",
@@ -548,7 +590,7 @@ IMAGE_CIRROS_DISK = openstack.image.v2.image.Image(
 IMAGE_LIST = [
     IMAGE_FEDORA, IMAGE_AMPHORA,
     IMAGE_CIRROS, IMAGE_CIRROS_DISK,
-    IMAGE_UBUNTU]
+    IMAGE_UBUNTU, IMAGE_1, IMAGE_2]
 
 
 class FakeSDKImageClient:

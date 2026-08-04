@@ -130,10 +130,13 @@ class Client:
             image_meta = {"base_image_ref": iid}
             # Notifications and libvirt XML metadata return all
             # image_meta values as strings. Do the same here.
-            image_meta.update((k, str(v))
-                              for k, v in image.items()
-                              if k not in ('id', 'name', 'metadata',
-                                           'kernel_id', 'ramdisk_id'))
+            # Use ignore_none=True to exclude unset attributes and avoid
+            # polluting metadata with "None" strings.
+            image_meta.update(
+                    (k, str(v))
+                     for k, v in image.to_dict(ignore_none=True).items()
+                     if k not in ('id', 'name', 'metadata',
+                                 'kernel_id', 'ramdisk_id', 'tags'))
         else:
             image_meta = {}
         instance.image_meta = image_meta
