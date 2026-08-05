@@ -14,6 +14,9 @@
 # under the License.
 """Implementation of Inspector abstraction for libvirt."""
 
+import glob
+from time import monotonic as now
+
 from lxml import etree
 from oslo_log import log as logging
 from oslo_utils import units
@@ -23,12 +26,39 @@ try:
 except ImportError:
     libvirt = None
 
+try:
+    import pynvml
+except ImportError:
+    pynvml = None
+
 from ceilometer.compute.pollsters import util
 from ceilometer.compute.virt import inspector as virt_inspector
 from ceilometer.compute.virt.libvirt import utils as libvirt_utils
 from ceilometer.i18n import _
 
 LOG = logging.getLogger(__name__)
+
+
+_NVML_UNCHECKED = object()
+
+NVIDIA_PCI_VENDOR_ID = '0x10de'
+NVIDIA_GPU_PCI_CLASS_PREFIX = '0x03'
+
+
+def _has_nvidia_gpu_hardware():
+    """Check if any NVIDIA GPU is present via sysfs PCI devices."""
+    for vendor_path in glob.glob('/sys/bus/pci/devices/*/vendor'):
+        try:
+            with open(vendor_path) as f:
+                if f.read().strip() == NVIDIA_PCI_VENDOR_ID:
+                    class_path = vendor_path.replace('vendor', 'class')
+                    with open(class_path) as cf:
+                        if cf.read().strip().startswith(
+                                NVIDIA_GPU_PCI_CLASS_PREFIX):
+                            return True
+        except OSError:
+            continue
+    return False
 
 
 class LibvirtInspector(virt_inspector.Inspector):
@@ -38,6 +68,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         # NOTE(sileht): create a connection on startup
         self.connection
         self.cache = {}
+        self._nvml_available = _NVML_UNCHECKED
 
     @property
     def connection(self):
@@ -285,3 +316,170 @@ class LibvirtInspector(virt_inspector.Inspector):
             cache_references=stats.get("perf.cache_references"),
             cache_misses=stats.get("perf.cache_misses")
         )
+
+    def _init_nvml(self):
+        """Initialize NVML lazily.
+
+        Returns True (available), False (GPU present, driver missing),
+        or None (no GPU hardware -- silent).
+        """
+        if self._nvml_available is not _NVML_UNCHECKED:
+            return self._nvml_available
+
+        if pynvml is None:
+            if _has_nvidia_gpu_hardware():
+                self._nvml_available = False
+                return False
+            self._nvml_available = None
+            return None
+
+        try:
+            pynvml.nvmlInit()
+            self._nvml_available = True
+            return True
+        except pynvml.NVMLError:
+            if _has_nvidia_gpu_hardware():
+                self._nvml_available = False
+                return False
+            self._nvml_available = None
+            return None
+
+    def _build_vgpu_map(self):
+        """Build a map of mdev UUID to (gpu_handle, vgpu_instance).
+
+        Cached per poll cycle via monotonic timestamp.
+        """
+        cache_key = '_vgpu_map'
+        cache_ts_key = '_vgpu_map_ts'
+        current_time = now()
+
+        if (cache_key in self.cache
+                and current_time - self.cache.get(cache_ts_key, 0) < 120):
+            return self.cache[cache_key]
+
+        vgpu_map = {}
+        try:
+            gpu_count = pynvml.nvmlDeviceGetCount()
+        except pynvml.NVMLError:
+            self.cache[cache_key] = vgpu_map
+            self.cache[cache_ts_key] = current_time
+            return vgpu_map
+
+        for i in range(gpu_count):
+            try:
+                gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(i)
+                gpu_uuid = pynvml.nvmlDeviceGetUUID(gpu_handle)
+                active_vgpus = pynvml.nvmlDeviceGetActiveVgpus(gpu_handle)
+                for vgpu_instance in active_vgpus:
+                    try:
+                        vgpu_uuid = pynvml.nvmlVgpuInstanceGetUUID(
+                            vgpu_instance)
+                        vgpu_uuid = vgpu_uuid.lower().strip()
+                        mdev_uuid = pynvml.nvmlVgpuInstanceGetMdevUUID(
+                            vgpu_instance)
+                        mdev_uuid = mdev_uuid.lower().strip()
+                        vgpu_map[mdev_uuid] = (gpu_handle, gpu_uuid,
+                                               vgpu_instance,
+                                               vgpu_uuid)
+                    except pynvml.NVMLError:
+                        continue
+            except pynvml.NVMLError:
+                continue
+
+        self.cache[cache_key] = vgpu_map
+        self.cache[cache_ts_key] = current_time
+        return vgpu_map
+
+    @staticmethod
+    def _get_mdev_uuids_from_domain(domain):
+        """Extract mdev UUIDs from a libvirt domain's XML."""
+        tree = etree.fromstring(domain.XMLDesc(0))
+        mdev_uuids = []
+        for hostdev in tree.findall('devices/hostdev'):
+            if (hostdev.get('type') == 'mdev'
+                    and hostdev.get('mode') == 'subsystem'):
+                source = hostdev.find('source')
+                if source is not None:
+                    address = source.find('address')
+                    if address is not None:
+                        uuid = address.get('uuid')
+                        if uuid:
+                            mdev_uuids.append(uuid.lower().strip())
+        return mdev_uuids
+
+    @staticmethod
+    def _get_vgpu_stats(gpu_handle, gpu_uuid, vgpu_instance, vgpu_uuid,
+                        device_id):
+        """Collect per-vGPU metrics using NVML vGPU-specific APIs."""
+        utilization = None
+        memory_used = None
+        memory_total = None
+        encoder_utilization = None
+        decoder_utilization = None
+
+        try:
+            samples = pynvml.nvmlDeviceGetVgpuUtilization(gpu_handle, 0)
+            for s in samples:
+                if s.vgpuInstance == vgpu_instance:
+                    utilization = s.smUtil.uiVal
+                    encoder_utilization = s.encUtil.uiVal
+                    decoder_utilization = s.decUtil.uiVal
+                    break
+        except (pynvml.NVMLError, AttributeError):
+            pass
+
+        try:
+            fb_bytes = pynvml.nvmlVgpuInstanceGetFbUsage(vgpu_instance)
+            memory_used = fb_bytes // (1024 * 1024)
+        except pynvml.NVMLError:
+            pass
+
+        try:
+            vgpu_type = pynvml.nvmlVgpuInstanceGetType(vgpu_instance)
+            fb_size = pynvml.nvmlVgpuTypeGetFramebufferSize(vgpu_type)
+            memory_total = fb_size // (1024 * 1024)
+        except pynvml.NVMLError:
+            pass
+
+        return virt_inspector.GPUStats(
+            device=device_id,
+            gpu_uuid=gpu_uuid,
+            vgpu_uuid=vgpu_uuid,
+            utilization=utilization,
+            memory_used=memory_used,
+            memory_total=memory_total,
+            temperature=None,
+            power_draw=None,
+            encoder_utilization=encoder_utilization,
+            decoder_utilization=decoder_utilization,
+        )
+
+
+    @libvirt_utils.retry_on_disconnect
+    def inspect_gpus(self, instance, duration):
+        nvml_state = self._init_nvml()
+
+        if nvml_state is None:
+            return
+
+        if nvml_state is False:
+            raise virt_inspector.NoDataException(
+                'NVIDIA GPU hardware detected but NVML is not available. '
+                'Ensure the NVIDIA driver is installed and libnvidia-ml.so '
+                'is accessible in the container.')
+
+        domain = self._get_domain(instance, True)
+        mdev_uuids = self._get_mdev_uuids_from_domain(domain)
+        if not mdev_uuids:
+            return
+
+        vgpu_map = self._build_vgpu_map()
+
+        for idx, mdev_uuid in enumerate(mdev_uuids):
+            if mdev_uuid in vgpu_map:
+                gpu_handle, gpu_uuid, vgpu_instance, vgpu_uuid = \
+                    vgpu_map[mdev_uuid]
+                device_id = mdev_uuid
+                yield self._get_vgpu_stats(
+                    gpu_handle, gpu_uuid, vgpu_instance,
+                    vgpu_uuid, device_id)

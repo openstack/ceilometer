@@ -1,0 +1,21 @@
+---
+features:
+  - |
+    Added GPU metrics collection for compute nodes using the NVIDIA
+    Management Library (NVML). Two families of meters are now available:
+
+    * Per-vGPU meters (``vgpu.utilization``, ``vgpu.memory.used``,
+      ``vgpu.memory.total``, ``vgpu.encoder.utilization`` and
+      ``vgpu.decoder.utilization``), reported against the instance that
+      owns each vGPU (mediated device).
+    * Per-physical-GPU meters (``gpu.utilization``, ``gpu.memory.used``,
+      ``gpu.memory.total``, ``gpu.temperature``, ``gpu.power.draw``,
+      ``gpu.encoder.utilization`` and ``gpu.decoder.utilization``),
+      reported against the physical GPU on the host.
+
+    Temperature and power draw are only reported at the physical GPU level,
+    as they are not exposed per vGPU. Collection requires the optional
+    ``nvidia-ml-py`` library (installable via the ``gpu`` extra, i.e.
+    ``pip install ceilometer[gpu]``) and the NVIDIA driver
+    (``libnvidia-ml.so``) on the compute node. When no NVIDIA GPU is
+    present the pollsters are silently skipped.

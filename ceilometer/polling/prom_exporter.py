@@ -135,6 +135,11 @@ def _gen_labels(sample):
             labels['keys'].append("resource_name")
             labels['values'].append(resource_metadata['name'])
 
+        for gpu_label in ('gpu_id', 'vgpu_id', 'mdev_id', 'gpu_name'):
+            if resource_metadata.get(gpu_label):
+                labels['keys'].append(gpu_label)
+                labels['values'].append(resource_metadata[gpu_label])
+
         # NOTE(jwysogla): The prometheus_client library doesn't support
         # variable count of labels for the same metric. That's why the
         # prometheus exporter cannot support custom metric labels added
