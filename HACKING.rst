@@ -8,7 +8,7 @@ Ceilometer Style Commandments
 Ceilometer Specific Commandments
 --------------------------------
 
-- [C302] Deprecated library function os.popen()
+N/A
 
 Running Unit Tests
 ------------------
