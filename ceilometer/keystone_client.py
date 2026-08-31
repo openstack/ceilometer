@@ -265,12 +265,7 @@ def register_keystoneauth_opts(conf):
 
 def _register_keystoneauth_group(conf, group):
     ka_loading.register_auth_conf_options(conf, group)
-    ka_loading.register_session_conf_options(
-        conf, group,
-        deprecated_opts={'cacert': [
-            cfg.DeprecatedOpt('os-cacert', group=group),
-            cfg.DeprecatedOpt('os-cacert', group="DEFAULT")]
-        })
+    ka_loading.register_session_conf_options(conf, group)
     conf.register_opts(CLI_OPTS, group=group)
 
 
