@@ -245,15 +245,10 @@ def get_auth_token(client):
 
 CLI_OPTS = [
     cfg.StrOpt('region-name',
-               deprecated_group="DEFAULT",
-               deprecated_name="os-region-name",
                default=os.environ.get('OS_REGION_NAME'),
                help='Region name to use for OpenStack service endpoints.'),
     cfg.StrOpt('interface',
-               default=os.environ.get(
-                   'OS_INTERFACE', os.environ.get('OS_ENDPOINT_TYPE',
-                                                  'public')),
-               deprecated_name="os-endpoint-type",
+               default=os.environ.get('OS_INTERFACE', 'public'),
                choices=('public', 'internal', 'admin',
                         'publicURL', 'internalURL', 'adminURL'),
                help='Type of endpoint in Identity service catalog to use for '
