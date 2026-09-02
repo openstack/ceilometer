@@ -236,6 +236,11 @@ The following meters are collected for OpenStack Compute.
 |           |       |      |          |          |         | from within the  |
 |           |       |      |          |          |         | instance         |
 +-----------+-------+------+----------+----------+---------+------------------+
+| **Meters added in the Indri release**                                       |
++-----------+-------+------+----------+----------+---------+------------------+
+| cpu.delay | Cumu\ | ns   | instance | Pollster | Libvirt | CPU steal time   |
+|           | lative|      | ID       |          |         |                  |
++-----------+-------+------+----------+----------+---------+------------------+
 
 .. note::
 

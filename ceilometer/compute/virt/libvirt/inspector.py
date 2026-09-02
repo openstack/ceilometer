@@ -246,7 +246,7 @@ class LibvirtInspector(virt_inspector.Inspector):
         # TODO(sileht): stats also have the disk/vnic info
         # we could use that instead of the old method for Queen
         stats = self.connection.domainListGetStats([domain], 0)[0][1]
-        cpu_time = 0
+        cpu_time = cpu_delay = 0
         current_cpus = stats.get('vcpu.current')
         # Iterate over the maximum number of CPUs here, and count the
         # actual number encountered, since the vcpu.x structure can
@@ -257,6 +257,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             try:
                 cpu_time += (stats.get('vcpu.%s.time' % vcpu) +
                              stats.get('vcpu.%s.wait' % vcpu))
+                cpu_delay += stats.get('vcpu.%s.delay' % vcpu)
                 current_cpus -= 1
             except TypeError:
                 # pass here, if there are too many holes, the cpu count will
@@ -266,11 +267,13 @@ class LibvirtInspector(virt_inspector.Inspector):
         if current_cpus:
             # There wasn't enough data, so fall back
             cpu_time = stats.get('cpu.time')
+            cpu_delay = 0
 
         return virt_inspector.InstanceStats(
             power_state=domain.info()[0],
             cpu_number=stats.get('vcpu.current'),
             cpu_time=cpu_time,
+            cpu_delay=cpu_delay,
             memory_actual=memory_actual,
             memory_available=memory_available,
             memory_usage=memory_used,
