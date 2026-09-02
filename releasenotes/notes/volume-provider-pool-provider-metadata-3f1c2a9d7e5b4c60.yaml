@@ -1,0 +1,11 @@
+---
+fixes:
+  - |
+    The ``volume.provider.pool.capacity.*`` pollsters now set the
+    ``provider`` resource metadata (the pool name up to ``#``), matching
+    what the ``capacity.pool`` notification meters produce. Without it the
+    Gnocchi publisher could not create ``volume_provider_pool`` resources
+    from polled samples, since that resource type declares ``provider`` as
+    a required attribute mapped from ``resource_metadata.provider``, and
+    every polled pool capacity sample was dropped with
+    ``required key not provided @ data['provider']``.

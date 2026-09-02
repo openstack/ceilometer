@@ -142,6 +142,13 @@ class _VolumeProviderPoolBase(_Base):
         metadata = super().extract_metadata(obj)
         caps = obj.capabilities or {}
         metadata['pool_name'] = caps.get("pool_name") or None
+        # A pool is named "<host>@<backend>#<pool>". The volume_provider_pool
+        # resource type in gnocchi_resources.yaml maps its ``provider``
+        # attribute from resource_metadata.provider, which the capacity.pool
+        # notification meters derive the same way (name_to_id up to '#').
+        # Polled samples lacked it, so Gnocchi rejected every one of them
+        # with "required key not provided @ data['provider']".
+        metadata['provider'] = obj.name.split('#', 1)[0]
         return metadata
 
 
