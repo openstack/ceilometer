@@ -118,7 +118,7 @@ class LibvirtInspector(virt_inspector.Inspector):
             try:
                 dom_stats = domain.interfaceStats(name)
             except libvirt.libvirtError as ex:
-                LOG.warning("Error from libvirt when running instanceStats, "
+                LOG.warning("Error from libvirt when running interfaceStats, "
                             "This may not be harmful, but please check : "
                             "%(ex)s",
                             {'ex': ex})
