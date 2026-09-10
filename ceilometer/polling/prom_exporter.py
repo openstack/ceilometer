@@ -22,12 +22,15 @@ LOG = log.getLogger(__name__)
 CEILOMETER_REGISTRY = prom.CollectorRegistry()
 
 
-def export(prom_iface, prom_port, tls_cert=None, tls_key=None):
+def export(prom_iface, prom_port, tls_cert=None, tls_key=None,
+           tls_client_ca=None):
     prom.start_http_server(port=prom_port,
                            addr=prom_iface,
                            registry=CEILOMETER_REGISTRY,
                            certfile=tls_cert,
-                           keyfile=tls_key)
+                           keyfile=tls_key,
+                           client_cafile=tls_client_ca,
+                           client_auth_required=bool(tls_client_ca))
 
 
 def collect_metrics(samples):

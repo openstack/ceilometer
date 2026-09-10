@@ -1,0 +1,13 @@
+---
+features:
+  - |
+    The Prometheus exporter now supports mutual TLS (mTLS). Setting the new
+    ``[polling] prometheus_tls_client_ca`` option (with ``prometheus_tls_enable``
+    on) makes the scrape endpoint require clients to present a certificate signed
+    by that CA, so only authorized scrapers can read the metrics.
+security:
+  - |
+    Previously the Prometheus exporter endpoint was unauthenticated: any client
+    able to reach the port could scrape all metrics, even with TLS enabled. It
+    can now be locked down with mutual TLS via
+    ``[polling] prometheus_tls_client_ca``.

@@ -117,6 +117,14 @@ POLLING_OPTS = [
                default=None,
                help='The private key to allow this ceilometer to '
                     'expose tls scrape endpoints'),
+    cfg.StrOpt('prometheus_tls_client_ca',
+               default=None,
+               help='The CA certificate used to verify client certificates '
+                    'presented by Prometheus scrapers. When set (and '
+                    'prometheus_tls_enable is true), the scrape endpoint '
+                    'requires clients to present a certificate signed by '
+                    'this CA (mutual TLS), restricting metrics access to '
+                    'authorized clients only.'),
     cfg.IntOpt('threads_to_process_pollsters',
                default=1,
                min=0,
@@ -607,18 +615,25 @@ class AgentManager(cotyledon.Service):
                     LOG.warning('Ignoring invalid address: %s', addr)
                 certfile = self.conf.polling.prometheus_tls_certfile
                 keyfile = self.conf.polling.prometheus_tls_keyfile
+                client_ca = self.conf.polling.prometheus_tls_client_ca
                 if self.conf.polling.prometheus_tls_enable:
                     if not certfile or not keyfile:
                         raise ValueError(
                             "Certfile and keyfile must be provided."
                         )
                 else:
+                    if client_ca:
+                        raise ValueError(
+                            "prometheus_tls_client_ca requires "
+                            "prometheus_tls_enable to be true."
+                        )
                     certfile = keyfile = None
                 prom_exporter.export(
                     address[0],
                     address[1],
                     certfile,
-                    keyfile)
+                    keyfile,
+                    client_ca)
 
         self._keystone = None
         self._keystone_last_exception = None
