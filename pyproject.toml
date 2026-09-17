@@ -2,6 +2,215 @@
 requires = ["pbr>=6.0.0", "setuptools>=64.0.0"]
 build-backend = "pbr.build"
 
+[project]
+name = "ceilometer"
+description = "OpenStack Telemetry"
+authors = [
+    {name = "OpenStack", email = "openstack-discuss@lists.openstack.org"},
+]
+readme = {file = "README.rst", content-type = "text/x-rst"}
+license = "Apache-2.0"
+dynamic = ["version", "dependencies"]
+requires-python = ">=3.11"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: OpenStack",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: System Administrators",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: System :: Monitoring",
+]
+
+[project.urls]
+Homepage = "https://docs.openstack.org/ceilometer"
+Repository = "https://opendev.org/openstack/ceilometer"
+
+[tool.setuptools.packages.find]
+include = ["ceilometer*"]
+
+[tool.setuptools.data-files]
+"etc/ceilometer" = [
+    "etc/ceilometer/*.conf",
+    "etc/ceilometer/*.yaml",
+]
+"etc/ceilometer/rootwrap.d" = [
+    "etc/ceilometer/rootwrap.d/*",
+]
+
+[project.scripts]
+ceilometer-polling = "ceilometer.cmd.polling:main"
+ceilometer-agent-notification = "ceilometer.cmd.agent_notification:main"
+ceilometer-send-sample = "ceilometer.cmd.sample:send_sample"
+ceilometer-upgrade = "ceilometer.cmd.storage:upgrade"
+ceilometer-rootwrap = "oslo_rootwrap.cmd:main"
+ceilometer-status = "ceilometer.cmd.status:main"
+
+[project.entry-points."ceilometer.notification.pipeline"]
+meter = "ceilometer.pipeline.sample:SamplePipelineManager"
+event = "ceilometer.pipeline.event:EventPipelineManager"
+
+[project.entry-points."ceilometer.sample.endpoint"]
+"http.request" = "ceilometer.middleware:HTTPRequest"
+"http.response" = "ceilometer.middleware:HTTPResponse"
+"hardware.ipmi.temperature" = "ceilometer.ipmi.notifications.ironic:TemperatureSensorNotification"
+"hardware.ipmi.voltage" = "ceilometer.ipmi.notifications.ironic:VoltageSensorNotification"
+"hardware.ipmi.current" = "ceilometer.ipmi.notifications.ironic:CurrentSensorNotification"
+"hardware.ipmi.fan" = "ceilometer.ipmi.notifications.ironic:FanSensorNotification"
+_sample = "ceilometer.telemetry.notifications:TelemetryIpc"
+meter = "ceilometer.meter.notifications:ProcessMeterNotifications"
+
+[project.entry-points."ceilometer.discover.compute"]
+local_instances = "ceilometer.compute.discovery:InstanceDiscovery"
+local_node = "ceilometer.polling.discovery.localnode:LocalNodeDiscovery"
+
+[project.entry-points."ceilometer.discover.central"]
+barbican = "ceilometer.polling.discovery.non_openstack_credentials_discovery:NonOpenStackCredentialsDiscovery"
+endpoint = "ceilometer.polling.discovery.endpoint:EndpointDiscovery"
+tenant = "ceilometer.polling.discovery.tenant:TenantDiscovery"
+vpn_services    = "ceilometer.network.services.discovery:VPNServicesDiscovery"
+ipsec_connections  = "ceilometer.network.services.discovery:IPSecConnectionsDiscovery"
+fw_services = "ceilometer.network.services.discovery:FirewallDiscovery"
+fw_policy = "ceilometer.network.services.discovery:FirewallPolicyDiscovery"
+fip_services = "ceilometer.network.services.discovery:FloatingIPDiscovery"
+lb_services = "ceilometer.load_balancer.discovery:LoadBalancerDiscovery"
+dns_zones = "ceilometer.dns.discovery:ZoneDiscovery"
+images = "ceilometer.image.discovery:ImagesDiscovery"
+volumes = "ceilometer.volume.discovery:VolumeDiscovery"
+volume_pools = "ceilometer.volume.discovery:VolumePoolsDiscovery"
+volume_snapshots = "ceilometer.volume.discovery:VolumeSnapshotsDiscovery"
+volume_backups = "ceilometer.volume.discovery:VolumeBackupsDiscovery"
+volume_services = "ceilometer.volume.discovery:VolumeServicesDiscovery"
+alarm = "ceilometer.alarm.discovery:AlarmDiscovery"
+manila_shares = "ceilometer.share.discovery:ShareDiscovery"
+
+[project.entry-points."ceilometer.discover.ipmi"]
+local_node = "ceilometer.polling.discovery.localnode:LocalNodeDiscovery"
+
+[project.entry-points."ceilometer.poll.compute"]
+"disk.device.read.requests" = "ceilometer.compute.pollsters.disk:PerDeviceReadRequestsPollster"
+"disk.device.write.requests" = "ceilometer.compute.pollsters.disk:PerDeviceWriteRequestsPollster"
+"disk.device.read.bytes" = "ceilometer.compute.pollsters.disk:PerDeviceReadBytesPollster"
+"disk.device.write.bytes" = "ceilometer.compute.pollsters.disk:PerDeviceWriteBytesPollster"
+"disk.device.read.latency" = "ceilometer.compute.pollsters.disk:PerDeviceDiskReadLatencyPollster"
+"disk.device.write.latency" = "ceilometer.compute.pollsters.disk:PerDeviceDiskWriteLatencyPollster"
+"power.state" = "ceilometer.compute.pollsters.instance_stats:PowerStatePollster"
+"cpu" = "ceilometer.compute.pollsters.instance_stats:CPUPollster"
+"vcpus" = "ceilometer.compute.pollsters.instance_stats:VCPUsPollster"
+"network.incoming.bytes" = "ceilometer.compute.pollsters.net:IncomingBytesPollster"
+"network.incoming.packets" = "ceilometer.compute.pollsters.net:IncomingPacketsPollster"
+"network.outgoing.bytes" = "ceilometer.compute.pollsters.net:OutgoingBytesPollster"
+"network.outgoing.packets" = "ceilometer.compute.pollsters.net:OutgoingPacketsPollster"
+"network.incoming.bytes.rate" = "ceilometer.compute.pollsters.net:IncomingBytesRatePollster"
+"network.outgoing.bytes.rate" = "ceilometer.compute.pollsters.net:OutgoingBytesRatePollster"
+"network.incoming.bytes.delta" = "ceilometer.compute.pollsters.net:IncomingBytesDeltaPollster"
+"network.outgoing.bytes.delta" = "ceilometer.compute.pollsters.net:OutgoingBytesDeltaPollster"
+"network.incoming.packets.drop" = "ceilometer.compute.pollsters.net:IncomingDropPollster"
+"network.outgoing.packets.drop" = "ceilometer.compute.pollsters.net:OutgoingDropPollster"
+"network.incoming.packets.error" = "ceilometer.compute.pollsters.net:IncomingErrorsPollster"
+"network.outgoing.packets.error" = "ceilometer.compute.pollsters.net:OutgoingErrorsPollster"
+"memory" = "ceilometer.compute.pollsters.instance_stats:MemoryPollster"
+"memory.available" = "ceilometer.compute.pollsters.instance_stats:MemoryAvailablePollster"
+"memory.usage" = "ceilometer.compute.pollsters.instance_stats:MemoryUsagePollster"
+"memory.resident" = "ceilometer.compute.pollsters.instance_stats:MemoryResidentPollster"
+"memory.swap.in" = "ceilometer.compute.pollsters.instance_stats:MemorySwapInPollster"
+"memory.swap.out" = "ceilometer.compute.pollsters.instance_stats:MemorySwapOutPollster"
+"disk.device.capacity" = "ceilometer.compute.pollsters.disk:PerDeviceCapacityPollster"
+"disk.device.allocation" = "ceilometer.compute.pollsters.disk:PerDeviceAllocationPollster"
+"disk.device.usage" = "ceilometer.compute.pollsters.disk:PerDevicePhysicalPollster"
+"disk.ephemeral.size" = "ceilometer.compute.pollsters.disk:EphemeralSizePollster"
+"disk.root.size" = "ceilometer.compute.pollsters.disk:RootSizePollster"
+"perf.cpu.cycles" = "ceilometer.compute.pollsters.instance_stats:PerfCPUCyclesPollster"
+"perf.instructions" = "ceilometer.compute.pollsters.instance_stats:PerfInstructionsPollster"
+"perf.cache.references" = "ceilometer.compute.pollsters.instance_stats:PerfCacheReferencesPollster"
+"perf.cache.misses" = "ceilometer.compute.pollsters.instance_stats:PerfCacheMissesPollster"
+
+[project.entry-points."ceilometer.poll.ipmi"]
+"hardware.ipmi.temperature" = "ceilometer.ipmi.pollsters.sensor:TemperatureSensorPollster"
+"hardware.ipmi.voltage" = "ceilometer.ipmi.pollsters.sensor:VoltageSensorPollster"
+"hardware.ipmi.current" = "ceilometer.ipmi.pollsters.sensor:CurrentSensorPollster"
+"hardware.ipmi.fan" = "ceilometer.ipmi.pollsters.sensor:FanSensorPollster"
+"hardware.ipmi.power" = "ceilometer.ipmi.pollsters.sensor:PowerSensorPollster"
+
+[project.entry-points."ceilometer.poll.central"]
+"alarm.evaluation_result" = "ceilometer.alarm.aodh:EvaluationResultPollster"
+"ip.floating" = "ceilometer.network.floatingip:FloatingIPPollster"
+"image.size" = "ceilometer.image.glance:ImageSizePollster"
+"radosgw.containers.objects" = "ceilometer.objectstore.rgw:ContainersObjectsPollster"
+"radosgw.containers.objects.size" = "ceilometer.objectstore.rgw:ContainersSizePollster"
+"radosgw.objects" = "ceilometer.objectstore.rgw:ObjectsPollster"
+"radosgw.objects.size" = "ceilometer.objectstore.rgw:ObjectsSizePollster"
+"radosgw.objects.containers" = "ceilometer.objectstore.rgw:ObjectsContainersPollster"
+"radosgw.usage" = "ceilometer.objectstore.rgw:UsagePollster"
+"storage.containers.objects" = "ceilometer.objectstore.swift:ContainersObjectsPollster"
+"storage.containers.objects.size" = "ceilometer.objectstore.swift:ContainersSizePollster"
+"storage.objects" = "ceilometer.objectstore.swift:ObjectsPollster"
+"storage.objects.size" = "ceilometer.objectstore.swift:ObjectsSizePollster"
+"storage.objects.containers" = "ceilometer.objectstore.swift:ObjectsContainersPollster"
+"network.services.vpn" = "ceilometer.network.services.vpnaas:VPNServicesPollster"
+"network.services.vpn.connections" = "ceilometer.network.services.vpnaas:IPSecConnectionsPollster"
+"network.services.firewall" = "ceilometer.network.services.fwaas:FirewallPollster"
+"network.services.firewall.policy" = "ceilometer.network.services.fwaas:FirewallPolicyPollster"
+"loadbalancer.operating" = "ceilometer.load_balancer.octavia:LoadBalancerOperatingStatusPollster"
+"loadbalancer.provisioning" = "ceilometer.load_balancer.octavia:LoadBalancerProvisioningStatusPollster"
+"dns.zone.status" = "ceilometer.dns.designate:ZoneStatusPollster"
+"dns.zone.recordsets" = "ceilometer.dns.designate:ZoneRecordsetCountPollster"
+"dns.zone.ttl" = "ceilometer.dns.designate:ZoneTTLPollster"
+"dns.zone.serial" = "ceilometer.dns.designate:ZoneSerialPollster"
+"volume.size" = "ceilometer.volume.cinder:VolumeSizePollster"
+"volume.snapshot.size" = "ceilometer.volume.cinder:VolumeSnapshotSize"
+"volume.backup.size" = "ceilometer.volume.cinder:VolumeBackupSize"
+"volume.provider.pool.capacity.total" = "ceilometer.volume.cinder:VolumeProviderPoolCapacityTotal"
+"volume.provider.pool.capacity.free" = "ceilometer.volume.cinder:VolumeProviderPoolCapacityFree"
+"volume.provider.pool.capacity.provisioned" = "ceilometer.volume.cinder:VolumeProviderPoolCapacityProvisioned"
+"volume.provider.pool.capacity.virtual_free" = "ceilometer.volume.cinder:VolumeProviderPoolCapacityVirtualFree"
+"volume.provider.pool.capacity.allocated" = "ceilometer.volume.cinder:VolumeProviderPoolCapacityAllocated"
+"volume.service.health" = "ceilometer.volume.cinder:VolumeServiceHealthPollster"
+"manila.share.status" = "ceilometer.share.manila:ShareStatusPollster"
+"manila.share.size" = "ceilometer.share.manila:ShareSizePollster"
+
+[project.entry-points."ceilometer.compute.virt"]
+libvirt = "ceilometer.compute.virt.libvirt.inspector:LibvirtInspector"
+
+[project.entry-points."ceilometer.sample.publisher"]
+test = "ceilometer.publisher.test:TestPublisher"
+notifier = "ceilometer.publisher.messaging:SampleNotifierPublisher"
+udp = "ceilometer.publisher.udp:UDPPublisher"
+tcp = "ceilometer.publisher.tcp:TCPPublisher"
+file = "ceilometer.publisher.file:FilePublisher"
+http = "ceilometer.publisher.http:HttpPublisher"
+prometheus = "ceilometer.publisher.prometheus:PrometheusPublisher"
+https = "ceilometer.publisher.http:HttpPublisher"
+gnocchi = "ceilometer.publisher.gnocchi:GnocchiPublisher"
+zaqar = "ceilometer.publisher.zaqar:ZaqarPublisher"
+opentelemetryhttp = "ceilometer.publisher.opentelemetry_http:OpentelemetryHttpPublisher"
+
+[project.entry-points."ceilometer.event.publisher"]
+test = "ceilometer.publisher.test:TestPublisher"
+notifier = "ceilometer.publisher.messaging:EventNotifierPublisher"
+http = "ceilometer.publisher.http:HttpPublisher"
+https = "ceilometer.publisher.http:HttpPublisher"
+gnocchi = "ceilometer.publisher.gnocchi:GnocchiPublisher"
+zaqar = "ceilometer.publisher.zaqar:ZaqarPublisher"
+file = "ceilometer.publisher.file:FilePublisher"
+
+[project.entry-points."ceilometer.event.trait_plugin"]
+split = "ceilometer.event.trait_plugins:SplitterTraitPlugin"
+bitfield = "ceilometer.event.trait_plugins:BitfieldTraitPlugin"
+timedelta = "ceilometer.event.trait_plugins:TimedeltaPlugin"
+map = "ceilometer.event.trait_plugins:MapTraitPlugin"
+
+[project.entry-points."oslo.config.opts"]
+ceilometer = "ceilometer.opts:list_opts"
+ceilometer-auth = "ceilometer.opts:list_keystoneauth_opts"
+
 [tool.autopep8]
 aggressive = 3
 in-place = true

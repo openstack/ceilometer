@@ -373,7 +373,7 @@ class TestDiscovery(base.BaseTestCase):
 
         self.utc_now = mock.MagicMock(
             return_value=datetime.datetime(
-                2016, 1, 1, tzinfo=datetime.timezone.utc))
+                2016, 1, 1, tzinfo=datetime.UTC))
         patch_timeutils = fixtures.MockPatch('oslo_utils.timeutils.utcnow',
                                              self.utc_now)
         self.useFixture(patch_timeutils)
@@ -416,16 +416,16 @@ class TestDiscovery(base.BaseTestCase):
                                group="compute")
         dsc = discovery.InstanceDiscovery(self.CONF)
         dsc.last_run = datetime.datetime(
-            2016, 1, 1, tzinfo=datetime.timezone.utc)
+            2016, 1, 1, tzinfo=datetime.UTC)
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=5, tzinfo=datetime.timezone.utc)
+            2016, 1, 1, minute=5, tzinfo=datetime.UTC)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(0, len(resources))
         self.client.instance_get_all_by_host.assert_not_called()
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=20, tzinfo=datetime.timezone.utc)
+            2016, 1, 1, minute=20, tzinfo=datetime.UTC)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(1, len(resources))
         self.assertEqual(1, list(resources)[0].id)
@@ -964,12 +964,12 @@ class TestDiscovery(base.BaseTestCase):
         self.assertEqual(1, len(resources))
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=20, tzinfo=datetime.timezone.utc)
+            2016, 1, 1, minute=20, tzinfo=datetime.UTC)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(1, len(resources))
 
         self.utc_now.return_value = datetime.datetime(
-            2016, 1, 1, minute=31, tzinfo=datetime.timezone.utc)
+            2016, 1, 1, minute=31, tzinfo=datetime.UTC)
         resources = dsc.discover(mock.MagicMock())
         self.assertEqual(1, len(resources))
 
