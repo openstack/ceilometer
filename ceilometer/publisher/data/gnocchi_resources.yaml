@@ -86,6 +86,8 @@ resources:
       power.state:
       cpu:
         archive_policy_name: ceilometer-low-rate
+      cpu.delay:
+        archive_policy_name: ceilometer-low-rate
       disk.root.size:
       disk.ephemeral.size:
       disk.latency:

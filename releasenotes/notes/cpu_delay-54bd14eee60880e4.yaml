@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The new ``cpu.delay`` meter has been added. This meter shows total CPU
+    steal time observed per instance.

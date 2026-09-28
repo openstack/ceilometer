@@ -104,6 +104,37 @@ class TestCPUPollster(base.TestPollsterBase):
                          samples[0].resource_metadata['instance_type'])
 
 
+class TestCPUDelayPollster(base.TestPollsterBase):
+
+    def test_get_samples(self):
+        self._mock_inspect_instance(
+            virt_inspector.InstanceStats(
+                cpu_delay=1 * (10 ** 6), cpu_number=2),
+            virt_inspector.InstanceStats(
+                cpu_delay=3 * (10 ** 6), cpu_number=2),
+            # cpu_delay resets on instance restart
+            virt_inspector.InstanceStats(
+                cpu_delay=2 * (10 ** 6), cpu_number=2),
+        )
+
+        mgr = manager.AgentManager(0, self.CONF)
+        pollster = instance_stats.CPUDelayPollster(self.CONF)
+
+        def _verify_cpu_metering(expected_time):
+            cache = {}
+            samples = list(pollster.get_samples(mgr, cache, [self.instance]))
+            self.assertEqual(1, len(samples))
+            self.assertEqual({'cpu.delay'}, {s.name for s in samples})
+            self.assertEqual(expected_time, samples[0].volume)
+            self.assertEqual(2, samples[0].resource_metadata.get('cpu_number'))
+            # ensure elapsed time between polling cycles is non-zero
+            time.sleep(0.001)
+
+        _verify_cpu_metering(1 * (10 ** 6))
+        _verify_cpu_metering(3 * (10 ** 6))
+        _verify_cpu_metering(2 * (10 ** 6))
+
+
 class TestVCPUsPollster(base.TestPollsterBase):
 
     def test_get_samples(self):

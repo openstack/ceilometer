@@ -38,6 +38,17 @@ class CPUPollster(InstanceStatsPollster):
         return {'cpu_number': c_data.cpu_number}
 
 
+class CPUDelayPollster(InstanceStatsPollster):
+    sample_name = 'cpu.delay'
+    sample_unit = 'ns'
+    sample_stats_key = 'cpu_delay'
+    sample_type = sample.TYPE_CUMULATIVE
+
+    @staticmethod
+    def get_additional_metadata(instance, c_data):
+        return {'cpu_number': c_data.cpu_number}
+
+
 class VCPUsPollster(InstanceStatsPollster):
     sample_name = 'vcpus'
     sample_unit = 'vcpu'

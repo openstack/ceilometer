@@ -64,10 +64,12 @@ class TestLibvirtInspection(base.BaseTestCase):
             'cpu.time': 999999,
             'vcpu.maximum': 4,
             'vcpu.current': 2,
-            'vcpu.0.time': 10000,
-            'vcpu.0.wait': 10000,
+            'vcpu.0.time': 20000,
+            'vcpu.0.wait': 2000,
+            'vcpu.0.delay': 100,
             'vcpu.2.time': 10000,
-            'vcpu.2.wait': 10000,
+            'vcpu.2.wait': 1000,
+            'vcpu.2.delay': 200,
             'perf.cpu_cycles': 7259361,
             'perf.instructions': 8815623,
             'perf.cache_references': 74184,
@@ -78,7 +80,8 @@ class TestLibvirtInspection(base.BaseTestCase):
             stats = self.inspector.inspect_instance(self.instance, None)
             self.assertEqual(0, stats.power_state)
             self.assertEqual(2, stats.cpu_number)
-            self.assertEqual(40000, stats.cpu_time)
+            self.assertEqual(33000, stats.cpu_time)
+            self.assertEqual(300, stats.cpu_delay)
             self.assertEqual(54400 / units.Ki, stats.memory_actual)
             self.assertEqual(51200 / units.Ki, stats.memory_available)
             self.assertEqual(25600 / units.Ki, stats.memory_usage)
@@ -110,6 +113,7 @@ class TestLibvirtInspection(base.BaseTestCase):
             stats = self.inspector.inspect_instance(self.instance)
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(999999, stats.cpu_time)
+            self.assertEqual(0, stats.cpu_delay)
 
     def test_inspect_instance_with_domain_shutoff(self):
         domain = mock.Mock()
@@ -138,6 +142,7 @@ class TestLibvirtInspection(base.BaseTestCase):
             self.assertEqual(2, stats.cpu_number)
             self.assertEqual(2097152 / units.Ki, stats.memory_actual)
             self.assertIsNone(stats.cpu_time)
+            self.assertIsNone(stats.cpu_delay)
             self.assertIsNone(stats.memory_available)
             self.assertIsNone(stats.memory_usage)
             self.assertIsNone(stats.memory_resident)
