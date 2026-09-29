@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The ``[service_types] cinder`` option now defaults to ``block-storage``,
+    which is the official and authorized service type name for cinder.

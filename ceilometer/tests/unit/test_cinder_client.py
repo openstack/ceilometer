@@ -34,7 +34,7 @@ class TestCinderClient(base.BaseTestCase):
             group='service_credentials',
             region_name='RegionOne',
             interface='publicURL')
-        self.conf.config(group='service_types', cinder='volumev3')
+        self.conf.config(group='service_types', cinder='block-storage')
 
         self.mock_get_session = self.useFixture(fixtures.MockPatch(
             'ceilometer.keystone_client.get_session'))
@@ -48,7 +48,7 @@ class TestCinderClient(base.BaseTestCase):
             oslo_conf=self.CONF,
             region_name='RegionOne',
             block_storage_interface='publicURL',
-            service_types={'volumev3'})
+            service_types={'block-storage'})
 
     def test_list_volumes_returns_volumes(self):
         result = self.client.list_volumes(search_opts={'all_projects': True})

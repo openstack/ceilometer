@@ -20,7 +20,7 @@ from ceilometer import keystone_client
 
 SERVICE_OPTS = [
     cfg.StrOpt('cinder',
-               default='volumev3',
+               default='block-storage',
                help='Cinder service type.'),
 ]
 
