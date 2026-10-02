@@ -197,6 +197,20 @@ class GnocchiPublisher(publisher.ConfigPublisherBase):
         # TODO(jd) allow to override Gnocchi endpoint via the host in the URL
         options = urlparse.parse_qs(parsed_url.query)
 
+        if (
+            'enable_filter_project' not in options
+            and 'filter_project' not in options
+        ):
+            LOG.warning(
+                'The Gnocchi publisher currently filters metrics from the '
+                'Gnocchi service project by default. In the 2028.1 release, '
+                'this behavior will change to be disabled by default. If you '
+                'run Gnocchi using Swift for metric storage, or otherwise '
+                'require Gnocchi service project metric filtering, add '
+                '?enable_filter_project=true to the publisher URL, or '
+                'explicitly set the project to filter using filter_project '
+                'and filter_domain. To disable Gnocchi service project '
+                'metric filtering, set ?enable_filter_project=false.')
         self.enable_filter_project = strutils.bool_from_string(
             options.get('enable_filter_project', ['true'])[-1])
         if self.enable_filter_project:

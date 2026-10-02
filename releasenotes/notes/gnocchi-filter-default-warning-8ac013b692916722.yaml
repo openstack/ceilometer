@@ -1,0 +1,27 @@
+---
+deprecations:
+  - |
+    By default, the Gnocchi publisher currently filters metrics from the
+    configured Gnocchi service project (set to ``service@Default`` by
+    default). This functionality is intended to be used when using Swift
+    as the metric storage backend for Gnocchi, to prevent feedback loops
+    when collecting Swift container metrics in Ceilometer. This behavior
+    can be changed using the ``enable_filter_project`` publisher URL
+    parameter, introduced in the 2026.1 Gazpacho release.
+
+    From the 2028.1 release, the value of ``enable_filter_project`` will
+    change to ``false`` by default, unless ``filter_project`` is explicitly
+    configured in the publisher URL. This change is being made because
+    other metric storage backends do not require usage from the Gnocchi
+    service project to be filtered.
+
+    As of the 2027.1 Indri release, a warning is emitted regarding this
+    behavior change if no project filtering values are explicitly configured
+    on the Gnocchi publisher URL. To suppress this warning while keeping
+    Gnocchi service project filtering enabled, add the
+    ``?enable_filter_project=true`` parameter to the Gnocchi publisher URL,
+    **or** explicitly set the service project you wish to filter using the
+    ``filter_project`` parameter (and ``filter_domain`` if required).
+
+    To disable service project filtering (the planned new default in 2028.1),
+    add the ``?enable_filter_project=false`` parameter to the publisher URL.
