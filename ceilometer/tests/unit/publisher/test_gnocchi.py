@@ -346,7 +346,47 @@ class PublisherTest(base.BaseTestCase):
         self.assertEqual(
             'Filtered project [service] not found in keystone, ignoring the '
             'filter_project option',
-            log_called_args[0][0][0] % log_called_args[0][0][1])
+            log_called_args[1][0][0] % log_called_args[1][0][1])
+
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
+    def test_activity_filter_match_filter_default_warning(self, logger):
+        self.samples[0].project_id = (
+            'a2d42c23-d518-46b6-96ab-3fba2e146859')
+        self._do_test_activity_filter(1)
+        self.assertIn(
+            mock.call(
+                'The Gnocchi publisher currently filters metrics from the '
+                'Gnocchi service project by default. In the 2028.1 release, '
+                'this behavior will change to be disabled by default. If you '
+                'run Gnocchi using Swift for metric storage, or otherwise '
+                'require Gnocchi service project metric filtering, add '
+                '?enable_filter_project=true to the publisher URL, or '
+                'explicitly set the project to filter using filter_project '
+                'and filter_domain. To disable Gnocchi service project '
+                'metric filtering, set ?enable_filter_project=false.'),
+            logger.warning.call_args_list,
+        )
+
+    @mock.patch('ceilometer.publisher.gnocchi.LOG')
+    def test_activity_filter_match_filter_explicitly_enabled(self, logger):
+        self.samples[0].project_id = (
+            'a2d42c23-d518-46b6-96ab-3fba2e146859')
+        self._do_test_activity_filter(
+            1,
+            params={"enable_filter_project": "true"})
+        self.assertNotIn(
+            mock.call(
+                'The Gnocchi publisher currently filters metrics from the '
+                'Gnocchi service project by default. In the 2028.1 release, '
+                'this behavior will change to be disabled by default. If you '
+                'run Gnocchi using Swift for metric storage, or otherwise '
+                'require Gnocchi service project metric filtering, add '
+                '?enable_filter_project=true to the publisher URL, or '
+                'explicitly set the project to filter using filter_project '
+                'and filter_domain. To disable Gnocchi service project '
+                'metric filtering, set ?enable_filter_project=false.'),
+            logger.warning.call_args_list,
+        )
 
     @mock.patch('ceilometer.publisher.gnocchi.LOG')
     def test_activity_gnocchi_project_filter_disabled(self, logger):
@@ -355,6 +395,19 @@ class PublisherTest(base.BaseTestCase):
         self._do_test_activity_filter(
             2,
             params={"enable_filter_project": "false"})
+        self.assertNotIn(
+            mock.call(
+                'The Gnocchi publisher currently filters metrics from the '
+                'Gnocchi service project by default. In the 2028.1 release, '
+                'this behavior will change to be disabled by default. If you '
+                'run Gnocchi using Swift for metric storage, or otherwise '
+                'require Gnocchi service project metric filtering, add '
+                '?enable_filter_project=true to the publisher URL, or '
+                'explicitly set the project to filter using filter_project '
+                'and filter_domain. To disable Gnocchi service project '
+                'metric filtering, set ?enable_filter_project=false.'),
+            logger.warning.call_args_list,
+        )
         self.assertIn(
             mock.call("Filtering Gnocchi project is disabled, "
                       "ignoring filter_project option"),
