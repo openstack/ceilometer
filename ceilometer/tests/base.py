@@ -72,9 +72,10 @@ class BaseTestCase(base.BaseTestCase):
 
         # NOTE(sileht): Ensure a new oslo.messaging driver is loaded
         # between each tests
-        self.transport = messaging.get_transport(conf, "fake://", cache=False)
+        self.transport = messaging.get_notification_transport(
+            conf, "fake://", cache=False)
         self.useFixture(fixtures.MockPatch(
-            'ceilometer.messaging.get_transport',
+            'ceilometer.messaging.get_notification_transport',
             return_value=self.transport))
 
     def cfg2file(self, data):

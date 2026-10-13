@@ -126,7 +126,8 @@ class NotificationService(cotyledon.Service):
         # not a ceilometer. Until we have something to get the
         # notification_topics in another way, we must create a transport
         # to ensure the option has been registered by oslo_messaging.
-        messaging.get_notifier(messaging.get_transport(self.conf), '')
+        transport = messaging.get_notification_transport(self.conf)
+        messaging.get_notifier(transport, '')
 
         endpoints = []
         for pipe_mgr in self.managers:
@@ -139,7 +140,7 @@ class NotificationService(cotyledon.Service):
 
         urls = self.conf.notification.messaging_urls or [None]
         for url in urls:
-            transport = messaging.get_transport(self.conf, url)
+            transport = messaging.get_notification_transport(self.conf, url)
             # NOTE(gordc): ignore batching as we want pull
             # to maintain sequencing as much as possible.
             listener = messaging.get_batch_notification_listener(

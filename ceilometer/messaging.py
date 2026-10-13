@@ -39,7 +39,7 @@ def setup():
     )
 
 
-def get_transport(conf, url=None, optional=False, cache=True):
+def get_notification_transport(conf, url=None, optional=False, cache=True):
     """Initialise the oslo_messaging layer."""
     global TRANSPORTS, DEFAULT_URL
     cache_key = url or DEFAULT_URL
