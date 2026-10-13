@@ -1,0 +1,15 @@
+---
+fixes:
+  - |
+    Fixed issues with resource discovery where for some groups of polling
+    meters using the same discovery method, only one of the selected meters
+    using that discovery method would discover resources at a time in a
+    polling run, and the other meters would not generate samples for those
+    resources.
+
+    Affected meter groups:
+
+    * ``loadbalancer.provisioning`` and ``loadbalancer.operating``
+    * ``manila.share.status`` and ``manila.share.size``
+    * ``dns.zone.status``, ``dns.zone.recordsets``, ``dns.zone.ttl``
+      and ``dns.zone.serial``
