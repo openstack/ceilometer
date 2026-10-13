@@ -39,4 +39,4 @@ class Client:
 
     def shares_list(self):
         """Return a list of shares from all projects."""
-        return self.conn.shared_file_system.shares(all_projects=True)
+        return list(self.conn.shared_file_system.shares(all_projects=True))

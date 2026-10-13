@@ -29,4 +29,4 @@ class ImagesDiscovery(plugin_base.DiscoveryBase):
 
     def discover(self, manager, param=None):
         """Discover resources to monitor."""
-        return self.image_client.image.images()
+        return list(self.image_client.image.images())
