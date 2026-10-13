@@ -39,8 +39,8 @@ class Client:
 
     def zones_list(self):
         """Return a list of DNS zones from all projects."""
-        return self.conn.dns.zones(all_projects=True)
+        return list(self.conn.dns.zones(all_projects=True))
 
     def recordsets_list(self, zone):
         """Return a list of recordsets for a zone."""
-        return self.conn.dns.recordsets(zone, all_projects=True)
+        return list(self.conn.dns.recordsets(zone, all_projects=True))
