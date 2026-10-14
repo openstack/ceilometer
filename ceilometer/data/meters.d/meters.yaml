@@ -148,6 +148,7 @@ metric:
     resource_id: $.payload.snapshot_id
     metadata:
       display_name: $.payload.display_name
+      volume_id: $.payload.volume_id
 
   - name: 'backup.size'
     event_type:
@@ -163,6 +164,8 @@ metric:
     resource_id: $.payload.backup_id
     metadata:
       display_name: $.payload.display_name
+      volume_id: $.payload.volume_id
+      snapshot_id: $.payload.snapshot_id
 
   # Magnum
   - name: $.payload.metrics.[*].name

@@ -120,6 +120,7 @@ class VolumeBackupSize(_Base):
               'object_count',
               'container',
               'volume_id',
+              'snapshot_id',
               'status',
               'description']
 
