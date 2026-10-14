@@ -141,6 +141,18 @@ DiskInfo = collections.namedtuple('DiskInfo',
                                    'allocation',
                                    'physical'])
 
+GPUStats = collections.namedtuple('GPUStats',
+                                  ['device',
+                                   'gpu_uuid',
+                                   'vgpu_uuid',
+                                   'utilization',
+                                   'memory_used',
+                                   'memory_total',
+                                   'temperature',
+                                   'power_draw',
+                                   'encoder_utilization',
+                                   'decoder_utilization'])
+
 
 # Exception types
 #
@@ -229,6 +241,17 @@ class Inspector:
         :param duration: the last 'n' seconds, over which the value should be
                inspected
         :return: for each disk , capacity , allocation and usage
+        """
+        raise ceilometer.NotImplementedError
+
+    def inspect_gpus(self, instance, duration):
+        """Inspect the GPU statistics for an instance.
+
+        :param instance: the target instance
+        :param duration: the last 'n' seconds, over which the value should be
+               inspected
+        :return: for each GPU/vGPU attached to the instance, the
+                 utilization, memory, temperature, and power stats
         """
         raise ceilometer.NotImplementedError
 

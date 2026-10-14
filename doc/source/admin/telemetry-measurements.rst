@@ -241,6 +241,60 @@ The following meters are collected for OpenStack Compute.
 | cpu.delay | Cumu\ | ns   | instance | Pollster | Libvirt | CPU steal time   |
 |           | lative|      | ID       |          |         |                  |
 +-----------+-------+------+----------+----------+---------+------------------+
+| vgpu.uti\ | Gauge | %    | instance | Pollster | NVML    | vGPU core        |
+| lization  |       |      | ID       |          |         | utilization      |
++-----------+-------+------+----------+----------+---------+------------------+
+| vgpu.mem\ | Gauge | MiB  | instance | Pollster | NVML    | vGPU memory in   |
+| ory.used  |       |      | ID       |          |         | use              |
++-----------+-------+------+----------+----------+---------+------------------+
+| vgpu.mem\ | Gauge | MiB  | instance | Pollster | NVML    | vGPU total       |
+| ory.total |       |      | ID       |          |         | memory           |
++-----------+-------+------+----------+----------+---------+------------------+
+| vgpu.enc\ | Gauge | %    | instance | Pollster | NVML    | vGPU HW encoder  |
+| oder.uti\ |       |      | ID       |          |         | utilization      |
+| lization  |       |      |          |          |         |                  |
++-----------+-------+------+----------+----------+---------+------------------+
+| vgpu.dec\ | Gauge | %    | instance | Pollster | NVML    | vGPU HW decoder  |
+| oder.uti\ |       |      | ID       |          |         | utilization      |
+| lization  |       |      |          |          |         |                  |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.util\ | Gauge | %    | GPU      | Pollster | NVML    | Physical GPU     |
+| ization   |       |      | UUID     |          |         | core utilization |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.memo\ | Gauge | MiB  | GPU      | Pollster | NVML    | Physical GPU     |
+| ry.used   |       |      | UUID     |          |         | memory in use    |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.memo\ | Gauge | MiB  | GPU      | Pollster | NVML    | Physical GPU     |
+| ry.total  |       |      | UUID     |          |         | total memory     |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.temp\ | Gauge | C    | GPU      | Pollster | NVML    | Physical GPU     |
+| erature   |       |      | UUID     |          |         | temperature      |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.powe\ | Gauge | mW   | GPU      | Pollster | NVML    | Physical GPU     |
+| r.draw    |       |      | UUID     |          |         | power draw       |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.enco\ | Gauge | %    | GPU      | Pollster | NVML    | Physical GPU     |
+| der.util\ |       |      | UUID     |          |         | HW encoder       |
+| ization   |       |      |          |          |         | utilization      |
++-----------+-------+------+----------+----------+---------+------------------+
+| gpu.deco\ | Gauge | %    | GPU      | Pollster | NVML    | Physical GPU     |
+| der.util\ |       |      | UUID     |          |         | HW decoder       |
+| ization   |       |      |          |          |         | utilization      |
++-----------+-------+------+----------+----------+---------+------------------+
+
+.. note::
+
+    The ``vgpu.*`` meters report per-vGPU metrics for instances with
+    NVIDIA mdev devices attached. The ``gpu.*`` meters report
+    per-physical-GPU metrics for the compute host. Temperature and
+    power draw are only available at the physical GPU level.
+
+.. note::
+
+    GPU meters require the ``pynvml`` library (``nvidia-ml-py``) and
+    access to ``libnvidia-ml.so`` on the host. PCI passthrough GPUs
+    are not supported (host has no visibility). On nodes without GPUs,
+    these pollsters are silently disabled.
 
 .. note::
 

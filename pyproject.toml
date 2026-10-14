@@ -33,6 +33,9 @@ classifiers = [
 Homepage = "https://docs.openstack.org/ceilometer"
 Repository = "https://opendev.org/openstack/ceilometer"
 
+[project.optional-dependencies]
+gpu = ["nvidia-ml-py>=12.0.0"]
+
 [tool.setuptools.packages.find]
 include = ["ceilometer*"]
 
@@ -70,6 +73,7 @@ meter = "ceilometer.meter.notifications:ProcessMeterNotifications"
 [project.entry-points."ceilometer.discover.compute"]
 local_instances = "ceilometer.compute.discovery:InstanceDiscovery"
 local_node = "ceilometer.polling.discovery.localnode:LocalNodeDiscovery"
+local_gpus = "ceilometer.polling.discovery.gpu:GPUDiscovery"
 
 [project.entry-points."ceilometer.discover.central"]
 barbican = "ceilometer.polling.discovery.non_openstack_credentials_discovery:NonOpenStackCredentialsDiscovery"
@@ -132,6 +136,18 @@ local_node = "ceilometer.polling.discovery.localnode:LocalNodeDiscovery"
 "perf.instructions" = "ceilometer.compute.pollsters.instance_stats:PerfInstructionsPollster"
 "perf.cache.references" = "ceilometer.compute.pollsters.instance_stats:PerfCacheReferencesPollster"
 "perf.cache.misses" = "ceilometer.compute.pollsters.instance_stats:PerfCacheMissesPollster"
+"vgpu.utilization" = "ceilometer.compute.pollsters.gpu:VGPUUtilizationPollster"
+"vgpu.memory.used" = "ceilometer.compute.pollsters.gpu:VGPUMemoryUsedPollster"
+"vgpu.memory.total" = "ceilometer.compute.pollsters.gpu:VGPUMemoryTotalPollster"
+"vgpu.encoder.utilization" = "ceilometer.compute.pollsters.gpu:VGPUEncoderUtilizationPollster"
+"vgpu.decoder.utilization" = "ceilometer.compute.pollsters.gpu:VGPUDecoderUtilizationPollster"
+"gpu.utilization" = "ceilometer.compute.pollsters.gpu:GPUUtilizationPollster"
+"gpu.memory.used" = "ceilometer.compute.pollsters.gpu:GPUMemoryUsedPollster"
+"gpu.memory.total" = "ceilometer.compute.pollsters.gpu:GPUMemoryTotalPollster"
+"gpu.temperature" = "ceilometer.compute.pollsters.gpu:GPUTemperaturePollster"
+"gpu.power.draw" = "ceilometer.compute.pollsters.gpu:GPUPowerDrawPollster"
+"gpu.encoder.utilization" = "ceilometer.compute.pollsters.gpu:GPUEncoderUtilizationPollster"
+"gpu.decoder.utilization" = "ceilometer.compute.pollsters.gpu:GPUDecoderUtilizationPollster"
 
 [project.entry-points."ceilometer.poll.ipmi"]
 "hardware.ipmi.temperature" = "ceilometer.ipmi.pollsters.sensor:TemperatureSensorPollster"
