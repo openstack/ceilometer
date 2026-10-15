@@ -39,4 +39,4 @@ class Client:
 
     def loadbalancers_list(self):
         """Return a list of load balancers."""
-        return self.conn.load_balancer.load_balancers()
+        return list(self.conn.load_balancer.load_balancers())
