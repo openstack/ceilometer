@@ -15,8 +15,8 @@
 """Implementation of Inspector abstraction for libvirt."""
 
 import glob
-from time import monotonic as now
 
+import cachetools
 from lxml import etree
 from oslo_log import log as logging
 from oslo_utils import units
@@ -344,25 +344,16 @@ class LibvirtInspector(virt_inspector.Inspector):
             self._nvml_available = None
             return None
 
+    @cachetools.cached(cache=cachetools.TTLCache(maxsize=1, ttl=120))
     def _build_vgpu_map(self):
         """Build a map of mdev UUID to (gpu_handle, vgpu_instance).
 
         Cached per poll cycle via monotonic timestamp.
         """
-        cache_key = '_vgpu_map'
-        cache_ts_key = '_vgpu_map_ts'
-        current_time = now()
-
-        if (cache_key in self.cache
-                and current_time - self.cache.get(cache_ts_key, 0) < 120):
-            return self.cache[cache_key]
-
         vgpu_map = {}
         try:
             gpu_count = pynvml.nvmlDeviceGetCount()
         except pynvml.NVMLError:
-            self.cache[cache_key] = vgpu_map
-            self.cache[cache_ts_key] = current_time
             return vgpu_map
 
         for i in range(gpu_count):
@@ -386,8 +377,6 @@ class LibvirtInspector(virt_inspector.Inspector):
             except pynvml.NVMLError:
                 continue
 
-        self.cache[cache_key] = vgpu_map
-        self.cache[cache_ts_key] = current_time
         return vgpu_map
 
     @staticmethod
