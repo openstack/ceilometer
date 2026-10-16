@@ -604,7 +604,7 @@ class AgentManager(cotyledon.Service):
 
         if self.conf.polling.enable_notifications:
             self.notifier = oslo_messaging.Notifier(
-                messaging.get_transport(self.conf),
+                messaging.get_notification_transport(self.conf),
                 driver=self.conf.publisher_notifier.telemetry_driver,
                 publisher_id="ceilometer.polling")
 

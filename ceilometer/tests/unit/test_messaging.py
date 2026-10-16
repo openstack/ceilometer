@@ -25,42 +25,46 @@ class MessagingTests(base.BaseTestCase):
         self.CONF = service.prepare_service([], [])
         self.useFixture(oslo_messaging.conffixture.ConfFixture(self.CONF))
 
-    def test_get_transport_invalid_url(self):
-        self.assertRaises(oslo_messaging.InvalidTransportURL,
-                          messaging.get_transport, self.CONF, "notvalid!")
+    def test_get_notification_transport_invalid_url(self):
+        self.assertRaises(
+            oslo_messaging.InvalidTransportURL,
+            messaging.get_notification_transport, self.CONF, "notvalid!")
 
-    def test_get_transport_url_caching(self):
-        t1 = messaging.get_transport(self.CONF, 'fake://')
-        t2 = messaging.get_transport(self.CONF, 'fake://')
+    def test_get_notification_transport_url_caching(self):
+        t1 = messaging.get_notification_transport(self.CONF, 'fake://')
+        t2 = messaging.get_notification_transport(self.CONF, 'fake://')
         self.assertEqual(t1, t2)
 
-    def test_get_transport_default_url_caching(self):
-        t1 = messaging.get_transport(self.CONF)
-        t2 = messaging.get_transport(self.CONF)
+    def test_get_notification_transport_default_url_caching(self):
+        t1 = messaging.get_notification_transport(self.CONF)
+        t2 = messaging.get_notification_transport(self.CONF)
         self.assertEqual(t1, t2)
 
-    def test_get_transport_default_url_no_caching(self):
-        t1 = messaging.get_transport(self.CONF, cache=False)
-        t2 = messaging.get_transport(self.CONF, cache=False)
+    def test_get_notification_transport_default_url_no_caching(self):
+        t1 = messaging.get_notification_transport(self.CONF, cache=False)
+        t2 = messaging.get_notification_transport(self.CONF, cache=False)
         self.assertNotEqual(t1, t2)
 
-    def test_get_transport_url_no_caching(self):
-        t1 = messaging.get_transport(self.CONF, 'fake://', cache=False)
-        t2 = messaging.get_transport(self.CONF, 'fake://', cache=False)
+    def test_get_notification_transport_url_no_caching(self):
+        t1 = messaging.get_notification_transport(
+            self.CONF, 'fake://', cache=False)
+        t2 = messaging.get_notification_transport(
+            self.CONF, 'fake://', cache=False)
         self.assertNotEqual(t1, t2)
 
-    def test_get_transport_default_url_caching_mix(self):
-        t1 = messaging.get_transport(self.CONF)
-        t2 = messaging.get_transport(self.CONF, cache=False)
+    def test_get_notification_transport_default_url_caching_mix(self):
+        t1 = messaging.get_notification_transport(self.CONF)
+        t2 = messaging.get_notification_transport(self.CONF, cache=False)
         self.assertNotEqual(t1, t2)
 
-    def test_get_transport_url_caching_mix(self):
-        t1 = messaging.get_transport(self.CONF, 'fake://')
-        t2 = messaging.get_transport(self.CONF, 'fake://', cache=False)
+    def test_get_notification_transport_url_caching_mix(self):
+        t1 = messaging.get_notification_transport(
+            self.CONF, 'fake://')
+        t2 = messaging.get_notification_transport(
+            self.CONF, 'fake://', cache=False)
         self.assertNotEqual(t1, t2)
 
-    def test_get_transport_optional(self):
+    def test_get_notification_transport_optional(self):
         self.CONF.set_override('transport_url', 'non-url')
-        self.assertIsNone(messaging.get_transport(self.CONF,
-                                                  optional=True,
-                                                  cache=False))
+        self.assertIsNone(messaging.get_notification_transport(
+            self.CONF, optional=True, cache=False))

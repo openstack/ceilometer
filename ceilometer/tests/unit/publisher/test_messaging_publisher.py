@@ -120,7 +120,7 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
                                     driver=mock.ANY, retry=mock.ANY,
                                     publisher_id=mock.ANY)
 
-    @mock.patch('ceilometer.messaging.get_transport')
+    @mock.patch('ceilometer.messaging.get_notification_transport')
     def test_publish_other_host(self, cgt):
         msg_publisher.SampleNotifierPublisher(
             self.CONF,
@@ -132,7 +132,7 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
             netutils.urlsplit('notifier://foo:foo@127.0.0.1:1234'))
         cgt.assert_called_with(self.CONF, 'rabbit://foo:foo@127.0.0.1:1234')
 
-    @mock.patch('ceilometer.messaging.get_transport')
+    @mock.patch('ceilometer.messaging.get_notification_transport')
     def test_publish_other_host_vhost_and_query(self, cgt):
         msg_publisher.SampleNotifierPublisher(
             self.CONF,
@@ -148,13 +148,13 @@ class NotifierOnlyPublisherTest(BasePublisherTestCase):
         cgt.assert_called_with(self.CONF, 'amqp://foo:foo@127.0.0.1:1234/foo'
                                '?amqp_auto_delete=true')
 
-    @mock.patch('ceilometer.messaging.get_transport')
+    @mock.patch('ceilometer.messaging.get_notification_transport')
     def test_publish_with_none_rabbit_driver(self, cgt):
         sample_publisher = msg_publisher.SampleNotifierPublisher(
             self.CONF,
             netutils.urlsplit('notifier://127.0.0.1:9092?driver=kafka'))
         cgt.assert_called_with(self.CONF, 'kafka://127.0.0.1:9092')
-        transport = oslo_messaging.get_transport(self.CONF,
+        transport = oslo_messaging.get_notification_transport(self.CONF,
                                                  'kafka://127.0.0.1:9092')
         self.assertIsInstance(transport._driver, kafka_driver.KafkaDriver)
 
