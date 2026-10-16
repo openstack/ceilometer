@@ -112,7 +112,7 @@ function install_gnocchi {
     echo_summary "Installing Gnocchi"
     if use_library_from_git "gnocchi"; then
         git_clone_by_name gnocchi
-        pip_install -e ${GITDIR["gnocchi"]}[redis,${DATABASE_TYPE},keystone]
+        setup_develop ${GITDIR["gnocchi"]} redis,${DATABASE_TYPE},keystone
     else
         pip_install gnocchi[redis,${DATABASE_TYPE},keystone]
     fi
