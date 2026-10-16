@@ -34,6 +34,20 @@ OPTS = [
                default='AUTH_',
                help="Swift reseller prefix. Must be on par with "
                "reseller_prefix in proxy-server.conf."),
+    cfg.BoolOpt('swift_ignore_empty_accounts',
+                default=False,
+                help=('Ignore samples for Swift account usage with a volume '
+                      'of 0. Reduces storage requirements if empty '
+                      'accounts do not need to be tracked. Applies to the '
+                      'following meters: storage.objects, '
+                      'storage.objects.size, storage.objects.containers')),
+    cfg.BoolOpt('swift_ignore_empty_containers',
+                default=False,
+                help=('Ignore samples for Swift container usage with a '
+                      'volume of 0. Reduces storage requirements if empty '
+                      'containers do not need to be tracked. Applies to the '
+                      'following meters: storage.containers.objects, '
+                      'storage.containers.objects.size')),
 ]
 
 SERVICE_OPTS = [
@@ -124,10 +138,17 @@ class ObjectsPollster(_Base):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
                                                    cache, tenants):
+            volume = int(account['x-account-object-count'])
+            if self.conf.swift_ignore_empty_accounts and volume <= 0:
+                LOG.debug(
+                    ("Ignoring object count sample with volume %i "
+                     "for account: %s"),
+                    volume, tenant)
+                continue
             yield sample.Sample(
                 name='storage.objects',
                 type=sample.TYPE_GAUGE,
-                volume=int(account['x-account-object-count']),
+                volume=volume,
                 unit='object',
                 user_id=None,
                 project_id=tenant,
@@ -143,10 +164,17 @@ class ObjectsSizePollster(_Base):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
                                                    cache, tenants):
+            volume = int(account['x-account-bytes-used'])
+            if self.conf.swift_ignore_empty_accounts and volume <= 0:
+                LOG.debug(
+                    ("Ignoring object size sample with volume %i "
+                     "for account: %s"),
+                    volume, tenant)
+                continue
             yield sample.Sample(
                 name='storage.objects.size',
                 type=sample.TYPE_GAUGE,
-                volume=int(account['x-account-bytes-used']),
+                volume=volume,
                 unit='B',
                 user_id=None,
                 project_id=tenant,
@@ -162,10 +190,17 @@ class ObjectsContainersPollster(_Base):
         tenants = resources
         for tenant, account in self._iter_accounts(manager.keystone,
                                                    cache, tenants):
+            volume = int(account['x-account-container-count'])
+            if self.conf.swift_ignore_empty_accounts and volume <= 0:
+                LOG.debug(
+                    ("Ignoring container count sample with volume %i "
+                     "for account: %s"),
+                    volume, tenant)
+                continue
             yield sample.Sample(
                 name='storage.objects.containers',
                 type=sample.TYPE_GAUGE,
-                volume=int(account['x-account-container-count']),
+                volume=volume,
                 unit='container',
                 user_id=None,
                 project_id=tenant,
@@ -185,10 +220,17 @@ class ContainersObjectsPollster(_ContainersBase):
                                                    cache, tenants):
             containers_info = account[1]
             for container in containers_info:
+                volume = int(container['count'])
+                if self.conf.swift_ignore_empty_containers and volume <= 0:
+                    LOG.debug(
+                        ("Ignoring container count sample with volume %i "
+                         "for account %s container: %s"),
+                        volume, tenant, container['name'])
+                    continue
                 yield sample.Sample(
                     name='storage.containers.objects',
                     type=sample.TYPE_GAUGE,
-                    volume=int(container['count']),
+                    volume=volume,
                     unit='object',
                     user_id=None,
                     project_id=tenant,
@@ -208,10 +250,17 @@ class ContainersSizePollster(_ContainersBase):
                                                    cache, tenants):
             containers_info = account[1]
             for container in containers_info:
+                volume = int(container['bytes'])
+                if self.conf.swift_ignore_empty_containers and volume <= 0:
+                    LOG.debug(
+                        ("Ignoring container size sample with volume %i "
+                         "for account %s container: %s"),
+                        volume, tenant, container['name'])
+                    continue
                 yield sample.Sample(
                     name='storage.containers.objects.size',
                     type=sample.TYPE_GAUGE,
-                    volume=int(container['bytes']),
+                    volume=volume,
                     unit='B',
                     user_id=None,
                     project_id=tenant,

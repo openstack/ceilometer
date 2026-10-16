@@ -1,0 +1,21 @@
+---
+features:
+  - |
+    Added the ``[DEFAULT]/swift_ignore_empty_accounts`` configuration option
+    to enable ignoring samples for empty Swift accounts. This reduces sample
+    storage usage when tracking empty Swift accounts is not required.
+
+    When enabled, samples with volume 0 will be ignored for these meters:
+
+    * ``storage.objects``
+    * ``storage.objects.size``
+    * ``storage.objects.containers``
+  - |
+    Added the ``[DEFAULT]/swift_ignore_empty_containers`` configuration option
+    to enable ignoring samples for empty Swift containers. This reduces sample
+    storage usage when tracking empty Swift containers is not required.
+
+    When enabled, samples with volume 0 will be ignored for these meters:
+
+    * ``storage.containers.objects``
+    * ``storage.containers.objects.size``
