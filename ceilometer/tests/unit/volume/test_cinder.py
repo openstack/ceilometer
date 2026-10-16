@@ -113,13 +113,26 @@ class TestVolumeBackupSizePollster(_BaseTestVolumePollster):
 
     def test_volume_backup_size_pollster(self):
         samples = self.get_samples()
-        self.assertEqual(1, len(samples))
+        self.assertEqual(2, len(samples))
         self.assertEqual('volume.backup.size', samples[0].name)
         self.assertEqual(1, samples[0].volume)
         self.assertEqual('75a52125-85ff-4a8d-b2aa-580f3b22273f',
                          samples[0].resource_id)
         self.assertEqual('6824974c08974d4db864bbaa6bc08303',
                          samples[0].project_id)
+        self.assertEqual('6f27bc42-c834-49ea-ae75-8d1073b37806',
+                         samples[0].resource_metadata['volume_id'])
+        self.assertIsNone(samples[0].resource_metadata['snapshot_id'])
+        self.assertEqual('volume.backup.size', samples[1].name)
+        self.assertEqual(1, samples[1].volume)
+        self.assertEqual('be86f207-ce62-4f61-bebf-91980d5fd5d2',
+                         samples[1].resource_id)
+        self.assertEqual('6824974c08974d4db864bbaa6bc08303',
+                         samples[1].project_id)
+        self.assertEqual('6f27bc42-c834-49ea-ae75-8d1073b37806',
+                         samples[1].resource_metadata['volume_id'])
+        self.assertEqual('be86f207-ce62-4f61-bebf-91980d5fd5d2',
+                         samples[1].resource_metadata['snapshot_id'])
 
     def test_get_samples_contains_expected_metadata(self):
         samples = self.get_samples()
@@ -131,6 +144,7 @@ class TestVolumeBackupSizePollster(_BaseTestVolumePollster):
             self.assertIn('object_count', metadata)
             self.assertIn('container', metadata)
             self.assertIn('volume_id', metadata)
+            self.assertIn('snapshot_id', metadata)
             self.assertIn('status', metadata)
             self.assertIn('description', metadata)
 

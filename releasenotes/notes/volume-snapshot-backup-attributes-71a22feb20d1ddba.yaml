@@ -1,0 +1,19 @@
+---
+features:
+  - |
+    The ``volume.backup.size`` pollster has had the ``snapshot_id`` attribute
+    added to resource metadata. This allows directly referencing the ID of the
+    snapshot used to create a volume backup Ceilometer publisher samples,
+    or in custom resource attributes in Gnocchi.
+  - |
+    The ``snapshot.size`` notification meter has had the ``volume_id``
+    attribute added to resource metadata, to match the
+    ``volume.snapshot.size`` pollster.
+  - |
+    The ``backup.size`` notification meter has had the ``volume_id`` and
+    ``snapshot_id`` attributes added to resource metadata, to match the
+    ``volume.backup.size`` pollster.
+upgrade:
+  - |
+    ``meters.yaml`` has been updated with resource metadata additions to the
+    ``snapshot.size`` and ``backup.size`` notification meters.

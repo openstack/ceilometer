@@ -862,7 +862,7 @@ SNAPSHOT = cinder_snapshot.Snapshot(connection=None, **{
     'group_snapshot_id': None,
     'name': None,
 })
-BACKUP = cinder_backup.Backup(connection=None, **{
+BACKUP_FROM_VOLUME = cinder_backup.Backup(connection=None, **{
     'status': 'available',
     'object_count': 0,
     'container': None,
@@ -884,6 +884,30 @@ BACKUP = cinder_backup.Backup(connection=None, **{
     'metadata': {},
     'user_id': 'be255bd31eb944578000fc762fde6dcf',
     'id': '75a52125-85ff-4a8d-b2aa-580f3b22273f',
+    'size': 1,
+})
+BACKUP_FROM_SNAPSHOT = cinder_backup.Backup(connection=None, **{
+    'status': 'available',
+    'object_count': 0,
+    'container': None,
+    'name': None,
+    'links': [
+        {'href': 'http://fake_urla', 'rel': 'self'},
+        {'href': 'http://fake_urlb', 'rel': 'bookmark'}],
+    'availability_zone': 'nova',
+    'created_at': '2016-10-19T06:55:23.000000',
+    'snapshot_id': 'be86f207-ce62-4f61-bebf-91980d5fd5d2',
+    'updated_at': '2016-10-19T06:55:23.000000',
+    'data_timestamp': '2016-10-19T06:55:23.000000',
+    'description': None,
+    'has_dependent_backups': False,
+    'volume_id': '6f27bc42-c834-49ea-ae75-8d1073b37806',
+    'os-backup-project-attr:project_id': '6824974c08974d4db864bbaa6bc08303',
+    'fail_reason': '',
+    'is_incremental': False,
+    'metadata': {},
+    'user_id': 'be255bd31eb944578000fc762fde6dcf',
+    'id': 'be86f207-ce62-4f61-bebf-91980d5fd5d2',
     'size': 1,
 })
 POOL_LVM = cinder_stats.Pools(connection=None, **{
@@ -1034,7 +1058,7 @@ SERVICE_CINDER_UNKNOWN_STATUS = cinder_service.Service(connection=None, **{
 
 VOLUME_LIST = [VOLUME]
 SNAPSHOT_LIST = [SNAPSHOT]
-BACKUP_LIST = [BACKUP]
+BACKUP_LIST = [BACKUP_FROM_VOLUME, BACKUP_FROM_SNAPSHOT]
 POOL_LIST = [POOL_LVM, POOL_CEPH]
 SERVICE_LIST = [
     SERVICE_CINDER_VOLUME, SERVICE_CINDER_SCHED, SERVICE_CINDER_BACKUP]
