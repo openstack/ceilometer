@@ -249,16 +249,9 @@ class PollingTask:
         number_workers_for_pollsters =\
             self.manager.conf.polling.threads_to_process_pollsters
 
-        if number_workers_for_pollsters < 0:
-            raise RuntimeError("The configuration "
-                               "'threads_to_process_pollsters' has a negative "
-                               "value [%s], which should not be allowed.",
-                               number_workers_for_pollsters)
-
         if number_workers_for_pollsters == 0:
             number_workers_for_pollsters = len(all_pollsters)
-
-        if number_workers_for_pollsters < len(all_pollsters):
+        elif number_workers_for_pollsters < len(all_pollsters):
             LOG.debug("The number of pollsters in source [%s] is bigger "
                       "than the number of worker threads to execute them. "
                       "Therefore, one can expect the process to be longer "
