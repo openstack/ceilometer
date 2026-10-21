@@ -125,6 +125,18 @@ POLLING_OPTS = [
                     'requires clients to present a certificate signed by '
                     'this CA (mutual TLS), restricting metrics access to '
                     'authorized clients only.'),
+    cfg.StrOpt('prometheus_tls_min_version',
+               default='1.3',
+               choices=['1.2', '1.3'],
+               help='Minimum TLS protocol version accepted by the Prometheus '
+                    'exporter scrape endpoint. Only used when '
+                    'prometheus_tls_enable is true.'),
+    cfg.StrOpt('prometheus_tls_max_version',
+               default='1.3',
+               choices=['1.2', '1.3'],
+               help='Maximum TLS protocol version accepted by the Prometheus '
+                    'exporter scrape endpoint. Only used when '
+                    'prometheus_tls_enable is true.'),
     cfg.IntOpt('threads_to_process_pollsters',
                default=1,
                min=0,
@@ -609,10 +621,18 @@ class AgentManager(cotyledon.Service):
                 certfile = self.conf.polling.prometheus_tls_certfile
                 keyfile = self.conf.polling.prometheus_tls_keyfile
                 client_ca = self.conf.polling.prometheus_tls_client_ca
+                min_version = self.conf.polling.prometheus_tls_min_version
+                max_version = self.conf.polling.prometheus_tls_max_version
                 if self.conf.polling.prometheus_tls_enable:
                     if not certfile or not keyfile:
                         raise ValueError(
                             "Certfile and keyfile must be provided."
+                        )
+                    if (min_version and max_version and
+                            min_version > max_version):
+                        raise ValueError(
+                            "prometheus_tls_min_version must not be greater "
+                            "than prometheus_tls_max_version."
                         )
                 else:
                     if client_ca:
@@ -621,12 +641,15 @@ class AgentManager(cotyledon.Service):
                             "prometheus_tls_enable to be true."
                         )
                     certfile = keyfile = None
+                    min_version = max_version = None
                 prom_exporter.export(
                     address[0],
                     address[1],
                     certfile,
                     keyfile,
-                    client_ca)
+                    client_ca,
+                    min_version,
+                    max_version)
 
         self._keystone = None
         self._keystone_last_exception = None

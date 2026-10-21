@@ -14,6 +14,7 @@
 # under the License.
 """Tests for ceilometer/polling/prom_exporter.py"""
 
+import ssl
 from unittest import mock
 from unittest.mock import call
 
@@ -307,10 +308,10 @@ class TestPromExporter(base.BaseTestCase):
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
-            call('127.0.0.1', 9101, None, None, None),
-            call('127.0.0.1', 9102, None, None, None),
-            call('::1', 9103, None, None, None),
-            call('localhost', 9104, None, None, None),
+            call('127.0.0.1', 9101, None, None, None, None, None),
+            call('127.0.0.1', 9102, None, None, None, None, None),
+            call('::1', 9103, None, None, None, None, None),
+            call('localhost', 9104, None, None, None, None, None),
         ])
 
     @mock.patch('ceilometer.polling.prom_exporter.export')
@@ -329,10 +330,10 @@ class TestPromExporter(base.BaseTestCase):
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
-            call('127.0.0.1', 9101, None, None, None),
-            call('127.0.0.1', 9102, None, None, None),
-            call('::1', 9103, None, None, None),
-            call('localhost', 9104, None, None, None),
+            call('127.0.0.1', 9101, None, None, None, None, None),
+            call('127.0.0.1', 9102, None, None, None, None, None),
+            call('::1', 9103, None, None, None, None, None),
+            call('localhost', 9104, None, None, None, None, None),
         ])
 
     @mock.patch('ceilometer.polling.prom_exporter.export')
@@ -353,10 +354,13 @@ class TestPromExporter(base.BaseTestCase):
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
-            call('127.0.0.1', 9101, "cert.pem", "key.pem", None),
-            call('127.0.0.1', 9102, "cert.pem", "key.pem", None),
-            call('::1', 9103, "cert.pem", "key.pem", None),
-            call('localhost', 9104, "cert.pem", "key.pem", None),
+            call('127.0.0.1', 9101, "cert.pem", "key.pem", None,
+                 '1.3', '1.3'),
+            call('127.0.0.1', 9102, "cert.pem", "key.pem", None,
+                 '1.3', '1.3'),
+            call('::1', 9103, "cert.pem", "key.pem", None, '1.3', '1.3'),
+            call('localhost', 9104, "cert.pem", "key.pem", None,
+                 '1.3', '1.3'),
         ])
 
     @mock.patch('ceilometer.polling.prom_exporter.export')
@@ -379,11 +383,63 @@ class TestPromExporter(base.BaseTestCase):
         manager.AgentManager(0, CONF)
 
         export.assert_has_calls([
-            call('127.0.0.1', 9101, "cert.pem", "key.pem", "ca.pem"),
-            call('127.0.0.1', 9102, "cert.pem", "key.pem", "ca.pem"),
-            call('::1', 9103, "cert.pem", "key.pem", "ca.pem"),
-            call('localhost', 9104, "cert.pem", "key.pem", "ca.pem"),
+            call('127.0.0.1', 9101, "cert.pem", "key.pem", "ca.pem",
+                 '1.3', '1.3'),
+            call('127.0.0.1', 9102, "cert.pem", "key.pem", "ca.pem",
+                 '1.3', '1.3'),
+            call('::1', 9103, "cert.pem", "key.pem", "ca.pem",
+                 '1.3', '1.3'),
+            call('localhost', 9104, "cert.pem", "key.pem", "ca.pem",
+                 '1.3', '1.3'),
         ])
+
+    @mock.patch('ceilometer.polling.prom_exporter.export')
+    def test_export_called_with_tls_versions(self, export):
+        CONF = service.prepare_service([], [])
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_listen_addresses',
+                          ['127.0.0.1:9101'], group='polling')
+        CONF.set_override('prometheus_tls_enable', True, group='polling')
+        CONF.set_override('prometheus_tls_certfile', "cert.pem",
+                          group='polling')
+        CONF.set_override('prometheus_tls_keyfile', "key.pem",
+                          group='polling')
+        CONF.set_override('prometheus_tls_min_version', '1.2',
+                          group='polling')
+        CONF.set_override('prometheus_tls_max_version', '1.3',
+                          group='polling')
+        manager.AgentManager(0, CONF)
+
+        export.assert_called_once_with('127.0.0.1', 9101, "cert.pem",
+                                       "key.pem", None, '1.2', '1.3')
+
+    @mock.patch('ceilometer.polling.prom_exporter.export')
+    def test_export_ignores_tls_versions_without_tls(self, export):
+        CONF = service.prepare_service([], [])
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_listen_addresses',
+                          ['127.0.0.1:9101'], group='polling')
+        CONF.set_override('prometheus_tls_enable', False, group='polling')
+        manager.AgentManager(0, CONF)
+
+        export.assert_called_once_with('127.0.0.1', 9101, None, None, None,
+                                       None, None)
+
+    def test_export_fails_if_min_version_greater_than_max(self):
+        CONF = service.prepare_service([], [])
+        CONF.set_override('enable_prometheus_exporter', True, group='polling')
+        CONF.set_override('prometheus_listen_addresses',
+                          ['127.0.0.1:9101'], group='polling')
+        CONF.set_override('prometheus_tls_enable', True, group='polling')
+        CONF.set_override('prometheus_tls_certfile', "cert.pem",
+                          group='polling')
+        CONF.set_override('prometheus_tls_keyfile', "key.pem",
+                          group='polling')
+        CONF.set_override('prometheus_tls_min_version', '1.3',
+                          group='polling')
+        CONF.set_override('prometheus_tls_max_version', '1.2',
+                          group='polling')
+        self.assertRaises(ValueError, manager.AgentManager, 0, CONF)
 
     @mock.patch('ceilometer.polling.prom_exporter.export')
     def test_export_fails_if_incomplete_tls(self, export):
@@ -421,7 +477,9 @@ class TestPromExporter(base.BaseTestCase):
             certfile='cert.pem',
             keyfile='key.pem',
             client_cafile='ca.pem',
-            client_auth_required=True)
+            client_auth_required=True,
+            tls_min_version=None,
+            tls_max_version=None)
 
     @mock.patch('ceilometer.polling.prom_exporter.prom.start_http_server')
     def test_export_without_client_ca_disables_client_auth(self,
@@ -434,7 +492,24 @@ class TestPromExporter(base.BaseTestCase):
             certfile='cert.pem',
             keyfile='key.pem',
             client_cafile=None,
-            client_auth_required=False)
+            client_auth_required=False,
+            tls_min_version=None,
+            tls_max_version=None)
+
+    @mock.patch('ceilometer.polling.prom_exporter.prom.start_http_server')
+    def test_export_maps_tls_versions(self, start_http_server):
+        prom_exporter.export('127.0.0.1', 9101, 'cert.pem', 'key.pem',
+                             None, '1.2', '1.3')
+        start_http_server.assert_called_once_with(
+            port=9101,
+            addr='127.0.0.1',
+            registry=prom_exporter.CEILOMETER_REGISTRY,
+            certfile='cert.pem',
+            keyfile='key.pem',
+            client_cafile=None,
+            client_auth_required=False,
+            tls_min_version=ssl.TLSVersion.TLSv1_2,
+            tls_max_version=ssl.TLSVersion.TLSv1_3)
 
     def test_collect_metrics(self):
         prom_exporter.collect_metrics(self.test_image_size)
