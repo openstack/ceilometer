@@ -29,6 +29,9 @@ from oslo_utils import timeutils
 from stevedore import extension
 
 from ceilometer.compute import discovery as nova_discover
+from ceilometer.polling.discovery.endpoint import EndpointDiscovery
+from ceilometer.polling.discovery.non_openstack_credentials_discovery\
+    import NonOpenStackCredentialsDiscovery
 from ceilometer.polling.dynamic_pollster import DynamicPollster
 from ceilometer.polling.dynamic_pollster import \
     NonOpenStackApisPollsterDefinition
@@ -155,6 +158,91 @@ class TestManager(base.BaseTestCase):
             for ext in mgr.extensions:
                 self.assertIn(ext.name, ['builder1', 'builder2', 'test'])
                 self.assertIsInstance(ext.obj, TestPollster)
+
+    def test_create_dynamic_pollster_discoveries(self):
+        extensions_dynamic_pollsters_fake =\
+            self.create_fake_dynamic_discoveries()
+
+        mgr = manager.AgentManager(0, self.conf)
+
+        method_return = mgr.create_dynamic_pollster_discoveries(
+            extensions_dynamic_pollsters_fake)
+
+        self.assertEqual(3, len(method_return))
+        self.assertEqual("barbican:123456", method_return[0].name)
+        self.assertIsInstance(
+            method_return[0].obj, NonOpenStackCredentialsDiscovery)
+        self.assertEqual("barbican:otherId", method_return[1].name)
+        self.assertIsInstance(
+            method_return[1].obj, NonOpenStackCredentialsDiscovery)
+        self.assertEqual("endpoint:nova", method_return[2].name)
+        self.assertIsInstance(method_return[2].obj, EndpointDiscovery)
+
+    def create_fake_dynamic_discoveries(self):
+        extensions_dynamic_pollsters_fake = list()
+        extensions_dynamic_pollsters_fake.append(create_fake_dynamic_pollster_extension("barbican:123456"))
+        extensions_dynamic_pollsters_fake.append(create_fake_dynamic_pollster_extension("barbican:otherId"))
+        extensions_dynamic_pollsters_fake.append(create_fake_dynamic_pollster_extension("endpoint:nova"))
+        extensions_dynamic_pollsters_fake.append(create_fake_dynamic_pollster_extension("somethingelse"))
+        return extensions_dynamic_pollsters_fake
+
+    def test_discoverer(self):
+        mgr = manager.AgentManager(0, self.conf)
+        extensions_dynamic_pollsters_fake =\
+            self.create_fake_dynamic_discoveries()
+        mgr.discoveries = mgr.discoveries + extensions_dynamic_pollsters_fake
+
+        barbican_discoverer = None
+        for d in mgr.discoveries:
+            if d.name == "barbican":
+                barbican_discoverer = d.obj
+
+        endpoint_discoverer = None
+        for d in mgr.discoveries:
+            if d.name == "endpoint":
+                endpoint_discoverer = d.obj
+
+        endpoint_discoverer_nova = None
+        for d in mgr.discoveries:
+            if d.name == "endpoint:nova":
+                endpoint_discoverer_nova = d.obj
+
+        barbican_discoverer_randon_id = None
+        for d in mgr.discoveries:
+            if d.name == "barbican:123456":
+                barbican_discoverer_randon_id = d.obj
+
+        barbican_discoverer_other_id= None
+        for d in mgr.discoveries:
+            if d.name == "barbican:otherId":
+                barbican_discoverer_other_id = d.obj
+
+
+        discoverer = mgr._discoverer("barbican")
+        self.assertEqual(barbican_discoverer, discoverer)
+
+        discoverer = mgr._discoverer("endpoint")
+        self.assertEqual(endpoint_discoverer, discoverer)
+
+        discoverer = mgr._discoverer("endpoint", "endpoint:keystone")
+        self.assertEqual(endpoint_discoverer, discoverer)
+
+        discoverer = mgr._discoverer("endpoint", "endpoint:nova")
+        self.assertEqual(endpoint_discoverer_nova, discoverer)
+
+        discoverer = mgr._discoverer("barbican", "barbican:123456")
+        self.assertEqual(barbican_discoverer_randon_id, discoverer)
+
+        discoverer = mgr._discoverer("barbican", "barbican:otherId")
+        self.assertEqual(barbican_discoverer_other_id, discoverer)
+
+
+def create_fake_dynamic_pollster_extension(default_discovery_string):
+    fake_dynamic_pollster_extension = mock.Mock()
+    fake_dynamic_pollster_extension.default_discovery =\
+        default_discovery_string
+    fake_dynamic_pollster_extension.name = default_discovery_string
+    return fake_dynamic_pollster_extension
 
 
 class BatchTestPollster(TestPollster):

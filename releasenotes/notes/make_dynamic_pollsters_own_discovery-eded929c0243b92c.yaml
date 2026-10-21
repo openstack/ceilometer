@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Make each dynamic pollster definition have its own discovery instance
