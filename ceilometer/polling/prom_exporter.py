@@ -14,6 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import ssl
+
 from oslo_log import log
 import prometheus_client as prom
 
@@ -21,16 +23,23 @@ LOG = log.getLogger(__name__)
 
 CEILOMETER_REGISTRY = prom.CollectorRegistry()
 
+TLS_VERSIONS = {
+    '1.2': ssl.TLSVersion.TLSv1_2,
+    '1.3': ssl.TLSVersion.TLSv1_3,
+}
+
 
 def export(prom_iface, prom_port, tls_cert=None, tls_key=None,
-           tls_client_ca=None):
+           tls_client_ca=None, tls_min_version=None, tls_max_version=None):
     prom.start_http_server(port=prom_port,
                            addr=prom_iface,
                            registry=CEILOMETER_REGISTRY,
                            certfile=tls_cert,
                            keyfile=tls_key,
                            client_cafile=tls_client_ca,
-                           client_auth_required=bool(tls_client_ca))
+                           client_auth_required=bool(tls_client_ca),
+                           tls_min_version=TLS_VERSIONS.get(tls_min_version),
+                           tls_max_version=TLS_VERSIONS.get(tls_max_version))
 
 
 def collect_metrics(samples):
