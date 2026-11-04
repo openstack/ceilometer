@@ -16,7 +16,7 @@
 import datetime
 from unittest import mock
 
-import jsonpath_rw_ext
+import jsonpath_ng.ext
 
 from ceilometer import declarative
 from ceilometer.event import converter
@@ -295,15 +295,16 @@ class TestTraitDefinition(ConverterBase):
     def test_string_fields_config(self):
         cfg = dict(fields='payload.test')
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
-        self.assertPathsEqual(t.getter.__self__,
-                              jsonpath_rw_ext.parse('payload.test'))
+        self.assertPathsEqual(
+            t.getter.__self__,
+            jsonpath_ng.ext.parse('payload.test'))
 
     def test_list_fields_config(self):
         cfg = dict(fields=['payload.test', 'payload.other'])
         t = converter.TraitDefinition('test_trait', cfg, self.fake_plugin_mgr)
         self.assertPathsEqual(
             t.getter.__self__,
-            jsonpath_rw_ext.parse('(payload.test)|(payload.other)'))
+            jsonpath_ng.ext.parse('(payload.test)|(payload.other)'))
 
     def test_invalid_path_config(self):
         # test invalid jsonpath...

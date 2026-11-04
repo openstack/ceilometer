@@ -419,11 +419,11 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][1]
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         multi="name")]})
@@ -438,11 +438,11 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][1]
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         multi="name",
@@ -583,11 +583,11 @@ class TestMeterProcessing(test.BaseTestCase):
 
     def test_multi_meter_payload(self):
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "volume", "unit"])]})
@@ -607,11 +607,11 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][1]
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "unit"])]})
@@ -627,11 +627,11 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements']
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         lookup="name")]})
@@ -677,11 +677,11 @@ class TestMeterProcessing(test.BaseTestCase):
         del event['payload']['measurements'][0]['result']
         del event['payload']['measurements'][1]['result']
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "unit", "volume"])]})
@@ -698,11 +698,11 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements'][0]['result']
         cfg = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                         event_type="objectstore.http.request",
                         type="delta",
-                        unit="$.payload.measurements.[*].metric.[*].unit",
-                        volume="$.payload.measurements.[*].result",
+                        unit="$.payload.measurements[*].metric.unit",
+                        volume="$.payload.measurements[*].result",
                         resource_id="$.payload.target_id",
                         project_id="$.payload.initiator.project_id",
                         lookup=["name", "unit", "volume"])]})
@@ -841,20 +841,20 @@ class TestMeterProcessing(test.BaseTestCase):
         event = copy.deepcopy(MIDDLEWARE_EVENT)
         del event['payload']['measurements']
         cfg1 = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                              event_type="objectstore.http.request",
                              type="delta",
-                             unit="$.payload.measurements.[*].metric.[*].unit",
-                             volume="$.payload.measurements.[*].result",
+                             unit="$.payload.measurements[*].metric.unit",
+                             volume="$.payload.measurements[*].result",
                              resource_id="$.payload.target_id",
                              project_id="$.payload.initiator.project_id",
                              lookup="name")]})
         cfg2 = yaml.dump(
-            {'metric': [dict(name="$.payload.measurements.[*].metric.[*].name",
+            {'metric': [dict(name="$.payload.measurements[*].metric.name",
                              event_type="objectstore.http.request",
                              type="delta",
-                             unit="$.payload.measurements.[*].metric.[*].unit",
-                             volume="$.payload.measurements.[*].result",
+                             unit="$.payload.measurements[*].metric.unit",
+                             volume="$.payload.measurements[*].result",
                              resource_id="$.payload.target_id",
                              project_id="$.payload.initiator.project_id",
                              lookup="name")]})

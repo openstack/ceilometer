@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    Meter definitions no longer accept expressions which are not compliant with
+    RFC 9535, such as `measurements.[*]` (it should be `measurements[*]`).
+    Review definitions if customized ones are used.

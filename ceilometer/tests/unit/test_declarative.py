@@ -32,7 +32,7 @@ class TestDefinition(base.BaseTestCase):
         ]
         self.parser = mock.MagicMock()
         parser_patch = fixtures.MockPatch(
-            "jsonpath_rw_ext.parser.ExtentedJsonPathParser.parse",
+            "jsonpath_ng.ext.parser.ExtendedJsonPathParser.parse",
             new=self.parser)
         self.useFixture(parser_patch)
 
