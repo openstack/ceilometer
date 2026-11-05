@@ -30,9 +30,9 @@ HEAD_ACCOUNTS = [('tenant-000', {'x-account-object-count': 12,
                                  'x-account-bytes-used': 321321321,
                                  'x-account-container-count': 7,
                                  }),
-                 ('tenant-001', {'x-account-object-count': 34,
-                                 'x-account-bytes-used': 9898989898,
-                                 'x-account-container-count': 17,
+                 ('tenant-001', {'x-account-object-count': 0,
+                                 'x-account-bytes-used': 0,
+                                 'x-account-container-count': 0,
                                  }),
                  ('tenant-002-ignored', {'x-account-object-count': 34,
                                          'x-account-bytes-used': 9898989898,
@@ -64,6 +64,8 @@ GET_ACCOUNTS = [('tenant-000', ({'x-account-object-count': 10,
                                          'x-account-container-count': 0,
                                          }, []))]
 
+IGNORED_ACCOUNTS = frozenset(('tenant-002-ignored',))
+
 Tenant = collections.namedtuple('Tenant', 'id')
 ASSIGNED_TENANTS = [Tenant('tenant-000'), Tenant('tenant-001')]
 
@@ -87,11 +89,53 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     # pollsters.
     scenarios = [
         ('storage.objects',
-         {'factory': swift.ObjectsPollster, 'resources': {}}),
+         {'factory': swift.ObjectsPollster,
+          'resources': {
+              project_id: {}
+              for project_id, _ in HEAD_ACCOUNTS
+              if project_id not in IGNORED_ACCOUNTS}}),
+
+        ('storage.objects-ignore_empty',
+         {'factory': swift.ObjectsPollster,
+          'resources': {
+              project_id: {}
+              for project_id, account in HEAD_ACCOUNTS
+              if (project_id not in IGNORED_ACCOUNTS
+                  and account['x-account-object-count'])},
+          'ignore_empty_accounts': True}),
+
         ('storage.objects.size',
-         {'factory': swift.ObjectsSizePollster, 'resources': {}}),
+         {'factory': swift.ObjectsSizePollster,
+          'resources': {
+              project_id: {}
+              for project_id, _ in HEAD_ACCOUNTS
+              if project_id not in IGNORED_ACCOUNTS}}),
+
+        ('storage.objects.size-ignore_empty',
+         {'factory': swift.ObjectsSizePollster,
+          'resources': {
+              project_id: {}
+              for project_id, account in HEAD_ACCOUNTS
+              if (project_id not in IGNORED_ACCOUNTS
+                  and account['x-account-bytes-used'])},
+          'ignore_empty_accounts': True}),
+
         ('storage.objects.containers',
-         {'factory': swift.ObjectsContainersPollster, 'resources': {}}),
+         {'factory': swift.ObjectsContainersPollster,
+          'resources': {
+              project_id: {}
+              for project_id, _ in HEAD_ACCOUNTS
+              if project_id not in IGNORED_ACCOUNTS}}),
+
+        ('storage.objects.containers-ignore_empty',
+         {'factory': swift.ObjectsContainersPollster,
+          'resources': {
+              project_id: {}
+              for project_id, account in HEAD_ACCOUNTS
+              if (project_id not in IGNORED_ACCOUNTS
+                  and account['x-account-container-count'])},
+          'ignore_empty_accounts': True}),
+
         ('storage.containers.objects',
          {'factory': swift.ContainersObjectsPollster,
           'resources': {
@@ -99,7 +143,20 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
               for project_id, container in itertools.chain.from_iterable(
                   itertools.product([acc[0]], acc[1][1])
                   for acc in GET_ACCOUNTS)
+              if project_id not in IGNORED_ACCOUNTS
           }}),
+
+        ('storage.containers.objects-ignore_empty',
+         {'factory': swift.ContainersObjectsPollster,
+          'resources': {
+              f"{project_id}/{container['name']}": container
+              for project_id, container in itertools.chain.from_iterable(
+                  itertools.product([acc[0]], acc[1][1])
+                  for acc in GET_ACCOUNTS)
+              if project_id not in IGNORED_ACCOUNTS and container['count']
+          },
+          'ignore_empty_containers': True}),
+
         ('storage.containers.objects.size',
          {'factory': swift.ContainersSizePollster,
           'resources': {
@@ -107,7 +164,19 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
               for project_id, container in itertools.chain.from_iterable(
                   itertools.product([acc[0]], acc[1][1])
                   for acc in GET_ACCOUNTS)
+              if project_id not in IGNORED_ACCOUNTS
           }}),
+
+        ('storage.containers.objects.size-ignore_empty',
+         {'factory': swift.ContainersSizePollster,
+          'resources': {
+              f"{project_id}/{container['name']}": container
+              for project_id, container in itertools.chain.from_iterable(
+                  itertools.product([acc[0]], acc[1][1])
+                  for acc in GET_ACCOUNTS)
+              if project_id not in IGNORED_ACCOUNTS and container['bytes']
+          },
+          'ignore_empty_containers': True}),
     ]
 
     @staticmethod
@@ -123,6 +192,15 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
     def setUp(self):
         super().setUp()
         self.CONF = service.prepare_service([], [])
+        if not hasattr(self, 'ignore_empty_accounts'):
+            self.ignore_empty_accounts = False
+        if self.ignore_empty_accounts:
+            self.CONF.set_override('swift_ignore_empty_accounts', True)
+        if not hasattr(self, 'ignore_empty_containers'):
+            self.ignore_empty_containers = False
+        if self.ignore_empty_containers:
+            self.CONF.set_override('swift_ignore_empty_containers', True)
+
         self.pollster = self.factory(self.CONF)
         self.manager = TestManager(0, self.CONF)
 
@@ -191,7 +269,13 @@ class TestSwiftPollster(testscenarios.testcase.WithScenarios,
             samples = list(self.pollster.get_samples(self.manager, {},
                                                      ASSIGNED_TENANTS))
 
-        self.assertEqual(2, len(samples), self.pollster.__class__)
+        self.assertEqual(
+            len(self.resources),
+            len(samples),
+            str({
+                "pollster": type(self.pollster).__name__,
+                "ignore_empty_accounts": self.ignore_empty_accounts,
+                "ignore_empty_containers": self.ignore_empty_containers}))
         for resource_id, resource in self.resources.items():
             for field in getattr(self.pollster, 'FIELDS', []):
                 with self.subTest(f'{resource_id}-{field}'):
