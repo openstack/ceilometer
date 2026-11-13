@@ -13,7 +13,7 @@
 
 import os
 
-from jsonpath_rw_ext import parser
+from jsonpath_ng.ext import parser
 from oslo_log import log
 import yaml
 
