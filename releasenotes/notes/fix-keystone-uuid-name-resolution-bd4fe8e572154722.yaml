@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixed resolving project and user names when
+    ``[polling] identity_name_discovery`` is enabled. Since the migration to
+    the OpenStack SDK, ``project_name`` and ``user_name`` were always left
+    empty.

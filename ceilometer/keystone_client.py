@@ -70,6 +70,25 @@ class Domain:
         )
 
 
+@dataclasses.dataclass(frozen=True)
+class User:
+    id: str
+    name: str
+    domain_id: str
+    is_enabled: bool
+    description: str = ''
+
+    @classmethod
+    def from_openstacksdk(cls, sdk_user):
+        return cls(
+            id=sdk_user.id,
+            name=sdk_user.name,
+            domain_id=sdk_user.domain_id,
+            is_enabled=sdk_user.is_enabled,
+            description=sdk_user.description or '',
+        )
+
+
 class Client:
     """Client for retrieving keystone resources.
 
@@ -144,6 +163,40 @@ class Client:
         projects = self._connection.list_projects(
             domain_id=domain_id, filters=filters or None)
         return [Project.from_openstacksdk(p) for p in projects]
+
+    def find_user(self, **kwargs):
+        """Find a single user matching the given attribute filters.
+
+        Delegates to the OpenStack SDK connection via
+        ``search_users(name_or_id, filters, domain_id)``.
+
+        :param kwargs: Attribute filters used to locate the user, e.g.
+            ``name='myuser'``, ``domain_id='<uuid>'``. All keyword arguments
+            are forwarded to the underlying SDK call.
+        :returns: A single ``User`` resource object whose attributes match
+            all supplied filters.
+        :raises ceilometer.exceptions.NotFound: if no user matches the
+            filters.
+        :raises ceilometer.exceptions.NoUniqueMatch: if more than one user
+            matches the filters.
+        """
+        filters = dict(**kwargs)
+        name_or_id = filters.pop('id', None)
+        if name_or_id is None:
+            name_or_id = filters.pop('name', None)
+        domain_id = filters.pop('domain_id', None)
+        users = self._connection.search_users(
+            name_or_id=name_or_id,
+            filters=filters or None,
+            domain_id=domain_id)
+
+        if len(users) > 1:
+            raise ceilo_exc.NoUniqueMatch("ClientException")
+        if len(users) == 0:
+            raise ceilo_exc.NotFound(
+                "No matching resources found",
+                f"No User matching {dict(**kwargs)}.")
+        return User.from_openstacksdk(users[0])
 
     def find_domain(self, **kwargs):
         """Find a single domain matching the given attribute filters.

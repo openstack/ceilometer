@@ -815,6 +815,34 @@ class TestKeystoneClientClientClass(base.BaseTestCase):
         result = self.client.list_projects(fakes.DOMAIN_DISABLED_ceilo)
         self.assertEqual([], result)
 
+    def test_find_user(self):
+        result = self.client.find_user(name='admin')
+        self.assertIsInstance(result, keystone_client.User)
+        self.assertEqual(fakes.USER_ADMIN_ceilo, result)
+
+    def test_find_user_by_id(self):
+        result = self.client.find_user(id=fakes.USER_ADMIN_ceilo.id)
+        self.assertEqual(fakes.USER_ADMIN_ceilo, result)
+
+    def test_find_user_by_domain_id(self):
+        result = self.client.find_user(
+            name='demo', domain_id=fakes.DOMAIN_HEAT_ceilo.id)
+        self.assertEqual(fakes.USER_DEMO_ceilo, result)
+
+    def test_find_user_not_found(self):
+        exc = self.assertRaises(
+            ceilo_exc.NotFound, self.client.find_user, name='nonexistent')
+        self.assertEqual("No User matching {'name': 'nonexistent'}.",
+                         exc.details)
+
+    def test_find_user_no_unique_match(self):
+        self.setup_connection(users=[fakes.USER_ADMIN_sdk,
+                                     fakes.USER_ADMIN_sdk])
+        client = keystone_client.Client(session=mock.Mock())
+
+        self.assertRaises(
+            ceilo_exc.NoUniqueMatch, client.find_user, name='admin')
+
     def test_find_domain(self):
         result = self.client.find_domain(name='Default')
         self.assertIsInstance(result, keystone_client.Domain)

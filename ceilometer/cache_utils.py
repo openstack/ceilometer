@@ -14,11 +14,11 @@
 # under the License.
 
 """Simple wrapper for oslo_cache."""
-from keystoneauth1 import exceptions as ka_exceptions
 from oslo_cache import core as cache
 from oslo_cache import exception
 from oslo_log import log
 
+from ceilometer import exceptions as ceilo_exc
 from ceilometer import keystone_client
 
 # Default cache expiration period
@@ -31,6 +31,17 @@ class CacheClient:
     def __init__(self, region, conf):
         self.region = region
         self.conf = conf
+        self._keystone = None
+
+    @property
+    def keystone(self):
+        # Build the keystone client lazily and reuse it for every lookup:
+        # creating an openstacksdk Connection per lookup is expensive and,
+        # with some openstacksdk releases, those connections are never
+        # released, leaking memory and file descriptors.
+        if self._keystone is None:
+            self._keystone = keystone_client.get_client(self.conf)
+        return self._keystone
 
     def get(self, key):
         value = self.region.get(key)
@@ -45,25 +56,31 @@ class CacheClient:
         return self.region.delete(key)
 
     def resolve_uuid_from_cache(self, attr, uuid):
-        resource_name = self.get(uuid)
+        # Keystone IDs are only unique per resource type, so a project and
+        # a user can share the same ID. Include the type in the cache key.
+        key = f'{attr}:{uuid}'
+        resource_name = self.get(key)
         if resource_name:
             return resource_name
         else:
             # Retrieve project and user names from Keystone only
             # if ceilometer doesn't have a caching backend
             resource_name = self._resolve_uuid_from_keystone(attr, uuid)
-            self.set(uuid, resource_name)
+            if resource_name:
+                self.set(key, resource_name)
             return resource_name
 
     def _resolve_uuid_from_keystone(self, attr, uuid):
+        client = self.keystone
         try:
-            return getattr(
-                keystone_client.get_client(self.conf), attr
-            ).get(uuid).name
-        except AttributeError as e:
-            LOG.warning("Found '%s' while resolving uuid %s to name", e, uuid)
-        except ka_exceptions.NotFound as e:
-            LOG.warning(e.message)
+            if attr == 'projects':
+                return client.find_project(id=uuid).name
+            if attr == 'users':
+                return client.find_user(id=uuid).name
+            LOG.warning("Unknown resource type '%s' while resolving uuid %s",
+                        attr, uuid)
+        except ceilo_exc.NotFound as e:
+            LOG.warning(e.details)
 
 
 def get_client(conf):

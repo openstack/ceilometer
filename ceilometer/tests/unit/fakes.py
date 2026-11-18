@@ -23,6 +23,7 @@ from openstack.dns.v2 import recordset
 from openstack.dns.v2 import zone
 from openstack.identity.v3 import domain as sdk_domain
 from openstack.identity.v3 import project as sdk_project
+from openstack.identity.v3 import user as sdk_user
 from openstack.load_balancer.v2 import load_balancer as sdk_load_balancer
 from openstack.network.v2 import firewall_group as sdk_firewall_group
 from openstack.network.v2 import firewall_policy as sdk_firewall_policy
@@ -92,6 +93,20 @@ PROJECT_DISABLED_sdk = sdk_project.Project(
     parent_id='default', domain_id='default',
     is_domain=False, is_enabled=False)
 
+USER_ADMIN_ceilo = keystone_client.User(
+    id='admin-user', name='admin', domain_id='default', is_enabled=True)
+USER_ADMIN_sdk = sdk_user.User(
+    connection=None,
+    id='admin-user', name='admin', domain_id='default', is_enabled=True)
+
+USER_DEMO_ceilo = keystone_client.User(
+    id='demo-user', name='demo',
+    domain_id='2f42ab40b7ad4140815ef830d816a16c', is_enabled=True)
+USER_DEMO_sdk = sdk_user.User(
+    connection=None,
+    id='demo-user', name='demo',
+    domain_id='2f42ab40b7ad4140815ef830d816a16c', is_enabled=True)
+
 
 # These are the default set of keystone resources that are used to populate
 # FakeKeyStoneClient and FakeConnection if no project or domain parameters
@@ -105,6 +120,8 @@ DEFAULT_PROJECTS_sdk = [
 
 DEFAULT_DOMAINS_ceilo = [DOMAIN_HEAT_ceilo, DOMAIN_DEFAULT_ceilo]
 DEFAULT_DOMAINS_sdk = [DOMAIN_HEAT_sdk, DOMAIN_DEFAULT_sdk]
+
+DEFAULT_USERS_sdk = [USER_ADMIN_sdk, USER_DEMO_sdk]
 
 
 #####################
@@ -637,14 +654,16 @@ class FakeSDKImageClient:
 class FakeConnection:
     """Fake connection object for testing."""
 
-    def __init__(self, session=None, domains=None, projects=None, zones=None,
-                 recordsets=None, shares=None, load_balancers=None,
+    def __init__(self, session=None, domains=None, projects=None, users=None,
+                 zones=None, recordsets=None, shares=None, load_balancers=None,
                  volumes=None, snapshots=None, backups=None, pools=None,
                  services=None, images=None):
         """Initialize FakeConnection.
 
         :param projects: Optional list of SDK Project objects. Defaults to the
             class-level SDK_PROJECT_* fixtures.
+        :param users: Optional list of SDK User objects. Defaults to
+            DEFAULT_USERS_sdk.
         :param domains: Optional list of SDK Domain objects. Defaults to the
             class-level DOMAIN_* fixtures.
         :param zones: Optional list of SDK Zone objects. Passed to
@@ -682,6 +701,7 @@ class FakeConnection:
         self._domains = domains if domains is not None else DEFAULT_DOMAINS_sdk
         self._projects = (
             projects if projects is not None else DEFAULT_PROJECTS_sdk)
+        self._users = users if users is not None else DEFAULT_USERS_sdk
 
         self.block_storage = FakeSDKCinderClient(
             volumes=volumes,
@@ -746,6 +766,24 @@ class FakeConnection:
             result = [p for p in result
                       if p.name == name_or_id or p.id == name_or_id]
 
+        return result
+
+    def search_users(self, name_or_id=None, filters=None, domain_id=None):
+        """Search users.
+
+        emulates openstacksdk/cloud/_identity.py:search_users
+        """
+        result = list(self._users)
+        if domain_id:
+            result = [u for u in result if u.domain_id == domain_id]
+        if name_or_id:
+            result = [u for u in result
+                      if u.name == name_or_id or u.id == name_or_id]
+        if filters:
+            for key, value in filters.items():
+                result = [u for u in result
+                          if getattr(u, key,
+                                     getattr(u, 'is_' + key, None)) == value]
         return result
 
     def search_domains(self, name_or_id=None, filters=None):
