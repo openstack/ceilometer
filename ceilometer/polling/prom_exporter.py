@@ -103,21 +103,16 @@ def _gen_labels(sample):
         labels['keys'].append("counter")
         labels['values'].append(sample['counter_name'])
 
-    if sample.get('project_id'):
-        labels['keys'].append("project")
-        labels['values'].append(sample['project_id'])
-
-    if sample.get('project_name'):
-        labels['keys'].append("project_name")
-        labels['values'].append(sample['project_name'])
-
-    if sample.get('user_id'):
-        labels['keys'].append("user")
-        labels['values'].append(sample['user_id'])
-
-    if sample.get('user_name'):
-        labels['keys'].append("user_name")
-        labels['values'].append(sample['user_name'])
+    identity_labels = (('project_id', 'project'),
+                       ('project_name', 'project_name'),
+                       ('domain_id', 'domain'),
+                       ('domain_name', 'domain_name'),
+                       ('user_id', 'user'),
+                       ('user_name', 'user_name'))
+    for field, label in identity_labels:
+        if sample.get(field):
+            labels['keys'].append(label)
+            labels['values'].append(sample[field])
 
     if sample.get('counter_unit'):
         labels['keys'].append("unit")

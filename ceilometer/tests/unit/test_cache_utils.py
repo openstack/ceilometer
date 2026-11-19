@@ -142,6 +142,44 @@ class TestResolveUuidFromKeystone(base.BaseTestCase):
 
         self.assertEqual(1, self.fake_conn.search_projects.call_count)
 
+    def test_resolve_project_domain_id(self):
+        self.assertEqual(
+            fakes.PROJECT_DEMO_ceilo.domain_id,
+            self.cache_client.resolve_project_domain_id(
+                fakes.PROJECT_DEMO_ceilo.id))
+
+    def test_resolve_domain_name(self):
+        self.assertEqual(
+            fakes.DOMAIN_HEAT_ceilo.name,
+            self.cache_client.resolve_uuid_from_cache(
+                'domains', fakes.DOMAIN_HEAT_ceilo.id))
+
+    def test_keystone_client_is_reused_for_domain_lookups(self):
+        project = fakes.PROJECT_DEMO_ceilo
+        domain_id = self.cache_client.resolve_project_domain_id(project.id)
+        self.cache_client.resolve_uuid_from_cache('domains', domain_id)
+        self.cache_client.resolve_project_domain_id('nonexistent-project')
+
+        self.assertEqual(1, self.fake_conn_class_mock.call_count)
+
+    def test_resolve_project_domain_id_not_found(self):
+        with self.assertLogs('ceilometer.cache_utils', level='WARNING'):
+            self.assertIsNone(
+                self.cache_client.resolve_project_domain_id(
+                    'nonexistent-project'))
+
+    def test_project_domain_id_does_not_replace_project_name(self):
+        project = fakes.PROJECT_DEMO_ceilo
+        self.cache_client.resolve_project_domain_id(project.id)
+
+        self.assertEqual(
+            project.name,
+            self.cache_client.resolve_uuid_from_cache('projects', project.id))
+        self.assertEqual(
+            project.domain_id,
+            self.cache_client.resolve_project_domain_id(project.id))
+        self.assertEqual(2, self.fake_conn.search_projects.call_count)
+
     def test_not_found_is_not_cached(self):
         self.cache_client.resolve_uuid_from_cache(
             'projects', 'nonexistent-project')

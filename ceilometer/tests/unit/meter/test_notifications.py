@@ -640,10 +640,15 @@ class TestMeterProcessing(test.BaseTestCase):
         self.assertEqual(0, len(c))
 
     @mock.patch(
+        'ceilometer.cache_utils.CacheClient.resolve_project_domain_id'
+    )
+    @mock.patch(
         'ceilometer.cache_utils.CacheClient._resolve_uuid_from_keystone'
     )
-    def test_multi_meter_payload_all_multi(self, resolved_uuid):
+    def test_multi_meter_payload_all_multi(self, resolved_uuid,
+                                           resolved_domain_id):
         resolved_uuid.return_value = "fake-name"
+        resolved_domain_id.return_value = "fake-domain-id"
         cfg = yaml.dump(
             {'metric': [dict(name="$.payload.[*].counter_name",
                         event_type="full.sample",
@@ -670,6 +675,8 @@ class TestMeterProcessing(test.BaseTestCase):
             self.assertEqual(msg[idx]['user_id'], s1['user_id'])
             self.assertEqual(msg[idx]['project_name'], s1['project_name'])
             self.assertEqual(msg[idx]['user_name'], s1['user_name'])
+            self.assertEqual('fake-domain-id', s1['domain_id'])
+            self.assertEqual('fake-name', s1['domain_name'])
 
     @mock.patch('ceilometer.meter.notifications.LOG')
     def test_multi_meter_payload_invalid_missing(self, LOG):

@@ -86,6 +86,25 @@ class TestSample(base.BaseTestCase):
         msg['payload']['host'] = msg['publisher_id']
         self.assertEqual(msg['payload'], s.resource_metadata)
 
+    def test_sample_from_notifications_identity_names(self):
+        msg = {
+            'event_type': 'sample.create',
+            'metadata': {
+                'timestamp': '2015-06-19T09:19:35.786893',
+                'message_id': '939823de-c242-45a2-a399-083f4d6a8c3e'},
+            'payload': {'counter_name': 'instance100'},
+            'priority': 'info',
+            'publisher_id': 'ceilometer.api',
+        }
+        s = sample.Sample.from_notification(
+            'sample', sample.TYPE_GAUGE, 1.0, '%', 'user', 'project',
+            'res', msg, user_name='user-name', project_name='project-name',
+            domain_id='domain', domain_name='domain-name')
+        self.assertEqual('user-name', s.user_name)
+        self.assertEqual('project-name', s.project_name)
+        self.assertEqual('domain', s.domain_id)
+        self.assertEqual('domain-name', s.domain_name)
+
     def test_sample_from_notifications_assume_utc(self):
         msg = {
             'event_type': 'sample.create',

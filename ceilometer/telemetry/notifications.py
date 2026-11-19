@@ -38,9 +38,12 @@ class TelemetryIpc(endpoint.SampleEndpoint):
                 source=sample_dict['source'],
                 id=sample_dict['message_id'],
 
-                # Project name and username might not be set, depending on the
-                # configuration `identity_name_discovery`. Therefore, we cannot
-                # assume that they exist in the sample dictionary.
+                # Project name, username and domain might not be set,
+                # depending on the configuration `identity_name_discovery`.
+                # Therefore, we cannot assume that they exist in the sample
+                # dictionary.
                 user_name=sample_dict.get('user_name'),
-                project_name=sample_dict.get('project_name')
+                project_name=sample_dict.get('project_name'),
+                domain_id=sample_dict.get('domain_id'),
+                domain_name=sample_dict.get('domain_name')
             )

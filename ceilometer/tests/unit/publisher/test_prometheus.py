@@ -40,6 +40,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
             volume=1,
             user_id='test',
             project_id='test',
+            domain_id='test',
             resource_id=resource_id,
             timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
@@ -51,6 +52,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
             volume=3,
             user_id='test',
             project_id='test',
+            domain_id='test',
             resource_id=resource_id,
             timestamp=timeutils.utcnow().isoformat(),
             resource_metadata={'name': 'TestPublish'},
@@ -62,6 +64,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
             volume=5,
             user_id='test',
             project_id='test',
+            domain_id='test',
             resource_id=resource_id,
             timestamp=datetime.datetime.now().isoformat(),
             resource_metadata={'name': 'TestPublish'},
@@ -73,6 +76,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
             volume=7,
             user_id='test',
             project_id='test',
+            domain_id='test',
             resource_id=resource_id,
             timestamp=datetime.datetime.now().isoformat(),
             resource_metadata={'name': 'TestPublish'},
@@ -82,6 +86,17 @@ class TestPrometheusPublisher(base.BaseTestCase):
     def setUp(self):
         super().setUp()
         self.CONF = service.prepare_service([], [])
+
+    def _expected_data(self):
+        labels = ('resource_id="%s", user_id="test", project_id="test", '
+                  'domain_id="test"' % self.resource_id)
+        return ('# TYPE alpha counter\n'
+                'alpha{%(labels)s} 1\n'
+                'beta{%(labels)s} 3\n'
+                '# TYPE gamma gauge\n'
+                'gamma{%(labels)s} 5\n'
+                '# TYPE delta_epsilon gauge\n'
+                'delta_epsilon{%(labels)s} 7\n' % {'labels': labels})
 
     def test_post_samples(self):
         """Test publisher post."""
@@ -95,15 +110,7 @@ class TestPrometheusPublisher(base.BaseTestCase):
                                return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
-        data = """# TYPE alpha counter
-alpha{{resource_id="{}", user_id="test", project_id="test"}} 1
-beta{{resource_id="{}", user_id="test", project_id="test"}} 3
-# TYPE gamma gauge
-gamma{{resource_id="{}", user_id="test", project_id="test"}} 5
-# TYPE delta_epsilon gauge
-delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
-""".format(self.resource_id, self.resource_id, self.resource_id,
-           self.resource_id)
+        data = self._expected_data()
 
         rid_q = urlparse.quote(self.resource_id, safe='')
         expected = [
@@ -131,15 +138,7 @@ delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
                                return_value=res) as m_req:
             publisher.publish_samples(self.sample_data)
 
-        data = """# TYPE alpha counter
-alpha{{resource_id="{}", user_id="test", project_id="test"}} 1
-beta{{resource_id="{}", user_id="test", project_id="test"}} 3
-# TYPE gamma gauge
-gamma{{resource_id="{}", user_id="test", project_id="test"}} 5
-# TYPE delta_epsilon gauge
-delta_epsilon{{resource_id="{}", user_id="test", project_id="test"}} 7
-""".format(self.resource_id, self.resource_id, self.resource_id,
-           self.resource_id)
+        data = self._expected_data()
 
         rid_q = urlparse.quote(self.resource_id, safe='')
         expected = [

@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    When ``[polling] identity_name_discovery`` is enabled, samples now include
+    the ``domain_id`` and ``domain_name`` of the project they belong to,
+    resolved from Keystone in the same way as ``project_name`` and
+    ``user_name``. The Prometheus exporter exposes them as the ``domain`` and
+    ``domain_name`` labels, and the Prometheus Pushgateway publisher adds a
+    ``domain_id`` label.
+upgrade:
+  - |
+    Metrics pushed by the Prometheus Pushgateway publisher now always carry a
+    ``domain_id`` label, and metrics from the Prometheus exporter carry
+    ``domain`` and ``domain_name`` labels when ``identity_name_discovery`` is
+    enabled. Queries, recording rules or dashboards that match the exact label
+    set of these series may need to be updated.

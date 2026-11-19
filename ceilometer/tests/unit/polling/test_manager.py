@@ -837,6 +837,28 @@ class TestPollingAgent(BaseAgent):
         polling_task.poll_and_notify()
         self.assertEqual(timestamp, polled_samples[0]['timestamp'])
 
+    def test_polling_samples_identity_name_discovery(self):
+        self.CONF.set_override('identity_name_discovery', True,
+                               group='polling')
+        self.setup_connection(projects=[fakes.PROJECT_DEMO_sdk])
+        test_data = default_test_data()
+        test_data.user_id = fakes.USER_DEMO_ceilo.id
+        test_data.project_id = fakes.PROJECT_DEMO_ceilo.id
+        self.useFixture(fixtures.MockPatchObject(
+            self.Pollster, 'test_data', test_data))
+
+        polled_samples = []
+        polling_task = list(self.mgr.setup_polling_tasks().values())[0]
+        polling_task._send_notification = mock.Mock(
+            side_effect=polled_samples.extend)
+        polling_task.poll_and_notify()
+
+        polled = polled_samples[0]
+        self.assertEqual('demo', polled['user_name'])
+        self.assertEqual('demo', polled['project_name'])
+        self.assertEqual(fakes.DOMAIN_HEAT_ceilo.id, polled['domain_id'])
+        self.assertEqual('heat', polled['domain_name'])
+
     def test_get_sample_resources(self):
         polling_tasks = self.mgr.setup_polling_tasks()
         self.mgr.interval_task(list(polling_tasks.values())[0])

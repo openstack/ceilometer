@@ -122,6 +122,8 @@ def meter_message_from_counter(sample, secret, publisher_id=None):
            'user_name': sample.user_name,
            'project_id': sample.project_id,
            'project_name': sample.project_name,
+           'domain_id': sample.domain_id,
+           'domain_name': sample.domain_name,
            'resource_id': sample.resource_id,
            'timestamp': sample.timestamp,
            'resource_metadata': sample.resource_metadata,

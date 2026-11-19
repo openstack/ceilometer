@@ -405,6 +405,15 @@ class PollingTask:
                                 "projects",
                                 sample.project_id
                             )
+                        sample.domain_id = \
+                            self._cache.resolve_project_domain_id(
+                                sample.project_id)
+                        if sample.domain_id:
+                            sample.domain_name = \
+                                self._cache.resolve_uuid_from_cache(
+                                    "domains",
+                                    sample.domain_id
+                                )
 
                     # Try to resolve user UUIDs from cache first,
                     # and then keystone

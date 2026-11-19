@@ -14,6 +14,7 @@
 # under the License.
 """Tests for ceilometer/polling/prom_exporter.py"""
 
+import copy
 import ssl
 from unittest import mock
 from unittest.mock import call
@@ -642,6 +643,23 @@ class TestPromExporter(base.BaseTestCase):
                               'cirros2', 'server_group123']
         label3 = prom_exporter._gen_labels(self.test_image_size[0])
         self.assertDictEqual(label3, slabels3)
+
+    def test_gen_labels_identity_names(self):
+        sample = copy.deepcopy(self.test_image_size[0])
+        sample['project_name'] = 'admin'
+        sample['domain_id'] = 'default'
+        sample['domain_name'] = 'Default'
+
+        labels = prom_exporter._gen_labels(sample)
+
+        self.assertEqual(
+            ['image', 'publisher', 'type', 'counter', 'project',
+             'project_name', 'domain', 'domain_name', 'unit', 'resource',
+             'resource_name', 'server_group'],
+            labels['keys'])
+        self.assertEqual('admin', labels['values'][5])
+        self.assertEqual('default', labels['values'][6])
+        self.assertEqual('Default', labels['values'][7])
 
     @mock.patch.object(prom_exporter.CEILOMETER_REGISTRY, 'unregister')
     def test_purge_stale_metrics_existing_metric(self, mock_unregister):

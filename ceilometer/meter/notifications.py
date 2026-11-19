@@ -172,8 +172,8 @@ class MeterDefinition:
                           for idx, value in enumerate(values)}
 
                 if self._name_discovery and self._cache:
-                    # populate user_name and project_name fields in the sample
-                    # created from notifications
+                    # populate user_name, project_name and the project domain
+                    # fields in the sample created from notifications
                     if sample['user_id']:
                         sample['user_name'] = \
                             self._cache.resolve_uuid_from_cache(
@@ -182,6 +182,13 @@ class MeterDefinition:
                         sample['project_name'] = \
                             self._cache.resolve_uuid_from_cache(
                                 'projects', sample['project_id'])
+                        sample['domain_id'] = \
+                            self._cache.resolve_project_domain_id(
+                                sample['project_id'])
+                        if sample['domain_id']:
+                            sample['domain_name'] = \
+                                self._cache.resolve_uuid_from_cache(
+                                    'domains', sample['domain_id'])
                 yield sample
         else:
             yield sample

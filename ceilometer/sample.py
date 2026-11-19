@@ -95,7 +95,8 @@ class Sample:
     def __init__(self, name, type, unit, volume, user_id, project_id,
                  resource_id, timestamp=None, resource_metadata=None,
                  source=None, id=None, monotonic_time=None,
-                 user_name=None, project_name=None):
+                 user_name=None, project_name=None,
+                 domain_id=None, domain_name=None):
         if type not in TYPES:
             raise ValueError('Unsupported type: %s')
 
@@ -107,6 +108,8 @@ class Sample:
         self.user_name = user_name
         self.project_id = project_id
         self.project_name = project_name
+        self.domain_id = domain_id
+        self.domain_name = domain_name
         self.resource_id = resource_id
         self.timestamp = timestamp
         self.resource_metadata = resource_metadata or {}
@@ -125,7 +128,8 @@ class Sample:
     def from_notification(cls, name, type, volume, unit,
                           user_id, project_id, resource_id,
                           message, timestamp=None, metadata=None, source=None,
-                          user_name=None, project_name=None):
+                          user_name=None, project_name=None,
+                          domain_id=None, domain_name=None):
         if not metadata:
             metadata = (copy.copy(message['payload'])
                         if isinstance(message['payload'], dict) else {})
@@ -144,7 +148,9 @@ class Sample:
                    resource_metadata=metadata,
                    source=source,
                    user_name=user_name,
-                   project_name=project_name)
+                   project_name=project_name,
+                   domain_id=domain_id,
+                   domain_name=domain_name)
 
     def set_timestamp(self, timestamp):
         self.timestamp = timestamp

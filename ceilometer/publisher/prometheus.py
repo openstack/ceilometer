@@ -75,9 +75,10 @@ class PrometheusPublisher(http.HttpPublisher):
         if metric_type and curated_sname not in doc_done:
             lines.append(f"# TYPE {curated_sname} {metric_type}\n")
             doc_done.add(curated_sname)
-        lines.append('%s{resource_id="%s", user_id="%s", project_id="%s"}'
-                     ' %s\n' % (curated_sname, s.resource_id, s.user_id,
-                                s.project_id, s.volume))
+        lines.append('%s{resource_id="%s", user_id="%s", project_id="%s", '
+                     'domain_id="%s"} %s\n' %
+                     (curated_sname, s.resource_id, s.user_id,
+                      s.project_id, s.domain_id, s.volume))
         return "".join(lines)
 
     def publish_samples(self, samples):

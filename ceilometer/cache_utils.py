@@ -70,6 +70,21 @@ class CacheClient:
                 self.set(key, resource_name)
             return resource_name
 
+    def resolve_project_domain_id(self, project_id):
+        # Project names are cached under 'projects:<id>', so use a
+        # different key for the project's domain ID
+        key = f'project_domain_id:{project_id}'
+        domain_id = self.get(key)
+        if domain_id:
+            return domain_id
+        try:
+            domain_id = self.keystone.find_project(id=project_id).domain_id
+        except ceilo_exc.NotFound as e:
+            LOG.warning(e.details)
+            return None
+        self.set(key, domain_id)
+        return domain_id
+
     def _resolve_uuid_from_keystone(self, attr, uuid):
         client = self.keystone
         try:
@@ -77,6 +92,8 @@ class CacheClient:
                 return client.find_project(id=uuid).name
             if attr == 'users':
                 return client.find_user(id=uuid).name
+            if attr == 'domains':
+                return client.find_domain(id=uuid).name
             LOG.warning("Unknown resource type '%s' while resolving uuid %s",
                         attr, uuid)
         except ceilo_exc.NotFound as e:
